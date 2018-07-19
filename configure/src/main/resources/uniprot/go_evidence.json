@@ -1,0 +1,127 @@
+[
+	{
+		"groupName": "Any",
+		"items": [
+			{
+				"name": "Any assertion method",
+				"code": "any"
+			},
+			{
+				"name": "Any manual assertion",
+				"code": "manual"
+			},
+			{
+				"name": "Any automatic assertion",
+				"code": "automatic"
+			},
+			{
+				"name": "Any experimental assertion",
+				"code": "experimental"
+			}
+		]
+	},
+	{
+		"groupName": "Manual experimental assertions",
+		"items": [
+			{
+				"name": "Inferred from experiment [EXP]",
+				"code": "EXP"
+			},
+			{
+				"name": "Inferred from direct assay [IDA]",
+				"code": "IDA"
+			},
+			{
+				"name": "Inferred from physical interaction [IPI]",
+				"code": "IPI"
+			},
+			{
+				"name": "Inferred from mutant phenotype [IMP]",
+				"code": "IMP"
+			},
+			{
+				"name": "Inferred from genetic interaction [IGI]",
+				"code": "IGI"
+			},
+			{
+				"name": "Inferred from expression pattern [IEP]",
+				"code": "IEP"
+			}
+		]
+	},
+	{
+		"groupName": "Munual high-throughput assertions",
+		"items": [
+			{
+				"name": "Inferred from high throughput direct assay [HDA]",
+				"code": "HDA"
+			},
+			{
+				"name": "Inferred from high throughput mutant phenotype [HMP]",
+				"code": "HMP"
+			},
+			{
+				"name": "Inferred from high throughput genetic interaction [HGI]",
+				"code": "HGI"
+			},
+			{
+				"name": "Interred from high throughput expression pattern [HEP]",
+				"code": "HEP"
+			},
+			{
+				"name": "Inferred from high throughput experiment [HTP]",
+				"code": "HTP"
+			}
+		]
+	},
+	{
+		"groupName": "Other manual assertions",
+		"items": [
+			{
+				"name": "Inferred from biological aspect of ancestor [IBA]",
+				"code": "IBA"
+			},
+			{
+				"name": "Inferred by curator [IC]",
+				"code": "IC"
+			},
+			{
+				"name": "Inferred from genomic context [IGC]",
+				"code": "IGC"
+			},
+			{
+				"name": "Inferred from sequence alignment [ISA]",
+				"code": "ISA"
+			},
+			{
+				"name": "Inferred from sequence mode [ISM]",
+				"code": "ISM"
+			},
+			{
+				"name": "Inferred from sequence orthology [ISO]",
+				"code": "ISO"
+			},
+			{
+				"name": "Inferred from sequence or structural similarity [ISS]",
+				"code": "ISS"
+			},
+			{
+				"name": "Non-traceable author statement [NAS]",
+				"code": "NAS"
+			},
+			{
+				"name": "Traceable author statement [TAS]",
+				"code": "TAS"
+			}
+		]
+	},
+	{
+		"groupName": "Other manual assertions",
+		"items": [
+			{
+				"name": "Inferred from electronic annotation [IEA]",
+				"code": "IEA"
+			}
+		]
+	}
+]

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>build</artifactId>
+    <groupId>uk.ac.ebi.uniprot</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Builds the UniProt BackEnd</name>
+    <description>Aggregator pom configured to build certain parts, or all of the  UniProt BackEnd project</description>
+
+      <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        
+        <module>dconfigure</module>
+    </modules>
+
+   
+</project>

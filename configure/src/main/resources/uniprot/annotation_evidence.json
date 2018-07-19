@@ -1,0 +1,77 @@
+[
+	{
+		"groupName": "Any",
+		"items": [
+			{
+				"name": "Any assertion method",
+				"code": "any"
+			},
+			{
+				"name": "Any manual assertion",
+				"code": "manual"
+			},
+			{
+				"name": "Any automatic assertion",
+				"code": "automatic"
+			},
+			{
+				"name": "Any experimental assertion",
+				"code": "experimental"
+			}
+		]
+	},
+	{
+		"groupName": "Manual assertions",
+		"items": [
+			{
+				"name": "Experimental",
+				"code": "ECO_0000269"
+			},
+			{
+				"name": "Non-traceable author statement",
+				"code": "ECO_0000303"
+			},
+			{
+				"name": "Curator inference",
+				"code": "ECO_0000305"
+			},
+			{
+				"name": "Sequence similarity",
+				"code": "ECO_0000250"
+			},
+			{
+				"name": "Sequence model",
+				"code": "ECO_0000255"
+			},
+			{
+				"name": "Combinatorial",
+				"code": "ECO_0000244"
+			},
+			{
+				"name": "Imported information",
+				"code": "ECO_0000312"
+			}
+		]
+	},
+	{
+		"groupName": "Automatic assertions",
+		"items": [
+			{
+				"name": "Sequence model",
+				"code": "ECO_0000256"
+			},
+			{
+				"name": "Combinatorial",
+				"code": "ECO_0000213"
+			},
+			{
+				"name": "Imported information",
+				"code": "ECO_0000313"
+			},
+			{
+				"name": "Sequence motif match (InterPro)",
+				"code": "ECO_0000259"
+			}
+		]
+	}
+]

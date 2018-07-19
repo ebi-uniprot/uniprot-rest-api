@@ -1,0 +1,108 @@
+{
+	"searchItems": [
+	{
+			"label": "UniProtKB AC",
+			"itemType": "single",
+			"term": "accession",
+			"dataType": "string",
+			"description": "Search by UniProtKB Accession",
+			"example": "P12345"
+		},
+		{
+			"label": "EntryName (ID)",
+			"term": "id",
+			"dataType": "string",
+			"description": "Search by UniProtKB entry name",
+			"example": "P53_HUMAN"
+		},		
+		{
+			"label": "Organism (OS)",
+			"term": "organism",
+			"dataType": "string",
+			"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?",
+			"description": "Search by Organism name",
+			"example": "saccharomyces"
+		},
+		
+		{
+			"label": "Protein Existence [PE]",
+			"term": "protein_existence",
+			"dataType": "enum",
+			"description": "Search by protein existence",
+			"values": [
+				{
+					"name": "Evidence at protein level",
+					"value": "1"
+				},
+				{
+					"name": "Evidence at transcript level",
+					"value": "2"
+				},
+				{
+					"name": "Inferred from homology",
+					"value": "3"
+				},
+				{
+					"name": "Predicted",
+					"value": "4"
+				},
+				{
+					"name": "Uncertain",
+					"value": "5"
+				}
+			],
+			"example": "1"
+		},
+	
+		{
+			"label": "Function",
+			"itemType": "group",
+			"term": "",
+			"items": [
+				{
+					"label": "Enzyme EC",
+					"term": "ec",
+					"dataType": "string",
+					"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?ec=?",
+					"description": "Search by Enzyme EC number",
+					"example": "1.1.2.3"
+				},
+				{
+					"label": "Cofactors",
+					"itemType": "group",
+					"items": [
+						{
+							"label": "ChEBI term",
+							"itemType": "comment",
+							"term": "cofactor_chebi",
+							"dataType": "string",
+							"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?chebi=?",
+							"hasEvidence": true,
+							"description": "Search by cofactor chebi ",
+							"example": "29105"
+						},
+						{
+							"label": "Note",
+							"itemType": "comment",
+							"term": "cofactor_note",
+							"dataType": "string",
+							"hasEvidence": true,
+							"description": "Search by cofactor note",
+							"example": "subunit"
+						}
+					]
+				},
+		
+				{
+					"label": "Function [CC]",
+					"itemType": "comment",
+					"term": "function",
+					"dataType": "string",
+					"hasEvidence": true,
+					"description": "Search by comment function",
+					"example": "\"some value\""
+				}
+			]
+		}
+	]
+}
