@@ -15,19 +15,7 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
 
 
 public class SearchItemsTest {
-	@Test
-	public void testRead() {
-		String filename ="src/test/resources/test_search_term.json";
-		try {
-			UniProtSearchItems terms =UniProtSearchItems.readFromFile(filename);
-	//		System.out.println(terms);
-	//	assertEquals(8, terms.getCount());
-		
-		}catch(Exception e ) {
-			e.printStackTrace();
-			fail("test");
-		}
-	}
+
 	
 	@Test
 	public void testRead2() {

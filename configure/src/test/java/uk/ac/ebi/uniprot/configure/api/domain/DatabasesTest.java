@@ -14,6 +14,7 @@ class DatabasesTest {
 		Databases instance = Databases.INSTANCE;
 		assertFalse(instance.getDatabases().isEmpty());
 		instance.getDatabases().forEach(System.out::println);
+		
 	}
 
 }
