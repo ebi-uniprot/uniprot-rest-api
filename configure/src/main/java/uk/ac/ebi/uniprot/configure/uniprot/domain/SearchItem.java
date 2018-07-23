@@ -1,16 +1,17 @@
 package uk.ac.ebi.uniprot.configure.uniprot.domain;
 
 import java.util.List;
-import java.util.Map;
 
 public interface SearchItem {
-	String getItem();
-	String getItemType();
+	String getLabel();
+	SearchItemType getItemType();
 	String getTerm();
-	String getDataType();
+	SearchDataType getDataType();
 	String getDescription();
-	Map<String, String> getEnumValues();
+	List<Tuple> getValues();
 	List<SearchItem> getItems();
-	boolean isRange();
-	boolean hasEvidence();
+	Boolean isRange();
+	Boolean isHasEvidence();
+	String getAutoComplete();
+	String getExample();
 }

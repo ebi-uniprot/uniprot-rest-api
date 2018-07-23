@@ -9,28 +9,28 @@
 			"example": "P12345"
 		},
 		{
-			"label": "EntryName (ID)",
+			"label": "EntryName [ID]",
 			"term": "id",
 			"dataType": "string",
 			"description": "Search by UniProtKB entry name",
 			"example": "P53_HUMAN"
 		},
 		{
-			"label": "Protein Name (DE)",
+			"label": "Protein Name [DE]",
 			"term": "protein_name",
 			"dataType": "string",
 			"description": "Search by UniProtKB Protein name",
 			"example": "mas5"
 		},
 		{
-			"label": "Gene Name (GN)",
+			"label": "Gene Name [GN]",
 			"term": "gene",
 			"dataType": "string",
 			"description": "Search by UniProtKB gene name",
 			"example": "ydj1"
 		},
 		{
-			"label": "Organism (OS)",
+			"label": "Organism [OS]",
 			"term": "organism",
 			"dataType": "string",
 			"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?",
@@ -38,7 +38,7 @@
 			"example": "saccharomyces"
 		},
 		{
-			"label": "Taxonomy",
+			"label": "Taxonomy [OC]",
 			"term": "taxonomy",
 			"dataType": "string",
 			"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?",

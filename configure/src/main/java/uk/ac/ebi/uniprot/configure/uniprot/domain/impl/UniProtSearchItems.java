@@ -12,19 +12,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @XmlRootElement(name = "searchItems")
 public class UniProtSearchItems {
 	private List<UniProtSearchItem> searchItems =new ArrayList<>();
-	
-	
-	
+	private UniProtSearchItems() {
+		
+	}
 	public List<UniProtSearchItem> getSearchItems() {
 		return searchItems;
 	}
-
-	public int getCount() {
-		return searchItems.stream().mapToInt(val ->val.getCount()).sum();
-
-	}
-
-
 	public void setSearchItems(List<UniProtSearchItem> searchItems) {
 		this.searchItems = searchItems;
 	}
@@ -35,7 +28,7 @@ public class UniProtSearchItems {
 		.collect(Collectors.joining(",\n"));
 	}
 
-
+	
 	public static UniProtSearchItems readFromFile(String filename) throws Exception{
 		ObjectMapper m = new ObjectMapper();
 		UniProtSearchItems searchTerms =

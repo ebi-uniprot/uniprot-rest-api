@@ -7,23 +7,25 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
 
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UniProtSearchItem {
+public class UniProtSearchItem implements SearchItem {
 
 	private String label;
 	private SearchItemType itemType=SearchItemType.SINGLE;
 	private String term;
 	private SearchDataType dataType=SearchDataType.STRING;
 
-	private List<ValuePair> values = new ArrayList<>();
-	private List<UniProtSearchItem> items = new ArrayList<>(); 
-	private boolean isRange =false;
-	private boolean hasEvidence= false;
+	private List<Tuple> values ;
+	private List<SearchItem> items ; 
+	private Boolean isRange;
+	private Boolean hasEvidence;
 	private String autoComplete;
 	private String description;
 	private String example;
@@ -53,28 +55,30 @@ public class UniProtSearchItem {
 	public void setDataType(SearchDataType type) {
 		this.dataType = type;
 	}
-	public List<ValuePair> getValues() {
+	public List<Tuple> getValues() {
 		return values;
 	}
-	public void setValues(List<ValuePair> values) {
-		this.values = values;
+	public void setValues(List<TupleImpl> values) {
+		this.values =new ArrayList<>();
+		this.values.addAll(values);
 	}
-	public List<UniProtSearchItem> getItems() {
+	public List<SearchItem> getItems() {
 		return items;
 	}
 	public void setItems(List<UniProtSearchItem> items) {
-		this.items = items;
+		this.items =new ArrayList<>();
+		this.items.addAll(items);
 	}
-	public boolean isRange() {
+	public Boolean isRange() {
 		return isRange;
 	}
-	public void setRange(boolean isRange) {
+	public void setRange(Boolean isRange) {
 		this.isRange = isRange;
 	}
-	public boolean isHasEvidence() {
+	public Boolean isHasEvidence() {
 		return hasEvidence;
 	}
-	public void setHasEvidence(boolean hasEvidence) {
+	public void setHasEvidence(Boolean hasEvidence) {
 		this.hasEvidence = hasEvidence;
 	}
 	public String getDescription() {
@@ -100,12 +104,12 @@ public class UniProtSearchItem {
 	public void setAutoComplete(String autoComplete) {
 		this.autoComplete = autoComplete;
 	}
-	public int getCount() {
-		if(itemType==SearchItemType.GROUP) {
-			return items.stream().mapToInt(val->val.getCount()).sum();
-		}else
-			return 1;
-	}
+//	public int getCount() {
+//		if(itemType==SearchItemType.GROUP) {
+//			return items.stream().mapToInt(val->val.getCount()).sum();
+//		}else
+//			return 1;
+//	}
 	private boolean isNullOrEmpty(String val) {
 		return (val ==null)||( val.length()==0);
 	}
@@ -162,36 +166,5 @@ public class UniProtSearchItem {
 		sb.append("}");
 		return sb.toString();
 	}
-	public static class ValuePair{
-		private String name;
-		private String value;
-		public ValuePair() {
-			
-		}
-		public ValuePair(String name, String value) {
-			this.name = name;
-			this.value = value;
-		}
 
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-		@Override
-		public String toString() {
-			return name+":" +value;
-		}
-		
-	}
 }
