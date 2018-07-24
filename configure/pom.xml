@@ -4,83 +4,40 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>uk.ac.ebi.uniprot</groupId>
 	<artifactId>configure</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>configure</name>
 	<description>UniProt Rest API by spring boot</description>
-
+	
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.3.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+        <artifactId>ujdk-parent</artifactId>
+        <groupId>uk.ac.ebi.uniprot</groupId>
+        <version>1.0</version>
+        <relativePath>../../uniprot-ujdk-parent</relativePath>
+    </parent>
 
 	<properties>
+	<spring.boot.version>2.0.3.RELEASE</spring.boot.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<junit5.platform.version>1.2.0</junit5.platform.version>
-		<junit5.jupiter.version>5.2.0</junit5.jupiter.version>
 		<uniprot.core.version>2018.10-SNAPSHOT</uniprot.core.version>
-		<http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
 	</properties>
 	
-	<repositories>
 
-		<!-- put "dev" user credentials in ~/.m2/settings.xml to be able to read 
-			these repos -->
-		<repository>
-			<id>uniprot-artifactory-release</id>
-			<name>UniProt Artifactory for Releases</name>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<url>${http-uniprot-private-url}/release</url>
-		</repository>
-
-		<repository>
-			<id>uniprot-artifactory-snapshots</id>
-			<name>UniProt Artifactory for Snapshots</name>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<checksumPolicy>warn</checksumPolicy>
-			</snapshots>
-			<url>${http-uniprot-private-url}/snapshot</url>
-		</repository>
-
-		<repository>
-			<id>uniprot-artifactory-public-thirdparty</id>
-			<name>UniProt Artifactory Public Third-Party Libraries</name>
-			<releases>
-				<enabled>true</enabled>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<url>${http-uniprot-private-url}/public-thirdparty</url>
-		</repository>
-
-		<repository>
-			<id>uniprot-artifactory-private-thirdparty</id>
-			<name>UniProt Artifactory Private Third-Party Libraries</name>
-			<releases>
-				<enabled>true</enabled>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<url>${http-uniprot-private-url}/private-thirdparty</url>
-		</repository>
-
-	</repositories>
+	<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -100,32 +57,26 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>${junit5.jupiter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit5.jupiter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-params</artifactId>
-			<version>${junit5.jupiter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
-			<version>${junit5.jupiter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
-			<version>${junit5.platform.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-runner</artifactId>
-			<version>${junit5.platform.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -136,6 +87,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
 		</plugins>
 	</build>
 
