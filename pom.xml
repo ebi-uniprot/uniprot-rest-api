@@ -14,7 +14,8 @@
 
     <modules>
         
-        <module>configure</module>
+        <module>configure-rest-api</module>
+         <module>uniprotkb-rest-api</module>
     </modules>
 
    
