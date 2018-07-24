@@ -7,12 +7,14 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
 
 public class DatabaseGroupImpl implements DatabaseGroup {
-	private String groupName;
-	private List<Tuple> items ;
+	private final String groupName;
+	private final List<Tuple> items;
+
 	public DatabaseGroupImpl(String groupName, List<Tuple> items) {
 		this.groupName = groupName;
-		this.items =new ArrayList<>(items);
+		this.items = new ArrayList<>(items);
 	}
+
 	@Override
 	public String getGroupName() {
 		return groupName;
@@ -22,6 +24,7 @@ public class DatabaseGroupImpl implements DatabaseGroup {
 	public List<Tuple> getItems() {
 		return items;
 	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -29,6 +32,7 @@ public class DatabaseGroupImpl implements DatabaseGroup {
 		this.items.forEach(val -> sb.append("  ").append(val.toString()).append("\n"));
 		return sb.toString();
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -37,6 +41,7 @@ public class DatabaseGroupImpl implements DatabaseGroup {
 		result = prime * result + ((items == null) ? 0 : items.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -58,5 +63,5 @@ public class DatabaseGroupImpl implements DatabaseGroup {
 			return false;
 		return true;
 	}
-	
+
 }

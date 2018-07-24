@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.uniprot.configure.api.service.UniProtConfigureService;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 
 @RestController
 @RequestMapping("/configure")
@@ -21,7 +21,7 @@ public class UniProtConfigureController {
 	}
 
 	@GetMapping("/uniprot/search_terms")
-	public UniProtSearchItems getUniProtSearchTerms() {
+	public List<SearchItem> getUniProtSearchTerms() {
 		return service.getUniProtSearchItems();
 	}
 

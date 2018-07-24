@@ -1,49 +1,44 @@
 package uk.ac.ebi.uniprot.configure.uniprot.domain.impl;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-@XmlRootElement(name = "searchItems")
-public class UniProtSearchItems {
-	private List<UniProtSearchItem> searchItems =new ArrayList<>();
-	private UniProtSearchItems() {
-		
+
+import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItems;
+
+public enum UniProtSearchItems implements SearchItems {
+	INSTANCE;
+	private static final String FILENAME = "uniprot/uniprot_search.json";
+	private List<SearchItem> searchItems = new ArrayList<>();
+
+	UniProtSearchItems() {
+		init();
 	}
-	public List<UniProtSearchItem> getSearchItems() {
+
+	void init() {
+		final ObjectMapper objectMapper = new ObjectMapper();
+		try (InputStream is = AnnotationEvidences.class.getClassLoader().getResourceAsStream(FILENAME);) {
+			List<UniProtSearchItem> items = objectMapper.readValue(is, new TypeReference<List<UniProtSearchItem>>() {
+			});
+			this.searchItems.addAll(items);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	public List<SearchItem> getSearchItems() {
 		return searchItems;
-	}
-	public void setSearchItems(List<UniProtSearchItem> searchItems) {
-		this.searchItems = searchItems;
 	}
 
 	@Override
 	public String toString() {
-		return searchItems.stream().map(val ->val.toString())
-		.collect(Collectors.joining(",\n"));
+		return searchItems.stream().map(val -> val.toString()).collect(Collectors.joining(",\n"));
 	}
 
-	
-	public static UniProtSearchItems readFromFile(String filename) throws Exception{
-		ObjectMapper m = new ObjectMapper();
-		UniProtSearchItems searchTerms =
-				m.readValue(new File(filename), UniProtSearchItems.class);
-		
-	
-		return searchTerms;
-	}
-	
-	public static  List<UniProtSearchItem> readFromFile2(String filename) throws Exception{
-		ObjectMapper m = new ObjectMapper();
-		List<UniProtSearchItem> searchTerms =
-				m.readValue(new File(filename),  new TypeReference<List<UniProtSearchItem>>(){});
-		
-	
-		return searchTerms;
-	}
 }

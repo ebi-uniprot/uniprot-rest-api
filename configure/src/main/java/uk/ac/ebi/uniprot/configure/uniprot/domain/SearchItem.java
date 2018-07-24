@@ -10,7 +10,7 @@ public interface SearchItem {
 	String getDescription();
 	List<Tuple> getValues();
 	List<SearchItem> getItems();
-	Boolean isRange();
+	Boolean isHasRange();
 	Boolean isHasEvidence();
 	String getAutoComplete();
 	String getExample();

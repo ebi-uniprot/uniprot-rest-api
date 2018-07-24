@@ -2,13 +2,15 @@ package uk.ac.ebi.uniprot.configure.uniprot.domain.impl;
 
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
 
-public class TupleImpl implements Tuple{
-	
+public class TupleImpl implements Tuple {
+
 	private String name;
 	private String value;
+
 	public TupleImpl() {
-		
+
 	}
+
 	public TupleImpl(String name, String value) {
 		this.name = name;
 		this.value = value;
@@ -29,10 +31,12 @@ public class TupleImpl implements Tuple{
 	public void setValue(String value) {
 		this.value = value;
 	}
+
 	@Override
 	public String toString() {
-		return name+": " +value;
+		return name + ": " + value;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -41,6 +45,7 @@ public class TupleImpl implements Tuple{
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -62,5 +67,5 @@ public class TupleImpl implements Tuple{
 			return false;
 		return true;
 	}
-	
+
 }

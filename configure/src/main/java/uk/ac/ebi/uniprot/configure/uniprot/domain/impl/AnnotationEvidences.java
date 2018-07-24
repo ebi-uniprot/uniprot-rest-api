@@ -14,7 +14,7 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchEvidences;
 
 public enum AnnotationEvidences implements SearchEvidences {
 	INSTANCE;
-	private final String FILENAME ="uniprot/annotation_evidence.json";
+	private static final String FILENAME ="uniprot/annotation_evidence.json";
 	private  List< EvidenceGroup> evidences = new ArrayList<>();  
  
 	 AnnotationEvidences(){
@@ -22,15 +22,13 @@ public enum AnnotationEvidences implements SearchEvidences {
 		 }
 	
 	 void init() {
-			
-		 try {
-			 final ObjectMapper objectMapper = new ObjectMapper();
-			 InputStream is = AnnotationEvidences.class.getClassLoader()
-					 .getResourceAsStream(FILENAME);
+		 final ObjectMapper objectMapper = new ObjectMapper();
+		 try ( InputStream is = AnnotationEvidences.class.getClassLoader()
+				 .getResourceAsStream(FILENAME);){
 			 List< EvidenceGroupImpl> evidences = objectMapper.readValue(is,  new TypeReference<List<EvidenceGroupImpl>>(){});
 			 this.evidences.addAll(evidences);
 		 }catch(Exception e) {
-			 
+			 throw new RuntimeException (e);
 		 }
 		 
 	

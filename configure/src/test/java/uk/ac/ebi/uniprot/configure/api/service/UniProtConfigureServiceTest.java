@@ -1,14 +1,13 @@
 package uk.ac.ebi.uniprot.configure.api.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItem;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 
 class UniProtConfigureServiceTest {
 	private static UniProtConfigureService service;
@@ -18,25 +17,24 @@ class UniProtConfigureServiceTest {
 	}
 	@Test
 	void testGetUniProtSearchItems() {
-		UniProtSearchItems searchItems =service.getUniProtSearchItems();
-		List<UniProtSearchItem> items =searchItems.getSearchItems();
+		List<SearchItem> items =service.getUniProtSearchItems();
 		assertEquals(27, items.size());
 		
 	}
 
 	@Test
 	void testGetAnnotationEvidences() {
-		fail("Not yet implemented");
+		assertEquals(3, service.getAnnotationEvidences().size());
 	}
 
 	@Test
 	void testGetGoEvidences() {
-		fail("Not yet implemented");
+		assertEquals(5, service.getGoEvidences().size());
 	}
 
 	@Test
 	void testGetDatabases() {
-		fail("Not yet implemented");
+		assertEquals(18, service.getDatabases().size());
 	}
 
 }

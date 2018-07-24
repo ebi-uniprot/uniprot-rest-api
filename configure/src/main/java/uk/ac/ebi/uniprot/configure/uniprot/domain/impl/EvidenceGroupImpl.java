@@ -23,7 +23,7 @@ public class EvidenceGroupImpl implements EvidenceGroup {
 	}
 
 	public void setItems(List<EvidenceItemImpl> items) {
-		this.items =new ArrayList<> ();
+		this.items = new ArrayList<>();
 		this.items.addAll(items);
 	}
 
@@ -34,6 +34,7 @@ public class EvidenceGroupImpl implements EvidenceGroup {
 		this.items.forEach(val -> sb.append("  ").append(val.toString()).append("\n"));
 		return sb.toString();
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -84,10 +85,12 @@ public class EvidenceGroupImpl implements EvidenceGroup {
 		public void setCode(String code) {
 			this.code = code;
 		}
+
 		@Override
 		public String toString() {
-			return name+": " +code;
+			return name + ": " + code;
 		}
+
 		@Override
 		public int hashCode() {
 			final int prime = 31;
