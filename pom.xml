@@ -4,19 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>build</artifactId>
+    <artifactId>UniProt-REST-API</artifactId>
     <groupId>uk.ac.ebi.uniprot</groupId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Builds the UniProt BackEnd</name>
+    <name>Builds the UniProt REST API</name>
     <description>Aggregator pom configured to build certain parts, or all of the  UniProt BackEnd project</description>
-
-      <modelVersion>4.0.0</modelVersion>
 
     <modules>
         
-        <module>dconfigure</module>
+        <module>configure</module>
     </modules>
 
    
