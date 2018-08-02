@@ -9,14 +9,33 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Builds the UniProt REST API</name>
-    <description>Aggregator pom configured to build certain parts, or all of the  UniProt BackEnd project</description>
+    <name>Build the UniProt REST API</name>
+    <description>Aggregator pom configured to build certain parts, or all of the UniProt BackEnd project</description>
+
+    <properties>
+        <compiler.version>3.3</compiler.version>
+        <java.version>1.8</java.version>
+    </properties>
 
     <modules>
-        
         <module>configure-rest-api</module>
-         <module>uniprotkb-rest-api</module>
+        <module>uniprotkb-rest-api</module>
+        <module>suggester-rest</module>
     </modules>
 
-   
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${compiler.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
