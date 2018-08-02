@@ -21,6 +21,7 @@
         <module>configure-rest-api</module>
         <module>uniprotkb-rest-api</module>
         <module>suggester-rest</module>
+        <module>advanced-search-rest</module>
     </modules>
 
     <build>
