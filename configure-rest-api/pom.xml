@@ -4,19 +4,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>configure-rest-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
-
+    <groupId>uk.ac.ebi.uniprot</groupId>
+    <artifactId>configure-rest-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 	<name>configure-rest-api</name>
-	<description>UniProt Rest API by spring boot</description>
 
-	<parent>
-		<artifactId>ujdk-parent</artifactId>
-		<groupId>uk.ac.ebi.uniprot</groupId>
-		<version>1.0</version>
-		<relativePath>../../uniprot-ujdk-parent</relativePath>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+    </parent>
+    
+    <description>UniProt Rest API by spring boot</description>
 
 	<properties>
 		<spring.boot.version>2.0.3.RELEASE</spring.boot.version>
@@ -24,20 +24,8 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<uniprot.core.version>2018.10-SNAPSHOT</uniprot.core.version>
+        <http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
 	</properties>
-
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${spring.boot.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -73,10 +61,12 @@
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
+			<version>${junit-platform.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-runner</artifactId>
+			<version>${junit-platform.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -87,9 +77,82 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
 		</plugins>
 	</build>
 
+	<repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+        <repository>
+            <id>spring-libs-milestone</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+		<repository>
+			<id>uniprot-artifactory-release</id>
+			<name>UniProt Artifactory for Releases</name>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<url>${http-uniprot-private-url}/release</url>
+		</repository>
+		<repository>
+			<id>uniprot-artifactory-snapshots</id>
+			<name>UniProt Artifactory for Snapshots</name>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<url>${http-uniprot-private-url}/snapshot</url>
+		</repository>
+	</repositories>
 
+	<pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-libs-milestone</id>
+            <url>https://repo.spring.io/libs-milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+		<pluginRepository>
+			<id>uniprot-artifactory-snapshots</id>
+			<name>UniProt Artifactory for Snapshots</name>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<url>${http-uniprot-private-url}/snapshot</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>uniprot-artifactory-releases-plugin</id>
+			<name>UniProt Plugin Release Repository</name>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<url>${http-uniprot-private-url}/release</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>

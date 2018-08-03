@@ -67,9 +67,9 @@
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>data-service-common-document</artifactId>
             <version>2018.7-SNAPSHOT</version>
-            <!--TODO: Important: change it -->
-            <scope>system</scope>
-            <systemPath>${user.home}/.m2/repository/uk/ac/ebi/uniprot/data-service-common-document/2018.7-SNAPSHOT/data-service-common-document-2018.7-SNAPSHOT.jar</systemPath>
+            <!--&lt;!&ndash;TODO: Important: change it &ndash;&gt;-->
+            <!--<scope>system</scope>-->
+            <!--<systemPath>${user.home}/.m2/repository/uk/ac/ebi/uniprot/data-service-common-document/2018.7-SNAPSHOT/data-service-common-document-2018.7-SNAPSHOT.jar</systemPath>-->
         </dependency>
 
         <!-- Solr Data -->
@@ -296,7 +296,6 @@
         </plugins>
     </build>
 
-
     <repositories>
         <repository>
             <id>spring-releases</id>
@@ -311,6 +310,19 @@
             </snapshots>
         </repository>
         <repository>
+            <id>uniprot-artifactory-release</id>
+            <name>UniProt Artifactory for Releases</name>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>${http-uniprot-private-url}/release</url>
+        </repository>
+        <repository>
             <id>uniprot-artifactory-snapshots</id>
             <name>UniProt Artifactory for Snapshots</name>
             <releases>
@@ -321,7 +333,7 @@
                 <checksumPolicy>warn</checksumPolicy>
             </snapshots>
             <url>${http-uniprot-private-url}/snapshot</url>
-        </repository>
+        </repository>        
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -346,6 +358,16 @@
                 <checksumPolicy>warn</checksumPolicy>
             </snapshots>
             <url>${http-uniprot-private-url}/snapshot</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>uniprot-artifactory-releases-plugin</id>
+            <name>UniProt Plugin Release Repository</name>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <url>${http-uniprot-private-url}/release</url>
         </pluginRepository>
     </pluginRepositories>
 </project>
