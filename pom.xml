@@ -271,4 +271,38 @@
             <url>${http-uniprot-private-url}/release</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <!-- active when running on jenkins -->
+    <profile>
+        <id>jenkins</id>
+        <activation>
+            <!--<property> -->
+            <!--<name>HOSTNAME</name> -->
+            <!--<value>ves-ebi-c9.ebi.ac.uk</value> -->
+            <!--</property> -->
+            <!--<property> <name>USER</name> <value>uni_ci</value> </property> -->
+            <property>
+                <name>env.BUILD_NUMBER</name>
+            </property>
+        </activation>
+
+        <properties>
+            <http.proxyHost>hx-wwwcache.ebi.ac.uk</http.proxyHost>
+            <http.proxyPort>3128</http.proxyPort>
+        </properties>
+
+        <distributionManagement>
+            <repository>
+                <id>uniprot-artifactory-deploy-release</id>
+                <name>Deploy Uniprot Maven Release</name>
+                <url>${http-uniprot-private-url}/release</url>
+            </repository>
+            <snapshotRepository>
+                <uniqueVersion>false</uniqueVersion>
+                <id>uniprot-artifactory-deploy-snapshot</id>
+                <name>Deploy Uniprot Maven Snapshot</name>
+                <url>${http-uniprot-private-url}/snapshot</url>
+            </snapshotRepository>
+        </distributionManagement>
+    </profile>
 </project>
