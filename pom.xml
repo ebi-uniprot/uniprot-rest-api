@@ -16,7 +16,8 @@
     <packaging>pom</packaging>
 
     <name>Build the UniProt REST API</name>
-    <description>Parent and aggregator pom configured to build certain parts, or all of the UniProt Backend project</description>
+    <description>Parent and aggregator pom configured to build certain parts, or all of the UniProt Backend project
+    </description>
 
     <properties>
         <maven.compiler.version>3.7.0</maven.compiler.version>
@@ -53,7 +54,7 @@
                 <artifactId>junit-platform-launcher</artifactId>
                 <version>${junit-platform.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.junit.platform</groupId>
                 <artifactId>junit-platform-runner</artifactId>
@@ -74,7 +75,7 @@
                         <target>${java.version}</target>
                     </configuration>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -141,7 +142,7 @@
                         </execution>
                     </executions>
                 </plugin>
-                
+
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${maven-clean-plugin.version}</version>
@@ -272,37 +273,28 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <!-- active when running on jenkins -->
-    <profile>
-        <id>jenkins</id>
-        <activation>
-            <!--<property> -->
-            <!--<name>HOSTNAME</name> -->
-            <!--<value>ves-ebi-c9.ebi.ac.uk</value> -->
-            <!--</property> -->
-            <!--<property> <name>USER</name> <value>uni_ci</value> </property> -->
-            <property>
-                <name>env.BUILD_NUMBER</name>
-            </property>
-        </activation>
-
-        <properties>
-            <http.proxyHost>hx-wwwcache.ebi.ac.uk</http.proxyHost>
-            <http.proxyPort>3128</http.proxyPort>
-        </properties>
-
-        <distributionManagement>
-            <repository>
-                <id>uniprot-artifactory-deploy-release</id>
-                <name>Deploy Uniprot Maven Release</name>
-                <url>${http-uniprot-private-url}/release</url>
-            </repository>
-            <snapshotRepository>
-                <uniqueVersion>false</uniqueVersion>
-                <id>uniprot-artifactory-deploy-snapshot</id>
-                <name>Deploy Uniprot Maven Snapshot</name>
-                <url>${http-uniprot-private-url}/snapshot</url>
-            </snapshotRepository>
-        </distributionManagement>
-    </profile>
+    <profiles>
+        <!-- active when running on jenkins -->
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>uniprot-artifactory-deploy-release</id>
+                    <name>Deploy Uniprot Maven Release</name>
+                    <url>${http-uniprot-private-url}/release</url>
+                </repository>
+                <snapshotRepository>
+                    <uniqueVersion>false</uniqueVersion>
+                    <id>uniprot-artifactory-deploy-snapshot</id>
+                    <name>Deploy Uniprot Maven Snapshot</name>
+                    <url>${http-uniprot-private-url}/snapshot</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
