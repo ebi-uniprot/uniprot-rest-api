@@ -5,10 +5,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.ebi.uniprot</groupId>
-    <artifactId>configure-rest-api</artifactId>
+    <artifactId>configure-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-	<name>configure-rest-api</name>
+	<name>configure-rest</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

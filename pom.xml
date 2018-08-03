@@ -18,8 +18,8 @@
     </properties>
 
     <modules>
-        <module>configure-rest-api</module>
-        <module>uniprotkb-rest-api</module>
+        <module>configure-rest</module>
+        <module>uniprotkb-rest</module>
         <module>suggester-rest</module>
         <module>advanced-search-rest</module>
     </modules>
