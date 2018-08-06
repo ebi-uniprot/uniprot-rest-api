@@ -24,9 +24,12 @@
         <java.version>1.8</java.version>
         <jacoco.version>0.7.8</jacoco.version>
 
-        <!--<junit-platform.version>1.1.0</junit-platform.version>-->
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
         <http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
+
+        <!-- Use most recent failsafe and surefire plugin versions -->
+        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 
         <!-- Test coverage -->
         <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
@@ -164,11 +167,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
             </plugin>
 
             <plugin>
