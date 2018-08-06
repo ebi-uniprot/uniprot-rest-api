@@ -17,6 +17,7 @@
     <properties>
         <solr.core.version>7.2.0</solr.core.version>
         <solrj.version>7.2.0</solrj.version>
+        <docker.image.prefix>eddsdocker</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -79,4 +80,26 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <!--
+        
+        https://spring.io/guides/gs/spring-boot-docker/
+        https://about.gitlab.com/2016/05/23/gitlab-container-registry/
+        
+        -->
+        <plugins>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.3.6</version>
+                <configuration>
+                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                    <buildArgs>
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
