@@ -10,13 +10,13 @@
         <version>2.0.3.RELEASE</version>
     </parent>
 
-    <artifactId>UniProt-REST-API</artifactId>
+    <artifactId>uniprot-rest-api</artifactId>
     <groupId>uk.ac.ebi.uniprot</groupId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-
-    <name>Build the UniProt REST API</name>
-    <description>Parent and aggregator pom configured to build certain parts, or all of the UniProt Backend project
+    <name>UniProt REST API Aggregator</name>
+    <description>
+        Parent and aggregator pom configured to build certain parts, or all of the UniProt Backend project
     </description>
 
     <properties>
