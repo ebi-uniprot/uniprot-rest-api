@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl;
+package uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniparc;
 
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,8 +13,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.SolrQueryRepository;
 @Repository
 public class UniparcQueryRepository extends SolrQueryRepository<UniParcDocument> {
 
-    public UniparcQueryRepository(SolrTemplate solrTemplate) {
-        super(solrTemplate, SolrCollection.uniparc, UniParcDocument.class);
+    public UniparcQueryRepository(SolrTemplate solrTemplate, UniparcFacetConfig uniparcFacetConfig) {
+        super(solrTemplate, SolrCollection.uniparc, UniParcDocument.class,uniparcFacetConfig);
     }
 
 }

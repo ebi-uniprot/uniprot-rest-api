@@ -13,8 +13,10 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.facet.Facet;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.PageImpl;
+import uk.ac.ebi.uniprot.uuw.advanced.search.repository.facet.FacetConfigConverter;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ import java.util.Optional;
  *
  * @author lgonzales
  */
-public class SolrQueryRepository<T> {
+public abstract class SolrQueryRepository<T> {
 
     private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrQueryRepository.class);
@@ -36,22 +38,15 @@ public class SolrQueryRepository<T> {
     private SolrTemplate solrTemplate;
     private SolrCollection collection;
     private Class<T> tClass;
+    private FacetConfigConverter facetConverter;
 
-    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass){
+    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass,FacetConfigConverter facetConverter){
         this.solrTemplate = solrTemplate;
         this.collection = collection;
         this.tClass = tClass;
+        this.facetConverter =facetConverter;
     }
 
-    /**
-     *
-     *
-     *
-     * @param query
-     * @param offset
-     * @param size
-     * @return
-     */
     public QueryResult<T> searchPage(SimpleQuery query, Long offset, Integer size) {
         try {
             if(size == null || size <= 0){
@@ -86,7 +81,9 @@ public class SolrQueryRepository<T> {
             page.setNextCursor(solrResponse.getNextCursorMark());
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
-            return QueryResult.of(resultList,page);
+            List<Facet> facets = facetConverter.convert(solrResponse);
+
+            return QueryResult.of(resultList,page,facets);
         }catch (Throwable e){
             throw new QueryRetrievalException("Unexpected error retrieving data from our Repository",e);
         }finally {
@@ -98,7 +95,7 @@ public class SolrQueryRepository<T> {
         try {
             return solrTemplate.queryForObject(collection.toString(), query, tClass);
         }catch (Exception e){
-            throw new RuntimeException("Error executing solr query",e);
+            throw new QueryRetrievalException("Error executing solr query",e);
         }finally {
             logSolrQuery(query);
         }
@@ -108,7 +105,7 @@ public class SolrQueryRepository<T> {
         try {
             return solrTemplate.queryForCursor(collection.toString(),query,tClass);
         }catch (Throwable e){
-            throw new RuntimeException("Error executing solr query",e);
+            throw new QueryRetrievalException("Error executing solr query",e);
         }finally {
             logSolrQuery(query);
         }

@@ -4,7 +4,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -37,7 +39,13 @@ public class RepositoryConfig {
 
     @Bean
     public SolrClient solrClient(HttpClient httpClient,RepositoryConfigProperties config) {
-        return new CloudSolrClient.Builder().withHttpClient(httpClient).withZkHost(config.getHost()).build();
+        if(!config.getZookeperhost().isEmpty()) {
+            return new CloudSolrClient.Builder().withHttpClient(httpClient).withZkHost(config.getZookeperhost()).build();
+        }else if(!config.getHttphost().isEmpty()){
+            return new HttpSolrClient.Builder().withHttpClient(httpClient).withBaseSolrUrl(config.getHttphost()).build();
+        }else{
+            throw new BeanCreationException("make sure your application.properties has eight solr zookeperhost or httphost properties");
+        }
     }
 
     @Bean

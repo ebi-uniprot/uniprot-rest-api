@@ -33,11 +33,16 @@ import java.util.stream.StreamSupport;
 @RequestMapping("/uniprot")
 public class UniprotAdvancedSearchController {
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
+
+    private final UniprotAdvancedSearchService queryBuilderService;
 
     @Autowired
-    UniprotAdvancedSearchService queryBuilderService;
+    public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
+                                           UniprotAdvancedSearchService queryBuilderService) {
+        this.eventPublisher = eventPublisher;
+        this.queryBuilderService = queryBuilderService;
+    }
 
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
@@ -54,7 +59,8 @@ public class UniprotAdvancedSearchController {
 
     @RequestMapping(value = "/searchCursor", method = RequestMethod.GET)
     public ResponseEntity<QueryResult<UniProtDocument>> searchCursor(@Valid QueryCursorRequest cursorRequest,
-                                                                     HttpServletRequest request, HttpServletResponse response) {
+                                                                     HttpServletRequest request,
+                                                                     HttpServletResponse response) {
 
         QueryResult<UniProtDocument> queryResult =  queryBuilderService.executeCursorQuery(cursorRequest);
 
