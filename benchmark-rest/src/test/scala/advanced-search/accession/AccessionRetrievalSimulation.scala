@@ -8,7 +8,8 @@ import scala.concurrent.duration._
 // large files to this git repo. Please set the following properties which can be passed to maven as -DvariableName=value
 //  advanced.search.url : the base url of the server under test
 //  advanced.search.accessions.csv : the file containing the accessions used in this test
-object AdvancedSearchSimulation {
+//  maxDuration : the maximum duration of the stress test
+object AccessionRetrievalSimulation {
 
   val httpConf = http
     .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
@@ -22,13 +23,12 @@ object AdvancedSearchSimulation {
       val requestStr: String = "/searchCursor?query=accession:${accession}";
 
       val request =
-        repeat(10, "i") {
         feed(feeder)
+          .pause(5 seconds, 15 seconds)
           .exec(http(httpReqInfo)
             .get(requestStr)
             .header("Accept", format)
           )
-      }
 
       return request
     }
@@ -37,19 +37,19 @@ object AdvancedSearchSimulation {
       AccessionScenario.getRequestWithFormat("application/json")
     )
 
-    val instance = scenario("ScenarioAccession").exec(requestSeq);
+    val instance = scenario("ScenarioAccession")
+      .forever {
+        exec(requestSeq)
+      }
   }
 
   class BasicSimulation extends Simulation {
     setUp(
-      // rampUsers(nbUsers) over(duration) => injects a given number of users with a linear ramp over a given duration.
       AccessionScenario.instance.inject(atOnceUsers(700))
     )
-      .throttle(
-        reachRps(700) in (10 seconds),
-        holdFor(1 minutes)
-      )
-      .protocols(AdvancedSearchSimulation.httpConf)
+      .protocols(AccessionRetrievalSimulation.httpConf)
+      .assertions(global.responseTime.percentile3.lessThan(500), global.successfulRequests.percent.greaterThan(99))
+      .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
   }
 
 }
