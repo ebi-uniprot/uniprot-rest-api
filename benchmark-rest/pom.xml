@@ -11,15 +11,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.version>2.1.2</gatling.version>
-        <gatling-plugin.version>2.1.2</gatling-plugin.version>
+        <gatling.highcharts.version>2.3.1</gatling.highcharts.version>
+        <gatling-plugin.version>2.2.4</gatling-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.gatling.highcharts</groupId>
             <artifactId>gatling-charts-highcharts</artifactId>
-            <version>${gatling.version}</version>
+            <version>${gatling.highcharts.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -29,7 +29,7 @@
             <plugin>
                 <groupId>io.gatling</groupId>
                 <artifactId>gatling-maven-plugin</artifactId>
-                <version>${gatling.version}</version>
+                <version>${gatling-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
@@ -52,7 +52,11 @@
                                 <configuration>
                                     <dataFolder>src/test/resources/data/advanced-search</dataFolder>
                                     <resultsFolder>target/gatling/results/advanced-search</resultsFolder>
-                                    <simulationsFolder>src/test/scala/advanced-search/${simulation}</simulationsFolder>
+                                    <simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
+                                    <runMultipleSimulations>true</runMultipleSimulations>
+                                    <excludes>
+                                        <param>advanced-search.download.DownloadSimulation</param>
+                                    </excludes>
                                 </configuration>
                             </execution>
                         </executions>

@@ -16,7 +16,7 @@ object AccessionRetrievalSimulation {
     .doNotTrackHeader("1")
 
   object AccessionScenario {
-    val feeder = csv(System.getProperty("advanced.search.accessions.csv")).random
+    val feeder = tsv(System.getProperty("advanced.search.accessions.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "accession=${accession}, format=" + format;
@@ -43,13 +43,12 @@ object AccessionRetrievalSimulation {
       }
   }
 
-  class BasicSimulation extends Simulation {
+  class AccessionRetrievalSimulation extends Simulation {
     setUp(
       AccessionScenario.instance.inject(atOnceUsers(700))
     )
       .protocols(AccessionRetrievalSimulation.httpConf)
-      .assertions(global.responseTime.percentile3.lessThan(500), global.successfulRequests.percent.greaterThan(99))
+      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
   }
-
 }

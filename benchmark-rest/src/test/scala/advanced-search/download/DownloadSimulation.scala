@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 // Variables used in this test have been externalised to system properties, so that we do not commit
 // large files to this git repo. Please set the following properties which can be passed to maven as -DvariableName=value
 //  advanced.search.url : the base url of the server under test
-//  advanced.search.accessions.csv : the file containing the accessions used in this test
+//  advanced.search.accessions.list : the file containing the accessions used in this test
 //  maxDuration : the maximum duration of the stress test
 object DownloadSimulation {
 
@@ -16,12 +16,12 @@ object DownloadSimulation {
     .doNotTrackHeader("1")
 
   object DownloadScenario {
-    val generalSearchFeeder = csv(System.getProperty("advanced.search.general-search.csv")).random
-    val organismFeeder = csv(System.getProperty("advanced.search.organism.csv")).random
-    val accessionFeeder = csv(System.getProperty("advanced.search.accessions.csv")).random
-    val taxonomyFeeder = csv(System.getProperty("advanced.search.taxonomy.csv")).random
-    val geneNameFeeder = csv(System.getProperty("advanced.search.gene.csv")).random
-    val proteinNameFeeder = csv(System.getProperty("advanced.search.protein.csv")).random
+    val generalSearchFeeder = tsv(System.getProperty("advanced.search.general-search.list")).random
+    val organismFeeder = tsv(System.getProperty("advanced.search.organism.list")).random
+    val accessionFeeder = tsv(System.getProperty("advanced.search.accessions.list")).random
+    val taxonomyFeeder = tsv(System.getProperty("advanced.search.taxonomy.list")).random
+    val geneNameFeeder = tsv(System.getProperty("advanced.search.gene.list")).random
+    val proteinNameFeeder = tsv(System.getProperty("advanced.search.protein.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "accession=${accession}, format=" + format;
@@ -58,7 +58,7 @@ object DownloadSimulation {
       DownloadScenario.instance.inject(atOnceUsers(700))
     )
       .protocols(DownloadSimulation.httpConf)
-      .assertions(global.responseTime.percentile3.lessThan(500), global.successfulRequests.percent.greaterThan(99))
+      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
   }
 
