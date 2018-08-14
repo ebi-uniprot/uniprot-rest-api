@@ -37,7 +37,7 @@ object AccessionRetrievalSimulation {
       AccessionScenario.getRequestWithFormat("application/json")
     )
 
-    val instance = scenario("ScenarioAccession")
+    val instance = scenario("Accession Retrieval Scenario")
       .forever {
         exec(requestSeq)
       }
@@ -48,7 +48,7 @@ object AccessionRetrievalSimulation {
       AccessionScenario.instance.inject(atOnceUsers(700))
     )
       .protocols(AccessionRetrievalSimulation.httpConf)
-      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+//      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
   }
 }

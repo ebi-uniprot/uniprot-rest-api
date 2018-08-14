@@ -47,7 +47,7 @@ object DownloadSimulation {
       DownloadScenario.getRequestWithFormat("application/json")
     )
 
-    val instance = scenario("ScenarioAccession")
+    val instance = scenario("Download Scenario")
       .forever {
         exec(requestSeq)
       }
@@ -58,7 +58,7 @@ object DownloadSimulation {
       DownloadScenario.instance.inject(atOnceUsers(700))
     )
       .protocols(DownloadSimulation.httpConf)
-      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+//      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
   }
 
