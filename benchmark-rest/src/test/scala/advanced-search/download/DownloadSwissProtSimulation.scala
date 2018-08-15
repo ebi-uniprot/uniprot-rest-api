@@ -22,11 +22,10 @@ object DownloadSwissProtSimulation {
       val filterGeneralRequestStr: String = "/searchAll?query=reviewed:true"
 
       val request =
-        feed(accessionFeeder)
-          .exec(http(httpReqInfo)
-            .get(filterGeneralRequestStr)
-            .header("Accept", format)
-          )
+        exec(http(httpReqInfo)
+          .get(filterGeneralRequestStr)
+          .header("Accept", format)
+        )
 
       return request
     }
