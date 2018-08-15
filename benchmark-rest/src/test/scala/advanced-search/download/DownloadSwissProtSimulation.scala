@@ -18,8 +18,8 @@ object DownloadSwissProtSimulation {
   object DownloadScenario {
 
     def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "downloading swissprot;
-      val filterGeneralRequestStr: String = "/searchAll?query=reviewed:true";
+      val httpReqInfo: String = "downloading swissprot";
+      val filterGeneralRequestStr: String = "/searchAll?query=reviewed:true"
 
       val request =
         feed(accessionFeeder)
