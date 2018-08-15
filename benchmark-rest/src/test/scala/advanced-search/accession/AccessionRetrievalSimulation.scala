@@ -45,7 +45,7 @@ object AccessionRetrievalSimulation {
 
   class AccessionRetrievalSimulation extends Simulation {
     setUp(
-      AccessionScenario.instance.inject(atOnceUsers(700))
+      AccessionScenario.instance.inject(atOnceUsers(Integer.getInteger("users", 700)))
     )
       .protocols(AccessionRetrievalSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))

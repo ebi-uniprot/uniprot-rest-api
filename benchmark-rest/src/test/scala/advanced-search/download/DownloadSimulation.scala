@@ -55,7 +55,7 @@ object DownloadSimulation {
 
   class BasicSimulation extends Simulation {
     setUp(
-      DownloadScenario.instance.inject(atOnceUsers(700))
+      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("users", 700)))
     )
       .protocols(DownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))

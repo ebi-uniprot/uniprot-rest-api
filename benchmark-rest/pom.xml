@@ -55,7 +55,7 @@
                                     <simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
                                     <runMultipleSimulations>true</runMultipleSimulations>
                                     <excludes>
-                                        <param>**/DownloadSimulation.scala</param>
+                                        <exclude>**/DownloadSimulation.scala</exclude>
                                     </excludes>
                                 </configuration>
                             </execution>

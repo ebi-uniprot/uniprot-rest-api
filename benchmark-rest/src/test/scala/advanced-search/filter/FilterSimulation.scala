@@ -78,7 +78,7 @@ object FilterSimulation {
 
   class FilterSimulation extends Simulation {
     setUp(
-      FilterScenario.instance.inject(atOnceUsers(700))
+      FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("users", 700)))
     )
       .protocols(FilterSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
