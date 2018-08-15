@@ -15,11 +15,11 @@ object FiltersWithDownloadSimulation {
     .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
     .doNotTrackHeader("1")
 
-  object DownloadScenario {
+  object DownloadFilterResultsScenario {
     val downloadFeeder = tsv(System.getProperty("advanced.search.download-query.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "download: ${query}"
+      val httpReqInfo: String = "download filter results: ${query}"
       val queryRequestStr: String = "/searchAll?query=${query}"
 
       val request =
@@ -34,17 +34,17 @@ object FiltersWithDownloadSimulation {
     }
 
     val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat("application/json")
+      DownloadFilterResultsScenario.getRequestWithFormat("application/json")
     )
 
-    val instance = scenario("Download Scenario")
+    val instance = scenario("Download Filter Results Scenario")
       .forever {
         exec(requestSeq)
       }
   }
 
   object FilterScenario {
-    // TODO: use a single property to specify the directory in which the files must be located 
+    // TODO: use a single property to specify the directory in which the files must be located
     val generalSearchFeeder = tsv(System.getProperty("advanced.search.general-search.list")).random
     val organismFeeder = tsv(System.getProperty("advanced.search.organism.list")).random
     val accessionFeeder = tsv(System.getProperty("advanced.search.accessions.list")).random
@@ -114,10 +114,10 @@ object FiltersWithDownloadSimulation {
   class FiltersWithDownloadSimulation extends Simulation {
     setUp(
       FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.users", 700))),
-      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.download.users", 25)))
+      DownloadFilterResultsScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.download.users", 25)))
     )
       .protocols(FiltersWithDownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("multi.filter.maxDuration", 2) minutes)
+      .maxDuration(Integer.getInteger("multi.filter.maxDuration", 120) minutes)
   }
 }
