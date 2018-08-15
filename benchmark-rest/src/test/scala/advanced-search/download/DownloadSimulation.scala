@@ -41,7 +41,7 @@ object DownloadSimulation {
       .exec(requestSeq)
   }
 
-  class BasicSimulation extends Simulation {
+  class DownloadSimulation extends Simulation {
     setUp(
       DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("download.users", 10)))
     )
