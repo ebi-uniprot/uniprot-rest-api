@@ -16,12 +16,14 @@ object FilterSimulation {
     .doNotTrackHeader("1")
 
   object FilterScenario {
+    // TODO: use a single property to specify the directory in which the files must be located 
     val generalSearchFeeder = tsv(System.getProperty("advanced.search.general-search.list")).random
     val organismFeeder = tsv(System.getProperty("advanced.search.organism.list")).random
     val accessionFeeder = tsv(System.getProperty("advanced.search.accessions.list")).random
     val taxonomyFeeder = tsv(System.getProperty("advanced.search.taxonomy.list")).random
     val geneNameFeeder = tsv(System.getProperty("advanced.search.gene.list")).random
     val proteinNameFeeder = tsv(System.getProperty("advanced.search.protein.list")).random
+//    val featureFeeder = tsv(System.getProperty("advanced.search.feature.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val filterGeneralRequestStr: String = "/searchCursor?query=content:${content}"
@@ -30,6 +32,7 @@ object FilterSimulation {
       val filterTaxonomyRequestStr: String = "/searchCursor?query=tax_id_lineage:${taxon}"
       val filterGeneRequestStr: String = "/searchCursor?query=gene:${gene}"
       val filterProteinRequestStr: String = "/searchCursor?query=protein_name:${protein}"
+//      val filterFeatureRequestStr: String = "/searchCursor?query=ft_molecule_processing:${feature}"
 
       val request =
         feed(accessionFeeder)
@@ -59,6 +62,10 @@ object FilterSimulation {
             .get(filterGeneRequestStr)
             .header("Accept", format))
           .pause(2 seconds, 5 seconds)
+//          .exec(http("feature molecule processing field")
+//            .get(filterFeatureRequestStr)
+//            .header("Accept", format))
+//          .pause(2 seconds, 5 seconds)
           .exec(http("protein_name field")
             .get(filterProteinRequestStr)
             .header("Accept", format))
