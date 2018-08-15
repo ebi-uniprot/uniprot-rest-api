@@ -47,7 +47,7 @@ object DownloadSimulation {
     )
       .protocols(DownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("maxDuration", 60) minutes)
+      .maxDuration(Integer.getInteger("download.maxDuration", 120) minutes)
   }
 
 }
