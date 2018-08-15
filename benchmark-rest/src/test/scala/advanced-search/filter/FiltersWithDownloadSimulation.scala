@@ -9,11 +9,39 @@ import scala.concurrent.duration._
 //  advanced.search.url : the base url of the server under test
 //  advanced.search.accessions.list : the file containing the accessions used in this test
 //  maxDuration : the maximum duration of the stress test
-object FilterSimulation {
+object FiltersWithDownloadSimulation {
 
   val httpConf = http
     .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
     .doNotTrackHeader("1")
+
+  object DownloadScenario {
+    val downloadFeeder = tsv(System.getProperty("advanced.search.download-query.list")).random
+
+    def getRequestWithFormat(format: String): ChainBuilder = {
+      val httpReqInfo: String = "download: ${query}"
+      val queryRequestStr: String = "/searchAll?query=${query}"
+
+      val request =
+        feed(downloadFeeder)
+          .pause(15 seconds, 120 seconds)
+          .exec(http(httpReqInfo)
+            .get(queryRequestStr)
+            .header("Accept", format)
+          )
+
+      return request
+    }
+
+    val requestSeq = Seq(
+      DownloadScenario.getRequestWithFormat("application/json")
+    )
+
+    val instance = scenario("Download Scenario")
+      .forever {
+        exec(requestSeq)
+      }
+  }
 
   object FilterScenario {
     // TODO: use a single property to specify the directory in which the files must be located 
@@ -83,13 +111,13 @@ object FilterSimulation {
       }
   }
 
-  class FilterSimulation extends Simulation {
+  class FiltersWithDownloadSimulation extends Simulation {
     setUp(
-      FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.users", 700)))
+      FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.users", 700))),
+      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.download.users", 25)))
     )
-      .protocols(FilterSimulation.httpConf)
+      .protocols(FiltersWithDownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(Integer.getInteger("multi.filter.maxDuration", 2) minutes)
   }
-
 }
