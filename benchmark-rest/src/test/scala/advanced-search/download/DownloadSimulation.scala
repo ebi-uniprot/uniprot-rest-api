@@ -16,27 +16,17 @@ object DownloadSimulation {
     .doNotTrackHeader("1")
 
   object DownloadScenario {
-    val generalSearchFeeder = tsv(System.getProperty("advanced.search.general-search.list")).random
-    val organismFeeder = tsv(System.getProperty("advanced.search.organism.list")).random
-    val accessionFeeder = tsv(System.getProperty("advanced.search.accessions.list")).random
-    val taxonomyFeeder = tsv(System.getProperty("advanced.search.taxonomy.list")).random
-    val geneNameFeeder = tsv(System.getProperty("advanced.search.gene.list")).random
-    val proteinNameFeeder = tsv(System.getProperty("advanced.search.protein.list")).random
+    val downloadFeeder = tsv(System.getProperty("advanced.search.download-query.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "accession=${accession}, format=" + format;
-      val filterGeneralRequestStr: String = "/searchCursor?query=accession:${accession}";
-      val filterOrganismRequestStr: String = "/searchCursor?query=accession:${accession}";
-      val accessionRequestStr: String = "/searchCursor?query=accession:${accession}";
-      val filterTaxonomyRequestStr: String = "/searchCursor?query=accession:${accession}";
-      val filterGeneRequestStr: String = "/searchCursor?query=accession:${accession}";
-      val filterProteinRequestStr: String = "/searchCursor?query=accession:${accession}";
+      val httpReqInfo: String = "download: ${query}"
+      val queryRequestStr: String = "/searchAll?query=${query}"
 
       val request =
-        feed(accessionFeeder)
+        feed(downloadFeeder)
           .pause(5 seconds, 15 seconds)
           .exec(http(httpReqInfo)
-            .get(filterGeneralRequestStr)
+            .get(queryRequestStr)
             .header("Accept", format)
           )
 
@@ -48,18 +38,16 @@ object DownloadSimulation {
     )
 
     val instance = scenario("Download Scenario")
-      .forever {
-        exec(requestSeq)
-      }
+      .exec(requestSeq)
   }
 
   class BasicSimulation extends Simulation {
     setUp(
-      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("users", 700)))
+      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("download.users", 10)))
     )
       .protocols(DownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
+      .maxDuration(Integer.getInteger("maxDuration", 60) minutes)
   }
 
 }

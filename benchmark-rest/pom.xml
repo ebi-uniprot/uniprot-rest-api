@@ -54,9 +54,9 @@
                                     <resultsFolder>target/gatling/results/advanced-search</resultsFolder>
                                     <simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
                                     <runMultipleSimulations>true</runMultipleSimulations>
-                                    <excludes>
-                                        <exclude>**/DownloadSimulation.scala</exclude>
-                                    </excludes>
+                                    <!--<excludes>-->
+                                        <!--<exclude>**/DownloadSimulation.scala</exclude>-->
+                                    <!--</excludes>-->
                                 </configuration>
                             </execution>
                         </executions>

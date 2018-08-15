@@ -24,12 +24,12 @@ object FilterSimulation {
     val proteinNameFeeder = tsv(System.getProperty("advanced.search.protein.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
-      val filterGeneralRequestStr: String = "/searchCursor?query=content:${content}";
-      val filterOrganismRequestStr: String = "/searchCursor?query=tax_name_lineage:${organism}";
-      val accessionRequestStr: String = "/searchCursor?query=accession:${accession}";
-      val filterTaxonomyRequestStr: String = "/searchCursor?query=tax_id_lineage:${taxon}";
-      val filterGeneRequestStr: String = "/searchCursor?query=gene:${gene}";
-      val filterProteinRequestStr: String = "/searchCursor?query=protein_name:${protein}";
+      val filterGeneralRequestStr: String = "/searchCursor?query=content:${content}"
+      val filterOrganismRequestStr: String = "/searchCursor?query=tax_name_lineage:${organism}"
+      val accessionRequestStr: String = "/searchCursor?query=accession:${accession}"
+      val filterTaxonomyRequestStr: String = "/searchCursor?query=tax_id_lineage:${taxon}"
+      val filterGeneRequestStr: String = "/searchCursor?query=gene:${gene}"
+      val filterProteinRequestStr: String = "/searchCursor?query=protein_name:${protein}"
 
       val request =
         feed(accessionFeeder)
@@ -78,11 +78,11 @@ object FilterSimulation {
 
   class FilterSimulation extends Simulation {
     setUp(
-      FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("users", 700)))
+      FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.users", 700)))
     )
       .protocols(FilterSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("maxDuration", 2) minutes)
+      .maxDuration(Integer.getInteger("multi.filter.maxDuration", 2) minutes)
   }
 
 }
