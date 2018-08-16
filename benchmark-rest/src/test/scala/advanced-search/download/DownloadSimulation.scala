@@ -3,20 +3,21 @@ import io.gatling.core.scenario.Simulation
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
+import com.typesafe.config._
 
-// Variables used in this test have been externalised to system properties, so that we do not commit
-// large files to this git repo. Please set the following properties which can be passed to maven as -DvariableName=value
-//  advanced.search.url : the base url of the server under test
-//  advanced.search.accessions.list : the file containing the accessions used in this test
-//  maxDuration : the maximum duration of the stress test
+/**
+  * Simulates downloading files.
+  */
 object DownloadSimulation {
 
+  val conf = ConfigFactory.load()
+
   val httpConf = http
-    .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
+    .baseURL(conf.getString("a.s.url"))
     .doNotTrackHeader("1")
 
   object DownloadScenario {
-    val downloadFeeder = tsv(System.getProperty("advanced.search.download-query.list")).random
+    val downloadFeeder = tsv(conf.getString("a.s.download.query.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "download: ${query}"
@@ -43,11 +44,11 @@ object DownloadSimulation {
 
   class DownloadSimulation extends Simulation {
     setUp(
-      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("download.users", 10)))
+      DownloadScenario.instance.inject(atOnceUsers(conf.getInt("a.s.download.users")))
     )
       .protocols(DownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("download.maxDuration", 120) minutes)
+      .maxDuration(conf.getInt("a.s.download.maxDuration") minutes)
   }
 
 }

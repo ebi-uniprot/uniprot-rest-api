@@ -3,16 +3,17 @@ import io.gatling.core.scenario.Simulation
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
+import com.typesafe.config._
 
-// Variables used in this test have been externalised to system properties, so that we do not commit
-// large files to this git repo. Please set the following properties which can be passed to maven as -DvariableName=value
-//  advanced.search.url : the base url of the server under test
-//  advanced.search.accessions.list : the file containing the accessions used in this test
-//  maxDuration : the maximum duration of the stress test
+/**
+  * Simulates downloading all of Swiss-Prot.
+  */
 object DownloadSwissProtSimulation {
 
+  val conf = ConfigFactory.load()
+
   val httpConf = http
-    .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
+    .baseURL(conf.getString("a.s.url"))
     .doNotTrackHeader("1")
 
   object DownloadScenario {
@@ -40,10 +41,10 @@ object DownloadSwissProtSimulation {
 
   class DownloadSwissProtSimulation extends Simulation {
     setUp(
-      DownloadScenario.instance.inject(atOnceUsers(Integer.getInteger("download.swissprot.users", 1)))
+      DownloadScenario.instance.inject(atOnceUsers(conf.getInt("a.s.download.swissprot.users")))
     )
       .protocols(DownloadSimulation.httpConf)
-      .maxDuration(Integer.getInteger("download.swissprot.maxDuration", 120) minutes)
+      .maxDuration(conf.getInt("a.s.download.swissprot.maxDuration") minutes)
   }
 
 }

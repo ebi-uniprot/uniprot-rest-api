@@ -3,20 +3,22 @@ import io.gatling.core.scenario.Simulation
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
+import com.typesafe.config._
 
-// Variables used in this test have been externalised to system properties, so that we do not commit
-// large files to this git repo. Please set the following properties which can be passed to maven as -DvariableName=value
-//  advanced.search.url : the base url of the server under test
-//  advanced.search.accessions.list : the file containing the accessions used in this test
-//  maxDuration : the maximum duration of the stress test
+/**
+  * Simulates common user behaviour, where a concurrent users perform a number of filters on the UniProtKB,
+  * and occasionally downloads a result set.
+  */
 object FiltersWithDownloadSimulation {
 
+  val conf = ConfigFactory.load()
+
   val httpConf = http
-    .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
+    .baseURL(conf.getString("a.s.url"))
     .doNotTrackHeader("1")
 
   object DownloadFilterResultsScenario {
-    val downloadFeeder = tsv(System.getProperty("advanced.search.download-query.list")).random
+    val downloadFeeder = tsv(conf.getString("a.s.download.query.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "download filter results: ${query}"
@@ -44,14 +46,13 @@ object FiltersWithDownloadSimulation {
   }
 
   object FilterScenario {
-    // TODO: use a single property to specify the directory in which the files must be located
-    val generalSearchFeeder = tsv(System.getProperty("advanced.search.general-search.list")).random
-    val organismFeeder = tsv(System.getProperty("advanced.search.organism.list")).random
-    val accessionFeeder = tsv(System.getProperty("advanced.search.accessions.list")).random
-    val taxonomyFeeder = tsv(System.getProperty("advanced.search.taxonomy.list")).random
-    val geneNameFeeder = tsv(System.getProperty("advanced.search.gene.list")).random
-    val proteinNameFeeder = tsv(System.getProperty("advanced.search.protein.list")).random
-//    val featureFeeder = tsv(System.getProperty("advanced.search.feature.list")).random
+    val generalSearchFeeder = tsv(conf.getString("a.s.multi.filters.general.search.list")).random
+    val organismFeeder = tsv(conf.getString("a.s.multi.filters.organism.list")).random
+    val accessionFeeder = tsv(conf.getString("a.s.multi.filters.accessions.retrieval.list")).random
+    val taxonomyFeeder = tsv(conf.getString("a.s.multi.filters.taxonomy.list")).random
+    val geneNameFeeder = tsv(conf.getString("a.s.multi.filters.gene.list")).random
+    val proteinNameFeeder = tsv(conf.getString("a.s.multi.filters.protein.list")).random
+//    val featureFeeder = tsv(conf.getString("advanced.search.feature.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val filterGeneralRequestStr: String = "/searchCursor?query=content:${content}"
@@ -113,11 +114,11 @@ object FiltersWithDownloadSimulation {
 
   class FiltersWithDownloadSimulation extends Simulation {
     setUp(
-      FilterScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.users", 700))),
-      DownloadFilterResultsScenario.instance.inject(atOnceUsers(Integer.getInteger("multi.filter.download.users", 25)))
+      FilterScenario.instance.inject(atOnceUsers(conf.getInt("a.s.multi.filters.users"))),
+      DownloadFilterResultsScenario.instance.inject(atOnceUsers(conf.getInt("a.s.multi.filters.download.users")))
     )
       .protocols(FiltersWithDownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("multi.filter.maxDuration", 120) minutes)
+      .maxDuration(Integer.getInteger("a.s.multi.filters.maxDuration") minutes)
   }
 }

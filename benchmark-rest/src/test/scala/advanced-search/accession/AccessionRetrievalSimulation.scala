@@ -3,20 +3,22 @@ import io.gatling.core.scenario.Simulation
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
+import com.typesafe.config._
 
-// Variables used in this test have been externalised to system properties, so that we do not commit
-// large files to this git repo. Please set the following properties which can be passed to maven as -DvariableName=value
-//  advanced.search.url : the base url of the server under test
-//  advanced.search.accessions.csv : the file containing the accessions used in this test
-//  maxDuration : the maximum duration of the stress test
+/**
+  * Simulates simple retrieval of accessions from the REST service. The most basic ID retrieval, which serves
+  * as a basis on which other test performances can be compared.
+  */
 object AccessionRetrievalSimulation {
 
+  val conf = ConfigFactory.load()
+
   val httpConf = http
-    .baseURL(System.getProperty("advanced.search.url")) // Here is the root for all relative URLs
+    .baseURL(conf.getString("a.s.url"))
     .doNotTrackHeader("1")
 
   object AccessionScenario {
-    val feeder = tsv(System.getProperty("advanced.search.accessions.list")).random
+    val feeder = tsv(conf.getString("a.s.accession.retrieval.list")).random
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "accession=${accession}, format=" + format;
@@ -45,10 +47,10 @@ object AccessionRetrievalSimulation {
 
   class AccessionRetrievalSimulation extends Simulation {
     setUp(
-      AccessionScenario.instance.inject(atOnceUsers(Integer.getInteger("accession.retrieval.users", 700)))
+      AccessionScenario.instance.inject(atOnceUsers(conf.getInt("a.s.accession.retrieval.users")))
     )
       .protocols(AccessionRetrievalSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("accession.retrieval.maxDuration", 2) minutes)
+      .maxDuration(conf.getInt("a.s.accession.retrieval.maxDuration") minutes)
   }
 }

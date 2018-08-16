@@ -32,6 +32,15 @@
                 <version>${gatling-plugin.version}</version>
             </plugin>
         </plugins>
+        <!-- allow us to specify an external properties files used to configure the tests -->
+        <testResources>
+            <testResource>
+                <directory>${properties.dir}</directory>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
     </build>
 
     <profiles>
@@ -54,9 +63,6 @@
                                     <resultsFolder>target/gatling/results/advanced-search</resultsFolder>
                                     <simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
                                     <runMultipleSimulations>true</runMultipleSimulations>
-                                    <!--<excludes>-->
-                                        <!--<exclude>**/DownloadSimulation.scala</exclude>-->
-                                    <!--</excludes>-->
                                 </configuration>
                             </execution>
                         </executions>
