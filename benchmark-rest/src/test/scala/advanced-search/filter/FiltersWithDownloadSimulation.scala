@@ -119,6 +119,6 @@ object FiltersWithDownloadSimulation {
     )
       .protocols(FiltersWithDownloadSimulation.httpConf)
 //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(Integer.getInteger("a.s.multi.filters.maxDuration") minutes)
+      .maxDuration(conf.getInt("a.s.multi.filters.maxDuration") minutes)
   }
 }
