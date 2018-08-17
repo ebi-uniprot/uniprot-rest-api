@@ -86,8 +86,7 @@ public class UniprotAdvancedSearchService {
                                                            collection,
                                                            solrQuery)) {
             cStream.open();
-            Iterable<String> resultIterable = () -> cloudStreamToIterator(cStream);
-            return StreamSupport.stream(resultIterable.spliterator(), false);
+            return cloudResultStreamToStream(cStream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -103,28 +102,28 @@ public class UniprotAdvancedSearchService {
         }
     }
 
-    static Iterator<String> cloudStreamToIterator(CloudSolrStream cStream) {
-        return new Iterator<String>() {
-            @Override
-            public boolean hasNext() {
-                try {
-                    return !cStream.read().EOF;
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
+    static Stream<String> cloudResultStreamToStream(CloudSolrStream cStream) {
+        Iterable<String> resultIterable = () -> new Iterator<String>() {
+                    @Override
+                    public boolean hasNext() {
+                        try {
+                            return !cStream.read().EOF;
+                        } catch (IOException e) {
+                            throw new IllegalStateException(e);
+                        }
+                    }
 
-            @Override
-            public String next() {
-                try {
-                    return cStream
-                            .read()
-                            .getString("accession");
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-        };
+                    @Override
+                    public String next() {
+                        try {
+                            return cStream
+                                    .read()
+                                    .getString("accession");
+                        } catch (IOException e) {
+                            throw new IllegalStateException(e);
+                        }
+                    }
+                };
+        return StreamSupport.stream(resultIterable.spliterator(), false);
     }
-
 }
