@@ -1,5 +1,8 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.io.Tuple;
+import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleQuery;
@@ -13,7 +16,11 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRespository;
 
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Service class responsible to build Solr query and execute it in the repository.
@@ -64,6 +71,52 @@ public class UniprotAdvancedSearchService {
         }
     }
 
+    public Stream<String> streamAll(String query) {
+        // TODO: 17/08/18 get zkHost from config
+        String zkHost = "FROM CONFIGURATION";
+        String collection = "uniprot";
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery(query);
+        String solrField = "accession";
+        solrQuery.setSort(solrField, SolrQuery.ORDER.desc);
+        solrQuery.setFields(solrField);
+        solrQuery.setRequestHandler("/export");
+
+        try (CloudSolrStream cStream = new CloudSolrStream(zkHost,
+                                                           collection,
+                                                           solrQuery)) {
+            cStream.open();
+            Iterable<String> resultIterable = () -> getCloudStreamIterator(cStream);
+            return StreamSupport.stream(resultIterable.spliterator(), false);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private Iterator<String> getCloudStreamIterator(CloudSolrStream cStream) {
+        return new Iterator<String>() {
+            @Override
+            public boolean hasNext() {
+                try {
+                    return cStream.read().EOF;
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+
+            @Override
+            public String next() {
+                try {
+                    return cStream
+                            .read()
+                            .getString("accession");
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        };
+    }
 
     public Optional<UniProtDocument> getByAccession(String accession) {
         try {

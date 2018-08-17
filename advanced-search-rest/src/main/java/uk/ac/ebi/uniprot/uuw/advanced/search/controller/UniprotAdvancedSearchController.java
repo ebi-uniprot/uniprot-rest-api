@@ -77,6 +77,11 @@ public class UniprotAdvancedSearchController {
         return new ResponseEntity<>(stream, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/streamAll", method = RequestMethod.GET)
+    public ResponseEntity<Stream<String>> streamAll(@RequestParam(value = "query", required = true) String query) {
+        return new ResponseEntity<>(queryBuilderService.streamAll(query), HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
     public UniProtDocument getByAccession(@RequestParam(value = "accession", required = true) String accession) {
