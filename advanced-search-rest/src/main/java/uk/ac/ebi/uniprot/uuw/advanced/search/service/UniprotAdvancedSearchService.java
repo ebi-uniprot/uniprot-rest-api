@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
@@ -87,19 +86,29 @@ public class UniprotAdvancedSearchService {
                                                            collection,
                                                            solrQuery)) {
             cStream.open();
-            Iterable<String> resultIterable = () -> getCloudStreamIterator(cStream);
+            Iterable<String> resultIterable = () -> cloudStreamToIterator(cStream);
             return StreamSupport.stream(resultIterable.spliterator(), false);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private Iterator<String> getCloudStreamIterator(CloudSolrStream cStream) {
+    public Optional<UniProtDocument> getByAccession(String accession) {
+        try {
+            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where("accession").is(accession.toUpperCase()));
+            return repository.getEntry(simpleQuery);
+        } catch (Exception e) {
+            String message = "Could not get accession for: [" + accession + "]";
+            throw new ServiceException(message, e);
+        }
+    }
+
+    static Iterator<String> cloudStreamToIterator(CloudSolrStream cStream) {
         return new Iterator<String>() {
             @Override
             public boolean hasNext() {
                 try {
-                    return cStream.read().EOF;
+                    return !cStream.read().EOF;
                 } catch (IOException e) {
                     throw new IllegalStateException(e);
                 }
@@ -116,16 +125,6 @@ public class UniprotAdvancedSearchService {
                 }
             }
         };
-    }
-
-    public Optional<UniProtDocument> getByAccession(String accession) {
-        try {
-            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where("accession").is(accession.toUpperCase()));
-            return repository.getEntry(simpleQuery);
-        } catch (Exception e) {
-            String message = "Could not get accession for: [" + accession + "]";
-            throw new ServiceException(message, e);
-        }
     }
 
 }
