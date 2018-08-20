@@ -20,5 +20,7 @@ public class QueryCursorRequest {
 
     @Positive(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.positive}")
     private Integer size;
+    
+    private String field;
 
 }

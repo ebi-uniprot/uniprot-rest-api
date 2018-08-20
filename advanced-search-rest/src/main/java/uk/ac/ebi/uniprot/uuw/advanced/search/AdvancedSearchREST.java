@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.uuw.advanced.search;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 
 /**
@@ -11,6 +12,7 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
  */
 @SpringBootApplication
 @EnableSolrRepositories(basePackages = { "uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl" })
+@Import({UniProtSearchConfigure.class})
 public class AdvancedSearchREST {
 
     public static void main(String[] args) {

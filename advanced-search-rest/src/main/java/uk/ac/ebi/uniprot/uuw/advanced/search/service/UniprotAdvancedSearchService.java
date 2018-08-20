@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
+import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
-import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRespository;
+import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
 
 import java.util.Optional;
 
@@ -24,10 +25,10 @@ import java.util.Optional;
 @Service
 public class UniprotAdvancedSearchService {
 
-    private UniprotQueryRespository repository;
+    private UniprotQueryRepository repository;
     private UniprotFacetConfig uniprotFacetConfig;
 
-    public UniprotAdvancedSearchService(UniprotQueryRespository repository, UniprotFacetConfig uniprotFacetConfig){
+    public UniprotAdvancedSearchService(UniprotQueryRepository repository, UniprotFacetConfig uniprotFacetConfig){
         this.repository = repository;
         this.uniprotFacetConfig = uniprotFacetConfig;
     }
@@ -35,6 +36,7 @@ public class UniprotAdvancedSearchService {
     public QueryResult<UniProtDocument> executeQuery(QuerySearchRequest searchRequest) {
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(searchRequest.getQuery(),uniprotFacetConfig).build();
+            simpleQuery.addProjectionOnField(new SimpleField("accession"));
             return repository.searchPage(simpleQuery,searchRequest.getOffset(),searchRequest.getSize());
         } catch (Exception e) {
             String message = "Could not get result for: [" + searchRequest + "]";
@@ -45,6 +47,7 @@ public class UniprotAdvancedSearchService {
     public QueryResult<UniProtDocument> executeCursorQuery(QueryCursorRequest cursorRequest) {
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(cursorRequest.getQuery(),uniprotFacetConfig).build();
+            simpleQuery.addProjectionOnField(new SimpleField("accession"));
             simpleQuery.addSort(new Sort(Sort.Direction.ASC,"accession"));
             return repository.searchCursorPage(simpleQuery,cursorRequest.getCursor(),cursorRequest.getSize());
         } catch (Exception e) {
@@ -56,6 +59,7 @@ public class UniprotAdvancedSearchService {
     public Cursor<UniProtDocument> getAll(String query) {
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(query,uniprotFacetConfig).build();
+            simpleQuery.addProjectionOnField(new SimpleField("accession"));
             simpleQuery.addSort(new Sort(Sort.Direction.ASC,"accession"));
             return repository.getAll(simpleQuery);
         } catch (Exception e) {
@@ -68,6 +72,7 @@ public class UniprotAdvancedSearchService {
     public Optional<UniProtDocument> getByAccession(String accession) {
         try {
             SimpleQuery simpleQuery = new SimpleQuery(Criteria.where("accession").is(accession.toUpperCase()));
+            simpleQuery.addProjectionOnField(new SimpleField("accession"));
             return repository.getEntry(simpleQuery);
         } catch (Exception e) {
             String message = "Could not get accession for: [" + accession + "]";
