@@ -58,6 +58,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>data-service-voldemort</artifactId>
+            <version>${data-service.version}</version>
+        </dependency>
+
         <!-- Solr Data -->
         <dependency>
             <groupId>org.apache.solr</groupId>
