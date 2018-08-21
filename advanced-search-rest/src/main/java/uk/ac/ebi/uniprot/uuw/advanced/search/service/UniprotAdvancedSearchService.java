@@ -1,7 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleQuery;
@@ -12,11 +12,11 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
+import uk.ac.ebi.uniprot.uuw.advanced.search.repository.RepositoryConfigProperties;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRespository;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -29,19 +29,26 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class UniprotAdvancedSearchService {
+    private final CloudSolrStreamTemplate cloudSolrStreamTemplate;
+    private final UniprotQueryRespository repository;
+    private final UniprotFacetConfig uniprotFacetConfig;
 
-    private UniprotQueryRespository repository;
-    private UniprotFacetConfig uniprotFacetConfig;
-
-    public UniprotAdvancedSearchService(UniprotQueryRespository repository, UniprotFacetConfig uniprotFacetConfig){
+    public UniprotAdvancedSearchService(UniprotQueryRespository repository,
+                                        UniprotFacetConfig uniprotFacetConfig,
+                                        CloudSolrStreamTemplate cloudSolrStreamTemplate) {
         this.repository = repository;
         this.uniprotFacetConfig = uniprotFacetConfig;
+        this.cloudSolrStreamTemplate = cloudSolrStreamTemplate;
+    }
+
+    static Stream<String> cloudResultStreamToStream(TupleStream tupleStream) {
+        return StreamSupport.stream(new TupleStreamIterable(tupleStream).spliterator(), false);
     }
 
     public QueryResult<UniProtDocument> executeQuery(QuerySearchRequest searchRequest) {
         try {
-            SimpleQuery simpleQuery = SolrQueryBuilder.of(searchRequest.getQuery(),uniprotFacetConfig).build();
-            return repository.searchPage(simpleQuery,searchRequest.getOffset(),searchRequest.getSize());
+            SimpleQuery simpleQuery = SolrQueryBuilder.of(searchRequest.getQuery(), uniprotFacetConfig).build();
+            return repository.searchPage(simpleQuery, searchRequest.getOffset(), searchRequest.getSize());
         } catch (Exception e) {
             String message = "Could not get result for: [" + searchRequest + "]";
             throw new ServiceException(message, e);
@@ -50,9 +57,9 @@ public class UniprotAdvancedSearchService {
 
     public QueryResult<UniProtDocument> executeCursorQuery(QueryCursorRequest cursorRequest) {
         try {
-            SimpleQuery simpleQuery = SolrQueryBuilder.of(cursorRequest.getQuery(),uniprotFacetConfig).build();
-            simpleQuery.addSort(new Sort(Sort.Direction.ASC,"accession"));
-            return repository.searchCursorPage(simpleQuery,cursorRequest.getCursor(),cursorRequest.getSize());
+            SimpleQuery simpleQuery = SolrQueryBuilder.of(cursorRequest.getQuery(), uniprotFacetConfig).build();
+            simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession"));
+            return repository.searchCursorPage(simpleQuery, cursorRequest.getCursor(), cursorRequest.getSize());
         } catch (Exception e) {
             String message = "Could not get result for: [" + cursorRequest + "]";
             throw new ServiceException(message, e);
@@ -61,34 +68,12 @@ public class UniprotAdvancedSearchService {
 
     public Cursor<UniProtDocument> getAll(String query) {
         try {
-            SimpleQuery simpleQuery = SolrQueryBuilder.of(query,uniprotFacetConfig).build();
-            simpleQuery.addSort(new Sort(Sort.Direction.ASC,"accession"));
+            SimpleQuery simpleQuery = SolrQueryBuilder.of(query, uniprotFacetConfig).build();
+            simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession"));
             return repository.getAll(simpleQuery);
         } catch (Exception e) {
             String message = "Could not get result for: [" + query + "]";
             throw new ServiceException(message, e);
-        }
-    }
-
-    public Stream<String> streamAll(String query) {
-        // TODO: 17/08/18 get zkHost from config
-        String zkHost = "FROM CONFIGURATION";
-        String collection = "uniprot";
-
-        SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setQuery(query);
-        String solrField = "accession";
-        solrQuery.setSort(solrField, SolrQuery.ORDER.desc);
-        solrQuery.setFields(solrField);
-        solrQuery.setRequestHandler("/export");
-
-        try (CloudSolrStream cStream = new CloudSolrStream(zkHost,
-                                                           collection,
-                                                           solrQuery)) {
-            cStream.open();
-            return cloudResultStreamToStream(cStream);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
         }
     }
 
@@ -102,28 +87,14 @@ public class UniprotAdvancedSearchService {
         }
     }
 
-    static Stream<String> cloudResultStreamToStream(CloudSolrStream cStream) {
-        Iterable<String> resultIterable = () -> new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        try {
-                            return !cStream.read().EOF;
-                        } catch (IOException e) {
-                            throw new IllegalStateException(e);
-                        }
-                    }
+    public Stream<String> streamAll(String query) {
+        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
 
-                    @Override
-                    public String next() {
-                        try {
-                            return cStream
-                                    .read()
-                                    .getString("accession");
-                        } catch (IOException e) {
-                            throw new IllegalStateException(e);
-                        }
-                    }
-                };
-        return StreamSupport.stream(resultIterable.spliterator(), false);
+        try {
+            cStream.open();
+            return StreamSupport.stream(new TupleStreamIterable(cStream).spliterator(), false);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

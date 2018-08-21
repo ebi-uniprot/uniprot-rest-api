@@ -32,9 +32,9 @@ public class UniprotAdvancedSearchServiceTest {
     @Test
     public void cloudStreamToStreamWithElements() throws IOException {
         when(cloudSolrStream.read())
-                .thenReturn(tuple("anything"))    // when calling hasNext() 1st time
+//                .thenReturn(tuple("anything"))    // when calling hasNext() 1st time
                 .thenReturn(tuple("accession1"))  // when calling next()
-                .thenReturn(tuple("anything"))    // when calling hasNext() 2nd time
+//                .thenReturn(tuple("anything"))    // when calling hasNext() 2nd time
                 .thenReturn(tuple("accession2"))  // when calling next() 2nd time
                 .thenReturn(endTuple());
         List<String> accessionsFromStream = cloudResultStreamToStream(cloudSolrStream).collect(Collectors.toList());
