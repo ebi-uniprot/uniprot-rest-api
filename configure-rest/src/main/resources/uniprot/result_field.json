@@ -1,0 +1,658 @@
+[
+	{
+		"groupName": "Names & Taxonomy",
+		"fields": [
+			{
+				"label": "Entry Name",
+				"name": "id"
+			},
+			{
+				"label": "Gene Names",
+				"name": "gene"
+			},
+			{
+				"label": "Gene Names (ordered locus)",
+				"name": "gene"
+			},
+			{
+				"label": "Gene Names (ORF)",
+				"name": "gene"
+			},
+			{
+				"label": "Gene Names (primary)",
+				"name": "gene"
+			},
+			{
+				"label": "Gene Names (synonym)",
+				"name": "gene"
+			},
+			{
+				"label": "Organism",
+				"name": "organism"
+			},
+			{
+				"label": "Organism (ID)",
+				"name": "organism"
+			},
+			{
+				"label": "Protein names",
+				"name": "protein_name"
+			},
+			{
+				"label": "Proteomes",
+				"name": "dr:proteomes"
+			},
+			{
+				"label": "Taxonomic lineage",
+				"name": "lineage"
+			},
+			{
+				"label": "Virus hosts",
+				"name": "organism_host"
+			}
+		]
+	},
+	{
+		"groupName": "Sequences",
+		"fields": [
+			{
+				"label": "Alternative products (isoforms)",
+				"name": "cc:alternative_products"
+			},
+			{
+				"label": "Alternative sequence",
+				"name": "ft:var_seq"
+			},
+			{
+				"label": "Erroneous gene model prediction",
+				"name": "cc:sequence_caution"
+			},
+			{
+				"label": "Fragment",
+				"name": "fragment"
+			},
+			{
+				"label": "Gene encoded by",
+				"name": "organelle"
+			},
+			{
+				"label": "Length",
+				"name": "sequence"
+			},
+			{
+				"label": "Mass",
+				"name": "sequence"
+			},
+			{
+				"label": "Mass spectrometry",
+				"name": "cc:mass_spectrometry"
+			},
+			{
+				"label": "Natural variant",
+				"name": "ft:variant"
+			},
+			{
+				"label": "Non-adjacent residue",
+				"name": "ft:non_con"
+			},
+			{
+				"label": "Non-standard residue",
+				"name": "ft:non_std"
+			},
+			{
+				"label": "Non-terminal residue",
+				"name": "ft:non_ter"
+			},
+			{
+				"label": "Polymorphism",
+				"name": "cc:polymorphism"
+			},
+			{
+				"label": "RNA Editing",
+				"name": "cc:rna_editing"
+			},
+			{
+				"label": "Sequence",
+				"name": "sequence"
+			},
+			{
+				"label": "Sequence caution",
+				"name": "cc:sequence_caution"
+			},
+			{
+				"label": "Sequence conflict",
+				"name": "ft:conflict"
+			},
+			{
+				"label": "Sequence uncertainty",
+				"name": "ft:unsure"
+			},
+			{
+				"label": "Sequence version",
+				"name": "sequence"
+			}
+		]
+	},
+	{
+		"groupName": "Function",
+		"fields": [
+			{
+				"label": "Absorption",
+				"name": "cc:biophysicochemical_properties"
+			},
+			{
+				"label": "Active site",
+				"name": "ft:act_site"
+			},
+			{
+				"label": "Binding site",
+				"name": "ft:binding"
+			},
+			{
+				"label": "Calcium binding",
+				"name": "ft:ca_bind"
+			},
+			{
+				"label": "Catalytic activity",
+				"name": "cc:catalytic_activity"
+			},
+			{
+				"label": "Cofactor",
+				"name": "cc:cofactor"
+			},
+			{
+				"label": "DNA binding",
+				"name": "ft:dna_bind"
+			},
+			{
+				"label": "EC number",
+				"name": "protein_name"
+			},
+			{
+				"label": "Enzyme regulation",
+				"name": "cc:enzyme_regulation"
+			},
+			{
+				"label": "Function [CC]",
+				"name": "cc:function"
+			},
+			{
+				"label": "Kinetics",
+				"name": "cc:biophysicochemical_properties"
+			},
+			{
+				"label": "Metal binding",
+				"name": "ft:metal"
+			},
+			{
+				"label": "Nucleotide binding",
+				"name": "ft:np_bind"
+			},
+			{
+				"label": "Pathway",
+				"name": "cc:pathway"
+			},
+			{
+				"label": "pH dependence",
+				"name": "cc:biophysicochemical_properties"
+			},
+			{
+				"label": "Redox potential",
+				"name": "cc:biophysicochemical_properties"
+			},
+			{
+				"label": "Site",
+				"name": "ft:site"
+			},
+			{
+				"label": "Temperature dependence",
+				"name": "cc:biophysicochemical_properties"
+			}
+		]
+	},
+	{
+		"groupName": "Miscellaneous",
+		"fields": [
+			{
+				"label": "Annotation",
+				"name": "score"
+			},
+			{
+				"label": "Caution",
+				"name": "cc:alternative_products"
+			},
+			{
+				"label": "Features",
+				"name": "feature"
+			},
+			{
+				"label": "Keywords",
+				"name": "keyword"
+			},
+			{
+				"label": "Matched text",
+				"name": "keyword"
+			},
+			{
+				"label": "Miscellaneous [CC]",
+				"name": "cc:miscellaneous"
+			},
+			{
+				"label": "Protein existence",
+				"name": "info"
+			},
+			{
+				"label": "Reviewed",
+				"name": "info"
+			},
+			{
+				"label": "Tools",
+				"name": ""
+			},
+			{
+				"label": "UniParc",
+				"name": "uniparc_id"
+			}
+		]
+	},
+	{
+		"groupName": "Interaction",
+		"fields": [
+			{
+				"label": "Interacts with",
+				"name": "cc:interaction"
+			},
+			{
+				"label": "Subunit structure",
+				"name": "cc:subunit"
+			}
+		]
+	},
+	{
+		"groupName": "Expression",
+		"fields": [
+			{
+				"label": "Developmental stage",
+				"name": "cc:developmental_stage"
+			},
+			{
+				"label": "Induction",
+				"name": "cc:induction"
+			},
+			{
+				"label": "Tissue specificity",
+				"name": "cc:tissue_specificity"
+			}
+		]
+	},
+	{
+		"groupName": "Gene Ontology (GO)",
+		"fields": [
+			{
+				"label": "Gene Ontology (biological process)",
+				"name": "dr:go"
+			},
+			{
+				"label": "Gene Ontology (cellular component)",
+				"name": "dr:go"
+			},
+			{
+				"label": "Gene Ontology (GO)",
+				"name": "dr:go"
+			},
+			{
+				"label": "Gene Ontology (molecular function)",
+				"name": "dr:go"
+			},
+			{
+				"label": "Gene Ontology IDs",
+				"name": "dr:go"
+			}
+		]
+	},
+	{
+		"groupName": "Pathology & Biotech",
+		"fields": [
+			{
+				"label": "Allergenic Properties",
+				"name": "cc:allergen"
+			},
+			{
+				"label": "Biotechnological use",
+				"name": "cc:biotechnology"
+			},
+			{
+				"label": "Disruption phenotype",
+				"name": "cc:disruption_phenotype"
+			},
+			{
+				"label": "Involvement in disease",
+				"name": "cc:disease"
+			},
+			{
+				"label": "Mutagenesis",
+				"name": "ft:mutagen"
+			},
+			{
+				"label": "Pharmaceutical use",
+				"name": "cc:pharmaceutical"
+			},
+			{
+				"label": "Toxic dose",
+				"name": "cc:toxic_dose"
+			}
+		]
+	},
+	{
+		"groupName": "Subcellular location",
+		"fields": [
+			{
+				"label": "Intramembrane",
+				"name": "ft:intramem"
+			},
+			{
+				"label": "Subcellular location [CC]",
+				"name": "cc:subcellular_location"
+			},
+			{
+				"label": "Topological domain",
+				"name": "ft:top_dom"
+			},
+			{
+				"label": "Transmembrane",
+				"name": "ft:transmem"
+			}
+		]
+	},
+	{
+		"groupName": "PTM / Processing",
+		"fields": [
+			{
+				"label": "Chain",
+				"name": "ft:chain"
+			},
+			{
+				"label": "Cross-link",
+				"name": "ft:crosslnk"
+			},
+			{
+				"label": "Disulfide bond",
+				"name": "ft:disulfide"
+			},
+			{
+				"label": "Glycosylation",
+				"name": "ft:carbohyd"
+			},
+			{
+				"label": "Initiator methionine",
+				"name": "ft:init_met"
+			},
+			{
+				"label": "Lipidation",
+				"name": "ft:lipid"
+			},
+			{
+				"label": "Modified residue",
+				"name": "ft:mod_res"
+			},
+			{
+				"label": "Peptide",
+				"name": "ft:peptide"
+			},
+			{
+				"label": "Post-translational modification",
+				"name": "cc:ptm"
+			},
+			{
+				"label": "Propeptide",
+				"name": "ft:propep"
+			},
+			{
+				"label": "Signal peptide",
+				"name": "ft:signal"
+			},
+			{
+				"label": "Transit peptide",
+				"name": "transit"
+			}
+		]
+	},
+	{
+		"groupName": "Structure",
+		"fields": [
+			{
+				"label": "3D",
+				"name": "dr:pdb"
+			},
+			{
+				"label": "Beta strand",
+				"name": "ft:strand"
+			},
+			{
+				"label": "Helix",
+				"name": "ft:helix"
+			},
+			{
+				"label": "Turn",
+				"name": "ft:turn"
+			}
+		]
+	},
+	{
+		"groupName": "Publications",
+		"fields": [
+			{
+				"label": "Mapped PubMed ID",
+				"name": ""
+			},
+			{
+				"label": "PubMed ID",
+				"name": "reference"
+			}
+		]
+	},
+	{
+		"groupName": "Date of",
+		"fields": [
+			{
+				"label": "Date of creation",
+				"name": "info"
+			},
+			{
+				"label": "Date of last modification",
+				"name": "info"
+			},
+			{
+				"label": "Date of last sequence modification",
+				"name": "info"
+			},
+			{
+				"label": "Entry version",
+				"name": "info"
+			}
+		]
+	},
+	{
+		"groupName": "Family & Domains",
+		"fields": [
+			{
+				"label": "Coiled coil",
+				"name": "ft:coiled"
+			},
+			{
+				"label": "Compositional bias",
+				"name": "ft:compbias"
+			},
+			{
+				"label": "Domain [CC]",
+				"name": "cc:domain"
+			},
+			{
+				"label": "Domain [FT]",
+				"name": "ft:domain"
+			},
+			{
+				"label": "Motif",
+				"name": "ft:motif"
+			},
+			{
+				"label": "Protein families",
+				"name": "cc:similarity"
+			},
+			{
+				"label": "Region",
+				"name": "ft:region"
+			},
+			{
+				"label": "Repeat",
+				"name": "ft:repeat"
+			},
+			{
+				"label": "Sequence similarities",
+				"name": "cc:similarity"
+			},
+			{
+				"label": "Zinc finger",
+				"name": "ft:zn_fing"
+			}
+		]
+	},
+	{
+		"groupName": "Taxonomic lineage",
+		"fields": [
+			{
+				"label": "Taxonomic lineage (all)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (CLASS)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (COHORT)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (FAMILY)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (FORMA)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (GENUS)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (INFRACLASS)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (INFRAORDER)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (KINGDOM)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (ORDER)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (PARVORDER)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (PHYLUM)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SPECIES)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SPECIES_GROUP)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SPECIES_SUBGROUP)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBCLASS)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBCOHORT)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBFAMILY)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBGENUS)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBKINGDOM)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBORDER)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBPHYLUM)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBSPECIES)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUBTRIBE)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUPERCLASS)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUPERFAMILY)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUPERKINGDOM)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUPERORDER)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (SUPERPHYLUM)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (TRIBE)",
+				"name": "lineage"
+			},
+			{
+				"label": "Taxonomic lineage (VARIETAS)",
+				"name": "lineage"
+			}
+		]
+	},
+	{
+		"groupName": "Taxonomic identifier",
+		"fields": [
+			{
+				"label": "Taxonomic lineage IDs",
+				"name": "organism"
+			}
+		]
+	}
+]
