@@ -55,6 +55,9 @@ public class FlatFileConverter extends AbstractHttpMessageConverter<Stream<Colle
                         if (currentCount % FLUSH_INTERVAL == 0) {
                             outputStream.flush();
                         }
+                        if (currentCount % 10000 == 0) {
+                            LOGGER.debug("UniProt flatfile entries written: {}", currentCount);
+                        }
 
                         outputStream.write(UniProtFlatfileWriter.write(entry).getBytes());
                     } catch (IOException e) {

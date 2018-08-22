@@ -23,6 +23,7 @@ public class CloudSolrStreamTemplate {
     private SolrQuery.ORDER order;
     private String key;
     private String collection;
+    private StreamContext streamContext;
 
     public CloudSolrStream create(String query) {
         CloudSolrStreamBuilder streamBuilder = CloudSolrStreamBuilder.builder()
@@ -31,6 +32,7 @@ public class CloudSolrStreamTemplate {
                 .key(key)
                 .order(order)
                 .requestHandler(requestHandler)
+                .streamContext(createStreamContext())
                 .build();
 
         return streamBuilder.build(query);
@@ -44,6 +46,7 @@ public class CloudSolrStreamTemplate {
         private SolrQuery.ORDER order;
         private String key;
         private String query;
+        private StreamContext streamContext;
 
         private CloudSolrStream build(String query) {
             SolrQuery solrQuery = new SolrQuery();
@@ -54,7 +57,7 @@ public class CloudSolrStreamTemplate {
 
             try {
                 CloudSolrStream cStream = new CloudSolrStream(zookeeperHost, collection, solrQuery);
-                cStream.setStreamContext(createStreamContext());
+                cStream.setStreamContext(streamContext);
                 return cStream;
             } catch (IOException e) {
                 LOGGER.error("Could not create CloudSolrStream", e);
@@ -62,13 +65,17 @@ public class CloudSolrStreamTemplate {
             }
         }
 
-        private StreamContext createStreamContext() {
-            StreamContext streamContext = new StreamContext();
-            streamContext.workerID = 0;
-            streamContext.numWorkers = 1;
-            SolrClientCache solrClientCache = new SolrClientCache();
-            streamContext.setSolrClientCache(solrClientCache);
-            return streamContext;
-        }
+    }
+
+    /**
+     * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
+     */
+    private StreamContext createStreamContext() {
+        StreamContext streamContext = new StreamContext();
+        streamContext.workerID = collection.hashCode(); // this should be the same for each collection, so that they share client caches
+        streamContext.numWorkers = 1;
+        SolrClientCache solrClientCache = new SolrClientCache();
+        streamContext.setSolrClientCache(solrClientCache);
+        return streamContext;
     }
 }
