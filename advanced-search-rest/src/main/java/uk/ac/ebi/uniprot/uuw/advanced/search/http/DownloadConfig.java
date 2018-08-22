@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileConverter;
 
 import java.util.List;
@@ -41,14 +40,15 @@ public class DownloadConfig {
     }
 
     /*
-     * Add to the supported message converters
+     * Add to the supported message converters.
+     * Add more message converters for additional response types.
      */
     @Bean
-    public WebMvcConfigurer extendedMessageConverters(UniProtClient uniProtClient) {
+    public WebMvcConfigurer extendedMessageConverters() {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new FlatFileConverter(uniProtClient));
+                converters.add(new FlatFileConverter());
             }
         };
     }

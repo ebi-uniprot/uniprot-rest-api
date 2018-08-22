@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.service;
+package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 
 import lombok.Builder;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -37,7 +37,7 @@ public class CloudSolrStreamTemplate {
     }
 
     @Builder
-    public static class CloudSolrStreamBuilder {
+    private static class CloudSolrStreamBuilder {
         private final String collection;
         private String zookeeperHost;
         private String requestHandler;
@@ -45,7 +45,7 @@ public class CloudSolrStreamTemplate {
         private String key;
         private String query;
 
-        public CloudSolrStream build(String query) {
+        private CloudSolrStream build(String query) {
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setQuery(query);
             solrQuery.setSort(key, order);

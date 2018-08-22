@@ -7,10 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
@@ -24,7 +22,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -37,6 +34,7 @@ import java.util.stream.StreamSupport;
 @RequestMapping("/uniprot")
 public class UniprotAdvancedSearchController {
 
+    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON;
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniprotAdvancedSearchService queryBuilderService;
@@ -85,38 +83,20 @@ public class UniprotAdvancedSearchController {
         return new ResponseEntity<>(stream, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/streamAll", method = RequestMethod.GET)
-    public ResponseEntity<StreamingResponseBody> streamAll(@RequestParam(value = "query", required = true) String query) {
-        AtomicInteger counter = new AtomicInteger();
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        StreamingResponseBody responseBody = outputStream ->
-                queryBuilderService.streamAll(query).forEach(acc -> {
-                    try {
-                        int currentCount = counter.getAndIncrement();
-                        if (currentCount % 10000 == 0) {
-                            outputStream.flush();
-                            double rate = (double) counter.get() / stopWatch.getTotalTimeSeconds();
-                            System.out.println("[total=" + currentCount + ", rate=" + rate + "]");
-                        }
-                        outputStream.write((acc + "\n").getBytes());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-
-        return ResponseEntity.ok().body(responseBody);
+    @RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
+    public UniProtDocument getByAccession(@RequestParam(value = "accession", required = true) String accession) {
+        return queryBuilderService.getByAccession(accession).orElse(null);
     }
 
-    @RequestMapping(value = "/streamAll2", method = RequestMethod.GET, produces = {"text/flatfile"})
-    public ResponseEntity<ResponseBodyEmitter> streamAll2(@RequestParam(value = "query", required = true) String query,
-                                                          @RequestHeader("Accept") String contentType) {
-        String[] contentTypeArr = contentType.split("/");
+    @RequestMapping(value = "/stream", method = RequestMethod.GET, produces = {"text/flatfile"})
+    public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
+                                                          @RequestHeader("Accept") String rawContentType) {
+        MediaType requestedMediaType = getMediaType(rawContentType);
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         downloadTaskExecutor.execute(() -> {
             try {
-                emitter.send(queryBuilderService.streamAll(query), new MediaType(contentTypeArr[0], contentTypeArr[1]));
+                emitter.send(queryBuilderService.stream(query), requestedMediaType);
             } catch (IOException e) {
                 emitter.completeWithError(e);
             }
@@ -126,8 +106,12 @@ public class UniprotAdvancedSearchController {
         return ResponseEntity.ok().body(emitter);
     }
 
-    @RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
-    public UniProtDocument getByAccession(@RequestParam(value = "accession", required = true) String accession) {
-        return queryBuilderService.getByAccession(accession).orElse(null);
+    private MediaType getMediaType(String rawContentType) {
+        String[] contentTypeArr = rawContentType.split("/");
+        if (contentTypeArr.length == 2) {
+            return new MediaType(contentTypeArr[0], contentTypeArr[1]);
+        } else {
+            return DEFAULT_MEDIA_TYPE;
+        }
     }
 }
