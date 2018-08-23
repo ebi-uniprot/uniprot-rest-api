@@ -69,11 +69,11 @@
 			},
 			{
 				"label": "Fragment",
-				"name": "fragment"
+				"name": "sequence"
 			},
 			{
 				"label": "Gene encoded by",
-				"name": "organelle"
+				"name": "gene_location"
 			},
 			{
 				"label": "Length",
@@ -239,7 +239,7 @@
 			},
 			{
 				"label": "Protein existence",
-				"name": "info"
+				"name": "protein_existence"
 			},
 			{
 				"label": "Reviewed",
@@ -413,7 +413,7 @@
 			},
 			{
 				"label": "Transit peptide",
-				"name": "transit"
+				"name": "ft:transit"
 			}
 		]
 	},

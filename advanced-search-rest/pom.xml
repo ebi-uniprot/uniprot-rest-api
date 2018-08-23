@@ -68,6 +68,12 @@
 			<artifactId>data-service-restful</artifactId>
 			<version>${data-service.version}</version>
 		</dependency>
+		
+		    <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tools-annotation-score</artifactId>
+            <version>${data-service.version}</version>
+        </dependency>
 	
 		<!-- Solr Data -->
 		<dependency>

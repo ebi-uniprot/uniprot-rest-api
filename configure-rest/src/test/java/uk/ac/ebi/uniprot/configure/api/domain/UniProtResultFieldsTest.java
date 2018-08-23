@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -80,6 +81,18 @@ class UniProtResultFieldsTest {
 		verifyField(groups, "Taxonomic identifier",  "Taxonomic lineage IDs", "organism");
 		
 		
+	}
+	@Test
+	void allFields() {
+		List<FieldGroup> groups = instance.getResultFields();
+		groups.stream().flatMap(val ->val.getFields().stream())
+		.map(val -> val.getName())
+		.distinct()
+		.filter(val->!val.startsWith("ft:"))
+		.filter(val->!val.startsWith("cc:"))
+		.filter(val->!val.startsWith("dr:"))
+		.filter(val ->!Strings.isNullOrEmpty(val))
+		.forEach(System.out::println);
 	}
 	
 	@Test

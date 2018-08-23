@@ -27,11 +27,13 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
+import uk.ac.ebi.uniprot.score.UniProtEntryScored;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.FieldsParser;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniprotAdvancedSearchService;
 
@@ -108,17 +110,35 @@ public class UniprotAdvancedSearchController {
 			return null;
 		Optional<UniProtEntry> result = entryService.getByAccession(doc.accession);
 		if (result.isPresent()) {
-			return jsonEntryAdaptor.convertEntity(result.get(), Collections.emptyMap());
+			return convertAndFilter(result.get(), Collections.emptyMap());
 		} else
 
 			return null;
 	}
 
-	QueryResult<UPEntry> convert(QueryResult<UniProtEntry> results, Map<String, List<String>> filters) {
-		List<UPEntry> upEntries = results.getContent().stream().map(val -> jsonEntryAdaptor.convertEntity(val, filters))
+	private QueryResult<UPEntry> convert(QueryResult<UniProtEntry> results, Map<String, List<String>> filters) {
+		List<UPEntry> upEntries = results.getContent().stream().map(val -> convertAndFilter(val, filters))
 				.collect(Collectors.toList());
 		return QueryResult.of(upEntries, results.getPage(), results.getFacets());
 
+	}
+	
+	private UPEntry convertAndFilter(UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
+		UPEntry entry  = jsonEntryAdaptor.convertEntity(upEntry, filterParams);
+		if((filterParams ==null ) || filterParams.isEmpty())
+			return entry;
+		EntryFilters.filterEntry(entry, filterParams);
+		if(filterParams.containsKey("score")) {
+			entry.setAnnotationScore(getScore(upEntry));
+		}
+		return entry;
+	}
+	private int getScore(UniProtEntry entry) {
+		 UniProtEntryScored entryScored = new UniProtEntryScored(entry);
+		 double score = entryScored.score();
+		 int q = (int) (score / 20d);
+		 int normalisedScore= q > 4 ? 5 : q + 1;
+		 return normalisedScore;
 	}
 
 }

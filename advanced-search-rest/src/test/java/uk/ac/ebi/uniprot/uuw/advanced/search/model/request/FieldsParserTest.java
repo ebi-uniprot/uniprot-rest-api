@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
+
 class FieldsParserTest {
 
 	@Test
@@ -43,7 +45,31 @@ class FieldsParserTest {
 		assertThat(comments, hasItems("function","domain" ));
 	}
 	
-
+	@Test
+	void withCommentCCSpecific() {
+		String fields ="accession,protein_name,gene_name,organism,comment:function,cc:domain";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(5, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("organism"));
+		assertTrue(filters.containsKey("comment"));
+		List<String> comments = filters.get("comment");
+		assertThat(comments, hasItems("function","domain" ));
+	}
+	
+	@Test
+	void withCCSpecific() {
+		String fields ="accession,protein_name,gene_name,organism,cc:function,cc:domain";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(5, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("organism"));
+		assertTrue(filters.containsKey("comment"));
+		List<String> comments = filters.get("comment");
+		assertThat(comments, hasItems("function","domain" ));
+	}
+	
+	
 	@Test
 	void withFeature() {
 		String fields ="accession,protein_name,gene_name,organism,feature";
@@ -67,6 +93,29 @@ class FieldsParserTest {
 		assertThat(comments, hasItems("binding","signal" ));
 	}
 	@Test
+	void withFeatureFTSpecific() {
+		String fields ="accession,protein_name,gene_name,organism,feature:binding,ft:signal";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(5, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("organism"));
+		assertTrue(filters.containsKey("feature"));
+		List<String> comments = filters.get("feature");
+		assertThat(comments, hasItems("binding","signal" ));
+	}
+	@Test
+	void withFTSpecific() {
+		String fields ="accession,protein_name,gene_name,organism,ft:binding,ft:signal";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(5, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("organism"));
+		assertTrue(filters.containsKey("feature"));
+		List<String> comments = filters.get("feature");
+		assertThat(comments, hasItems("binding","signal" ));
+	}
+	
+	@Test
 	void withXref() {
 		String fields ="accession,protein_name,gene_name,organism,xref";
 		Map<String, List<String> > filters = FieldsParser.parse(fields);
@@ -88,5 +137,28 @@ class FieldsParserTest {
 		List<String> comments = filters.get("xref");
 		assertThat(comments, hasItems("embl","pdb" ));
 	}
+	@Test
+	void withXrefDRSpecific() {
+		String fields ="accession,protein_name,gene_name,organism,xref:embl,dr:pdb";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(5, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("organism"));
+		assertTrue(filters.containsKey("xref"));
+		List<String> comments = filters.get("xref");
+		assertThat(comments, hasItems("embl","pdb" ));
+	}
+	@Test
+	void withDRSpecific() {
+		String fields ="accession,protein_name,gene_name,organism,dr:embl,dr:pdb";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(5, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("organism"));
+		assertTrue(filters.containsKey("xref"));
+		List<String> comments = filters.get("xref");
+		assertThat(comments, hasItems("embl","pdb" ));
+	}
+	
 
 }
