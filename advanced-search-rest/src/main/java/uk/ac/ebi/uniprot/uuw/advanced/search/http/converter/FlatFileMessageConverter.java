@@ -12,6 +12,8 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -23,12 +25,12 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-public class FlatFileConverter extends AbstractHttpMessageConverter<Stream<Collection<UniProtEntry>>> {
-    private static final Logger LOGGER = getLogger(FlatFileConverter.class);
+public class FlatFileMessageConverter extends AbstractHttpMessageConverter<Stream<Collection<UniProtEntry>>> {
+    private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
     private static final MediaType MEDIA_TYPE = new MediaType("text", "flatfile");
     private static final int FLUSH_INTERVAL = 5000;
 
-    public FlatFileConverter() {
+    public FlatFileMessageConverter() {
         super(MEDIA_TYPE);
     }
 
@@ -46,6 +48,7 @@ public class FlatFileConverter extends AbstractHttpMessageConverter<Stream<Colle
     protected void writeInternal(Stream<Collection<UniProtEntry>> contentStream, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
+        Instant start = Instant.now();
 
         try {
             contentStream.forEach(items -> {
@@ -56,19 +59,27 @@ public class FlatFileConverter extends AbstractHttpMessageConverter<Stream<Colle
                             outputStream.flush();
                         }
                         if (currentCount % 10000 == 0) {
-                            LOGGER.debug("UniProt flatfile entries written: {}", currentCount);
+                            Instant now = Instant.now();
+                            long millisDuration = Duration.between(start, now).toMillis();
+                            int secDuration = (int) millisDuration / 1000;
+                            String rate = String.format("%.2f", ((double) currentCount) / secDuration);
+                            LOGGER.info("UniProt flatfile entries written: {}", currentCount);
+                            LOGGER.info("UniProt flatfile entries time: {} ({} entries/sec)", secDuration, rate);
                         }
 
-                        outputStream.write(UniProtFlatfileWriter.write(entry).getBytes());
+                        outputStream.write((UniProtFlatfileWriter.write(entry) + "\n").getBytes());
                     } catch (IOException e) {
                         throw new StopStreamException("Could not write entry: " + entry, e);
                     }
                 });
             });
+
+
         } catch (StopStreamException e) {
             LOGGER.error("Client aborted streaming: closing stream.", e);
-            outputStream.flush();
             contentStream.close();
+        } finally {
+            outputStream.flush();
         }
     }
 }

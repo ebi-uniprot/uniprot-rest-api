@@ -1,10 +1,14 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -17,6 +21,7 @@ public class TupleStreamIterable implements Iterable<String> {
     private static final Logger LOGGER = getLogger(TupleStreamIterable.class);
     private final TupleStream tupleStream;
     private final String id;
+    private final RetryPolicy retryPolicy;
     private Tuple current = new Tuple();
     private Tuple next = current;
     private boolean atEnd = false;
@@ -24,6 +29,10 @@ public class TupleStreamIterable implements Iterable<String> {
     public TupleStreamIterable(TupleStream tupleStream, String id) {
         this.tupleStream = tupleStream;
         this.id = id;
+        this.retryPolicy = new RetryPolicy()
+                .retryOn(IOException.class)
+                .withDelay(500, TimeUnit.MILLISECONDS)
+                .withMaxRetries(5);
     }
 
     @Override
@@ -31,18 +40,6 @@ public class TupleStreamIterable implements Iterable<String> {
         return new Iterator<String>() {
             @Override
             public boolean hasNext() {
-//                try {
-//                    current = tupleStream.read();
-//                    boolean eof = current.EOF;
-//                    if (eof) {
-//                        tupleStream.close();
-//                    }
-//                    return !eof;
-//                } catch (Exception e) {
-//                    LOGGER.error("Error whilst iterating through Solr results stream", e);
-//                    throw new IllegalStateException(e);
-//                }
-
                 if (!atEnd && next == current) {   // using ==, since we're interested in the reference
                     next = nextTupleFromStream();
                     if (next.EOF) {
@@ -65,7 +62,7 @@ public class TupleStreamIterable implements Iterable<String> {
 
             private Tuple nextTupleFromStream() {
                 try {
-                    return tupleStream.read();
+                    return Failsafe.with(retryPolicy).get(tupleStream::read);
                 } catch (Exception e) {
                     LOGGER.error("Error whilst iterating through Solr results stream", e);
                     throw new IllegalStateException(e);

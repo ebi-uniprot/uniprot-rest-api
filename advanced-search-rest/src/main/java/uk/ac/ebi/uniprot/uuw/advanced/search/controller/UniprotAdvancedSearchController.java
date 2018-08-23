@@ -33,8 +33,6 @@ import java.util.stream.StreamSupport;
 @RestController
 @RequestMapping("/uniprot")
 public class UniprotAdvancedSearchController {
-
-    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON;
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniprotAdvancedSearchService queryBuilderService;
@@ -88,15 +86,20 @@ public class UniprotAdvancedSearchController {
         return queryBuilderService.getByAccession(accession).orElse(null);
     }
 
-    @RequestMapping(value = "/stream", method = RequestMethod.GET, produces = {"text/flatfile"})
+    /*
+     * E.g., usage from command line:
+     *
+     * time curl -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for just accessions)
+     * time curl -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for entries)
+     */
+    @RequestMapping(value = "/stream", method = RequestMethod.GET, produces = {"text/flatfile", "text/list"})
     public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
-                                                          @RequestHeader("Accept") String rawContentType) {
-        MediaType requestedMediaType = getMediaType(rawContentType);
+                                                          @RequestHeader("Accept") MediaType contentType) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         downloadTaskExecutor.execute(() -> {
             try {
-                emitter.send(queryBuilderService.stream(query), requestedMediaType);
+                emitter.send(queryBuilderService.stream(query, contentType), contentType);
             } catch (IOException e) {
                 emitter.completeWithError(e);
             }
@@ -104,14 +107,5 @@ public class UniprotAdvancedSearchController {
         });
 
         return ResponseEntity.ok().body(emitter);
-    }
-
-    private MediaType getMediaType(String rawContentType) {
-        String[] contentTypeArr = rawContentType.split("/");
-        if (contentTypeArr.length == 2) {
-            return new MediaType(contentTypeArr[0], contentTypeArr[1]);
-        } else {
-            return DEFAULT_MEDIA_TYPE;
-        }
     }
 }

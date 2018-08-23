@@ -52,7 +52,7 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithUnaryBatchSize() {
         createSearchStoreStream(1);
         Stream<Collection<String>> storeStream = storeStreamer
-                .searchToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
+                .idsToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 singletonList(transformString("a")),
@@ -67,7 +67,7 @@ public class StoreStreamerTest {
         createSearchStoreStream(3);
         TupleStream tupleStream = tupleStream(asList("a", "b", "c", "d", "e"));
         Stream<Collection<String>> storeStream = storeStreamer
-                .searchToStoreStream(tupleStream);
+                .idsToStoreStream(tupleStream);
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         System.out.println(results);
         assertThat(results, contains(
@@ -82,7 +82,7 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithBiggerBatchSize() {
         createSearchStoreStream(4);
         Stream<Collection<String>> storeStream = storeStreamer
-                .searchToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
+                .idsToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 asList(transformString("a"),
@@ -97,7 +97,7 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
         createSearchStoreStream(10);
         Stream<Collection<String>> storeStream = storeStreamer
-                .searchToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
+                .idsToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 asList(transformString("a"),

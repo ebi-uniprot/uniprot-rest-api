@@ -5,9 +5,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -87,11 +89,35 @@ public class UniprotAdvancedSearchService {
         }
     }
 
-    public Stream<Collection<UniProtEntry>> stream(String query) {
+    public Stream<Collection<UniProtEntry>> streamEntries(String query) {
         CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
         try {
             cStream.open();
-            return storeStreamer.searchToStoreStream(cStream);
+            return storeStreamer.idsToStoreStream(cStream);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public Stream<String> streamIds(String query) {
+        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
+        try {
+            cStream.open();
+            return storeStreamer.idsStream(cStream);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public Stream<?> stream(String query, MediaType mediaType) {
+        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
+        try {
+            cStream.open();
+            if (mediaType.equals(ListMessageConverter.MEDIA_TYPE)) {
+                return storeStreamer.idsStream(cStream);
+            } else {
+                return storeStreamer.idsToStoreStream(cStream);
+            }
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

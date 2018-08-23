@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "download")
 @Getter @Setter
-public class DownloadConfig {
+public class MessageConverterConfig {
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
 
     @Bean
@@ -48,7 +49,8 @@ public class DownloadConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new FlatFileConverter());
+                converters.add(new FlatFileMessageConverter());
+                converters.add(new ListMessageConverter());
             }
         };
     }
