@@ -13,7 +13,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.SolrQueryRepository;
  * @author lgonzales
  */
 @Repository
-
 public class UniprotQueryRepository  extends SolrQueryRepository<UniProtDocument> {
 
     public UniprotQueryRepository(SolrTemplate solrTemplate, UniprotFacetConfig facetConverter) {

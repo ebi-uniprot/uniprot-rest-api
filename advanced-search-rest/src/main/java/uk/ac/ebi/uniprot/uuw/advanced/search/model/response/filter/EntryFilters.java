@@ -1,9 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.DbReference;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
@@ -11,13 +7,17 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.Comment;
 import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Feature;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
 public class EntryFilters {
 	private static final String SCORE = "score";
 	private static final String ALL = "all";
 
-	public static UPEntry convertAndFilter(JsonDataAdapter<UniProtEntry, UPEntry> jsonEntryAdaptor,
+	public static UPEntry convertAndFilter(JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
 			UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
-		UPEntry entry  = jsonEntryAdaptor.convertEntity(upEntry, filterParams);
+		UPEntry entry  = uniProtJsonAdaptor.convertEntity(upEntry, filterParams);
 		if((filterParams ==null ) || filterParams.isEmpty())
 			return entry;
 		filterEntry(entry, filterParams);

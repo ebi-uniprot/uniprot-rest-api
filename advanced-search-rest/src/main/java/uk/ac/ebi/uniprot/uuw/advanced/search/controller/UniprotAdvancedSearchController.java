@@ -2,7 +2,6 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
@@ -27,10 +27,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.VARY;
@@ -47,20 +49,20 @@ public class UniprotAdvancedSearchController {
 
     private final UniprotAdvancedSearchService queryBuilderService;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
-	private final UniprotAdvancedSearchService queryBuilderService;
 	private final UniProtEntryService entryService;
-	@Inject
-	private JsonDataAdapter<UniProtEntry, UPEntry> jsonEntryAdaptor;
+	private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
                                            UniprotAdvancedSearchService queryBuilderService,
                                            ThreadPoolTaskExecutor downloadTaskExecutor,
-                                           UniProtEntryService entryService) {
+                                           UniProtEntryService entryService,
+										   JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor) {
         this.eventPublisher = eventPublisher;
         this.queryBuilderService = queryBuilderService;
         this.downloadTaskExecutor = downloadTaskExecutor;
         this.entryService = entryService;
+        this.uniProtJsonAdaptor = uniProtJsonAdaptor;
     }
 
 
@@ -95,7 +97,7 @@ public class UniprotAdvancedSearchController {
 			@RequestParam(value = "field", required = false) String field) {
 		Stream<UniProtEntry> stream = entryService.getAll(query);
 		Map<String, List<String>> filters = FieldsParser.parse(field);
-		Stream<UPEntry> entryStream = stream.map(val -> jsonEntryAdaptor.convertEntity(val, filters));
+		Stream<UPEntry> entryStream = stream.map(val -> uniProtJsonAdaptor.convertEntity(val, filters));
 		return new ResponseEntity<>(entryStream, HttpStatus.OK);
 	}
 
@@ -127,7 +129,7 @@ public class UniprotAdvancedSearchController {
 	}
 
 	private UPEntry convertAndFilter(UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
-		UPEntry entry  = jsonEntryAdaptor.convertEntity(upEntry, filterParams);
+		UPEntry entry  = uniProtJsonAdaptor.convertEntity(upEntry, filterParams);
 		if((filterParams ==null ) || filterParams.isEmpty())
 			return entry;
 		EntryFilters.filterEntry(entry, filterParams);

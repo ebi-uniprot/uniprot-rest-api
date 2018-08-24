@@ -28,13 +28,13 @@ public class ResultsConfig {
     @Bean
     public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtClient uniProtClient) {
         return new StoreStreamer<>(uniProtClient,
-                                   resultsConfigProperties().getUniProtStreamerBatchSize(),
-                                   resultsConfigProperties().getUniProtStreamerValueId());
+                                   resultsConfigProperties().getUniprot().getBatchSize(),
+                                   resultsConfigProperties().getUniprot().getValueId());
     }
 
     @Bean
-    public ResultsConfigProperties resultsConfigProperties() {
-        return new ResultsConfigProperties();
+    public StreamerConfigProperties resultsConfigProperties() {
+        return new StreamerConfigProperties();
     }
 
 }

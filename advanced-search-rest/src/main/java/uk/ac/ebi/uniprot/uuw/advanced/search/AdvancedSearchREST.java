@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.solr.repository.config.EnableSolrRepositories;
+import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtSearchConfigure;
 
 /**
  * Starts advanced-search REST application.
@@ -18,5 +19,4 @@ public class AdvancedSearchREST {
     public static void main(String[] args) {
         SpringApplication.run(AdvancedSearchREST.class, args);
     }
-
 }

@@ -1,23 +1,14 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.stereotype.Service;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -25,14 +16,20 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 @Service
 public class UniProtEntryService {
 	private UniprotQueryRepository repository;
 	private UniprotFacetConfig uniprotFacetConfig;
-	private VoldemortEntryService entryService;
+	private UniProtClient entryService;
 
-	public UniProtEntryService(UniprotQueryRepository repository, UniprotFacetConfig uniprotFacetConfig,
-			VoldemortEntryService entryService) {
+	public UniProtEntryService(UniprotQueryRepository repository,
+							   UniprotFacetConfig uniprotFacetConfig,
+							   UniProtClient entryService) {
 		this.repository = repository;
 		this.uniprotFacetConfig = uniprotFacetConfig;
 		this.entryService = entryService;

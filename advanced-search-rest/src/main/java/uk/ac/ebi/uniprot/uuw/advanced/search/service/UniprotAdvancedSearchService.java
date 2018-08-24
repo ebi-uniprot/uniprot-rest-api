@@ -1,19 +1,29 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
+import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
+import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
-import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRespository;
+import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Service class responsible to build Solr query and execute it in the repository.
@@ -24,11 +34,11 @@ import java.util.Optional;
 @Service
 public class UniprotAdvancedSearchService {
     private final CloudSolrStreamTemplate cloudSolrStreamTemplate;
-    private final UniprotQueryRespository repository;
+    private final UniprotQueryRepository repository;
     private final UniprotFacetConfig uniprotFacetConfig;
     private final StoreStreamer<UniProtEntry> storeStreamer;
 
-    public UniprotAdvancedSearchService(UniprotQueryRespository repository,
+    public UniprotAdvancedSearchService(UniprotQueryRepository repository,
                                         UniprotFacetConfig uniprotFacetConfig,
                                         CloudSolrStreamTemplate cloudSolrStreamTemplate,
                                         StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer) {
@@ -81,26 +91,6 @@ public class UniprotAdvancedSearchService {
         } catch (Exception e) {
             String message = "Could not get accession for: [" + accession + "]";
             throw new ServiceException(message, e);
-        }
-    }
-
-    public Stream<Collection<UniProtEntry>> streamEntries(String query) {
-        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
-        try {
-            cStream.open();
-            return storeStreamer.idsToStoreStream(cStream);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public Stream<String> streamIds(String query) {
-        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
-        try {
-            cStream.open();
-            return storeStreamer.idsStream(cStream);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
         }
     }
 
