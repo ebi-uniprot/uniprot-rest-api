@@ -6,23 +6,17 @@
 
     <parent>
         <groupId>uk.ac.ebi.uniprot</groupId>
-        <artifactId>UniProt-REST-API</artifactId>
+        <artifactId>uniprot-rest-api</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
     <artifactId>configure-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>configure-rest</name>
     <description>UniProt Rest API Configuration</description>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <compiler.version>3.3</compiler.version>
         <uniprot.core.version>2018.10-SNAPSHOT</uniprot.core.version>
-        <http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
     </properties>
 
     <dependencies>
