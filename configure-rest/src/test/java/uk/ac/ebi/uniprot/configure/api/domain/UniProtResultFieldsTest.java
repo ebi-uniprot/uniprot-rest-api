@@ -57,28 +57,28 @@ class UniProtResultFieldsTest {
 		assertEquals(19, seqGroup.get().getFields().size());
 		Optional<Field> massField = getField(seqGroup.get(), "Mass");
 		assertTrue(massField.isPresent());
-		assertEquals("sequence", massField.get().getName());
+		assertEquals("mass", massField.get().getName());
 	}
 	
 	@Test
 	void testResultField() {
 		List<FieldGroup> groups = instance.getResultFields();
-		verifyField(groups, "Names & Taxonomy", "Gene Names", "gene");
+		verifyField(groups, "Names & Taxonomy", "Gene Names", "gene_names");
 		verifyField(groups, "Sequences", "Alternative sequence", "ft:var_seq");
-		verifyField(groups, "Function", "Kinetics", "cc:biophysicochemical_properties");
-		verifyField(groups, "Miscellaneous", "Caution", "cc:alternative_products");
+		verifyField(groups, "Function", "Kinetics", "kinetics");
+		verifyField(groups, "Miscellaneous", "Caution", "caution");
 		verifyField(groups, "Interaction", "Subunit structure", "cc:subunit");
 		verifyField(groups, "Expression", "Induction", "cc:induction");
-		verifyField(groups, "Gene Ontology (GO)", "Gene Ontology (cellular component)", "dr:go");
+		verifyField(groups, "Gene Ontology (GO)", "Gene Ontology (cellular component)", "go_c");
 		verifyField(groups, "Pathology & Biotech", "Mutagenesis", "ft:mutagen");
 		verifyField(groups, "Subcellular location",  "Subcellular location [CC]", "cc:subcellular_location");
 		verifyField(groups, "PTM / Processing", "Cross-link", "ft:crosslnk");
 		verifyField(groups, "Structure",  "3D", "dr:pdb");
-		verifyField(groups, "Publications",  "PubMed ID", "reference");
-		verifyField(groups, "Date of", "Date of creation", "info");
+		verifyField(groups, "Publications",  "PubMed ID", "pm_id");
+		verifyField(groups, "Date of", "Date of creation", "date_create");
 		verifyField(groups, "Family & Domains",  "Compositional bias", "ft:compbias");
-		verifyField(groups, "Taxonomic lineage",  "Taxonomic lineage (CLASS)", "lineage");
-		verifyField(groups, "Taxonomic identifier",  "Taxonomic lineage IDs", "organism");
+		verifyField(groups, "Taxonomic lineage",  "Taxonomic lineage (CLASS)", "lin_class");
+		verifyField(groups, "Taxonomic identifier",  "Taxonomic lineage IDs", "tax_id");
 		
 		
 	}
