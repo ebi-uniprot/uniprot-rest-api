@@ -8,6 +8,8 @@ import java.util.Map;
 
 import com.google.common.base.Strings;
 
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldMaps;
+
 public class FieldsParser {
 	private static final String COLON = ":";
 	private static final String ALL = "all";
@@ -27,15 +29,16 @@ public class FieldsParser {
 		Map<String, List<String>> filters = new HashMap<>();
 		String tokens[] = fields.split(COMMA);
 		for (String token : tokens) {
-			if (token.startsWith(CC) || token.startsWith(COMMENT)) {
-				addTypedField(filters, COMMENT, CC, token);
+			String field = FieldMaps.INSTANCE.getField(token);
+			if (field.startsWith(CC) || field.startsWith(COMMENT)) {
+				addTypedField(filters, COMMENT, CC, field);
 
-			} else if (token.startsWith(FEATURE) || token.startsWith(FT)) {
-				addTypedField(filters, FEATURE, FT, token);
-			} else if (token.startsWith(XREF) || token.startsWith(DR)) {
-				addTypedField(filters, XREF, DR, token);
+			} else if (field.startsWith(FEATURE) || field.startsWith(FT)) {
+				addTypedField(filters, FEATURE, FT, field);
+			} else if (field.startsWith(XREF) || field.startsWith(DR)) {
+				addTypedField(filters, XREF, DR, field);
 			} else {
-				filters.put(token, Collections.emptyList());
+				filters.put(field, Collections.emptyList());
 			}
 		}
 		return filters;
