@@ -59,22 +59,24 @@ public class ListMessageConverter extends AbstractHttpMessageConverter<Stream<St
                 } catch (IOException e) {
                     throw new StopStreamException("Could not write id: " + id, e);
                 }
-
             });
 
-            Instant now = Instant.now();
-            long millisDuration = Duration.between(start, now).toMillis();
-            int secDuration = (int) millisDuration / 1000;
-            int totalCount = counter.get();
-            String rate = String.format("%.2f", ((double) totalCount) / secDuration);
-            LOGGER.info("IDs written: {}", totalCount);
-            LOGGER.info("IDs writing duration: {} ({} entries/sec)", secDuration, rate);
+            logStats(counter.get(), start);
         } catch (StopStreamException e) {
             LOGGER.error("Client aborted streaming: closing stream.", e);
             contentStream.close();
         } finally {
             outputStream.flush();
         }
+    }
+
+    private void logStats(int counter, Instant start) {
+        Instant now = Instant.now();
+        long millisDuration = Duration.between(start, now).toMillis();
+        int secDuration = (int) millisDuration / 1000;
+        String rate = String.format("%.2f", ((double) counter) / secDuration);
+        LOGGER.info("IDs written: {}", counter);
+        LOGGER.info("IDs writing duration: {} ({} entries/sec)", secDuration, rate);
     }
 }
 

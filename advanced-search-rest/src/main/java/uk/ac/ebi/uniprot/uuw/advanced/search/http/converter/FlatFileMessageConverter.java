@@ -59,12 +59,7 @@ public class FlatFileMessageConverter extends AbstractHttpMessageConverter<Strea
                             outputStream.flush();
                         }
                         if (currentCount % 10000 == 0) {
-                            Instant now = Instant.now();
-                            long millisDuration = Duration.between(start, now).toMillis();
-                            int secDuration = (int) millisDuration / 1000;
-                            String rate = String.format("%.2f", ((double) currentCount) / secDuration);
-                            LOGGER.info("UniProt flatfile entries written: {}", currentCount);
-                            LOGGER.info("UniProt flatfile entries time: {} ({} entries/sec)", secDuration, rate);
+                            logStats(currentCount, start);
                         }
 
                         outputStream.write((UniProtFlatfileWriter.write(entry) + "\n").getBytes());
@@ -74,12 +69,21 @@ public class FlatFileMessageConverter extends AbstractHttpMessageConverter<Strea
                 });
             });
 
-
+            logStats(counter.get(), start);
         } catch (StopStreamException e) {
             LOGGER.error("Client aborted streaming: closing stream.", e);
             contentStream.close();
         } finally {
             outputStream.flush();
         }
+    }
+
+    private void logStats(int counter, Instant start) {
+        Instant now = Instant.now();
+        long millisDuration = Duration.between(start, now).toMillis();
+        int secDuration = (int) millisDuration / 1000;
+        String rate = String.format("%.2f", ((double) counter) / secDuration);
+        LOGGER.info("UniProt flatfile entries written: {}", counter);
+        LOGGER.info("UniProt flatfile entries duration: {} ({} entries/sec)", secDuration, rate);
     }
 }
