@@ -159,6 +159,47 @@ class FieldsParserTest {
 		List<String> comments = filters.get("xref");
 		assertThat(comments, hasItems("embl","pdb" ));
 	}
-	
+	@Test
+	void withGenes() {
+		String fields ="accession,protein_name,gene_name,gene_orf,gene_oln";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(3, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("gene"));
+	}
 
+	@Test
+	void withGo() {
+		String fields ="accession,protein_name,go_id,go_f,go_c";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(3, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("xref"));
+		List<String> comments = filters.get("xref");
+		assertThat(comments, hasItems("go" ));
+	}
+	@Test
+	void withLineage() {
+		String fields ="accession,protein_name,lineage_all,lin_genus,lin_superfamily";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(3, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("lineage"));
+	}
+	@Test
+	void withInfo() {
+		String fields ="accession,protein_name,date_create,date_mod,version";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(3, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("info"));
+	}
+	@Test
+	void withSequence() {
+		String fields ="accession,protein_name,fragment,length,mass";
+		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		assertEquals(3, filters.size());
+		assertTrue(filters.containsKey("protein_name"));
+		assertTrue(filters.containsKey("sequence"));
+	}
 }

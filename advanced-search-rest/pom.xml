@@ -47,7 +47,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>configure-rest</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>
 			<artifactId>data-service-common-document</artifactId>

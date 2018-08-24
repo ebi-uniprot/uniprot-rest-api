@@ -4,27 +4,27 @@
 		"fields": [
 			{
 				"label": "Entry Name",
-				"name": "id"
+				"name": "id"	
 			},
 			{
 				"label": "Gene Names",
-				"name": "gene"
+				"name": "gene_names"
 			},
 			{
 				"label": "Gene Names (ordered locus)",
-				"name": "gene"
+				"name": "gene_oln"
 			},
 			{
 				"label": "Gene Names (ORF)",
-				"name": "gene"
+				"name": "gene_orf"
 			},
 			{
 				"label": "Gene Names (primary)",
-				"name": "gene"
+				"name": "gene_name"
 			},
 			{
 				"label": "Gene Names (synonym)",
-				"name": "gene"
+				"name": "gene_synonym"
 			},
 			{
 				"label": "Organism",
@@ -32,7 +32,7 @@
 			},
 			{
 				"label": "Organism (ID)",
-				"name": "organism"
+				"name": "organism_id"
 			},
 			{
 				"label": "Protein names",
@@ -65,11 +65,11 @@
 			},
 			{
 				"label": "Erroneous gene model prediction",
-				"name": "cc:sequence_caution"
+				"name": "error_gmodel_pred"
 			},
 			{
 				"label": "Fragment",
-				"name": "sequence"
+				"name": "fragment"
 			},
 			{
 				"label": "Gene encoded by",
@@ -77,11 +77,11 @@
 			},
 			{
 				"label": "Length",
-				"name": "sequence"
+				"name": "length"
 			},
 			{
 				"label": "Mass",
-				"name": "sequence"
+				"name": "mass"
 			},
 			{
 				"label": "Mass spectrometry",
@@ -138,7 +138,7 @@
 		"fields": [
 			{
 				"label": "Absorption",
-				"name": "cc:biophysicochemical_properties"
+				"name": "absorption"
 			},
 			{
 				"label": "Active site",
@@ -166,7 +166,7 @@
 			},
 			{
 				"label": "EC number",
-				"name": "protein_name"
+				"name": "ec"
 			},
 			{
 				"label": "Enzyme regulation",
@@ -178,7 +178,7 @@
 			},
 			{
 				"label": "Kinetics",
-				"name": "cc:biophysicochemical_properties"
+				"name": "kinetics"
 			},
 			{
 				"label": "Metal binding",
@@ -194,11 +194,11 @@
 			},
 			{
 				"label": "pH dependence",
-				"name": "cc:biophysicochemical_properties"
+				"name": "ph_dependence"
 			},
 			{
 				"label": "Redox potential",
-				"name": "cc:biophysicochemical_properties"
+				"name": "redox_potential"
 			},
 			{
 				"label": "Site",
@@ -206,7 +206,7 @@
 			},
 			{
 				"label": "Temperature dependence",
-				"name": "cc:biophysicochemical_properties"
+				"name": "temp_dependence"
 			}
 		]
 	},
@@ -219,11 +219,11 @@
 			},
 			{
 				"label": "Caution",
-				"name": "cc:alternative_products"
+				"name": "caution"
 			},
 			{
 				"label": "Features",
-				"name": "feature"
+				"name": "features"
 			},
 			{
 				"label": "Keywords",
@@ -231,7 +231,7 @@
 			},
 			{
 				"label": "Matched text",
-				"name": "keyword"
+				"name": "matched_text"
 			},
 			{
 				"label": "Miscellaneous [CC]",
@@ -243,11 +243,11 @@
 			},
 			{
 				"label": "Reviewed",
-				"name": "info"
+				"name": "reviewed"
 			},
 			{
 				"label": "Tools",
-				"name": ""
+				"name": "tools"
 			},
 			{
 				"label": "UniParc",
@@ -290,23 +290,23 @@
 		"fields": [
 			{
 				"label": "Gene Ontology (biological process)",
-				"name": "dr:go"
+				"name": "go_p"
 			},
 			{
 				"label": "Gene Ontology (cellular component)",
-				"name": "dr:go"
+				"name": "go_c"
 			},
 			{
 				"label": "Gene Ontology (GO)",
-				"name": "dr:go"
+				"name": "go"
 			},
 			{
 				"label": "Gene Ontology (molecular function)",
-				"name": "dr:go"
+				"name": "go_f"
 			},
 			{
 				"label": "Gene Ontology IDs",
-				"name": "dr:go"
+				"name": "go_id"
 			}
 		]
 	},
@@ -443,11 +443,11 @@
 		"fields": [
 			{
 				"label": "Mapped PubMed ID",
-				"name": ""
+				"name": "mapped_pm_id"
 			},
 			{
 				"label": "PubMed ID",
-				"name": "reference"
+				"name": "pm_id"
 			}
 		]
 	},
@@ -456,19 +456,19 @@
 		"fields": [
 			{
 				"label": "Date of creation",
-				"name": "info"
+				"name": "date_create"
 			},
 			{
 				"label": "Date of last modification",
-				"name": "info"
+				"name": "date_mod"
 			},
 			{
 				"label": "Date of last sequence modification",
-				"name": "info"
+				"name": "date_seq_mod"
 			},
 			{
 				"label": "Entry version",
-				"name": "info"
+				"name": "version"
 			}
 		]
 	},
@@ -522,127 +522,127 @@
 		"fields": [
 			{
 				"label": "Taxonomic lineage (all)",
-				"name": "lineage"
+				"name": "lin_all"
 			},
 			{
 				"label": "Taxonomic lineage (CLASS)",
-				"name": "lineage"
+				"name": "lin_class"
 			},
 			{
 				"label": "Taxonomic lineage (COHORT)",
-				"name": "lineage"
+				"name": "lin_cohort"
 			},
 			{
 				"label": "Taxonomic lineage (FAMILY)",
-				"name": "lineage"
+				"name": "lin_family"
 			},
 			{
 				"label": "Taxonomic lineage (FORMA)",
-				"name": "lineage"
+				"name": "lin_forma"
 			},
 			{
 				"label": "Taxonomic lineage (GENUS)",
-				"name": "lineage"
+				"name": "lin_genus"
 			},
 			{
 				"label": "Taxonomic lineage (INFRACLASS)",
-				"name": "lineage"
+				"name": "lin_infraclass"
 			},
 			{
 				"label": "Taxonomic lineage (INFRAORDER)",
-				"name": "lineage"
+				"name": "lin_infraorder"
 			},
 			{
 				"label": "Taxonomic lineage (KINGDOM)",
-				"name": "lineage"
+				"name": "lin_kingdom"
 			},
 			{
 				"label": "Taxonomic lineage (ORDER)",
-				"name": "lineage"
+				"name": "lin_order"
 			},
 			{
 				"label": "Taxonomic lineage (PARVORDER)",
-				"name": "lineage"
+				"name": "lin_parvorder"
 			},
 			{
 				"label": "Taxonomic lineage (PHYLUM)",
-				"name": "lineage"
+				"name": "lin_phylum"
 			},
 			{
 				"label": "Taxonomic lineage (SPECIES)",
-				"name": "lineage"
+				"name": "lin_species"
 			},
 			{
 				"label": "Taxonomic lineage (SPECIES_GROUP)",
-				"name": "lineage"
+				"name": "lin_species_group"
 			},
 			{
 				"label": "Taxonomic lineage (SPECIES_SUBGROUP)",
-				"name": "lineage"
+				"name": "lin_species_subgroup"
 			},
 			{
 				"label": "Taxonomic lineage (SUBCLASS)",
-				"name": "lineage"
+				"name": "lin_subclass"
 			},
 			{
 				"label": "Taxonomic lineage (SUBCOHORT)",
-				"name": "lineage"
+				"name": "lin_subcohort"
 			},
 			{
 				"label": "Taxonomic lineage (SUBFAMILY)",
-				"name": "lineage"
+				"name": "lin_subfamily"
 			},
 			{
 				"label": "Taxonomic lineage (SUBGENUS)",
-				"name": "lineage"
+				"name": "lin_subgenus"
 			},
 			{
 				"label": "Taxonomic lineage (SUBKINGDOM)",
-				"name": "lineage"
+				"name": "lin_subkingdom"
 			},
 			{
 				"label": "Taxonomic lineage (SUBORDER)",
-				"name": "lineage"
+				"name": "lin_suborder"
 			},
 			{
 				"label": "Taxonomic lineage (SUBPHYLUM)",
-				"name": "lineage"
+				"name": "lin_subphylum"
 			},
 			{
 				"label": "Taxonomic lineage (SUBSPECIES)",
-				"name": "lineage"
+				"name": "lin_subspecies"
 			},
 			{
 				"label": "Taxonomic lineage (SUBTRIBE)",
-				"name": "lineage"
+				"name": "lin_subtribe"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERCLASS)",
-				"name": "lineage"
+				"name": "lin_superclass"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERFAMILY)",
-				"name": "lineage"
+				"name": "lin_superfamily"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERKINGDOM)",
-				"name": "lineage"
+				"name": "lin_superkingdom"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERORDER)",
-				"name": "lineage"
+				"name": "lin_superorder"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERPHYLUM)",
-				"name": "lineage"
+				"name": "lin_superphylum"
 			},
 			{
 				"label": "Taxonomic lineage (TRIBE)",
-				"name": "lineage"
+				"name": "lin_tribe"
 			},
 			{
 				"label": "Taxonomic lineage (VARIETAS)",
-				"name": "lineage"
+				"name": "lin_varietas"
 			}
 		]
 	},
@@ -651,7 +651,7 @@
 		"fields": [
 			{
 				"label": "Taxonomic lineage IDs",
-				"name": "organism"
+				"name": "tax_id"
 			}
 		]
 	}
