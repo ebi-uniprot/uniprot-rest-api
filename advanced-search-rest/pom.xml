@@ -22,7 +22,8 @@
 		<logback.version>1.2.3</logback.version>
 		<hamcrest-all.version>1.3</hamcrest-all.version>
 		<commons-codec.version>1.11</commons-codec.version>
-		<data-service.version>2018.7-SNAPSHOT</data-service.version>
+		<data-service.version>web-2018.7-SNAPSHOT</data-service.version>
+		<ujdk.version>2018.7-SNAPSHOT</ujdk.version>
 
 		<!-- plugin version numbers -->
 		<compiler.version>3.3</compiler.version>
@@ -72,7 +73,7 @@
 		    <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>tools-annotation-score</artifactId>
-            <version>${data-service.version}</version>
+            <version>${ujdk.version}</version>
         </dependency>
 	
 		<!-- Solr Data -->
