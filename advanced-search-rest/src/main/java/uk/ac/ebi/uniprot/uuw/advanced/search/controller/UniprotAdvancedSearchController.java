@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.solr.core.query.result.Cursor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,9 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.VARY;
 
 /**
  * Controller for uniprot advanced search service.
@@ -89,12 +93,15 @@ public class UniprotAdvancedSearchController {
     /*
      * E.g., usage from command line:
      *
-     * time curl -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for just accessions)
-     * time curl -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for entries)
+     * time curl -OJ -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for just accessions)
+     * time curl -OJ -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for entries)
+     *
+     * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
     @RequestMapping(value = "/stream", method = RequestMethod.GET, produces = {"text/flatfile", "text/list"})
     public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
-                                                          @RequestHeader("Accept") MediaType contentType) {
+                                                      @RequestHeader("Accept") MediaType contentType,
+                                                      HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         downloadTaskExecutor.execute(() -> {
@@ -106,6 +113,18 @@ public class UniprotAdvancedSearchController {
             emitter.complete();
         });
 
-        return ResponseEntity.ok().body(emitter);
+        return ResponseEntity.ok()
+                .headers(createHttpDownloadHeader(contentType, request))
+                .body(emitter);
+    }
+
+    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, HttpServletRequest request) {
+        String queryString = request.getQueryString();
+        String fileName = "UniProt-Download-" + queryString + "." + mediaType.getSubtype();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentDispositionFormData("attachment", fileName);
+        httpHeaders.setContentType(mediaType);
+        httpHeaders.add(VARY, ACCEPT); // used so that gate-way caching uses accept header as a key
+        return httpHeaders;
     }
 }
