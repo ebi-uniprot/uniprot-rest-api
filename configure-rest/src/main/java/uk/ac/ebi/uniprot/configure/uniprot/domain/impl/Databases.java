@@ -8,15 +8,19 @@ import java.util.stream.Collectors;
 import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseCategory;
 import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
 
 public enum Databases {
 	INSTANCE;
+	private static final String DATABASES2 = " databases";
+	private static final String DR = "dr:";
 	private static final String ANY2 = "any";
 	private static final String ANY_CROSS_REFERENCE = "Any cross-reference";
 	private static final String ANY = "Any";
 	private List<DatabaseGroup> databases = new ArrayList<>();
-
+	private List<FieldGroup> databaseFields = new ArrayList<>();
 	Databases() {
 		init();
 	}
@@ -26,14 +30,25 @@ public enum Databases {
 		for (DatabaseCategory category : DatabaseCategory.values()) {
 			if (category != DatabaseCategory.UNKNOWN) {
 				List<DatabaseType> types = DatabaseType.getDatabaseTypes(category);
-				List<Tuple> databaseTypes = types.stream().map(this::convert).collect(Collectors.toList());
+				List<Tuple> databaseTypes = types.stream().map(this::convertTuple).collect(Collectors.toList());
 				databases.add(new DatabaseGroupImpl(category.getName(), databaseTypes));
+				List<Field> fields = types.stream().map(this::convertField).collect(Collectors.toList());
+				databaseFields.add(new FieldGroupImpl(trimCategory(category.getName()), fields));
 			}
 		}
 
 	}
 
-	private Tuple convert(DatabaseType type) {
+	private String trimCategory(String category) {
+		if(category.endsWith(DATABASES2)) {
+			return category.substring(0, category.length()-DATABASES2.length());
+		}else
+			return category;
+	}
+	private Field convertField(DatabaseType type) {
+		return new FieldImpl(type.getName(), DR+type.name().toLowerCase());
+	}
+	private Tuple convertTuple(DatabaseType type) {
 		return new TupleImpl(type.getName(), type.name().toLowerCase());
 	}
 
@@ -45,5 +60,9 @@ public enum Databases {
 
 	public List<DatabaseGroup> getDatabases() {
 		return databases;
+	}
+	
+	public List<FieldGroup> getDatabaseFields() {
+		return databaseFields;
 	}
 }

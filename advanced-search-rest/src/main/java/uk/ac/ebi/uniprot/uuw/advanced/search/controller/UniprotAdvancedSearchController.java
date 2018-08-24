@@ -11,10 +11,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
+import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
+import uk.ac.ebi.uniprot.score.UniProtEntryScored;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
+import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniprotAdvancedSearchService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,54 +47,102 @@ public class UniprotAdvancedSearchController {
 
     private final UniprotAdvancedSearchService queryBuilderService;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
+	private final UniprotAdvancedSearchService queryBuilderService;
+	private final UniProtEntryService entryService;
+	@Inject
+	private JsonDataAdapter<UniProtEntry, UPEntry> jsonEntryAdaptor;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
                                            UniprotAdvancedSearchService queryBuilderService,
-                                           ThreadPoolTaskExecutor downloadTaskExecutor) {
+                                           ThreadPoolTaskExecutor downloadTaskExecutor,
+                                           UniProtEntryService entryService) {
         this.eventPublisher = eventPublisher;
         this.queryBuilderService = queryBuilderService;
         this.downloadTaskExecutor = downloadTaskExecutor;
+        this.entryService = entryService;
     }
 
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public ResponseEntity<QueryResult<UniProtDocument>> searchPage(@Valid QuerySearchRequest searchRequest,
-                                                                   HttpServletRequest request,
-                                                                   HttpServletResponse response) {
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public ResponseEntity<QueryResult<UPEntry>> search(@Valid QuerySearchRequest searchRequest,
+			HttpServletRequest request, HttpServletResponse response) {
 
-        QueryResult<UniProtDocument> queryResult = queryBuilderService.executeQuery(searchRequest);
+		QueryResult<UniProtEntry> queryResult = entryService.executeQuery(searchRequest);
+		String fields = searchRequest.getField();
+		Map<String, List<String>> filters = FieldsParser.parse(fields);
+		QueryResult<UPEntry> result = convert(queryResult, filters);
 
-        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPage()));
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
-    }
+		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPage()));
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/searchCursor", method = RequestMethod.GET)
+	public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid QueryCursorRequest cursorRequest,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		QueryResult<UniProtEntry> queryResult = entryService.executeCursorQuery(cursorRequest);
+		String fields = cursorRequest.getField();
+		Map<String, List<String>> filters = FieldsParser.parse(fields);
+		QueryResult<UPEntry> result = convert(queryResult, filters);
+		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPage()));
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 
 
-    @RequestMapping(value = "/searchCursor", method = RequestMethod.GET)
-    public ResponseEntity<QueryResult<UniProtDocument>> searchCursor(@Valid QueryCursorRequest cursorRequest,
-                                                                     HttpServletRequest request,
-                                                                     HttpServletResponse response) {
+	@RequestMapping(value = "/searchAll", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Stream<UPEntry>> searchAll(@RequestParam(value = "query", required = true) String query,
+			@RequestParam(value = "field", required = false) String field) {
+		Stream<UniProtEntry> stream = entryService.getAll(query);
+		Map<String, List<String>> filters = FieldsParser.parse(field);
+		Stream<UPEntry> entryStream = stream.map(val -> jsonEntryAdaptor.convertEntity(val, filters));
+		return new ResponseEntity<>(entryStream, HttpStatus.OK);
+	}
 
-        QueryResult<UniProtDocument> queryResult = queryBuilderService.executeCursorQuery(cursorRequest);
+	@RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
+	public UniProtDocument getBySearchAccession(@RequestParam(value = "accession", required = true) String accession) {
+		UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
 
-        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPage()));
-        return new ResponseEntity<>(queryResult, HttpStatus.OK);
-    }
+		return doc;
+	}
 
+	@RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE )
+	public UPEntry getByAccession(@PathVariable String accession) {
+		UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
+		if (doc == null)
+			return null;
+		Optional<UniProtEntry> result = entryService.getByAccession(doc.accession);
+		if (result.isPresent()) {
+			return convertAndFilter(result.get(), Collections.emptyMap());
+		} else
 
-    @RequestMapping(value = "/searchAll", method = RequestMethod.GET)
-    public ResponseEntity<Stream<UniProtDocument>> searchAll(@RequestParam(value = "query", required = true) String query) {
-        Cursor<UniProtDocument> cursor = queryBuilderService.getAll(query);
+			return null;
+	}
 
-        Stream<UniProtDocument> stream = StreamSupport
-                .stream(Spliterators.spliteratorUnknownSize(cursor, Spliterator.ORDERED), false);
-        return new ResponseEntity<>(stream, HttpStatus.OK);
-    }
+	private QueryResult<UPEntry> convert(QueryResult<UniProtEntry> results, Map<String, List<String>> filters) {
+		List<UPEntry> upEntries = results.getContent().stream().map(val -> convertAndFilter(val, filters))
+				.collect(Collectors.toList());
+		return QueryResult.of(upEntries, results.getPage(), results.getFacets());
 
-    @RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
-    public UniProtDocument getByAccession(@RequestParam(value = "accession", required = true) String accession) {
-        return queryBuilderService.getByAccession(accession).orElse(null);
-    }
+	}
+
+	private UPEntry convertAndFilter(UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
+		UPEntry entry  = jsonEntryAdaptor.convertEntity(upEntry, filterParams);
+		if((filterParams ==null ) || filterParams.isEmpty())
+			return entry;
+		EntryFilters.filterEntry(entry, filterParams);
+		if(filterParams.containsKey("score")) {
+			entry.setAnnotationScore(getScore(upEntry));
+		}
+		return entry;
+	}
+	private int getScore(UniProtEntry entry) {
+		 UniProtEntryScored entryScored = new UniProtEntryScored(entry);
+		 double score = entryScored.score();
+		 int q = (int) (score / 20d);
+		 int normalisedScore= q > 4 ? 5 : q + 1;
+		 return normalisedScore;
+	}
 
     /*
      * E.g., usage from command line:

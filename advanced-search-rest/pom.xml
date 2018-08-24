@@ -13,15 +13,16 @@
     <artifactId>advanced-search-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <properties>
-        <!-- Dependency versions -->
-        <solr.core.version>7.2.1</solr.core.version>
-        <solrj.version>7.2.0</solrj.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <logback.version>1.2.3</logback.version>
-        <hamcrest-all.version>1.3</hamcrest-all.version>
-        <commons-codec.version>1.11</commons-codec.version>
-        <data-service.version>2018.7-SNAPSHOT</data-service.version>
+	<properties>
+		<!-- Dependency versions -->
+		<solr.core.version>7.2.1</solr.core.version>
+		<solrj.version>7.2.0</solrj.version>
+		<slf4j.version>1.7.25</slf4j.version>
+		<logback.version>1.2.3</logback.version>
+		<hamcrest-all.version>1.3</hamcrest-all.version>
+		<commons-codec.version>1.11</commons-codec.version>
+		<data-service.version>web-2018.7-SNAPSHOT</data-service.version>
+		<ujdk.version>2018.7-SNAPSHOT</ujdk.version>
 
         <!-- plugin version numbers -->
         <compiler.version>3.3</compiler.version>
@@ -46,22 +47,32 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>data-service-common-document</artifactId>
-            <version>${data-service.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.solr</groupId>
-                    <artifactId>solr-solrj</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>data-service-common-document</artifactId>
+			<version>${data-service.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.solr</groupId>
+					<artifactId>solr-solrj</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>data-service-voldemort</artifactId>
+			<version>${data-service.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>data-service-restful</artifactId>
+			<version>${data-service.version}</version>
+		</dependency>
 
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>data-service-voldemort</artifactId>
-            <version>${data-service.version}</version>
+		    <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tools-annotation-score</artifactId>
+            <version>${ujdk.version}</version>
         </dependency>
 
         <!-- Solr Data -->

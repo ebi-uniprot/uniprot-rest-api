@@ -1,9 +1,8 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.request;
 
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+
+import lombok.Data;
 
 /**
  * Search cursor request Entity
@@ -11,10 +10,7 @@ import javax.validation.constraints.Positive;
  * @author lgonzales
  */
 @Data
-public class QueryCursorRequest {
-
-    @NotNull(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.required}")
-    private String query;
+public class QueryCursorRequest extends QueryRequest {
 
     private String cursor;
 

@@ -21,7 +21,7 @@ public enum GoEvidences implements SearchEvidences {
 
 	void init() {
 		final ObjectMapper objectMapper = new ObjectMapper();
-		try (InputStream is = AnnotationEvidences.class.getClassLoader().getResourceAsStream(FILENAME);) {
+		try (InputStream is = GoEvidences.class.getClassLoader().getResourceAsStream(FILENAME);) {
 			List<EvidenceGroupImpl> evidences = objectMapper.readValue(is,
 					new TypeReference<List<EvidenceGroupImpl>>() {
 					});

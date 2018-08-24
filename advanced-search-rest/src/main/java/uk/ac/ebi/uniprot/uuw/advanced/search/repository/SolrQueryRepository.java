@@ -68,7 +68,6 @@ public abstract class SolrQueryRepository<T> {
             logSolrQuery(query);
         }
     }
-
     public QueryResult<T> searchCursorPage(SimpleQuery query, String cursor,Integer pageSize) {
         if(pageSize == null || pageSize <=0){
             pageSize = DEFAULT_PAGE_SIZE;

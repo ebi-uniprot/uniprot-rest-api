@@ -1,0 +1,35 @@
+package uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public enum FilterComponentType {
+	PROTEIN_EXISTENCE,
+	SECONDARY_ACCESSION,
+	PROTEIN_NAME,
+	GENE,
+	ORGANISM,
+	ORGANISM_HOST,
+	LINEAGE,
+	GENE_LOCATION,
+	COMMENT(true),
+	KEYWORD,
+	FEATURE(true),
+	SEQUENCE,
+	XREF (true),
+	REFERENCE;
+	boolean hasSubcomponent;
+	FilterComponentType(){
+		this(false);
+	}
+	FilterComponentType(boolean hasSubcomponent){
+		this.hasSubcomponent =hasSubcomponent;
+	}
+	public List<String> getAllFilterNames(){
+		return Arrays.stream(
+		FilterComponentType.values())
+		.map(val ->val.name().toLowerCase())
+		.collect(Collectors.toList());
+	}
+}
