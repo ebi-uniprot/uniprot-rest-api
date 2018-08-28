@@ -80,6 +80,17 @@
         
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>data-service-common-avro</artifactId>
+            <version>${data-service.version}</version>
+            	<exclusions>
+				<exclusion>
+					<groupId>org.apache.avro</groupId>
+					<artifactId>avro-tools</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>tools-annotation-score</artifactId>
             <version>${ujdk.version}</version>
         </dependency>

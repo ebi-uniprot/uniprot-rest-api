@@ -10,8 +10,11 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
+import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
+import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
 import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
 import uk.ac.ebi.uniprot.score.UniProtEntryScored;
+import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -32,7 +35,11 @@ public class UniProtEntryService {
 	private UniprotFacetConfig uniprotFacetConfig;
 	private UniProtClient entryService;
 	private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
-	public UniProtEntryService(UniprotQueryRepository repository,
+	  private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
+	            .instanceOf(DefaultEntryObject.class);
+		 private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
+	public UniProtEntryService(
+			UniprotQueryRepository repository,
 							   UniprotFacetConfig uniprotFacetConfig,
 							   UniProtClient entryService,
 							   JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor) {
@@ -106,16 +113,10 @@ public class UniProtEntryService {
 	}
 
 	
-	
-	
-	
-	
-	
-	
-	
 	private Optional<UPEntry> convertDocToUPEntry(UniProtDocument doc,  Map<String, List<String>> filters) {
 		if(doc.active) {
-			Optional<UniProtEntry>  opEntry= entryService.getEntry(doc.accession);
+			
+			Optional<UniProtEntry>  opEntry= convert2UniProtEntry(doc, filters);
 			return opEntry.isPresent()? Optional.of(convertAndFilter(opEntry.get(), filters)): Optional.empty();
 		}else {
 			UPEntry upEntry = new UPEntry(doc.accession, doc.id, false, doc.inactiveReason);
@@ -124,7 +125,14 @@ public class UniProtEntryService {
 		}
 	}
 
-	
+	private Optional<UniProtEntry> convert2UniProtEntry(UniProtDocument doc,  Map<String, List<String>> filters) {
+		if(FieldsParser.isDefaultFilters(filters) && (doc.avro_binary !=null) ){
+			  DefaultEntryObject avroObject = deSerialize.fromByteArray(doc.avro_binary);
+		        return Optional.ofNullable(avroConverter.fromAvro(avroObject));
+		}
+		return entryService.getEntry(doc.accession);
+	}
+
 	public UPEntry convertAndFilter(UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
 		UPEntry entry  = uniProtJsonAdaptor.convertEntity(upEntry, filterParams);
 		if((filterParams ==null ) || filterParams.isEmpty())
@@ -142,11 +150,7 @@ public class UniProtEntryService {
 		 int normalisedScore= q > 4 ? 5 : q + 1;
 		 return normalisedScore;
 	}
-	
-
-	
-
-
+		
 	public Optional<UniProtEntry> getByAccession(String accession) {
 		try {
 			SimpleQuery simpleQuery = new SimpleQuery(Criteria.where("accession").is(accession.toUpperCase()));

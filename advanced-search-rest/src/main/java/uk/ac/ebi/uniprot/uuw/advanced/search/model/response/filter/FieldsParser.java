@@ -3,8 +3,10 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Strings;
 
@@ -21,6 +23,19 @@ public class FieldsParser {
 	private static final String DR = "dr";
 	private static final String FT = "ft";
 	private static final String CC = "cc";
+	private static Set<String> DEFAULTFILTERS =new HashSet<>();
+	static {
+		DEFAULTFILTERS.add("accession");
+		DEFAULTFILTERS.add("id");
+		DEFAULTFILTERS.add("protein_name");
+		DEFAULTFILTERS.add("gene");
+		DEFAULTFILTERS.add("organism");
+	}
+	
+	public static boolean isDefaultFilters(Map<String, List<String>> filters) {
+		return filters.keySet().stream()
+		.anyMatch(val ->!DEFAULTFILTERS.contains(val) );
+	}
 
 	public static Map<String, List<String>> parse(String fields) {
 		if (Strings.isNullOrEmpty(fields)) {
