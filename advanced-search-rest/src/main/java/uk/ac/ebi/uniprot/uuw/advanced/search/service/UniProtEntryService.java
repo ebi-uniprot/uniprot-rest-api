@@ -8,10 +8,15 @@ import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
+import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
 import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
+import uk.ac.ebi.uniprot.score.UniProtEntryScored;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
@@ -26,37 +31,50 @@ public class UniProtEntryService {
 	private UniprotQueryRepository repository;
 	private UniprotFacetConfig uniprotFacetConfig;
 	private UniProtClient entryService;
-
+	private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
 	public UniProtEntryService(UniprotQueryRepository repository,
 							   UniprotFacetConfig uniprotFacetConfig,
-							   UniProtClient entryService) {
+							   UniProtClient entryService,
+							   JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor) {
 		this.repository = repository;
 		this.uniprotFacetConfig = uniprotFacetConfig;
 		this.entryService = entryService;
+		this.uniProtJsonAdaptor = uniProtJsonAdaptor;
 	}
-
-	public QueryResult<UniProtEntry> executeQuery(QuerySearchRequest searchRequest) {
+	
+	public QueryResult<UPEntry> executeQuery(QuerySearchRequest searchRequest) {
+		String fields = searchRequest.getField();
+		Map<String, List<String>> filters = FieldsParser.parse(fields);
 		try {
 			SimpleQuery simpleQuery = SolrQueryBuilder.of(searchRequest.getQuery(), uniprotFacetConfig).build();
 		     simpleQuery.addProjectionOnField(new SimpleField("accession"));
 			QueryResult<UniProtDocument> results = repository.searchPage(simpleQuery, searchRequest.getOffset(),
 					searchRequest.getSize());
-			return convert(results);
+			return convertQueryDoc2UPEntry(results, filters);
 		} catch (Exception e) {
 			String message = "Could not get result for: [" + searchRequest + "]";
 			throw new ServiceException(message, e);
 		}
 	}
+	
 
-	private QueryResult<UniProtEntry> convert(QueryResult<UniProtDocument> results) {
-		List<String> accessions = results.getContent().stream().map(val -> val.accession).collect(Collectors.toList());
-		Map<String, UniProtEntry> entryMap = entryService.getEntryMap(accessions);
-		List<UniProtEntry> entries = accessions.stream().map(val -> entryMap.get(val)).filter((val -> val != null))
-				.collect(Collectors.toList());
-		return QueryResult.of(entries, results.getPage(), results.getFacets());
+	public Stream<UPEntry> getAll(String query) {
+		try {
+			SimpleQuery simpleQuery = SolrQueryBuilder.of(query, uniprotFacetConfig).build();
+		     simpleQuery.addProjectionOnField(new SimpleField("accession"));
+			simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession"));
+			Cursor<UniProtDocument> results = repository.getAll(simpleQuery);
+			return convertStreamDoc2UPEntry(results, Collections.emptyMap());
+		} catch (Exception e) {
+			String message = "Could not get result for: [" + query + "]";
+			throw new ServiceException(message, e);
+		}
 	}
+	
 
-	public QueryResult<UniProtEntry> executeCursorQuery(QueryCursorRequest cursorRequest) {
+	public QueryResult<UPEntry> executeCursorQuery(QueryCursorRequest cursorRequest) {
+		String fields = cursorRequest.getField();
+		Map<String, List<String>> filters = FieldsParser.parse(fields);
 		try {
 			SimpleQuery simpleQuery = SolrQueryBuilder.of(cursorRequest.getQuery(), uniprotFacetConfig).build();
 		      simpleQuery.addProjectionOnField(new SimpleField("accession"));
@@ -64,33 +82,70 @@ public class UniProtEntryService {
 			simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession"));
 			QueryResult<UniProtDocument> results = repository.searchCursorPage(simpleQuery, cursorRequest.getCursor(),
 					cursorRequest.getSize());
-			return convert(results);
+			return convertQueryDoc2UPEntry(results, filters);
 		} catch (Exception e) {
 			String message = "Could not get result for: [" + cursorRequest + "]";
 			throw new ServiceException(message, e);
 		}
 	}
-
-	public Stream<UniProtEntry> getAll(String query) {
-		try {
-			SimpleQuery simpleQuery = SolrQueryBuilder.of(query, uniprotFacetConfig).build();
-		     simpleQuery.addProjectionOnField(new SimpleField("accession"));
-			simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession"));
-			Cursor<UniProtDocument> results = repository.getAll(simpleQuery);
-			return convert(results);
-		} catch (Exception e) {
-			String message = "Could not get result for: [" + query + "]";
-			throw new ServiceException(message, e);
-		}
-	}
-
-	private Stream<UniProtEntry> convert(Cursor<UniProtDocument> cursor) {
+	
+	
+	private Stream<UPEntry> convertStreamDoc2UPEntry(Cursor<UniProtDocument> cursor, Map<String, List<String>> filters) {
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(cursor, Spliterator.ORDERED), false)
-				.map(val->val.accession)
-				.map(val -> entryService.getEntry(val))
+				.map(doc -> convertDocToUPEntry(doc, filters))
 				.flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty());
 
 	}
+
+	private QueryResult<UPEntry> convertQueryDoc2UPEntry(QueryResult<UniProtDocument> results, Map<String, List<String>> filters) {
+		List<UPEntry> upEntries = results.getContent().stream().map(doc -> convertDocToUPEntry(doc, filters))
+				.filter(val ->val.isPresent()).map(val ->val.get())
+				.collect(Collectors.toList());
+		return QueryResult.of(upEntries, results.getPage(), results.getFacets());
+
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	private Optional<UPEntry> convertDocToUPEntry(UniProtDocument doc,  Map<String, List<String>> filters) {
+		if(doc.active) {
+			Optional<UniProtEntry>  opEntry= entryService.getEntry(doc.accession);
+			return opEntry.isPresent()? Optional.of(convertAndFilter(opEntry.get(), filters)): Optional.empty();
+		}else {
+			UPEntry upEntry = new UPEntry(doc.accession, doc.id, false, doc.inactiveReason);
+			
+			return Optional.of(upEntry);
+		}
+	}
+
+	
+	public UPEntry convertAndFilter(UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
+		UPEntry entry  = uniProtJsonAdaptor.convertEntity(upEntry, filterParams);
+		if((filterParams ==null ) || filterParams.isEmpty())
+			return entry;
+		EntryFilters.filterEntry(entry, filterParams);
+		if(filterParams.containsKey("score")) {
+			entry.setAnnotationScore(getScore(upEntry));
+		}
+		return entry;
+	}
+	private int getScore(UniProtEntry entry) {
+		 UniProtEntryScored entryScored = new UniProtEntryScored(entry);
+		 double score = entryScored.score();
+		 int q = (int) (score / 20d);
+		 int normalisedScore= q > 4 ? 5 : q + 1;
+		 return normalisedScore;
+	}
+	
+
+	
+
 
 	public Optional<UniProtEntry> getByAccession(String accession) {
 		try {
@@ -103,4 +158,5 @@ public class UniProtEntryService {
 			throw new ServiceException(message, e);
 		}
 	}
+	
 }
