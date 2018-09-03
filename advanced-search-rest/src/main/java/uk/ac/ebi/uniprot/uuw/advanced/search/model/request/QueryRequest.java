@@ -10,4 +10,6 @@ public class QueryRequest {
 	private String query;
 
 	private String field;
+	
+	private String sort;
 }

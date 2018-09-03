@@ -1,13 +1,18 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
-import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
@@ -19,11 +24,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFace
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Service class responsible to build Solr query and execute it in the repository.
@@ -51,19 +51,26 @@ public class UniprotAdvancedSearchService {
     public QueryResult<UniProtDocument> executeQuery(QuerySearchRequest searchRequest) {
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(searchRequest.getQuery(),uniprotFacetConfig).build();
-            simpleQuery.addProjectionOnField(new SimpleField("accession"));
+            addSort(simpleQuery, searchRequest.getSort());
             return repository.searchPage(simpleQuery,searchRequest.getOffset(),searchRequest.getSize());
         } catch (Exception e) {
             String message = "Could not get result for: [" + searchRequest + "]";
             throw new ServiceException(message, e);
         }
     }
+    
+    private void addSort(SimpleQuery simpleQuery, String sort) {
+		List<Sort> sorts = UniProtSortUtil.createSort(sort);
+		if(sorts.isEmpty()) {
+			sorts = UniProtSortUtil.createDefaultSort();
+		}
+		sorts.forEach(simpleQuery::addSort);
+	}
 
     public QueryResult<UniProtDocument> executeCursorQuery(QueryCursorRequest cursorRequest) {
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(cursorRequest.getQuery(),uniprotFacetConfig).build();
-            simpleQuery.addProjectionOnField(new SimpleField("accession"));
-            simpleQuery.addSort(new Sort(Sort.Direction.ASC,"accession"));
+            addSort(simpleQuery, cursorRequest.getSort());
             return repository.searchCursorPage(simpleQuery,cursorRequest.getCursor(),cursorRequest.getSize());
         } catch (Exception e) {
             String message = "Could not get result for: [" + cursorRequest + "]";
@@ -74,8 +81,7 @@ public class UniprotAdvancedSearchService {
     public Cursor<UniProtDocument> getAll(String query) {
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(query,uniprotFacetConfig).build();
-            simpleQuery.addProjectionOnField(new SimpleField("accession"));
-            simpleQuery.addSort(new Sort(Sort.Direction.ASC,"accession"));
+            addSort(simpleQuery, "");
             return repository.getAll(simpleQuery);
         } catch (Exception e) {
             String message = "Could not get result for: [" + query + "]";
@@ -86,7 +92,6 @@ public class UniprotAdvancedSearchService {
     public Optional<UniProtDocument> getByAccession(String accession) {
         try {
             SimpleQuery simpleQuery = new SimpleQuery(Criteria.where("accession").is(accession.toUpperCase()));
-            simpleQuery.addProjectionOnField(new SimpleField("accession"));
             return repository.getEntry(simpleQuery);
         } catch (Exception e) {
             String message = "Could not get accession for: [" + accession + "]";

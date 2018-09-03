@@ -18,7 +18,7 @@ public class ResultsConfig {
     public CloudSolrStreamTemplate cloudSolrStreamTemplate(RepositoryConfigProperties configProperties) {
         return CloudSolrStreamTemplate.builder()
                 .collection("uniprot")
-                .key("accession_exact")
+                .key("accession")
                 .order(SolrQuery.ORDER.asc)
                 .requestHandler("/export")
                 .zookeeperHost(configProperties.getZookeperhost())

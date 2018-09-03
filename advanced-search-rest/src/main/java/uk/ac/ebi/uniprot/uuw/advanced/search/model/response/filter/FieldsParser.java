@@ -30,11 +30,16 @@ public class FieldsParser {
 		DEFAULTFILTERS.add("protein_name");
 		DEFAULTFILTERS.add("gene");
 		DEFAULTFILTERS.add("organism");
+		DEFAULTFILTERS.add("length");
+		DEFAULTFILTERS.add("mass");
+		DEFAULTFILTERS.add("score");
 	}
 	
 	public static boolean isDefaultFilters(Map<String, List<String>> filters) {
-		return filters.keySet().stream()
+		boolean notDefault= filters.keySet().stream()
 		.anyMatch(val ->!DEFAULTFILTERS.contains(val) );
+		
+		return !notDefault;
 	}
 
 	public static Map<String, List<String>> parse(String fields) {

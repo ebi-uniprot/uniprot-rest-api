@@ -17,6 +17,8 @@ public enum FilterComponentType {
 	KEYWORD,
 	FEATURE(true),
 	SEQUENCE,
+	LENGTH,
+	MASS,
 	XREF (true),
 	REFERENCE;
 	boolean hasSubcomponent;

@@ -32,14 +32,6 @@
 		"mapTo": "sequence"
 	},
 	{
-		"name": "length",
-		"mapTo": "sequence"
-	},
-	{
-		"name": "mass",
-		"mapTo": "sequence"
-	},
-	{
 		"name": "absorption",
 		"mapTo": "cc:biophysicochemical_properties"
 	},

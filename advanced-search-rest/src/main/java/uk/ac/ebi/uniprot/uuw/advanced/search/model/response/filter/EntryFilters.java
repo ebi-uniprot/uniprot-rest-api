@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class EntryFilters {
-	private static final String SCORE = "score";
 	private static final String ALL = "all";
 
 	public static UPEntry convertAndFilter(JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
@@ -21,9 +20,7 @@ public class EntryFilters {
 		if((filterParams ==null ) || filterParams.isEmpty())
 			return entry;
 		filterEntry(entry, filterParams);
-		if(filterParams.containsKey(SCORE)) {
-			
-		}
+	
 		return entry;
 	}
 	public static void filterEntry(UPEntry entry, Map<String, List<String>> filterParams) {

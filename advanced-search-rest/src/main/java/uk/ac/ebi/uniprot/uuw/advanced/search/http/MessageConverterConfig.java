@@ -10,6 +10,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.UniProtXmlMessageConverter;
 
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
+                converters.add(new UniProtXmlMessageConverter());
             }
         };
     }
