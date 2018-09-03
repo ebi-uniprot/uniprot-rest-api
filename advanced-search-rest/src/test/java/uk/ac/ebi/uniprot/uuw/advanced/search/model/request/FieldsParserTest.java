@@ -198,8 +198,8 @@ class FieldsParserTest {
 	void withSequence() {
 		String fields ="accession,protein_name,fragment,length,mass";
 		Map<String, List<String> > filters = FieldsParser.parse(fields);
-		assertEquals(3, filters.size());
+		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
-		assertTrue(filters.containsKey("sequence"));
+		assertTrue(filters.containsKey("length"));
 	}
 }

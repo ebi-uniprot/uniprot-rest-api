@@ -22,6 +22,8 @@ public class UniProtSortUtil {
 		validSortFields.add("organism");
 		validSortFields.add("protein_name");
 		validSortFields.add("gene");
+		validSortFields.add("length");
+		validSortFields.add("mass");
 	}
 
 	public static List<Sort> createSort(String sortFields){
