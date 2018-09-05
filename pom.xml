@@ -50,6 +50,7 @@
         <module>uniprotkb-rest</module>
         <module>suggester-rest</module>
         <module>advanced-search-rest</module>
+        <module>common-rest</module>
     </modules>
 
     <dependencyManagement>
