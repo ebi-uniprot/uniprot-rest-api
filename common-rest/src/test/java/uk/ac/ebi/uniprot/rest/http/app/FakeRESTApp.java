@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.http;
+package uk.ac.ebi.uniprot.rest.http.app;
 
 import lombok.Data;
 import org.springframework.boot.SpringApplication;
@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.ac.ebi.uniprot.rest.http.HttpCommonHeaderConfig;
 
 /**
  * A fake RESTful application that returns a single configurable resource.
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Profile("allow-origins-integration-test")
 @SpringBootApplication
-@Import({FakeRESTApp.FakeController.class})
+@Import({FakeRESTApp.FakeController.class, HttpCommonHeaderConfig.class})
 public class FakeRESTApp {
-    static final String RESOURCE_1_URL = "/resource1";
+    public static final String RESOURCE_1_URL = "/resource1";
 
     public static void main(String[] args) {
         SpringApplication.run(FakeRESTApp.class, args);
@@ -29,6 +30,7 @@ public class FakeRESTApp {
     @Profile("allow-origins-integration-test")
     @RestController
     @Data
+//    @Import(HttpCommonHeaderConfig.class)
     static class FakeController {
         private String value;
         private final static String DEFAULT_VALUE = "value";
