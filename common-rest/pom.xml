@@ -12,6 +12,10 @@
     <artifactId>common-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
+    <properties>
+        <hamcrest-all.version>1.3</hamcrest-all.version>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -59,7 +63,7 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -82,7 +86,7 @@
             <artifactId>junit-platform-launcher</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
