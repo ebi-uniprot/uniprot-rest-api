@@ -1,17 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.VARY;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -19,23 +7,31 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlEntityMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniprotAdvancedSearchService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.VARY;
 
 /**
  * Controller for uniprot advanced search service.
@@ -120,7 +116,7 @@ public class UniprotAdvancedSearchController {
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
     @RequestMapping(value = "/stream", method = RequestMethod.GET, 
-    		produces = {"text/flatfile", "text/list", MediaType.APPLICATION_XML_VALUE})
+    		produces = {"text/flatfile", "text/list", "x-uniprot/xml"})
     public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
                                                       @RequestHeader("Accept") MediaType contentType,
                                                       HttpServletRequest request) {
@@ -140,9 +136,51 @@ public class UniprotAdvancedSearchController {
                 .body(emitter);
     }
 
+    @RequestMapping(value = "/stream2", method = RequestMethod.GET,
+            produces = {"text/flatfile", "text/list", "x-uniprot2/xml"})
+    public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
+                                                      @RequestHeader("Accept") MediaType contentType,
+                                                      @RequestHeader(value = "Accept-Encoding", required = false) String requestedEncoding,
+                                                      HttpServletRequest request) {
+
+
+//        switch (requestedEncoding) {
+//            case "x-gzip":
+//
+//                break;
+//            default:
+//                break;
+//        }
+
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+
+        downloadTaskExecutor.execute(() -> {
+            try {
+
+//                XmlEntityMessageConverter<UniProtEntry, Entry> bla = XmlEntityMessageConverter.<UniProtEntry, Entry>builder()
+                XmlEntityMessageConverter bla = new XmlEntityMessageConverter();
+                bla.setHeader("<uniprot>");
+                bla.setFooter("</uniprot>");
+                bla.setConverter(entry -> {
+                    return new EntryXmlConverterImpl().convert(entry);});
+                bla.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
+                bla.setEntities((Stream<Collection<UniProtEntry>>) queryBuilderService.stream(query, contentType));
+//                        .build();
+
+                emitter.send(bla, contentType);
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+            emitter.complete();
+        });
+
+        return ResponseEntity.ok()
+                .headers(createHttpDownloadHeader(contentType, request))
+                .body(emitter);
+    }
+
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType, HttpServletRequest request) {
-        String queryString = request.getQueryString();
-        String fileName = "UniProt-Download-" + queryString + "." + mediaType.getSubtype();
+		String fileName = "uniprot-" + request.getQueryString() + "." + mediaType.getSubtype();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentDispositionFormData("attachment", fileName);
         httpHeaders.setContentType(mediaType);

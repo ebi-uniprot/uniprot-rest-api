@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.UniProtXmlMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class MessageConverterConfig {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
                 converters.add(new UniProtXmlMessageConverter());
+                converters.add(new XmlMessageConverter());
             }
         };
     }
