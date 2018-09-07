@@ -1,11 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
@@ -14,14 +8,11 @@ import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -30,6 +21,11 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFace
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Service class responsible to build Solr query and execute it in the repository.
@@ -136,7 +132,7 @@ public class UniprotAdvancedSearchService {
         }
     }
 
-    public <S, T> void stream2(String query, XmlMessageConverterContext<S, T> context, ResponseBodyEmitter emitter) {
+    public void stream2(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {
         MediaType contentType = context.getContentType();
         context.setEntities(streamEntities(query, contentType));
 

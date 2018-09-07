@@ -27,11 +27,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class XmlMessageConverter<S, T> extends AbstractHttpMessageConverter<XmlMessageConverterContext<S, T>> {
     private static final int FLUSH_INTERVAL = 5000;
     private static final Logger LOGGER = getLogger(UniProtXmlMessageConverter.class);
+    public static final MediaType XML_MEDIA_TYPE = new MediaType("x-uniprot2", "xml");
 
     private final Map<String, Marshaller> marshallers;
 
     public XmlMessageConverter() {
-        super(new MediaType("x-uniprot2", "xml"));
+        super(XML_MEDIA_TYPE);
         marshallers = new HashMap<>();
     }
 

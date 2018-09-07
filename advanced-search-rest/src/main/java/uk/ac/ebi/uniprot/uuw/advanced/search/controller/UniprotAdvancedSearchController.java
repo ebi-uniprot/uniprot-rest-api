@@ -10,12 +10,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.MessageConverterConfig;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -45,16 +44,19 @@ public class UniprotAdvancedSearchController {
     private final UniprotAdvancedSearchService queryBuilderService;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final UniProtEntryService entryService;
+    private final MessageConverterConfig.MessageConverterContextFactory converterContextFactory;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
                                            UniprotAdvancedSearchService queryBuilderService,
                                            ThreadPoolTaskExecutor downloadTaskExecutor,
-                                           UniProtEntryService entryService) {
+                                           UniProtEntryService entryService,
+                                           MessageConverterConfig.MessageConverterContextFactory converterContextFactory) {
         this.eventPublisher = eventPublisher;
         this.queryBuilderService = queryBuilderService;
         this.downloadTaskExecutor = downloadTaskExecutor;
         this.entryService = entryService;
+        this.converterContextFactory = converterContextFactory;
     }
 
 
@@ -136,23 +138,16 @@ public class UniprotAdvancedSearchController {
 
     @RequestMapping(value = "/stream2", method = RequestMethod.GET,
             produces = {"text/flatfile", "text/list", "x-uniprot2/xml"})
-    public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
+    public ResponseEntity<ResponseBodyEmitter> stream2(@RequestParam(value = "query", required = true) String query,
                                                       @RequestHeader("Accept") MediaType contentType,
                                                       @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
                                                       HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-//        MessageConverterContextFactory.get(UNIPROT, contentType);
-        XmlMessageConverterContext<UniProtEntry, Entry> converterContext = XmlMessageConverterContext.<UniProtEntry, Entry>builder()
-                .header("<uniprot>")
-                .footer("</uniprot>")
-                .compressed(encoding != null && encoding.equals("gzip"))
-                .converter(entry -> new EntryXmlConverterImpl().convert(entry))
-                .context("uk.ac.ebi.kraken.xml.jaxb.uniprot")
-                .contentType(contentType)
-                .build();
+        MessageConverterContext context = converterContextFactory.get(MessageConverterConfig.Resource.UNIPROT, contentType);
+        context.setCompressed(encoding != null && encoding.equals("gzip"));
 
-        queryBuilderService.stream2(query, converterContext, emitter);
+        queryBuilderService.stream2(query, context, emitter);
 
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, encoding, request))
