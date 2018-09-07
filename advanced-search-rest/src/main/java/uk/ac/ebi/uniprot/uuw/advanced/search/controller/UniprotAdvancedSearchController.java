@@ -10,11 +10,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlEntityMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.HttpHeaders.VARY;
 
 /**
@@ -45,7 +47,7 @@ public class UniprotAdvancedSearchController {
 
     private final UniprotAdvancedSearchService queryBuilderService;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
-	private final UniProtEntryService entryService;
+    private final UniProtEntryService entryService;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
@@ -59,52 +61,51 @@ public class UniprotAdvancedSearchController {
     }
 
 
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	public ResponseEntity<QueryResult<UPEntry>> search(@Valid QuerySearchRequest searchRequest,
-			HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity<QueryResult<UPEntry>> search(@Valid QuerySearchRequest searchRequest,
+                                                       HttpServletRequest request, HttpServletResponse response) {
 
-		QueryResult<UPEntry> queryResult = entryService.executeQuery(searchRequest);
+        QueryResult<UPEntry> queryResult = entryService.executeQuery(searchRequest);
 
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPage()));
-		return new ResponseEntity<>(queryResult, HttpStatus.OK);
-	}
+        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPage()));
+        return new ResponseEntity<>(queryResult, HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/searchCursor", method = RequestMethod.GET)
-	public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid QueryCursorRequest cursorRequest,
-			HttpServletRequest request, HttpServletResponse response) {
-		QueryResult<UPEntry> result = entryService.executeCursorQuery(cursorRequest);
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPage()));
-		return new ResponseEntity<>(result, HttpStatus.OK);
-	}
+    @RequestMapping(value = "/searchCursor", method = RequestMethod.GET)
+    public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid QueryCursorRequest cursorRequest,
+                                                             HttpServletRequest request, HttpServletResponse response) {
+        QueryResult<UPEntry> result = entryService.executeCursorQuery(cursorRequest);
+        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPage()));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
 
-	@RequestMapping(value = "/searchAll", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Stream<UPEntry>> searchAll(@RequestParam(value = "query", required = true) String query,
-			@RequestParam(value = "field", required = false) String field) {
-		Stream<UPEntry> entryStream = entryService.getAll(query);
-		return new ResponseEntity<>(entryStream, HttpStatus.OK);
-	}
+    @RequestMapping(value = "/searchAll", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Stream<UPEntry>> searchAll(@RequestParam(value = "query", required = true) String query,
+                                                     @RequestParam(value = "field", required = false) String field) {
+        Stream<UPEntry> entryStream = entryService.getAll(query);
+        return new ResponseEntity<>(entryStream, HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
-	public UniProtDocument getBySearchAccession(@RequestParam(value = "accession", required = true) String accession) {
-		UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
+    @RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
+    public UniProtDocument getBySearchAccession(@RequestParam(value = "accession", required = true) String accession) {
+        UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
 
-		return doc;
-	}
+        return doc;
+    }
 
-	@RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE )
-	public UPEntry getByAccession(@PathVariable String accession) {
-		UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
-		if((doc == null) || !doc.active)
-			return null;
-		Optional<UniProtEntry> result = entryService.getByAccession(doc.accession);
-		if (result.isPresent()) {
-			return entryService.convertAndFilter(result.get(), Collections.emptyMap());
-		} else
+    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UPEntry getByAccession(@PathVariable String accession) {
+        UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
+        if ((doc == null) || !doc.active)
+            return null;
+        Optional<UniProtEntry> result = entryService.getByAccession(doc.accession);
+        if (result.isPresent()) {
+            return entryService.convertAndFilter(result.get(), Collections.emptyMap());
+        } else
 
-			return null;
-	}
-
+            return null;
+    }
 
 
     /*
@@ -115,8 +116,8 @@ public class UniprotAdvancedSearchController {
      *
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
-    @RequestMapping(value = "/stream", method = RequestMethod.GET, 
-    		produces = {"text/flatfile", "text/list", "x-uniprot/xml"})
+    @RequestMapping(value = "/stream", method = RequestMethod.GET,
+            produces = {"text/flatfile", "text/list", "x-uniprot/xml"})
     public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
                                                       @RequestHeader("Accept") MediaType contentType,
                                                       HttpServletRequest request) {
@@ -132,7 +133,7 @@ public class UniprotAdvancedSearchController {
         });
 
         return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(contentType, request))
+                .headers(createHttpDownloadHeader(contentType, "", request))
                 .body(emitter);
     }
 
@@ -140,34 +141,23 @@ public class UniprotAdvancedSearchController {
             produces = {"text/flatfile", "text/list", "x-uniprot2/xml"})
     public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
                                                       @RequestHeader("Accept") MediaType contentType,
-                                                      @RequestHeader(value = "Accept-Encoding", required = false) String requestedEncoding,
+                                                      @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
                                                       HttpServletRequest request) {
-
-
-//        switch (requestedEncoding) {
-//            case "x-gzip":
-//
-//                break;
-//            default:
-//                break;
-//        }
-
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         downloadTaskExecutor.execute(() -> {
             try {
 
-//                XmlEntityMessageConverter<UniProtEntry, Entry> bla = XmlEntityMessageConverter.<UniProtEntry, Entry>builder()
-                XmlEntityMessageConverter bla = new XmlEntityMessageConverter();
-                bla.setHeader("<uniprot>");
-                bla.setFooter("</uniprot>");
-                bla.setConverter(entry -> {
-                    return new EntryXmlConverterImpl().convert(entry);});
-                bla.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
-                bla.setEntities((Stream<Collection<UniProtEntry>>) queryBuilderService.stream(query, contentType));
-//                        .build();
+                XmlMessageConverterContext<UniProtEntry, Entry> converterContext = XmlMessageConverterContext.<UniProtEntry, Entry>builder()
+                        .header("<uniprot>")
+                        .footer("</uniprot>")
+                        .compressed(encoding != null && encoding.equals("gzip"))
+                        .converter(entry -> new EntryXmlConverterImpl().convert(entry))
+                        .context("uk.ac.ebi.kraken.xml.jaxb.uniprot")
+                        .entities((Stream<Collection<UniProtEntry>>) queryBuilderService.stream(query, contentType))
+                        .build();
 
-                emitter.send(bla, contentType);
+                emitter.send(converterContext, contentType);
             } catch (IOException e) {
                 emitter.completeWithError(e);
             }
@@ -175,16 +165,20 @@ public class UniprotAdvancedSearchController {
         });
 
         return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(contentType, request))
+                .headers(createHttpDownloadHeader(contentType, encoding, request))
                 .body(emitter);
     }
 
-    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, HttpServletRequest request) {
-		String fileName = "uniprot-" + request.getQueryString() + "." + mediaType.getSubtype();
+    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, String encoding, HttpServletRequest request) {
+        String fileName = "uniprot-" + request.getQueryString() + "." + mediaType
+                .getSubtype() + (encoding != null && encoding.equals("gzip") ? ".gz" : "");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentDispositionFormData("attachment", fileName);
         httpHeaders.setContentType(mediaType);
-        httpHeaders.add(VARY, ACCEPT); // used so that gate-way caching uses accept header as a key
+
+        // used so that gate-way caching uses accept/accept-encoding headers as a key
+        httpHeaders.add(VARY, ACCEPT);
+        httpHeaders.add(VARY, ACCEPT_ENCODING);
         return httpHeaders;
     }
 }

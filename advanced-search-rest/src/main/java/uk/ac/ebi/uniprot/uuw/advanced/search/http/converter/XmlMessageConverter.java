@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -17,6 +15,8 @@ import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -24,49 +24,48 @@ import java.util.zip.GZIPOutputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class XmlMessageConverter extends AbstractHttpMessageConverter<XmlEntityMessageConverter> {
+public class XmlMessageConverter<S, T> extends AbstractHttpMessageConverter<XmlMessageConverterContext<S, T>> {
     private static final int FLUSH_INTERVAL = 5000;
     private static final Logger LOGGER = getLogger(UniProtXmlMessageConverter.class);
-    private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n";
-    private static final String FOOTER = "<copyright>\n" +
-            "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms Distributed under the Creative Commons Attribution (CC BY 4.0) License\n" +
-            "</copyright>\n" +
-            "</uniprot>";
-    //    private EntryXmlConverter xmlConverter = new EntryXmlConverterImpl();
-    private Marshaller marshaller;
+
+    private final Map<String, Marshaller> marshallers;
 
     public XmlMessageConverter() {
         super(new MediaType("x-uniprot2", "xml"));
-        marshaller = initXmlMarshaller();
+        marshallers = new HashMap<>();
     }
 
     @Override
     protected boolean supports(Class<?> clazz) {
-        return XmlEntityMessageConverter.class.isAssignableFrom(clazz);
+        return XmlMessageConverterContext.class.isAssignableFrom(clazz);
     }
 
     @Override
-    protected XmlEntityMessageConverter readInternal(Class<? extends XmlEntityMessageConverter> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+    protected XmlMessageConverterContext readInternal(Class<? extends XmlMessageConverterContext<S, T>> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
         return null;
     }
 
-
     @Override
-    protected void writeInternal(XmlEntityMessageConverter contentStream, HttpOutputMessage httpOutputMessage)
+    protected void writeInternal(XmlMessageConverterContext<S, T> messageConfig, HttpOutputMessage httpOutputMessage)
             throws IOException, HttpMessageNotWritableException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
 
-        try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
-            writeDataToOutputStream(contentStream, counter, gzipOutputStream);
+        if (messageConfig.isCompressed()) {
+            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
+                writeDataToOutputStream(messageConfig, counter, gzipOutputStream);
+            }
+        } else {
+            writeDataToOutputStream(messageConfig, counter, outputStream);
         }
 
     }
 
-    private void writeDataToOutputStream(XmlEntityMessageConverter contentStream, AtomicInteger counter, OutputStream outputStream) throws IOException {
+    private void writeDataToOutputStream(XmlMessageConverterContext<S, T> contentStream, AtomicInteger counter, OutputStream outputStream) throws IOException {
+        initXmlMarshaller(contentStream);
         Instant start = Instant.now();
         final MutableWriteState writeState = new MutableWriteState();
-        Stream<Collection<UniProtEntry>> entities = contentStream.getEntities();
+        Stream<Collection<S>> entities = contentStream.getEntities();
 
         try {
             entities.forEach(batch -> {
@@ -84,7 +83,7 @@ public class XmlMessageConverter extends AbstractHttpMessageConverter<XmlEntityM
                             outputStream.write(contentStream.getHeader().getBytes());
                         }
 
-                        outputStream.write((getXmlString(contentStream.getConverter(), entry)).getBytes());
+                        outputStream.write((getXmlString(contentStream, entry)).getBytes());
                     } catch (IOException | RuntimeException e) {
                         throw new StopStreamException("Could not write xml entry: " + entry, e);
                     }
@@ -104,26 +103,31 @@ public class XmlMessageConverter extends AbstractHttpMessageConverter<XmlEntityM
         }
     }
 
-    private Marshaller initXmlMarshaller() {
+    private void initXmlMarshaller(XmlMessageConverterContext<S, T> config) {
+        marshallers.putIfAbsent(config.getContext(), createMarshaller(config.getContext()));
+    }
+
+    private Marshaller createMarshaller(String context) {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance("uk.ac.ebi.kraken.xml.jaxb.uniprot");
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            return marshaller;
+            JAXBContext jaxbContext = JAXBContext.newInstance(context);
+            Marshaller contextMarshaller = jaxbContext.createMarshaller();
+            contextMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            contextMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            return contextMarshaller;
         } catch (Exception e) {
             throw new RuntimeException("JAXB initialisation failed", e);
         }
     }
 
-    private String getXmlString(Function<UniProtEntry, Entry> converter, UniProtEntry uniProtEntry) {
+    private String getXmlString(XmlMessageConverterContext<S, T> config, S uniProtEntry) {
         try {
-            Entry entry = converter.apply(uniProtEntry);
+            Function<S, T> converter = config.getConverter();
+            T entry = converter.apply(uniProtEntry);
             StringWriter xmlString = new StringWriter();
             Writer out = new BufferedWriter(xmlString);
             DataWriter writer = new DataWriter(out, "UTF-8");
             writer.setIndentStep("  ");
-            marshaller.marshal(entry, writer);
+            marshallers.get(config.getContext()).marshal(entry, writer);
             writer.characters("\n");
             writer.flush();
             return xmlString.toString();
