@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,11 +12,16 @@ import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -37,15 +43,18 @@ public class UniprotAdvancedSearchService {
     private final UniprotQueryRepository repository;
     private final UniprotFacetConfig uniprotFacetConfig;
     private final StoreStreamer<UniProtEntry> storeStreamer;
+    private final ThreadPoolTaskExecutor downloadTaskExecutor;
 
     public UniprotAdvancedSearchService(UniprotQueryRepository repository,
                                         UniprotFacetConfig uniprotFacetConfig,
                                         CloudSolrStreamTemplate cloudSolrStreamTemplate,
-                                        StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer) {
+                                        StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
+                                        ThreadPoolTaskExecutor downloadTaskExecutor) {
         this.repository = repository;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.cloudSolrStreamTemplate = cloudSolrStreamTemplate;
         this.storeStreamer = uniProtEntryStoreStreamer;
+        this.downloadTaskExecutor = downloadTaskExecutor;
     }
 
     public QueryResult<UniProtDocument> executeQuery(QuerySearchRequest searchRequest) {
@@ -111,5 +120,33 @@ public class UniprotAdvancedSearchService {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private Stream<?> streamEntities(String query, MediaType contentType) {
+        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
+        try {
+            cStream.open();
+            if (contentType.equals(ListMessageConverter.MEDIA_TYPE)) {
+                return storeStreamer.idsStream(cStream);
+            } else {
+                return storeStreamer.idsToStoreStream(cStream);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public <S, T> void stream2(String query, XmlMessageConverterContext<S, T> context, ResponseBodyEmitter emitter) {
+        MediaType contentType = context.getContentType();
+        context.setEntities(streamEntities(query, contentType));
+
+        downloadTaskExecutor.execute(() -> {
+            try {
+                emitter.send(context, contentType);
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+            emitter.complete();
+        });
     }
 }

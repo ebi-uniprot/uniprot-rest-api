@@ -26,14 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
-import static org.springframework.http.HttpHeaders.VARY;
+import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Controller for uniprot advanced search service.
@@ -145,24 +142,17 @@ public class UniprotAdvancedSearchController {
                                                       HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-        downloadTaskExecutor.execute(() -> {
-            try {
+//        MessageConverterContextFactory.get(UNIPROT, contentType);
+        XmlMessageConverterContext<UniProtEntry, Entry> converterContext = XmlMessageConverterContext.<UniProtEntry, Entry>builder()
+                .header("<uniprot>")
+                .footer("</uniprot>")
+                .compressed(encoding != null && encoding.equals("gzip"))
+                .converter(entry -> new EntryXmlConverterImpl().convert(entry))
+                .context("uk.ac.ebi.kraken.xml.jaxb.uniprot")
+                .contentType(contentType)
+                .build();
 
-                XmlMessageConverterContext<UniProtEntry, Entry> converterContext = XmlMessageConverterContext.<UniProtEntry, Entry>builder()
-                        .header("<uniprot>")
-                        .footer("</uniprot>")
-                        .compressed(encoding != null && encoding.equals("gzip"))
-                        .converter(entry -> new EntryXmlConverterImpl().convert(entry))
-                        .context("uk.ac.ebi.kraken.xml.jaxb.uniprot")
-                        .entities((Stream<Collection<UniProtEntry>>) queryBuilderService.stream(query, contentType))
-                        .build();
-
-                emitter.send(converterContext, contentType);
-            } catch (IOException e) {
-                emitter.completeWithError(e);
-            }
-            emitter.complete();
-        });
+        queryBuilderService.stream2(query, converterContext, emitter);
 
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, encoding, request))

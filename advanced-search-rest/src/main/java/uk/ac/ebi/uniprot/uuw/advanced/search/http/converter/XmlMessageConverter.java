@@ -65,7 +65,7 @@ public class XmlMessageConverter<S, T> extends AbstractHttpMessageConverter<XmlM
         initXmlMarshaller(contentStream);
         Instant start = Instant.now();
         final MutableWriteState writeState = new MutableWriteState();
-        Stream<Collection<S>> entities = contentStream.getEntities();
+        Stream<Collection<S>> entities = (Stream<Collection<S>>)contentStream.getEntities();
 
         try {
             entities.forEach(batch -> {
