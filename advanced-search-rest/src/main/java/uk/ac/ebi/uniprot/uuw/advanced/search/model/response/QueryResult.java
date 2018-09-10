@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class QueryResult<T> {
 
-    private final Page page;
+    private Page page;
     private final Collection<T> content;
     private final Collection<Facet> facets;
 
@@ -33,6 +33,12 @@ public class QueryResult<T> {
 
     public Page getPage() {
         return page;
+    }
+
+    public Page getPageAndClean(){
+        Page result = this.page;
+        this.page = null;
+        return result;
     }
 
     public Collection<T> getContent() {

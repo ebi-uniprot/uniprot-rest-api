@@ -1,17 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.VARY;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -19,14 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
@@ -36,6 +18,17 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniprotAdvancedSearchService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.VARY;
 
 /**
  * Controller for uniprot advanced search service.
@@ -69,7 +62,7 @@ public class UniprotAdvancedSearchController {
 
 		QueryResult<UPEntry> queryResult = entryService.executeQuery(searchRequest);
 
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPage()));
+		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPageAndClean()));
 		return new ResponseEntity<>(queryResult, HttpStatus.OK);
 	}
 
@@ -77,7 +70,7 @@ public class UniprotAdvancedSearchController {
 	public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid QueryCursorRequest cursorRequest,
 			HttpServletRequest request, HttpServletResponse response) {
 		QueryResult<UPEntry> result = entryService.executeCursorQuery(cursorRequest);
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPage()));
+		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
