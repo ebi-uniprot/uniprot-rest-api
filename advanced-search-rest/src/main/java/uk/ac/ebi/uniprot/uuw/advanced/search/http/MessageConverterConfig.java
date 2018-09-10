@@ -8,11 +8,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.UniProtXmlMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter.XML_MEDIA_TYPE;
 
 /**
  * Created 21/08/18
@@ -53,7 +65,51 @@ public class MessageConverterConfig {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
                 converters.add(new UniProtXmlMessageConverter());
+                converters.add(0, new XmlMessageConverter());
             }
         };
+    }
+
+    @Bean
+    public MessageConverterContextFactory messageConverterContextFactory() {
+        MessageConverterContextFactory contextFactory = new MessageConverterContextFactory();
+
+        contextFactory.addMessageConverterContexts(asList(
+                uniProtListMessageConverterContext(),
+                uniProtFlatFileMessageConverterContext(),
+                uniProtXmlMessageConverterContext()));
+
+        return contextFactory;
+    }
+
+    private XmlMessageConverterContext uniProtXmlMessageConverterContext() {
+        XmlMessageConverterContext<UniProtEntry, Entry> converter = new XmlMessageConverterContext<>();
+        converter.setHeader("<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n");
+        converter.setFooter("<copyright>\n" +
+                                    "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms Distributed under the Creative Commons Attribution (CC BY 4.0) License\n" +
+                                    "</copyright>\n" +
+                                    "</uniprot>");
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
+        converter.setConverter(entry -> new EntryXmlConverterImpl().convert(entry));
+        converter.setContentType(XML_MEDIA_TYPE);
+
+        return converter;
+    }
+
+    private MessageConverterContext uniProtFlatFileMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(FF_MEDIA_TYPE);
+
+        return converter;
+    }
+
+    private MessageConverterContext uniProtListMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(LIST_MEDIA_TYPE);
+
+        return converter;
     }
 }
