@@ -2,18 +2,14 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
 import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import uk.ac.ebi.kraken.ffwriter.line.impl.UniProtFlatfileWriter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,7 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-public class FlatFileMessageConverter extends AbstractHttpMessageConverter<MessageConverterContext> {
+public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
     public static final MediaType FF_MEDIA_TYPE = new MediaType("text", "flatfile");
     private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
@@ -46,10 +42,10 @@ public class FlatFileMessageConverter extends AbstractHttpMessageConverter<Messa
     }
 
     @Override
-    protected void writeInternal(MessageConverterContext messageConfig, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
-        AtomicInteger counter = new AtomicInteger();
-        OutputStream outputStream = httpOutputMessage.getBody();
-        Instant start = Instant.now();
+    protected void write(MessageConverterContext messageConfig,
+                         OutputStream outputStream,
+                         Instant start,
+                         AtomicInteger counter) throws IOException {
         Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>)messageConfig.getEntities();
 
         try {
@@ -78,14 +74,5 @@ public class FlatFileMessageConverter extends AbstractHttpMessageConverter<Messa
         } finally {
             outputStream.flush();
         }
-    }
-
-    private void logStats(int counter, Instant start) {
-        Instant now = Instant.now();
-        long millisDuration = Duration.between(start, now).toMillis();
-        int secDuration = (int) millisDuration / 1000;
-        String rate = String.format("%.2f", ((double) counter) / secDuration);
-        LOGGER.info("UniProt flatfile entries written: {}", counter);
-        LOGGER.info("UniProt flatfile entries duration: {} ({} entries/sec)", secDuration, rate);
     }
 }

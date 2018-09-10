@@ -17,7 +17,7 @@ public class XmlMessageConverterContext<S, T> extends MessageConverterContext {
     public MessageConverterContext asCopy() {
         XmlMessageConverterContext<S, T> copy = new XmlMessageConverterContext<>();
         copy.setContentType(this.getContentType());
-        copy.setCompressed(this.isCompressed());
+        copy.setFileType(this.getFileType());
         copy.setResource(this.getResource());
         copy.setEntities(this.getEntities());
         copy.setConverter(this.converter);

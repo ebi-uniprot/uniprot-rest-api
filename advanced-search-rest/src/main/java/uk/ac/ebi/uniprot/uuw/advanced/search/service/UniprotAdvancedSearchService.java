@@ -104,20 +104,6 @@ public class UniprotAdvancedSearchService {
         }
     }
 
-    public Stream<?> stream(String query, MediaType mediaType) {
-        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
-        try {
-            cStream.open();
-            if (mediaType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
-                return storeStreamer.idsStream(cStream);
-            } else {
-                return storeStreamer.idsToStoreStream(cStream);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     private Stream<?> streamEntities(String query, MediaType contentType) {
         CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
         try {
@@ -132,7 +118,7 @@ public class UniprotAdvancedSearchService {
         }
     }
 
-    public void stream2(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {
+    public void stream(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {
         MediaType contentType = context.getContentType();
         context.setEntities(streamEntities(query, contentType));
 

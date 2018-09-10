@@ -13,6 +13,7 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
@@ -24,7 +25,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniprotAdvancedSearchServic
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -113,31 +113,13 @@ public class UniprotAdvancedSearchController {
      *
      * time curl -OJ -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for just accessions)
      * time curl -OJ -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for entries)
+     * time curl -OJ -H "Accept:application/xml" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for XML entries)
+     *
+     * for GZIPPED results, add -H "Accept-Encoding:gzip"
      *
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
     @RequestMapping(value = "/stream", method = RequestMethod.GET,
-            produces = {"text/flatfile", "text/list", "x-uniprot/xml"})
-    public ResponseEntity<ResponseBodyEmitter> stream(@RequestParam(value = "query", required = true) String query,
-                                                      @RequestHeader("Accept") MediaType contentType,
-                                                      HttpServletRequest request) {
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
-
-        downloadTaskExecutor.execute(() -> {
-            try {
-                emitter.send(queryBuilderService.stream(query, contentType), contentType);
-            } catch (IOException e) {
-                emitter.completeWithError(e);
-            }
-            emitter.complete();
-        });
-
-        return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(contentType, "", request))
-                .body(emitter);
-    }
-
-    @RequestMapping(value = "/stream2", method = RequestMethod.GET,
             produces = {"text/flatfile", "text/list", "application/xml"})
     public ResponseEntity<ResponseBodyEmitter> stream2(@RequestParam(value = "query", required = true) String query,
                                                       @RequestHeader("Accept") MediaType contentType,
@@ -146,18 +128,18 @@ public class UniprotAdvancedSearchController {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
-        context.setCompressed(encoding != null && encoding.equals("gzip"));
+        context.setFileType(FileType.bestFileTypeMatch(encoding));
 
-        queryBuilderService.stream2(query, context, emitter);
+        queryBuilderService.stream(query, context, emitter);
 
         return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(contentType, encoding, request))
+                .headers(createHttpDownloadHeader(contentType, context, request))
                 .body(emitter);
     }
 
-    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, String encoding, HttpServletRequest request) {
+    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {
         String fileName = "uniprot-" + request.getQueryString() + "." + mediaType
-                .getSubtype() + (encoding != null && encoding.equals("gzip") ? ".gz" : "");
+                .getSubtype() + context.getFileType().getExtension();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentDispositionFormData("attachment", fileName);
         httpHeaders.setContentType(mediaType);

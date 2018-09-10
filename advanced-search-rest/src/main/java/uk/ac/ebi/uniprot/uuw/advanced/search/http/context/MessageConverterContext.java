@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  * @author Edd
  */
 public class MessageConverterContext {
-    private boolean compressed;
+    private FileType fileType;
     private MediaType contentType;
     private Stream<?> entities;
     private MessageConverterContextFactory.Resource resource;
@@ -20,16 +20,38 @@ public class MessageConverterContext {
         context.resource = this.resource;
         context.entities = this.entities;
         context.contentType = this.contentType;
-        context.compressed = this.compressed;
+        context.fileType = this.fileType;
         return context;
     }
 
-    public boolean isCompressed() {
-        return compressed;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MessageConverterContext that = (MessageConverterContext) o;
+
+        if (fileType != that.fileType) return false;
+        if (contentType != null ? !contentType.equals(that.contentType) : that.contentType != null) return false;
+        if (entities != null ? !entities.equals(that.entities) : that.entities != null) return false;
+        return resource == that.resource;
     }
 
-    public void setCompressed(boolean compressed) {
-        this.compressed = compressed;
+    @Override
+    public int hashCode() {
+        int result = fileType != null ? fileType.hashCode() : 0;
+        result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
+        result = 31 * result + (entities != null ? entities.hashCode() : 0);
+        result = 31 * result + (resource != null ? resource.hashCode() : 0);
+        return result;
+    }
+
+    public FileType getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
     }
 
     public MediaType getContentType() {
@@ -56,25 +78,4 @@ public class MessageConverterContext {
         this.resource = resource;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MessageConverterContext that = (MessageConverterContext) o;
-
-        if (compressed != that.compressed) return false;
-        if (contentType != null ? !contentType.equals(that.contentType) : that.contentType != null) return false;
-        if (entities != null ? !entities.equals(that.entities) : that.entities != null) return false;
-        return resource == that.resource;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (compressed ? 1 : 0);
-        result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
-        result = 31 * result + (entities != null ? entities.hashCode() : 0);
-        result = 31 * result + (resource != null ? resource.hashCode() : 0);
-        return result;
-    }
 }
