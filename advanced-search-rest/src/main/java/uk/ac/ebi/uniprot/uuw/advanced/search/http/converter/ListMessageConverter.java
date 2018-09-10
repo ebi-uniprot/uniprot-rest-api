@@ -44,11 +44,11 @@ public class ListMessageConverter extends AbstractHttpMessageConverter<MessageCo
     }
 
     @Override
-    protected void writeInternal(MessageConverterContext contentStream, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(MessageConverterContext messageConfig, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
         Instant start = Instant.now();
-        Stream<String> entities = (Stream<String>)contentStream.getEntities();
+        Stream<String> entities = (Stream<String>)messageConfig.getEntities();
 
         try {
             entities.forEach(id -> {

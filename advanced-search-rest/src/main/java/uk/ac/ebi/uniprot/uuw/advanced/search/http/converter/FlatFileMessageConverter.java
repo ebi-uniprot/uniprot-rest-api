@@ -46,11 +46,11 @@ public class FlatFileMessageConverter extends AbstractHttpMessageConverter<Messa
     }
 
     @Override
-    protected void writeInternal(MessageConverterContext contentStream, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(MessageConverterContext messageConfig, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
         Instant start = Instant.now();
-        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>)contentStream.getEntities();
+        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>)messageConfig.getEntities();
 
         try {
             entities.forEach(items -> {
