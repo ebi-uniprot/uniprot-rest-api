@@ -1,36 +1,20 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.VARY;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -58,19 +42,16 @@ public class UniprotAdvancedSearchController {
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniprotAdvancedSearchService queryBuilderService;
-    private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final UniProtEntryService entryService;
     private final MessageConverterContextFactory converterContextFactory;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
                                            UniprotAdvancedSearchService queryBuilderService,
-                                           ThreadPoolTaskExecutor downloadTaskExecutor,
                                            UniProtEntryService entryService,
                                            MessageConverterContextFactory converterContextFactory) {
         this.eventPublisher = eventPublisher;
         this.queryBuilderService = queryBuilderService;
-        this.downloadTaskExecutor = downloadTaskExecutor;
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
     }
