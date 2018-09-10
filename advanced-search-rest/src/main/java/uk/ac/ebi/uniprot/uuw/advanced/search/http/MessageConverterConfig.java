@@ -1,26 +1,29 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.*;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.UniProtXmlMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter.XML_MEDIA_TYPE;
 
 /**
@@ -62,7 +65,7 @@ public class MessageConverterConfig {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
                 converters.add(new UniProtXmlMessageConverter());
-                converters.add(new XmlMessageConverter());
+                converters.add(0, new XmlMessageConverter());
             }
         };
     }
@@ -71,18 +74,22 @@ public class MessageConverterConfig {
     public MessageConverterContextFactory messageConverterContextFactory() {
         MessageConverterContextFactory contextFactory = new MessageConverterContextFactory();
 
-        contextFactory.addMessageConverterContexts(singletonList(uniProtXmlMessageConverterContext()));
+        contextFactory.addMessageConverterContexts(asList(
+                uniProtListMessageConverterContext(),
+                uniProtFlatFileMessageConverterContext(),
+                uniProtXmlMessageConverterContext()));
 
         return contextFactory;
     }
 
-    // TODO: 07/09/18 add uniprotFlatFile, uniprotList contexts
-    // may need to provide a supplier/method that does the conversion of entry -> flatfile string
     private XmlMessageConverterContext uniProtXmlMessageConverterContext() {
         XmlMessageConverterContext<UniProtEntry, Entry> converter = new XmlMessageConverterContext<>();
-        converter.setHeader("<uniprot>");
-        converter.setFooter("</uniprot>");
-        converter.setResource(Resource.UNIPROT);
+        converter.setHeader("<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n");
+        converter.setFooter("<copyright>\n" +
+                                    "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms Distributed under the Creative Commons Attribution (CC BY 4.0) License\n" +
+                                    "</copyright>\n" +
+                                    "</uniprot>");
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
         converter.setConverter(entry -> new EntryXmlConverterImpl().convert(entry));
         converter.setContentType(XML_MEDIA_TYPE);
@@ -90,35 +97,19 @@ public class MessageConverterConfig {
         return converter;
     }
 
-    // TODO: 07/09/18 extract class
-    public static class MessageConverterContextFactory {
-        private final Map<Pair, MessageConverterContext> converters = new HashMap<>();
+    private MessageConverterContext uniProtFlatFileMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(FF_MEDIA_TYPE);
 
-        public void addMessageConverterContexts(List<MessageConverterContext> converters) {
-            converters.forEach(converter -> {
-                Pair pair = Pair.builder().contentType(converter.getContentType()).resource(converter.getResource())
-                        .build();
-                this.converters.put(pair, converter);
-            });
-        }
-
-        public MessageConverterContext get(Resource resource, MediaType contentType) {
-            Pair pair = Pair.builder().contentType(contentType).resource(resource).build();
-
-            MessageConverterContext messageConverterContext = converters.get(pair);
-
-            return messageConverterContext.asCopy();
-        }
+        return converter;
     }
 
-    @Data
-    @Builder
-    private static class Pair {
-        private Resource resource;
-        private MediaType contentType;
-    }
+    private MessageConverterContext uniProtListMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(LIST_MEDIA_TYPE);
 
-    public enum Resource {
-        UNIPROT, UNIREF, UNIPARC
+        return converter;
     }
 }

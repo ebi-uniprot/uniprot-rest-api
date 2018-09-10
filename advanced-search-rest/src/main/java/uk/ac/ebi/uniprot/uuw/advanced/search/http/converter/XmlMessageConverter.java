@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -27,7 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class XmlMessageConverter<S, T> extends AbstractHttpMessageConverter<XmlMessageConverterContext<S, T>> {
     private static final int FLUSH_INTERVAL = 5000;
     private static final Logger LOGGER = getLogger(UniProtXmlMessageConverter.class);
-    public static final MediaType XML_MEDIA_TYPE = new MediaType("x-uniprot2", "xml");
+    public static final MediaType XML_MEDIA_TYPE = new MediaType("application", "xml");
 
     private final Map<String, Marshaller> marshallers;
 
@@ -42,7 +43,7 @@ public class XmlMessageConverter<S, T> extends AbstractHttpMessageConverter<XmlM
     }
 
     @Override
-    protected XmlMessageConverterContext readInternal(Class<? extends XmlMessageConverterContext<S, T>> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+    protected XmlMessageConverterContext<S, T> readInternal(Class<? extends XmlMessageConverterContext<S, T>> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
         return null;
     }
 

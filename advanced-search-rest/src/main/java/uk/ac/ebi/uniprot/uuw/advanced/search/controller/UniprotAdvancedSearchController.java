@@ -13,8 +13,8 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.MessageConverterConfig;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.springframework.http.HttpHeaders.*;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
 
 /**
  * Controller for uniprot advanced search service.
@@ -44,14 +45,14 @@ public class UniprotAdvancedSearchController {
     private final UniprotAdvancedSearchService queryBuilderService;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final UniProtEntryService entryService;
-    private final MessageConverterConfig.MessageConverterContextFactory converterContextFactory;
+    private final MessageConverterContextFactory converterContextFactory;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
                                            UniprotAdvancedSearchService queryBuilderService,
                                            ThreadPoolTaskExecutor downloadTaskExecutor,
                                            UniProtEntryService entryService,
-                                           MessageConverterConfig.MessageConverterContextFactory converterContextFactory) {
+                                           MessageConverterContextFactory converterContextFactory) {
         this.eventPublisher = eventPublisher;
         this.queryBuilderService = queryBuilderService;
         this.downloadTaskExecutor = downloadTaskExecutor;
@@ -137,14 +138,14 @@ public class UniprotAdvancedSearchController {
     }
 
     @RequestMapping(value = "/stream2", method = RequestMethod.GET,
-            produces = {"text/flatfile", "text/list", "x-uniprot2/xml"})
+            produces = {"text/flatfile", "text/list", "application/xml"})
     public ResponseEntity<ResponseBodyEmitter> stream2(@RequestParam(value = "query", required = true) String query,
                                                       @RequestHeader("Accept") MediaType contentType,
                                                       @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
                                                       HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-        MessageConverterContext context = converterContextFactory.get(MessageConverterConfig.Resource.UNIPROT, contentType);
+        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         context.setCompressed(encoding != null && encoding.equals("gzip"));
 
         queryBuilderService.stream2(query, context, emitter);

@@ -1,7 +1,6 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
+package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 
 import org.springframework.http.MediaType;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.MessageConverterConfig;
 
 import java.util.stream.Stream;
 
@@ -14,7 +13,7 @@ public class MessageConverterContext {
     private boolean compressed;
     private MediaType contentType;
     private Stream<?> entities;
-    private MessageConverterConfig.Resource resource;
+    private MessageConverterContextFactory.Resource resource;
 
     public MessageConverterContext asCopy() {
         MessageConverterContext context = new MessageConverterContext();
@@ -49,11 +48,11 @@ public class MessageConverterContext {
         this.entities = entities;
     }
 
-    public MessageConverterConfig.Resource getResource() {
+    public MessageConverterContextFactory.Resource getResource() {
         return resource;
     }
 
-    public void setResource(MessageConverterConfig.Resource resource) {
+    public void setResource(MessageConverterContextFactory.Resource resource) {
         this.resource = resource;
     }
 

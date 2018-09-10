@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
+package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 
 import java.util.function.Function;
 

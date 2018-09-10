@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -108,7 +108,7 @@ public class UniprotAdvancedSearchService {
         CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
         try {
             cStream.open();
-            if (mediaType.equals(ListMessageConverter.MEDIA_TYPE)) {
+            if (mediaType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
                 return storeStreamer.idsStream(cStream);
             } else {
                 return storeStreamer.idsToStoreStream(cStream);
@@ -122,7 +122,7 @@ public class UniprotAdvancedSearchService {
         CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
         try {
             cStream.open();
-            if (contentType.equals(ListMessageConverter.MEDIA_TYPE)) {
+            if (contentType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
                 return storeStreamer.idsStream(cStream);
             } else {
                 return storeStreamer.idsToStoreStream(cStream);
