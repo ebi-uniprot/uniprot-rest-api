@@ -22,7 +22,7 @@ object FiltersWithDownloadSimulation {
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "download filter results: ${query}"
-      val queryRequestStr: String = "/searchAll?query=${query}"
+      val queryRequestStr: String = "/download?query=${query}"
 
       val request =
         feed(downloadFeeder)
@@ -36,7 +36,7 @@ object FiltersWithDownloadSimulation {
     }
 
     val requestSeq = Seq(
-      DownloadFilterResultsScenario.getRequestWithFormat("application/json")
+      DownloadFilterResultsScenario.getRequestWithFormat("text/flatfile")
     )
 
     val instance = scenario("Download Filter Results Scenario")
