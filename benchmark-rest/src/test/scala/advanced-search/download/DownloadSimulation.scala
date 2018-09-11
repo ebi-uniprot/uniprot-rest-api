@@ -21,7 +21,7 @@ object DownloadSimulation {
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "download: ${query}"
-      val queryRequestStr: String = "/searchAll?query=${query}"
+      val queryRequestStr: String = "/download?query=${query}"
 
       val request =
         feed(downloadFeeder)
@@ -35,7 +35,7 @@ object DownloadSimulation {
     }
 
     val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat("application/json")
+      DownloadScenario.getRequestWithFormat("text/flatfile")
     )
 
     val instance = scenario("Download Scenario")

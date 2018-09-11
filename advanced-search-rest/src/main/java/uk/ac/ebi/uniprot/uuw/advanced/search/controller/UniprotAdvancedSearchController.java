@@ -115,12 +115,12 @@ public class UniprotAdvancedSearchController {
      *
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
-    @RequestMapping(value = "/stream", method = RequestMethod.GET,
+    @RequestMapping(value = "/download", method = RequestMethod.GET,
             produces = {"text/flatfile", "text/list", "application/xml"})
-    public ResponseEntity<ResponseBodyEmitter> stream2(@RequestParam(value = "query", required = true) String query,
-                                                      @RequestHeader("Accept") MediaType contentType,
-                                                      @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-                                                      HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyEmitter> download(@RequestParam(value = "query", required = true) String query,
+														@RequestHeader("Accept") MediaType contentType,
+														@RequestHeader(value = "Accept-Encoding", required = false) String encoding,
+														HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);

@@ -20,7 +20,7 @@ object DownloadSwissProtSimulation {
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "downloading swissprot"
-      val filterGeneralRequestStr: String = "/searchAll?query=reviewed:true"
+      val filterGeneralRequestStr: String = "/download?query=reviewed:true"
 
       val request =
         exec(http(httpReqInfo)
@@ -32,7 +32,7 @@ object DownloadSwissProtSimulation {
     }
 
     val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat("application/json")
+      DownloadScenario.getRequestWithFormat("text/flatfile")
     )
 
     val instance = scenario("Download Swiss-Prot Scenario")

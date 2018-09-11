@@ -22,7 +22,7 @@ object AccessionRetrievalSimulation {
 
     def getRequestWithFormat(format: String): ChainBuilder = {
       val httpReqInfo: String = "accession=${accession}, format=" + format;
-      val requestStr: String = "/searchCursor?query=accession:${accession}";
+      val requestStr: String = "/searchAccession?query=${accession}";
 
       val request =
         feed(feeder)
