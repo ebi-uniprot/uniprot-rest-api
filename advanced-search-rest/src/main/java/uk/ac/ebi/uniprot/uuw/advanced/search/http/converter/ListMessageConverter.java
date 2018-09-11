@@ -63,7 +63,8 @@ public class ListMessageConverter extends AbstractUUWHttpMessageConverter<Messag
             LOGGER.error("Client aborted streaming: closing stream.", e);
             entities.close();
         } finally {
-            outputStream.flush();
+//            outputStream.flush();
+            outputStream.close();
         }
     }
 }

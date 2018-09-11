@@ -23,7 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<XmlMessageConverterContext<S, T>> {
     private static final int FLUSH_INTERVAL = 5000;
-    private static final Logger LOGGER = getLogger(UniProtXmlMessageConverter.class);
+    private static final Logger LOGGER = getLogger(XmlMessageConverter.class);
     public static final MediaType XML_MEDIA_TYPE = new MediaType("application", "xml");
 
     private final Map<String, Marshaller> marshallers;
@@ -64,18 +64,20 @@ public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<X
                             logStats(currentCount, start);
                         }
 
-                        outputStream.write((getXmlString(messageConfig, entry)).getBytes());
+                        // try converting here so in case of exception, we abort before writing xml header
+                        String entryXml = getXmlString(messageConfig, entry);
 
                         if (writeState.state == WriteState.CREATED) {
                             writeState.setWriteState(WriteState.ENTRIES_WRITTEN);
                             outputStream.write(messageConfig.getHeader().getBytes());
                         }
+
+                        outputStream.write(entryXml.getBytes());
                     } catch (IOException | RuntimeException e) {
                         throw new StopStreamException("Could not write xml entry: " + ((UniProtEntryImpl)entry).getPrimaryUniProtAccession().getValue(), e);
                     }
                 });
             });
-
         } catch (StopStreamException e) {
             LOGGER.error("Streaming aborted after error found. Closing stream.", e);
             entities.close();
@@ -83,8 +85,7 @@ public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<X
             if (writeState.state == WriteState.ENTRIES_WRITTEN) {
                 outputStream.write(messageConfig.getFooter().getBytes());
             }
-
-            outputStream.flush();
+            outputStream.close();
         }
     }
 

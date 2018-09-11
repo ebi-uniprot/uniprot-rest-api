@@ -72,7 +72,7 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
             LOGGER.error("Client aborted streaming: closing stream.", e);
             entities.close();
         } finally {
-            outputStream.flush();
+            outputStream.close();
         }
     }
 }

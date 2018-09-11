@@ -16,7 +16,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContex
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.UniProtXmlMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
 import java.util.List;
@@ -64,7 +63,6 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
-                converters.add(new UniProtXmlMessageConverter());
                 converters.add(0, new XmlMessageConverter());
             }
         };
@@ -91,7 +89,8 @@ public class MessageConverterConfig {
                                     "</uniprot>");
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
-        converter.setConverter(entry -> new EntryXmlConverterImpl().convert(entry));
+        final EntryXmlConverterImpl entryXmlConverter = new EntryXmlConverterImpl();
+        converter.setConverter(entryXmlConverter::convert);
         converter.setContentType(XML_MEDIA_TYPE);
 
         return converter;
