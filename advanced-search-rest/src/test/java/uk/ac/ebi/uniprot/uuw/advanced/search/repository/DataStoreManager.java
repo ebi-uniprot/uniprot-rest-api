@@ -24,6 +24,10 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class DataStoreManager {
+    public enum StoreType {
+        UNIPROT, UNIPARC, UNIREF
+    }
+
     private static final Logger LOGGER = getLogger(DataStoreManager.class);
     private final SolrDataStoreManager solrDataStoreManager;
     private final Map<StoreType, SolrClient> solrClientMap = new HashMap<>();
@@ -136,9 +140,5 @@ public class DataStoreManager {
         } catch (SolrServerException | IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public enum StoreType {
-        UNIPROT, UNIPARC, UNIREF
     }
 }
