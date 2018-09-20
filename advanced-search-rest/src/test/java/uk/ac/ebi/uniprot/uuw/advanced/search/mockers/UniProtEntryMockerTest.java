@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
+package uk.ac.ebi.uniprot.uuw.advanced.search.mockers;
 
 import org.junit.Test;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
@@ -8,7 +8,7 @@ import java.util.Collection;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.UniProtEntryMocker.Type.SP;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker.Type.SP;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

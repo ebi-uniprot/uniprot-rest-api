@@ -7,6 +7,7 @@ import uk.ac.ebi.uniprot.dataservice.document.Document;
 import uk.ac.ebi.uniprot.dataservice.document.DocumentConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.Converter;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
+import voldemort.versioning.ObsoleteVersionException;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -24,7 +25,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class DataStoreManager {
-    enum StoreType {
+    public enum StoreType {
         UNIPROT, UNIPARC, UNIREF
     }
 
@@ -50,6 +51,16 @@ public class DataStoreManager {
         solrDataStoreManager.cleanUp();
     }
 
+    public <T> void save(StoreType storeType, List<T> entries) {
+        saveToVoldemort(storeType, entries);
+        saveEntriesInSolr(storeType, entries);
+    }
+
+    public <T> void save(StoreType storeType, T... entries) {
+        saveToVoldemort(storeType, asList(entries));
+        saveEntriesInSolr(storeType, asList(entries));
+    }
+
     public void addSolrClient(StoreType storeType, ClosableEmbeddedSolrClient client) {
         solrClientMap.put(storeType, client);
     }
@@ -70,8 +81,18 @@ public class DataStoreManager {
     public <T> void saveToVoldemort(StoreType storeType, List<T> entries) {
         VoldemortClient voldemort = getVoldemort(storeType);
         Converter<T, ?> converter = entryConverterMap.get(storeType);
-        entries.stream().map(converter::toAvro).forEach(entryObject -> voldemort.saveEntry(entryObject));
-        LOGGER.debug("Added {} entries to voldemort", entries.size());
+        List<?> objects = entries.stream().map(converter::toAvro).collect(Collectors.toList());
+        int count = 0;
+        for (Object o : objects) {
+            try {
+                voldemort.saveEntry(o);
+                count++;
+            } catch (ObsoleteVersionException e) {
+                LOGGER.debug("Trying to add entry {} to voldemort again but it already exists -- skipping", o.toString());
+            }
+        }
+
+        LOGGER.debug("Added {} entries to voldemort", count);
     }
 
     public <T> void saveToVoldemort(StoreType storeType, T... entries) {

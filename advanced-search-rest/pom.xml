@@ -23,7 +23,7 @@
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <commons-codec.version>1.11</commons-codec.version>
         <data-service.version>web-2018.7-SNAPSHOT</data-service.version>
-        <ujdk.version>2018.8</ujdk.version>
+        <ujdk.version>2018.7-SNAPSHOT</ujdk.version>
     </properties>
 
     <dependencies>

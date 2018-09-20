@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
+package uk.ac.ebi.uniprot.uuw.advanced.search.mockers;
 
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.model.factories.DefaultUniProtFactory;

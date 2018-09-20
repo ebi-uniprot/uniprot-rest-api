@@ -1,37 +1,33 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.uniprot.dataservice.document.Document;
-import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.AdvancedSearchREST;
-import uk.ac.ebi.uniprot.uuw.advanced.search.repository.SolrClientTestConfig;
+import uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker;
+import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager;
+import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreTestConfig;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.UniProtDocMocker.createDocs;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AdvancedSearchREST.class, properties = "spring.http.encoding.enabled=false")
 @WebAppConfiguration
-@Import({SolrClientTestConfig.class})
+@Import({DataStoreTestConfig.class})
+@ActiveProfiles("hello")
 public class UniprotAdvancedSearchControllerIT {
     @Autowired
-    private SolrClient uniProtSolrClient;
+    private DataStoreManager storeManager;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -47,30 +43,8 @@ public class UniprotAdvancedSearchControllerIT {
 
     @Test
     public void canReachDownloadEndpoint() throws Exception {
-        saveDocuments(20);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, UniProtEntryMocker.create(UniProtEntryMocker.Type.SP));
 
         mockMvc.perform(get("/uniprot/search?query=accession:*")).andDo(print());
-    }
-
-    private void saveDocuments(Document... docs) {
-        try {
-            for (Document doc : docs) {
-                uniProtSolrClient.addBean(doc);
-            }
-            uniProtSolrClient.commit();
-        } catch (SolrServerException | IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private List<UniProtDocument> saveDocuments(int docCount) {
-        List<UniProtDocument> addedDocs = createDocs(docCount);
-        try {
-            uniProtSolrClient.addBeans(addedDocs);
-            uniProtSolrClient.commit();
-        } catch (SolrServerException | IOException e) {
-            throw new IllegalStateException(e);
-        }
-        return addedDocs;
     }
 }

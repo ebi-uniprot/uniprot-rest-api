@@ -1,9 +1,10 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileReader;
@@ -22,16 +23,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- * A test configuration providing {@link SolrClient} beans that override those set in {@link RepositoryConfig}.
- * For example, this allows us to use embedded Solr data stores, rather than live HTTP/Zookeeper stores hosted on
- * external VMs.
+ * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override production ones.
+ * For example, this allows us to use embedded Solr data stores or in memory Voldemort instances, rather than ones
+ * running on VMs.
  * <p>
  * Created 14/09/18
  *
  * @author Edd
  */
-@TestConfiguration
-public class SolrClientTestConfig {
+@Configuration
+public class DataStoreTestConfig {
     @Bean(destroyMethod = "close")
     public DataStoreManager dataStoreManager() throws IOException {
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
@@ -47,6 +48,7 @@ public class SolrClientTestConfig {
     }
 
     @Bean
+    @Profile("hello")
     @Primary
     public VoldemortClient uniProtClient(DataStoreManager dsm) {
         VoldemortInMemoryUniprotEntryStore entryStore = VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot");

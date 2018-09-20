@@ -28,8 +28,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.UniProtDocMocker.createDoc;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.UniProtDocMocker.createDocs;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDoc;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDocs;
 
 /**
  * Created 17/09/18
@@ -178,7 +178,7 @@ public class SolrQueryRepositoryIT {
 
     @Configuration
     @EnableAutoConfiguration
-    @Import({RepositoryConfig.class, SolrClientTestConfig.class, UniprotFacetConfig.class})
+    @Import({RepositoryConfig.class, DataStoreTestConfig.class, UniprotFacetConfig.class})
     public static class FakeApplication {
     }
 }

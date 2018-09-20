@@ -4,7 +4,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
+import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.RepositoryConfigProperties;
 
 /**
@@ -26,7 +26,7 @@ public class ResultsConfig {
     }
 
     @Bean
-    public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtClient uniProtClient) {
+    public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(VoldemortClient uniProtClient) {
         return new StoreStreamer<>(uniProtClient,
                                    resultsConfigProperties().getUniprot().getBatchSize(),
                                    resultsConfigProperties().getUniprot().getValueId());

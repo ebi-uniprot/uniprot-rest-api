@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
+package uk.ac.ebi.uniprot.uuw.advanced.search.mockers;
 
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 

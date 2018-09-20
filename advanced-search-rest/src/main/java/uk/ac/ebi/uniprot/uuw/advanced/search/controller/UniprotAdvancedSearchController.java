@@ -57,7 +57,7 @@ public class UniprotAdvancedSearchController {
     }
 
 
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = {"application/json"})
 	public ResponseEntity<QueryResult<UPEntry>> search(@Valid QuerySearchRequest searchRequest,
 			HttpServletRequest request, HttpServletResponse response) {
 

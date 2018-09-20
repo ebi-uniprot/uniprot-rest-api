@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,8 +25,8 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager.StoreType.UNIPROT;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.UniProtDocMocker.createDoc;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.UniProtEntryMocker.Type.SP;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDoc;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker.Type.SP;
 
 /**
  * Created 19/09/18
@@ -84,9 +85,25 @@ public class DataStoreManagerIT {
         assertThat(voldemortEntries.get(0), is(entry));
     }
 
+    @Test
+    public void canAddAndFetchEntriesInSolrAndVoldemort() throws IOException, SolrServerException {
+        UniProtEntry entry = UniProtEntryMocker.create(SP);
+        String accession = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(UNIPROT, entry);
+
+        QueryResponse response = storeManager.getSolrClient(UNIPROT).query(new SolrQuery("*:*"));
+        List<String> results = response.getBeans(UniProtDocument.class).stream().map(doc -> doc.accession)
+                .collect(Collectors.toList());
+        assertThat(results, contains(accession));
+
+        List<UniProtEntry> voldemortEntries = storeManager.getVoldemortEntries(UNIPROT, accession);
+        assertThat(voldemortEntries, hasSize(1));
+        assertThat(voldemortEntries.get(0), is(entry));
+    }
+
     @Configuration
     @EnableAutoConfiguration
-    @Import({RepositoryConfig.class, SolrClientTestConfig.class})
+    @Import({RepositoryConfig.class, DataStoreTestConfig.class})
     public static class FakeApplication {
     }
 }
