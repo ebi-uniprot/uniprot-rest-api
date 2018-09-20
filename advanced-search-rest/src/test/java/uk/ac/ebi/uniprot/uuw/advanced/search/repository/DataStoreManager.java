@@ -24,7 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class DataStoreManager {
-    public enum StoreType {
+    enum StoreType {
         UNIPROT, UNIPARC, UNIREF
     }
 
