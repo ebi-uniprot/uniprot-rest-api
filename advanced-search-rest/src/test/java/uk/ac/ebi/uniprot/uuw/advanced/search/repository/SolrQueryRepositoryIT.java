@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,15 +49,15 @@ public class SolrQueryRepositoryIT {
     private static GeneralSolrQueryRespository queryRepo;
 
     @Before
-    public void setUp() throws IOException, SolrServerException {
+    public void setUp() {
         queryRepo =
                 new GeneralSolrQueryRespository(template, SolrCollection.uniprot, UniProtDocument.class, facetConverter);
-        storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT).deleteByQuery("*:*");
+        storeManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
     }
 
     // getEntry -------------------
     @Test
-    public void getEntrySucceeds() throws IOException, SolrServerException {
+    public void getEntrySucceeds() {
         // given
         String acc = "P12345";
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, createDoc(acc));
@@ -84,7 +82,7 @@ public class SolrQueryRepositoryIT {
 
     // getAll -------------------
     @Test
-    public void getAllSucceeds() throws IOException, SolrServerException {
+    public void getAllSucceeds() {
         // given
         int docCount = 100;
         List<UniProtDocument> docs = createDocs(docCount);
@@ -111,7 +109,7 @@ public class SolrQueryRepositoryIT {
 
     // searchPage -------------------
     @Test
-    public void searchPageSucceeds() throws IOException, SolrServerException {
+    public void searchPageSucceeds() {
         // given
         int docCount = 10;
         List<UniProtDocument> docs = createDocs(docCount);
@@ -134,7 +132,7 @@ public class SolrQueryRepositoryIT {
 
     // searchCursorPage -------------------
     @Test
-    public void searchCursorPageSucceeds() throws IOException, SolrServerException {
+    public void searchCursorPageSucceeds() {
         // given
         int docCount = 10;
         List<UniProtDocument> docs = createDocs(docCount);

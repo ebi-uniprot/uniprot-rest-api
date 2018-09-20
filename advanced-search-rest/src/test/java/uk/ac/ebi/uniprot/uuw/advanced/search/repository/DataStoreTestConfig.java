@@ -4,7 +4,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileReader;
@@ -48,7 +47,6 @@ public class DataStoreTestConfig {
     }
 
     @Bean
-    @Profile("hello")
     @Primary
     public VoldemortClient uniProtClient(DataStoreManager dsm) {
         VoldemortInMemoryUniprotEntryStore entryStore = VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot");

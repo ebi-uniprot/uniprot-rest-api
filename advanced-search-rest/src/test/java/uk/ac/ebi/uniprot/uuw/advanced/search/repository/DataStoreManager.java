@@ -1,7 +1,9 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.slf4j.Logger;
 import uk.ac.ebi.uniprot.dataservice.document.Document;
 import uk.ac.ebi.uniprot.dataservice.document.DocumentConverter;
@@ -101,6 +103,10 @@ public class DataStoreManager {
 
     public SolrClient getSolrClient(StoreType storeType) {
         return solrClientMap.get(storeType);
+    }
+
+    public QueryResponse querySolr(StoreType storeType, String query) throws IOException, SolrServerException {
+        return solrClientMap.get(storeType).query(new SolrQuery(query));
     }
 
     public <T> void saveDocs(StoreType storeType, List<T> docs) {

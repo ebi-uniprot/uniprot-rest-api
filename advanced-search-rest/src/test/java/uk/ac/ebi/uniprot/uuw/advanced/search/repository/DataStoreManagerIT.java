@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.Before;
@@ -15,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker;
+import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreConfig;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,9 +24,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager.StoreType.UNIPROT;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDoc;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker.Type.SP;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager.StoreType.UNIPROT;
 
 /**
  * Created 19/09/18
@@ -49,7 +49,7 @@ public class DataStoreManagerIT {
     @Test
     public void canAddAndSearchDocumentsInSolr() throws IOException, SolrServerException {
         storeManager.saveDocs(UNIPROT, createDoc(P12345));
-        QueryResponse response = storeManager.getSolrClient(UNIPROT).query(new SolrQuery("accession:P12345"));
+        QueryResponse response = storeManager.querySolr(UNIPROT, "accession:P12345");
         List<String> results = response.getBeans(UniProtDocument.class).stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
         assertThat(results, contains(P12345));
@@ -58,7 +58,7 @@ public class DataStoreManagerIT {
     @Test
     public void canAddEntriesAndSearchDocumentsInSolr() throws IOException, SolrServerException {
         storeManager.saveDocs(UNIPROT, createDoc(P12345));
-        QueryResponse response = storeManager.getSolrClient(UNIPROT).query(new SolrQuery("accession:P12345"));
+        QueryResponse response = storeManager.querySolr(UNIPROT, "accession:P12345");
         List<String> results = response.getBeans(UniProtDocument.class).stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
         assertThat(results, contains(P12345));
@@ -69,7 +69,7 @@ public class DataStoreManagerIT {
         UniProtEntry entry = UniProtEntryMocker.create(SP);
         String accession = entry.getPrimaryUniProtAccession().getValue();
         storeManager.saveEntriesInSolr(UNIPROT, entry);
-        QueryResponse response = storeManager.getSolrClient(UNIPROT).query(new SolrQuery("*:*"));
+        QueryResponse response = storeManager.querySolr(UNIPROT, "*:*");
         List<String> results = response.getBeans(UniProtDocument.class).stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
         assertThat(results, contains(accession));
@@ -91,7 +91,7 @@ public class DataStoreManagerIT {
         String accession = entry.getPrimaryUniProtAccession().getValue();
         storeManager.save(UNIPROT, entry);
 
-        QueryResponse response = storeManager.getSolrClient(UNIPROT).query(new SolrQuery("*:*"));
+        QueryResponse response = storeManager.querySolr(UNIPROT, "*:*");
         List<String> results = response.getBeans(UniProtDocument.class).stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
         assertThat(results, contains(accession));
@@ -103,7 +103,7 @@ public class DataStoreManagerIT {
 
     @Configuration
     @EnableAutoConfiguration
-    @Import({RepositoryConfig.class, DataStoreTestConfig.class})
+    @Import({UniProtStoreConfig.class, RepositoryConfig.class, DataStoreTestConfig.class})
     public static class FakeApplication {
     }
 }
