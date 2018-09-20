@@ -6,8 +6,9 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.dataaccess.EntryJsonDataAdapterImpl;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
-import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
+import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.dataservice.voldemort.client.impl.DefaultClientFactory;
+import uk.ac.ebi.uniprot.services.data.serializer.model.entry.EntryObject;
 
 /**
  * Created 21/08/18
@@ -22,7 +23,7 @@ public class UniProtStoreConfig {
     }
 
     @Bean
-    public UniProtClient uniProtClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
+    public VoldemortClient uniProtClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
         return new DefaultClientFactory(
                 uniProtStoreConfigProperties.getHost(),
                 uniProtStoreConfigProperties.getNumberOfConnections(),

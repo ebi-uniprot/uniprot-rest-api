@@ -1,21 +1,11 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Sort;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Sequence;
@@ -23,7 +13,7 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
-import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
+import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
@@ -35,19 +25,24 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 @Service
 public class UniProtEntryService {
 	private static final String ACCESSION = "accession";
 	private UniprotQueryRepository repository;
 	private UniprotFacetConfig uniprotFacetConfig;
-	private UniProtClient entryService;
+	private VoldemortClient<UniProtEntry> entryService;
 	private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
 	private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
 			.instanceOf(DefaultEntryObject.class);
 	private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
 
 	public UniProtEntryService(UniprotQueryRepository repository, UniprotFacetConfig uniprotFacetConfig,
-			UniProtClient entryService, JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor) {
+			VoldemortClient<UniProtEntry> entryService, JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor) {
 		this.repository = repository;
 		this.uniprotFacetConfig = uniprotFacetConfig;
 		this.entryService = entryService;

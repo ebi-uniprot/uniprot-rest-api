@@ -1,23 +1,31 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.apache.solr.common.util.NamedList;
-import org.apache.solr.core.CoreContainer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
+import uk.ac.ebi.uniprot.dataservice.serializer.avro.EntryConverter;
+import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileReader;
+import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileRepo;
+import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationRepo;
+import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoTermFileReader;
+import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.FileNodeIterable;
+import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyMapRepo;
+import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyRepo;
+import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
+import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * A test configuration providing {@link SolrClient} beans that override those set in {@link RepositoryConfig}.
  * For example, this allows us to use embedded Solr data stores, rather than live HTTP/Zookeeper stores hosted on
  * external VMs.
- *
+ * <p>
  * Created 14/09/18
  *
  * @author Edd
@@ -25,33 +33,48 @@ import java.io.IOException;
 @TestConfiguration
 public class SolrClientTestConfig {
     @Bean(destroyMethod = "close")
-    @Primary
-    public SolrClient uniProtSolrClient(RepositoryConfigProperties config) throws IOException {
-        return new ClosableEmbeddedSolrClient(config, SolrCollection.uniprot);
+    public DataStoreManager dataStoreManager() throws IOException {
+        SolrDataStoreManager sdsm = new SolrDataStoreManager();
+        return new DataStoreManager(sdsm);
     }
 
-    public static class ClosableEmbeddedSolrClient extends SolrClient {
-        private static final String SOLR_HOME = "solr.home";
-        private final SolrDataStoreManager storeManager;
-        private final EmbeddedSolrServer server;
+    @Bean
+    @Primary
+    public SolrClient uniProtSolrClient(DataStoreManager dataStoreManager) throws IOException, URISyntaxException {
+        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.uniprot);
+        addUniProtStoreInfo(dataStoreManager, solrClient);
+        return solrClient;
+    }
 
-        ClosableEmbeddedSolrClient(RepositoryConfigProperties config, SolrCollection collection) throws IOException {
-            this.storeManager = new SolrDataStoreManager();
-            CoreContainer container = new CoreContainer(new File(System.getProperty(SOLR_HOME)).getAbsolutePath());
-            container.load();
-            this.server = new EmbeddedSolrServer(container, collection.name());
-        }
+    @Bean
+    @Primary
+    public VoldemortClient uniProtClient(DataStoreManager dsm) {
+        VoldemortInMemoryUniprotEntryStore entryStore = VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot");
+        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, entryStore);
+        dsm.addEntryConverter(DataStoreManager.StoreType.UNIPROT, new EntryConverter());
+        return entryStore;
+    }
 
-        @Override
-        public NamedList<Object> request(SolrRequest solrRequest, String s) throws SolrServerException, IOException {
-            return server.request(solrRequest, s);
-        }
+    private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(taxonomyRepo(), goRelationRepo()));
+        dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);
+    }
 
-        @Override
-        public void close() throws IOException {
-            // close server (=> close CoreContainer) before deleting temporary directory maintained by storeManager
-            server.close();
-            storeManager.cleanUp();
-        }
+    private File getTaxonomyFile() throws URISyntaxException {
+        URL url = ClassLoader.getSystemClassLoader().getResource("taxonomy/taxonomy.dat");
+        return new File(url.toURI());
+    }
+
+    private GoRelationRepo goRelationRepo() {
+        String gotermPath = ClassLoader.getSystemClassLoader().getResource("goterm").getFile();
+        return GoRelationFileRepo.create(new GoRelationFileReader(gotermPath),
+                                                              new GoTermFileReader(gotermPath));
+    }
+
+    private TaxonomyRepo taxonomyRepo() throws URISyntaxException {
+        File taxonomicFile = getTaxonomyFile();
+
+        FileNodeIterable taxonomicNodeIterable = new FileNodeIterable(taxonomicFile);
+        return new TaxonomyMapRepo(taxonomicNodeIterable);
     }
 }

@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.uniprot.dataservice.document.Document;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage;
@@ -45,7 +43,7 @@ public class SolrQueryRepositoryIT {
     private SolrTemplate template;
 
     @Autowired
-    private SolrClient uniProtSolrClient;
+    private DataStoreManager storeManager;
 
     @Autowired
     private UniprotFacetConfig facetConverter;
@@ -56,7 +54,7 @@ public class SolrQueryRepositoryIT {
     public void setUp() throws IOException, SolrServerException {
         queryRepo =
                 new GeneralSolrQueryRespository(template, SolrCollection.uniprot, UniProtDocument.class, facetConverter);
-        uniProtSolrClient.deleteByQuery("*:*");
+        storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT).deleteByQuery("*:*");
     }
 
     // getEntry -------------------
@@ -64,7 +62,7 @@ public class SolrQueryRepositoryIT {
     public void getEntrySucceeds() throws IOException, SolrServerException {
         // given
         String acc = "P12345";
-        saveDocuments(createDoc(acc));
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, createDoc(acc));
 
         // when
         Optional<UniProtDocument> entry = queryRepo.getEntry(query("accession:" + acc));
@@ -89,8 +87,10 @@ public class SolrQueryRepositoryIT {
     public void getAllSucceeds() throws IOException, SolrServerException {
         // given
         int docCount = 100;
+        List<UniProtDocument> docs = createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
         List<String> savedAccs =
-                saveDocuments(docCount)
+                docs
                         .stream()
                         .map(doc -> doc.accession)
                         .collect(Collectors.toList());
@@ -114,8 +114,10 @@ public class SolrQueryRepositoryIT {
     public void searchPageSucceeds() throws IOException, SolrServerException {
         // given
         int docCount = 10;
+        List<UniProtDocument> docs = createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
         List<String> savedAccs =
-                saveDocuments(docCount)
+                docs
                         .stream()
                         .map(doc -> doc.accession)
                         .collect(Collectors.toList());
@@ -135,8 +137,10 @@ public class SolrQueryRepositoryIT {
     public void searchCursorPageSucceeds() throws IOException, SolrServerException {
         // given
         int docCount = 10;
+        List<UniProtDocument> docs = createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
         List<String> savedAccs =
-                saveDocuments(docCount)
+                docs
                         .stream()
                         .map(doc -> doc.accession)
                         .collect(Collectors.toList());
@@ -148,7 +152,7 @@ public class SolrQueryRepositoryIT {
         QueryResult<UniProtDocument> queryResult = queryRepo.searchCursorPage(query(accQuery), null, 2);
         List<String> page1Accs = queryResult.getContent().stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
-        String nextCursor = ((CursorPage)queryResult.getPage()).getEncryptedNextCursor();
+        String nextCursor = ((CursorPage) queryResult.getPage()).getEncryptedNextCursor();
 
         // ... and attempt to fetch page 2
         queryResult = queryRepo.searchCursorPage(query(accQuery), nextCursor, 2);
@@ -176,19 +180,5 @@ public class SolrQueryRepositoryIT {
     @EnableAutoConfiguration
     @Import({RepositoryConfig.class, SolrClientTestConfig.class, UniprotFacetConfig.class})
     public static class FakeApplication {
-    }
-
-    private void saveDocuments(Document... docs) throws IOException, SolrServerException {
-        for (Document doc : docs) {
-            uniProtSolrClient.addBean(doc);
-        }
-        uniProtSolrClient.commit();
-    }
-
-    private List<UniProtDocument> saveDocuments(int docCount) throws IOException, SolrServerException {
-        List<UniProtDocument> addedDocs = createDocs(docCount);
-        uniProtSolrClient.addBeans(addedDocs);
-        uniProtSolrClient.commit();
-        return addedDocs;
     }
 }
