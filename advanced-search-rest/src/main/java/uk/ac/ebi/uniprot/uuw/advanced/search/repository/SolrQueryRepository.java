@@ -27,6 +27,7 @@ import java.util.Optional;
  * It was defined a common QueryResult object in order to be able to
  *
  * @param <T> Returned Solr entity
+ *
  * @author lgonzales
  */
 public abstract class SolrQueryRepository<T> {
@@ -46,30 +47,8 @@ public abstract class SolrQueryRepository<T> {
         this.facetConverter = facetConverter;
     }
 
-    public QueryResult<T> searchPage(SimpleQuery query, Long offset, Integer size) {
-        try {
-            if (size == null || size <= 0) {
-                size = DEFAULT_PAGE_SIZE;
-            }
-            if (offset == null) {
-                offset = 0L;
-            }
-
-            query.setOffset(offset);
-            query.setRows(size);
-
-            Page<T> result = solrTemplate.queryForPage(collection.toString(), query, tClass);
-            PageImpl resultPage = PageImpl.of(size, offset, result.getTotalElements());
-            return QueryResult.of(result.getContent(), resultPage);
-        } catch (Throwable e) {
-            throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
-        } finally {
-            logSolrQuery(query);
-        }
-    }
-
-    public QueryResult<T> searchCursorPage(SimpleQuery query, String cursor, Integer pageSize) {
-        if (pageSize == null || pageSize <= 0) {
+    public QueryResult<T> searchPage(SimpleQuery query, String cursor,Integer pageSize) {
+        if(pageSize == null || pageSize <=0){
             pageSize = DEFAULT_PAGE_SIZE;
         }
         try {
@@ -100,24 +79,15 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    public Cursor<T> getAll(SimpleQuery query) {
-        try {
-            return solrTemplate.queryForCursor(collection.toString(), query, tClass);
-        } catch (Throwable e) {
-            throw new QueryRetrievalException("Error executing solr query", e);
-        } finally {
-            logSolrQuery(query);
-        }
-    }
 
-    private SolrCallback<QueryResponse> getSolrCursorCallback(SimpleQuery query, String cursor, Integer pageSize) {
+    private SolrCallback<QueryResponse> getSolrCursorCallback(SimpleQuery query, String cursor,Integer pageSize) {
         return solrClient -> {
             DefaultQueryParser queryParser = new DefaultQueryParser();
             SolrQuery solrQuery = queryParser.doConstructSolrQuery(query);
 
-            if (cursor != null && !cursor.isEmpty()) {
+            if(cursor != null && !cursor.isEmpty()) {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
-            } else {
+            }else {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
             }
             solrQuery.setRows(pageSize);
@@ -126,10 +96,10 @@ public abstract class SolrQueryRepository<T> {
         };
     }
 
-    private void logSolrQuery(SimpleQuery query) {
-        if (query != null) {
+    private void logSolrQuery(SimpleQuery query){
+        if(query != null) {
             DefaultQueryParser queryParser = new DefaultQueryParser();
-            LOGGER.debug("solrQuery: {}", queryParser.getQueryString(query));
+            LOGGER.debug("solrQuery: " + queryParser.getQueryString(query));
         }
     }
 
