@@ -15,6 +15,7 @@ import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyMapRepo;
 import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyRepo;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
+import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,11 +49,11 @@ public class DataStoreTestConfig {
 
     @Bean
     @Primary
-    public VoldemortClient uniProtClient(DataStoreManager dsm) {
-        VoldemortInMemoryUniprotEntryStore entryStore = VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot");
-        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, entryStore);
-        dsm.addEntryConverter(DataStoreManager.StoreType.UNIPROT, new EntryConverter());
-        return entryStore;
+    public UniProtStoreClient uniProtStoreClient(DataStoreManager dsm) {
+        UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
+                                                                               .getInstance("avro-uniprot"), new EntryConverter());
+        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
+        return storeClient;
     }
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {

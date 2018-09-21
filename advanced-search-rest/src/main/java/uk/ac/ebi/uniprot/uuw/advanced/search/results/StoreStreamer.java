@@ -23,11 +23,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class StoreStreamer<T> {
-    private final VoldemortClient storeClient;
+    private final VoldemortClient<T> storeClient;
     private final int streamerBatchSize;
     private final String id;
 
-    public StoreStreamer(VoldemortClient storeClient, int streamerBatchSize, String id) {
+    public StoreStreamer(VoldemortClient<T> storeClient, int streamerBatchSize, String id) {
         this.storeClient = storeClient;
         this.streamerBatchSize = streamerBatchSize;
         this.id = id;

@@ -7,7 +7,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.slf4j.Logger;
 import uk.ac.ebi.uniprot.dataservice.document.Document;
 import uk.ac.ebi.uniprot.dataservice.document.DocumentConverter;
-import uk.ac.ebi.uniprot.dataservice.serializer.avro.Converter;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import voldemort.versioning.ObsoleteVersionException;
 
@@ -36,7 +35,7 @@ public class DataStoreManager {
     private final Map<StoreType, SolrClient> solrClientMap = new HashMap<>();
     private final Map<StoreType, VoldemortClient> voldemortMap = new HashMap<>();
     private final Map<StoreType, DocumentConverter> docConverterMap = new HashMap<>();
-    private final Map<StoreType, Converter> entryConverterMap = new HashMap<>();
+//    private final Map<StoreType, Converter> entryConverterMap = new HashMap<>();
 
     public DataStoreManager(SolrDataStoreManager solrDataStoreManager) {
         this.solrDataStoreManager = solrDataStoreManager;
@@ -75,17 +74,17 @@ public class DataStoreManager {
         docConverterMap.put(storeType, converter);
     }
 
-    public void addEntryConverter(StoreType storeType, Converter converter) {
-        entryConverterMap.put(storeType, converter);
-    }
+//    public void addEntryConverter(StoreType storeType, Converter converter) {
+//        entryConverterMap.put(storeType, converter);
+//    }
 
     @SuppressWarnings("unchecked")
     public <T> void saveToVoldemort(StoreType storeType, List<T> entries) {
         VoldemortClient voldemort = getVoldemort(storeType);
-        Converter<T, ?> converter = entryConverterMap.get(storeType);
-        List<?> objects = entries.stream().map(converter::toAvro).collect(Collectors.toList());
+//        Converter<T, ?> converter = entryConverterMap.get(storeType);
+//        List<?> objects = entries.stream().map(converter::toAvro).collect(Collectors.toList());
         int count = 0;
-        for (Object o : objects) {
+        for (Object o : entries) {
             try {
                 voldemort.saveEntry(o);
                 count++;
@@ -153,10 +152,11 @@ public class DataStoreManager {
     }
 
     public <S, T> List<T> getVoldemortEntries(StoreType storeType, List<String> entries) {
-        VoldemortClient<S> voldemort = getVoldemort(storeType);
-        Converter<T, S> converter = entryConverterMap.get(storeType);
-        List<S> voldemortEntries = voldemort.getEntries(entries);
-        return voldemortEntries.stream().map(converter::fromAvro).collect(Collectors.toList());
+        return getVoldemort(storeType).getEntries(entries);
+//        VoldemortClient<S> voldemort = getVoldemort(storeType);
+//        Converter<T, S> converter = entryConverterMap.get(storeType);
+//        List<S> voldemortEntries = voldemort.getEntries(entries);
+//        return voldemortEntries.stream().map(converter::fromAvro).collect(Collectors.toList());
     }
 
     public void cleanSolr(StoreType storeType) {

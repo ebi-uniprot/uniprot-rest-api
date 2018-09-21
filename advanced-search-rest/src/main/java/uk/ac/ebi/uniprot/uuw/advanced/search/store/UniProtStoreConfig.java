@@ -6,8 +6,9 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.dataaccess.EntryJsonDataAdapterImpl;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
+import uk.ac.ebi.uniprot.dataservice.serializer.avro.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
-import uk.ac.ebi.uniprot.dataservice.voldemort.client.impl.DefaultClientFactory;
+import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortRemoteUniprotEntryStore;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.EntryObject;
 
 /**
@@ -23,16 +24,17 @@ public class UniProtStoreConfig {
     }
 
     @Bean
-    public VoldemortClient uniProtClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
-        return new DefaultClientFactory(
-                uniProtStoreConfigProperties.getHost(),
-                uniProtStoreConfigProperties.getNumberOfConnections(),
-                uniProtStoreConfigProperties.getStoreName())
-                .createUniProtClient();
+    public UniProtStoreClient uniProtStoreClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
+        VoldemortClient<EntryObject> client =
+                new VoldemortRemoteUniprotEntryStore(uniProtStoreConfigProperties
+                                                             .getNumberOfConnections(),
+                                                     uniProtStoreConfigProperties.getStoreName(),
+                                                     uniProtStoreConfigProperties.getHost());
+        return new UniProtStoreClient(client, new EntryConverter());
     }
 
     @Bean
-    public JsonDataAdapter<UniProtEntry,UPEntry> uniProtJsonAdaptor() {
+    public JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor() {
         return new EntryJsonDataAdapterImpl();
     }
 }
