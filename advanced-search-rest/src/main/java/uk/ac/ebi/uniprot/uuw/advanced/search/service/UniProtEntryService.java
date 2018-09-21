@@ -1,21 +1,22 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
+import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.core.query.result.Cursor;
+import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Sequence;
@@ -25,8 +26,9 @@ import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
 import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
@@ -34,6 +36,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterCompone
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 
 @Service
 public class UniProtEntryService {
@@ -45,29 +49,24 @@ public class UniProtEntryService {
 	private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
 			.instanceOf(DefaultEntryObject.class);
 	private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
+	private final CloudSolrStreamTemplate cloudSolrStreamTemplate;
+	private final StoreStreamer<UniProtEntry> storeStreamer;
+	private final ThreadPoolTaskExecutor downloadTaskExecutor;
 
-	public UniProtEntryService(UniprotQueryRepository repository, UniprotFacetConfig uniprotFacetConfig,
-			UniProtClient entryService, JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor) {
+	public UniProtEntryService(UniprotQueryRepository repository,
+							   UniprotFacetConfig uniprotFacetConfig,
+							   UniProtClient entryService,
+							   JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
+							   CloudSolrStreamTemplate cloudSolrStreamTemplate,
+							   StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
+							   ThreadPoolTaskExecutor downloadTaskExecutor) {
 		this.repository = repository;
 		this.uniprotFacetConfig = uniprotFacetConfig;
 		this.entryService = entryService;
 		this.uniProtJsonAdaptor = uniProtJsonAdaptor;
-	}
-
-	public QueryResult<UPEntry> executeQuery(QuerySearchRequest searchRequest) {
-		String fields = searchRequest.getField();
-		Map<String, List<String>> filters = FieldsParser.parse(fields);
-		String sort = searchRequest.getSort();
-		try {
-			SimpleQuery simpleQuery = SolrQueryBuilder.of(searchRequest.getQuery(), uniprotFacetConfig).build();
-			addSort(simpleQuery, sort);
-			QueryResult<UniProtDocument> results = repository.searchPage(simpleQuery, searchRequest.getOffset(),
-					searchRequest.getSize());
-			return convertQueryDoc2UPEntry(results, filters);
-		} catch (Exception e) {
-			String message = "Could not get result for: [" + searchRequest + "]";
-			throw new ServiceException(message, e);
-		}
+		this.cloudSolrStreamTemplate = cloudSolrStreamTemplate;
+		this.storeStreamer = uniProtEntryStoreStreamer;
+		this.downloadTaskExecutor = downloadTaskExecutor;
 	}
 
 	private void addSort(SimpleQuery simpleQuery, String sort) {
@@ -78,19 +77,7 @@ public class UniProtEntryService {
 		sorts.forEach(simpleQuery::addSort);
 	}
 
-	public Stream<UPEntry> getAll(String query) {
-		try {
-			SimpleQuery simpleQuery = SolrQueryBuilder.of(query, uniprotFacetConfig).build();
-			addSort(simpleQuery, "");
-			Cursor<UniProtDocument> results = repository.getAll(simpleQuery);
-			return convertStreamDoc2UPEntry(results, Collections.emptyMap());
-		} catch (Exception e) {
-			String message = "Could not get result for: [" + query + "]";
-			throw new ServiceException(message, e);
-		}
-	}
-
-	public QueryResult<UPEntry> executeCursorQuery(QueryCursorRequest cursorRequest) {
+	public QueryResult<UPEntry> executeQuery(SearchRequestDTO cursorRequest) {
 		String fields = cursorRequest.getField();
 		Map<String, List<String>> filters = FieldsParser.parse(fields);
 		try {
@@ -98,21 +85,13 @@ public class UniProtEntryService {
 
 			addSort(simpleQuery, cursorRequest.getSort());
 
-			QueryResult<UniProtDocument> results = repository.searchCursorPage(simpleQuery, cursorRequest.getCursor(),
+			QueryResult<UniProtDocument> results = repository.searchPage(simpleQuery, cursorRequest.getCursor(),
 					cursorRequest.getSize());
 			return convertQueryDoc2UPEntry(results, filters);
 		} catch (Exception e) {
 			String message = "Could not get result for: [" + cursorRequest + "]";
 			throw new ServiceException(message, e);
 		}
-	}
-
-	private Stream<UPEntry> convertStreamDoc2UPEntry(Cursor<UniProtDocument> cursor,
-			Map<String, List<String>> filters) {
-		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(cursor, Spliterator.ORDERED), false)
-				.map(doc -> convertDocToUPEntry(doc, filters))
-				.flatMap(o -> o.isPresent() ? Stream.of(o.get()) : Stream.empty());
-
 	}
 
 	private QueryResult<UPEntry> convertQueryDoc2UPEntry(QueryResult<UniProtDocument> results,
@@ -165,15 +144,48 @@ public class UniProtEntryService {
 		return entry;
 	}
 
-	public Optional<UniProtEntry> getByAccession(String accession) {
+	public UPEntry getByAccession(String accession,String field) {
+		UPEntry result = null;
 		try {
 			SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
 			simpleQuery.addProjectionOnField(new SimpleField(ACCESSION));
-			Optional<UniProtDocument> result = repository.getEntry(simpleQuery);
-			return result.isPresent() ? entryService.getEntry(result.get().accession) : Optional.empty();
+			Optional<UniProtDocument> documentEntry = repository.getEntry(simpleQuery);
+			if(documentEntry.isPresent()){
+				Map<String, List<String>> filters = FieldsParser.parse(field);
+				result = convertDocToUPEntry(documentEntry.get(), filters).orElse(null);
+			}
 		} catch (Exception e) {
 			String message = "Could not get accession for: [" + accession + "]";
 			throw new ServiceException(message, e);
+		}
+		return result;
+	}
+
+	public void stream(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {
+		MediaType contentType = context.getContentType();
+		context.setEntities(streamEntities(query, contentType));
+
+		downloadTaskExecutor.execute(() -> {
+			try {
+				emitter.send(context, contentType);
+			} catch (IOException e) {
+				emitter.completeWithError(e);
+			}
+			emitter.complete();
+		});
+	}
+
+	private Stream<?> streamEntities(String query, MediaType contentType) {
+		CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
+		try {
+			cStream.open();
+			if (contentType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
+				return storeStreamer.idsStream(cStream);
+			} else {
+				return storeStreamer.idsToStoreStream(cStream);
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 

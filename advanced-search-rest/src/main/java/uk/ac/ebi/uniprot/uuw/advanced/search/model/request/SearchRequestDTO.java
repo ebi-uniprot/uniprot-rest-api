@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.request;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import lombok.Data;
@@ -10,7 +11,14 @@ import lombok.Data;
  * @author lgonzales
  */
 @Data
-public class QueryCursorRequest extends QueryRequest {
+public class SearchRequestDTO {
+
+    @NotNull(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.required}")
+    private String query;
+
+    private String field;
+
+    private String sort;
 
     private String cursor;
 

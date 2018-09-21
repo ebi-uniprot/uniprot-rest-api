@@ -6,16 +6,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.solr.core.DefaultQueryParser;
 import org.springframework.data.solr.core.SolrCallback;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.facet.Facet;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.PageImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.facet.FacetConfigConverter;
 
 import java.util.List;
@@ -47,28 +44,7 @@ public abstract class SolrQueryRepository<T> {
         this.facetConverter =facetConverter;
     }
 
-    public QueryResult<T> searchPage(SimpleQuery query, Long offset, Integer size) {
-        try {
-            if(size == null || size <= 0){
-                size = DEFAULT_PAGE_SIZE;
-            }
-            if(offset == null){
-                offset = 0L;
-            }
-
-            query.setOffset(offset);
-            query.setRows(size);
-
-            Page<T> result = solrTemplate.queryForPage(collection.toString(), query, tClass);
-            PageImpl resultPage = PageImpl.of(size, offset, result.getTotalElements());
-            return QueryResult.of(result.getContent(),resultPage);
-        }catch (Throwable e){
-            throw new QueryRetrievalException("Unexpected error retrieving data from our Repository",e);
-        }finally {
-            logSolrQuery(query);
-        }
-    }
-    public QueryResult<T> searchCursorPage(SimpleQuery query, String cursor,Integer pageSize) {
+    public QueryResult<T> searchPage(SimpleQuery query, String cursor,Integer pageSize) {
         if(pageSize == null || pageSize <=0){
             pageSize = DEFAULT_PAGE_SIZE;
         }
@@ -94,16 +70,6 @@ public abstract class SolrQueryRepository<T> {
         try {
             return solrTemplate.queryForObject(collection.toString(), query, tClass);
         }catch (Exception e){
-            throw new QueryRetrievalException("Error executing solr query",e);
-        }finally {
-            logSolrQuery(query);
-        }
-    }
-
-    public Cursor<T> getAll(SimpleQuery query) {
-        try {
-            return solrTemplate.queryForCursor(collection.toString(),query,tClass);
-        }catch (Throwable e){
             throw new QueryRetrievalException("Error executing solr query",e);
         }finally {
             logSolrQuery(query);
