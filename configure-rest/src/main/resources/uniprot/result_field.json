@@ -3,6 +3,10 @@
 		"groupName": "Names & Taxonomy",
 		"fields": [
 			{
+				"label": "Entry",
+				"name": "accession"	
+			},
+			{
 				"label": "Entry Name",
 				"name": "id"	
 			},
@@ -20,7 +24,7 @@
 			},
 			{
 				"label": "Gene Names (primary)",
-				"name": "gene_name"
+				"name": "gene_primary"
 			},
 			{
 				"label": "Gene Names (synonym)",
@@ -129,7 +133,7 @@
 			},
 			{
 				"label": "Sequence version",
-				"name": "sequence"
+				"name": "sequence_version"
 			}
 		]
 	},
@@ -219,7 +223,7 @@
 			},
 			{
 				"label": "Caution",
-				"name": "caution"
+				"name": "cc:caution"
 			},
 			{
 				"label": "Features",
@@ -497,7 +501,7 @@
 			},
 			{
 				"label": "Protein families",
-				"name": "cc:similarity"
+				"name": "protein_families"
 			},
 			{
 				"label": "Region",
@@ -522,127 +526,127 @@
 		"fields": [
 			{
 				"label": "Taxonomic lineage (all)",
-				"name": "lin_all"
+				"name": "tl:all"
 			},
 			{
 				"label": "Taxonomic lineage (CLASS)",
-				"name": "lin_class"
+				"name": "tl:class"
 			},
 			{
 				"label": "Taxonomic lineage (COHORT)",
-				"name": "lin_cohort"
+				"name": "tl:cohort"
 			},
 			{
 				"label": "Taxonomic lineage (FAMILY)",
-				"name": "lin_family"
+				"name": "tl:family"
 			},
 			{
 				"label": "Taxonomic lineage (FORMA)",
-				"name": "lin_forma"
+				"name": "tl:forma"
 			},
 			{
 				"label": "Taxonomic lineage (GENUS)",
-				"name": "lin_genus"
+				"name": "tl:genus"
 			},
 			{
 				"label": "Taxonomic lineage (INFRACLASS)",
-				"name": "lin_infraclass"
+				"name": "tl:infraclass"
 			},
 			{
 				"label": "Taxonomic lineage (INFRAORDER)",
-				"name": "lin_infraorder"
+				"name": "tl:infraorder"
 			},
 			{
 				"label": "Taxonomic lineage (KINGDOM)",
-				"name": "lin_kingdom"
+				"name": "tl:kingdom"
 			},
 			{
 				"label": "Taxonomic lineage (ORDER)",
-				"name": "lin_order"
+				"name": "tl:order"
 			},
 			{
 				"label": "Taxonomic lineage (PARVORDER)",
-				"name": "lin_parvorder"
+				"name": "tl:parvorder"
 			},
 			{
 				"label": "Taxonomic lineage (PHYLUM)",
-				"name": "lin_phylum"
+				"name": "tl:phylum"
 			},
 			{
 				"label": "Taxonomic lineage (SPECIES)",
-				"name": "lin_species"
+				"name": "tl:species"
 			},
 			{
 				"label": "Taxonomic lineage (SPECIES_GROUP)",
-				"name": "lin_species_group"
+				"name": "tl:species_group"
 			},
 			{
 				"label": "Taxonomic lineage (SPECIES_SUBGROUP)",
-				"name": "lin_species_subgroup"
+				"name": "tl:species_subgroup"
 			},
 			{
 				"label": "Taxonomic lineage (SUBCLASS)",
-				"name": "lin_subclass"
+				"name": "tl:subclass"
 			},
 			{
 				"label": "Taxonomic lineage (SUBCOHORT)",
-				"name": "lin_subcohort"
+				"name": "tl:subcohort"
 			},
 			{
 				"label": "Taxonomic lineage (SUBFAMILY)",
-				"name": "lin_subfamily"
+				"name": "tl:subfamily"
 			},
 			{
 				"label": "Taxonomic lineage (SUBGENUS)",
-				"name": "lin_subgenus"
+				"name": "tl:subgenus"
 			},
 			{
 				"label": "Taxonomic lineage (SUBKINGDOM)",
-				"name": "lin_subkingdom"
+				"name": "tl:subkingdom"
 			},
 			{
 				"label": "Taxonomic lineage (SUBORDER)",
-				"name": "lin_suborder"
+				"name": "tl:suborder"
 			},
 			{
 				"label": "Taxonomic lineage (SUBPHYLUM)",
-				"name": "lin_subphylum"
+				"name": "tl:subphylum"
 			},
 			{
 				"label": "Taxonomic lineage (SUBSPECIES)",
-				"name": "lin_subspecies"
+				"name": "tl:subspecies"
 			},
 			{
 				"label": "Taxonomic lineage (SUBTRIBE)",
-				"name": "lin_subtribe"
+				"name": "tl:subtribe"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERCLASS)",
-				"name": "lin_superclass"
+				"name": "tl:superclass"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERFAMILY)",
-				"name": "lin_superfamily"
+				"name": "tl:superfamily"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERKINGDOM)",
-				"name": "lin_superkingdom"
+				"name": "tl:superkingdom"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERORDER)",
-				"name": "lin_superorder"
+				"name": "tl:superorder"
 			},
 			{
 				"label": "Taxonomic lineage (SUPERPHYLUM)",
-				"name": "lin_superphylum"
+				"name": "tl:superphylum"
 			},
 			{
 				"label": "Taxonomic lineage (TRIBE)",
-				"name": "lin_tribe"
+				"name": "tl:tribe"
 			},
 			{
 				"label": "Taxonomic lineage (VARIETAS)",
-				"name": "lin_varietas"
+				"name": "tl:varietas"
 			}
 		]
 	},

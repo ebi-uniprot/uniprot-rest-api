@@ -27,8 +27,16 @@
 		"name": "error_gmodel_pred",
 		"mapTo": "cc:sequence_caution"
 	},
+		{
+		"name": "protein_families",
+		"mapTo": "cc:similarity"
+	},
 	{
 		"name": "fragment",
+		"mapTo": "sequence"
+	},
+	{
+		"name": "sequence_version",
 		"mapTo": "sequence"
 	},
 	{
@@ -105,7 +113,7 @@
 	},
 	{
 		"name": "date_seq_mod",
-		"mapTo": "info"
+		"mapTo": "sequence"
 	},
 	{
 		"name": "version",

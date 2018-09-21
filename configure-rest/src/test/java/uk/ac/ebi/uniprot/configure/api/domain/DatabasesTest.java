@@ -5,12 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.Databases;
 
@@ -20,6 +23,25 @@ class DatabasesTest {
 	@BeforeAll
 	static void initAll() {
 		instance = Databases.INSTANCE;
+	}
+	
+	@Test
+	void fieldUniqueness() {
+		Map<String, List<Field>> result = instance.getDatabaseFields()
+				.stream().flatMap(val -> val.getFields().stream()).collect(Collectors.groupingBy(Field::getName));
+		
+		assertFalse( result.entrySet()
+		.stream()
+		.anyMatch(val -> val.getValue().size()>1))
+		;
+		
+	
+	}
+	@Test
+	void testField() {
+		assertTrue(instance.getField("dr:embl").isPresent());
+		assertTrue(instance.getField("dr:ensembl").isPresent());
+		assertFalse(instance.getField("embl").isPresent());
 	}
 
 	@Test
