@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.core.query.result.Cursor;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
@@ -19,13 +18,13 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDoc;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDocs;
 
@@ -46,12 +45,12 @@ public class SolrQueryRepositoryIT {
     @Autowired
     private UniprotFacetConfig facetConverter;
 
-    private static GeneralSolrQueryRespository queryRepo;
+    private static GeneralSolrQueryRepository queryRepo;
 
     @Before
     public void setUp() {
         queryRepo =
-                new GeneralSolrQueryRespository(template, SolrCollection.uniprot, UniProtDocument.class, facetConverter);
+                new GeneralSolrQueryRepository(template, SolrCollection.uniprot, UniProtDocument.class, facetConverter);
         storeManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
     }
 
@@ -80,56 +79,6 @@ public class SolrQueryRepositoryIT {
         assertThat(entry.isPresent(), is(false));
     }
 
-    // getAll -------------------
-    @Test
-    public void getAllSucceeds() {
-        // given
-        int docCount = 100;
-        List<UniProtDocument> docs = createDocs(docCount);
-        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
-        List<String> savedAccs =
-                docs
-                        .stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
-        Set<String> uniqSavedAccs = new HashSet<>(savedAccs);
-
-        // when
-        Cursor<UniProtDocument> docCursor = queryRepo.getAll(query("accession:*"));
-
-        List<String> foundAccs = new ArrayList<>();
-        docCursor.forEachRemaining(doc -> foundAccs.add(doc.accession));
-        Set<String> uniqFoundAccs = new HashSet<>(foundAccs);
-
-        // then
-        assertThat(savedAccs, hasSize(docCount));
-        assertThat(foundAccs, hasSize(docCount));
-        assertThat(uniqSavedAccs, is(uniqFoundAccs));
-    }
-
-    // searchPage -------------------
-    @Test
-    public void searchPageSucceeds() {
-        // given
-        int docCount = 10;
-        List<UniProtDocument> docs = createDocs(docCount);
-        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
-        List<String> savedAccs =
-                docs
-                        .stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
-        List<String> expectedAccs = asList(savedAccs.get(5), savedAccs.get(6));
-
-        // when
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query("accession:*"), 5L, 2);
-        List<String> pageAccs = queryResult.getContent().stream().map(doc -> doc.accession)
-                .collect(Collectors.toList());
-
-        // then
-        assertThat(pageAccs, is(expectedAccs));
-    }
-
     // searchCursorPage -------------------
     @Test
     public void searchCursorPageSucceeds() {
@@ -147,13 +96,13 @@ public class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchCursorPage(query(accQuery), null, 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query(accQuery), null, 2);
         List<String> page1Accs = queryResult.getContent().stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
         String nextCursor = ((CursorPage) queryResult.getPage()).getEncryptedNextCursor();
 
         // ... and attempt to fetch page 2
-        queryResult = queryRepo.searchCursorPage(query(accQuery), nextCursor, 2);
+        queryResult = queryRepo.searchPage(query(accQuery), nextCursor, 2);
         List<String> page2Accs = queryResult.getContent().stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
 
@@ -168,8 +117,8 @@ public class SolrQueryRepositoryIT {
         return simpleQuery;
     }
 
-    public static class GeneralSolrQueryRespository extends SolrQueryRepository<UniProtDocument> {
-        GeneralSolrQueryRespository(SolrTemplate solrTemplate, SolrCollection collection, Class<UniProtDocument> docClass, FacetConfigConverter facetConverter) {
+    public static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
+        GeneralSolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<UniProtDocument> docClass, FacetConfigConverter facetConverter) {
             super(solrTemplate, collection, docClass, facetConverter);
         }
     }

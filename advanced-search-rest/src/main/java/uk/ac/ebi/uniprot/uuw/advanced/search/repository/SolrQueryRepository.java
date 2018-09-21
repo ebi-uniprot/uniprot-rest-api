@@ -6,16 +6,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.solr.core.DefaultQueryParser;
 import org.springframework.data.solr.core.SolrCallback;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.facet.Facet;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.PageImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.facet.FacetConfigConverter;
 
 import java.util.List;
