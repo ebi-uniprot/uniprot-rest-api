@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.store;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.dataaccess.EntryJsonDataAdapterImpl;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
@@ -24,6 +25,7 @@ public class UniProtStoreConfig {
     }
 
     @Bean
+    @Profile("live")
     public UniProtStoreClient uniProtStoreClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
         VoldemortClient<EntryObject> client =
                 new VoldemortRemoteUniprotEntryStore(uniProtStoreConfigProperties

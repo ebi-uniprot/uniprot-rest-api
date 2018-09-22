@@ -9,6 +9,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.core.SolrTemplate;
 
 /**
@@ -25,6 +26,7 @@ public class RepositoryConfig {
     }
 
     @Bean
+    @Profile("live")
     public HttpClient httpClient(RepositoryConfigProperties config) {
         // I am creating HttpClient exactly in the same way it is created inside CloudSolrClient.Builder,
         // but here I am just adding Credentials
@@ -38,7 +40,8 @@ public class RepositoryConfig {
     }
 
     @Bean
-    public SolrClient solrClient(HttpClient httpClient, RepositoryConfigProperties config) {
+    @Profile("live")
+    public SolrClient uniProtSolrClient(HttpClient httpClient, RepositoryConfigProperties config) {
         if (!config.getZookeperhost().isEmpty()) {
             return new CloudSolrClient.Builder().withHttpClient(httpClient).withZkHost(config.getZookeperhost())
                     .build();
@@ -51,7 +54,7 @@ public class RepositoryConfig {
     }
 
     @Bean
-    public SolrTemplate solrTemplate(SolrClient solrClient) {
-        return new SolrTemplate(solrClient);
+    public SolrTemplate solrTemplate(SolrClient uniProtSolrClient) {
+        return new SolrTemplate(uniProtSolrClient);
     }
 }

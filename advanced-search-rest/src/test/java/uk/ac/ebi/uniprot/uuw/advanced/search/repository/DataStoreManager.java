@@ -35,7 +35,6 @@ public class DataStoreManager {
     private final Map<StoreType, SolrClient> solrClientMap = new HashMap<>();
     private final Map<StoreType, VoldemortClient> voldemortMap = new HashMap<>();
     private final Map<StoreType, DocumentConverter> docConverterMap = new HashMap<>();
-//    private final Map<StoreType, Converter> entryConverterMap = new HashMap<>();
 
     public DataStoreManager(SolrDataStoreManager solrDataStoreManager) {
         this.solrDataStoreManager = solrDataStoreManager;
@@ -74,15 +73,9 @@ public class DataStoreManager {
         docConverterMap.put(storeType, converter);
     }
 
-//    public void addEntryConverter(StoreType storeType, Converter converter) {
-//        entryConverterMap.put(storeType, converter);
-//    }
-
     @SuppressWarnings("unchecked")
     public <T> void saveToVoldemort(StoreType storeType, List<T> entries) {
         VoldemortClient voldemort = getVoldemort(storeType);
-//        Converter<T, ?> converter = entryConverterMap.get(storeType);
-//        List<?> objects = entries.stream().map(converter::toAvro).collect(Collectors.toList());
         int count = 0;
         for (Object o : entries) {
             try {
@@ -153,10 +146,6 @@ public class DataStoreManager {
 
     public <S, T> List<T> getVoldemortEntries(StoreType storeType, List<String> entries) {
         return getVoldemort(storeType).getEntries(entries);
-//        VoldemortClient<S> voldemort = getVoldemort(storeType);
-//        Converter<T, S> converter = entryConverterMap.get(storeType);
-//        List<S> voldemortEntries = voldemort.getEntries(entries);
-//        return voldemortEntries.stream().map(converter::fromAvro).collect(Collectors.toList());
     }
 
     public void cleanSolr(StoreType storeType) {

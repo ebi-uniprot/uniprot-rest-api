@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UniprotAdvancedSearchControllerIT {
     private static final String BASE_RESOURCE = "/uniprot";
     private static final String ACCESSION_RESOURCE = BASE_RESOURCE + "/accession/";
+
     @Autowired
     private DataStoreManager storeManager;
 

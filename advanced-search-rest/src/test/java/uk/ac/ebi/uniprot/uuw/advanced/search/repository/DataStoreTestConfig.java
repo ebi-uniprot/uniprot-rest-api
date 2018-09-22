@@ -1,9 +1,9 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileReader;
@@ -31,7 +31,7 @@ import java.net.URL;
  *
  * @author Edd
  */
-@Configuration
+@TestConfiguration
 public class DataStoreTestConfig {
     @Bean(destroyMethod = "close")
     public DataStoreManager dataStoreManager() throws IOException {
@@ -40,16 +40,16 @@ public class DataStoreTestConfig {
     }
 
     @Bean
-    @Primary
-    public SolrClient uniProtSolrClient(DataStoreManager dataStoreManager) throws IOException, URISyntaxException {
+    @Profile("offline")
+    public SolrClient uniProtSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
         ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.uniprot);
         addUniProtStoreInfo(dataStoreManager, solrClient);
         return solrClient;
     }
 
     @Bean
-    @Primary
-    public UniProtStoreClient uniProtStoreClient(DataStoreManager dsm) {
+    @Profile("offline")
+    public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
         UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
                                                                                .getInstance("avro-uniprot"), new EntryConverter());
         dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
