@@ -61,7 +61,7 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
                         }
 
                         outputStream.write((UniProtFlatfileWriter.write(entry) + "\n").getBytes());
-                    } catch (IOException e) {
+                    } catch (Throwable e) {
                         throw new StopStreamException("Could not write entry: " + entry, e);
                     }
                 });
