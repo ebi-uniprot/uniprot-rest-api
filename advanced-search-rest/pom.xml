@@ -15,6 +15,9 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
+        <!-- Plugin versions -->
+        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+
         <!-- Dependency versions -->
         <solr.core.version>7.2.1</solr.core.version>
         <solrj.version>7.2.0</solrj.version>
@@ -231,7 +234,22 @@
     </dependencies>
 
     <build>
+        <!--<resources>-->
+        <!--<resource>-->
+        <!--<directory>src/test/resources</directory>-->
+        <!--<filtering>true</filtering>-->
+        <!--</resource>-->
+        <!--</resources>-->
         <plugins>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<systemPropertyVariables>-->
+            <!--<basedir>${project.build.directory}</basedir>-->
+            <!--</systemPropertyVariables>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
             <!-- allows executable jar with embedded jetty to be created through, "mvn package" command -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -244,6 +262,32 @@
                         </goals>
                         <configuration>
                             <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>uk.ac.ebi.uniprot</groupId>
+                                    <artifactId>data-service-deployments</artifactId>
+                                    <version>web-2018.7-SNAPSHOT</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
