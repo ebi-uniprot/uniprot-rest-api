@@ -23,13 +23,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, AdvancedSearchREST.class})
 @WebAppConfiguration
 public class UniprotAdvancedSearchControllerIT {
-    private static final String BASE_RESOURCE = "/uniprot";
-    private static final String ACCESSION_RESOURCE = BASE_RESOURCE + "/accession/";
+    private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
 
     @Autowired
     private DataStoreManager storeManager;

@@ -36,6 +36,7 @@ import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
 
 /**
@@ -48,8 +49,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessa
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class})
 public class UniProtAdvancedSearchDownloadTest {
-    private static final String BASE_RESOURCE = "/uniprot";
-    private static final String DOWNLOAD_RESOURCE = BASE_RESOURCE + "/download/";
+    private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
 
     @Autowired

@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
 
 import static org.springframework.http.HttpHeaders.*;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
 
 /**
@@ -31,8 +32,9 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverte
  * @author lgonzales
  */
 @RestController
-@RequestMapping("/uniprotkb")
+@RequestMapping(UNIPROTKB_RESOURCE)
 public class UniprotAdvancedSearchController {
+    public static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniProtEntryService entryService;
