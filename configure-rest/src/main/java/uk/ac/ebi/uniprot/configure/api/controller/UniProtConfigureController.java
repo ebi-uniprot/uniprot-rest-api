@@ -1,19 +1,18 @@
 package uk.ac.ebi.uniprot.configure.api.controller;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.ac.ebi.uniprot.configure.api.service.UniProtConfigureService;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/configure")
+@RequestMapping("/uniprotkb")
 public class UniProtConfigureController {
 	UniProtConfigureService service;
 
@@ -21,30 +20,30 @@ public class UniProtConfigureController {
 		this.service = service;
 	}
 
-	@GetMapping("/uniprot/search_terms")
+	@GetMapping("/search_terms")
 	public List<SearchItem> getUniProtSearchTerms() {
 		return service.getUniProtSearchItems();
 	}
 
-	@GetMapping("/uniprot/annotation_evidences")
+	@GetMapping("/annotation_evidences")
 	public  List<EvidenceGroup>  getUniProtAnnotationEvidences() {
 		return service.getAnnotationEvidences();
 	}
 	
-	@GetMapping("/uniprot/go_evidences")
+	@GetMapping("/go_evidences")
 	public  List<EvidenceGroup>  getUniProtGoEvidences() {
 		return service.getGoEvidences();
 	}
-	@GetMapping("/uniprot/databases")
+	@GetMapping("/databases")
 	public  List<DatabaseGroup>  getUniProtDatabase() {
 		return service.getDatabases();
 	}
 	
-	@GetMapping("/uniprot/databasefields")
+	@GetMapping("/databasefields")
 	public  List<FieldGroup>  getDatabaseFields(){
 		return service.getDatabaseFields();
 	}
-	@GetMapping("/uniprot/resultfields")
+	@GetMapping("/resultfields")
 	public  List<FieldGroup>  getResultFields(){
 		return service.getResultFields();
 	}
