@@ -31,7 +31,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverte
  * @author lgonzales
  */
 @RestController
-@RequestMapping("/uniprot")
+@RequestMapping("/uniprotkb")
 public class UniprotAdvancedSearchController {
     private final ApplicationEventPublisher eventPublisher;
 
