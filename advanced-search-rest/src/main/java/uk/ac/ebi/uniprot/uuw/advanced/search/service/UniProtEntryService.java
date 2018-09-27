@@ -98,7 +98,6 @@ public class UniProtEntryService {
         List<UPEntry> upEntries = results.getContent().stream().map(doc -> convertDocToUPEntry(doc, filters))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
         return QueryResult.of(upEntries, results.getPage(), results.getFacets());
-
     }
 
     private Optional<UPEntry> convertDocToUPEntry(UniProtDocument doc, Map<String, List<String>> filters) {
@@ -158,6 +157,14 @@ public class UniProtEntryService {
             throw new ServiceException(message, e);
         }
         return result;
+    }
+
+    public void streamForAccessions(List<String> accessions, MessageConverterContext context, ResponseBodyEmitter emitter) {
+        String queryStr = "(" + accessions.stream()
+                .map(acc -> "(" + ACCESSION + ":" + acc.toUpperCase() + ")")
+                .collect(Collectors.joining(" OR ")) + ")";
+
+        stream(queryStr, context, emitter);
     }
 
     public void stream(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {

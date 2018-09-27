@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.*;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
@@ -34,7 +35,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverte
 @RestController
 @RequestMapping(UNIPROTKB_RESOURCE)
 public class UniprotAdvancedSearchController {
-    public static final String UNIPROTKB_RESOURCE = "/uniprotkb";
+    static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniProtEntryService entryService;
@@ -49,20 +50,18 @@ public class UniprotAdvancedSearchController {
         this.converterContextFactory = converterContextFactory;
     }
 
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid SearchRequestDTO cursorRequest,
+                                                             HttpServletRequest request, HttpServletResponse response) {
+        QueryResult<UPEntry> result = entryService.executeQuery(cursorRequest);
+        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid SearchRequestDTO cursorRequest,
-			HttpServletRequest request, HttpServletResponse response) {
-		QueryResult<UPEntry> result = entryService.executeQuery(cursorRequest);
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-		return new ResponseEntity<>(result, HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE )
-	public UPEntry getByAccession(@PathVariable("accession") String accession, @QueryParam("field") String field) {
-		return entryService.getByAccession(accession,field);
-	}
-
+    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UPEntry getByAccession(@PathVariable("accession") String accession, @QueryParam("field") String field) {
+        return entryService.getByAccession(accession, field);
+    }
 
     /*
      * E.g., usage from command line:
@@ -87,6 +86,24 @@ public class UniprotAdvancedSearchController {
         context.setFileType(FileType.bestFileTypeMatch(encoding));
 
         entryService.stream(query, context, emitter);
+
+        return ResponseEntity.ok()
+                .headers(createHttpDownloadHeader(contentType, context, request))
+                .body(emitter);
+    }
+
+    @RequestMapping(value = "/download/accessions", method = RequestMethod.GET,
+            produces = {"text/flatfile", "text/list", "application/xml"})
+    public ResponseEntity<ResponseBodyEmitter> downloadAccessions(@RequestParam(value = "list", required = true) List<String> accessions,
+                                                                  @RequestHeader("Accept") MediaType contentType,
+                                                                  @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
+                                                                  HttpServletRequest request) {
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+
+        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        context.setFileType(FileType.bestFileTypeMatch(encoding));
+
+        entryService.streamForAccessions(accessions, context, emitter);
 
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, context, request))
