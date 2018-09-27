@@ -1,14 +1,11 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.MockitoRule;
 import uk.ac.ebi.kraken.ffwriter.line.impl.UniProtFlatfileWriter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
@@ -33,8 +30,6 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker.T
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class FlatFileMessageConverterTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().silent();
     @Mock
     private MessageConverterContext context;
 
