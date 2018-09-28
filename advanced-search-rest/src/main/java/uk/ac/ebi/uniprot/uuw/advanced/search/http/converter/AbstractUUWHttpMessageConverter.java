@@ -59,7 +59,7 @@ public abstract class AbstractUUWHttpMessageConverter<T extends MessageConverter
         logStats(counter.get(), start);
     }
 
-    protected abstract void write(T t, OutputStream gzipOutputStream, Instant start, AtomicInteger counter) throws IOException;
+    protected abstract void write(T t, OutputStream outputStream, Instant start, AtomicInteger counter) throws IOException;
 
     void logStats(int counter, Instant start) {
         Instant now = Instant.now();

@@ -33,6 +33,7 @@ public class StoreStreamer<T> {
         this.id = id;
     }
 
+    @SuppressWarnings("unchecked")
     public Stream<Collection<T>> idsToStoreStream(TupleStream tupleStream) {
         BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
                 new TupleStreamIterable(tupleStream, id),

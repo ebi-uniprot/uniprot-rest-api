@@ -15,6 +15,9 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
+        <!-- Plugin versions -->
+        <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+
         <!-- Dependency versions -->
         <solr.core.version>7.2.1</solr.core.version>
         <solrj.version>7.2.0</solrj.version>
@@ -23,7 +26,7 @@
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <commons-codec.version>1.11</commons-codec.version>
         <data-service.version>web-2018.7-SNAPSHOT</data-service.version>
-        <ujdk.version>2018.8</ujdk.version>
+        <ujdk.version>2018.7-SNAPSHOT</ujdk.version>
     </properties>
 
     <dependencies>
@@ -59,7 +62,7 @@
             <artifactId>uniprotkb-rest</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        
+
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>data-service-common-document</artifactId>
@@ -83,17 +86,17 @@
             <artifactId>data-service-restful</artifactId>
             <version>${data-service.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>data-service-common-avro</artifactId>
             <version>${data-service.version}</version>
-            	<exclusions>
-				<exclusion>
-					<groupId>org.apache.avro</groupId>
-					<artifactId>avro-tools</artifactId>
-				</exclusion>
-			</exclusions>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro-tools</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -102,6 +105,12 @@
         </dependency>
 
         <!-- Solr Data -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <version>${solrj.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
@@ -166,6 +175,14 @@
         </dependency>
 
         <!-- Tests -->
+        <!-- required for its voldemort document transformers, used when starting up embedded solr in tests -->
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>data-service</artifactId>
+            <version>${data-service.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -217,7 +234,22 @@
     </dependencies>
 
     <build>
+        <!--<resources>-->
+        <!--<resource>-->
+        <!--<directory>src/test/resources</directory>-->
+        <!--<filtering>true</filtering>-->
+        <!--</resource>-->
+        <!--</resources>-->
         <plugins>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<systemPropertyVariables>-->
+            <!--<basedir>${project.build.directory}</basedir>-->
+            <!--</systemPropertyVariables>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
             <!-- allows executable jar with embedded jetty to be created through, "mvn package" command -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -230,6 +262,32 @@
                         </goals>
                         <configuration>
                             <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>uk.ac.ebi.uniprot</groupId>
+                                    <artifactId>data-service-deployments</artifactId>
+                                    <version>web-2018.7-SNAPSHOT</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>

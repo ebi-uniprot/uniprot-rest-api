@@ -1,21 +1,13 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
@@ -24,7 +16,6 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
-import uk.ac.ebi.uniprot.dataservice.voldemort.client.UniProtClient;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
@@ -38,13 +29,21 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFace
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
+import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UniProtEntryService {
 	private static final String ACCESSION = "accession";
 	private UniprotQueryRepository repository;
 	private UniprotFacetConfig uniprotFacetConfig;
-	private UniProtClient entryService;
+	private UniProtStoreClient entryService;
 	private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
 	private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
 			.instanceOf(DefaultEntryObject.class);
@@ -55,7 +54,7 @@ public class UniProtEntryService {
 
 	public UniProtEntryService(UniprotQueryRepository repository,
 							   UniprotFacetConfig uniprotFacetConfig,
-							   UniProtClient entryService,
+                               UniProtStoreClient entryService,
 							   JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
 							   CloudSolrStreamTemplate cloudSolrStreamTemplate,
 							   StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,

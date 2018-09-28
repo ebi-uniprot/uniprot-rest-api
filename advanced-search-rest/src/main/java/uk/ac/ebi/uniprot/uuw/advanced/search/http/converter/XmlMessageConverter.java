@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import uk.ac.ebi.kraken.model.uniprot.UniProtEntryImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 
 import javax.xml.bind.JAXBContext;
@@ -73,8 +72,8 @@ public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<X
                         }
 
                         outputStream.write(entryXml.getBytes());
-                    } catch (IOException | RuntimeException e) {
-                        throw new StopStreamException("Could not write xml entry: " + ((UniProtEntryImpl)entry).getPrimaryUniProtAccession().getValue(), e);
+                    } catch (Throwable e) {
+                        throw new StopStreamException("Could not write xml entry: " + entry.toString(), e);
                     }
                 });
             });
@@ -82,14 +81,18 @@ public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<X
             LOGGER.error("Streaming aborted after error found. Closing stream.", e);
             entities.close();
         } finally {
-            if (writeState.state == WriteState.ENTRIES_WRITTEN) {
-                outputStream.write(messageConfig.getFooter().getBytes());
+            try {
+                if (writeState.state == WriteState.ENTRIES_WRITTEN) {
+                    outputStream.write(messageConfig.getFooter().getBytes());
+                }
+            } catch (Throwable throwable) {
+                LOGGER.error("Streaming aborted after error found. Closing stream.", throwable);
             }
             outputStream.close();
         }
     }
 
-    private void initXmlMarshaller(XmlMessageConverterContext<S, T> config) {
+    void initXmlMarshaller(XmlMessageConverterContext<S, T> config) {
         marshallers.putIfAbsent(config.getContext(), createMarshaller(config.getContext()));
     }
 
@@ -105,7 +108,7 @@ public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<X
         }
     }
 
-    private String getXmlString(XmlMessageConverterContext<S, T> config, S uniProtEntry) {
+    String getXmlString(XmlMessageConverterContext<S, T> config, S uniProtEntry) {
         try {
             Function<S, T> converter = config.getConverter();
             T entry = converter.apply(uniProtEntry);
