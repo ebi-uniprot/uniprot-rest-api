@@ -68,7 +68,7 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Protein Existence [PE]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("protein_existence", item.get().getTerm());
+		assertEquals("existence", item.get().getTerm());
 		assertEquals(SearchDataType.ENUM, item.get().getDataType());
 		assertNull(item.get().getAutoComplete());
 		assertNotNull(item.get().getValues());
