@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.kraken.database.util.DbConnInfos;
 import uk.ac.ebi.kraken.database.util.DbConnectionInfo;
+import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -61,8 +62,8 @@ public class TaxonomySuggestions {
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
             while (resultSet.next()) {
-                TaxRow taxRow = convertRecord(resultSet);
-                createTaxSuggestions(taxRow).stream()
+                TaxEntity taxEntity = convertRecord(resultSet);
+                createTaxSuggestions(taxEntity).stream()
                         .map(Suggestion::toSuggestionLine)
                         .forEach(suggestion -> {
                             int currentCount = counter.getAndIncrement();
@@ -77,29 +78,29 @@ public class TaxonomySuggestions {
         }
     }
 
-    private List<Suggestion> createTaxSuggestions(TaxRow taxRow) {
+    private List<Suggestion> createTaxSuggestions(TaxEntity taxEntity) {
         List<Suggestion> suggestions = new ArrayList<>();
 
         // scientific name
-        Suggestion scientificSuggestion = createSuggestion(taxRow, TaxRow::getSptrScientific);
+        Suggestion scientificSuggestion = createSuggestion(taxEntity, TaxEntity::getSptrScientific);
         if (Objects.isNull(scientificSuggestion)) {
-            scientificSuggestion = createSuggestion(taxRow, TaxRow::getNcbiScientific);
+            scientificSuggestion = createSuggestion(taxEntity, TaxEntity::getNcbiScientific);
         }
         if (Objects.nonNull(scientificSuggestion)) {
             suggestions.add(scientificSuggestion);
         }
 
         // common name
-        Suggestion commonSuggestion = createSuggestion(taxRow, TaxRow::getSptrCommon);
+        Suggestion commonSuggestion = createSuggestion(taxEntity, TaxEntity::getSptrCommon);
         if (Objects.isNull(commonSuggestion)) {
-            commonSuggestion = createSuggestion(taxRow, TaxRow::getNcbiCommon);
+            commonSuggestion = createSuggestion(taxEntity, TaxEntity::getNcbiCommon);
         }
         if (Objects.nonNull(commonSuggestion)) {
             suggestions.add(commonSuggestion);
         }
 
         // synonym
-        Suggestion synonymSuggestion = createSuggestion(taxRow, TaxRow::getSptrSynonym);
+        Suggestion synonymSuggestion = createSuggestion(taxEntity, TaxEntity::getSptrSynonym);
         if (Objects.nonNull(synonymSuggestion)) {
             suggestions.add(synonymSuggestion);
         }
@@ -107,20 +108,20 @@ public class TaxonomySuggestions {
         return suggestions;
     }
 
-    private Suggestion createSuggestion(TaxRow taxRow, Function<TaxRow, String> nameGetter) {
+    private Suggestion createSuggestion(TaxEntity taxEntity, Function<TaxEntity, String> nameGetter) {
         Suggestion suggestion = null;
-        if (Objects.nonNull(nameGetter.apply(taxRow))) {
+        if (Objects.nonNull(nameGetter.apply(taxEntity))) {
             suggestion = Suggestion.builder()
-                    .name(nameGetter.apply(taxRow))
-                    .id(taxRow.getTaxId().toString())
+                    .name(nameGetter.apply(taxEntity))
+                    .id(taxEntity.getTaxId().toString())
                     .build();
         }
 
         return suggestion;
     }
 
-    private TaxRow convertRecord(ResultSet resultSet) throws SQLException {
-        return TaxRow.builder()
+    private TaxEntity convertRecord(ResultSet resultSet) throws SQLException {
+        return TaxEntity.builder()
                 .taxId(resultSet.getInt("tax_id"))
                 .sptrScientific(resultSet.getString("sptr_scientific"))
                 .sptrCommon(resultSet.getString("sptr_common"))
@@ -131,18 +132,8 @@ public class TaxonomySuggestions {
     }
 
     @Builder
-    private static class Suggestion {
-        String id;
-        String name;
-
-        String toSuggestionLine() {
-            return name + " [" + id + "]";
-        }
-    }
-
-    @Builder
     @Data
-    private static class TaxRow {
+    private static class TaxEntity {
         private Integer taxId;
         private String sptrScientific;
         private String sptrCommon;

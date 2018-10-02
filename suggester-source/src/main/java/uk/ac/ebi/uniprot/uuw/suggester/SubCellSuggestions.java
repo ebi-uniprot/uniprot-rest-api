@@ -7,27 +7,23 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created 28/09/18
  *
  * @author Edd
  */
-public class GOSuggestions {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GOSuggestions.class);
-    private static final Pattern TYPE_PREFIX = Pattern.compile("((P:|F:|C:).*)");
-    private static final Pattern LINE_FORMAT = Pattern.compile(".*[ \t]*;[ \t]*(GO:[0-9]+)[ \t]*;[ \t]*(.*);.*");
+public class SubCellSuggestions {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubCellSuggestions.class);
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "goSuggestions.txt";
+    private String outputFile = "subcellSuggestions.txt";
 
-    @Parameter(names = {"--go-file", "-i"}, description = "The source GO file", required = true)
+    @Parameter(names = {"--subcell-file", "-i"}, description = "The source subcellular location file", required = true)
     private String sourceFile;
 
     public static void main(String[] args) {
-        GOSuggestions suggestions = new GOSuggestions();
+        SubCellSuggestions suggestions = new SubCellSuggestions();
         JCommander.newBuilder()
                 .addObject(suggestions)
                 .build()
@@ -44,24 +40,22 @@ public class GOSuggestions {
             Suggestion.SuggestionBuilder lineBuilder = Suggestion.builder();
 
             while ((line = in.readLine()) != null) {
-                Matcher matcher = LINE_FORMAT.matcher(line);
-                if (matcher.matches()) {
-                    lineBuilder.id(matcher.group(1))
-                            .name(removeTypePrefixFrom(matcher.group(2)));
+                if (line.startsWith("ID")) {
+                    lineBuilder.name(removePrefixFrom(line));
+                } else if (line.startsWith("AC")) {
+                    lineBuilder.id(removePrefixFrom(line));
+                }
+                if (line.startsWith("//")) {
                     out.println(lineBuilder.build().toSuggestionLine());
                     lineBuilder = Suggestion.builder();
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to create GO suggestions file, " + sourceFile, e);
+            LOGGER.error("Failed to create subcellular location suggestions file, " + sourceFile, e);
         }
     }
 
-    private String removeTypePrefixFrom(String line) {
-        if (TYPE_PREFIX.matcher(line).matches()) {
-            return line.substring(2);
-        } else { 
-            return line;
-        }
+    private String removePrefixFrom(String line) {
+        return line.substring(5);
     }
 }

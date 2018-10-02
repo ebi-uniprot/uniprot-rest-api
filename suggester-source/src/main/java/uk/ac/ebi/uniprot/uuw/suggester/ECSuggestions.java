@@ -2,9 +2,9 @@ package uk.ac.ebi.uniprot.uuw.suggester;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.*;
 import java.net.URL;
@@ -63,9 +63,12 @@ public class ECSuggestions {
                 } else if (line.startsWith("DE")) {
                     lineBuilder.name(removePrefixFrom(line));
                 }
-                if (line.startsWith("//") && Objects.nonNull(lineBuilder.id) && Objects.nonNull(lineBuilder.name)) {
-                    out.println(lineBuilder.build().toSuggestionLine());
-                    lineBuilder = Suggestion.builder();
+                if (line.startsWith("//")) {
+                    Suggestion suggestion = lineBuilder.build();
+                    if (Objects.nonNull(suggestion.getId()) && Objects.nonNull(suggestion.getName())) {
+                        out.println(suggestion.toSuggestionLine());
+                        lineBuilder = Suggestion.builder();
+                    }
                 }
             }
         } catch (IOException e) {
@@ -90,15 +93,5 @@ public class ECSuggestions {
 
     private String removePrefixFrom(String line) {
         return line.substring(5);
-    }
-
-    @Builder
-    private static class Suggestion {
-        String id;
-        String name;
-
-        String toSuggestionLine() {
-            return name + " [" + id + "]";
-        }
     }
 }

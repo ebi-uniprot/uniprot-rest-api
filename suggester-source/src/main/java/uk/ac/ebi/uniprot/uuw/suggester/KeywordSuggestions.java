@@ -2,9 +2,9 @@ package uk.ac.ebi.uniprot.uuw.suggester;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.*;
 
@@ -57,15 +57,5 @@ public class KeywordSuggestions {
 
     private String removePrefixFrom(String line) {
         return line.substring(5);
-    }
-
-    @Builder
-    private static class Suggestion {
-        String id;
-        String name;
-
-        String toSuggestionLine() {
-            return name + " [" + id + "]";
-        }
     }
 }
