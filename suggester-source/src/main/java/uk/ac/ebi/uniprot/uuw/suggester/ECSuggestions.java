@@ -8,9 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -58,7 +60,7 @@ public class ECSuggestions {
             while ((line = in.readLine()) != null) {
                 if (line.startsWith("ID")) {
                     lineBuilder.id(removePrefixFrom(line));
-                }   else if(line.startsWith("DE")) {
+                } else if (line.startsWith("DE")) {
                     lineBuilder.name(removePrefixFrom(line));
                 }
                 if (line.startsWith("//") && Objects.nonNull(lineBuilder.id) && Objects.nonNull(lineBuilder.name)) {
@@ -74,23 +76,11 @@ public class ECSuggestions {
     private void addDeleteDirOnExitHook(Path directory) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                Files.walkFileTree(directory,
-                                   new SimpleFileVisitor<Path>() {
-                                       @Override
-                                       public FileVisitResult postVisitDirectory(
-                                               Path dir, IOException exc) throws IOException {
-                                           Files.delete(dir);
-                                           return FileVisitResult.CONTINUE;
-                                       }
+                Files.walk(directory)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
 
-                                       @Override
-                                       public FileVisitResult visitFile(
-                                               Path file, BasicFileAttributes attrs)
-                                               throws IOException {
-                                           Files.delete(file);
-                                           return FileVisitResult.CONTINUE;
-                                       }
-                                   });
                 LOGGER.debug("deleted temporary directory {}.", directory);
             } catch (IOException e) {
                 LOGGER.error("Problem during temporary directory cleanup", e);
