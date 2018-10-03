@@ -26,8 +26,9 @@ public class ECSuggestions {
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
     private String outputFile = "ecSuggestions.txt";
 
-    @Parameter(names = {"--enzyme-file-url",
-                        "-i"}, description = "The URL of the enzyme commission file (default is 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat')")
+    @Parameter(
+            names = {"--enzyme-file-url", "-i"},
+            description = "The URL of the enzyme commission file (default is 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat')")
     private String sourceFile = "ftp://ftp.expasy.org/databases/enzyme/enzyme.dat";
 
     public static void main(String[] args) throws IOException {
@@ -58,22 +59,27 @@ public class ECSuggestions {
             Suggestion.SuggestionBuilder lineBuilder = Suggestion.builder();
 
             while ((line = in.readLine()) != null) {
-                if (line.startsWith("ID")) {
-                    lineBuilder.id(removePrefixFrom(line));
-                } else if (line.startsWith("DE")) {
-                    lineBuilder.name(removePrefixFrom(line));
-                }
-                if (line.startsWith("//")) {
-                    Suggestion suggestion = lineBuilder.build();
-                    if (Objects.nonNull(suggestion.getId()) && Objects.nonNull(suggestion.getName())) {
-                        out.println(suggestion.toSuggestionLine());
-                        lineBuilder = Suggestion.builder();
-                    }
-                }
+                lineBuilder = process(line, lineBuilder, out);
             }
         } catch (IOException e) {
             LOGGER.error("Failed to create EC suggestions file, " + sourceFile, e);
         }
+    }
+
+    Suggestion.SuggestionBuilder process(String line, Suggestion.SuggestionBuilder lineBuilder, PrintWriter out) {
+        if (line.startsWith("ID")) {
+            lineBuilder.id(removePrefixFrom(line));
+        } else if (line.startsWith("DE")) {
+            lineBuilder.name(removePrefixFrom(line));
+        }
+        if (line.startsWith("//")) {
+            Suggestion suggestion = lineBuilder.build();
+            if (Objects.nonNull(suggestion.getId()) && Objects.nonNull(suggestion.getName())) {
+                out.println(suggestion.toSuggestionLine());
+                lineBuilder = Suggestion.builder();
+            }
+        }
+        return lineBuilder;
     }
 
     private void addDeleteDirOnExitHook(Path directory) {

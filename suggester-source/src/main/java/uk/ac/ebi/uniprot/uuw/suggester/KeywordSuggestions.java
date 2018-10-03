@@ -40,19 +40,24 @@ public class KeywordSuggestions {
             Suggestion.SuggestionBuilder lineBuilder = Suggestion.builder();
 
             while ((line = in.readLine()) != null) {
-                if (line.startsWith("ID")) {
-                    lineBuilder.name(removePrefixFrom(line));
-                } else if (line.startsWith("AC")) {
-                    lineBuilder.id(removePrefixFrom(line));
-                }
-                if (line.startsWith("//")) {
-                    out.println(lineBuilder.build().toSuggestionLine());
-                    lineBuilder = Suggestion.builder();
-                }
+                lineBuilder = process(line, lineBuilder, out);
             }
         } catch (IOException e) {
             LOGGER.error("Failed to create keyword suggestions file, " + sourceFile, e);
         }
+    }
+
+    Suggestion.SuggestionBuilder process(String line, Suggestion.SuggestionBuilder lineBuilder, PrintWriter out) {
+        if (line.startsWith("ID")) {
+            lineBuilder.name(removePrefixFrom(line));
+        } else if (line.startsWith("AC")) {
+            lineBuilder.id(removePrefixFrom(line));
+        }
+        if (line.startsWith("//")) {
+            out.println(lineBuilder.build().toSuggestionLine());
+            lineBuilder = Suggestion.builder();
+        }
+        return lineBuilder;
     }
 
     private String removePrefixFrom(String line) {

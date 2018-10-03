@@ -78,7 +78,7 @@ public class TaxonomySuggestions {
         }
     }
 
-    private List<Suggestion> createTaxSuggestions(TaxEntity taxEntity) {
+    List<Suggestion> createTaxSuggestions(TaxEntity taxEntity) {
         List<Suggestion> suggestions = new ArrayList<>();
 
         // scientific name
@@ -133,7 +133,7 @@ public class TaxonomySuggestions {
 
     @Builder
     @Data
-    private static class TaxEntity {
+    static class TaxEntity {
         private Integer taxId;
         private String sptrScientific;
         private String sptrCommon;

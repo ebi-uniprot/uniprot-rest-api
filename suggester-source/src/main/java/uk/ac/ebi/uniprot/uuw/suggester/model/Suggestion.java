@@ -1,7 +1,9 @@
 package uk.ac.ebi.uniprot.uuw.suggester.model;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Created 02/10/18
@@ -10,6 +12,8 @@ import lombok.Getter;
  */
 @Builder
 @Getter
+@ToString
+@EqualsAndHashCode
 public class Suggestion {
     String id;
     String name;

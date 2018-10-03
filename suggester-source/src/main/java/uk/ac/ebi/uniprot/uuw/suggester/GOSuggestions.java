@@ -40,20 +40,23 @@ public class GOSuggestions {
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw);
              BufferedReader in = new BufferedReader(new FileReader(sourceFile))) {
-            String line;
-            Suggestion.SuggestionBuilder lineBuilder = Suggestion.builder();
 
+            String line;
             while ((line = in.readLine()) != null) {
-                Matcher matcher = LINE_FORMAT.matcher(line);
-                if (matcher.matches()) {
-                    lineBuilder.id(matcher.group(1))
-                            .name(removeTypePrefixFrom(matcher.group(2)));
-                    out.println(lineBuilder.build().toSuggestionLine());
-                    lineBuilder = Suggestion.builder();
-                }
+                process(line, out);
             }
         } catch (IOException e) {
             LOGGER.error("Failed to create GO suggestions file, " + sourceFile, e);
+        }
+    }
+
+    void process(String line, PrintWriter out) {
+        Suggestion.SuggestionBuilder lineBuilder = Suggestion.builder();
+        Matcher matcher = LINE_FORMAT.matcher(line);
+        if (matcher.matches()) {
+            lineBuilder.id(matcher.group(1))
+                    .name(removeTypePrefixFrom(matcher.group(2)));
+            out.println(lineBuilder.build().toSuggestionLine());
         }
     }
 
