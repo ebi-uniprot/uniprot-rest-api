@@ -11,6 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Generates file used for GO suggestions. Depends on GO.dat file, located in
+ * /ebi/uniprot/production/xrefs/prod/current/databases.
+ *
  * Created 28/09/18
  *
  * @author Edd

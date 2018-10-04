@@ -16,6 +16,8 @@ import java.util.Comparator;
 import java.util.Objects;
 
 /**
+ * Generates file used for EC suggestions. Depends on enzyme.dat file produced by SIB.
+ *
  * Created 28/09/18
  *
  * @author Edd
