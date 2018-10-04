@@ -25,12 +25,19 @@ public class SubCellSuggestions {
     @Parameter(names = {"--subcell-file", "-i"}, description = "The source subcellular location file", required = true)
     private String sourceFile;
 
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
+
     public static void main(String[] args) {
         SubCellSuggestions suggestions = new SubCellSuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 

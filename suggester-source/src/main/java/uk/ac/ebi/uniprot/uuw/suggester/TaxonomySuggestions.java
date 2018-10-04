@@ -45,12 +45,19 @@ public class TaxonomySuggestions {
     @Parameter(names = {"--tax-connection", "-c"}, description = "The connection details to the taxonomy DB", required = true)
     private String taxonomyConnectionStr;
 
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
+
     public static void main(String[] args) throws SQLException {
         TaxonomySuggestions suggestions = new TaxonomySuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 

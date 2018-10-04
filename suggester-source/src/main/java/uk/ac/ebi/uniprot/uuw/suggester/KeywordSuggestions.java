@@ -22,15 +22,22 @@ public class KeywordSuggestions {
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
     private String outputFile = "keywordSuggestions.txt";
 
-    @Parameter(names = {"--keyword-list-file", "-i"}, description = "The source keyword list file", required = true)
+    @Parameter(names = {"--keyword-list-file", "-i"}, description = "The source keyword list file, e.g., /ebi/ftp/private/uniprot/current_release/knowledgebase/complete/docs/keywlist.txt", required = true)
     private String sourceFile;
+
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
 
     public static void main(String[] args) {
         KeywordSuggestions suggestions = new KeywordSuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 

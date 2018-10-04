@@ -35,12 +35,19 @@ public class MainSearchSuggestions {
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
     private String outputFile = "mainSearchSuggestions.txt";
 
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
+
     public static void main(String[] args) throws IOException {
         MainSearchSuggestions suggestions = new MainSearchSuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 
