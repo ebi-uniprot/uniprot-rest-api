@@ -40,7 +40,7 @@ public class TaxonomySuggestions {
             " from taxonomy.v_public_node t";
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "taxonSuggestions.txt";
+    private String outputFile = "taxon-suggestions.txt";
 
     @Parameter(names = {"--tax-connection", "-c"}, description = "The connection details to the taxonomy DB", required = true)
     private String taxonomyConnectionStr;

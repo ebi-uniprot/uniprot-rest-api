@@ -20,9 +20,9 @@ public class SubCellSuggestions {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubCellSuggestions.class);
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "subcellSuggestions.txt";
+    private String outputFile = "subcellular-suggestions.txt";
 
-    @Parameter(names = {"--subcell-file", "-i"}, description = "The source subcellular location file", required = true)
+    @Parameter(names = {"--subcell-file", "-i"}, description = "The source subcellular location file, e.g., /ebi/ftp/private/uniprot/current_release/knowledgebase/complete/docs/subcell.txt", required = true)
     private String sourceFile;
 
     @Parameter(names = "--help", help = true)

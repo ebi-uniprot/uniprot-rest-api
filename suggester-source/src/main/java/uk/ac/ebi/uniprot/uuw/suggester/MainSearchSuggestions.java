@@ -33,7 +33,7 @@ public class MainSearchSuggestions {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainSearchSuggestions.class);
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "mainSearchSuggestions.txt";
+    private String outputFile = "main-search-suggestions.txt";
 
     @Parameter(names = "--help", help = true)
     private boolean help = false;

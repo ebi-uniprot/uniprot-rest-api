@@ -26,9 +26,9 @@ public class GOSuggestions {
     private static final Pattern LINE_FORMAT = Pattern.compile(".*[ \t]*;[ \t]*(GO:[0-9]+)[ \t]*;[ \t]*(.*);.*");
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "goSuggestions.txt";
+    private String outputFile = "go-suggestions.txt";
 
-    @Parameter(names = {"--go-file", "-i"}, description = "The source GO file", required = true)
+    @Parameter(names = {"--go-file", "-i"}, description = "The source GO file, e.g., /ebi/uniprot/production/xrefs/prod/current/databases/GO.dat", required = true)
     private String sourceFile;
 
     @Parameter(names = "--help", help = true)

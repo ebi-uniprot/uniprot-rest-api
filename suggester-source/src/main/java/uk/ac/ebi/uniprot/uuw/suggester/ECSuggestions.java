@@ -26,7 +26,7 @@ public class ECSuggestions {
     private static final Logger LOGGER = LoggerFactory.getLogger(ECSuggestions.class);
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "ecSuggestions.txt";
+    private String outputFile = "ec-suggestions.txt";
 
     @Parameter(
             names = {"--enzyme-file-url", "-i"},
