@@ -49,5 +49,4 @@ public class ECSuggestionsTest {
         Suggestion expectedSuggestion = Suggestion.builder().name(ecName).id(ec).build();
         verify(out, times(1)).println(expectedSuggestion.toSuggestionLine());
     }
-
 }

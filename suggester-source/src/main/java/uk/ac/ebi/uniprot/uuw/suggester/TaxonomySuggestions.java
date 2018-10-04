@@ -25,6 +25,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
+ * Generates file used for taxonomy suggestions. Depends on a UniProt DB, e.g., SWPREAD, using data from
+ * TAXONOMY.V_PUBLIC_NODE.
+ *
  * Created 28/09/18
  *
  * @author Edd

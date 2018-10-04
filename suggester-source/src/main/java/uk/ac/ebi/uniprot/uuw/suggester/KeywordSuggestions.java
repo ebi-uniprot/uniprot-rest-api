@@ -9,6 +9,9 @@ import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 import java.io.*;
 
 /**
+ * Generates file used for keyword suggestions. Depends on keywlist.txt file, located in
+ * /ebi/ftp/private/uniprot/current_release/knowledgebase/complete/docs.
+ *
  * Created 28/09/18
  *
  * @author Edd

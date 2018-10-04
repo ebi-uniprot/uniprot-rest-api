@@ -13,10 +13,32 @@
 
     <properties>
         <ujdk.version>2018.7-SNAPSHOT</ujdk.version>
+        <data-service.version>web-2018.7-SNAPSHOT</data-service.version>
         <jcommander.version>1.71</jcommander.version>
+        <streamex.version>0.6.7</streamex.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>interfaces</artifactId>
+            <version>${ujdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>database</artifactId>
+            <version>${ujdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>data-service-restful</artifactId>
+            <version>${data-service.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>one.util</groupId>
+            <artifactId>streamex</artifactId>
+            <version>${streamex.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
@@ -39,12 +61,7 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>database</artifactId>
-            <version>${ujdk.version}</version>
-        </dependency>
-
+        
         <!-- Tests -->
         <dependency>
             <groupId>org.hamcrest</groupId>

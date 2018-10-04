@@ -9,6 +9,9 @@ import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 import java.io.*;
 
 /**
+ * Generates file used for subcellular location suggestions. Depends on subcell.txt file, located in
+ * /ebi/ftp/private/uniprot/current_release/knowledgebase/complete/docs.
+ *
  * Created 28/09/18
  *
  * @author Edd
