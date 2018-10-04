@@ -61,7 +61,7 @@ public class TaxonomySuggestions {
         try (Connection conn = dbConnectionInfo.createConnection();
              Statement statement = conn.createStatement();
              ResultSet resultSet = statement.executeQuery(ALL_TAX_QUERY);
-             FileWriter fw = new FileWriter(outputFile, true);
+             FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
             while (resultSet.next()) {

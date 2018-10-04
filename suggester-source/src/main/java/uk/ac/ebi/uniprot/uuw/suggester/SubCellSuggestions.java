@@ -35,7 +35,7 @@ public class SubCellSuggestions {
     }
 
     private void createFile() {
-        try (FileWriter fw = new FileWriter(outputFile, true);
+        try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw);
              BufferedReader in = new BufferedReader(new FileReader(sourceFile))) {
@@ -51,7 +51,7 @@ public class SubCellSuggestions {
     }
 
     Suggestion.SuggestionBuilder process(String line, Suggestion.SuggestionBuilder lineBuilder, PrintWriter out) {
-        if (line.startsWith("ID")) {
+        if (line.startsWith("ID") || line.startsWith("IO") || line.startsWith("IT")) {
             lineBuilder.name(removePrefixFrom(line));
         } else if (line.startsWith("AC")) {
             lineBuilder.id(removePrefixFrom(line));

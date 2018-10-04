@@ -53,7 +53,7 @@ public class ECSuggestions {
 
         Files.copy(new URL(sourceFile).openStream(), tempECFile);
 
-        try (FileWriter fw = new FileWriter(outputFile, true);
+        try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw);
              BufferedReader in = Files.newBufferedReader(tempECFile)) {

@@ -39,7 +39,7 @@ public class GOSuggestions {
     }
 
     private void createFile() {
-        try (FileWriter fw = new FileWriter(outputFile, true);
+        try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw);
              BufferedReader in = new BufferedReader(new FileReader(sourceFile))) {
