@@ -51,7 +51,7 @@ public class KeywordSuggestions {
     }
 
     Suggestion.SuggestionBuilder process(String line, Suggestion.SuggestionBuilder lineBuilder, PrintWriter out) {
-        if (line.startsWith("ID")) {
+        if (line.startsWith("ID") || line.startsWith("IC")) {
             lineBuilder.name(removePrefixFrom(line));
         } else if (line.startsWith("AC")) {
             lineBuilder.id(removePrefixFrom(line));
