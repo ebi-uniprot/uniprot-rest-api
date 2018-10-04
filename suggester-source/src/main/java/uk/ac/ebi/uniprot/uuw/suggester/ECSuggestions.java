@@ -26,19 +26,26 @@ public class ECSuggestions {
     private static final Logger LOGGER = LoggerFactory.getLogger(ECSuggestions.class);
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "ecSuggestions.txt";
+    private String outputFile = "ec-suggestions.txt";
 
     @Parameter(
             names = {"--enzyme-file-url", "-i"},
             description = "The URL of the enzyme commission file (default is 'ftp://ftp.expasy.org/databases/enzyme/enzyme.dat')")
     private String sourceFile = "ftp://ftp.expasy.org/databases/enzyme/enzyme.dat";
 
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
+
     public static void main(String[] args) throws IOException {
         ECSuggestions suggestions = new ECSuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 
@@ -53,7 +60,7 @@ public class ECSuggestions {
 
         Files.copy(new URL(sourceFile).openStream(), tempECFile);
 
-        try (FileWriter fw = new FileWriter(outputFile, true);
+        try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw);
              BufferedReader in = Files.newBufferedReader(tempECFile)) {

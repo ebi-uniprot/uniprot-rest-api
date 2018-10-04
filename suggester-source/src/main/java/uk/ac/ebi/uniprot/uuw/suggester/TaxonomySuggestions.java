@@ -40,17 +40,24 @@ public class TaxonomySuggestions {
             " from taxonomy.v_public_node t";
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "taxonSuggestions.txt";
+    private String outputFile = "taxon-suggestions.txt";
 
     @Parameter(names = {"--tax-connection", "-c"}, description = "The connection details to the taxonomy DB", required = true)
     private String taxonomyConnectionStr;
 
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
+
     public static void main(String[] args) throws SQLException {
         TaxonomySuggestions suggestions = new TaxonomySuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 
@@ -61,7 +68,7 @@ public class TaxonomySuggestions {
         try (Connection conn = dbConnectionInfo.createConnection();
              Statement statement = conn.createStatement();
              ResultSet resultSet = statement.executeQuery(ALL_TAX_QUERY);
-             FileWriter fw = new FileWriter(outputFile, true);
+             FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
             while (resultSet.next()) {

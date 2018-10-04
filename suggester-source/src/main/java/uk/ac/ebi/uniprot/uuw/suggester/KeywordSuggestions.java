@@ -20,22 +20,29 @@ public class KeywordSuggestions {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordSuggestions.class);
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
-    private String outputFile = "keywordSuggestions.txt";
+    private String outputFile = "keyword-suggestions.txt";
 
-    @Parameter(names = {"--keyword-list-file", "-i"}, description = "The source keyword list file", required = true)
+    @Parameter(names = {"--keyword-list-file", "-i"}, description = "The source keyword list file, e.g., /ebi/ftp/private/uniprot/current_release/knowledgebase/complete/docs/keywlist.txt", required = true)
     private String sourceFile;
+
+    @Parameter(names = "--help", help = true)
+    private boolean help = false;
 
     public static void main(String[] args) {
         KeywordSuggestions suggestions = new KeywordSuggestions();
-        JCommander.newBuilder()
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(suggestions)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+        if (suggestions.help) {
+            jCommander.usage();
+            return;
+        }
         suggestions.createFile();
     }
 
     private void createFile() {
-        try (FileWriter fw = new FileWriter(outputFile, true);
+        try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw);
              BufferedReader in = new BufferedReader(new FileReader(sourceFile))) {
@@ -51,7 +58,7 @@ public class KeywordSuggestions {
     }
 
     Suggestion.SuggestionBuilder process(String line, Suggestion.SuggestionBuilder lineBuilder, PrintWriter out) {
-        if (line.startsWith("ID")) {
+        if (line.startsWith("ID") || line.startsWith("IC")) {
             lineBuilder.name(removePrefixFrom(line));
         } else if (line.startsWith("AC")) {
             lineBuilder.id(removePrefixFrom(line));
