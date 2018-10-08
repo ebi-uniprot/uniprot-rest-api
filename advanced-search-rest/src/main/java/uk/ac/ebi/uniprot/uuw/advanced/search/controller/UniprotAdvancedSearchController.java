@@ -1,7 +1,13 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.search.Query;
+import org.apache.solr.parser.QueryParser;
+import org.apache.solr.search.ExtendedDismaxQParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.solr.core.QueryParsers;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

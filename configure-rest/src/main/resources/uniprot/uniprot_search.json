@@ -8,7 +8,7 @@
 		"example": "P12345"
 	},
 	{
-		"label": "EntryName [ID]",
+		"label": "Entry Name [ID]",
 		"term": "mnemonic",
 		"dataType": "string",
 		"description": "Search by UniProtKB entry name",
@@ -87,7 +87,7 @@
 		"term": "",
 		"items": [
 			{
-				"label": "Enzyme EC",
+				"label": "Enzyme classification [EC]",
 				"term": "ec",
 				"dataType": "string",
 				"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?ec=?",
@@ -142,7 +142,7 @@
 						"example": "prosthetic"
 					},
 					{
-						"label": "Kinetic parameters",
+						"label": "Kinetics",
 						"itemType": "comment",
 						"term": "bpcp_kinetics",
 						"dataType": "string",
@@ -190,7 +190,7 @@
 			{
 				"label": "Activity regulation",
 				"itemType": "comment",
-				"term": "activity_regulation",
+				"term": "enzyme_regulation",
 				"dataType": "string",
 				"hasEvidence": true,
 				"description": "Search by comment activity regulation",
@@ -204,6 +204,15 @@
 				"hasEvidence": true,
 				"description": "Search by comment function",
 				"example": "enzyme"
+			},
+			{
+				"label": "Caution",
+				"itemType": "comment",
+				"term": "caution",
+				"dataType": "string",
+				"hasEvidence": true,
+				"description": "Search by caution comment",
+				"example": "kinase"
 			},
 			{
 				"label": "Sites",
@@ -321,52 +330,16 @@
 				"items": [
 					{
 						"label": "Subcellular location term",
-						"itemType": "group",
-						"items": [
-							{
-								"label": "Any",
-								"itemType": "comment",
-								"term": "scl_term",
-								"dataType": "string",
-								"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?sublocation=?",
-								"hasEvidence": true,
-								"description": "Search by comment subcellular location any term",
-								"example": "membrane"
-							},
-							{
-								"label": "Component",
-								"itemType": "comment",
-								"term": "scl_term_location",
-								"dataType": "string",
-								"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?sublocation=?",
-								"hasEvidence": true,
-								"description": "Search by comment subcellular location component",
-								"example": " \"Bud membrane [SL-0028]\""
-							},
-							{
-								"label": "Orientation",
-								"itemType": "comment",
-								"term": "scl_term_orientation",
-								"dataType": "string",
-								"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?sublocation=?",
-								"hasEvidence": true,
-								"description": "Search by comment subcellular location orientation",
-								"example": "\"Bud membrane [SL-0028]\""
-							},
-							{
-								"label": "Topology",
-								"itemType": "comment",
-								"term": "scl_term_topology",
-								"dataType": "string",
-								"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?sublocation=?",
-								"hasEvidence": true,
-								"description": "Search by comment subcellular location topology",
-								"example": "\"Bud membrane [SL-0028]\""
-							}
-						]
+						"itemType": "comment",
+						"term": "scl_term",
+						"dataType": "string",
+						"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?sublocation=?",
+						"hasEvidence": true,
+						"description": "Search by comment subcellular location term",
+						"example": "membrane"
 					},
 					{
-						"label": "Note",
+						"label": "Subcellular location note",
 						"itemType": "comment",
 						"term": "scl_note",
 						"dataType": "string",
@@ -543,13 +516,79 @@
 			},
 			{
 				"label": "Molecule Processing [FT]",
-				"itemType": "feature",
-				"term": "molecule_processing",
-				"dataType": "string",
-				"hasRange": true,
-				"hasEvidence": true,
-				"description": "Search by Feature Molecule Processing",
-				"example": "disulfide"
+				"itemType": "group",
+				"items": [
+					{
+						"label": "Any molecule processing",
+						"itemType": "feature",
+						"term": "molecule_processing",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature Molecule Processing",
+						"example": "disulfide"
+					},
+					{
+						"label": "Chain",
+						"itemType": "feature",
+						"term": "chain",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature chain",
+						"example": "kinase"
+					},
+					{
+						"label": "Initiator methionine",
+						"itemType": "feature",
+						"term": "init_met",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature initiator methionine",
+						"example": "Removed"
+					},
+					{
+						"label": "Peptide",
+						"itemType": "feature",
+						"term": "peptide",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature peptide",
+						"example": "Removed"
+					},
+					{
+						"label": "Signal Peptide",
+						"itemType": "feature",
+						"term": "signal",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature signal peptide",
+						"example": "cleaved"
+					},
+					{
+						"label": "Propeptide",
+						"itemType": "feature",
+						"term": "propep",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature signal peptide",
+						"example": "Activation peptide"
+					},
+					{
+						"label": "Transit Peptide",
+						"itemType": "feature",
+						"term": "transit",
+						"dataType": "string",
+						"hasRange": true,
+						"hasEvidence": true,
+						"description": "Search by Feature signal peptide",
+						"example": "Mitochondrion"
+					}
+				]
 			}
 		]
 	},
