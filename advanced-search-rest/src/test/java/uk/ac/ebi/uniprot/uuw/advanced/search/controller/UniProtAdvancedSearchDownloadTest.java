@@ -50,7 +50,9 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessa
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class})
 public class UniProtAdvancedSearchDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
+    private static final String DOWNLOAD_ACCESSIONS_RESOURCE = DOWNLOAD_RESOURCE + "/accessions";
     private static final String QUERY = "query";
+    private static final String LIST = "list";
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,6 +83,29 @@ public class UniProtAdvancedSearchDownloadTest {
                 get(DOWNLOAD_RESOURCE)
                         .header(ACCEPT, FF_MEDIA_TYPE)
                         .param(QUERY, accessionQuery(acc)));
+
+        response.andExpect(
+                request().asyncStarted())
+                .andDo(MvcResult::getAsyncResult)
+                .andDo(print())
+                .andExpect(content().contentType(FF_MEDIA_TYPE))
+                .andExpect(content().string(containsString("AC   Q8DIA7;")))
+                .andExpect(header().stringValues(VARY, ACCEPT, ACCEPT_ENCODING))
+                .andExpect(header().exists(CONTENT_DISPOSITION));
+    }
+
+    @Test
+    public void canReachDownloadAccessionsEndpoint() throws Exception {
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        mockStreamerResponseOf(entry);
+
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_ACCESSIONS_RESOURCE)
+                        .header(ACCEPT, FF_MEDIA_TYPE)
+                        .param(LIST, acc));
 
         response.andExpect(
                 request().asyncStarted())
