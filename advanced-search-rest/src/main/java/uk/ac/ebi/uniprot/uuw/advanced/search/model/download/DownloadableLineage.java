@@ -13,12 +13,12 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.TaxNode;
 public class DownloadableLineage implements Downloadable {
 	private final List<TaxNode> lineage;
 	public static final List<String> FIELDS = 
-			Arrays.asList(new String[] { "tl:all", "tl:class", "tl:cohort",
+			Arrays.asList( "lineage", "tl:all", "tl:class", "tl:cohort",
 					"tl:family", "tl:forma", "tl:genus", "tl:infraclass", "tl:infraorder", "tl:kingdom", "tl:order",
 					"tl:parvorder", "tl:phylum", "tl:species", "tl:species_group", "tl:species_subgroup", "tl:subclass",
 					"tl:subcohort", "tl:subfamily", "tl:subgenus", "tl:subkingdom", "tl:suborder", "tl:subphylum",
 					"tl:subspecies", "tl:subtribe", "tl:superclass", "tl:superfamily", "tl:superkingdom", "tl:superorder",
-					"tl:superphylum", "tl:tribe", "tl:varietas" });
+					"tl:superphylum", "tl:tribe", "tl:varietas" );
 
 	public DownloadableLineage(List<TaxNode> lineage) {
 		if (lineage == null) {
@@ -30,12 +30,14 @@ public class DownloadableLineage implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, String> map() {
 		if(lineage.isEmpty()) {
 			return Collections.emptyMap();
 		}
 		Map<String, String> map = new HashMap<>();
-		map.put("tl:all", getAll());
+		String allLineage= getAll();
+		map.put("tl:all", allLineage);
+		map.put("lineage", allLineage);
 		FIELDS.stream().skip(1).forEach(val -> addToMap(val, map));
 		return map;
 	}
@@ -55,5 +57,9 @@ public class DownloadableLineage implements Downloadable {
 	private Optional<TaxNode> getValue(String field) {
 		String type = field.substring(3);
 		return lineage.stream().filter(val -> val.getRank().equalsIgnoreCase(type)).findFirst();
+	}
+	public static  boolean contains(List<String> fields) {
+		return fields.stream().anyMatch(val -> FIELDS.contains(val));
+		
 	}
 }

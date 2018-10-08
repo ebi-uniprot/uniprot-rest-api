@@ -29,7 +29,7 @@ class DownloadableEntryInfoTest {
 	void testGetData() {
 		EntryInfo info = new EntryInfo("Swiss-Prot",  "2005-05-24", "2018-09-12",  119);
 		DownloadableEntryInfo downloadable = new DownloadableEntryInfo(info);
-		Map<String, String> result = downloadable.getData();
+		Map<String, String> result = downloadable.map();
 		assertEquals(4, result.size());
 		verify("reviewed", "reviewed", result);
 		verify("version", "119", result);

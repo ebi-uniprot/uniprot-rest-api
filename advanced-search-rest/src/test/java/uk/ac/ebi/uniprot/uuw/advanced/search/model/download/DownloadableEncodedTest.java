@@ -31,7 +31,7 @@ class DownloadableEncodedTest {
 	@Test
 	void testGetDataEmpty() {
 		DownloadableEncoded dl = new DownloadableEncoded(null);
-		assertTrue(dl.getData().isEmpty());
+		assertTrue(dl.map().isEmpty());
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ class DownloadableEncodedTest {
 		 glocations.add(new GeneLocation("Mitochondrion", Collections.emptyList(), ""));
 		 glocations.add(new GeneLocation("Plasmid", Collections.emptyList(), "mlp1"));
 		DownloadableEncoded dl = new DownloadableEncoded(glocations);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertEquals(1, result.size());
 		String value = result.get(DownloadableEncoded.FIELDS.get(0));
 		assertNotNull(value);

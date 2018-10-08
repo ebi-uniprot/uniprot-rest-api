@@ -24,7 +24,7 @@ public class DownloadableEncoded implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, String> map() {
 		if (geneLocations.isEmpty()) {
 			return Collections.emptyMap();
 		}
@@ -41,5 +41,9 @@ public class DownloadableEncoded implements Downloadable {
 			sb.append(" ").append(g.getName());
 		}
 		return sb.toString();
+	}
+
+	public static boolean contains(List<String> fields) {
+		return fields.stream().anyMatch(val -> FIELDS.contains(val));
 	}
 }

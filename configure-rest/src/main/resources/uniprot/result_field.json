@@ -227,11 +227,15 @@
 			},
 			{
 				"label": "Features",
-				"name": "features"
+				"name": "feature"
 			},
 			{
 				"label": "Keywords",
 				"name": "keyword"
+			},
+			{
+				"label": "Keyword ID",
+				"name": "keywordId"
 			},
 			{
 				"label": "Matched text",
@@ -426,7 +430,7 @@
 		"fields": [
 			{
 				"label": "3D",
-				"name": "dr:pdb"
+				"name": "3d"
 			},
 			{
 				"label": "Beta strand",

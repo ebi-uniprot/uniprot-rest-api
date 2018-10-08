@@ -76,6 +76,13 @@ class UniProtResultFieldsTest {
 	void testResultFieldGroup() {
 		List<FieldGroup> groups = instance.getResultFields();
 		assertEquals(16, groups.size());
+		System.out.println(
+		groups.stream().flatMap(val->val.getFields().stream())
+		.map(val->val.getName())
+		.filter(val ->val.startsWith("ft:"))
+		.map(val -> "\"" + val +"\"")
+		.collect(Collectors.joining(", ")));
+	
 		Optional<FieldGroup> seqGroup = getGroup(groups, "Sequences");
 		assertTrue(seqGroup.isPresent());
 		assertEquals(19, seqGroup.get().getFields().size());
@@ -90,7 +97,7 @@ class UniProtResultFieldsTest {
 		verifyField(groups, "Names & Taxonomy", "Gene Names", "gene_names");
 		verifyField(groups, "Sequences", "Alternative sequence", "ft:var_seq");
 		verifyField(groups, "Function", "Kinetics", "kinetics");
-		verifyField(groups, "Miscellaneous", "Caution", "caution");
+		verifyField(groups, "Miscellaneous", "Caution", "cc:caution");
 		verifyField(groups, "Interaction", "Subunit structure", "cc:subunit");
 		verifyField(groups, "Expression", "Induction", "cc:induction");
 		verifyField(groups, "Gene Ontology (GO)", "Gene Ontology (cellular component)", "go_c");

@@ -246,6 +246,18 @@
 	{
 		"name": "tax_id",
 		"mapTo": "organism"
+	},
+	{
+		"name": "dr:dbsnp",
+		"mapTo": "ft:variant"
+	},
+	{
+		"name": "3d",
+		"mapTo": "dr:pdb"
+	},
+	{
+		"name": "keywordId",
+		"mapTo": "keyword"
 	}
 	
 

@@ -17,7 +17,7 @@ class DownloadableLineageTest {
 	@Test
 	void testFields() {
 		List<String> fields = DownloadableLineage.FIELDS;
-		List<String> expected = Arrays.asList(new String[] { "tl:all", "tl:class", "tl:cohort",
+		List<String> expected = Arrays.asList(new String[] {"lineage", "tl:all", "tl:class", "tl:cohort",
 				"tl:family", "tl:forma", "tl:genus", "tl:infraclass", "tl:infraorder", "tl:kingdom", "tl:order",
 				"tl:parvorder", "tl:phylum", "tl:species", "tl:species_group", "tl:species_subgroup", "tl:subclass",
 				"tl:subcohort", "tl:subfamily", "tl:subgenus", "tl:subkingdom", "tl:suborder", "tl:subphylum",
@@ -31,7 +31,7 @@ class DownloadableLineageTest {
 	@Test
 	void testGetDataEmpty() {
 		DownloadableLineage dl = new DownloadableLineage(null);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertTrue(result.isEmpty());
 		
 	}
@@ -51,8 +51,8 @@ class DownloadableLineageTest {
 		lineage.add(new  TaxNode(9605, "Homo", "genus", false));
 		lineage.add(new  TaxNode(9606, "Homo sapiens", "species", true));
 		DownloadableLineage dl = new DownloadableLineage(lineage);
-		Map<String, String> result = dl.getData();
-		assertEquals(11, result.size());
+		Map<String, String> result = dl.map();
+		assertEquals(12, result.size());
 		verify(result, "tl:all",
 				"Eukaryota, Metazoa, Chordata, Mammalia, Primates, Hominoidea, Hominidae, Homininae, Homo, Homo sapiens");
 		verify(result, "tl:superkingdom", "Eukaryota");

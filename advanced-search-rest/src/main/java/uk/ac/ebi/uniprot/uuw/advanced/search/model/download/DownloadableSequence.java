@@ -9,10 +9,10 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Sequence;
 
 public class DownloadableSequence implements Downloadable {
 	public static final List<String> FIELDS = 
-			Arrays.asList(new String [] {
+			Arrays.asList(
 					"sequence", "sequence_version",
 					"mass", "length", "date_seq_mod", "fragment"
-			});
+			);
 	
 	private final Sequence sequence;
 	public DownloadableSequence(Sequence sequence) {
@@ -20,7 +20,7 @@ public class DownloadableSequence implements Downloadable {
 	}
 	
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, String> map() {
 		 Map<String, String> map = new HashMap<>();
 		map.put(FIELDS.get(0), sequence.getSequence()==null?"": sequence.getSequence());
 		map.put(FIELDS.get(1), ""+sequence.getVersion());
@@ -30,5 +30,8 @@ public class DownloadableSequence implements Downloadable {
 		map.put(FIELDS.get(5), sequence.getFragment()==null?"": sequence.getFragment());
 		 return map;
 	}
-
+	public static boolean contains(List<String> fields) {
+		return fields.stream().anyMatch(val -> FIELDS.contains(val));
+		
+	}
 }

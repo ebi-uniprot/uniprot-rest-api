@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.download;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class DownloadableProtein implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, String> map() {
 		StringBuilder sb = new StringBuilder();
 		if (protein.getRecommendedName() != null) {
 			sb.append(getDownloadStringFromName(protein.getRecommendedName()));
@@ -123,5 +124,8 @@ public class DownloadableProtein implements Downloadable {
 		}
 		return sb.toString();
 	}
-
+	public static  boolean contains(List<String> fields) {
+		return fields.contains(FIELD);
+		
+	}
 }

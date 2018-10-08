@@ -13,22 +13,6 @@ import uk.ac.ebi.uniprot.dataservice.restful.features.domain.DbReferenceObject;
 
 public class DownloadableUtilTest {
 	@Test
-	void testEvidenceToString() {
-		String expected = "ECO:0000269|PubMed:18258429";
-		Evidence evidence = createEvidence("ECO:0000269", "PubMed", "18258429");
-		String result = DownloadableUtil.evidenceToString(evidence);
-		assertEquals(expected, result);
-	}
-
-	@Test
-	void testEvidenceToString2() {
-		String expected = "ECO:0000269";
-		Evidence evidence = createEvidence("ECO:0000269", "", "");
-		String result = DownloadableUtil.evidenceToString(evidence);
-		assertEquals(expected, result);
-	}
-
-	@Test
 	void testEvidencesToString() {
 		String expected = "{ECO:0000269|PubMed:18258429, ECO:0000313|EMBL:AAC45250.1}";
 		List<Evidence> evidences = new ArrayList<>();

@@ -17,11 +17,11 @@ public class DownloadableGene implements Downloadable {
 	private static final String SEMICOLON = "; ";
 	private final List<Gene> genes;
 	public static final List<String> FIELDS = 
-			Arrays.asList(new String [] {
+			Arrays.asList(
 					"gene_names", "gene_primary",
 					"gene_synonym", "gene_oln",
 					"gene_orf"
-			});
+			);
 	
 
 	public DownloadableGene(List<Gene> genes) {
@@ -32,7 +32,7 @@ public class DownloadableGene implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, String> map() {
 		if(genes.isEmpty()) {
 			return Collections.emptyMap();
 		}
@@ -113,5 +113,8 @@ public class DownloadableGene implements Downloadable {
 		} else
 			return "";
 	}
-
+	public static  boolean contains(List<String> fields) {
+		return fields.stream().anyMatch(val -> FIELDS.contains(val));
+		
+	}
 }

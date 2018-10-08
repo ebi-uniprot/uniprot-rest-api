@@ -29,7 +29,7 @@ class DownloadableGeneTest {
 	@Test
 	void testGetDataEmpty() {
 		DownloadableGene dl = new DownloadableGene(null);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertTrue(result.isEmpty());
 		
 	}
@@ -44,7 +44,7 @@ class DownloadableGeneTest {
 		List<Gene> genes = new ArrayList<>();
 		genes.add(builder.build());
 		DownloadableGene dl = new DownloadableGene(genes);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertEquals(5, result.size());
 		verify("gene_names", "name11 syn1 syn2 oln1 oln2 orf1 orf2", result);
 		verify("gene_primary", "name11", result);
@@ -68,7 +68,7 @@ class DownloadableGeneTest {
 		genes.add(builder2.build());
 
 		DownloadableGene dl = new DownloadableGene(genes);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertEquals(5, result.size());
 		verify("gene_names", "name11 syn1 syn2 oln1 oln2 orf1 orf2; name12 syn3 syn4", result);
 		verify("gene_primary", "name11; name12", result);
@@ -85,7 +85,7 @@ class DownloadableGeneTest {
 		List<Gene> genes = new ArrayList<>();
 		genes.add(builder.build());
 		DownloadableGene dl = new DownloadableGene(genes);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertEquals(5, result.size());
 		verify("gene_names", "name11 syn1 syn2", result);
 		verify("gene_primary", "name11", result);
@@ -102,7 +102,7 @@ class DownloadableGeneTest {
 		List<Gene> genes = new ArrayList<>();
 		genes.add(builder.build());
 		DownloadableGene dl = new DownloadableGene(genes);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertEquals(5, result.size());
 		verify("gene_names", "name11 orf1 orf2", result);
 		verify("gene_primary", "name11", result);
@@ -118,7 +118,7 @@ class DownloadableGeneTest {
 		List<Gene> genes = new ArrayList<>();
 		genes.add(builder.build());
 		DownloadableGene dl = new DownloadableGene(genes);
-		Map<String, String> result = dl.getData();
+		Map<String, String> result = dl.map();
 		assertEquals(5, result.size());
 		verify("gene_names", "oln1 oln2", result);
 		verify("gene_primary", "", result);
