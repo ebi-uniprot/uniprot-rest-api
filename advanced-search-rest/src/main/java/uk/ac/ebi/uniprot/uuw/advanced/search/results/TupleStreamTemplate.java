@@ -3,8 +3,10 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 import lombok.Builder;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.SolrClientCache;
-import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.apache.solr.client.solrj.io.stream.expr.DefaultStreamFactory;
+import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +18,8 @@ import java.io.IOException;
  * @author Edd
  */
 @Builder
-public class CloudSolrStreamTemplate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CloudSolrStreamTemplate.class);
+public class TupleStreamTemplate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TupleStreamTemplate.class);
     private String zookeeperHost;
     private String requestHandler;
     private SolrQuery.ORDER order;
@@ -25,8 +27,8 @@ public class CloudSolrStreamTemplate {
     private String collection;
     private StreamContext streamContext;
 
-    public CloudSolrStream create(String query) {
-        CloudSolrStreamBuilder streamBuilder = CloudSolrStreamBuilder.builder()
+    public TupleStream create(String query) {
+        TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
                 .zookeeperHost(zookeeperHost)
                 .collection(collection)
                 .key(key)
@@ -39,7 +41,7 @@ public class CloudSolrStreamTemplate {
     }
 
     @Builder
-    private static class CloudSolrStreamBuilder {
+    private static class TupleStreamBuilder {
         private final String collection;
         private String zookeeperHost;
         private String requestHandler;
@@ -48,17 +50,17 @@ public class CloudSolrStreamTemplate {
         private String query;
         private StreamContext streamContext;
 
-        private CloudSolrStream build(String query) {
-            SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setQuery(query);
-            solrQuery.setSort(key, order);
-            solrQuery.setFields(key);
-            solrQuery.setRequestHandler("/export");
-
+        private TupleStream build(String query) {
             try {
-                CloudSolrStream cStream = new CloudSolrStream(zookeeperHost, collection, solrQuery);
-                cStream.setStreamContext(streamContext);
-                return cStream;
+                StreamFactory streamFactory = new DefaultStreamFactory()
+                        .withCollectionZkHost(collection, zookeeperHost);
+                String request =
+                        String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s %s\", qt=\"/export\")",
+                                      collection, query, key, key, order);
+
+                TupleStream tupleStream = streamFactory.constructStream(request);
+                tupleStream.setStreamContext(streamContext);
+                return tupleStream;
             } catch (IOException e) {
                 LOGGER.error("Could not create CloudSolrStream", e);
                 throw new IllegalStateException();
@@ -72,7 +74,8 @@ public class CloudSolrStreamTemplate {
      */
     private StreamContext createStreamContext() {
         StreamContext streamContext = new StreamContext();
-        streamContext.workerID = collection.hashCode(); // this should be the same for each collection, so that they share client caches
+        streamContext.workerID = collection
+                .hashCode(); // this should be the same for each collection, so that they share client caches
         streamContext.numWorkers = 1;
         SolrClientCache solrClientCache = new SolrClientCache();
         streamContext.setSolrClientCache(solrClientCache);

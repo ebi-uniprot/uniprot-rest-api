@@ -19,8 +19,8 @@
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
 
         <!-- Dependency versions -->
-        <solr.core.version>7.2.1</solr.core.version>
-        <solrj.version>7.2.0</solrj.version>
+        <solr.core.version>7.5.0</solr.core.version>
+        <solrj.version>7.5.0</solrj.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <hamcrest-all.version>1.3</hamcrest-all.version>
@@ -109,6 +109,13 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <version>${solrj.version}</version>
+            <exclusions>
+                <!-- Required to prevent logger cycle -> StackOverFlowError -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

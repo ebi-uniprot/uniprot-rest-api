@@ -15,8 +15,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 @Configuration
 public class ResultsConfig {
     @Bean
-    public CloudSolrStreamTemplate cloudSolrStreamTemplate(RepositoryConfigProperties configProperties) {
-        return CloudSolrStreamTemplate.builder()
+    public TupleStreamTemplate cloudSolrStreamTemplate(RepositoryConfigProperties configProperties) {
+        return TupleStreamTemplate.builder()
                 .collection("uniprot")
                 .key("accession")
                 .order(SolrQuery.ORDER.asc)

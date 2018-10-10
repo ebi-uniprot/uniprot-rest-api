@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
@@ -27,8 +27,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterCompone
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
-import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class UniProtEntryService {
     private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
             .instanceOf(DefaultEntryObject.class);
     private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
-    private final CloudSolrStreamTemplate cloudSolrStreamTemplate;
+    private final TupleStreamTemplate tupleStreamTemplate;
     private final StoreStreamer<UniProtEntry> storeStreamer;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
 
@@ -56,14 +56,14 @@ public class UniProtEntryService {
                                UniprotFacetConfig uniprotFacetConfig,
                                UniProtStoreClient entryService,
                                JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
-                               CloudSolrStreamTemplate cloudSolrStreamTemplate,
+                               TupleStreamTemplate tupleStreamTemplate,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
                                ThreadPoolTaskExecutor downloadTaskExecutor) {
         this.repository = repository;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.entryService = entryService;
         this.uniProtJsonAdaptor = uniProtJsonAdaptor;
-        this.cloudSolrStreamTemplate = cloudSolrStreamTemplate;
+        this.tupleStreamTemplate = tupleStreamTemplate;
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.downloadTaskExecutor = downloadTaskExecutor;
     }
@@ -182,13 +182,13 @@ public class UniProtEntryService {
     }
 
     private Stream<?> streamEntities(String query, MediaType contentType) {
-        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
+        TupleStream tupleStream = tupleStreamTemplate.create(query);
         try {
-            cStream.open();
+            tupleStream.open();
             if (contentType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
-                return storeStreamer.idsStream(cStream);
+                return storeStreamer.idsStream(tupleStream);
             } else {
-                return storeStreamer.idsToStoreStream(cStream);
+                return storeStreamer.idsToStoreStream(tupleStream);
             }
         } catch (IOException e) {
             throw new IllegalStateException(e);
