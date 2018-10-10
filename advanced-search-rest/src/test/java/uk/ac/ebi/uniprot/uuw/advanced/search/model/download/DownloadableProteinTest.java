@@ -19,10 +19,15 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EvidencedString;
 
 class DownloadableProteinTest {
 	
-	@Test 
-	void testField() {
-		assertEquals("protein_name", DownloadableProtein.FIELD);
-		assertTrue(UniProtResultFields.INSTANCE.getField("protein_name").isPresent());
+	@Test
+	void testFields() {
+		List<String> fields = DownloadableProtein.FIELDS;
+		List<String> expected = Arrays
+				.asList("protein_name", "ec" );
+		assertEquals(expected, fields);
+		for (String field : fields) {
+			assertTrue(UniProtResultFields.INSTANCE.getField(field).isPresent());
+		}
 	}
 
 	@Test
@@ -35,11 +40,13 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2";
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 	
 	@Test
@@ -56,13 +63,16 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " (alter name1, EC 1.1.2.3, EC 1.2.22.2) (altr name 2, short11, short12)";
 
 		assertEquals(expected, value);
+		
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 	
 	@Test
@@ -80,14 +90,16 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " (alter name1, EC 1.1.2.3, EC 1.2.22.2) (altr name 2, short11, short12)"
 				+ " (allergen someAller)";
 
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 	
 	@Test
@@ -106,14 +118,16 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " (alter name1, EC 1.1.2.3, EC 1.2.22.2) (altr name 2, short11, short12)"
 				+ " (allergen someAller) (biotech some biote)";
 
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 	
 	@Test
@@ -135,8 +149,8 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " (alter name1, EC 1.1.2.3, EC 1.2.22.2) (altr name 2, short11, short12)"
@@ -144,6 +158,8 @@ class DownloadableProteinTest {
 				+ " (CD antigen some antig1) (CD antigen some antig2)";
 
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 	
 	@Test
@@ -165,8 +181,8 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " (alter name1, EC 1.1.2.3, EC 1.2.22.2) (altr name 2, short11, short12)"
@@ -174,6 +190,8 @@ class DownloadableProteinTest {
 				+ " (some antig1) (some antig2)";
 
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 	
 	@Test
@@ -188,11 +206,13 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "subname name1, EC 1.1.2.3, EC 1.2.22.2 (subname name 2, short11, short12)";
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.2.22.2", ec);
 	}
 
 	@Test
@@ -208,14 +228,16 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " [Cleaved into: some contains1, sh1, sh2, EC 1.1.22.3, EC 1.2.34.2 (new Altname1, EC 1.1.22.3, EC 1.2.34.2) (new Altname 2, short11, short12);"
 				+ " some contains 2, sh1, sh2, EC 1.1.22.3, EC 1.2.34.2 ]" 
 				;
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.1.22.3; 1.2.22.2; 1.2.34.2", ec);
 	}
 	
 	@Test
@@ -235,8 +257,8 @@ class DownloadableProteinTest {
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
 		Map<String, String> result = downloadable.map();
-		assertEquals(1, result.size());
-		String value = result.get(DownloadableProtein.FIELD);
+		assertEquals(2, result.size());
+		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
 		String expected = "some full name, short1, short2, EC 1.1.2.3, EC 1.2.22.2"
 				+ " [Cleaved into: some contains1, sh1, sh2, EC 1.1.22.3, EC 1.2.34.2 (new Altname1, EC 1.1.22.3, EC 1.2.34.2) (new Altname 2, short11, short12);"
@@ -245,6 +267,8 @@ class DownloadableProteinTest {
 				+ " (new Altname1, EC 1.1.22.3, EC 1.2.34.2) (new Altname 2, short11, short12) ]" 
 				;
 		assertEquals(expected, value);
+		String ec = result.get(DownloadableProtein.FIELDS.get(1));
+		assertEquals("1.1.2.3; 1.1.22.3; 1.2.22.2; 1.2.34.2", ec);
 	}
 	private ProteinName createProteinName(String fullName, boolean hasAltName) {
 		List<String> shortNames = Arrays.asList(new String[]{"sh1", "sh2"});

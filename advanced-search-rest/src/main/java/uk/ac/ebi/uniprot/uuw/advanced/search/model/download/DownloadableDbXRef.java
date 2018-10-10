@@ -94,10 +94,11 @@ public class DownloadableDbXRef implements Downloadable {
 	}
 	
 	public static String proteomeXrefToString(DbReference xref) {
+	
 		StringBuilder sb = new StringBuilder();
 		sb.append(xref.getId())
 		.append(": ")
-		.append("Chromosome 4");
+		.append(xref.getProperties().get(0).getValue());
 	
 		return sb.toString();
 	}

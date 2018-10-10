@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
@@ -35,6 +37,7 @@ public class DownloadableComments implements Downloadable {
 			"redox_potential", "temp_dependence", "error_gmodel_pred", "protein_families");
 
 	private final List<Comment> comments;
+	private static final Pattern PATTERN_FAMILY =Pattern.compile("(?:In the .+? section; )?[Bb]elongs to the (.+?family)\\.(?: (.+?family)\\.)?(?: (.+?family)\\.)?(?: Highly divergent\\.)?");
 
 	public DownloadableComments(List<Comment> comments) {
 		if (comments == null) {
@@ -90,9 +93,15 @@ public class DownloadableComments implements Downloadable {
 			case WEBRESOURCE:
 				// List<WRComment> wrComments = getComments(type);
 				break;
+			case SIMILARITY:
+				List<TextComment> simiComments = getComments(type);
+				updateTextComments(map, type, simiComments);
+				updateProteinFamility(map, type, simiComments);
+				
 			default:
 				List<TextComment> txtComments = getComments(type);
 				updateTextComments(map, type, txtComments);
+				
 			}
 
 		}
@@ -205,15 +214,22 @@ public class DownloadableComments implements Downloadable {
 			List<SeqCautionComment> scComments) {
 		if ((scComments == null) || scComments.isEmpty())
 			return;
-
-		String result = scComments.stream().map(SeqCautionComment::toString)
+		List<String> result= scComments.stream()
+				.filter(val -> !SequenceCautionType.ERRONEOUS_PREDICTION.toDisplayName().equals(val.getConflictType()))
+				.map(SeqCautionComment::toString)
+				.collect(Collectors.toList());
+		if(!result.isEmpty()) {
+		String result3 = result.stream()
 				.collect(Collectors.joining(";  ", "SEQUENCE CAUTION:  ", ""));
-		map.put("cc:sequence_caution", result);
-		String result1 = scComments.stream()
+		map.put("cc:sequence_caution", result3);
+		}
+		List<String> result1= scComments.stream()
 				.filter(val -> SequenceCautionType.ERRONEOUS_PREDICTION.toDisplayName().equals(val.getConflictType()))
-				.map(SeqCautionComment::toString).collect(Collectors.joining(";  ", "SEQUENCE CAUTION:  ", ""));
-		if (!Strings.isNullOrEmpty(result1)) {
-			map.put("error_gmodel_pred", result1);
+				.map(SeqCautionComment::toString)
+				.collect(Collectors.toList());
+		if(!result1.isEmpty()) {
+				String result2 =result1.stream().collect(Collectors.joining(";  ", "SEQUENCE CAUTION:  ", ""));
+			map.put("error_gmodel_pred", result2);
 		}
 	}
 
@@ -235,6 +251,36 @@ public class DownloadableComments implements Downloadable {
 		map.put(field, value);
 	}
 
+	private void updateProteinFamility(Map<String, String> map, CommentType type, List<TextComment> txtComments) {
+		if ((txtComments == null) || txtComments.isEmpty() || type != CommentType.SIMILARITY)
+			return;
+		
+		String value = txtComments.stream().flatMap(val->val.getText().stream())
+				.map(val -> convertToProteinFamily(val.getValue()))
+				.filter(val ->!Strings.isNullOrEmpty(val))
+				.collect(Collectors.joining("; "));
+		String field = "protein_families";
+		map.put(field, value);
+	}
+
+	private String convertToProteinFamily(String text) {
+		String val = text;
+		if(!val.endsWith(".")) {
+			val +=".";
+		}
+		Matcher m = PATTERN_FAMILY.matcher(val);
+		if (m.matches()){
+			StringBuilder line = new StringBuilder();
+			line.append(m.group(1));
+			if (m.group(2) != null)
+				line.append(", ").append(m.group(2));
+			if (m.group(3) != null)
+				line.append(", ").append(m.group(3));
+			String result = line.toString();
+			return result.substring(0, 1).toUpperCase() + result.substring(1);
+		}
+		return null;
+	}
 	public static List<String> getSequenceCautionTypes(List<Comment> comments) {
 		if (comments == null)
 			return Collections.emptyList();

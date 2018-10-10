@@ -1,8 +1,13 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.download;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
@@ -25,7 +30,12 @@ public class DownloadableProtein implements Downloadable {
 	private static final String BLACKET_LEFT = "(";
 	private static final String SPACE = " ";
 	private static final String DELIMITER = ", ";
-	public static final String FIELD = "protein_name";
+	
+	public static final List<String> FIELDS = 
+			Arrays.asList(
+					"protein_name", "ec"
+			);
+	
 	private final Protein protein;
 
 	public DownloadableProtein(Protein protein) {
@@ -34,6 +44,20 @@ public class DownloadableProtein implements Downloadable {
 
 	@Override
 	public Map<String, String> map() {
+		if(protein ==null) {
+			return Collections.emptyMap();
+		}
+		
+		Map<String, String> map = new HashMap<>();
+		map.put(FIELDS.get(0), getProteinName());
+		String ecs = getECNumber();
+		if(!Strings.isNullOrEmpty(ecs)) {
+			map.put(FIELDS.get(1), ecs);
+		}
+		return map;
+	}
+	
+	private String getProteinName() {
 		StringBuilder sb = new StringBuilder();
 		if (protein.getRecommendedName() != null) {
 			sb.append(getDownloadStringFromName(protein.getRecommendedName()));
@@ -86,11 +110,35 @@ public class DownloadableProtein implements Downloadable {
 					.stream().map(val -> getDownloadStringFromProteinName(val)).collect(Collectors.joining(SEMICOLON)))
 					.append(SPACE).append(SQUARE_BLACKET_RIGHT);
 		}
-		Map<String, String> map = new HashMap<>();
-		map.put(FIELD, sb.toString());
-		return map;
+		return sb.toString();
 	}
 
+	private String getECNumber() {
+		Set<String> ecs = new TreeSet<>();
+		if (protein.getRecommendedName() != null) {
+			ecs.addAll(getEcFromName(protein.getRecommendedName()));
+		}
+		if ((protein.getAlternativeName() != null) && !protein.getAlternativeName().isEmpty() ){
+			protein.getAlternativeName().forEach(val -> ecs.addAll(getEcFromName(val)));			
+		}
+		if ((protein.getSubmittedName() != null) && !protein.getSubmittedName().isEmpty()) {
+			protein.getSubmittedName().forEach(val -> ecs.addAll(getEcFromName(val)));
+			
+		}
+	
+		if ((protein.getComponent() != null) && !protein.getComponent().isEmpty()) {
+					protein.getComponent().stream().forEach(val -> ecs.addAll(getEcFromProteinName(val)));
+		}
+
+		if ((protein.getDomain() != null) && !protein.getDomain().isEmpty()) {
+			protein.getDomain().stream().forEach(val -> ecs.addAll(getEcFromProteinName(val)));
+		}
+		if(ecs.isEmpty()) {
+			return "";
+		}else {
+			return ecs.stream().collect(Collectors.joining("; "));
+		}
+	}
 	private String getDownloadStringFromProteinName(ProteinName pname) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getDownloadStringFromName(pname.getRecommendedName()));
@@ -124,8 +172,23 @@ public class DownloadableProtein implements Downloadable {
 		}
 		return sb.toString();
 	}
+	private  List<String>  getEcFromProteinName(ProteinName pname) {
+		List<String> ec = new ArrayList<>();
+		ec.addAll(getEcFromName(pname.getRecommendedName()));
+		if ((pname.getAlternativeName() != null) && !pname.getAlternativeName().isEmpty()){
+			pname.getAlternativeName().forEach(val -> ec.addAll(getEcFromName(val)));
+		}
+		return ec;
+	}
+	private List<String> getEcFromName(Name name) {
+		if( name.getEcNumber() !=null) {
+			return name.getEcNumber().stream().map(val ->val.getValue()).collect(Collectors.toList());
+		}else
+			return Collections.emptyList();
+	}
+	
 	public static  boolean contains(List<String> fields) {
-		return fields.contains(FIELD);
+		return fields.stream().anyMatch(val -> FIELDS.contains(val));
 		
 	}
 }

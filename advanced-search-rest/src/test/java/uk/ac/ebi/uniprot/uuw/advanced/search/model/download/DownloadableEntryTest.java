@@ -16,13 +16,33 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConvert
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 
 class DownloadableEntryTest {
-	static UPEntry entryQ15758;
+	private static UPEntry entryQ15758;
+	private static UPEntry entryP03431;
+	private static UPEntry entryQ84MC7;
+	private static UPEntry entryQ70KY3;
+	
 	@BeforeAll
 	static void setup() throws Exception {
 		 InputStream is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/Q15758.dat" );
 	     UniProtEntry entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
 	     EntryConverter converter = new EntryConverter();
 	     entryQ15758 =converter.apply(entry);
+	     is.close();
+	     
+	     is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/P03431.dat" );
+	      entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
+	      entryP03431 =converter.apply(entry);
+	      is.close();
+	      is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/Q84MC7.dat" );
+	      entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
+	      entryQ84MC7 =converter.apply(entry);
+	      is.close();
+	      is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/Q70KY3.dat" );
+	      entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
+	      entryQ70KY3 =converter.apply(entry);
+	      is.close();
+	      
+	      
 	}
 	@Test
 	void testIdAccession() {
@@ -80,7 +100,19 @@ class DownloadableEntryTest {
 		verify("SLC1A5 ASCT2 M7V1 RDR RDRC", 3, result);
 		verify("Homo sapiens (Human)", 4, result);
 	}
-	
+	@Test
+	void testECnumber() {
+		List<String> fields= Arrays.asList("accession","protein_name", "ec");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		String proteinName ="RNA-directed RNA polymerase catalytic subunit, EC 2.7.7.48 (Polymerase basic protein 1, PB1)"
+				+ " (RNA-directed RNA polymerase subunit P1)" ;
+		verify("P03431", 0, result);
+		verify(proteinName, 1, result);
+		verify("2.7.7.48", 2, result);
+		
+	}
 	@Test
 	void testGene() {
 		List<String> fields= Arrays.asList("gene_names", "gene_primary",
@@ -118,7 +150,18 @@ class DownloadableEntryTest {
 		verify(lineage, 4, result);
 		
 	}
+	@Test
+	void testOrganismHost() {
+		List<String> fields= Arrays.asList("accession", "organism", "organism_host",
+				"lineage", "tl:all");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("P03431", 0, result);
+		verify("Influenza A virus (strain A/Puerto Rico/8/1934 H1N1)", 1, result);
+		verify("Aves [TaxID: 8782]; Homo sapiens (Human) [TaxID: 9606]; Sus scrofa (Pig) [TaxID: 9823]", 2, result);
 	
+	}
 	@Test
 	void testAlterProduct() {
 		List<String> fields= Arrays.asList("accession", "cc:alternative_products");
@@ -179,6 +222,85 @@ class DownloadableEntryTest {
 		verify(crnaediting, 4, result);	
 	}
 	
+	@Test
+	 void testComments2() {
+		List<String> fields= Arrays.asList("accession", "cc:interaction", "cc:subcellular_location", "cc:ptm", "cc:similarity");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("P03431", 0, result);
+		String interaction ="Q14318; P03466; P03433; P03428; Q99959";
+		String subcell ="SUBCELLULAR LOCATION: Host nucleus {ECO:0000255|HAMAP-Rule:MF_04065, ECO:0000269|PubMed:19906916}."
+				+ " Host cytoplasm {ECO:0000255|HAMAP-Rule:MF_04065, ECO:0000269|PubMed:19906916}." ;
+		String ptm="PTM: Phosphorylated by host PRKCA {ECO:0000255|HAMAP-Rule:MF_04065, ECO:0000269|PubMed:19264651}.";
+		String similarity="SIMILARITY: Belongs to the influenza viruses polymerase PB1 family {ECO:0000255|HAMAP-Rule:MF_04065}.";
+		verify(interaction, 1, result);
+		verify(subcell, 2, result);
+		verify(ptm, 3, result);
+		verify(similarity, 4, result);	
+	}
+	@Test
+	 void testProteinFamily() {
+		List<String> fields= Arrays.asList("accession", "protein_families", "cc:similarity");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("P03431", 0, result);
+		String proteinFamily ="Influenza viruses polymerase PB1 family";
+		String similarity="SIMILARITY: Belongs to the influenza viruses polymerase PB1 family {ECO:0000255|HAMAP-Rule:MF_04065}.";
+		verify(proteinFamily, 1, result);
+		verify(similarity, 2, result);	
+	}
+	
+	@Test
+	 void testSequenceCaution() {
+		List<String> fields= Arrays.asList("accession", "cc:sequence_caution", "error_gmodel_pred");
+		DownloadableEntry  dl =new  DownloadableEntry(entryQ84MC7, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("Q84MC7", 0, result);
+		String seqCaution ="SEQUENCE CAUTION:  Sequence=AAF97339.1; Type=Erroneous initiation; Note=Translation N-terminally extended.;"
+				+ " Evidence={ECO:0000305};" ; 
+		String seqCaution2="SEQUENCE CAUTION:  Sequence=AAG51053.1; Type=Erroneous gene model prediction; Evidence={ECO:0000305};";
+		
+		
+		verify(seqCaution, 1, result);
+		verify(seqCaution2, 2, result);	
+	}
+	
+	@Test
+	void testBPCP() {
+		List<String> fields= Arrays.asList("accession",  "absorption", "kinetics", "ph_dependence",
+				"redox_potential", "temp_dependence");
+		DownloadableEntry  dl =new  DownloadableEntry(entryQ70KY3, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("Q70KY3", 0, result);
+		String absorption ="BIOPHYSICOCHEMICAL PROPERTIES: ;  Absorption: Abs(max)=280 {ECO:0000269|PubMed:12111146,"
+				+ " ECO:0000269|PubMed:12118243}; Note=Exhibits a shoulder at 360 nm, a smaller absorption peak at 450 nm,"
+				+ " and a second, larger peak at 590 nm. {ECO:0000269|PubMed:12118243};" ;
+		String kinetic="BIOPHYSICOCHEMICAL PROPERTIES:  Kinetic parameters: KM=5.61 mM for ethanol {ECO:0000269|PubMed:10320337,"
+				+ " ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276}; KM=0.105 mM for butane-1-ol {ECO:0000269|PubMed:10320337,"
+				+ " ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276}; Vmax=45.5 umol/min/mg enzyme toward potassium"
+				+ " ferricyanide (in the presence of 30 mM Tris-HCl pH 8.0) {ECO:0000269|PubMed:10320337, ECO:0000269|PubMed:16061256,"
+				+ " ECO:0000269|PubMed:7730276};" ;
+		String phDep ="BIOPHYSICOCHEMICAL PROPERTIES: ;  pH dependence: Optimum pH is 3.5 with 2,2'-azinobis-(3-ethylbenzthiazoline-6-sulphonate)"
+				+ " as substrate, 5.0-7.5 with guiacol as substrate, and 6.0-7.0 with syringaldazine as substrate."
+				+ " {ECO:0000269|PubMed:12111146, ECO:0000269|PubMed:12118243}; Optimum pH is 8.0."
+				+ " {ECO:0000269|PubMed:10320337, ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276}" ;
+		String redox ="BIOPHYSICOCHEMICAL PROPERTIES: ;  Redox potential: E(0) is +185 mV for heme c at pH 7.0,"
+				+ " +188 mV for heme c at pH 8.0, +172 mV for heme c at pH 8.0 and 0.3 M KCl and +189 mV for"
+				+ " ADH IIB-Azurin complex. {ECO:0000269|PubMed:10320337, ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276}" ;
+		String tempDep= "BIOPHYSICOCHEMICAL PROPERTIES: ;  Temperature dependence: Optimum temperature is 60-70 degrees Celsius."
+				+ " {ECO:0000269|PubMed:12111146, ECO:0000269|PubMed:12118243}" ;
+		
+		verify(absorption, 1, result);
+		verify(kinetic, 2, result);	
+		verify(phDep, 3, result);	
+		verify(redox, 4, result);	
+		verify(tempDep, 5, result);	
+		
+	}
 	@Test
 	void testFeatures() {
 		List<String> fields= Arrays.asList("accession", "ft:chain", "ft:topo_dom",
@@ -407,8 +529,46 @@ class DownloadableEntryTest {
 		verify(prosite, 4, result);
 		verify(pfam, 5, result);
 	}
+	@Test
+	void testProteome() {
+		List<String> fields= Arrays.asList("accession", "dr:proteomes");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("P03431", 0, result);
+		String proteome="UP000009255: Genome; UP000116373: Genome; UP000170967: Genome";
+		verify(proteome, 1, result);
+		
+	}
+	@Test
+	void testPdb() {
+		List<String> fields= Arrays.asList("accession", "dr:pdb", "3d");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("P03431", 0, result);
+		String pdb="2ZNL;2ZTT;3A1G;";
+		String d3d="X-ray crystallography (3)";
+		verify(pdb, 1, result);
+		verify(d3d, 2, result);
+	}
 	
-	
+	@Test
+	void testkeyword() {
+		List<String> fields= Arrays.asList("accession", "keyword", "keywordid");
+		DownloadableEntry  dl =new  DownloadableEntry(entryP03431, fields);
+		List<String> result= dl.getData();
+		assertEquals(fields.size(), result.size());
+		verify("P03431", 0, result);
+		String keyword="3D-structure;Complete proteome;Eukaryotic host gene expression shutoff by virus;"
+				+ "Eukaryotic host transcription shutoff by virus;Host cytoplasm;"
+				+ "Host gene expression shutoff by virus;Host nucleus;Host-virus interaction;"
+				+ "Inhibition of host RNA polymerase II by virus;Nucleotide-binding;Nucleotidyltransferase;"
+				+ "Phosphoprotein;Reference proteome;RNA-directed RNA polymerase;Transferase;Viral RNA replication;Viral transcription" ;
+		String keywordid="";
+		verify(keyword, 1, result);
+		verify(keywordid, 2, result);
+	}
 	private void verify(String expected, int pos, List<String> result) {
 		assertEquals(expected, result.get(pos));
 	}

@@ -235,7 +235,7 @@
 			},
 			{
 				"label": "Keyword ID",
-				"name": "keywordId"
+				"name": "keywordid"
 			},
 			{
 				"label": "Matched text",
