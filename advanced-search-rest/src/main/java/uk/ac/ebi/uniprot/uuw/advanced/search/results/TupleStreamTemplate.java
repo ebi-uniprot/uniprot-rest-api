@@ -28,11 +28,15 @@ public class TupleStreamTemplate {
     private StreamContext streamContext;
 
     public TupleStream create(String query) {
+        return create(query, key, SortCriteria.builder().addCriterion(key, SolrQuery.ORDER.asc).build());
+    }
+
+    public TupleStream create(String query, String key, SortCriteria sortCriteria) {
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
                 .zookeeperHost(zookeeperHost)
                 .collection(collection)
                 .key(key)
-                .order(order)
+                .order(sortCriteria)
                 .requestHandler(requestHandler)
                 .streamContext(createStreamContext())
                 .build();
@@ -45,7 +49,7 @@ public class TupleStreamTemplate {
         private final String collection;
         private String zookeeperHost;
         private String requestHandler;
-        private SolrQuery.ORDER order;
+        private SortCriteria order;
         private String key;
         private String query;
         private StreamContext streamContext;
@@ -55,8 +59,8 @@ public class TupleStreamTemplate {
                 StreamFactory streamFactory = new DefaultStreamFactory()
                         .withCollectionZkHost(collection, zookeeperHost);
                 String request =
-                        String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s %s\", qt=\"/export\")",
-                                      collection, query, key, key, order);
+                        String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s\", qt=\"/export\")",
+                                      collection, query, key, order.toString());
 
                 TupleStream tupleStream = streamFactory.constructStream(request);
                 tupleStream.setStreamContext(streamContext);

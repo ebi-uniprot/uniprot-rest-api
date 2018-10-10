@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
@@ -27,16 +28,22 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterCompone
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.SortCriteria;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
 
 @Service
 public class UniProtEntryService {
@@ -164,12 +171,12 @@ public class UniProtEntryService {
                 .map(acc -> "(" + ACCESSION + ":" + acc.toUpperCase() + ")")
                 .collect(Collectors.joining(" OR ")) + ")";
 
-        stream(queryStr, context, emitter);
+        stream(queryStr, singletonList("accession"), context, emitter);
     }
 
-    public void stream(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {
+    public void stream(String query, List<String> fields, MessageConverterContext context, ResponseBodyEmitter emitter) {
         MediaType contentType = context.getContentType();
-        context.setEntities(streamEntities(query, contentType));
+        context.setEntities(streamEntities(query, fields, contentType));
 
         downloadTaskExecutor.execute(() -> {
             try {
@@ -181,13 +188,24 @@ public class UniProtEntryService {
         });
     }
 
-    private Stream<?> streamEntities(String query, MediaType contentType) {
-        TupleStream tupleStream = tupleStreamTemplate.create(query);
+    private Stream<?> streamEntities(String query, List<String> fields, MediaType contentType) {
         try {
-            tupleStream.open();
-            if (contentType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
+            if (contentType.equals(LIST_MEDIA_TYPE)) {
+                TupleStream tupleStream = tupleStreamTemplate.create(query);
+                tupleStream.open();
                 return storeStreamer.idsStream(tupleStream);
+            }
+            if (asList("accession", "description").containsAll(fields)) {
+                TupleStream tupleStream = tupleStreamTemplate
+                        .create(query, "avro_bin",
+                                SortCriteria.builder()
+                                        .addCriterion("avro_bin", SolrQuery.ORDER.asc)
+                                        .build());
+                tupleStream.open();
+                return storeStreamer.defaultFieldStream(tupleStream);
             } else {
+                TupleStream tupleStream = tupleStreamTemplate.create(query);
+                tupleStream.open();
                 return storeStreamer.idsToStoreStream(tupleStream);
             }
         } catch (IOException e) {

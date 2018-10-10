@@ -4,8 +4,13 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
+import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
+import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.RepositoryConfigProperties;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
+
+import java.util.Base64;
 
 /**
  * Created 21/08/18
@@ -29,7 +34,19 @@ public class ResultsConfig {
     public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtStoreClient uniProtClient) {
         return new StoreStreamer<>(uniProtClient,
                                    resultsConfigProperties().getUniprot().getBatchSize(),
-                                   resultsConfigProperties().getUniprot().getValueId());
+                                   resultsConfigProperties().getUniprot().getValueId(),
+                                   resultsConfigProperties().getUniprot().getDefaultsField(),
+                                   this::convertDefaultAvroToUniProtEntry);
+    }
+
+    private UniProtEntry convertDefaultAvroToUniProtEntry(String s) {
+        DefaultEntryConverter defaultEntryConverter = new DefaultEntryConverter();
+        AvroByteArraySerializer<DefaultEntryObject> avroDeserializer =
+                AvroByteArraySerializer.instanceOf(DefaultEntryObject.class);
+
+        byte[] avroBinaryBytes = Base64.getDecoder().decode(s.getBytes());
+        DefaultEntryObject avroObject = avroDeserializer.fromByteArray(avroBinaryBytes);
+        return defaultEntryConverter.fromAvro(avroObject);
     }
 
     @Bean

@@ -77,6 +77,7 @@ public class UniprotAdvancedSearchController {
     @RequestMapping(value = "/download", method = RequestMethod.GET,
             produces = {"text/flatfile", "text/list", "application/xml"})
     public ResponseEntity<ResponseBodyEmitter> download(@RequestParam(value = "query", required = true) String query,
+														@RequestParam(value = "fields", required = true) List<String> fields,
 														@RequestHeader("Accept") MediaType contentType,
 														@RequestHeader(value = "Accept-Encoding", required = false) String encoding,
 														HttpServletRequest request) {
@@ -85,7 +86,7 @@ public class UniprotAdvancedSearchController {
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
 
-        entryService.stream(query, context, emitter);
+        entryService.stream(query, fields, context, emitter);
 
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, context, request))

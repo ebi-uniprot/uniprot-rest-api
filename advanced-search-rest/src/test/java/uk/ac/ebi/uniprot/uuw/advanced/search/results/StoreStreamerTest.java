@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StoreStreamerTest {
     private static final String ID = "id";
+    private static final String DEFAULTS = "defaults";
     private FakeVoldemortClient fakeVoldemortClient;
     private StoreStreamer<String> storeStreamer;
 
@@ -39,7 +40,7 @@ public class StoreStreamerTest {
     }
 
     private void createSearchStoreStream(int streamerBatchSize) {
-        this.storeStreamer = new StoreStreamer<>(fakeVoldemortClient, streamerBatchSize, ID);
+        this.storeStreamer = new StoreStreamer<>(fakeVoldemortClient, streamerBatchSize, ID, DEFAULTS, s -> s);
     }
 
     @Test
