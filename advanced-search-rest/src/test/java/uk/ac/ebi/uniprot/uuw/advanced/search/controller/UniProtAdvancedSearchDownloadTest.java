@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
-import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,9 +19,9 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.RepositoryConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
-import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.ResultsConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreConfig;
 
@@ -61,14 +61,14 @@ public class UniProtAdvancedSearchDownloadTest {
     private DataStoreManager storeManager;
 
     @MockBean
-    private CloudSolrStreamTemplate cloudSolrStreamTemplate;
+    private TupleStreamTemplate tupleStreamTemplate;
 
     @MockBean
     private StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer;
 
     @Before
     public void setUp() {
-        when(cloudSolrStreamTemplate.create(any())).thenReturn(mock(CloudSolrStream.class));
+        when(tupleStreamTemplate.create(any())).thenReturn(mock(TupleStream.class));
     }
 
     @Test
