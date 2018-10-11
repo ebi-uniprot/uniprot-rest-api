@@ -21,11 +21,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.ws.rs.QueryParam;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE_VALUE;
 
 /**
  * Controller for uniprot advanced search service.
@@ -58,7 +64,7 @@ public class UniprotAdvancedSearchController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     public UPEntry getByAccession(@PathVariable("accession") String accession, @QueryParam("field") String field) {
         return entryService.getByAccession(accession, field);
     }
@@ -75,39 +81,19 @@ public class UniprotAdvancedSearchController {
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
-            produces = {"text/flatfile", "text/list", "application/xml"})
+            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(
-            //@Valid SearchRequestDTO request,
-            // TODO: 10/10/18 use SearchRequestDTO object, but find out what the existing 'field' param means (can i reuse it for my fields param?)
-            @RequestParam(value = "query", required = true) String query,
-														@RequestParam(value = "fields", required = true) List<String> fields,
-														@RequestHeader("Accept") MediaType contentType,
-														@RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-														HttpServletRequest request) {
+            @Valid SearchRequestDTO searchRequest,
+            @RequestHeader("Accept") MediaType contentType,
+            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
+            HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
+        context.setRequestDTO(searchRequest);
 
-        entryService.stream(query, fields, context, emitter);
-
-        return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(contentType, context, request))
-                .body(emitter);
-    }
-
-    @RequestMapping(value = "/download/accessions", method = RequestMethod.GET,
-            produces = {"text/flatfile", "text/list", "application/xml"})
-    public ResponseEntity<ResponseBodyEmitter> downloadAccessions(@RequestParam(value = "list", required = true) List<String> accessions,
-                                                                  @RequestHeader("Accept") MediaType contentType,
-                                                                  @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-                                                                  HttpServletRequest request) {
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
-
-        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
-        context.setFileType(FileType.bestFileTypeMatch(encoding));
-
-        entryService.streamForAccessions(accessions, context, emitter);
+        entryService.stream(searchRequest, context, emitter);
 
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, context, request))
@@ -115,10 +101,23 @@ public class UniprotAdvancedSearchController {
     }
 
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {
-        String fileName = "uniprot-" + request.getQueryString() + "." + mediaType
-                .getSubtype() + context.getFileType().getExtension();
+        String suffix = "." + mediaType.getSubtype() + context.getFileType().getExtension();
+        String queryString = request.getQueryString();
+        String desiredFileName = "uniprot-" + queryString + suffix;
+        String actualFileName;
+        // truncate the file name if the query makes it too long -- instead use date + truncated query
+        if (desiredFileName.length() > 200) {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd@HH:mm:ss.SS");
+            String timestamp = now.format(dateTimeFormatter);
+            int queryStrLength = queryString.length();
+            int queryStringTruncatePoint = queryStrLength > 50 ? 50 : queryStrLength;
+            actualFileName = "uniprot-" + timestamp + "-" + queryString.substring(0, queryStringTruncatePoint) + suffix;
+        } else {
+            actualFileName = desiredFileName;
+        }
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentDispositionFormData("attachment", fileName);
+        httpHeaders.setContentDispositionFormData("attachment", actualFileName);
         httpHeaders.setContentType(mediaType);
 
         // used so that gate-way caching uses accept/accept-encoding headers as a key

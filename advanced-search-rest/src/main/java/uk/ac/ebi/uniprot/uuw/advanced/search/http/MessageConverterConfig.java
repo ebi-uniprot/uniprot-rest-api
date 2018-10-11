@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,6 +17,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContex
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter.XML_MEDIA_TYPE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE;
 
 /**
  * Created 21/08/18
@@ -64,6 +66,7 @@ public class MessageConverterConfig {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
                 converters.add(0, new XmlMessageConverter());
+                converters.add(new TSVMessageConverter());
             }
         };
     }
@@ -75,9 +78,27 @@ public class MessageConverterConfig {
         contextFactory.addMessageConverterContexts(asList(
                 uniProtListMessageConverterContext(),
                 uniProtFlatFileMessageConverterContext(),
-                uniProtXmlMessageConverterContext()));
+                uniProtXmlMessageConverterContext(),
+                uniprotJsonMessageConverterContext(),
+                uniprotTSVMessageConverterContext()));
 
         return contextFactory;
+    }
+
+    private MessageConverterContext uniprotTSVMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(TSV_MEDIA_TYPE);
+
+        return converter;
+    }
+
+    private MessageConverterContext uniprotJsonMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(MediaType.APPLICATION_JSON);
+
+        return converter;
     }
 
     private XmlMessageConverterContext uniProtXmlMessageConverterContext() {
@@ -91,7 +112,7 @@ public class MessageConverterConfig {
         converter.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
         final EntryXmlConverterImpl entryXmlConverter = new EntryXmlConverterImpl();
         converter.setConverter(entryXmlConverter::convert);
-        converter.setContentType(XML_MEDIA_TYPE);
+        converter.setContentType(MediaType.APPLICATION_XML);
 
         return converter;
     }

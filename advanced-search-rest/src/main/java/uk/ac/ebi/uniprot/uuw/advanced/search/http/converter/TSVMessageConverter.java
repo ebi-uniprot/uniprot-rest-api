@@ -4,32 +4,34 @@ import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import uk.ac.ebi.kraken.ffwriter.line.impl.UniProtFlatfileWriter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Created 21/08/18
+ * Created 11/10/18
  *
  * @author Edd
  */
-public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
-    public static final String FF_MEDIA_TYPE_VALUE = "text/flatfile";
-    public static final MediaType FF_MEDIA_TYPE = new MediaType("text", "flatfile");
+public class TSVMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
+    public static final String TSV_MEDIA_TYPE_VALUE = "text/tsv";
+    public static final MediaType TSV_MEDIA_TYPE = new MediaType("text", "tsv");
     private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
 
-    public FlatFileMessageConverter() {
-        super(FF_MEDIA_TYPE);
+    public TSVMessageConverter() {
+        super(TSV_MEDIA_TYPE);
     }
 
     @Override
@@ -47,10 +49,14 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
                          OutputStream outputStream,
                          Instant start,
                          AtomicInteger counter) throws IOException {
-        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
+        // fields requested
+        Map<String, List<String>> fields = FieldsParser.parse(messageConfig.getRequestDTO().getFields());
+
+        // entries
+        Stream<Collection<UniProtEntry>> entriesStream = (Stream<Collection<UniProtEntry>>)messageConfig.getEntities();
 
         try {
-            entities.forEach(items -> {
+            entriesStream.forEach(items -> {
                 items.forEach(entry -> {
                     try {
                         int currentCount = counter.getAndIncrement();
@@ -61,9 +67,9 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
                             logStats(currentCount, start);
                         }
 
-                        outputStream.write((UniProtFlatfileWriter.write(entry) + "\n").getBytes());
+                        outputStream.write((entry.getPrimaryUniProtAccession().getValue() + " hello world " + "\n").getBytes());
                     } catch (Throwable e) {
-                        throw new StopStreamException("Could not write entry: " + entry, e);
+                        throw new StopStreamException("Could not write entry: " + entry.getPrimaryUniProtAccession().getValue(), e);
                     }
                 });
             });
@@ -71,7 +77,7 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
             logStats(counter.get(), start);
         } catch (StopStreamException e) {
             LOGGER.error("Client aborted streaming: closing stream.", e);
-            entities.close();
+            entriesStream.close();
         } finally {
             outputStream.close();
         }
