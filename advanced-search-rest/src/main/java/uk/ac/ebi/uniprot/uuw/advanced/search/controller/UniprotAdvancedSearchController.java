@@ -76,7 +76,10 @@ public class UniprotAdvancedSearchController {
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
             produces = {"text/flatfile", "text/list", "application/xml"})
-    public ResponseEntity<ResponseBodyEmitter> download(@RequestParam(value = "query", required = true) String query,
+    public ResponseEntity<ResponseBodyEmitter> download(
+            //@Valid SearchRequestDTO request,
+            // TODO: 10/10/18 use SearchRequestDTO object, but find out what the existing 'field' param means (can i reuse it for my fields param?)
+            @RequestParam(value = "query", required = true) String query,
 														@RequestParam(value = "fields", required = true) List<String> fields,
 														@RequestHeader("Accept") MediaType contentType,
 														@RequestHeader(value = "Accept-Encoding", required = false) String encoding,

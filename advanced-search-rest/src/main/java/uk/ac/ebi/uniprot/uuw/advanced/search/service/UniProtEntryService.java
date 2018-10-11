@@ -1,7 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
@@ -19,7 +17,6 @@ import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
@@ -28,13 +25,10 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterCompone
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
-import uk.ac.ebi.uniprot.uuw.advanced.search.results.SortCriteria;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
-import uk.ac.ebi.uniprot.uuw.advanced.search.results.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +49,7 @@ public class UniProtEntryService {
     private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
             .instanceOf(DefaultEntryObject.class);
     private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
-    private final TupleStreamTemplate tupleStreamTemplate;
+    //    private final TupleStreamTemplate tupleStreamTemplate;
     private final StoreStreamer<UniProtEntry> storeStreamer;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
 
@@ -63,14 +57,14 @@ public class UniProtEntryService {
                                UniprotFacetConfig uniprotFacetConfig,
                                UniProtStoreClient entryService,
                                JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
-                               TupleStreamTemplate tupleStreamTemplate,
+//                               TupleStreamTemplate tupleStreamTemplate,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
                                ThreadPoolTaskExecutor downloadTaskExecutor) {
         this.repository = repository;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.entryService = entryService;
         this.uniProtJsonAdaptor = uniProtJsonAdaptor;
-        this.tupleStreamTemplate = tupleStreamTemplate;
+//        this.tupleStreamTemplate = tupleStreamTemplate;
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.downloadTaskExecutor = downloadTaskExecutor;
     }
@@ -189,27 +183,13 @@ public class UniProtEntryService {
     }
 
     private Stream<?> streamEntities(String query, List<String> fields, MediaType contentType) {
-        try {
-            if (contentType.equals(LIST_MEDIA_TYPE)) {
-                TupleStream tupleStream = tupleStreamTemplate.create(query);
-                tupleStream.open();
-                return storeStreamer.idsStream(tupleStream);
-            }
-            if (asList("accession", "description").containsAll(fields)) {
-                TupleStream tupleStream = tupleStreamTemplate
-                        .create(query, "avro_bin",
-                                SortCriteria.builder()
-                                        .addCriterion("avro_bin", SolrQuery.ORDER.asc)
-                                        .build());
-                tupleStream.open();
-                return storeStreamer.defaultFieldStream(tupleStream);
-            } else {
-                TupleStream tupleStream = tupleStreamTemplate.create(query);
-                tupleStream.open();
-                return storeStreamer.idsToStoreStream(tupleStream);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+        if (contentType.equals(LIST_MEDIA_TYPE)) {
+            return storeStreamer.idsStream(query);
+        }
+        if (asList("accession", "description").containsAll(fields)) {
+            return storeStreamer.defaultFieldStream(query);
+        } else {
+            return storeStreamer.idsToStoreStream(query);
         }
     }
 

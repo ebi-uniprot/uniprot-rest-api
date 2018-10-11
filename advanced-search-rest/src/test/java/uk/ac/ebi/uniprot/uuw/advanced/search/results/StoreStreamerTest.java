@@ -19,6 +19,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,29 +32,30 @@ import static org.mockito.Mockito.when;
 public class StoreStreamerTest {
     private static final String ID = "id";
     private static final String DEFAULTS = "defaults";
+    public static final String FAKE_QUERY = "any query";
     private FakeVoldemortClient fakeVoldemortClient;
     private StoreStreamer<String> storeStreamer;
+
+    public static String transformString(String id) {
+        return id + "-transformed";
+    }
 
     @Before
     public void setUp() {
         fakeVoldemortClient = new FakeVoldemortClient();
     }
 
-    private void createSearchStoreStream(int streamerBatchSize) {
-        this.storeStreamer = new StoreStreamer<>(fakeVoldemortClient, streamerBatchSize, ID, DEFAULTS, s -> s);
-    }
-
     @Test
     public void canCreateSearchStoreStream() {
-        createSearchStoreStream(1);
+        createSearchStoreStream(1, tupleStream(singletonList("a")));
         assertThat(storeStreamer, is(notNullValue()));
     }
 
     @Test
     public void canTransformSourceStreamWithUnaryBatchSize() {
-        createSearchStoreStream(1);
+        createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<Collection<String>> storeStream = storeStreamer
-                .idsToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
+                .idsToStoreStream(FAKE_QUERY);
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 singletonList(transformString("a")),
@@ -65,10 +67,9 @@ public class StoreStreamerTest {
 
     @Test
     public void canTransformSourceStreamWithIntermediateBatchSize() {
-        createSearchStoreStream(3);
-        TupleStream tupleStream = tupleStream(asList("a", "b", "c", "d", "e"));
+        createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<Collection<String>> storeStream = storeStreamer
-                .idsToStoreStream(tupleStream);
+                .idsToStoreStream(FAKE_QUERY);
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         System.out.println(results);
         assertThat(results, contains(
@@ -81,9 +82,9 @@ public class StoreStreamerTest {
 
     @Test
     public void canTransformSourceStreamWithBiggerBatchSize() {
-        createSearchStoreStream(4);
+        createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<Collection<String>> storeStream = storeStreamer
-                .idsToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
+                .idsToStoreStream(FAKE_QUERY);
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 asList(transformString("a"),
@@ -96,9 +97,9 @@ public class StoreStreamerTest {
 
     @Test
     public void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
-        createSearchStoreStream(10);
+        createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<Collection<String>> storeStream = storeStreamer
-                .idsToStoreStream(tupleStream(asList("a", "b", "c", "d", "e")));
+                .idsToStoreStream(FAKE_QUERY);
         List<Collection<String>> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 asList(transformString("a"),
@@ -106,6 +107,19 @@ public class StoreStreamerTest {
                        transformString("c"),
                        transformString("d"),
                        transformString("e"))));
+    }
+
+    private void createSearchStoreStream(int streamerBatchSize, TupleStream tupleStream) {
+        TupleStreamTemplate mockTupleStreamTemplate = mock(TupleStreamTemplate.class);
+        when(mockTupleStreamTemplate.create(anyString())).thenReturn(tupleStream);
+        this.storeStreamer = StoreStreamer.<String>builder()
+                .storeClient(fakeVoldemortClient)
+                .streamerBatchSize(streamerBatchSize)
+                .id(ID)
+                .tupleStreamTemplate(mockTupleStreamTemplate)
+                .defaultsField(DEFAULTS)
+                .defaultsConverter(s -> s)
+                .build();
     }
 
     private TupleStream tupleStream(Collection<String> values) {
@@ -117,7 +131,7 @@ public class StoreStreamerTest {
                 System.out.println("hello " + value);
                 ongoingStubbing = ongoingStubbing.thenReturn(tuple(value));
             }
-            
+
             ongoingStubbing = ongoingStubbing.thenReturn(endTuple());
         } catch (IOException e) {
             e.printStackTrace();
@@ -137,7 +151,6 @@ public class StoreStreamerTest {
         eofMap.put("EOF", "");
         return new Tuple(eofMap);
     }
-
 
     private static class FakeVoldemortClient implements VoldemortClient<String> {
         @Override
@@ -166,9 +179,5 @@ public class StoreStreamerTest {
         public void saveEntry(String s) {
 
         }
-    }
-
-    public static String transformString(String id) {
-        return id + "-transformed";
     }
 }

@@ -31,12 +31,15 @@ public class ResultsConfig {
     }
 
     @Bean
-    public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtStoreClient uniProtClient) {
-        return new StoreStreamer<>(uniProtClient,
-                                   resultsConfigProperties().getUniprot().getBatchSize(),
-                                   resultsConfigProperties().getUniprot().getValueId(),
-                                   resultsConfigProperties().getUniprot().getDefaultsField(),
-                                   this::convertDefaultAvroToUniProtEntry);
+    public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtStoreClient uniProtClient, TupleStreamTemplate tupleStreamTemplate) {
+        return StoreStreamer.<UniProtEntry>builder()
+                .id(resultsConfigProperties().getUniprot().getValueId())
+                .defaultsField(resultsConfigProperties().getUniprot().getDefaultsField())
+                .streamerBatchSize(resultsConfigProperties().getUniprot().getBatchSize())
+                .storeClient(uniProtClient)
+                .defaultsConverter(this::convertDefaultAvroToUniProtEntry)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .build();
     }
 
     private UniProtEntry convertDefaultAvroToUniProtEntry(String s) {
