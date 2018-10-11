@@ -8,27 +8,23 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QueryCursorRequest;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.QuerySearchRequest;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
-import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniprotAdvancedSearchService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Stream;
+import javax.ws.rs.QueryParam;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.*;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
 
 /**
@@ -37,79 +33,42 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverte
  * @author lgonzales
  */
 @RestController
-@RequestMapping("/uniprot")
+@RequestMapping(UNIPROTKB_RESOURCE)
 public class UniprotAdvancedSearchController {
+    static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private final ApplicationEventPublisher eventPublisher;
 
-    private final UniprotAdvancedSearchService queryBuilderService;
     private final UniProtEntryService entryService;
     private final MessageConverterContextFactory converterContextFactory;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
-                                           UniprotAdvancedSearchService queryBuilderService,
                                            UniProtEntryService entryService,
                                            MessageConverterContextFactory converterContextFactory) {
         this.eventPublisher = eventPublisher;
-        this.queryBuilderService = queryBuilderService;
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
     }
 
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid SearchRequestDTO cursorRequest,
+                                                             HttpServletRequest request, HttpServletResponse response) {
+        QueryResult<UPEntry> result = entryService.executeQuery(cursorRequest);
+        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	public ResponseEntity<QueryResult<UPEntry>> search(@Valid QuerySearchRequest searchRequest,
-			HttpServletRequest request, HttpServletResponse response) {
-
-		QueryResult<UPEntry> queryResult = entryService.executeQuery(searchRequest);
-
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, queryResult.getPageAndClean()));
-		return new ResponseEntity<>(queryResult, HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/searchCursor", method = RequestMethod.GET)
-	public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid QueryCursorRequest cursorRequest,
-			HttpServletRequest request, HttpServletResponse response) {
-		QueryResult<UPEntry> result = entryService.executeCursorQuery(cursorRequest);
-		eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-		return new ResponseEntity<>(result, HttpStatus.OK);
-	}
-
-
-	@RequestMapping(value = "/searchAll", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Stream<UPEntry>> searchAll(@RequestParam(value = "query", required = true) String query,
-			@RequestParam(value = "field", required = false) String field) {
-		Stream<UPEntry> entryStream = entryService.getAll(query);
-		return new ResponseEntity<>(entryStream, HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/searchAccession", method = RequestMethod.GET)
-	public UniProtDocument getBySearchAccession(@RequestParam(value = "accession", required = true) String accession) {
-		UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
-
-		return doc;
-	}
-
-	@RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE )
-	public UPEntry getByAccession(@PathVariable String accession) {
-		UniProtDocument doc = queryBuilderService.getByAccession(accession).orElse(null);
-		if((doc == null) || !doc.active)
-			return null;
-		Optional<UniProtEntry> result = entryService.getByAccession(doc.accession);
-		if (result.isPresent()) {
-			return entryService.convertAndFilter(result.get(), Collections.emptyMap());
-		} else
-
-			return null;
-	}
-
+    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UPEntry getByAccession(@PathVariable("accession") String accession, @QueryParam("field") String field) {
+        return entryService.getByAccession(accession, field);
+    }
 
     /*
      * E.g., usage from command line:
      *
-     * time curl -OJ -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for just accessions)
-     * time curl -OJ -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for entries)
-     * time curl -OJ -H "Accept:application/xml" "http://localhost:8090/advancedsearch/uniprot/stream?query=reviewed:true" (for XML entries)
+     * time curl -OJ -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/download?query=reviewed:true" (for just accessions)
+     * time curl -OJ -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/download?query=reviewed:true" (for entries)
+     * time curl -OJ -H "Accept:application/xml" "http://localhost:8090/advancedsearch/uniprot/download?query=reviewed:true" (for XML entries)
      *
      * for GZIPPED results, add -H "Accept-Encoding:gzip"
      *
@@ -117,7 +76,11 @@ public class UniprotAdvancedSearchController {
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
             produces = {"text/flatfile", "text/list", "application/xml"})
-    public ResponseEntity<ResponseBodyEmitter> download(@RequestParam(value = "query", required = true) String query,
+    public ResponseEntity<ResponseBodyEmitter> download(
+            //@Valid SearchRequestDTO request,
+            // TODO: 10/10/18 use SearchRequestDTO object, but find out what the existing 'field' param means (can i reuse it for my fields param?)
+            @RequestParam(value = "query", required = true) String query,
+														@RequestParam(value = "fields", required = true) List<String> fields,
 														@RequestHeader("Accept") MediaType contentType,
 														@RequestHeader(value = "Accept-Encoding", required = false) String encoding,
 														HttpServletRequest request) {
@@ -126,7 +89,25 @@ public class UniprotAdvancedSearchController {
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
 
-        queryBuilderService.stream(query, context, emitter);
+        entryService.stream(query, fields, context, emitter);
+
+        return ResponseEntity.ok()
+                .headers(createHttpDownloadHeader(contentType, context, request))
+                .body(emitter);
+    }
+
+    @RequestMapping(value = "/download/accessions", method = RequestMethod.GET,
+            produces = {"text/flatfile", "text/list", "application/xml"})
+    public ResponseEntity<ResponseBodyEmitter> downloadAccessions(@RequestParam(value = "list", required = true) List<String> accessions,
+                                                                  @RequestHeader("Accept") MediaType contentType,
+                                                                  @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
+                                                                  HttpServletRequest request) {
+        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+
+        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        context.setFileType(FileType.bestFileTypeMatch(encoding));
+
+        entryService.streamForAccessions(accessions, context, emitter);
 
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, context, request))

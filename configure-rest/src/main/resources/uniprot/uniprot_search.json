@@ -9,14 +9,14 @@
 	},
 	{
 		"label": "EntryName [ID]",
-		"term": "id",
+		"term": "mnemonic",
 		"dataType": "string",
 		"description": "Search by UniProtKB entry name",
 		"example": "P53_HUMAN"
 	},
 	{
 		"label": "Protein Name [DE]",
-		"term": "protein_name",
+		"term": "name",
 		"dataType": "string",
 		"description": "Search by UniProtKB Protein name",
 		"example": "mas5"
@@ -54,7 +54,7 @@
 	},
 	{
 		"label": "Protein Existence [PE]",
-		"term": "protein_existence",
+		"term": "existence",
 		"dataType": "enum",
 		"description": "Search by protein existence",
 		"values": [
@@ -1133,7 +1133,8 @@
 	},
 	{
 		"label": "Web Resources",
-		"term": "cc_webresource",
+		"itemType": "comment",
+		"term": "webresource",
 		"dataType": "string",
 		"description": "Search by comment Web resources",
 		"example": "lck"
@@ -1179,7 +1180,7 @@
 	},
 	{
 		"label": "Keyword [KW]",
-		"term": "keywords",
+		"term": "keyword",
 		"dataType": "string",
 		"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?keyword=?",
 		"description": "Search by keyword",
@@ -1198,7 +1199,7 @@
 			},
 			{
 				"label": "Author",
-				"term": "lib_author",
+				"term": "lit_author",
 				"dataType": "string",
 				"description": "Search by author",
 				"example": "smith"
@@ -1240,7 +1241,7 @@
 		"items": [
 			{
 				"label": "Proteome ID",
-				"term": "xref_proteome",
+				"term": "proteome",
 				"dataType": "string",
 				"description": "Search by Proteome ID",
 				"example": "UP1234"

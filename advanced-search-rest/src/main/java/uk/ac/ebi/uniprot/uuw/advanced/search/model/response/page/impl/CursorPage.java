@@ -11,7 +11,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Stack;
-import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -70,9 +69,7 @@ public class CursorPage implements Page {
     public Optional<String> getNextPageLink(UriComponentsBuilder uriBuilder) {
         Optional<String> nextPageLink = Optional.empty();
         if(hasNextPage()) {
-            cursorStack.push(nextCursor);
-            String nextPageCursor = cursorStack.stream().collect(Collectors.joining(DELIMITER));
-            nextPageCursor = CursorEncryptor.encryptCursor(nextPageCursor);
+            String nextPageCursor = getEncryptedNextCursor();
 
             cursorStack.pop();
 
@@ -81,6 +78,13 @@ public class CursorPage implements Page {
             nextPageLink = Optional.of(uriBuilder.build().encode().toUriString());
         }
         return nextPageLink;
+    }
+
+    public String getEncryptedNextCursor() {
+        cursorStack.push(nextCursor);
+        String nextPageCursor = String.join(DELIMITER, cursorStack);
+        nextPageCursor = CursorEncryptor.encryptCursor(nextPageCursor);
+        return nextPageCursor;
     }
 
     /**
@@ -97,7 +101,7 @@ public class CursorPage implements Page {
                 previousPageLink = Optional.of(uriBuilder.build().encode().toUriString());
             }else {
                 cursorStack.pop();
-                String previousPageCursor = cursorStack.stream().collect(Collectors.joining(DELIMITER));
+                String previousPageCursor = String.join(DELIMITER, cursorStack);
 
                 previousPageCursor = CursorEncryptor.encryptCursor(previousPageCursor);
 
@@ -144,7 +148,7 @@ public class CursorPage implements Page {
      * @return true if there is at least current cursor is in the cursor stack
      */
     private boolean hasPreviousPage() {
-        return cursorStack.size() > 0;
+        return !cursorStack.isEmpty();
     }
 
 
@@ -220,7 +224,7 @@ public class CursorPage implements Page {
                     try {
                         count = decompressor.inflate(buf);
                     } catch (DataFormatException e) {
-                        e.printStackTrace();
+                        LOGGER.error("Problem encountered during decompression", e);
                     }
                     stream.write(buf, 0, count);
                 }
