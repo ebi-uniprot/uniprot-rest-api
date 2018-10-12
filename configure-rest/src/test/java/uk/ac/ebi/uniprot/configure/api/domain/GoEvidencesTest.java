@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -24,19 +25,19 @@ class GoEvidencesTest {
 	@Test
 	void testSize() {
 		List<EvidenceGroup> groups = instance.getEvidences();
-		assertEquals(5, groups.size());
+		assertEquals(3, groups.size());
 		int size =
 				groups.stream().mapToInt(val ->val.getItems().size())
 				.sum();
-		assertEquals(25, size);
+		assertEquals(24, size);
 	}
 	
 	@Test
 	void testEvidenceGroup() {
 		List<EvidenceGroup> groups = instance.getEvidences();
-		assertEquals(5, groups.size());
+		assertEquals(3, groups.size());
 		assertTrue(groups.stream().anyMatch(val -> val.getGroupName().equals("Any")));
-		assertTrue(groups.stream().anyMatch(val -> val.getGroupName().equals("Manual experimental assertions")));
+		assertFalse(groups.stream().anyMatch(val -> val.getGroupName().equals("Manual experimental assertions")));
 
 	}
 
@@ -44,10 +45,14 @@ class GoEvidencesTest {
 	void testEvidence() {
 		List<EvidenceGroup> groups = instance.getEvidences();
 		Optional<EvidenceGroup> aaGroup = groups.stream()
-				.filter(val -> val.getGroupName().equals("Munual high-throughput assertions")).findFirst();
+				.filter(val -> val.getGroupName().equals("Manual high-throughput assertions")).findFirst();
 
+		assertFalse(aaGroup.isPresent());
+		
+		aaGroup = groups.stream()
+				.filter(val -> val.getGroupName().equals("Manual assertions")).findFirst();
 		assertTrue(aaGroup.isPresent());
-		assertEquals(5, aaGroup.get().getItems().size());
+		assertEquals(20, aaGroup.get().getItems().size());
 		Optional<EvidenceItem> item = aaGroup.get().getItems().stream()
 				.filter(val -> val.getName().equals("Inferred from high throughput genetic interaction [HGI]")).findFirst();
 		assertTrue(item.isPresent());

@@ -29,7 +29,7 @@ class UniProtConfigureServiceTest {
 
 	@Test
 	void testGetGoEvidences() {
-		assertEquals(5, service.getGoEvidences().size());
+		assertEquals(3, service.getGoEvidences().size());
 	}
 
 	@Test

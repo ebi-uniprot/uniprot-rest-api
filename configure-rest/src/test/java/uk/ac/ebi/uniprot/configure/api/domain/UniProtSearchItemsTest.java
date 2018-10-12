@@ -32,7 +32,7 @@ class UniProtSearchItemsTest {
 		assertEquals(27, items.size());
 		AtomicInteger counter = new AtomicInteger();
 		items.forEach(val -> numberOfItem(val, counter));
-		assertEquals(123, counter.get());
+		assertEquals(127, counter.get());
 	}
 
 	private void numberOfItem(SearchItem item, AtomicInteger counter) {
