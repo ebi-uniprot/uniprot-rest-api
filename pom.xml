@@ -28,6 +28,7 @@
 
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
         <http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
+        <failsafe.version>1.1.0</failsafe.version>
 
         <!-- Use most recent failsafe and surefire plugin versions -->
         <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
@@ -66,6 +67,12 @@
                 <groupId>org.junit.platform</groupId>
                 <artifactId>junit-platform-runner</artifactId>
                 <version>${junit-platform.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.jodah</groupId>
+                <artifactId>failsafe</artifactId>
+                <version>${failsafe.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
