@@ -28,7 +28,7 @@ object DownloadSwissProtSimulation {
         feed(downloadFeeder)
           .exec(http(httpReqInfo)
             .get(filterGeneralRequestStr)
-            .header("Accept", "${download_sp_format})
+            .header("Accept", "${download_sp_format}")
           )
 
       return request
