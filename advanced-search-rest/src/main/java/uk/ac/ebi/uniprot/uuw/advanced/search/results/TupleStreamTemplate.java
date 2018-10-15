@@ -22,10 +22,8 @@ public class TupleStreamTemplate {
     private static final Logger LOGGER = LoggerFactory.getLogger(TupleStreamTemplate.class);
     private String zookeeperHost;
     private String requestHandler;
-    private SolrQuery.ORDER order;
     private String key;
     private String collection;
-    private StreamContext streamContext;
 
     public TupleStream create(String query) {
         return create(query, key, SortCriteria.builder().addCriterion(key, SolrQuery.ORDER.asc).build());
@@ -41,7 +39,7 @@ public class TupleStreamTemplate {
                 .streamContext(createStreamContext())
                 .build();
 
-        return streamBuilder.build(query);
+        return streamBuilder.createFor(query);
     }
 
     @Builder
@@ -51,10 +49,9 @@ public class TupleStreamTemplate {
         private String requestHandler;
         private SortCriteria order;
         private String key;
-        private String query;
         private StreamContext streamContext;
 
-        private TupleStream build(String query) {
+        private TupleStream createFor(String query) {
             try {
                 StreamFactory streamFactory = new DefaultStreamFactory()
                         .withCollectionZkHost(collection, zookeeperHost);
@@ -70,7 +67,6 @@ public class TupleStreamTemplate {
                 throw new IllegalStateException();
             }
         }
-
     }
 
     /**

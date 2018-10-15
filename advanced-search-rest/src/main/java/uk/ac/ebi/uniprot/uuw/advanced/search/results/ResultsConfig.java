@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
@@ -24,7 +23,6 @@ public class ResultsConfig {
         return TupleStreamTemplate.builder()
                 .collection("uniprot")
                 .key("accession")
-                .order(SolrQuery.ORDER.asc)
                 .requestHandler("/export")
                 .zookeeperHost(configProperties.getZookeperhost())
                 .build();
