@@ -19,23 +19,23 @@ object DownloadSimulation {
   object DownloadScenario {
     val downloadFeeder = tsv(conf.getString("a.s.download.query.list")).random
 
-    def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "download: ${query}"
-      val queryRequestStr: String = "/download?query=${query}"
+    def getRequestWithFormat(): ChainBuilder = {
+      val httpReqInfo: String = "url=${download_url}, format=${download_format}"
+      val queryRequestStr: String = "${download_url}"
 
       val request =
         feed(downloadFeeder)
           .pause(5 seconds, 15 seconds)
           .exec(http(httpReqInfo)
             .get(queryRequestStr)
-            .header("Accept", format)
+            .header("Accept", "${download_format}")
           )
 
       return request
     }
 
     val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat("text/flatfile")
+      DownloadScenario.getRequestWithFormat()
     )
 
     val instance = scenario("Download Scenario")

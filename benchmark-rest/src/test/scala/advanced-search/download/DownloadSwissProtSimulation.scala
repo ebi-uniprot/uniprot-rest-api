@@ -2,6 +2,7 @@ import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
+
 import scala.concurrent.duration._
 import com.typesafe.config._
 
@@ -17,22 +18,24 @@ object DownloadSwissProtSimulation {
     .doNotTrackHeader("1")
 
   object DownloadScenario {
+    val downloadFeeder = tsv(conf.getString("a.s.download.swissprot.query.list")).random
 
-    def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "downloading swissprot"
-      val filterGeneralRequestStr: String = "/download?query=reviewed:true"
+    def getRequestWithFormat(): ChainBuilder = {
+      val httpReqInfo: String = "url=${download_sp_url}, format=${download_sp_format}"
+      val filterGeneralRequestStr: String = "${download_sp_url}"
 
       val request =
-        exec(http(httpReqInfo)
-          .get(filterGeneralRequestStr)
-          .header("Accept", format)
-        )
+        feed(downloadFeeder)
+          .exec(http(httpReqInfo)
+            .get(filterGeneralRequestStr)
+            .header("Accept", "${download_sp_format})
+          )
 
       return request
     }
 
     val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat("text/flatfile")
+      DownloadScenario.getRequestWithFormat()
     )
 
     val instance = scenario("Download Swiss-Prot Scenario")

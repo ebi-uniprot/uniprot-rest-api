@@ -21,15 +21,15 @@ object AccessionRetrievalSimulation {
     val feeder = csv(conf.getString("a.s.accession.retrieval.list")).random
 
     def getRequest(): ChainBuilder = {
-      val httpReqInfo: String = "url=${url}, format=${format}";
-      val requestStr: String = "${url}";
+      val httpReqInfo: String = "url=${accession_url}, format=${accession_format}";
+      val requestStr: String = "${accession_url}";
 
       val request =
         feed(feeder)
           .pause(5 seconds, 15 seconds)
           .exec(http(httpReqInfo)
             .get(requestStr)
-            .header("Accept", "${format}")
+            .header("Accept", "${accession_format}")
           )
 
       return request

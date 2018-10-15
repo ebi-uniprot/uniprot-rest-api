@@ -20,9 +20,9 @@ object FiltersWithDownloadSimulation {
   object DownloadFilterResultsScenario {
     val downloadFeeder = tsv(conf.getString("a.s.download.query.list")).random
 
-    def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "download filter results: ${query}"
-      val queryRequestStr: String = "/download?query=${query}"
+    def getRequestWithFormat(): ChainBuilder = {
+      val httpReqInfo: String = "url=${url}, format=${format}"
+      val queryRequestStr: String = "${url}"
 
       val request =
         feed(downloadFeeder)
@@ -36,7 +36,7 @@ object FiltersWithDownloadSimulation {
     }
 
     val requestSeq = Seq(
-      DownloadFilterResultsScenario.getRequestWithFormat("text/flatfile")
+      DownloadFilterResultsScenario.getRequestWithFormat()
     )
 
     val instance = scenario("Download Filter Results Scenario")
@@ -54,13 +54,13 @@ object FiltersWithDownloadSimulation {
     val proteinNameFeeder = tsv(conf.getString("a.s.multi.filters.protein.list")).random
 //    val featureFeeder = tsv(conf.getString("advanced.search.feature.list")).random
 
-    def getRequestWithFormat(format: String): ChainBuilder = {
-      val filterGeneralRequestStr: String = "/searchCursor?query=content:${content}"
-      val filterOrganismRequestStr: String = "/searchCursor?query=tax_name_lineage:${organism}"
-      val accessionRequestStr: String = "/searchCursor?query=accession:${accession}"
-      val filterTaxonomyRequestStr: String = "/searchCursor?query=tax_id_lineage:${taxon}"
-      val filterGeneRequestStr: String = "/searchCursor?query=gene:${gene}"
-      val filterProteinRequestStr: String = "/searchCursor?query=protein_name:${protein}"
+    def getRequestWithFormat(): ChainBuilder = {
+      val filterGeneralRequestStr: String = "${content_url}"
+      val filterOrganismRequestStr: String = "${organism_url}"
+      val accessionRequestStr: String = "${accession_url}"
+      val filterTaxonomyRequestStr: String = "${taxon_url}"
+      val filterGeneRequestStr: String = "${gene_url}"
+      val filterProteinRequestStr: String = "${protein_url}"
 //      val filterFeatureRequestStr: String = "/searchCursor?query=ft_molecule_processing:${feature}"
 
       val request =
@@ -73,23 +73,23 @@ object FiltersWithDownloadSimulation {
           .pause(5 seconds, 15 seconds)
           .exec(http("content field")
             .get(filterGeneralRequestStr)
-            .header("Accept", format))
+            .header("Accept", "${content_format}"))
           .pause(2 seconds, 5 seconds)
           .exec(http("tax_name_lineage field")
             .get(filterOrganismRequestStr)
-            .header("Accept", format))
+            .header("Accept", "${organism_format}"))
           .pause(2 seconds, 10 seconds)
           .exec(http("accession field")
             .get(accessionRequestStr)
-            .header("Accept", format))
+            .header("Accept", "${accession_format}"))
           .pause(2 seconds, 5 seconds)
           .exec(http("tax_id_lineage field")
             .get(filterTaxonomyRequestStr)
-            .header("Accept", format))
+            .header("Accept", "${taxon_format}"))
           .pause(2 seconds, 5 seconds)
           .exec(http("gene field")
             .get(filterGeneRequestStr)
-            .header("Accept", format))
+            .header("Accept", "${gene_format}"))
           .pause(2 seconds, 5 seconds)
 //          .exec(http("feature molecule processing field")
 //            .get(filterFeatureRequestStr)
@@ -97,13 +97,13 @@ object FiltersWithDownloadSimulation {
 //          .pause(2 seconds, 5 seconds)
           .exec(http("protein_name field")
             .get(filterProteinRequestStr)
-            .header("Accept", format))
+            .header("Accept", "${protein_format}"))
 
       return request
     }
 
     val requestSeq = Seq(
-      FilterScenario.getRequestWithFormat("application/json")
+      FilterScenario.getRequestWithFormat()
     )
 
     val instance = scenario("Multiple Filter Request Scenario")
