@@ -2,7 +2,11 @@ package uk.ac.ebi.uniprot.configure.uniprot.domain.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseCategory;
@@ -21,6 +25,7 @@ public enum Databases {
 	private static final String ANY = "Any";
 	private List<DatabaseGroup> databases = new ArrayList<>();
 	private List<FieldGroup> databaseFields = new ArrayList<>();
+	private Map<String, Field> fieldMap = new HashMap<>();
 	Databases() {
 		init();
 	}
@@ -36,7 +41,11 @@ public enum Databases {
 				databaseFields.add(new FieldGroupImpl(trimCategory(category.getName()), fields));
 			}
 		}
-
+		this.fieldMap =this.databaseFields
+				.stream()
+				.flatMap(val -> val.getFields().stream())
+				.collect(
+		                Collectors.toMap(Field::getName, Function.identity()));
 	}
 
 	private String trimCategory(String category) {
@@ -65,4 +74,8 @@ public enum Databases {
 	public List<FieldGroup> getDatabaseFields() {
 		return databaseFields;
 	}
+	public Optional<Field> getField(String name){
+		return Optional.ofNullable(this.fieldMap.get(name));
+	}
+
 }

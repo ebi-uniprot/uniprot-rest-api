@@ -17,5 +17,6 @@ public class StreamerConfigProperties {
     static class StreamerProperties {
         private int batchSize;
         private String valueId;
+        private String defaultsField;
     }
 }

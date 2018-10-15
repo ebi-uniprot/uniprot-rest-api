@@ -16,7 +16,7 @@ class FieldsParserTest {
 	@Test
 	void onlySimpleFields() {
 		String fields ="accession,protein_name,gene_name,organism";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(4, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -25,7 +25,7 @@ class FieldsParserTest {
 	@Test
 	void withComment() {
 		String fields ="accession,protein_name,gene_name,organism,comment";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -36,7 +36,7 @@ class FieldsParserTest {
 	@Test
 	void withCommentSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,comment:function,comment:domain";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -48,7 +48,7 @@ class FieldsParserTest {
 	@Test
 	void withCommentCCSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,comment:function,cc:domain";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -60,7 +60,7 @@ class FieldsParserTest {
 	@Test
 	void withCCSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,cc:function,cc:domain";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -73,7 +73,7 @@ class FieldsParserTest {
 	@Test
 	void withFeature() {
 		String fields ="accession,protein_name,gene_name,organism,feature";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -84,7 +84,7 @@ class FieldsParserTest {
 	@Test
 	void withFeatureSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,feature:binding,feature:signal";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -95,7 +95,7 @@ class FieldsParserTest {
 	@Test
 	void withFeatureFTSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,feature:binding,ft:signal";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -106,7 +106,7 @@ class FieldsParserTest {
 	@Test
 	void withFTSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,ft:binding,ft:signal";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -118,7 +118,7 @@ class FieldsParserTest {
 	@Test
 	void withXref() {
 		String fields ="accession,protein_name,gene_name,organism,xref";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -129,7 +129,7 @@ class FieldsParserTest {
 	@Test
 	void withXrefSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,xref:embl,xref:pdb";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -140,7 +140,7 @@ class FieldsParserTest {
 	@Test
 	void withXrefDRSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,xref:embl,dr:pdb";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -151,7 +151,7 @@ class FieldsParserTest {
 	@Test
 	void withDRSpecific() {
 		String fields ="accession,protein_name,gene_name,organism,dr:embl,dr:pdb";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("organism"));
@@ -162,7 +162,7 @@ class FieldsParserTest {
 	@Test
 	void withGenes() {
 		String fields ="accession,protein_name,gene_name,gene_orf,gene_oln";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(3, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("gene"));
@@ -171,7 +171,7 @@ class FieldsParserTest {
 	@Test
 	void withGo() {
 		String fields ="accession,protein_name,go_id,go_f,go_c";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(3, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("xref"));
@@ -181,7 +181,7 @@ class FieldsParserTest {
 	@Test
 	void withLineage() {
 		String fields ="accession,protein_name,lineage_all,lin_genus,lin_superfamily";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(3, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("lineage"));
@@ -189,7 +189,7 @@ class FieldsParserTest {
 	@Test
 	void withInfo() {
 		String fields ="accession,protein_name,date_create,date_mod,version";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(3, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("info"));
@@ -197,7 +197,7 @@ class FieldsParserTest {
 	@Test
 	void withSequence() {
 		String fields ="accession,protein_name,fragment,length,mass";
-		Map<String, List<String> > filters = FieldsParser.parse(fields);
+		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(5, filters.size());
 		assertTrue(filters.containsKey("protein_name"));
 		assertTrue(filters.containsKey("length"));

@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 
 import org.springframework.http.MediaType;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 
 import java.util.stream.Stream;
 
@@ -14,6 +15,7 @@ public class MessageConverterContext {
     private MediaType contentType;
     private Stream<?> entities;
     private MessageConverterContextFactory.Resource resource;
+    private SearchRequestDTO requestDTO;
 
     public MessageConverterContext asCopy() {
         MessageConverterContext context = new MessageConverterContext();
@@ -21,6 +23,7 @@ public class MessageConverterContext {
         context.entities = this.entities;
         context.contentType = this.contentType;
         context.fileType = this.fileType;
+        context.requestDTO = this.requestDTO;
         return context;
     }
 
@@ -34,7 +37,8 @@ public class MessageConverterContext {
         if (fileType != that.fileType) return false;
         if (contentType != null ? !contentType.equals(that.contentType) : that.contentType != null) return false;
         if (entities != null ? !entities.equals(that.entities) : that.entities != null) return false;
-        return resource == that.resource;
+        if (resource != that.resource) return false;
+        return requestDTO != null ? requestDTO.equals(that.requestDTO) : that.requestDTO == null;
     }
 
     @Override
@@ -43,6 +47,7 @@ public class MessageConverterContext {
         result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
         result = 31 * result + (entities != null ? entities.hashCode() : 0);
         result = 31 * result + (resource != null ? resource.hashCode() : 0);
+        result = 31 * result + (requestDTO != null ? requestDTO.hashCode() : 0);
         return result;
     }
 
@@ -70,7 +75,7 @@ public class MessageConverterContext {
         this.entities = entities;
     }
 
-    public MessageConverterContextFactory.Resource getResource() {
+    MessageConverterContextFactory.Resource getResource() {
         return resource;
     }
 
@@ -78,4 +83,11 @@ public class MessageConverterContext {
         this.resource = resource;
     }
 
+    public SearchRequestDTO getRequestDTO() {
+        return requestDTO;
+    }
+
+    public void setRequestDTO(SearchRequestDTO requestDTO) {
+        this.requestDTO = requestDTO;
+    }
 }
