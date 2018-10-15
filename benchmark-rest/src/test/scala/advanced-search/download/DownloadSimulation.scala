@@ -20,7 +20,7 @@ object DownloadSimulation {
     val downloadFeeder = tsv(conf.getString("a.s.download.query.list")).random
 
     def getRequestWithFormat(): ChainBuilder = {
-      val httpReqInfo: String = "url=${download_url}, format=${download_format}"
+      val httpReqInfo: String = "url=${download_url}, format=${download_format}, encoding=${download_encoding}"
       val queryRequestStr: String = "${download_url}"
 
       val request =
@@ -29,6 +29,7 @@ object DownloadSimulation {
           .exec(http(httpReqInfo)
             .get(queryRequestStr)
             .header("Accept", "${download_format}")
+            .header("Accept-Encoding", "${download_encoding}")
           )
 
       return request
