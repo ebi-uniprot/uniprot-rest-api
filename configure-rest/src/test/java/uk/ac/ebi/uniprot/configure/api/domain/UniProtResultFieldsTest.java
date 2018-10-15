@@ -51,7 +51,7 @@ class UniProtResultFieldsTest {
 		verifyGroupSize(groups, "Names & Taxonomy", 13);
 		verifyGroupSize(groups, "Sequences", 19);
 		verifyGroupSize(groups, "Function", 18);
-		verifyGroupSize(groups, "Miscellaneous", 10);
+		verifyGroupSize(groups, "Miscellaneous", 11);
 		verifyGroupSize(groups, "Interaction", 2);
 		verifyGroupSize(groups, "Expression", 3);
 		verifyGroupSize(groups, "Gene Ontology (GO)", 5);
@@ -104,7 +104,7 @@ class UniProtResultFieldsTest {
 		verifyField(groups, "Pathology & Biotech", "Mutagenesis", "ft:mutagen");
 		verifyField(groups, "Subcellular location", "Subcellular location [CC]", "cc:subcellular_location");
 		verifyField(groups, "PTM / Processing", "Cross-link", "ft:crosslnk");
-		verifyField(groups, "Structure", "3D", "dr:pdb");
+		verifyField(groups, "Structure", "3D", "3d");
 		verifyField(groups, "Publications", "PubMed ID", "pm_id");
 		verifyField(groups, "Date of", "Date of creation", "date_create");
 		verifyField(groups, "Family & Domains", "Compositional bias", "ft:compbias");
