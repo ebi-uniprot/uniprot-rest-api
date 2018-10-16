@@ -37,7 +37,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 public class TSVMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
     public static final String TSV_MEDIA_TYPE_VALUE = "text/tsv";
     public static final MediaType TSV_MEDIA_TYPE = new MediaType("text", "tsv");
-    private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
+    private static final Logger LOGGER = getLogger(TSVMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
     private final Function<UniProtEntry, UPEntry> entryConverter =new EntryConverter();
     public TSVMessageConverter() {
