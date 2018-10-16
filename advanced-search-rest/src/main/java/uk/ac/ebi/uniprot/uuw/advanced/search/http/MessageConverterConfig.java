@@ -18,14 +18,14 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterCon
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XlsMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
 import java.util.List;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 import static java.util.Arrays.asList;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE;
+
 
 /**
  * Created 21/08/18
@@ -67,6 +67,7 @@ public class MessageConverterConfig {
                 converters.add(new ListMessageConverter());
                 converters.add(0, new XmlMessageConverter());
                 converters.add(new TSVMessageConverter());
+                converters.add(new XlsMessageConverter());
             }
         };
     }
@@ -80,7 +81,8 @@ public class MessageConverterConfig {
                 uniProtFlatFileMessageConverterContext(),
                 uniProtXmlMessageConverterContext(),
                 uniprotJsonMessageConverterContext(),
-                uniprotTSVMessageConverterContext()));
+                uniprotTSVMessageConverterContext(),
+                uniprotXlsMessageConverterContext()));
 
         return contextFactory;
     }
@@ -89,6 +91,14 @@ public class MessageConverterConfig {
         MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(TSV_MEDIA_TYPE);
+
+        return converter;
+    }
+    
+    private MessageConverterContext uniprotXlsMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(XLS_MEDIA_TYPE);
 
         return converter;
     }

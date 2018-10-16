@@ -25,6 +25,7 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.download.DownloadableEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
@@ -35,13 +36,11 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
  * @author Edd
  */
 public class TSVMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
-    public static final String TSV_MEDIA_TYPE_VALUE = "text/tsv";
-    public static final MediaType TSV_MEDIA_TYPE = new MediaType("text", "tsv");
     private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
     private final Function<UniProtEntry, UPEntry> entryConverter =new EntryConverter();
     public TSVMessageConverter() {
-        super(TSV_MEDIA_TYPE);
+        super(UniProtMediaType.TSV_MEDIA_TYPE);
     }
 
     @Override

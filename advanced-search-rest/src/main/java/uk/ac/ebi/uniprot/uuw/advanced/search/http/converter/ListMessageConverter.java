@@ -5,6 +5,7 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,13 +21,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class ListMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
-    public static final String LIST_MEDIA_TYPE_VALUE = "text/list";
-    public static final MediaType LIST_MEDIA_TYPE = new MediaType("text", "list");
     private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
 
     public ListMessageConverter() {
-        super(LIST_MEDIA_TYPE);
+        super(UniProtMediaType.LIST_MEDIA_TYPE);
     }
 
     @Override
