@@ -3,8 +3,8 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 import lombok.Builder;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 
 import java.io.IOException;
@@ -33,9 +33,9 @@ public class StoreStreamer<T> {
     private TupleStreamTemplate tupleStreamTemplate;
 
     @SuppressWarnings("unchecked")
-    public Stream<Collection<T>> idsToStoreStream(String query) {
+    public Stream<Collection<T>> idsToStoreStream(String query, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query);
+            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
             tupleStream.open();
 
             BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
@@ -48,9 +48,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<String> idsStream(String query) {
+    public Stream<String> idsStream(String query, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query);
+            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
             tupleStream.open();
             return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
         } catch (IOException e) {
@@ -58,13 +58,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<Collection<T>> defaultFieldStream(String query) {
+    public Stream<Collection<T>> defaultFieldStream(String query, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate
-                    .create(query, defaultsField,
-                            SortCriteria.builder()
-                                    .addCriterion(defaultsField, SolrQuery.ORDER.asc)
-                                    .build());
+            TupleStream tupleStream = tupleStreamTemplate.create(query, defaultsField, sort);
             tupleStream.open();
 
             TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, defaultsField);

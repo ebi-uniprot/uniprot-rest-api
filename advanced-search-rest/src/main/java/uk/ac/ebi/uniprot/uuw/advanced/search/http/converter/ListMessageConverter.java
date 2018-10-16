@@ -22,7 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ListMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
     public static final String LIST_MEDIA_TYPE_VALUE = "text/list";
     public static final MediaType LIST_MEDIA_TYPE = new MediaType("text", "list");
-    private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
+    private static final Logger LOGGER = getLogger(ListMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
 
     public ListMessageConverter() {

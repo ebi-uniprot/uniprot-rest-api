@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 
 import lombok.Builder;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -9,6 +8,7 @@ import org.apache.solr.client.solrj.io.stream.expr.DefaultStreamFactory;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
 
@@ -26,15 +26,15 @@ public class TupleStreamTemplate {
     private String collection;
 
     public TupleStream create(String query) {
-        return create(query, key, SortCriteria.builder().addCriterion(key, SolrQuery.ORDER.asc).build());
+        return create(query, key, new Sort(Sort.Direction.ASC, key));
     }
 
-    public TupleStream create(String query, String key, SortCriteria sortCriteria) {
+    public TupleStream create(String query, String key, Sort sort) {
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
                 .zookeeperHost(zookeeperHost)
                 .collection(collection)
                 .key(key)
-                .order(sortCriteria)
+                .order(sort)
                 .requestHandler(requestHandler)
                 .streamContext(createStreamContext())
                 .build();
@@ -47,7 +47,7 @@ public class TupleStreamTemplate {
         private final String collection;
         private String zookeeperHost;
         private String requestHandler;
-        private SortCriteria order;
+        private Sort order;
         private String key;
         private StreamContext streamContext;
 

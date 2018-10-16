@@ -41,15 +41,15 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageCon
 @Service
 public class UniProtEntryService {
     private static final String ACCESSION = "accession";
-    private UniprotQueryRepository repository;
-    private UniprotFacetConfig uniprotFacetConfig;
-    private UniProtStoreClient entryService;
-    private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
     private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
             .instanceOf(DefaultEntryObject.class);
     private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
     private final StoreStreamer<UniProtEntry> storeStreamer;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
+    private UniprotQueryRepository repository;
+    private UniprotFacetConfig uniprotFacetConfig;
+    private UniProtStoreClient entryService;
+    private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
 
     public UniProtEntryService(UniprotQueryRepository repository,
                                UniprotFacetConfig uniprotFacetConfig,
@@ -65,21 +65,13 @@ public class UniProtEntryService {
         this.downloadTaskExecutor = downloadTaskExecutor;
     }
 
-    private void addSort(SimpleQuery simpleQuery, String sort) {
-        List<Sort> sorts = UniProtSortUtil.createSort(sort);
-        if (sorts.isEmpty()) {
-            sorts = UniProtSortUtil.createDefaultSort();
-        }
-        sorts.forEach(simpleQuery::addSort);
-    }
-
     public QueryResult<UPEntry> executeQuery(SearchRequestDTO request) {
         String fields = request.getFields();
         Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
         try {
             SimpleQuery simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
 
-            addSort(simpleQuery, request.getSort());
+            simpleQuery.addSort(getUniProtSort(request.getSort()));
 
             QueryResult<UniProtDocument> results = repository.searchPage(simpleQuery, request.getCursor(),
                                                                          request.getSize());
@@ -88,6 +80,42 @@ public class UniProtEntryService {
             String message = "Could not get result for: [" + request + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    public UPEntry getByAccession(String accession, String fields) {
+        UPEntry result = null;
+        try {
+            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
+            simpleQuery.addProjectionOnField(new SimpleField(ACCESSION));
+            Optional<UniProtDocument> documentEntry = repository.getEntry(simpleQuery);
+            if (documentEntry.isPresent()) {
+                Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
+                result = convertDocToUPEntry(documentEntry.get(), filters).orElse(null);
+            }
+        } catch (Exception e) {
+            String message = "Could not get accession for: [" + accession + "]";
+            throw new ServiceException(message, e);
+        }
+        return result;
+    }
+
+    public void stream(SearchRequestDTO request, MessageConverterContext context, ResponseBodyEmitter emitter) {
+        MediaType contentType = context.getContentType();
+        boolean defaultFieldsRequested = FieldsParser.isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
+        context.setEntities(streamEntities(request, defaultFieldsRequested, contentType));
+
+        downloadTaskExecutor.execute(() -> {
+            try {
+                emitter.send(context, contentType);
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+            emitter.complete();
+        });
+    }
+
+    private Sort getUniProtSort(String sortStr) {
+        return UniProtSortUtil.createSort(sortStr).orElse(UniProtSortUtil.createDefaultSort());
     }
 
     private QueryResult<UPEntry> convertQueryDoc2UPEntry(QueryResult<UniProtDocument> results,
@@ -139,46 +167,17 @@ public class UniProtEntryService {
         return entry;
     }
 
-    public UPEntry getByAccession(String accession, String fields) {
-        UPEntry result = null;
-        try {
-            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
-            simpleQuery.addProjectionOnField(new SimpleField(ACCESSION));
-            Optional<UniProtDocument> documentEntry = repository.getEntry(simpleQuery);
-            if (documentEntry.isPresent()) {
-                Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
-                result = convertDocToUPEntry(documentEntry.get(), filters).orElse(null);
-            }
-        } catch (Exception e) {
-            String message = "Could not get accession for: [" + accession + "]";
-            throw new ServiceException(message, e);
-        }
-        return result;
-    }
-
-    public void stream(SearchRequestDTO request, MessageConverterContext context, ResponseBodyEmitter emitter) {
-        MediaType contentType = context.getContentType();
-        boolean defaultFieldsRequested = FieldsParser.isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        context.setEntities(streamEntities(request.getQuery(), defaultFieldsRequested, contentType));
-
-        downloadTaskExecutor.execute(() -> {
-            try {
-                emitter.send(context, contentType);
-            } catch (IOException e) {
-                emitter.completeWithError(e);
-            }
-            emitter.complete();
-        });
-    }
-
-    private Stream<?> streamEntities(String query, boolean defaultFieldsOnly, MediaType contentType) {
+    private Stream<?> streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType) {
+        String query = request.getQuery();
+        Sort sort = getUniProtSort(request.getSort());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            return storeStreamer.idsStream(query);
+            return storeStreamer.idsStream(query, sort);
         }
-        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType.equals(TSV_MEDIA_TYPE))) {
-            return storeStreamer.defaultFieldStream(query);
+        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType
+                .equals(TSV_MEDIA_TYPE))) {
+            return storeStreamer.defaultFieldStream(query, sort);
         } else {
-            return storeStreamer.idsToStoreStream(query);
+            return storeStreamer.idsToStoreStream(query, sort);
         }
     }
 }
