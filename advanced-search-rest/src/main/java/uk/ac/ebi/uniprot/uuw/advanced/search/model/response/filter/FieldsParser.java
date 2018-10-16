@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +43,7 @@ public class FieldsParser {
 		return !notDefault;
 	}
 
-	public static Map<String, List<String>> parse(String fields) {
+	public static Map<String, List<String>> parseForFilters(String fields) {
 		if (Strings.isNullOrEmpty(fields)) {
 			return Collections.emptyMap();
 		}
@@ -63,6 +64,9 @@ public class FieldsParser {
 		}
 		return filters;
 
+	}
+	public static List<String> parse(String fields) {
+		return Arrays.asList( fields.split(COMMA));
 	}
 
 	private static void addTypedField(Map<String, List<String>> filters, String type, String abbr, String token) {

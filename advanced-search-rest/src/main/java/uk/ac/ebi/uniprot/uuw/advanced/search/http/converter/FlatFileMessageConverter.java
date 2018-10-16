@@ -23,6 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
+    public static final String FF_MEDIA_TYPE_VALUE = "text/flatfile";
     public static final MediaType FF_MEDIA_TYPE = new MediaType("text", "flatfile");
     private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
@@ -46,7 +47,7 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
                          OutputStream outputStream,
                          Instant start,
                          AtomicInteger counter) throws IOException {
-        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>)messageConfig.getEntities();
+        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
 
         try {
             entities.forEach(items -> {

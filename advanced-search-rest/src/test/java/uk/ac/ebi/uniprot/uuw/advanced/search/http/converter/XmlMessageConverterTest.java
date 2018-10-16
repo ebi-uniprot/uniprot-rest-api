@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.MediaType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.stream.Stream;
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter.XML_MEDIA_TYPE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverterTest.FakeSource.createFakeSource;
 
 /**
@@ -75,7 +75,7 @@ public class XmlMessageConverterTest {
     private void mockXmlMessageConverterContext() {
         when(context.getHeader()).thenReturn(HEADER);
         when(context.getFooter()).thenReturn(FOOTER);
-        when(context.getContentType()).thenReturn(XML_MEDIA_TYPE);
+        when(context.getContentType()).thenReturn(MediaType.APPLICATION_XML);
     }
 
     private void doConversion() throws IOException {
