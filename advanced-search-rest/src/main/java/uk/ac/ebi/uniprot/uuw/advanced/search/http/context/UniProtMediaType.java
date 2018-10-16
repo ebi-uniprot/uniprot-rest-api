@@ -14,6 +14,8 @@ public class UniProtMediaType {
 	public static final MediaType TSV_MEDIA_TYPE = valueOf(TSV_MEDIA_TYPE_VALUE);
 	public static final String XLS_MEDIA_TYPE_VALUE = "application/vnd.ms-excel";
 	public static final MediaType XLS_MEDIA_TYPE = valueOf(XLS_MEDIA_TYPE_VALUE);
+	public static final String FASTA_MEDIA_TYPE_VALUE = "text/fasta";
+	public static final MediaType FASTA_MEDIA_TYPE = valueOf(FASTA_MEDIA_TYPE_VALUE);
 
 	private static Map<MediaType, String> MEDIATYPE_EXTENSION_MAP = new HashMap<>();
 	static {
@@ -28,4 +30,5 @@ public class UniProtMediaType {
 	public static String getFileExtension(MediaType type) {
 		return MEDIATYPE_EXTENSION_MAP.getOrDefault(type, type.getSubtype());
 	}
+	
 }

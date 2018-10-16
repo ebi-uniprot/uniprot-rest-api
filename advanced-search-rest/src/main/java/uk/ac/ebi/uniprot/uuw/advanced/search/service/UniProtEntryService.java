@@ -174,7 +174,8 @@ public class UniProtEntryService {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             return storeStreamer.idsStream(query);
         }
-        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType.equals(TSV_MEDIA_TYPE))) {
+        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType.equals(TSV_MEDIA_TYPE) 
+        		||contentType.equals(XLS_MEDIA_TYPE)  )) {
             return storeStreamer.defaultFieldStream(query);
         } else {
             return storeStreamer.idsToStoreStream(query);

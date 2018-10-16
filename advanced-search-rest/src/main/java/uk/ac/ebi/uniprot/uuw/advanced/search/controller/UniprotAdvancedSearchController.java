@@ -88,7 +88,8 @@ public class UniprotAdvancedSearchController {
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
-            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
+            		APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE,FASTA_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(
             @Valid SearchRequestDTO searchRequest,
             @RequestHeader("Accept") MediaType contentType,
