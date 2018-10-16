@@ -18,7 +18,7 @@ object FiltersWithDownloadSimulation {
     .doNotTrackHeader("1")
 
   object DownloadFilterResultsScenario {
-    val downloadFeeder = tsv(conf.getString("a.s.download.query.list")).random
+    val downloadFeeder = csv(conf.getString("a.s.download.query.list")).random
 
     def getRequestWithFormat(): ChainBuilder = {
       val httpReqInfo: String = "url=${download_url}, format=${download_format}, encoding=${download_encoding}"
@@ -47,26 +47,20 @@ object FiltersWithDownloadSimulation {
   }
 
   object FilterScenario {
-    val generalSearchFeeder = tsv(conf.getString("a.s.multi.filters.general.search.list")).random
-    val organismFeeder = tsv(conf.getString("a.s.multi.filters.organism.list")).random
-    val accessionFeeder = tsv(conf.getString("a.s.multi.filters.accessions.retrieval.list")).random
-    val taxonomyFeeder = tsv(conf.getString("a.s.multi.filters.taxonomy.list")).random
-    val geneNameFeeder = tsv(conf.getString("a.s.multi.filters.gene.list")).random
-    val proteinNameFeeder = tsv(conf.getString("a.s.multi.filters.protein.list")).random
+    val generalSearchFeeder = csv(conf.getString("a.s.multi.filters.general.search.list")).random
+    val organismFeeder = csv(conf.getString("a.s.multi.filters.organism.list")).random
+    val accessionFeeder = csv(conf.getString("a.s.multi.filters.accessions.retrieval.list")).random
+    val taxonomyFeeder = csv(conf.getString("a.s.multi.filters.taxonomy.list")).random
+    val geneNameFeeder = csv(conf.getString("a.s.multi.filters.gene.list")).random
+    val proteinNameFeeder = csv(conf.getString("a.s.multi.filters.protein.list")).random
 //    val featureFeeder = tsv(conf.getString("advanced.search.feature.list")).random
 
     def getRequestWithFormat(): ChainBuilder = {
-      val filterGeneralRequestStr: String = "${content_url}"
-      val filterOrganismRequestStr: String = "${organism_url}"
-      val accessionRequestStr: String = "${accession_url}"
-      val filterTaxonomyRequestStr: String = "${taxon_url}"
-      val filterGeneRequestStr: String = "${gene_url}"
-      val filterProteinRequestStr: String = "${protein_url}"
-//      val filterFeatureRequestStr: String = "/searchCursor?query=ft_molecule_processing:${feature}"
+      //      val filterFeatureRequestStr: String = "/searchCursor?query=ft_molecule_processing:${feature}"
 
       val request =
         feed(accessionFeeder)
-          .feed(organismFeeder)
+          feed(organismFeeder)
           .feed(generalSearchFeeder)
           .feed(taxonomyFeeder)
           .feed(geneNameFeeder)
@@ -75,29 +69,29 @@ object FiltersWithDownloadSimulation {
           .exec(http("content field")
             .get(filterGeneralRequestStr)
             .header("Accept", "${content_format}"))
-          .pause(2 seconds, 5 seconds)
-          .exec(http("tax_name_lineage field")
-            .get(filterOrganismRequestStr)
+          .pause(5 seconds, 15 seconds)
+          .exec(http("organism field")
+            .get("${organism_url}")
             .header("Accept", "${organism_format}"))
-          .pause(2 seconds, 10 seconds)
+          .pause(5 seconds, 15 seconds)
           .exec(http("accession field")
-            .get(accessionRequestStr)
+            .get("${accession_url}")
             .header("Accept", "${accession_format}"))
-          .pause(2 seconds, 5 seconds)
-          .exec(http("tax_id_lineage field")
-            .get(filterTaxonomyRequestStr)
+          .pause(5 seconds, 15 seconds)
+          .exec(http("taxon field")
+            .get("${taxon_url}")
             .header("Accept", "${taxon_format}"))
-          .pause(2 seconds, 5 seconds)
+          .pause(5 seconds, 15 seconds)
           .exec(http("gene field")
-            .get(filterGeneRequestStr)
+            .get("${gene_url}")
             .header("Accept", "${gene_format}"))
-          .pause(2 seconds, 5 seconds)
+          .pause(5 seconds, 15 seconds)
 //          .exec(http("feature molecule processing field")
 //            .get(filterFeatureRequestStr)
 //            .header("Accept", format))
-//          .pause(2 seconds, 5 seconds)
-          .exec(http("protein_name field")
-            .get(filterProteinRequestStr)
+          .pause(5 seconds, 15 seconds)
+          .exec(http("protein field")
+            .get("${protein_url}")
             .header("Accept", "${protein_format}"))
 
       return request
