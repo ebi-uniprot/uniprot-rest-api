@@ -67,7 +67,7 @@ object FiltersWithDownloadSimulation {
           .feed(proteinNameFeeder)
           .pause(5 seconds, 15 seconds)
           .exec(http("content field")
-            .get(filterGeneralRequestStr)
+            .get("${content_url}")
             .header("Accept", "${content_format}"))
           .pause(5 seconds, 15 seconds)
           .exec(http("organism field")
