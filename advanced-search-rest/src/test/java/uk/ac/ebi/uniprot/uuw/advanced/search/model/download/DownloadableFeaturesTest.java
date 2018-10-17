@@ -20,7 +20,7 @@ class DownloadableFeaturesTest {
 
 		List<Feature> features =createTestFeatures();
 		DownloadableFeatures dl = new DownloadableFeatures(features);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(4, result.size());
 		verify("rs1064793108 rs1064793121", "dr:dbsnp", result);
 		verify("DOMAIN 23 23 some domain.", "ft:domain", result);

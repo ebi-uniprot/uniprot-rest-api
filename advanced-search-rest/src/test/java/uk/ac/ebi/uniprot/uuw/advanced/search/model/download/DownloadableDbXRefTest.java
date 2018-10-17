@@ -23,7 +23,7 @@ class DownloadableDbXRefTest {
 	@Test
 	void testGetDataEmpty() {
 		DownloadableDbXRef dl = new DownloadableDbXRef(null);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertTrue(result.isEmpty());
 
 	}
@@ -34,7 +34,7 @@ class DownloadableDbXRefTest {
 		xrefs.add(createXref(DatabaseType.EMBL, "AY189288", "AAO86732.1", "-", "mRNA", null));
 		xrefs.add(createXref(DatabaseType.EMBL, "AK022746", "BAB14220.1", "-", "mRNA", null));
 		DownloadableDbXRef dl = new DownloadableDbXRef(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(1, result.size());
 		verify("AY189288;AK022746;", "dr:embl", result);
 	}
@@ -51,7 +51,7 @@ class DownloadableDbXRefTest {
 		xrefs.add(
 				createXref(DatabaseType.ENSEMBL, "ENST00000439351", "ENSP00000414398", "ENSG00000090520", null, null));
 		DownloadableDbXRef dl = new DownloadableDbXRef(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(2, result.size());
 		verify("AY189288;AK022746;", "dr:embl", result);
 		verify("ENST00000330899 [P31689-1];ENST00000439351;", "dr:ensembl", result);
@@ -66,7 +66,7 @@ class DownloadableDbXRefTest {
 		xrefs.add(createXref(DatabaseType.PDB, "5TKG", "X-ray", "1.20 A", "A/B=16-23", null));
 		xrefs.add(createXref(DatabaseType.SMR, "P31689", "-", null, null, null));
 		DownloadableDbXRef dl = new DownloadableDbXRef(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(3, result.size());
 		verify("2LO1;2M6Y;5TKG;", "dr:pdb", result);
 		verify("P31689;", "dr:smr", result);
@@ -81,7 +81,7 @@ class DownloadableDbXRefTest {
 		
 		xrefs.add(createXref(DatabaseType.STRINGXREF, "9606.ENSP00000369127", "-", null, null, null));
 		DownloadableDbXRef dl = new DownloadableDbXRef(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(2, result.size());
 		verify("P31689;", "dr:intact", result);
 		verify("9606.ENSP00000369127;", "dr:stringxref", result);
@@ -94,7 +94,7 @@ class DownloadableDbXRefTest {
 		
 		xrefs.add(createXref(DatabaseType.SWISSLIPIDS, "SLP:000000475", "-", null, null, null));
 		DownloadableDbXRef dl = new DownloadableDbXRef(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(2, result.size());
 		verify("CHEMBL2189122;", "dr:chembl", result);
 		verify("SLP:000000475;", "dr:swisslipids", result);

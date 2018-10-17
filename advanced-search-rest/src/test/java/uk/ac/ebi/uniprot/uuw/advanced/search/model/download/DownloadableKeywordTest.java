@@ -28,7 +28,7 @@ class DownloadableKeywordTest {
 	@Test
 	void testMapEmpty() {
 		DownloadableKeyword dl = new DownloadableKeyword(null);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertTrue(result.isEmpty());
 	}
 	@Test
@@ -37,7 +37,7 @@ class DownloadableKeywordTest {
 		keywords.add(new Keyword("KW-0002", create("3D-structure")));
 		keywords.add(new Keyword("KW-0106", create("Calcium")));
 		DownloadableKeyword dl = new DownloadableKeyword(keywords);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(2, result.size());
 		verify("KW-0002; KW-0106", "keywordid", result );
 		verify("3D-structure;Calcium", "keyword", result );

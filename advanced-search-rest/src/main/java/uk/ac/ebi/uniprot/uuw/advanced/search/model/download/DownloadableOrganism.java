@@ -1,11 +1,11 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.download;
 
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Organism;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Organism;
 
 public class DownloadableOrganism implements Downloadable {
 	public static final List<String> FIELDS = Arrays.asList( "organism", "organism_id", "tax_id" );
@@ -16,7 +16,7 @@ public class DownloadableOrganism implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> map() {
+	public Map<String, String> attributeValues() {
 		Map<String, String> map = new HashMap<>();
 		map.put(FIELDS.get(0), DownloadableUtil.convertOrganism(organism));
 		map.put(FIELDS.get(1), "" + organism.getTaxonomy());
@@ -27,7 +27,6 @@ public class DownloadableOrganism implements Downloadable {
 
 	
 	public static boolean contains(List<String> fields) {
-		return fields.stream().anyMatch(val -> FIELDS.contains(val));
-		
+		return fields.stream().anyMatch(FIELDS::contains);
 	}
 }

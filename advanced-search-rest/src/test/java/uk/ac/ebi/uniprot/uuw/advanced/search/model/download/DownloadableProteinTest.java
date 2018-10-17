@@ -39,7 +39,7 @@ class DownloadableProteinTest {
 		
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -62,7 +62,7 @@ class DownloadableProteinTest {
 		builder.addAlternativeName(alternativeName);
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -89,7 +89,7 @@ class DownloadableProteinTest {
 		builder.addAllergenName(createEvidenceString("someAller"));
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -117,7 +117,7 @@ class DownloadableProteinTest {
 		builder.addBiotechName(createEvidenceString("some biote"));
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -148,7 +148,7 @@ class DownloadableProteinTest {
 		builder.addCdAntigenName(cdAntigenName);
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -180,7 +180,7 @@ class DownloadableProteinTest {
 		builder.addInnName(inns);
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -205,7 +205,7 @@ class DownloadableProteinTest {
 		builder.addSubmittedName(subnames);
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -227,7 +227,7 @@ class DownloadableProteinTest {
 		builder.addComponents(component);
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);
@@ -256,7 +256,7 @@ class DownloadableProteinTest {
 		builder.addDomain(domain);
 		Protein protein = builder.build();
 		DownloadableProtein downloadable = new DownloadableProtein(protein);
-		Map<String, String> result = downloadable.map();
+		Map<String, String> result = downloadable.attributeValues();
 		assertEquals(2, result.size());
 		String value = result.get(DownloadableProtein.FIELDS.get(0));
 		assertNotNull(value);

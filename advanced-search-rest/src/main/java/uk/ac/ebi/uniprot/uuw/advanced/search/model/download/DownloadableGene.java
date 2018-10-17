@@ -1,16 +1,11 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.download;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.google.common.base.Strings;
-
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EvidencedString;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Gene;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DownloadableGene implements Downloadable {
 	private static final String SPACE = " ";
@@ -32,7 +27,7 @@ public class DownloadableGene implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> map() {
+	public Map<String, String> attributeValues() {
 		if(genes.isEmpty()) {
 			return Collections.emptyMap();
 		}
@@ -50,7 +45,7 @@ public class DownloadableGene implements Downloadable {
 		if (genes.isEmpty()) {
 			return "";
 		}
-		return genes.stream().map(val -> getGeneName(val)).collect(Collectors.joining(SEMICOLON));
+		return genes.stream().map(this::getGeneName).collect(Collectors.joining(SEMICOLON));
 	}
 
 	private String getGeneName(Gene gene) {

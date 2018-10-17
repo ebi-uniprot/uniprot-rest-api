@@ -1,6 +1,18 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.download.DownloadableEntry;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,20 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.download.DownloadableEntry;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created 11/10/18
@@ -62,10 +61,13 @@ public class TSVMessageConverter extends AbstractUUWHttpMessageConverter<Message
         // fields requested
         Map<String, List<String>> filters = FieldsParser.parseForFilters(messageConfig.getRequestDTO().getFields());
         List<String> fields =  FieldsParser.parse(messageConfig.getRequestDTO().getFields());
+
         // entries
         Stream<Collection<UniProtEntry>> entriesStream = (Stream<Collection<UniProtEntry>>)messageConfig.getEntities();
-        outputStream.write(convertHeader(fields).stream().collect(Collectors.joining("\t","", "\n")).getBytes());
+
         try {
+            outputStream.write(convertHeader(fields).stream().collect(Collectors.joining("\t", "", "\n")).getBytes());
+
             entriesStream.forEach(items -> {
                 items.forEach(entry -> {
                     try {
@@ -85,11 +87,12 @@ public class TSVMessageConverter extends AbstractUUWHttpMessageConverter<Message
             });
 
             logStats(counter.get(), start);
-        } catch (StopStreamException e) {
+        } catch (StopStreamException | IOException e) {
             LOGGER.error("Client aborted streaming: closing stream.", e);
             entriesStream.close();
         } finally {
             outputStream.close();
+            System.out.println("closed");
         }
     }
     private List<String> convertHeader(List<String> fields){

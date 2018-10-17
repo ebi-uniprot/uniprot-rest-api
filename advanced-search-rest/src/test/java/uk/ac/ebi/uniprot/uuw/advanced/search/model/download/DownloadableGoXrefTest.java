@@ -34,7 +34,7 @@ class DownloadableGoXrefTest {
 	@Test
 	void testGetDataEmpty() {
 		DownloadableGoXref dl = new DownloadableGoXref(null);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertTrue(result.isEmpty());
 
 	}
@@ -43,7 +43,7 @@ class DownloadableGoXrefTest {
 	void testGetDataFull() {
 		List<DbReference> xrefs = create();
 		DownloadableGoXref dl = new DownloadableGoXref(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(5, result.size());
 		String go = "endoplasmic reticulum [GO:0005783];" + " endoplasmic reticulum lumen [GO:0005788];"
 				+ " membrane [GO:0016020];" + " unfolded protein binding [GO:0051082];"
@@ -69,7 +69,7 @@ class DownloadableGoXrefTest {
 	void testGetDataFullWithDownloadableDbXref() {
 		List<DbReference> xrefs = create();
 		DownloadableDbXRef dl = new DownloadableDbXRef(xrefs);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(5, result.size());
 		String go = "endoplasmic reticulum [GO:0005783];" + " endoplasmic reticulum lumen [GO:0005788];"
 				+ " membrane [GO:0016020];" + " unfolded protein binding [GO:0051082];"

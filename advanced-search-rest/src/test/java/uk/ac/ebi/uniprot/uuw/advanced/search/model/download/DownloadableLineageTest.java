@@ -31,7 +31,7 @@ class DownloadableLineageTest {
 	@Test
 	void testGetDataEmpty() {
 		DownloadableLineage dl = new DownloadableLineage(null);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertTrue(result.isEmpty());
 		
 	}
@@ -51,7 +51,7 @@ class DownloadableLineageTest {
 		lineage.add(new  TaxNode(9605, "Homo", "genus", false));
 		lineage.add(new  TaxNode(9606, "Homo sapiens", "species", true));
 		DownloadableLineage dl = new DownloadableLineage(lineage);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(12, result.size());
 		verify(result, "tl:all",
 				"Eukaryota, Metazoa, Chordata, Mammalia, Primates, Hominoidea, Hominidae, Homininae, Homo, Homo sapiens");

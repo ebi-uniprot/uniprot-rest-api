@@ -29,7 +29,7 @@ class DownloadableSequenceTest {
 		Sequence sequence = new 
 				 Sequence(23, 123, 9456, "", "");
 		DownloadableSequence dl = new DownloadableSequence(sequence);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(6, result.size());
 		verify("sequence", "", result);
 		verify("sequence_version", "23", result);
@@ -48,7 +48,7 @@ class DownloadableSequenceTest {
 				 Sequence(23, 123, 9456, "2005-05-24", "AFADSFADSD");
 		sequence.setFragment("fragment");
 		DownloadableSequence dl = new DownloadableSequence(sequence);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(6, result.size());
 		verify("sequence", "AFADSFADSD", result);
 		verify("sequence_version", "23", result);

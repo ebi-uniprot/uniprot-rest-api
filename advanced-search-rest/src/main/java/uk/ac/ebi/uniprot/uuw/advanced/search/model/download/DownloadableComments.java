@@ -25,7 +25,6 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.RnaEdCom
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.SeqCautionComment;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.SubcellLocationComment;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.TextComment;
-//import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.WRComment;
 
 public class DownloadableComments implements Downloadable {
 	public static final List<String> FIELDS = Arrays.asList("cc:alternative_products", "cc:mass_spectrometry",
@@ -47,7 +46,7 @@ public class DownloadableComments implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> map() {
+	public Map<String, String> attributeValues() {
 		if (comments.isEmpty())
 			return Collections.emptyMap();
 

@@ -1,15 +1,10 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.download;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.google.common.base.Strings;
-
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.GeneLocation;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DownloadableEncoded implements Downloadable {
 	public static final List<String> FIELDS = Arrays.asList(new String[] { "gene_location" });
@@ -24,7 +19,7 @@ public class DownloadableEncoded implements Downloadable {
 	}
 
 	@Override
-	public Map<String, String> map() {
+	public Map<String, String> attributeValues() {
 		if (geneLocations.isEmpty()) {
 			return Collections.emptyMap();
 		}
@@ -44,6 +39,6 @@ public class DownloadableEncoded implements Downloadable {
 	}
 
 	public static boolean contains(List<String> fields) {
-		return fields.stream().anyMatch(val -> FIELDS.contains(val));
+		return fields.stream().anyMatch(FIELDS::contains);
 	}
 }

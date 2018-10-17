@@ -34,7 +34,7 @@ class DownloadableOrganismTest {
 		names.add(new OrganismName("common", "Human"));
 		Organism organism = new Organism("9606", names);
 		DownloadableOrganism dl = new DownloadableOrganism(organism);
-		Map<String, String> result = dl.map();
+		Map<String, String> result = dl.attributeValues();
 		assertEquals(3, result.size());
 		verify("organism", "Homo sapiens (Human)", result);
 		verify("organism_id", "9606", result);
