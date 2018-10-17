@@ -29,6 +29,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -136,8 +137,10 @@ public class UniProtEntryService {
     private Optional<UPEntry> convert2UPEntry(UniProtDocument doc, Map<String, List<String>> filters) {
         UPEntry entry = null;
         if (FieldsParser.isDefaultFilters(filters) && (doc.avro_binary != null)) {
-            DefaultEntryObject avroObject = deSerialize.fromByteArray(doc.avro_binary);
+            byte[] avroBinaryBytes = Base64.getDecoder().decode(doc.avro_binary.getBytes());
+            DefaultEntryObject avroObject = deSerialize.fromByteArray(avroBinaryBytes);
             UniProtEntry uniEntry = avroConverter.fromAvro(avroObject);
+
             if (uniEntry == null)
                 return Optional.empty();
             entry = convertAndFilter(uniEntry, filters);

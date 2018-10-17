@@ -18,7 +18,7 @@ public class UniProtDocMocker {
         UniProtDocument document = new UniProtDocument();
         document.accession = accession;
         document.proteinNames = "Phosphoribosylformylglycinamidine synthase subunit PurQ";
-        document.avro_binary = new byte[0];
+        document.avro_binary = "pretend base 64 string";
         document.active = true;
         return document;
     }
