@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Created 21/08/18
@@ -57,7 +59,7 @@ public class TupleStreamTemplate {
                         .withCollectionZkHost(collection, zookeeperHost);
                 String request =
                         String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s\", qt=\"/export\")",
-                                      collection, query, key, order.toString());
+                                      collection, query, key, sortToString(order));
 
                 TupleStream tupleStream = streamFactory.constructStream(request);
                 tupleStream.setStreamContext(streamContext);
@@ -65,6 +67,20 @@ public class TupleStreamTemplate {
             } catch (IOException e) {
                 LOGGER.error("Could not create CloudSolrStream", e);
                 throw new IllegalStateException();
+            }
+        }
+
+        private String sortToString(Sort order) {
+            return StreamSupport.stream(order.spliterator(), false)
+                            .map(o -> o.getProperty() + " " + getSortDirection(o.getDirection()))
+                            .collect(Collectors.joining(","));
+        }
+
+        private static String getSortDirection(Sort.Direction direction) {
+            if (direction.isAscending()) {
+                return "asc";
+            } else {
+                return "desc";
             }
         }
     }
