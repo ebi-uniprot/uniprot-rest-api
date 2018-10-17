@@ -30,6 +30,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSe
 @WebAppConfiguration
 public class UniprotAdvancedSearchControllerIT {
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
+    private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
     @Autowired
     private DataStoreManager storeManager;
@@ -62,5 +63,151 @@ public class UniprotAdvancedSearchControllerIT {
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+    }
+
+    @Test
+    public void queryWithInvalidQueryFormat() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=invalidfield(:invalidValue AND :invalid:10)")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("query parameter has an invalid syntax")));
+    }
+
+    @Test
+    public void queryWithInvalidFilterType() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform( //query={!parent which=\"accession:P21802\"}gene:BRCA2")
+                get(SEARCH_RESOURCE + "?query=accession:P21802^2")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("'org.apache.lucene.search.BoostQuery' " +
+                        "is currently not an accepted search type, please contact us if you require it")));
+    }
+
+    @Test
+    public void queryWithInvalidFieldName() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=invalidfield:invalidValue OR invalidfield2:invalidValue2 OR accession:P21802")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("'invalidfield' is not a valid search field")))
+                .andExpect(content().string(containsString("'invalidfield2' is not a valid search field")));
+    }
+
+    @Test
+    public void queryWithWrongFieldType() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:P21802 AND created:01-01-2018")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("'created' filter type 'term' is invalid. Expected 'range' filter type")));
+    }
+
+    @Test
+    public void queryWithWrongAccessionFieldValue() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:invalidValue")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("The 'accession' filter value 'invalidvalue' has invalid format. It should be a valid UniProtKB accession")));
+    }
+
+    @Test
+    public void queryWithWrongProteomeFieldValue() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=proteome:invalidValue")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("The 'proteome' filter value has invalid format. It should match the regular expression UP[0-9]{9}")));
+    }
+
+    @Test
+    public void queryWithWrongBooleanFieldValue() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=active:invalidValue")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("The 'active' parameter can only be true or false")));
+    }
+
+    @Test
+    public void queryWithWrongNumberFieldValue() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=organism_id:invalidValue")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("The 'organism_id' filter value should be a number")));
     }
 }

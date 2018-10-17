@@ -1,22 +1,18 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.query;
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
-import org.apache.lucene.util.BytesRef;
 import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseType;
 import uk.ac.ebi.kraken.interfaces.uniprot.ProteinExistence;
 import uk.ac.ebi.kraken.interfaces.uniprot.comments.CommentType;
 import uk.ac.ebi.kraken.interfaces.uniprot.features.FeatureType;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.FeatureCategory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This class is responsible to parse
@@ -37,15 +33,12 @@ public class RequestQueryParser {
     }
 
     public static String parse(String queryString){
-        StandardQueryParser standardQueryParser = new StandardQueryParser();
         try {
-            //System.out.println("INN: "+queryString);
-            Query query = standardQueryParser.parse(queryString,"");
-            Query parsedQuery = parse(query,queryString.contains("location"),queryString.contains("cofactor"));
-            //System.out.println("OUT: "+parsedQuery);
-            //System.out.println("");
+            QueryParser queryParser = new QueryParser("",new StandardAnalyzer());
+            Query inputQuery = queryParser.parse(queryString);
+            Query parsedQuery = parse(inputQuery,queryString.contains("location"),queryString.contains("cofactor"));
             return parsedQuery.toString();
-        } catch (QueryNodeException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Error parsing requested Query ",e);
         }
     }
@@ -53,8 +46,10 @@ public class RequestQueryParser {
 
     private static Query parse(Query inputQuery,boolean hasLocationFilter,boolean hasCofactorFilter){
         Query parsedQuery;
-        if(inputQuery instanceof TermQuery){
-            parsedQuery = parseTermQuery((TermQuery) inputQuery,hasLocationFilter,hasCofactorFilter);
+        if(inputQuery instanceof TermQuery) {
+            parsedQuery = parseTermQuery((TermQuery) inputQuery, hasLocationFilter, hasCofactorFilter);
+        } else if(inputQuery instanceof PhraseQuery){
+            parsedQuery = parsePhraseQuery((PhraseQuery) inputQuery, hasLocationFilter, hasCofactorFilter);
         }else if(inputQuery instanceof TermRangeQuery){
             parsedQuery = parseTermRangeQuery((TermRangeQuery) inputQuery);
         }else if(inputQuery instanceof BooleanQuery){
@@ -66,24 +61,30 @@ public class RequestQueryParser {
     }
 
     private static Query parseTermQuery(TermQuery termQuery,boolean hasLocationFilter,boolean hasCofactorFilter) {
+        String fieldName = termQuery.getTerm().field();
+        String value = termQuery.getTerm().text();
         Query parsedQuery;
-        if(isCommentOrFeatureType(termQuery)) { //for features and comment
+        if(isCommentOrFeatureType(fieldName,value)) { //for features and comment
             String prefix = getTypePrefix(termQuery.getTerm().text());
             String type = getFeatureOrCommentType(termQuery.getTerm().text());
             Term parsedTerm = new Term(prefix+"_"+type, "*");
             parsedQuery = new TermQuery(parsedTerm);
-        }else if(isCitation(termQuery)){
-            parsedQuery = parseCitationQuery(termQuery);
-        }else if(isCofactorTermQuery(termQuery)) {
+        }else if(isCitation(fieldName)){
+            String citationFieldName = getCitationFieldName(fieldName);
+            Term parsedTerm = new Term(citationFieldName, termQuery.getTerm().bytes());
+            parsedQuery = new TermQuery(parsedTerm);
+        }else if(isCofactorTermQuery(fieldName)) {
             Term parsedTerm = new Term("cc_cofactor_chebi", termQuery.getTerm().bytes());
             parsedQuery = new TermQuery(parsedTerm);
-        }else if(isLocationTermQuery(termQuery)) {
+        }else if(isLocationTermQuery(fieldName)) {
             Term parsedTerm = new Term("cc_scl_term_location", termQuery.getTerm().bytes());
             parsedQuery = new TermQuery(parsedTerm);
-        }else if(isNoteTermQuery(termQuery)) {
-            parsedQuery = parseNoteQuery(termQuery,hasLocationFilter,hasCofactorFilter);
-        }else if(isTaxonomyRelatedQuery(termQuery)) {
-            parsedQuery = parseTaxonomyRelatedQuery(termQuery);
+        }else if(isNoteTermQuery(fieldName)) {
+            String noteFieldName = getNoteFieldName(hasLocationFilter,hasCofactorFilter);
+            Term parsedTerm = new Term(noteFieldName, termQuery.getTerm().bytes());
+            parsedQuery = new TermQuery(parsedTerm);
+        }else if(isTaxonomyRelatedQuery(fieldName)) {
+            parsedQuery = parseTaxonomyRelatedQuery(false,fieldName,value);
         }else if(isDatabaseCrossReference(termQuery)) {
             Term parsedTerm = new Term("database", termQuery.getTerm().text());
             parsedQuery = new TermQuery(parsedTerm);
@@ -93,6 +94,57 @@ public class RequestQueryParser {
         }else{
             Term parsedTerm = new Term(termQuery.getTerm().field(), termQuery.getTerm().bytes());
             parsedQuery = new TermQuery(parsedTerm);
+        }
+        return parsedQuery;
+    }
+
+    private static Query parsePhraseQuery(PhraseQuery phraseQuery, boolean hasLocationFilter, boolean hasCofactorFilter){
+        Query parsedQuery;
+
+        String fieldName = phraseQuery.getTerms()[0].field();
+        String value = Arrays.stream(phraseQuery.getTerms()).map(Term::text).collect(Collectors.joining( " "));
+
+        if(isCommentOrFeatureType(fieldName,value)) { //for features and comment
+            String prefix = getTypePrefix(value);
+            String type = getFeatureOrCommentType(value);
+            Term parsedTerm = new Term(prefix+"_"+type, "*");
+            parsedQuery = new TermQuery(parsedTerm);
+        }else if(isTaxonomyRelatedQuery(fieldName)) {
+            String[] values = Arrays.stream(phraseQuery.getTerms()).map(Term::text).toArray(String[]::new);
+            parsedQuery = parseTaxonomyRelatedQuery(true,fieldName,values);
+        }else if(fieldName.equalsIgnoreCase("existence")) {
+            Optional<ProteinExistence> proteinExistence = Arrays.stream(ProteinExistence.values())
+                    .filter(pExistence -> {
+                        String pExistenceName = pExistence.name();
+                        if(pExistenceName.indexOf("_LEVEL") > 0){
+                            pExistenceName = pExistenceName.substring(0,pExistenceName.indexOf("_LEVEL"));
+                        }
+                        return value.toLowerCase().contains(pExistenceName.toLowerCase());
+                    })
+                    .findFirst();
+            String existence = "";
+            if(proteinExistence.isPresent()){
+                existence = proteinExistence.get().name().toLowerCase();
+            }
+            Term parsedTerm = new Term("existence",existence);
+            parsedQuery = new TermQuery(parsedTerm);
+        }else {
+            String parsedFieldName = fieldName;
+            if (isCitation(fieldName)) {
+                parsedFieldName = getCitationFieldName(fieldName);
+            } else if (isCofactorTermQuery(fieldName)) {
+                parsedFieldName = "cc_cofactor_chebi";
+            } else if (isLocationTermQuery(fieldName)) {
+                parsedFieldName = "cc_scl_term_location";
+            } else if (isNoteTermQuery(fieldName)) {
+                parsedFieldName = getNoteFieldName(hasLocationFilter,hasCofactorFilter);
+            }
+            PhraseQuery.Builder builder = new PhraseQuery.Builder();
+            builder.setSlop(phraseQuery.getSlop());
+            for(Term term: phraseQuery.getTerms()){
+                builder.add(new Term(parsedFieldName,term.text()));
+            }
+            parsedQuery = builder.build();
         }
         return parsedQuery;
     }
@@ -129,6 +181,7 @@ public class RequestQueryParser {
         String evidence = "";
         String annotation = "*";
         TermRangeQuery length = null;
+        String[] phraseAnnotationns = null;
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
@@ -146,14 +199,29 @@ public class RequestQueryParser {
                 if(query.getField().equalsIgnoreCase("length")){
                     length = query;
                 }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery phraseQuery = (PhraseQuery) clause.getQuery();
+                String phraseField = phraseQuery.getTerms()[0].field();
+                String phraseValue = Arrays.stream(phraseQuery.getTerms()).map(Term::text).collect(Collectors.joining( " "));
+                if(phraseField.equalsIgnoreCase("type")){
+                    type = getFeatureOrCommentType(phraseValue);
+                }
+                if(phraseField.equalsIgnoreCase("annotation")){
+                    phraseAnnotationns = Arrays.stream(phraseQuery.getTerms()).map(Term::text).toArray(String[]::new);
+                }
             }
         }
         String prefix = getTypePrefix(type);
 
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
 
-        TermQuery typeQuery = new TermQuery(new Term(prefix+"_"+type,annotation));
-        builder.add(typeQuery,BooleanClause.Occur.MUST);
+        if(phraseAnnotationns != null) {
+            PhraseQuery typeQuery = new PhraseQuery(prefix + "_" + type,phraseAnnotationns);
+            builder.add(typeQuery, BooleanClause.Occur.MUST);
+        }else{
+            TermQuery typeQuery = new TermQuery(new Term(prefix + "_" + type, annotation));
+            builder.add(typeQuery, BooleanClause.Occur.MUST);
+        }
         if(!evidence.isEmpty()){
             TermQuery evidenceQuery = new TermQuery(new Term(prefix+"ev_"+type,evidence));
             builder.add(evidenceQuery,BooleanClause.Occur.MUST);
@@ -168,22 +236,26 @@ public class RequestQueryParser {
     }
 
 
-    private static Query parseTaxonomyRelatedQuery(TermQuery termQuery) {
-        String term = termQuery.getTerm().field();
-        String value = termQuery.getTerm().text();
+    private static Query parseTaxonomyRelatedQuery(boolean isPhraseQuery,String term,String ... values) {
+        String value = Arrays.stream(values).collect(Collectors.joining( " "));
         if(value.matches("^(\\d+)$")){
             term += "_id";
-        }else if(value.matches("^.*(\\[(\\d+)\\])(\\s)*$")){
+            return new TermQuery(new Term(term, value));
+        }else if(value.matches("^.* (\\d+)(\\s)*$")){
             term += "_id";
-            Matcher m = Pattern.compile("^.*(\\[(\\d+)\\])(\\s)*$").matcher(value);
+            Matcher m = Pattern.compile("^.* (\\d+)(\\s)*$").matcher(value);
             if(m.matches()) {
-                value = m.group(2);
+                value = m.group(1);
             }
+            return new TermQuery(new Term(term, value));
         }else{
             term += "_name";
+            if(isPhraseQuery){
+                return new PhraseQuery(term,values);
+            }else{
+                return new TermQuery(new Term(term, value));
+            }
         }
-        Term parsedTerm = new Term(term, value);
-        return new TermQuery(parsedTerm);
     }
 
     private static Query parseDatabaseBooleanQuery(BooleanQuery booleanQuery) {
@@ -205,9 +277,7 @@ public class RequestQueryParser {
         return builder.build();
     }
 
-    private static Query parseCitationQuery(TermQuery termQuery) {
-        Query parsedQuery;
-        String fieldName = termQuery.getTerm().field();
+    private static String getCitationFieldName(String  fieldName) {
         if(fieldName.equalsIgnoreCase("citation")){
             fieldName = "lit_title";
         }else if(fieldName.equalsIgnoreCase("published")) {
@@ -215,99 +285,97 @@ public class RequestQueryParser {
         }else { // for author, title or journal
             fieldName = "lit_"+fieldName;
         }
-        Term parsedTerm = new Term(fieldName, termQuery.getTerm().bytes());
-        parsedQuery = new TermQuery(parsedTerm);
-        return parsedQuery;
+        return fieldName;
     }
 
     private static Query parseLocationBooleanQuery(BooleanQuery booleanQuery) {
-        String evidence = "";
-        String location = "";
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
                 if(query.getTerm().field().equalsIgnoreCase("evidence")){
-                    evidence = query.getTerm().text();
+                    String evidence = query.getTerm().text();
+                    TermQuery evidenceQuery = new TermQuery(new Term("ccev_scl_term_location", evidence));
+                    builder.add(evidenceQuery, BooleanClause.Occur.MUST);
                 }else if(query.getTerm().field().equalsIgnoreCase("location")) {
-                    location = query.getTerm().text();
+                    String location = query.getTerm().text();
+                    TermQuery typeQuery = new TermQuery(new Term("cc_scl_term_location",location));
+                    builder.add(typeQuery,BooleanClause.Occur.MUST);
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery query = (PhraseQuery) clause.getQuery();
+                String fieldName = query.getTerms()[0].field();
+                if(fieldName.equalsIgnoreCase("location")) {
+                    String[] values = Arrays.stream(query.getTerms()).map(Term::text).toArray(String[]::new);
+                    builder.add(new PhraseQuery("cc_scl_term_location",values),BooleanClause.Occur.MUST);
                 }
             }
         }
-        BooleanQuery.Builder builder = new BooleanQuery.Builder();
 
-        TermQuery typeQuery = new TermQuery(new Term("cc_scl_term_location",location));
-        builder.add(typeQuery,BooleanClause.Occur.MUST);
-        if(!evidence.isEmpty()) {
-            TermQuery evidenceQuery = new TermQuery(new Term("ccev_scl_term_location", evidence));
-            builder.add(evidenceQuery, BooleanClause.Occur.MUST);
-        }
         return builder.build();
     }
 
     private static Query parseCofactorBooleanQuery(BooleanQuery booleanQuery) {
-        String evidence = "";
-        String cofactor = "";
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
                 if(query.getTerm().field().equalsIgnoreCase("evidence")){
-                    evidence = query.getTerm().text();
+                    String evidence = query.getTerm().text();
+                    TermQuery evidenceQuery = new TermQuery(new Term("ccev_cofactor_chebi", evidence));
+                    builder.add(evidenceQuery, BooleanClause.Occur.MUST);
                 }else if(query.getTerm().field().equalsIgnoreCase("chebi")) {
-                    cofactor = query.getTerm().text();
+                    String cofactor = query.getTerm().text();
+                    TermQuery typeQuery = new TermQuery(new Term("cc_cofactor_chebi",cofactor));
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery query = (PhraseQuery) clause.getQuery();
+                String fieldName = query.getTerms()[0].field();
+                if(fieldName.equalsIgnoreCase("chebi")) {
+                    String[] values = Arrays.stream(query.getTerms()).map(Term::text).toArray(String[]::new);
+                    builder.add(new PhraseQuery("cc_cofactor_chebi",values),BooleanClause.Occur.MUST);
                 }
             }
-        }
-        BooleanQuery.Builder builder = new BooleanQuery.Builder();
-
-        TermQuery typeQuery = new TermQuery(new Term("cc_cofactor_chebi",cofactor));
-        builder.add(typeQuery,BooleanClause.Occur.MUST);
-        if(!evidence.isEmpty()) {
-            TermQuery evidenceQuery = new TermQuery(new Term("ccev_cofactor_chebi", evidence));
-            builder.add(evidenceQuery, BooleanClause.Occur.MUST);
         }
         return builder.build();
     }
 
     private static Query parseNoteBooleanQuery(BooleanQuery booleanQuery, boolean hasLocationFilter, boolean hasCofactorFilter) {
-        String evidence = "";
-        String note = "";
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
                 if(query.getTerm().field().equalsIgnoreCase("evidence")){
-                    evidence = query.getTerm().text();
+                    String evidence = query.getTerm().text();
+                    Term evidenceTerm = parseNoteEvidenceTerm(evidence, hasLocationFilter, hasCofactorFilter);
+                    builder.add(new TermQuery(evidenceTerm), BooleanClause.Occur.MUST);
                 }else if(query.getTerm().field().equalsIgnoreCase("note")) {
-                    note = query.getTerm().text();
+                    String noteFieldName = getNoteFieldName(hasLocationFilter,hasCofactorFilter);
+                    builder.add(new TermQuery(new Term(noteFieldName,query.getTerm().text())),BooleanClause.Occur.MUST);
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery query = (PhraseQuery) clause.getQuery();
+                String fieldName = query.getTerms()[0].field();
+                if(fieldName.equalsIgnoreCase("note")) {
+                    String noteFieldName = getNoteFieldName(hasLocationFilter,hasCofactorFilter);
+                    String[] values = Arrays.stream(query.getTerms()).map(Term::text).toArray(String[]::new);
+                    builder.add(new PhraseQuery(noteFieldName,values),BooleanClause.Occur.MUST);
                 }
             }
-        }
-        BooleanQuery.Builder builder = new BooleanQuery.Builder();
-
-        Term term = parseNoteTerm(note, hasLocationFilter, hasCofactorFilter);
-        builder.add(new TermQuery(term),BooleanClause.Occur.MUST);
-        if(!evidence.isEmpty()) {
-            Term evidenceTerm = parseNoteEvidenceTerm(evidence, hasLocationFilter, hasCofactorFilter);
-            builder.add(new TermQuery(evidenceTerm), BooleanClause.Occur.MUST);
         }
         return builder.build();
     }
 
-
-    private static Query parseNoteQuery(TermQuery termQuery, boolean hasLocationFilter, boolean hasCofactorFilter) {
-        Term term = parseNoteTerm(termQuery.getTerm().text(), hasLocationFilter, hasCofactorFilter);
-        return new TermQuery(term);
-    }
-
-    private static Term parseNoteTerm(String value, boolean hasLocationFilter, boolean hasCofactorFilter) {
-        Term term;
+    private static String getNoteFieldName(boolean hasLocationFilter, boolean hasCofactorFilter) {
+        String fieldName;
         if(hasCofactorFilter){
-            term = new Term("cc_cofactor_note",value);
+            fieldName = "cc_cofactor_note";
         } else if(hasLocationFilter){
-            term = new Term("cc_scl_note",value);
+            fieldName = "cc_scl_note";
         } else{
-            term = new Term("note",value);
+            fieldName = "note";
         }
-        return term;
+        return fieldName;
     }
 
     private static Term parseNoteEvidenceTerm(String value, boolean hasLocationFilter, boolean hasCofactorFilter) {
@@ -345,8 +413,7 @@ public class RequestQueryParser {
         return isFieldNameType && isValueAValidDatabase;
     }
 
-    private static boolean isTaxonomyRelatedQuery(TermQuery termQuery) {
-        String fieldName = termQuery.getTerm().field();
+    private static boolean isTaxonomyRelatedQuery(String fieldName) {
         return fieldName.equalsIgnoreCase("organism") || fieldName.equalsIgnoreCase("host") ||
                 fieldName.equalsIgnoreCase("taxonomy");
     }
@@ -355,7 +422,13 @@ public class RequestQueryParser {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
-                if(isLocationTermQuery(query)){
+                if(isLocationTermQuery(query.getTerm().field())){
+                    return true;
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery phraseQuery = (PhraseQuery) clause.getQuery();
+                String phraseField = phraseQuery.getTerms()[0].field();
+                if(isLocationTermQuery(phraseField)){
                     return true;
                 }
             }
@@ -363,15 +436,21 @@ public class RequestQueryParser {
         return false;
     }
 
-    private static boolean isLocationTermQuery(TermQuery termQuery) {
-        return termQuery.getTerm().field().equalsIgnoreCase("location");
+    private static boolean isLocationTermQuery(String fieldName) {
+        return fieldName.equalsIgnoreCase("location");
     }
 
     private static boolean isCofactor(BooleanQuery booleanQuery) {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
-                if(isCofactorTermQuery(query)){
+                if(isCofactorTermQuery(query.getTerm().field())){
+                    return true;
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery phraseQuery = (PhraseQuery) clause.getQuery();
+                String phraseField = phraseQuery.getTerms()[0].field();
+                if(isCofactorTermQuery(phraseField)){
                     return true;
                 }
             }
@@ -379,15 +458,21 @@ public class RequestQueryParser {
         return false;
     }
 
-    private static boolean isCofactorTermQuery(TermQuery termQuery) {
-        return termQuery.getTerm().field().equalsIgnoreCase("chebi");
+    private static boolean isCofactorTermQuery(String fieldName) {
+        return fieldName.equalsIgnoreCase("chebi");
     }
 
     private static boolean isNote(BooleanQuery booleanQuery) {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
-                if(isNoteTermQuery(query)){
+                if(isNoteTermQuery(query.getTerm().field())){
+                    return true;
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery phraseQuery = (PhraseQuery) clause.getQuery();
+                String phraseField = phraseQuery.getTerms()[0].field();
+                if(isNoteTermQuery(phraseField)){
                     return true;
                 }
             }
@@ -399,16 +484,23 @@ public class RequestQueryParser {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if(clause.getQuery() instanceof TermQuery){
                 TermQuery query = (TermQuery) clause.getQuery();
-                if(isCommentOrFeatureType(query)){
+                if(isCommentOrFeatureType(query.getTerm().field(),query.getTerm().text())){
+                    return true;
+                }
+            }else if(clause.getQuery() instanceof PhraseQuery){
+                PhraseQuery phraseQuery = (PhraseQuery) clause.getQuery();
+                String phraseField = phraseQuery.getTerms()[0].field();
+                String phraseValue = Arrays.stream(phraseQuery.getTerms()).map(Term::text).collect(Collectors.joining( " "));
+                if(isCommentOrFeatureType(phraseField,phraseValue)){
                     return true;
                 }
             }
         }
         return false;
     }
-    private static boolean isCommentOrFeatureType(TermQuery termQuery) {
-        String value = termQuery.getTerm().text();
-        return termQuery.getTerm().field().equalsIgnoreCase("type")
+
+    private static boolean isCommentOrFeatureType(String fieldName,String value) {
+        return fieldName.equalsIgnoreCase("type")
                 && (isComment(value) || isFeature(value));
     }
 
@@ -420,15 +512,14 @@ public class RequestQueryParser {
         return commentMappingType.containsKey(type);
     }
 
-    private static boolean isCitation(TermQuery termQuery) {
-        String fieldName = termQuery.getTerm().field();
+    private static boolean isCitation(String fieldName) {
         return fieldName.equalsIgnoreCase("author") || fieldName.equalsIgnoreCase("journal") ||
                fieldName.equalsIgnoreCase("published") || fieldName.equalsIgnoreCase("title") ||
                fieldName.equalsIgnoreCase("citation");
     }
 
-    private static boolean isNoteTermQuery(TermQuery termQuery) {
-        return termQuery.getTerm().field().equalsIgnoreCase("note");
+    private static boolean isNoteTermQuery(String fieldName) {
+        return fieldName.equalsIgnoreCase("note");
     }
 
     private static String getFeatureOrCommentType(String type) {

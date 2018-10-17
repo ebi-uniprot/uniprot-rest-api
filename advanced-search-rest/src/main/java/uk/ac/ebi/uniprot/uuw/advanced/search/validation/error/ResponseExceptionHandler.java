@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.error;
+package uk.ac.ebi.uniprot.uuw.advanced.search.validation.error;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

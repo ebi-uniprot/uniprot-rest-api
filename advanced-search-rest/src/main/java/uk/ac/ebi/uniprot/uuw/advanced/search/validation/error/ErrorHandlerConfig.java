@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.error;
+package uk.ac.ebi.uniprot.uuw.advanced.search.validation.error;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
