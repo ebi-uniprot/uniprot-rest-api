@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
-import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,9 +19,9 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.RepositoryConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
-import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.ResultsConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
+import uk.ac.ebi.uniprot.uuw.advanced.search.results.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreConfig;
 
@@ -50,7 +50,6 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessa
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class})
 public class UniProtAdvancedSearchDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
-    private static final String DOWNLOAD_ACCESSIONS_RESOURCE = DOWNLOAD_RESOURCE + "/accessions";
     private static final String QUERY = "query";
     private static final String LIST = "list";
 
@@ -61,14 +60,14 @@ public class UniProtAdvancedSearchDownloadTest {
     private DataStoreManager storeManager;
 
     @MockBean
-    private CloudSolrStreamTemplate cloudSolrStreamTemplate;
+    private TupleStreamTemplate tupleStreamTemplate;
 
     @MockBean
     private StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer;
 
     @Before
     public void setUp() {
-        when(cloudSolrStreamTemplate.create(any())).thenReturn(mock(CloudSolrStream.class));
+        when(tupleStreamTemplate.create(any())).thenReturn(mock(TupleStream.class));
     }
 
     @Test
@@ -94,35 +93,12 @@ public class UniProtAdvancedSearchDownloadTest {
                 .andExpect(header().exists(CONTENT_DISPOSITION));
     }
 
-    @Test
-    public void canReachDownloadAccessionsEndpoint() throws Exception {
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        mockStreamerResponseOf(entry);
-
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_ACCESSIONS_RESOURCE)
-                        .header(ACCEPT, FF_MEDIA_TYPE)
-                        .param(LIST, acc));
-
-        response.andExpect(
-                request().asyncStarted())
-                .andDo(MvcResult::getAsyncResult)
-                .andDo(print())
-                .andExpect(content().contentType(FF_MEDIA_TYPE))
-                .andExpect(content().string(containsString("AC   Q8DIA7;")))
-                .andExpect(header().stringValues(VARY, ACCEPT, ACCEPT_ENCODING))
-                .andExpect(header().exists(CONTENT_DISPOSITION));
-    }
-
     private String accessionQuery(String acc) {
         return "accession:" + acc;
     }
 
     private void mockStreamerResponseOf(UniProtEntry... entries) {
-        when(uniProtEntryStoreStreamer.idsToStoreStream(any()))
+        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any()))
                 .thenReturn(Stream.of(asList(entries)));
     }
 }

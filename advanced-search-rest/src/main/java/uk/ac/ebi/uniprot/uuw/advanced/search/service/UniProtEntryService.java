@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
-import org.apache.solr.client.solrj.io.stream.CloudSolrStream;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
@@ -18,7 +17,6 @@ import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
@@ -27,70 +25,98 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterCompone
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
-import uk.ac.ebi.uniprot.uuw.advanced.search.results.CloudSolrStreamTemplate;
 import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE;
+
 @Service
 public class UniProtEntryService {
     private static final String ACCESSION = "accession";
+    private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
+            .instanceOf(DefaultEntryObject.class);
+    private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
+    private final StoreStreamer<UniProtEntry> storeStreamer;
+    private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private UniprotQueryRepository repository;
     private UniprotFacetConfig uniprotFacetConfig;
     private UniProtStoreClient entryService;
     private JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor;
-    private final AvroByteArraySerializer<DefaultEntryObject> deSerialize = AvroByteArraySerializer
-            .instanceOf(DefaultEntryObject.class);
-    private final DefaultEntryConverter avroConverter = new DefaultEntryConverter();
-    private final CloudSolrStreamTemplate cloudSolrStreamTemplate;
-    private final StoreStreamer<UniProtEntry> storeStreamer;
-    private final ThreadPoolTaskExecutor downloadTaskExecutor;
 
     public UniProtEntryService(UniprotQueryRepository repository,
                                UniprotFacetConfig uniprotFacetConfig,
                                UniProtStoreClient entryService,
                                JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
-                               CloudSolrStreamTemplate cloudSolrStreamTemplate,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
                                ThreadPoolTaskExecutor downloadTaskExecutor) {
         this.repository = repository;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.entryService = entryService;
         this.uniProtJsonAdaptor = uniProtJsonAdaptor;
-        this.cloudSolrStreamTemplate = cloudSolrStreamTemplate;
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.downloadTaskExecutor = downloadTaskExecutor;
     }
 
-    private void addSort(SimpleQuery simpleQuery, String sort) {
-        List<Sort> sorts = UniProtSortUtil.createSort(sort);
-        if (sorts.isEmpty()) {
-            sorts = UniProtSortUtil.createDefaultSort();
-        }
-        sorts.forEach(simpleQuery::addSort);
-    }
-
-    public QueryResult<UPEntry> executeQuery(SearchRequestDTO cursorRequest) {
-        String fields = cursorRequest.getField();
-        Map<String, List<String>> filters = FieldsParser.parse(fields);
+    public QueryResult<UPEntry> executeQuery(SearchRequestDTO request) {
+        String fields = request.getFields();
+        Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
         try {
-            SimpleQuery simpleQuery = SolrQueryBuilder.of(cursorRequest.getQuery(), uniprotFacetConfig).build();
+            SimpleQuery simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
 
-            addSort(simpleQuery, cursorRequest.getSort());
+            simpleQuery.addSort(getUniProtSort(request.getSort()));
 
-            QueryResult<UniProtDocument> results = repository.searchPage(simpleQuery, cursorRequest.getCursor(),
-                                                                         cursorRequest.getSize());
+            QueryResult<UniProtDocument> results = repository.searchPage(simpleQuery, request.getCursor(),
+                                                                         request.getSize());
             return convertQueryDoc2UPEntry(results, filters);
         } catch (Exception e) {
-            String message = "Could not get result for: [" + cursorRequest + "]";
+            String message = "Could not get result for: [" + request + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    public UPEntry getByAccession(String accession, String fields) {
+        UPEntry result = null;
+        try {
+            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
+            simpleQuery.addProjectionOnField(new SimpleField(ACCESSION));
+            Optional<UniProtDocument> documentEntry = repository.getEntry(simpleQuery);
+            if (documentEntry.isPresent()) {
+                Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
+                result = convertDocToUPEntry(documentEntry.get(), filters).orElse(null);
+            }
+        } catch (Exception e) {
+            String message = "Could not get accession for: [" + accession + "]";
+            throw new ServiceException(message, e);
+        }
+        return result;
+    }
+
+    public void stream(SearchRequestDTO request, MessageConverterContext context, ResponseBodyEmitter emitter) {
+        MediaType contentType = context.getContentType();
+        boolean defaultFieldsRequested = FieldsParser.isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
+        context.setEntities(streamEntities(request, defaultFieldsRequested, contentType));
+
+        downloadTaskExecutor.execute(() -> {
+            try {
+                emitter.send(context, contentType);
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+            emitter.complete();
+        });
+    }
+
+    private Sort getUniProtSort(String sortStr) {
+        return UniProtSortUtil.createSort(sortStr).orElse(UniProtSortUtil.createDefaultSort());
     }
 
     private QueryResult<UPEntry> convertQueryDoc2UPEntry(QueryResult<UniProtDocument> results,
@@ -111,8 +137,10 @@ public class UniProtEntryService {
     private Optional<UPEntry> convert2UPEntry(UniProtDocument doc, Map<String, List<String>> filters) {
         UPEntry entry = null;
         if (FieldsParser.isDefaultFilters(filters) && (doc.avro_binary != null)) {
-            DefaultEntryObject avroObject = deSerialize.fromByteArray(doc.avro_binary);
+            byte[] avroBinaryBytes = Base64.getDecoder().decode(doc.avro_binary.getBytes());
+            DefaultEntryObject avroObject = deSerialize.fromByteArray(avroBinaryBytes);
             UniProtEntry uniEntry = avroConverter.fromAvro(avroObject);
+
             if (uniEntry == null)
                 return Optional.empty();
             entry = convertAndFilter(uniEntry, filters);
@@ -142,57 +170,17 @@ public class UniProtEntryService {
         return entry;
     }
 
-    public UPEntry getByAccession(String accession, String field) {
-        UPEntry result = null;
-        try {
-            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
-            simpleQuery.addProjectionOnField(new SimpleField(ACCESSION));
-            Optional<UniProtDocument> documentEntry = repository.getEntry(simpleQuery);
-            if (documentEntry.isPresent()) {
-                Map<String, List<String>> filters = FieldsParser.parse(field);
-                result = convertDocToUPEntry(documentEntry.get(), filters).orElse(null);
-            }
-        } catch (Exception e) {
-            String message = "Could not get accession for: [" + accession + "]";
-            throw new ServiceException(message, e);
+    private Stream<?> streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType) {
+        String query = request.getQuery();
+        Sort sort = getUniProtSort(request.getSort());
+        if (contentType.equals(LIST_MEDIA_TYPE)) {
+            return storeStreamer.idsStream(query, sort);
         }
-        return result;
-    }
-
-    public void streamForAccessions(List<String> accessions, MessageConverterContext context, ResponseBodyEmitter emitter) {
-        String queryStr = "(" + accessions.stream()
-                .map(acc -> "(" + ACCESSION + ":" + acc.toUpperCase() + ")")
-                .collect(Collectors.joining(" OR ")) + ")";
-
-        stream(queryStr, context, emitter);
-    }
-
-    public void stream(String query, MessageConverterContext context, ResponseBodyEmitter emitter) {
-        MediaType contentType = context.getContentType();
-        context.setEntities(streamEntities(query, contentType));
-
-        downloadTaskExecutor.execute(() -> {
-            try {
-                emitter.send(context, contentType);
-            } catch (IOException e) {
-                emitter.completeWithError(e);
-            }
-            emitter.complete();
-        });
-    }
-
-    private Stream<?> streamEntities(String query, MediaType contentType) {
-        CloudSolrStream cStream = cloudSolrStreamTemplate.create(query);
-        try {
-            cStream.open();
-            if (contentType.equals(ListMessageConverter.LIST_MEDIA_TYPE)) {
-                return storeStreamer.idsStream(cStream);
-            } else {
-                return storeStreamer.idsToStoreStream(cStream);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType
+                .equals(TSV_MEDIA_TYPE))) {
+            return storeStreamer.defaultFieldStream(query, sort);
+        } else {
+            return storeStreamer.idsToStoreStream(query, sort);
         }
     }
-
 }

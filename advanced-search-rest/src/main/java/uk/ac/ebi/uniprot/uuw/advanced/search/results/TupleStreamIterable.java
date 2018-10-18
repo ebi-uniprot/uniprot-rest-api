@@ -29,7 +29,7 @@ public class TupleStreamIterable implements Iterable<String> {
     public TupleStreamIterable(TupleStream tupleStream, String id) {
         this.tupleStream = tupleStream;
         this.id = id;
-        this.retryPolicy = new RetryPolicy()
+            this.retryPolicy = new RetryPolicy()
                 .retryOn(IOException.class)
                 .withDelay(500, TimeUnit.MILLISECONDS)
                 .withMaxRetries(5);

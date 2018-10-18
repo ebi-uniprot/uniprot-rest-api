@@ -1,5 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.request;
 
+import lombok.Data;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -22,7 +24,7 @@ public class SearchRequestDTO {
     @ValidSolrQueryFields(fieldValidatorClazz = UniprotSolrQueryFieldValidator.class)
     private String query;
 
-    private String field;
+    private String fields;
 
     private String sort;
 

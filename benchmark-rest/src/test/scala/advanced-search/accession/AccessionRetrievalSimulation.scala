@@ -18,25 +18,25 @@ object AccessionRetrievalSimulation {
     .doNotTrackHeader("1")
 
   object AccessionScenario {
-    val feeder = tsv(conf.getString("a.s.accession.retrieval.list")).random
+    val feeder = csv(conf.getString("a.s.accession.retrieval.list")).random
 
-    def getRequestWithFormat(format: String): ChainBuilder = {
-      val httpReqInfo: String = "accession=${accession}, format=" + format;
-      val requestStr: String = "/searchAccession?query=${accession}";
+    def getRequest(): ChainBuilder = {
+      val httpReqInfo: String = "url=${accession_url}, format=${accession_format}";
+      val requestStr: String = "${accession_url}";
 
       val request =
         feed(feeder)
           .pause(5 seconds, 15 seconds)
           .exec(http(httpReqInfo)
             .get(requestStr)
-            .header("Accept", format)
+            .header("Accept", "${accession_format}")
           )
 
       return request
     }
 
     val requestSeq = Seq(
-      AccessionScenario.getRequestWithFormat("application/json")
+      AccessionScenario.getRequest()
     )
 
     val instance = scenario("Accession Retrieval Scenario")

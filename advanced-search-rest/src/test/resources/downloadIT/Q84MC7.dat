@@ -1,0 +1,304 @@
+ID   PYL9_ARATH              Reviewed;         187 AA.
+AC   Q84MC7; Q8LA91; Q9LNI7;
+DT   02-MAR-2010, integrated into UniProtKB/Swiss-Prot.
+DT   01-JUN-2003, sequence version 1.
+DT   23-MAY-2018, entry version 83.
+DE   RecName: Full=Abscisic acid receptor PYL9;
+DE   AltName: Full=ABI1-binding protein 4;
+DE   AltName: Full=PYR1-like protein 9;
+DE   AltName: Full=Regulatory components of ABA receptor 1;
+GN   Name=PYL9; Synonyms=RCAR1; OrderedLocusNames=At1g01360;
+GN   ORFNames=F6F3.16;
+OS   Arabidopsis thaliana (Mouse-ear cress).
+OC   Eukaryota; Viridiplantae; Streptophyta; Embryophyta; Tracheophyta;
+OC   Spermatophyta; Magnoliophyta; eudicotyledons; Gunneridae;
+OC   Pentapetalae; rosids; malvids; Brassicales; Brassicaceae; Camelineae;
+OC   Arabidopsis.
+OX   NCBI_TaxID=3702;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=cv. Columbia;
+RX   PubMed=11130712; DOI=10.1038/35048500;
+RA   Theologis A., Ecker J.R., Palm C.J., Federspiel N.A., Kaul S.,
+RA   White O., Alonso J., Altafi H., Araujo R., Bowman C.L., Brooks S.Y.,
+RA   Buehler E., Chan A., Chao Q., Chen H., Cheuk R.F., Chin C.W.,
+RA   Chung M.K., Conn L., Conway A.B., Conway A.R., Creasy T.H., Dewar K.,
+RA   Dunn P., Etgu P., Feldblyum T.V., Feng J.-D., Fong B., Fujii C.Y.,
+RA   Gill J.E., Goldsmith A.D., Haas B., Hansen N.F., Hughes B., Huizar L.,
+RA   Hunter J.L., Jenkins J., Johnson-Hopson C., Khan S., Khaykin E.,
+RA   Kim C.J., Koo H.L., Kremenetskaia I., Kurtz D.B., Kwan A., Lam B.,
+RA   Langin-Hooper S., Lee A., Lee J.M., Lenz C.A., Li J.H., Li Y.-P.,
+RA   Lin X., Liu S.X., Liu Z.A., Luros J.S., Maiti R., Marziali A.,
+RA   Militscher J., Miranda M., Nguyen M., Nierman W.C., Osborne B.I.,
+RA   Pai G., Peterson J., Pham P.K., Rizzo M., Rooney T., Rowley D.,
+RA   Sakano H., Salzberg S.L., Schwartz J.R., Shinn P., Southwick A.M.,
+RA   Sun H., Tallon L.J., Tambunga G., Toriumi M.J., Town C.D.,
+RA   Utterback T., Van Aken S., Vaysberg M., Vysotskaia V.S., Walker M.,
+RA   Wu D., Yu G., Fraser C.M., Venter J.C., Davis R.W.;
+RT   "Sequence and analysis of chromosome 1 of the plant Arabidopsis
+RT   thaliana.";
+RL   Nature 408:816-820(2000).
+RN   [2]
+RP   GENOME REANNOTATION.
+RC   STRAIN=cv. Columbia;
+RX   PubMed=27862469; DOI=10.1111/tpj.13415;
+RA   Cheng C.Y., Krishnakumar V., Chan A.P., Thibaud-Nissen F., Schobel S.,
+RA   Town C.D.;
+RT   "Araport11: a complete reannotation of the Arabidopsis thaliana
+RT   reference genome.";
+RL   Plant J. 89:789-804(2017).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA].
+RC   STRAIN=cv. Columbia;
+RX   PubMed=14593172; DOI=10.1126/science.1088305;
+RA   Yamada K., Lim J., Dale J.M., Chen H., Shinn P., Palm C.J.,
+RA   Southwick A.M., Wu H.C., Kim C.J., Nguyen M., Pham P.K., Cheuk R.F.,
+RA   Karlin-Newmann G., Liu S.X., Lam B., Sakano H., Wu T., Yu G.,
+RA   Miranda M., Quach H.L., Tripp M., Chang C.H., Lee J.M., Toriumi M.J.,
+RA   Chan M.M., Tang C.C., Onodera C.S., Deng J.M., Akiyama K., Ansari Y.,
+RA   Arakawa T., Banh J., Banno F., Bowser L., Brooks S.Y., Carninci P.,
+RA   Chao Q., Choy N., Enju A., Goldsmith A.D., Gurjal M., Hansen N.F.,
+RA   Hayashizaki Y., Johnson-Hopson C., Hsuan V.W., Iida K., Karnes M.,
+RA   Khan S., Koesema E., Ishida J., Jiang P.X., Jones T., Kawai J.,
+RA   Kamiya A., Meyers C., Nakajima M., Narusaka M., Seki M., Sakurai T.,
+RA   Satou M., Tamse R., Vaysberg M., Wallender E.K., Wong C., Yamamura Y.,
+RA   Yuan S., Shinozaki K., Davis R.W., Theologis A., Ecker J.R.;
+RT   "Empirical analysis of transcriptional activity in the Arabidopsis
+RT   genome.";
+RL   Science 302:842-846(2003).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA].
+RC   STRAIN=cv. Columbia;
+RA   Totoki Y., Seki M., Ishida J., Nakajima M., Enju A., Kamiya A.,
+RA   Narusaka M., Shin-i T., Nakagawa M., Sakamoto N., Oishi K., Kohara Y.,
+RA   Kobayashi M., Toyoda A., Sakaki Y., Sakurai T., Iida K., Akiyama K.,
+RA   Satou M., Toyoda T., Konagaya A., Carninci P., Kawai J.,
+RA   Hayashizaki Y., Shinozaki K.;
+RT   "Large-scale analysis of RIKEN Arabidopsis full-length (RAFL) cDNAs.";
+RL   Submitted (JUL-2006) to the EMBL/GenBank/DDBJ databases.
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA].
+RA   Brover V.V., Troukhan M.E., Alexandrov N.A., Lu Y.-P., Flavell R.B.,
+RA   Feldmann K.A.;
+RT   "Full-length cDNA from Arabidopsis thaliana.";
+RL   Submitted (MAR-2002) to the EMBL/GenBank/DDBJ databases.
+RN   [6]
+RP   FUNCTION, TISSUE SPECIFICITY, INTERACTION WITH ABI1; ABI2 AND HAB1,
+RP   AND GENE FAMILY.
+RX   PubMed=19407143; DOI=10.1126/science.1172408;
+RA   Ma Y., Szostkiewicz I., Korte A., Moes D., Yang Y., Christmann A.,
+RA   Grill E.;
+RT   "Regulators of PP2C phosphatase activity function as abscisic acid
+RT   sensors.";
+RL   Science 324:1064-1068(2009).
+RN   [7]
+RP   INTERACTION WITH HAB1, GENE FAMILY, AND NOMENCLATURE.
+RX   PubMed=19407142; DOI=10.1126/science.1173041;
+RA   Park S.-Y., Fung P., Nishimura N., Jensen D.R., Fujii H., Zhao Y.,
+RA   Lumba S., Santiago J., Rodrigues A., Chow T.F., Alfred S.E.,
+RA   Bonetta D., Finkelstein R., Provart N.J., Desveaux D., Rodriguez P.L.,
+RA   McCourt P., Zhu J.-K., Schroeder J.I., Volkman B.F., Cutler S.R.;
+RT   "Abscisic acid inhibits type 2C protein phosphatases via the PYR/PYL
+RT   family of START proteins.";
+RL   Science 324:1068-1071(2009).
+RN   [8]
+RP   INTERACTION WITH ABI1, AND IDENTIFICATION BY MASS SPECTROMETRY.
+RX   PubMed=19874541; DOI=10.1111/j.1365-313X.2009.04054.x;
+RA   Nishimura N., Sarkeshik A., Nito K., Park S.-Y., Wang A.,
+RA   Carvalho P.C., Lee S., Caddell D.F., Cutler S.R., Chory J.,
+RA   Yates J.R., Schroeder J.I.;
+RT   "PYR/PYL/RCAR family members are major in-vivo ABI1 protein
+RT   phosphatase 2C-interacting proteins in Arabidopsis.";
+RL   Plant J. 61:290-299(2010).
+RN   [9]
+RP   FUNCTION, MONOMER, AND GENE FAMILY.
+RX   PubMed=21658606; DOI=10.1016/j.molcel.2011.05.011;
+RA   Hao Q., Yin P., Li W., Wang L., Yan C., Lin Z., Wu J.Z., Wang J.,
+RA   Yan S.F., Yan N.;
+RT   "The molecular basis of ABA-independent inhibition of PP2Cs by a
+RT   subclass of PYL proteins.";
+RL   Mol. Cell 42:662-672(2011).
+RN   [10]
+RP   INTERACTION WITH TOPP1.
+RX   PubMed=26943172; DOI=10.1371/journal.pgen.1005835;
+RA   Hou Y.J., Zhu Y., Wang P., Zhao Y., Xie S., Batelli G., Wang B.,
+RA   Duan C.G., Wang X., Xing L., Lei M., Yan J., Zhu X., Zhu J.K.;
+RT   "Type one protein phosphatase 1 and its regulatory protein inhibitor 2
+RT   negatively regulate ABA signaling.";
+RL   PLoS Genet. 12:E1005835-E1005835(2016).
+RN   [11]
+RP   X-RAY CRYSTALLOGRAPHY (2.68 ANGSTROMS) IN COMPLEX WITH ABA, FUNCTION,
+RP   MUTAGENESIS OF CYS-29; CYS-34; ILE-112; CYS-159 AND LEU-165, DISULFIDE
+RP   BOND, INTERACTION WITH ABA, AND GENE FAMILY.
+RX   PubMed=23844015; DOI=10.1371/journal.pone.0067477;
+RA   Zhang X., Jiang L., Wang G., Yu L., Zhang Q., Xin Q., Wu W., Gong Z.,
+RA   Chen Z.;
+RT   "Structural insights into the abscisic acid stereospecificity by the
+RT   ABA receptors PYR/PYL/RCAR.";
+RL   PLoS ONE 8:E67477-E67477(2013).
+RN   [12]
+RP   X-RAY CRYSTALLOGRAPHY (1.90 ANGSTROMS) IN COMPLEX WITH ABA,
+RP   MUTAGENESIS OF CYS-29; CYS-34 AND CYS-159, AND HOMODIMER.
+RX   PubMed=24645846; DOI=10.1111/gtc.12140;
+RA   Nakagawa M., Kagiyama M., Shibata N., Hirano Y., Hakoshima T.;
+RT   "Mechanism of high-affinity abscisic acid binding to PYL9/RCAR1.";
+RL   Genes Cells 19:386-404(2014).
+CC   -!- FUNCTION: Receptor for abscisic acid (ABA) required for ABA-
+CC       mediated responses such as stomatal closure and germination
+CC       inhibition. Inhibits the activity of group-A protein phosphatases
+CC       type 2C (PP2Cs) in an ABA-independent manner but more efficiently
+CC       when activated by ABA. Confers enhanced sensitivity to ABA
+CC       (PubMed:19407143, PubMed:23844015, PubMed:21658606). Can be
+CC       activated only by (+)-ABA but not by (-)-ABA (PubMed:23844015).
+CC       {ECO:0000269|PubMed:19407143, ECO:0000269|PubMed:21658606,
+CC       ECO:0000269|PubMed:23844015}.
+CC   -!- SUBUNIT: Homodimer (PubMed:24645846). Monomer (PubMed:21658606).
+CC       Binds ABA on one subunit only. Binds to CARs protein in an ABA-
+CC       independent manner, both at the plasma membrane and in the nucleus
+CC       (By similarity). Binds specifically (+)-ABA but not (-)-ABA
+CC       (PubMed:23844015, PubMed:24645846). Interacts with HAB1, ABI1 and
+CC       ABI2, and possibly with other PP2Cs (PubMed:19407142,
+CC       PubMed:19407143, PubMed:19874541). Interacts with TOPP1
+CC       (PubMed:26943172). {ECO:0000250|UniProtKB:O49686,
+CC       ECO:0000269|PubMed:19407142, ECO:0000269|PubMed:19407143,
+CC       ECO:0000269|PubMed:19874541, ECO:0000269|PubMed:21658606,
+CC       ECO:0000269|PubMed:23844015, ECO:0000269|PubMed:24645846,
+CC       ECO:0000269|PubMed:26943172}.
+CC   -!- INTERACTION:
+CC       P49597:ABI1; NbExp=5; IntAct=EBI-2349513, EBI-782526;
+CC       O04719:ABI2; NbExp=3; IntAct=EBI-2349513, EBI-537680;
+CC   -!- SUBCELLULAR LOCATION: Cytoplasm {ECO:0000250|UniProtKB:Q9FLB1}.
+CC       Nucleus {ECO:0000250|UniProtKB:O49686}. Cell membrane
+CC       {ECO:0000250|UniProtKB:O49686}. Note=Localizes at the plasma
+CC       membrane in the presence of a CAR protein.
+CC       {ECO:0000250|UniProtKB:O80920}.
+CC   -!- TISSUE SPECIFICITY: Expressed in root tips, vascular tissues,
+CC       stomata, flowers, pollen tubes and developing seeds.
+CC       {ECO:0000269|PubMed:19407143}.
+CC   -!- DOMAIN: Upon interaction with ABA, the 'latch' and 'gate' loops
+CC       change in conformation leading to a tight dimerization and the
+CC       creation a surface that enables the receptor to dock into and
+CC       inhibit the PP2C active site. {ECO:0000250|UniProtKB:Q8VZS8}.
+CC   -!- SIMILARITY: Belongs to the PYR/PYL/RCAR abscisic acid
+CC       intracellular receptor family. {ECO:0000305}.
+CC   -!- SEQUENCE CAUTION:
+CC       Sequence=AAF97339.1; Type=Erroneous initiation; Note=Translation N-terminally extended.; Evidence={ECO:0000305};
+CC       Sequence=AAG51053.1; Type=Erroneous gene model prediction; Evidence={ECO:0000305};
+DR   EMBL; AC023628; AAF97339.1; ALT_INIT; Genomic_DNA.
+DR   EMBL; CP002684; AEE27277.1; -; Genomic_DNA.
+DR   EMBL; BT006399; AAP21207.1; -; mRNA.
+DR   EMBL; AK227623; BAE99614.1; -; mRNA.
+DR   EMBL; AY087967; AAM65514.1; ALT_INIT; mRNA.
+DR   RefSeq; NP_563626.1; NM_100018.5.
+DR   UniGene; At.42653; -.
+DR   PDB; 3OQU; X-ray; 2.68 A; A/B=1-187.
+DR   PDB; 3W9R; X-ray; 1.90 A; A=1-187.
+DR   PDBsum; 3OQU; -.
+DR   PDBsum; 3W9R; -.
+DR   ProteinModelPortal; Q84MC7; -.
+DR   SMR; Q84MC7; -.
+DR   BioGrid; 23691; 9.
+DR   DIP; DIP-53480N; -.
+DR   IntAct; Q84MC7; 3.
+DR   STRING; 3702.AT1G01360.1; -.
+DR   PaxDb; Q84MC7; -.
+DR   EnsemblPlants; AT1G01360.1; AT1G01360.1; AT1G01360.
+DR   GeneID; 838452; -.
+DR   Gramene; AT1G01360.1; AT1G01360.1; AT1G01360.
+DR   KEGG; ath:AT1G01360; -.
+DR   Araport; AT1G01360; -.
+DR   TAIR; locus:2035227; AT1G01360.
+DR   eggNOG; ENOG410IIK9; Eukaryota.
+DR   eggNOG; ENOG4111HU5; LUCA.
+DR   HOGENOM; HOG000238422; -.
+DR   InParanoid; Q84MC7; -.
+DR   KO; K14496; -.
+DR   OMA; HSCREDQ; -.
+DR   OrthoDB; EOG09360OHL; -.
+DR   PhylomeDB; Q84MC7; -.
+DR   PRO; PR:Q84MC7; -.
+DR   Proteomes; UP000006548; Chromosome 1.
+DR   ExpressionAtlas; Q84MC7; baseline and differential.
+DR   Genevisible; Q84MC7; AT.
+DR   GO; GO:0005737; C:cytoplasm; ISS:UniProtKB.
+DR   GO; GO:0005634; C:nucleus; ISS:UniProtKB.
+DR   GO; GO:0005886; C:plasma membrane; IEA:UniProtKB-SubCell.
+DR   GO; GO:0010427; F:abscisic acid binding; IDA:UniProtKB.
+DR   GO; GO:0042803; F:protein homodimerization activity; ISS:UniProtKB.
+DR   GO; GO:0004864; F:protein phosphatase inhibitor activity; IDA:UniProtKB.
+DR   GO; GO:0038023; F:signaling receptor activity; IDA:UniProtKB.
+DR   GO; GO:0009738; P:abscisic acid-activated signaling pathway; IDA:UniProtKB.
+DR   Gene3D; 3.30.530.20; -; 1.
+DR   InterPro; IPR019587; Polyketide_cyclase/dehydratase.
+DR   InterPro; IPR023393; START-like_dom_sf.
+DR   Pfam; PF10604; Polyketide_cyc2; 1.
+PE   1: Evidence at protein level;
+KW   3D-structure; Abscisic acid signaling pathway; Cell membrane;
+KW   Complete proteome; Cytoplasm; Disulfide bond; Membrane; Nucleus;
+KW   Protein phosphatase inhibitor; Receptor; Reference proteome.
+FT   CHAIN         1    187       Abscisic acid receptor PYL9.
+FT                                /FTId=PRO_0000391744.
+FT   REGION       27    178       START-like.
+FT   REGION       91     96       ABA binding.
+FT                                {ECO:0000250|UniProtKB:O49686}.
+FT   REGION      118    124       ABA binding.
+FT                                {ECO:0000250|UniProtKB:O49686}.
+FT   MOTIF        87     91       Gate loop.
+FT                                {ECO:0000250|UniProtKB:Q8VZS8}.
+FT   MOTIF       117    119       Latch loop.
+FT                                {ECO:0000250|UniProtKB:Q8VZS8}.
+FT   BINDING      63     63       ABA. {ECO:0000244|PDB:3OQU,
+FT                                ECO:0000244|PDB:3W9R,
+FT                                ECO:0000269|PubMed:23844015,
+FT                                ECO:0000269|PubMed:24645846}.
+FT   BINDING     143    143       ABA. {ECO:0000250|UniProtKB:O49686}.
+FT   SITE         64     64       Involved in ABA binding.
+FT                                {ECO:0000269|PubMed:24645846}.
+FT   SITE         90     90       Involved in interactions with PP2Cs.
+FT                                {ECO:0000250|UniProtKB:O49686}.
+FT   SITE        110    110       Involved in ABA binding.
+FT                                {ECO:0000269|PubMed:24645846}.
+FT   SITE        154    154       Involved in interactions with PP2Cs.
+FT                                {ECO:0000250|UniProtKB:O49686}.
+FT   SITE        162    162       Involved in ABA binding.
+FT                                {ECO:0000269|PubMed:24645846}.
+FT   SITE        165    165       Involved in ABA binding.
+FT                                {ECO:0000269|PubMed:24645846}.
+FT   DISULFID     29    159       Reversible.
+FT                                {ECO:0000269|PubMed:23844015}.
+FT   DISULFID     34    159       Reversible.
+FT                                {ECO:0000269|PubMed:23844015}.
+FT   MUTAGEN      29     29       C->S: Stable homogeneity in reducing
+FT                                condition. {ECO:0000269|PubMed:23844015,
+FT                                ECO:0000269|PubMed:24645846}.
+FT   MUTAGEN      34     34       C->S: Stable homogeneity in reducing
+FT                                condition. {ECO:0000269|PubMed:23844015,
+FT                                ECO:0000269|PubMed:24645846}.
+FT   MUTAGEN     112    112       I->V: Increased HAB1 inhibitory ability.
+FT                                {ECO:0000269|PubMed:23844015}.
+FT   MUTAGEN     159    159       C->S: Abnormal stable homogeneity in
+FT                                reducing condition.
+FT                                {ECO:0000269|PubMed:23844015,
+FT                                ECO:0000269|PubMed:24645846}.
+FT   MUTAGEN     165    165       L->V: Slight potentiation of (-)-ABA-
+FT                                binding. {ECO:0000269|PubMed:23844015}.
+FT   CONFLICT      7      7       G -> D (in Ref. 1; AAM65514).
+FT                                {ECO:0000305}.
+FT   HELIX        14     28       {ECO:0000244|PDB:3W9R}.
+FT   STRAND       33     44       {ECO:0000244|PDB:3W9R}.
+FT   HELIX        46     53       {ECO:0000244|PDB:3W9R}.
+FT   HELIX        59     61       {ECO:0000244|PDB:3W9R}.
+FT   STRAND       66     70       {ECO:0000244|PDB:3W9R}.
+FT   STRAND       80     85       {ECO:0000244|PDB:3W9R}.
+FT   STRAND       92    102       {ECO:0000244|PDB:3W9R}.
+FT   TURN        103    106       {ECO:0000244|PDB:3W9R}.
+FT   STRAND      107    118       {ECO:0000244|PDB:3W9R}.
+FT   STRAND      123    133       {ECO:0000244|PDB:3W9R}.
+FT   STRAND      136    148       {ECO:0000244|PDB:3W9R}.
+FT   HELIX       155    181       {ECO:0000244|PDB:3W9R}.
+SQ   SEQUENCE   187 AA;  20901 MW;  070D485311163568 CRC64;
+     MMDGVEGGTA MYGGLETVQY VRTHHQHLCR ENQCTSALVK HIKAPLHLVW SLVRRFDQPQ
+     KYKPFVSRCT VIGDPEIGSL REVNVKSGLP ATTSTERLEL LDDEEHILGI KIIGGDHRLK
+     NYSSILTVHP EIIEGRAGTM VIESFVVDVP QGNTKDETCY FVEALIRCNL KSLADVSERL
+     ASQDITQ
+//

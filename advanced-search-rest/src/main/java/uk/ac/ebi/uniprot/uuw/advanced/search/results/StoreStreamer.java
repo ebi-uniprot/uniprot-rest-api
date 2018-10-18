@@ -1,9 +1,10 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.results;
 
+import lombok.Builder;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.slf4j.Logger;
+import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 
 import java.io.IOException;
@@ -12,55 +13,96 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created 22/08/18
  *
  * @author Edd
  */
+@Builder
 public class StoreStreamer<T> {
-    private final VoldemortClient<T> storeClient;
-    private final int streamerBatchSize;
-    private final String id;
-
-    public StoreStreamer(VoldemortClient<T> storeClient, int streamerBatchSize, String id) {
-        this.storeClient = storeClient;
-        this.streamerBatchSize = streamerBatchSize;
-        this.id = id;
-    }
+    private VoldemortClient<T> storeClient;
+    private int streamerBatchSize;
+    private String id;
+    private String defaultsField;
+    private Function<String, T> defaultsConverter;
+    private TupleStreamTemplate tupleStreamTemplate;
 
     @SuppressWarnings("unchecked")
-    public Stream<Collection<T>> idsToStoreStream(TupleStream tupleStream) {
-        BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
-                new TupleStreamIterable(tupleStream, id),
-                storeClient,
-                streamerBatchSize);
-        return StreamSupport.stream(batchStoreIterable.spliterator(), false);
+    public Stream<Collection<T>> idsToStoreStream(String query, Sort sort) {
+        try {
+            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
+            tupleStream.open();
+
+            BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
+                    new TupleStreamIterable(tupleStream, id),
+                    storeClient,
+                    streamerBatchSize);
+            return StreamSupport.stream(batchStoreIterable.spliterator(), false);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
-    public Stream<String> idsStream(TupleStream tupleStream) {
-        return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
+    public Stream<String> idsStream(String query, Sort sort) {
+        try {
+            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
+            tupleStream.open();
+            return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
-    private static class BatchStoreIterable<T> implements Iterable<Collection<T>> {
-        private static final Logger LOGGER = getLogger(BatchStoreIterable.class);
-        private final Iterator<String> sourceIterator;
-        private final int batchSize;
-        private final VoldemortClient<T> storeClient;
-        private final RetryPolicy retryPolicy;
+    public Stream<Collection<T>> defaultFieldStream(String query, Sort sort) {
+        try {
+            TupleStream tupleStream = tupleStreamTemplate.create(query, defaultsField, sort);
+            tupleStream.open();
+
+            TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, defaultsField);
+            BatchIterable<T> batchIterable = new BatchIterable<T>(sourceIterable, streamerBatchSize) {
+                @Override
+                List<T> convertBatch(List<String> batch) {
+                    return batch.stream().map(defaultsConverter).collect(Collectors.toList());
+                }
+            };
+
+            return StreamSupport.stream(batchIterable.spliterator(), false);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static class BatchStoreIterable<T> extends BatchIterable<T> {
+        private VoldemortClient<T> storeClient;
+        private RetryPolicy retryPolicy;
 
         BatchStoreIterable(Iterable<String> sourceIterable, VoldemortClient<T> storeClient, int batchSize) {
-            this.batchSize = batchSize;
-            this.sourceIterator = sourceIterable.iterator();
+            super(sourceIterable, batchSize);
             this.storeClient = storeClient;
             this.retryPolicy = new RetryPolicy()
                     .retryOn(IOException.class)
                     .withDelay(500, TimeUnit.MILLISECONDS)
                     .withMaxRetries(5);
+        }
+
+        @Override
+        List<T> convertBatch(List<String> batch) {
+            return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(batch));
+        }
+    }
+
+    private abstract static class BatchIterable<T> implements Iterable<Collection<T>> {
+        private final Iterator<String> sourceIterator;
+        private final int batchSize;
+
+        BatchIterable(Iterable<String> sourceIterable, int batchSize) {
+            this.batchSize = batchSize;
+            this.sourceIterator = sourceIterable.iterator();
         }
 
         @Override
@@ -81,13 +123,13 @@ public class StoreStreamer<T> {
                             break;
                         }
                     }
-                    return getEntries(batch);
+
+                    return convertBatch(batch);
                 }
             };
         }
 
-        private List<T> getEntries(List<String> batch) {
-            return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(batch));
-        }
+        abstract List<T> convertBatch(List<String> batch);
     }
+
 }
