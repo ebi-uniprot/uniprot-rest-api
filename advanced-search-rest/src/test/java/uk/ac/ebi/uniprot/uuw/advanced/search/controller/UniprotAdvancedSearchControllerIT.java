@@ -210,4 +210,80 @@ public class UniprotAdvancedSearchControllerIT {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(content().string(containsString("The 'organism_id' filter value should be a number")));
     }
+
+    @Test
+    public void sortWithCorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&sort=organism_name asc")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+    }
+
+    @Test
+    public void sortWithMultipleCorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&sort=accession desc,gene asc")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+    }
+
+    @Test
+    public void sortWithIncorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=organism_id:9606&sort=invalidField invalidSort")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("Invalid sort field invalidfield")))
+                .andExpect(content().string(containsString("Invalid sort field order invalidsort. Expected asc or desc")));
+    }
+
+    @Test
+    public void sortWithMultipleIncorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=organism_id:9606&sort=invalidField invalidSort,invalidField1 invalidSort1")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("Invalid sort field order invalidsort1. Expected asc or desc")))
+                .andExpect(content().string(containsString("Invalid sort field invalidfield")))
+                .andExpect(content().string(containsString("Invalid sort field invalidfield1")))
+                .andExpect(content().string(containsString("Invalid sort field order invalidsort. Expected asc or desc")));
+    }
 }

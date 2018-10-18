@@ -5,10 +5,10 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import lombok.Data;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidSolrQuerySyntax;
+import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidSolrSortFields;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.validator.impl.UniprotSolrQueryFieldValidator;
 
 /**
@@ -26,6 +26,7 @@ public class SearchRequestDTO {
 
     private String fields;
 
+    @ValidSolrSortFields(sortFieldEnumClazz = UniProtField.Sort.class)
     private String sort;
 
     private String cursor;
