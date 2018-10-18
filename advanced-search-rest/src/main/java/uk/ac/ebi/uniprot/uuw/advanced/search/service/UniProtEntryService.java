@@ -36,8 +36,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 @Service
 public class UniProtEntryService {
@@ -176,8 +175,8 @@ public class UniProtEntryService {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             return storeStreamer.idsStream(query, sort);
         }
-        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType
-                .equals(TSV_MEDIA_TYPE))) {
+        if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType.equals(TSV_MEDIA_TYPE) 
+        		||contentType.equals(XLS_MEDIA_TYPE)  )) {
             return storeStreamer.defaultFieldStream(query, sort);
         } else {
             return storeStreamer.idsToStoreStream(query, sort);
