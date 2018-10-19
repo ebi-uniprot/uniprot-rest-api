@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
+
 @Service
 public class UniProtEntryService {
     private static final String ACCESSION = "accession";
@@ -175,8 +176,10 @@ public class UniProtEntryService {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             return storeStreamer.idsStream(query, sort);
         }
+
         if (defaultFieldsOnly && (contentType.equals(MediaType.APPLICATION_JSON) || contentType.equals(TSV_MEDIA_TYPE) 
-        		||contentType.equals(XLS_MEDIA_TYPE)  )) {
+        		||contentType.equals(XLS_MEDIA_TYPE) )) {
+
             return storeStreamer.defaultFieldStream(query, sort);
         } else {
             return storeStreamer.idsToStoreStream(query, sort);

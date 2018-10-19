@@ -17,6 +17,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContex
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FastaMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.GffMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XlsMessageConverter;
@@ -26,7 +27,6 @@ import java.util.List;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 import static java.util.Arrays.asList;
-
 
 /**
  * Created 21/08/18
@@ -70,6 +70,7 @@ public class MessageConverterConfig {
                 converters.add(new TSVMessageConverter());
                 converters.add(new XlsMessageConverter());
                 converters.add(new FastaMessageConverter());
+                converters.add(new GffMessageConverter());
             }
         };
     }
@@ -85,7 +86,8 @@ public class MessageConverterConfig {
                 uniprotJsonMessageConverterContext(),
                 uniprotTSVMessageConverterContext(),
                 uniprotFastaMessageConverterContext(),
-                uniprotXlsMessageConverterContext()));
+                uniprotXlsMessageConverterContext(),
+                uniProtGffMessageConverterContext()));
 
         return contextFactory;
     }
@@ -150,6 +152,14 @@ public class MessageConverterConfig {
         MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(LIST_MEDIA_TYPE);
+
+        return converter;
+    }
+    
+    private MessageConverterContext uniProtGffMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(GFF_MEDIA_TYPE);
 
         return converter;
     }

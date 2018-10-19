@@ -13,6 +13,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaTyp
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.GFF_MEDIA_TYPE_VALUE;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,6 +45,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
+
+import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Controller for uniprot advanced search service.
@@ -94,7 +97,7 @@ public class UniprotAdvancedSearchController {
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-            		APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE,FASTA_MEDIA_TYPE_VALUE})
+            		APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE,FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(
             @Valid SearchRequestDTO searchRequest,
             @RequestHeader("Accept") MediaType contentType,
