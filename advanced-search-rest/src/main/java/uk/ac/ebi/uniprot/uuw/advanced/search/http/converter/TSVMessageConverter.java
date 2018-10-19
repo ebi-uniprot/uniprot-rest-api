@@ -92,7 +92,6 @@ public class TSVMessageConverter extends AbstractUUWHttpMessageConverter<Message
             entriesStream.close();
         } finally {
             outputStream.close();
-            System.out.println("closed");
         }
     }
     private List<String> convertHeader(List<String> fields){

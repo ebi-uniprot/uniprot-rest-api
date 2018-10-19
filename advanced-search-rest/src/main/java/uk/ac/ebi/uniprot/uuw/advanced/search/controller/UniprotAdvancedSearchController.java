@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
@@ -42,6 +41,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageCon
 @RequestMapping(UNIPROTKB_RESOURCE)
 public class UniprotAdvancedSearchController {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
+    private static final int PREVIEW_SIZE = 10;
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniProtEntryService entryService;
@@ -56,32 +56,47 @@ public class UniprotAdvancedSearchController {
         this.converterContextFactory = converterContextFactory;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public ResponseEntity<QueryResult<UPEntry>> searchCursor(@Valid SearchRequestDTO cursorRequest,
-                                                             HttpServletRequest request, HttpServletResponse response) {
-        QueryResult<UPEntry> result = entryService.executeQuery(cursorRequest);
+    @RequestMapping(value = "/search", method = RequestMethod.GET,
+            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
+                        APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageConverterContext> searchCursor(@Valid SearchRequestDTO searchRequest,
+                                                                @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+                                                                @RequestHeader("Accept") MediaType contentType,
+                                                                HttpServletRequest request, HttpServletResponse response) {
+        setPreviewInfo(searchRequest, preview);
+
+        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        context.setRequestDTO(searchRequest);
+        QueryResult<?> result = entryService.search(searchRequest, context, contentType);
+
         eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(context, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
-    public UPEntry getByAccession(@PathVariable("accession") String accession, @QueryParam("fields") String fields) {
-        return entryService.getByAccession(accession, fields);
+    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET,
+            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
+                        APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> getByAccession(@PathVariable("accession") String accession,
+                                                 @RequestHeader("Accept") MediaType contentType,
+                                                 @QueryParam("fields") String fields) {
+        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        SearchRequestDTO requestDTO = new SearchRequestDTO();
+        requestDTO.setFields(fields);
+        context.setRequestDTO(requestDTO);
+        context.setEntities(entryService.getByAccession(accession, fields, contentType));
+
+        return new ResponseEntity<>(context, HttpStatus.OK);
     }
 
     /*
      * E.g., usage from command line:
-     *
-     * time curl -OJ -H "Accept:text/list" "http://localhost:8090/advancedsearch/uniprot/download?query=reviewed:true" (for just accessions)
-     * time curl -OJ -H "Accept:text/flatfile" "http://localhost:8090/advancedsearch/uniprot/download?query=reviewed:true" (for entries)
-     * time curl -OJ -H "Accept:application/xml" "http://localhost:8090/advancedsearch/uniprot/download?query=reviewed:true" (for XML entries)
-     *
-     * for GZIPPED results, add -H "Accept-Encoding:gzip"
-     *
-     * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
+     * time curl -OJ -H "Accept:text/list" "http://localhost:8090/uniprot/api/uniprotkb/download?query=reviewed:true" (i.e., show accessions)
+     *   - for GZIPPED results, add -H "Accept-Encoding:gzip"
+     *   - omit '-OJ' option to curl, to just see it print to standard output
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
-            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
+                        APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(
             @Valid SearchRequestDTO searchRequest,
             @RequestHeader("Accept") MediaType contentType,
@@ -98,6 +113,12 @@ public class UniprotAdvancedSearchController {
         return ResponseEntity.ok()
                 .headers(createHttpDownloadHeader(contentType, context, request))
                 .body(emitter);
+    }
+
+    private void setPreviewInfo(SearchRequestDTO searchRequest, boolean preview) {
+        if (preview) {
+            searchRequest.setSize(PREVIEW_SIZE);
+        }
     }
 
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {

@@ -15,10 +15,7 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.*;
 
 import java.util.List;
 
@@ -66,6 +63,7 @@ public class MessageConverterConfig {
                 converters.add(new FlatFileMessageConverter());
                 converters.add(new ListMessageConverter());
                 converters.add(0, new XmlMessageConverter());
+                converters.add(1, new JsonMessageConverter());
                 converters.add(new TSVMessageConverter());
             }
         };
