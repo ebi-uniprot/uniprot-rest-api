@@ -58,7 +58,7 @@ public class TupleStreamTemplate {
             try {
                 StreamFactory streamFactory = new DefaultStreamFactory()
                         .withCollectionZkHost(collection, zookeeperHost);
-                String request =
+				String request =
                         String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s\", qt=\"/export\")",
                                       collection, query, fieldsToReturn(key, order), sortToString(order));
 

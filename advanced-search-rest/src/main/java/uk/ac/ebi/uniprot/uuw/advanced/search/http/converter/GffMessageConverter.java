@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryGffConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,27 +9,27 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-
-import uk.ac.ebi.kraken.ffwriter.line.impl.UniProtFlatfileWriter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Created 21/08/18
+ * 
+ * @author gqi
  *
- * @author Edd
  */
-public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
-    private static final Logger LOGGER = getLogger(FlatFileMessageConverter.class);
+public class GffMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
+    public static final String GFF_MEDIA_TYPE_VALUE = "text/gff";
+    public static final MediaType GFF_MEDIA_TYPE = new MediaType("text", "gff");
+    private static final Logger LOGGER = getLogger(GffMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
 
-    public FlatFileMessageConverter() {
-        super(UniProtMediaType.FF_MEDIA_TYPE);
+    public GffMessageConverter() {
+        super(GFF_MEDIA_TYPE);
     }
 
     @Override
@@ -37,15 +38,16 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
     }
 
     @Override
-    protected MessageConverterContext readInternal(Class<? extends MessageConverterContext> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+    protected MessageConverterContext readInternal(Class<? extends MessageConverterContext> aClass,
+            HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
         throw new UnsupportedOperationException();
     }
 
     @Override
     protected void write(MessageConverterContext messageConfig,
-                         OutputStream outputStream,
-                         Instant start,
-                         AtomicInteger counter) throws IOException {
+            OutputStream outputStream,
+            Instant start,
+            AtomicInteger counter) throws IOException {
         Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
 
         try {
@@ -60,7 +62,7 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
                             logStats(currentCount, start);
                         }
 
-                        outputStream.write((UniProtFlatfileWriter.write(entry) + "\n").getBytes());
+                        outputStream.write((EntryGffConverter.convert(entry) + "\n").getBytes());
                     } catch (Throwable e) {
                         throw new StopStreamException("Could not write entry: " + entry, e);
                     }
@@ -75,4 +77,5 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
             outputStream.close();
         }
     }
+
 }

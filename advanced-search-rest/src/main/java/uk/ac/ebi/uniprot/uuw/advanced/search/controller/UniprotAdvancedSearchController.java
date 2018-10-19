@@ -1,37 +1,52 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 
+
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
+import static org.springframework.http.HttpHeaders.VARY;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.GFF_MEDIA_TYPE_VALUE;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.ws.rs.QueryParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.ws.rs.QueryParam;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE_VALUE;
 
 /**
  * Controller for uniprot advanced search service.
@@ -81,7 +96,8 @@ public class UniprotAdvancedSearchController {
      * Note that by setting content-disposition header, we a file is downloaded (and it's not written to stdout).
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
-            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
+            		APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE,FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(
             @Valid SearchRequestDTO searchRequest,
             @RequestHeader("Accept") MediaType contentType,
@@ -101,7 +117,7 @@ public class UniprotAdvancedSearchController {
     }
 
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {
-        String suffix = "." + mediaType.getSubtype() + context.getFileType().getExtension();
+        String suffix = "." +UniProtMediaType.getFileExtension(mediaType) + context.getFileType().getExtension();
         String queryString = request.getQueryString();
         String desiredFileName = "uniprot-" + queryString + suffix;
         String actualFileName;

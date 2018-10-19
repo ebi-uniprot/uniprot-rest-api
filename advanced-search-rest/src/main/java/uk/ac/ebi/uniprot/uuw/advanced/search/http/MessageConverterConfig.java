@@ -15,17 +15,18 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FastaMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.GffMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XlsMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 
 import java.util.List;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 import static java.util.Arrays.asList;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE;
 
 /**
  * Created 21/08/18
@@ -67,6 +68,9 @@ public class MessageConverterConfig {
                 converters.add(new ListMessageConverter());
                 converters.add(0, new XmlMessageConverter());
                 converters.add(new TSVMessageConverter());
+                converters.add(new XlsMessageConverter());
+                converters.add(new FastaMessageConverter());
+                converters.add(new GffMessageConverter());
             }
         };
     }
@@ -80,15 +84,34 @@ public class MessageConverterConfig {
                 uniProtFlatFileMessageConverterContext(),
                 uniProtXmlMessageConverterContext(),
                 uniprotJsonMessageConverterContext(),
-                uniprotTSVMessageConverterContext()));
+                uniprotTSVMessageConverterContext(),
+                uniprotFastaMessageConverterContext(),
+                uniprotXlsMessageConverterContext(),
+                uniProtGffMessageConverterContext()));
 
         return contextFactory;
+    }
+    
+    private MessageConverterContext uniprotFastaMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(FASTA_MEDIA_TYPE);
+
+        return converter;
     }
 
     private MessageConverterContext uniprotTSVMessageConverterContext() {
         MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(TSV_MEDIA_TYPE);
+
+        return converter;
+    }
+    
+    private MessageConverterContext uniprotXlsMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(XLS_MEDIA_TYPE);
 
         return converter;
     }
@@ -129,6 +152,14 @@ public class MessageConverterConfig {
         MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(LIST_MEDIA_TYPE);
+
+        return converter;
+    }
+    
+    private MessageConverterContext uniProtGffMessageConverterContext() {
+        MessageConverterContext converter = new MessageConverterContext();
+        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+        converter.setContentType(GFF_MEDIA_TYPE);
 
         return converter;
     }
