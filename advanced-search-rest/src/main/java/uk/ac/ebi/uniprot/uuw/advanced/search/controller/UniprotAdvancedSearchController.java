@@ -73,7 +73,7 @@ public class UniprotAdvancedSearchController {
 
     @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-                        APPLICATION_JSON_VALUE})
+                        APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
     public ResponseEntity<Object> getByAccession(@PathVariable("accession") String accession,
                                                  @RequestHeader("Accept") MediaType contentType,
                                                  @RequestParam(value = "fields", required = false) String fields) {
