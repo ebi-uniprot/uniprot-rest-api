@@ -56,7 +56,7 @@ public class UniprotAdvancedSearchController {
 
     @RequestMapping(value = "/search", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-                        APPLICATION_JSON_VALUE})
+                        APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext> searchCursor(@Valid SearchRequestDTO searchRequest,
                                                                 @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
                                                                 @RequestHeader("Accept") MediaType contentType,
