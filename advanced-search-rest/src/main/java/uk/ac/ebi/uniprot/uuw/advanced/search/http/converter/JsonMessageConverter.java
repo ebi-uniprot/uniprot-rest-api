@@ -8,7 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.JsonMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 
@@ -30,7 +30,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
+public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<JsonMessageConverterContext> {
     private static final Logger LOGGER = getLogger(JsonMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
     private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
@@ -42,16 +42,16 @@ public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<Messag
 
     @Override
     protected boolean supports(Class<?> aClass) {
-        return MessageConverterContext.class.isAssignableFrom(aClass);
+        return JsonMessageConverterContext.class.isAssignableFrom(aClass);
     }
 
     @Override
-    protected MessageConverterContext readInternal(Class<? extends MessageConverterContext> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+    protected JsonMessageConverterContext readInternal(Class<? extends JsonMessageConverterContext> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void write(MessageConverterContext messageConfig,
+    protected void write(JsonMessageConverterContext messageConfig,
                          OutputStream outputStream,
                          Instant start,
                          AtomicInteger counter) throws IOException {
@@ -63,7 +63,7 @@ public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<Messag
         AtomicBoolean firstIteration = new AtomicBoolean(true);
 
         try {
-            outputStream.write("[".getBytes());
+            outputStream.write(messageConfig.getHeader().getBytes());
 
             entriesStream.forEach(items -> {
                 items.stream()
@@ -97,7 +97,7 @@ public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<Messag
                             }
                         });
             });
-            outputStream.write("]".getBytes());
+            outputStream.write(messageConfig.getFooter().getBytes());
 
             logStats(counter.get(), start);
         } catch (StopStreamException | IOException e) {

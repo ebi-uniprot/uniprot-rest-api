@@ -18,11 +18,13 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreTestConfig;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 
 @RunWith(SpringRunner.class)
@@ -30,6 +32,7 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSe
 @WebAppConfiguration
 public class UniprotAdvancedSearchControllerIT {
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
+    private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
     @Autowired
     private DataStoreManager storeManager;
@@ -38,7 +41,7 @@ public class UniprotAdvancedSearchControllerIT {
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
-    
+
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.
@@ -49,9 +52,7 @@ public class UniprotAdvancedSearchControllerIT {
     @Test
     public void canReachAccessionEndpoint() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        String acc = saveEntry();
 
         // when
         ResultActions response = mockMvc.perform(
@@ -62,5 +63,70 @@ public class UniprotAdvancedSearchControllerIT {
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+    }
+
+    @Test
+    public void canFilterEntryFromAccessionEndpoint() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + acc)
+                        .param("fields", "gene")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.accession", contains(acc)))
+                .andExpect(jsonPath("$.results.*.gene").exists())
+                // ensure other parts of the entry were not returned (using one example)
+                .andExpect(jsonPath("$.results.*.lineage").doesNotExist());
+    }
+
+    @Test
+    public void canReachSearchEndpoint() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+    }
+
+    @Test
+    public void canFilterEntryFromSearchEndpoint() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + acc)
+                        .param("query", "accession:" + acc)
+                        .param("fields", "gene")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.accession", contains(acc)))
+                .andExpect(jsonPath("$.results.*.gene").exists())
+                // ensure other parts of the entry were not returned (using one example)
+                .andExpect(jsonPath("$.results.*.lineage").doesNotExist());
+    }
+
+    private String saveEntry() {
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        return acc;
     }
 }

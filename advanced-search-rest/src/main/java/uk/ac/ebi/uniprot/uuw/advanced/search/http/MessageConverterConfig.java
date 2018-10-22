@@ -12,22 +12,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.JsonMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FastaMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.GffMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XlsMessageConverter;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.XmlMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.*;
 
 import java.util.List;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 import static java.util.Arrays.asList;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 /**
  * Created 21/08/18
@@ -118,8 +112,10 @@ public class MessageConverterConfig {
         return converter;
     }
 
-    private MessageConverterContext uniprotJsonMessageConverterContext() {
-        MessageConverterContext converter = new MessageConverterContext();
+    private JsonMessageConverterContext uniprotJsonMessageConverterContext() {
+        JsonMessageConverterContext converter = new JsonMessageConverterContext();
+        converter.setHeader("{\"results\" : [");
+        converter.setFooter("]}");
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(MediaType.APPLICATION_JSON);
 
