@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -57,9 +58,9 @@ public class TupleStreamTemplate {
             try {
                 StreamFactory streamFactory = new DefaultStreamFactory()
                         .withCollectionZkHost(collection, zookeeperHost);
-                String request =
+				String request =
                         String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s\", qt=\"/export\")",
-                                      collection, query, key, sortToString(order));
+                                      collection, query, fieldsToReturn(key, order), sortToString(order));
 
                 TupleStream tupleStream = streamFactory.constructStream(request);
                 tupleStream.setStreamContext(streamContext);
@@ -70,10 +71,17 @@ public class TupleStreamTemplate {
             }
         }
 
+        private String fieldsToReturn(String key, Sort order) {
+            String sortFields = StreamSupport.stream(order.spliterator(), false)
+                    .map(Sort.Order::getProperty)
+                    .collect(Collectors.joining(","));
+            return key + (Objects.isNull(sortFields) ? "" : "," + sortFields);
+        }
+
         private String sortToString(Sort order) {
             return StreamSupport.stream(order.spliterator(), false)
-                            .map(o -> o.getProperty() + " " + getSortDirection(o.getDirection()))
-                            .collect(Collectors.joining(","));
+                    .map(o -> o.getProperty() + " " + getSortDirection(o.getDirection()))
+                    .collect(Collectors.joining(","));
         }
 
         private static String getSortDirection(Sort.Direction direction) {

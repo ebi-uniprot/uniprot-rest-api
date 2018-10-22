@@ -37,8 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE;
-
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 /**
  * Created 21/09/18
  *

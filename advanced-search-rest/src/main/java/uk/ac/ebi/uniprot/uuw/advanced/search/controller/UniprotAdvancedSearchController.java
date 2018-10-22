@@ -12,6 +12,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
@@ -19,7 +20,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.service.UniProtEntryService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.ws.rs.QueryParam;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,9 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.FlatFileMessageConverter.FF_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
 /**
  * Controller for uniprot advanced search service.
@@ -78,7 +76,7 @@ public class UniprotAdvancedSearchController {
                         APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> getByAccession(@PathVariable("accession") String accession,
                                                  @RequestHeader("Accept") MediaType contentType,
-                                                 @QueryParam("fields") String fields) {
+                                                 @RequestParam("fields") String fields) {
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         SearchRequestDTO requestDTO = new SearchRequestDTO();
         requestDTO.setFields(fields);
@@ -96,7 +94,7 @@ public class UniprotAdvancedSearchController {
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-                        APPLICATION_JSON_VALUE})
+                        APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(
             @Valid SearchRequestDTO searchRequest,
             @RequestHeader("Accept") MediaType contentType,
@@ -122,7 +120,7 @@ public class UniprotAdvancedSearchController {
     }
 
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {
-        String suffix = "." + mediaType.getSubtype() + context.getFileType().getExtension();
+        String suffix = "." + UniProtMediaType.getFileExtension(mediaType) + context.getFileType().getExtension();
         String queryString = request.getQueryString();
         String desiredFileName = "uniprot-" + queryString + suffix;
         String actualFileName;

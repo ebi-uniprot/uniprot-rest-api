@@ -10,10 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Sequence;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
+import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
+import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
+import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
+import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterComponentType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotQueryRepository;
@@ -21,16 +29,16 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.ListMessageConverter.LIST_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.TSVMessageConverter.TSV_MEDIA_TYPE;
 
 @Service
 public class UniProtEntryService {
@@ -116,7 +124,7 @@ public class UniProtEntryService {
             return storeStreamer.idsStream(query, sort);
         }
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
-                .equals(TSV_MEDIA_TYPE))) {
+                .equals(TSV_MEDIA_TYPE) ||contentType.equals(XLS_MEDIA_TYPE))) {
             return storeStreamer.defaultFieldStream(query, sort);
         } else {
             return storeStreamer.idsToStoreStream(query, sort);
