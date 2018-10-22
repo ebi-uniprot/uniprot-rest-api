@@ -76,7 +76,7 @@ public class UniprotAdvancedSearchController {
                         APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> getByAccession(@PathVariable("accession") String accession,
                                                  @RequestHeader("Accept") MediaType contentType,
-                                                 @RequestParam("fields") String fields) {
+                                                 @RequestParam(value = "fields", required = false) String fields) {
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         SearchRequestDTO requestDTO = new SearchRequestDTO();
         requestDTO.setFields(fields);
