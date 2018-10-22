@@ -1,9 +1,9 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 
+import org.springframework.http.MediaType;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.springframework.http.MediaType;
 
 public class UniProtMediaType {
 	public static final String FF_MEDIA_TYPE_VALUE = "text/flatfile";
@@ -18,7 +18,6 @@ public class UniProtMediaType {
 	public static final MediaType FASTA_MEDIA_TYPE = valueOf(FASTA_MEDIA_TYPE_VALUE);
 	public static final String GFF_MEDIA_TYPE_VALUE = "text/gff";
     public static final MediaType GFF_MEDIA_TYPE = valueOf(GFF_MEDIA_TYPE_VALUE);
-	
 
 	private static Map<MediaType, String> MEDIATYPE_EXTENSION_MAP = new HashMap<>();
 	static {
