@@ -16,6 +16,12 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
+ * This class is responsible for simplifying the creation {@link TupleStream} instances, which enable the exporting
+ * of entire result sets from Solr. This template class is initialised with correct configuration details,
+ * e.g., zookeeper address and collection, in {@link ResultsConfig}. This template instance can then be used to
+ * create specific {@link TupleStream}s for a given query, using the original configuration details specified in the
+ * template.
+ *
  * Created 21/08/18
  *
  * @author Edd

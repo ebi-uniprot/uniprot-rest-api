@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * This class represents configurable properties of {@link StoreStreamer} instances.
+ *
  * Created 22/08/18
  *
  * @author Edd
