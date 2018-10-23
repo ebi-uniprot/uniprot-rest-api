@@ -3,7 +3,6 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +67,9 @@ public class UniprotAdvancedSearchController {
         QueryResult<?> result = entryService.search(searchRequest, context, contentType);
 
         eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-        return new ResponseEntity<>(context, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(createHttpSearchHeader(contentType))
+                .body(context);
     }
 
     @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET,
@@ -83,7 +84,9 @@ public class UniprotAdvancedSearchController {
         context.setRequestDTO(requestDTO);
         context.setEntities(entryService.getByAccession(accession, fields, contentType));
 
-        return new ResponseEntity<>(context, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(createHttpSearchHeader(contentType))
+                .body(context);
     }
 
     /*
@@ -117,6 +120,16 @@ public class UniprotAdvancedSearchController {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
+    }
+
+    private HttpHeaders createHttpSearchHeader(MediaType mediaType) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(mediaType);
+
+        // used so that gate-way caching uses accept/accept-encoding headers as a key
+        httpHeaders.add(VARY, ACCEPT);
+        httpHeaders.add(VARY, ACCEPT_ENCODING);
+        return httpHeaders;
     }
 
     private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {
