@@ -12,7 +12,8 @@ import javax.validation.constraints.Positive;
  */
 @Data
 public class SearchRequestDTO {
-
+    private static final int DEFAULT_RESULTS_SIZE = 25;
+    
     @NotNull(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.required}")
     private String query;
 
@@ -23,6 +24,5 @@ public class SearchRequestDTO {
     private String cursor;
 
     @Positive(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.positive}")
-    private Integer size;
-
+    private Integer size = DEFAULT_RESULTS_SIZE;
 }
