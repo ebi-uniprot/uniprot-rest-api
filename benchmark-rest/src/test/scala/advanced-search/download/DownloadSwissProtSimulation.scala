@@ -46,7 +46,7 @@ object DownloadSwissProtSimulation {
     setUp(
       DownloadScenario.instance.inject(atOnceUsers(conf.getInt("a.s.download.swissprot.users")))
     )
-      .protocols(DownloadSimulation.httpConf)
+      .protocols(DownloadSwissProtSimulation.httpConf)
       .maxDuration(conf.getInt("a.s.download.swissprot.maxDuration") minutes)
   }
 
