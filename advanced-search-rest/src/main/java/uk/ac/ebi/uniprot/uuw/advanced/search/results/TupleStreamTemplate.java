@@ -52,7 +52,7 @@ public class TupleStreamTemplate {
     }
 
     @Builder
-    private static class TupleStreamBuilder {
+    static class TupleStreamBuilder {
         private final String collection;
         private String zookeeperHost;
         private String requestHandler;
@@ -72,19 +72,19 @@ public class TupleStreamTemplate {
                 tupleStream.setStreamContext(streamContext);
                 return tupleStream;
             } catch (IOException e) {
-                LOGGER.error("Could not create CloudSolrStream", e);
+                LOGGER.error("Could not create TupleStream", e);
                 throw new IllegalStateException();
             }
         }
 
-        private String fieldsToReturn(String key, Sort order) {
+        static String fieldsToReturn(String key, Sort order) {
             String sortFields = StreamSupport.stream(order.spliterator(), false)
                     .map(Sort.Order::getProperty)
                     .collect(Collectors.joining(","));
             return key + (Objects.isNull(sortFields) ? "" : "," + sortFields);
         }
 
-        private String sortToString(Sort order) {
+        static String sortToString(Sort order) {
             return StreamSupport.stream(order.spliterator(), false)
                     .map(o -> o.getProperty() + " " + getSortDirection(o.getDirection()))
                     .collect(Collectors.joining(","));
