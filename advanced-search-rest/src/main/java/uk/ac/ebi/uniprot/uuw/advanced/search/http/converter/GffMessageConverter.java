@@ -1,5 +1,9 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
+import org.slf4j.Logger;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryGffConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 
@@ -9,13 +13,9 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.GFF_MEDIA_TYPE;
 
 /**
  * 
@@ -23,8 +23,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  */
 public class GffMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext> {
-    public static final String GFF_MEDIA_TYPE_VALUE = "text/gff";
-    public static final MediaType GFF_MEDIA_TYPE = new MediaType("text", "gff");
     private static final Logger LOGGER = getLogger(GffMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
 
