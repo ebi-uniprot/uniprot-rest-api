@@ -14,7 +14,7 @@ object DownloadSwissProtSimulation {
   val conf = ConfigFactory.load()
 
   val httpConf = http
-    .baseURL(conf.getString("a.s.url"))
+    .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
   object DownloadScenario {

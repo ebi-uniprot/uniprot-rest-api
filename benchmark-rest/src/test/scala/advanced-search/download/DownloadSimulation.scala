@@ -13,7 +13,7 @@ object DownloadSimulation {
   val conf = ConfigFactory.load()
 
   val httpConf = http
-    .baseURL(conf.getString("a.s.url"))
+    .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
   object DownloadScenario {
@@ -48,7 +48,7 @@ object DownloadSimulation {
       DownloadScenario.instance.inject(atOnceUsers(conf.getInt("a.s.download.users")))
     )
       .protocols(DownloadSimulation.httpConf)
-//      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+      //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(conf.getInt("a.s.download.maxDuration") minutes)
   }
 
