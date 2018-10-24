@@ -18,7 +18,7 @@ object DownloadSwissProtSimulation {
     .doNotTrackHeader("1")
 
   object DownloadScenario {
-    val downloadFeeder = csv(conf.getString("a.s.download.swissprot.query.list")).random
+    val downloadFeeder = separatedValues(conf.getString("a.s.download.swissprot.query.list"), '#').random
 
     def getRequestWithFormat(): ChainBuilder = {
       val httpReqInfo: String = "url=${download_sp_url}, format=${download_sp_format}"
