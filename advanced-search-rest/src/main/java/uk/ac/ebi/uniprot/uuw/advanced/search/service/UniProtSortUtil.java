@@ -3,21 +3,24 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 import com.google.common.base.Strings;
 import org.springframework.data.domain.Sort;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class UniProtSortUtil {
     private static final String D = "d";
     private static final String ANNOTATION_SCORE = "annotation_score";
-    private static final String ACCESSION = "accession";
+    private static final String ACCESSION = "accession_id";
 
     private static final Set<String> validSortFields = new HashSet<>();
 
     static {
         validSortFields.add(ACCESSION);
         validSortFields.add(ANNOTATION_SCORE);
-        validSortFields.add("organism");
-        validSortFields.add("protein_name");
-        validSortFields.add("gene");
+        validSortFields.add("organism_sort");
+        validSortFields.add("mnemonic_sort");
+        validSortFields.add("name_sort");
+        validSortFields.add("gene_sort");
         validSortFields.add("length");
         validSortFields.add("mass");
     }
