@@ -32,7 +32,7 @@
 		"label": "Organism [OS]",
 		"term": "organism",
 		"dataType": "string",
-		"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?",
+		"autoComplete": "/uniprot/api/suggester?dict=taxonomy&query=?",
 		"description": "Search by Organism name",
 		"example": "saccharomyces"
 	},
@@ -40,7 +40,7 @@
 		"label": "Taxonomy [OC]",
 		"term": "taxonomy",
 		"dataType": "string",
-		"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?",
+		"autoComplete": "/uniprot/api/suggester?dict=taxonomy&query=?",
 		"description": "Search by NCBI taxonomy",
 		"example": "human"
 	},
@@ -48,7 +48,7 @@
 		"label": "Virus host",
 		"term": "host",
 		"dataType": "string",
-		"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?",
+		"autoComplete": "/uniprot/api/suggester?dict=taxonomy&query=?",
 		"description": "Search by virus host",
 		"example": "human"
 	},
@@ -90,7 +90,7 @@
 				"label": "Enzyme classification [EC]",
 				"term": "ec",
 				"dataType": "string",
-				"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?ec=?",
+				"autoComplete": "/uniprot/api/suggester?dict=ec&query=?",
 				"description": "Search by Enzyme EC number",
 				"example": "1.1.2.3"
 			},
@@ -103,7 +103,7 @@
 						"itemType": "comment",
 						"term": "cofactor_chebi",
 						"dataType": "string",
-						"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?chebi=?",
+						"autoComplete": "/uniprot/api/suggester?dict=chebi&query=?",
 						"hasEvidence": true,
 						"description": "Search by cofactor chebi ",
 						"example": "29105"
@@ -333,7 +333,7 @@
 						"itemType": "comment",
 						"term": "scl_term",
 						"dataType": "string",
-						"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?sublocation=?",
+						"autoComplete": "/uniprot/api/suggester?dict=subcell&query=?",
 						"hasEvidence": true,
 						"description": "Search by comment subcellular location term",
 						"example": "membrane"
@@ -1002,7 +1002,7 @@
 				"label": "Encoded in",
 				"term": "organelle",
 				"dataType": "string",
-				"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?organelle=?",
+				"autoComplete": "/uniprot/api/suggester?dict=organelle&query=?",
 				"description": "Search by organelle",
 				"example": "mitochondrion"
 			},
@@ -1212,7 +1212,7 @@
 		"label": "Gene Ontology [GO]",
 		"itemType": "goterm",
 		"term": "go",
-		"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?goterm=?",
+		"autoComplete": "/uniprot/api/suggester?dict=go&query=?",
 		"hasEvidence": true,
 		"description": "search go term with evidence. If evidence is not consider term is go. If evidence is considered such as iea, the term is go_iea",
 		"example": "0009986"
@@ -1221,7 +1221,7 @@
 		"label": "Keyword [KW]",
 		"term": "keyword",
 		"dataType": "string",
-		"autoComplete": "https://www.ebi.ac.uk/proteins/api/selector?keyword=?",
+		"autoComplete": "/uniprot/api/suggester?dict=keyword&query=?",
 		"description": "Search by keyword",
 		"example": "chromosomal"
 	},
