@@ -14,7 +14,7 @@ object FiltersWithDownloadSimulation {
   val conf = ConfigFactory.load()
 
   val httpConf = http
-    .baseURL(conf.getString("a.s.url"))
+    .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
   object DownloadFilterResultsScenario {
@@ -53,46 +53,46 @@ object FiltersWithDownloadSimulation {
     val taxonomyFeeder = csv(conf.getString("a.s.multi.filters.taxonomy.list")).random
     val geneNameFeeder = csv(conf.getString("a.s.multi.filters.gene.list")).random
     val proteinNameFeeder = csv(conf.getString("a.s.multi.filters.protein.list")).random
-//    val featureFeeder = tsv(conf.getString("advanced.search.feature.list")).random
+    //    val featureFeeder = tsv(conf.getString("advanced.search.feature.list")).random
 
     def getRequestWithFormat(): ChainBuilder = {
       //      val filterFeatureRequestStr: String = "/searchCursor?query=ft_molecule_processing:${feature}"
 
       val request =
         feed(accessionFeeder)
-          feed(organismFeeder)
-          .feed(generalSearchFeeder)
-          .feed(taxonomyFeeder)
-          .feed(geneNameFeeder)
-          .feed(proteinNameFeeder)
-          .pause(5 seconds, 15 seconds)
-          .exec(http("content field")
-            .get("${content_url}")
-            .header("Accept", "${content_format}"))
-          .pause(5 seconds, 15 seconds)
-          .exec(http("organism field")
-            .get("${organism_url}")
-            .header("Accept", "${organism_format}"))
-          .pause(5 seconds, 15 seconds)
-          .exec(http("accession field")
-            .get("${accession_url}")
-            .header("Accept", "${accession_format}"))
-          .pause(5 seconds, 15 seconds)
-          .exec(http("taxon field")
-            .get("${taxon_url}")
-            .header("Accept", "${taxon_format}"))
-          .pause(5 seconds, 15 seconds)
-          .exec(http("gene field")
-            .get("${gene_url}")
-            .header("Accept", "${gene_format}"))
-          .pause(5 seconds, 15 seconds)
-//          .exec(http("feature molecule processing field")
-//            .get(filterFeatureRequestStr)
-//            .header("Accept", format))
-          .pause(5 seconds, 15 seconds)
-          .exec(http("protein field")
-            .get("${protein_url}")
-            .header("Accept", "${protein_format}"))
+      feed(organismFeeder)
+        .feed(generalSearchFeeder)
+        .feed(taxonomyFeeder)
+        .feed(geneNameFeeder)
+        .feed(proteinNameFeeder)
+        .pause(5 seconds, 15 seconds)
+        .exec(http("content field")
+          .get("${content_url}")
+          .header("Accept", "${content_format}"))
+        .pause(5 seconds, 15 seconds)
+        .exec(http("organism field")
+          .get("${organism_url}")
+          .header("Accept", "${organism_format}"))
+        .pause(5 seconds, 15 seconds)
+        .exec(http("accession field")
+          .get("${accession_url}")
+          .header("Accept", "${accession_format}"))
+        .pause(5 seconds, 15 seconds)
+        .exec(http("taxon field")
+          .get("${taxon_url}")
+          .header("Accept", "${taxon_format}"))
+        .pause(5 seconds, 15 seconds)
+        .exec(http("gene field")
+          .get("${gene_url}")
+          .header("Accept", "${gene_format}"))
+        .pause(5 seconds, 15 seconds)
+        //          .exec(http("feature molecule processing field")
+        //            .get(filterFeatureRequestStr)
+        //            .header("Accept", format))
+        .pause(5 seconds, 15 seconds)
+        .exec(http("protein field")
+          .get("${protein_url}")
+          .header("Accept", "${protein_format}"))
 
       return request
     }
@@ -113,7 +113,8 @@ object FiltersWithDownloadSimulation {
       DownloadFilterResultsScenario.instance.inject(atOnceUsers(conf.getInt("a.s.multi.filters.download.users")))
     )
       .protocols(FiltersWithDownloadSimulation.httpConf)
-//      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+      //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
       .maxDuration(conf.getInt("a.s.multi.filters.maxDuration") minutes)
   }
+
 }
