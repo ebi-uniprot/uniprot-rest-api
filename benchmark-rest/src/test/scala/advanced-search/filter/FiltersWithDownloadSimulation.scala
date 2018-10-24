@@ -18,7 +18,7 @@ object FiltersWithDownloadSimulation {
     .doNotTrackHeader("1")
 
   object DownloadFilterResultsScenario {
-    val downloadFeeder = csv(conf.getString("a.s.download.query.list")).random
+    val downloadFeeder = separatedValues(conf.getString("a.s.download.query.list"), '#').random
 
     def getRequestWithFormat(): ChainBuilder = {
       val httpReqInfo: String = "url=${download_url}, format=${download_format}, encoding=${download_encoding}"
@@ -47,12 +47,12 @@ object FiltersWithDownloadSimulation {
   }
 
   object FilterScenario {
-    val generalSearchFeeder = csv(conf.getString("a.s.multi.filters.general.search.list")).random
-    val organismFeeder = csv(conf.getString("a.s.multi.filters.organism.list")).random
-    val accessionFeeder = csv(conf.getString("a.s.multi.filters.accessions.retrieval.list")).random
-    val taxonomyFeeder = csv(conf.getString("a.s.multi.filters.taxonomy.list")).random
-    val geneNameFeeder = csv(conf.getString("a.s.multi.filters.gene.list")).random
-    val proteinNameFeeder = csv(conf.getString("a.s.multi.filters.protein.list")).random
+    val generalSearchFeeder = separatedValues(conf.getString("a.s.multi.filters.general.search.list"), '#').random
+    val organismFeeder = separatedValues(conf.getString("a.s.multi.filters.organism.list"), '#').random
+    val accessionFeeder = separatedValues(conf.getString("a.s.multi.filters.accessions.retrieval.list"), '#').random
+    val taxonomyFeeder = separatedValues(conf.getString("a.s.multi.filters.taxonomy.list"), '#').random
+    val geneNameFeeder = separatedValues(conf.getString("a.s.multi.filters.gene.list"), '#').random
+    val proteinNameFeeder = separatedValues(conf.getString("a.s.multi.filters.protein.list"), '#').random
     //    val featureFeeder = tsv(conf.getString("advanced.search.feature.list")).random
 
     def getRequestWithFormat(): ChainBuilder = {

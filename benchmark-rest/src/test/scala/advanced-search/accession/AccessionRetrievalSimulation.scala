@@ -18,7 +18,7 @@ object AccessionRetrievalSimulation {
     .doNotTrackHeader("1")
 
   object AccessionScenario {
-    val feeder = csv(conf.getString("a.s.accession.retrieval.list")).random
+    val feeder = separatedValues(conf.getString("a.s.accession.retrieval.list"), '#').random
 
     def getRequest(): ChainBuilder = {
       val httpReqInfo: String = "url=${accession_url}, format=${accession_format}";
