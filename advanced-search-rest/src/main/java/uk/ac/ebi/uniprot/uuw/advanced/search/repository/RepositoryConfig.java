@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.core.SolrTemplate;
 
+import java.util.Collections;
+import java.util.Optional;
+
 /**
  * Configure spring-data-solr repository beans, that are used to retrieve data from a solr instance.
  *
@@ -43,7 +46,8 @@ public class RepositoryConfig {
     @Profile("live")
     public SolrClient uniProtSolrClient(HttpClient httpClient, RepositoryConfigProperties config) {
         if (!config.getZookeperhost().isEmpty()) {
-            return new CloudSolrClient.Builder().withHttpClient(httpClient).withZkHost(config.getZookeperhost())
+            return new CloudSolrClient.Builder(Collections.singletonList(config.getZookeperhost()), Optional.empty())
+                    .withHttpClient(httpClient)
                     .build();
         } else if (!config.getHttphost().isEmpty()) {
             return new HttpSolrClient.Builder().withHttpClient(httpClient).withBaseSolrUrl(config.getHttphost())
