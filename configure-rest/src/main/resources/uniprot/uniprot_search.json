@@ -1164,11 +1164,8 @@
 	},
 	{
 		"label": "Cross-references",
-		"itemType": "database",
-		"term": "xref",
-		"dataType": "string",
-		"description": "Search by Cross reference: if database is selected, but value is not set or value is set *, query become: database:embl",
-		"example": "embl-EU518936"
+		"itemType": "group",
+        "items" : []
 	},
 	{
 		"label": "Web Resources",

@@ -1,15 +1,14 @@
 package uk.ac.ebi.uniprot.configure.uniprot.domain.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -21,6 +20,7 @@ public class UniProtSearchItem implements SearchItem {
 	private SearchDataType dataType = SearchDataType.STRING;
 
 	private List<Tuple> values;
+	private String valuePrefix;
 	private List<SearchItem> items;
 	private Boolean hasRange;
 	private Boolean hasEvidence;
@@ -102,6 +102,14 @@ public class UniProtSearchItem implements SearchItem {
 		this.description = description;
 	}
 
+	@Override
+	public String getValuePrefix() {
+		return this.valuePrefix;
+	}
+
+	public void setValuePrefix(String valuePrefix) {
+		this.valuePrefix = valuePrefix;
+	}
 	public String getExample() {
 		return example;
 	}
@@ -152,20 +160,16 @@ public class UniProtSearchItem implements SearchItem {
 			sb.append("description:").append(description).append("\n");
 		}
 
-		if (!values.isEmpty()) {
+		if (values != null && !values.isEmpty()) {
 			sb.append("values:[\n");
 			values.forEach(val -> sb.append("\t").append(val).append("\n"));
 			sb.append("]\n");
 		}
-		if (!values.isEmpty()) {
-			sb.append("values:[\n");
-			values.forEach(val -> sb.append("\t").append(val).append("\n"));
-			sb.append("]\n");
-		}
-		if (hasRange) {
+
+		if (hasRange != null && hasRange) {
 			sb.append("hasRange: true\n");
 		}
-		if (hasEvidence) {
+		if (hasEvidence != null && hasEvidence) {
 			sb.append("hasEvidence: true\n");
 		}
 		if (!isNullOrEmpty(autoComplete)) {
@@ -175,10 +179,13 @@ public class UniProtSearchItem implements SearchItem {
 			sb.append("example:").append(example).append("\n");
 		}
 
-		if (!items.isEmpty()) {
+		if (items != null && !items.isEmpty()) {
 			sb.append("items:[");
 			items.forEach(val -> sb.append(val).append("\n"));
 			sb.append("]\n");
+		}
+		if (!isNullOrEmpty(valuePrefix)) {
+			sb.append("valuePrefix:").append(valuePrefix).append("\n");
 		}
 		sb.append("}");
 		return sb.toString();

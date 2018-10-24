@@ -8,6 +8,7 @@ public interface SearchItem {
 	String getTerm();
 	SearchDataType getDataType();
 	String getDescription();
+	String getValuePrefix();
 	List<Tuple> getValues();
 	List<SearchItem> getItems();
 	Boolean isHasRange();
