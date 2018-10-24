@@ -11,10 +11,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
+ * This class is responsible for simplifying the creation {@link TupleStream} instances, which enable the exporting
+ * of entire result sets from Solr. This template class is initialised with correct configuration details,
+ * e.g., zookeeper address and collection, in {@link ResultsConfig}. This template instance can then be used to
+ * create specific {@link TupleStream}s for a given query, using the original configuration details specified in the
+ * template.
+ *
  * Created 21/08/18
  *
  * @author Edd
@@ -45,7 +52,7 @@ public class TupleStreamTemplate {
     }
 
     @Builder
-    private static class TupleStreamBuilder {
+    static class TupleStreamBuilder {
         private final String collection;
         private String zookeeperHost;
         private String requestHandler;
@@ -57,23 +64,30 @@ public class TupleStreamTemplate {
             try {
                 StreamFactory streamFactory = new DefaultStreamFactory()
                         .withCollectionZkHost(collection, zookeeperHost);
-                String request =
+				String request =
                         String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s\", qt=\"/export\")",
-                                      collection, query, key, sortToString(order));
+                                      collection, query, fieldsToReturn(key, order), sortToString(order));
 
                 TupleStream tupleStream = streamFactory.constructStream(request);
                 tupleStream.setStreamContext(streamContext);
                 return tupleStream;
             } catch (IOException e) {
-                LOGGER.error("Could not create CloudSolrStream", e);
+                LOGGER.error("Could not create TupleStream", e);
                 throw new IllegalStateException();
             }
         }
 
-        private String sortToString(Sort order) {
+        static String fieldsToReturn(String key, Sort order) {
+            String sortFields = StreamSupport.stream(order.spliterator(), false)
+                    .map(Sort.Order::getProperty)
+                    .collect(Collectors.joining(","));
+            return key + (Objects.isNull(sortFields) ? "" : "," + sortFields);
+        }
+
+        static String sortToString(Sort order) {
             return StreamSupport.stream(order.spliterator(), false)
-                            .map(o -> o.getProperty() + " " + getSortDirection(o.getDirection()))
-                            .collect(Collectors.joining(","));
+                    .map(o -> o.getProperty() + " " + getSortDirection(o.getDirection()))
+                    .collect(Collectors.joining(","));
         }
 
         private static String getSortDirection(Sort.Direction direction) {

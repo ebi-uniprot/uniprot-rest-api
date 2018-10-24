@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * @author Edd
  */
 public class MessageConverterContext {
-    private FileType fileType;
+    private FileType fileType = FileType.FILE;
     private MediaType contentType;
     private Stream<?> entities;
     private MessageConverterContextFactory.Resource resource;

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage;
@@ -113,7 +114,7 @@ public class SolrQueryRepositoryIT {
 
     private SimpleQuery query(String query) {
         SimpleQuery simpleQuery = new SimpleQuery(query);
-        simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession"));
+        simpleQuery.addSort(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
         return simpleQuery;
     }
 

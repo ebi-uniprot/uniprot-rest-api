@@ -13,6 +13,9 @@ import java.util.concurrent.TimeUnit;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
+ * This class wraps an existing {@link TupleStream}, originating from a streaming result set from Solr, and creates
+ * an {@link Iterable} of its contents. This simplifies iterating through all results in a {@link TupleStream}.
+ *
  * Created 21/08/18
  *
  * @author Edd
@@ -26,7 +29,7 @@ public class TupleStreamIterable implements Iterable<String> {
     private Tuple next = current;
     private boolean atEnd = false;
 
-    public TupleStreamIterable(TupleStream tupleStream, String id) {
+    TupleStreamIterable(TupleStream tupleStream, String id) {
         this.tupleStream = tupleStream;
         this.id = id;
             this.retryPolicy = new RetryPolicy()

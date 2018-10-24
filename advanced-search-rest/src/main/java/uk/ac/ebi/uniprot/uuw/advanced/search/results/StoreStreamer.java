@@ -19,6 +19,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
+ * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored fields).
+ * Clients of this class need not know what store they need to access. They need only provide the query that
+ * needs answering, in addition to the sortable fields.
+ *
  * Created 22/08/18
  *
  * @author Edd

@@ -18,7 +18,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.validation.validator.impl.UniprotSo
  */
 @Data
 public class SearchRequestDTO {
-
+    private static final int DEFAULT_RESULTS_SIZE = 25;
+    
     @NotNull(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.required}")
     @ValidSolrQuerySyntax(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.query}")
     @ValidSolrQueryFields(fieldValidatorClazz = UniprotSolrQueryFieldValidator.class)
@@ -32,6 +33,5 @@ public class SearchRequestDTO {
     private String cursor;
 
     @Positive(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.positive}")
-    private Integer size;
-
+    private Integer size = DEFAULT_RESULTS_SIZE;
 }
