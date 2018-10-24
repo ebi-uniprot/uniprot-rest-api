@@ -17,8 +17,8 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtEntryMocker;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.DataStoreTestConfig;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -285,7 +285,7 @@ public class UniprotAdvancedSearchControllerIT {
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&sort=organism_name asc")
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&sort=organism asc")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
