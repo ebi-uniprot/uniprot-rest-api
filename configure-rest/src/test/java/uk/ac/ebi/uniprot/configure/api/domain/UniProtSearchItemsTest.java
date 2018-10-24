@@ -1,22 +1,19 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UniProtSearchItemsTest {
 	private static UniProtSearchItems searchItems;
@@ -60,7 +57,7 @@ class UniProtSearchItemsTest {
 		assertEquals("organism", item.get().getTerm());
 		assertEquals(SearchDataType.STRING, item.get().getDataType());
 		assertNotNull(item.get().getAutoComplete());
-		assertEquals("https://www.ebi.ac.uk/proteins/api/selector?taxonomy=?", item.get().getAutoComplete());
+		assertEquals("/uniprot/api/suggester?dict=taxonomy&query=?", item.get().getAutoComplete());
 	}
 
 	@Test
@@ -113,7 +110,7 @@ class UniProtSearchItemsTest {
 		assertTrue(subSubItem.isPresent());
 		assertEquals(SearchDataType.STRING, subSubItem.get().getDataType());
 		assertEquals(SearchItemType.COMMENT, subSubItem.get().getItemType());
-		assertEquals("https://www.ebi.ac.uk/proteins/api/selector?chebi=?", subSubItem.get().getAutoComplete());
+		assertEquals("/uniprot/api/suggester?dict=chebi&query=?", subSubItem.get().getAutoComplete());
 		assertEquals("cofactor_chebi", subSubItem.get().getTerm());
 		assertTrue(subSubItem.get().isHasEvidence());
 	}
