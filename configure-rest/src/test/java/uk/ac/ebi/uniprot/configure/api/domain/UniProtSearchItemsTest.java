@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UniProtSearchItemsTest {
@@ -29,7 +31,7 @@ class UniProtSearchItemsTest {
 		assertEquals(27, items.size());
 		AtomicInteger counter = new AtomicInteger();
 		items.forEach(val -> numberOfItem(val, counter));
-		assertEquals(127, counter.get());
+		assertThat(counter.get(), Matchers.is(Matchers.greaterThan(127)));
 	}
 
 	private void numberOfItem(SearchItem item, AtomicInteger counter) {
@@ -144,10 +146,8 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Cross-references")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("xref", item.get().getTerm());
-		assertEquals(SearchDataType.STRING, item.get().getDataType());
-		assertEquals(SearchItemType.DATABASE, item.get().getItemType());
-		assertEquals("embl-EU518936", item.get().getExample());
+		assertEquals(SearchItemType.GROUP, item.get().getItemType());
+		assertThat(item.get().getItems().size(), Matchers.is(Matchers.greaterThan(0)));
 	}
 
 	@Test
