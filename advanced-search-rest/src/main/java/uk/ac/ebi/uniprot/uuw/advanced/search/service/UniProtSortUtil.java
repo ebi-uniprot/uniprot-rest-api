@@ -2,31 +2,14 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.service;
 
 import com.google.common.base.Strings;
 import org.springframework.data.domain.Sort;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 public class UniProtSortUtil {
-    private static final String D = "d";
-    private static final String ANNOTATION_SCORE = "annotation_score";
-    private static final String ACCESSION = "accession_id";
 
-    private static final Set<String> validSortFields = new HashSet<>();
-
-    static {
-        validSortFields.add(ACCESSION);
-        validSortFields.add(ANNOTATION_SCORE);
-        validSortFields.add("organism_sort");
-        validSortFields.add("mnemonic_sort");
-        validSortFields.add("name_sort");
-        validSortFields.add("gene_sort");
-        validSortFields.add("length");
-        validSortFields.add("mass");
-    }
-
-    private static Sort addSort(Sort initialSort, Sort.Direction direction, String... fields) {
-        Sort newSort = new Sort(direction, fields);
+    private static Sort addSort(Sort initialSort, Sort.Direction direction, UniProtField.Sort fields) {
+        Sort newSort = new Sort(direction, fields.getSolrFieldName());
         if (initialSort != null) {
             return initialSort.and(newSort);
         } else {
@@ -40,21 +23,19 @@ public class UniProtSortUtil {
         }
         Sort sort = null;
         boolean hasAccession = false;
-        String[] tokens = sortFields.split(",");
+        String[] tokens = sortFields.split("\\s*,\\s*");
         for (String token : tokens) {
-            String[] sortedField = token.split(":");
-            if (!isValidSortField(sortedField[0]))
-                continue;
-            if (sortedField[0].equals(ACCESSION))
+            String[] sortedField = token.split("\\s+");
+            if (sortedField[0].equals(UniProtField.Sort.accession.name()))
                 hasAccession = true;
-            if ((sortedField.length == 2) && D.equals(sortedField[1])) {
-                sort = addSort(sort, Sort.Direction.DESC, sortedField[0]);
+            if (isDescendentSort(sortedField)) {
+                sort = addSort(sort, Sort.Direction.DESC, UniProtField.Sort.valueOf(sortedField[0]));
             } else {
-                sort = addSort(sort, Sort.Direction.ASC, sortedField[0]);
+                sort = addSort(sort, Sort.Direction.ASC, UniProtField.Sort.valueOf(sortedField[0]));
             }
         }
         if (sort != null && !hasAccession) {
-            sort = addSort(sort, Sort.Direction.ASC, ACCESSION);
+            sort = addSort(sort, Sort.Direction.ASC, UniProtField.Sort.accession);
         }
 
         if (sort == null) {
@@ -64,12 +45,13 @@ public class UniProtSortUtil {
         }
     }
 
-    public static Sort createDefaultSort() {
-        return new Sort(Sort.Direction.DESC, ANNOTATION_SCORE)
-                .and(new Sort(Sort.Direction.ASC, ACCESSION));
+    private static boolean isDescendentSort(String[] sortedField) {
+        return (sortedField.length == 2) && sortedField[1].equalsIgnoreCase(Sort.Direction.DESC.name());
     }
 
-    public static boolean isValidSortField(String field) {
-        return validSortFields.contains(field);
+    public static Sort createDefaultSort() {
+        return new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName())
+                .and(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
     }
+
 }
