@@ -9,7 +9,7 @@ import com.typesafe.config._
 /**
   * Simulates downloading all of Swiss-Prot.
   */
-object DownloadSwissProtSimulation {
+class DownloadSwissProtSimulation extends Simulation {
 
   val conf = ConfigFactory.load()
 
@@ -17,37 +17,32 @@ object DownloadSwissProtSimulation {
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
-  object DownloadScenario {
-    val downloadFeeder = separatedValues(conf.getString("a.s.download.swissprot.query.list"), '#').random
+  val downloadFeeder = separatedValues(conf.getString("a.s.download.swissprot.query.list"), '#').random
 
-    def getRequestWithFormat(): ChainBuilder = {
-      val httpReqInfo: String = "url=${download_sp_url}, format=${download_sp_format}"
-      val filterGeneralRequestStr: String = "${download_sp_url}"
+  def getRequestWithFormat(): ChainBuilder = {
+    val httpReqInfo: String = "url=${download_sp_url}, format=${download_sp_format}"
+    val filterGeneralRequestStr: String = "${download_sp_url}"
 
-      val request =
-        feed(downloadFeeder)
-          .exec(http(httpReqInfo)
-            .get(filterGeneralRequestStr)
-            .header("Accept", "${download_sp_format}")
-          )
+    val request =
+      feed(downloadFeeder)
+        .exec(http(httpReqInfo)
+          .get(filterGeneralRequestStr)
+          .header("Accept", "${download_sp_format}")
+        )
 
-      return request
-    }
-
-    val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat()
-    )
-
-    val instance = scenario("Download Swiss-Prot Scenario")
-      .exec(requestSeq)
+    return request
   }
 
-  class DownloadSwissProtSimulation extends Simulation {
-    setUp(
-      DownloadScenario.instance.inject(atOnceUsers(conf.getInt("a.s.download.swissprot.users")))
-    )
-      .protocols(DownloadSwissProtSimulation.httpConf)
-      .maxDuration(conf.getInt("a.s.download.swissprot.maxDuration") minutes)
-  }
+  val requestSeq = Seq(
+    getRequestWithFormat()
+  )
 
+  val instance = scenario("Download Swiss-Prot Scenario")
+    .exec(requestSeq)
+
+  setUp(
+    instance.inject(atOnceUsers(conf.getInt("a.s.download.swissprot.users")))
+  )
+    .protocols(httpConf)
+    .maxDuration(conf.getInt("a.s.download.swissprot.maxDuration") minutes)
 }

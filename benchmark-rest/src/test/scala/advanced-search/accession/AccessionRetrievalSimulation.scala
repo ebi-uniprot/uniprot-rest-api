@@ -9,7 +9,7 @@ import com.typesafe.config._
   * Simulates simple retrieval of accessions from the REST service. The most basic ID retrieval, which serves
   * as a basis on which other test performances can be compared.
   */
-object AccessionRetrievalSimulation {
+class AccessionRetrievalSimulation extends Simulation {
 
   val conf = ConfigFactory.load()
 
@@ -17,41 +17,36 @@ object AccessionRetrievalSimulation {
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
-  object AccessionScenario {
-    val feeder = separatedValues(conf.getString("a.s.accession.retrieval.list"), '#').random
+  val feeder = separatedValues(conf.getString("a.s.accession.retrieval.list"), '#').random
 
-    def getRequest(): ChainBuilder = {
-      val httpReqInfo: String = "url=${accession_url}, format=${accession_format}";
-      val requestStr: String = "${accession_url}";
+  def getRequest(): ChainBuilder = {
+    val httpReqInfo: String = "url=${accession_url}, format=${accession_format}";
+    val requestStr: String = "${accession_url}";
 
-      val request =
-        feed(feeder)
-          .pause(5 seconds, 15 seconds)
-          .exec(http(httpReqInfo)
-            .get(requestStr)
-            .header("Accept", "${accession_format}")
-          )
+    val request =
+      feed(feeder)
+        .pause(5 seconds, 15 seconds)
+        .exec(http(httpReqInfo)
+          .get(requestStr)
+          .header("Accept", "${accession_format}")
+        )
 
-      return request
+    return request
+  }
+
+  val requestSeq = Seq(
+    getRequest()
+  )
+
+  val instance = scenario("Accession Retrieval Scenario")
+    .forever {
+      exec(requestSeq)
     }
 
-    val requestSeq = Seq(
-      AccessionScenario.getRequest()
-    )
-
-    val instance = scenario("Accession Retrieval Scenario")
-      .forever {
-        exec(requestSeq)
-      }
-  }
-
-  class AccessionRetrievalSimulation extends Simulation {
-    setUp(
-      AccessionScenario.instance.inject(atOnceUsers(conf.getInt("a.s.accession.retrieval.users")))
-    )
-      .protocols(AccessionRetrievalSimulation.httpConf)
-      //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(conf.getInt("a.s.accession.retrieval.maxDuration") minutes)
-  }
-
+  setUp(
+    instance.inject(atOnceUsers(conf.getInt("a.s.accession.retrieval.users")))
+  )
+    .protocols(httpConf)
+    //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+    .maxDuration(conf.getInt("a.s.accession.retrieval.maxDuration") minutes)
 }

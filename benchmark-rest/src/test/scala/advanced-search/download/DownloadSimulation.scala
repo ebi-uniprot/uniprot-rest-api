@@ -8,7 +8,7 @@ import com.typesafe.config._
 /**
   * Simulates downloading files.
   */
-object DownloadSimulation {
+class DownloadSimulation extends Simulation {
 
   val conf = ConfigFactory.load()
 
@@ -16,40 +16,36 @@ object DownloadSimulation {
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
-  object DownloadScenario {
-    val downloadFeeder = separatedValues(conf.getString("a.s.download.query.list"), '#').random
+  val downloadFeeder = separatedValues(conf.getString("a.s.download.query.list"), '#').random
 
-    def getRequestWithFormat(): ChainBuilder = {
-      val httpReqInfo: String = "url=${download_url}, format=${download_format}, encoding=${download_encoding}"
-      val queryRequestStr: String = "${download_url}"
+  def getRequestWithFormat(): ChainBuilder = {
+    val httpReqInfo: String = "url=${download_url}, format=${download_format}, encoding=${download_encoding}"
+    val queryRequestStr: String = "${download_url}"
 
-      val request =
-        feed(downloadFeeder)
-          .pause(5 seconds, 15 seconds)
-          .exec(http(httpReqInfo)
-            .get(queryRequestStr)
-            .header("Accept", "${download_format}")
-            .header("Accept-Encoding", "${download_encoding}")
-          )
+    val request =
+      feed(downloadFeeder)
+        .pause(5 seconds, 15 seconds)
+        .exec(http(httpReqInfo)
+          .get(queryRequestStr)
+          .header("Accept", "${download_format}")
+          .header("Accept-Encoding", "${download_encoding}")
+        )
 
-      return request
-    }
-
-    val requestSeq = Seq(
-      DownloadScenario.getRequestWithFormat()
-    )
-
-    val instance = scenario("Download Scenario")
-      .exec(requestSeq)
+    return request
   }
 
-  class DownloadSimulation extends Simulation {
-    setUp(
-      DownloadScenario.instance.inject(atOnceUsers(conf.getInt("a.s.download.users")))
-    )
-      .protocols(DownloadSimulation.httpConf)
-      //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
-      .maxDuration(conf.getInt("a.s.download.maxDuration") minutes)
-  }
+  val requestSeq = Seq(
+    getRequestWithFormat()
+  )
+
+  val instance = scenario("Download Scenario")
+    .exec(requestSeq)
+
+  setUp(
+    instance.inject(atOnceUsers(conf.getInt("a.s.download.users")))
+  )
+    .protocols(httpConf)
+    //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+    .maxDuration(conf.getInt("a.s.download.maxDuration") minutes)
 
 }
