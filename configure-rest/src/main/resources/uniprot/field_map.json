@@ -12,7 +12,7 @@
 		"mapTo": "gene"
 	},
 	{
-		"name": "gene_name",
+		"name": "gene_primary",
 		"mapTo": "gene"
 	},
 	{
