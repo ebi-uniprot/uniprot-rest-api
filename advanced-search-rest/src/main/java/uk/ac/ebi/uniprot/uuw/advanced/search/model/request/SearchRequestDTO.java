@@ -1,15 +1,16 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.request;
 
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
+import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidSolrQuerySyntax;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.ValidSolrSortFields;
+import uk.ac.ebi.uniprot.uuw.advanced.search.validation.validator.impl.UniprotReturnFieldsValidator;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.validator.impl.UniprotSolrQueryFieldValidator;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * Search cursor request Entity
@@ -25,6 +26,7 @@ public class SearchRequestDTO {
     @ValidSolrQueryFields(fieldValidatorClazz = UniprotSolrQueryFieldValidator.class)
     private String query;
 
+    @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
     private String fields;
 
     @ValidSolrSortFields(sortFieldEnumClazz = UniProtField.Sort.class)
