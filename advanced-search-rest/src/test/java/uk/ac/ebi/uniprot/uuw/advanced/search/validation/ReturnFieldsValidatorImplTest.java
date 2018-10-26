@@ -102,6 +102,11 @@ class ReturnFieldsValidatorImplTest {
             errorFields.add(field);
         }
 
+        @Override
+        void disableDefaultErrorMessage(ConstraintValidatorContextImpl contextImpl) {
+            //do nothing.....
+        }
+
         List<String> getErrorFields() {
             return errorFields;
         }

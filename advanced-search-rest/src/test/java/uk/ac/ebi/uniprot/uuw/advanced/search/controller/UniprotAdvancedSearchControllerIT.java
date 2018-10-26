@@ -351,4 +351,65 @@ public class UniprotAdvancedSearchControllerIT {
                 .andExpect(content().string(containsString("Invalid sort field invalidfield1")))
                 .andExpect(content().string(containsString("Invalid sort field order invalidsort. Expected asc or desc")));
     }
+
+
+    @Test
+    public void returnFieldsWithSingleIncorrectValue() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=organism_id:9606&fields=invalidField,accession")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("Invalid fields parameter value 'invalidField'")));
+    }
+
+    @Test
+    public void returnFieldsWithMultipleIncorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=organism_id:9606&fields=invalidField,accession,otherInvalid")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("Invalid fields parameter value 'invalidField'")))
+                .andExpect(content().string(containsString("Invalid fields parameter value 'otherInvalid'")));
+    }
+
+    @Test
+    public void returnFieldsWithCorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,organism")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"accession\":\"Q8DIA7\"")))
+                .andExpect(content().string(containsString("\"organism\":{" +
+                        "\"taxonomy\":197221," +
+                        "\"names\":[{\"type\":\"scientific\"," +
+                            "\"value\":\"Thermosynechococcus elongatus (strain BP-1)\"" +
+                        "}]}")));
+    }
 }

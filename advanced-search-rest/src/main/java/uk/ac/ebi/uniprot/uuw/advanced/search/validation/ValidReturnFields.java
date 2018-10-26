@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  *
  * @author lgonzales
  */
-@Constraint(validatedBy = ValidSolrQueryFields.QueryFieldValidator.class)
+@Constraint(validatedBy = ValidReturnFields.ReturnFieldsValidatorImpl.class)
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidReturnFields {
@@ -60,8 +60,15 @@ public @interface ValidReturnFields {
                         isValid = false;
                     }
                 }
+                if(!isValid){
+                    disableDefaultErrorMessage(contextImpl);
+                }
             }
             return isValid;
+        }
+
+        void disableDefaultErrorMessage(ConstraintValidatorContextImpl contextImpl) {
+            contextImpl.disableDefaultConstraintViolation();
         }
 
         void buildErrorMessage(String field,ConstraintValidatorContextImpl contextImpl) {
