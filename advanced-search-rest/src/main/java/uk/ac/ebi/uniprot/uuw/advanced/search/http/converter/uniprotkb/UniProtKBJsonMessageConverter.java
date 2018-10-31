@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.uniprotkb;
+package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.uniprotkb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
@@ -6,7 +6,7 @@ import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.AbstractUUWHttpMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.AbstractEntityHttpMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class UniProtKBJsonMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext, UniProtEntry> {
+public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();

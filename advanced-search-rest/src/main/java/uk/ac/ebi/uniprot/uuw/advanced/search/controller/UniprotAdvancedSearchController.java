@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.event.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.FileType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
@@ -42,12 +43,12 @@ public class UniprotAdvancedSearchController {
     private final ApplicationEventPublisher eventPublisher;
 
     private final UniProtEntryService entryService;
-    private final MessageConverterContextFactory converterContextFactory;
+    private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
 
     @Autowired
     public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
                                            UniProtEntryService entryService,
-                                           MessageConverterContextFactory converterContextFactory) {
+                                           MessageConverterContextFactory<UniProtEntry> converterContextFactory) {
         this.eventPublisher = eventPublisher;
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
@@ -62,9 +63,9 @@ public class UniprotAdvancedSearchController {
                                                                 HttpServletRequest request, HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
 
-        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
         context.setFields(searchRequest.getFields());
-        QueryResult<?> result = entryService.search(searchRequest, context, contentType);
+        QueryResult<?> result = entryService.search(searchRequest, context);
 
         eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
         return ResponseEntity.ok()
@@ -78,10 +79,9 @@ public class UniprotAdvancedSearchController {
     public ResponseEntity<Object> getByAccession(@PathVariable("accession") String accession,
                                                  @RequestHeader("Accept") MediaType contentType,
                                                  @RequestParam(value = "fields", required = false) String fields) {
-        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
         context.setFields(fields);
-
-        context.setEntities(entryService.getByAccession(accession, fields, contentType));
+        entryService.getByAccession(accession, fields, context);
 
         return ResponseEntity.ok()
                 .headers(createHttpSearchHeader(contentType))
@@ -104,14 +104,14 @@ public class UniprotAdvancedSearchController {
             HttpServletRequest request) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
-        MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
+        MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
         context.setFields(searchRequest.getFields());
 
         entryService.stream(searchRequest, context, emitter);
 
         return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(contentType, context, request))
+                .headers(createHttpDownloadHeader(context, request))
                 .body(emitter);
     }
 
@@ -131,7 +131,8 @@ public class UniprotAdvancedSearchController {
         return httpHeaders;
     }
 
-    private HttpHeaders createHttpDownloadHeader(MediaType mediaType, MessageConverterContext context, HttpServletRequest request) {
+    private HttpHeaders createHttpDownloadHeader(MessageConverterContext context, HttpServletRequest request) {
+        MediaType mediaType = context.getContentType();
         String suffix = "." + UniProtMediaType.getFileExtension(mediaType) + context.getFileType().getExtension();
         String queryString = request.getQueryString();
         String desiredFileName = "uniprot-" + queryString + suffix;

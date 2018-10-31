@@ -5,40 +5,39 @@ import lombok.Data;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * Created 10/09/18
  *
  * @author Edd
  */
-public class MessageConverterContextFactory {
-    private final Map<Pair, MessageConverterContext<?>> converters = new HashMap<>();
+public class MessageConverterContextFactory<T> {
+    private final Map<Pair, MessageConverterContext<T>> converters = new HashMap<>();
 
-    public void addMessageConverterContexts(List<MessageConverterContext> converters) {
-        converters.forEach(converter -> {
-            Pair pair = Pair.builder().contentType(converter.getContentType()).resource(converter.getResource())
-                    .build();
-            this.converters.put(pair, converter);
-        });
+//    @SuppressWarnings("varargs")
+//    public void addMessageConverterContexts(MessageConverterContext<T>... converters) {
+//        asList(converters).forEach(converter -> {
+//            Pair pair = Pair.builder().contentType(converter.getContentType()).resource(converter.getResource())
+//                    .build();
+//            this.converters.put(pair, converter);
+//        });
+//    }
+
+    public void addMessageConverterContext(MessageConverterContext<T> converter) {
+        Pair pair = Pair.builder().contentType(converter.getContentType()).resource(converter.getResource())
+                .build();
+        this.converters.put(pair, converter);
     }
 
-    public MessageConverterContext get(Resource resource, MediaType contentType) {
+    public MessageConverterContext<T> get(Resource resource, MediaType contentType) {
         Pair pair = Pair.builder().contentType(contentType).resource(resource).build();
 
-        MessageConverterContext messageConverterContext = converters.get(pair);
+        MessageConverterContext<T> messageConverterContext = converters.get(pair);
 
         return messageConverterContext.asCopy();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> MessageConverterContext<T> get2(Resource resource, MediaType contentType, Class<T> type) {
-        Pair pair = Pair.builder().contentType(contentType).resource(resource).build();
-
-        MessageConverterContext messageConverterContext = converters.get(pair);
-
-        return (MessageConverterContext<T>) messageConverterContext.asCopy();
     }
 
     @Data

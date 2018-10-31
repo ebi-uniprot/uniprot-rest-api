@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Collections.singletonList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
 
@@ -52,7 +51,8 @@ public class UniProtEntryService {
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore);
     }
 
-    public QueryResult<?> search(SearchRequestDTO request, MessageConverterContext context, MediaType contentType) {
+    public QueryResult<?> search(SearchRequestDTO request, MessageConverterContext<UniProtEntry> context) {
+        MediaType contentType = context.getContentType();
         SimpleQuery simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
         simpleQuery.addSort(getUniProtSort(request.getSort()));
         QueryResult<UniProtDocument> results = repository
@@ -60,7 +60,7 @@ public class UniProtEntryService {
 
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             List<String> accList = results.getContent().stream().map(doc -> doc.accession).collect(Collectors.toList());
-            context.setEntities(results.getContent().stream().map(doc -> doc.accession));
+            context.setEntityIds(results.getContent().stream().map(doc -> doc.accession));
             return QueryResult.of(accList, results.getPage(), results.getFacets());
         } else {
             QueryResult<UniProtEntry> queryResult = resultsConverter
@@ -70,10 +70,11 @@ public class UniProtEntryService {
         }
     }
 
-    public Stream<?> getByAccession(String accession, String fields, MediaType contentType) {
+    public void getByAccession(String accession, String fields, MessageConverterContext<UniProtEntry> context) {
+        MediaType contentType = context.getContentType();
         try {
             if (contentType.equals(LIST_MEDIA_TYPE)) {
-                return Stream.of(singletonList(accession));
+                context.setEntityIds(Stream.of(accession));
             } else {
                 Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
                 SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
@@ -84,7 +85,7 @@ public class UniProtEntryService {
                         .orElseThrow(() -> new ServiceException("Document found to be null"));
                 UniProtEntry uniProtEntry = optionalUniProtEntry
                         .orElseThrow(() -> new ServiceException("Entry found to be null"));
-                return Stream.of(uniProtEntry);
+                context.setEntities(Stream.of(uniProtEntry));
             }
         } catch (Exception e) {
             String message = "Could not get accession for: [" + accession + "]";
@@ -92,11 +93,11 @@ public class UniProtEntryService {
         }
     }
 
-    public void stream(SearchRequestDTO request, MessageConverterContext context, ResponseBodyEmitter emitter) {
+    public void stream(SearchRequestDTO request, MessageConverterContext<UniProtEntry> context, ResponseBodyEmitter emitter) {
         MediaType contentType = context.getContentType();
         boolean defaultFieldsRequested = FieldsParser
                 .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        context.setEntities(streamEntities(request, defaultFieldsRequested, contentType));
+        streamEntities(request, defaultFieldsRequested, contentType, context);
 
         downloadTaskExecutor.execute(() -> {
             try {
@@ -108,18 +109,18 @@ public class UniProtEntryService {
         });
     }
 
-    private Stream<?> streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType) {
+    private void streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType, MessageConverterContext<UniProtEntry> context) {
         String query = request.getQuery();
         Sort sort = getUniProtSort(request.getSort());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            return storeStreamer.idsStream(query, sort);
+            context.setEntityIds(storeStreamer.idsStream(query, sort));
         }
 
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
                 .equals(TSV_MEDIA_TYPE) ||contentType.equals(XLS_MEDIA_TYPE))) {
-            return storeStreamer.defaultFieldStream(query, sort);
+            context.setEntities(storeStreamer.defaultFieldStream(query, sort));
         } else {
-            return storeStreamer.idsToStoreStream(query, sort);
+            context.setEntities(storeStreamer.idsToStoreStream(query, sort));
         }
     }
 

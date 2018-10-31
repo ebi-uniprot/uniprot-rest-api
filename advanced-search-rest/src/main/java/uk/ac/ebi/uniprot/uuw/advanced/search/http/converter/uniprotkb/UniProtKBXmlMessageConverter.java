@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.uniprotkb;
+package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.uniprotkb;
 
 import com.sun.xml.bind.marshaller.DataWriter;
 import org.springframework.http.MediaType;
@@ -7,13 +7,13 @@ import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.EntryXmlConverter;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.AbstractUUWHttpMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.AbstractEntityHttpMessageConverter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.*;
 
-public class UniProtKBXmlMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext, UniProtEntry> {
+public class UniProtKBXmlMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private final EntryXmlConverter converter;
     private final Marshaller marshaller;
     private static final String XML_CONTEXT = "uk.ac.ebi.kraken.xml.jaxb.uniprot";

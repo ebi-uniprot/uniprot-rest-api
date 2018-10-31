@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.uniprotkb;
+package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.uniprotkb;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -12,7 +12,7 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConvert
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.AbstractUUWHttpMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.AbstractEntityHttpMessageConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.download.DownloadableEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class UniProtKBXslMessageConverter extends AbstractUUWHttpMessageConverter<MessageConverterContext, UniProtEntry> {
+public class UniProtKBXslMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private static final Logger LOGGER = getLogger(UniProtKBXslMessageConverter.class);
     
     private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();

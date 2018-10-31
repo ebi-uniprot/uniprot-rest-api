@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -23,8 +26,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-public abstract class AbstractUUWHttpMessageConverter<T extends MessageConverterContext> extends AbstractHttpMessageConverter<T> {
+public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttpMessageConverter<MessageConverterContext<C>> {
     private static final Logger LOGGER = getLogger(AbstractUUWHttpMessageConverter.class);
+    private static final int FLUSH_INTERVAL = 5000;
+    private static final int LOG_INTERVAL = 10000;
+    private String entitySeparator;
 
     public AbstractUUWHttpMessageConverter(MediaType mediaType) {
         super(mediaType);
@@ -32,34 +38,113 @@ public abstract class AbstractUUWHttpMessageConverter<T extends MessageConverter
 
     @Override
     protected boolean supports(Class<?> aClass) {
-        return false;
+        return MessageConverterContext.class.isAssignableFrom(aClass);
     }
 
     @Override
-    protected T readInternal(Class<? extends T> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+    protected MessageConverterContext<C> readInternal(Class<? extends MessageConverterContext<C>> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
         return null;
     }
 
     @Override
-    protected void writeInternal(T t, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(MessageConverterContext<C> context, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
         Instant start = Instant.now();
 
-        switch (t.getFileType()) {
+        switch (context.getFileType()) {
             case GZIP:
                 try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
-                    write(t, gzipOutputStream, start, counter);
+                    writeContents(context, counter, start, gzipOutputStream);
                 }
                 break;
             default:
-                 write(t, outputStream, start, counter);
+                writeContents(context, counter, start, outputStream);
         }
 
         logStats(counter.get(), start);
     }
 
-    protected abstract void write(T t, OutputStream outputStream, Instant start, AtomicInteger counter) throws IOException;
+    private void writeContents(MessageConverterContext<C> context, AtomicInteger counter, Instant start, OutputStream outputStream) throws IOException {
+        init(context);
+
+        writeContents(context, outputStream, start, counter);
+    }
+
+    protected void init(MessageConverterContext<C> context) {
+    }
+
+    protected void before(MessageConverterContext<C> context, OutputStream outputStream) throws IOException {
+    }
+
+    protected void after(MessageConverterContext<C> context, OutputStream outputStream) throws IOException {
+    }
+
+    protected abstract Stream<T> entitiesToWrite(MessageConverterContext<C> context);
+
+    protected void writeContents(MessageConverterContext<C> context, OutputStream outputStream, Instant start, AtomicInteger counter) throws IOException {
+        Stream<T> entities = entitiesToWrite(context);
+
+        try {
+            before(context, outputStream);
+
+            writeEntities(entities, outputStream, start, counter);
+
+            after(context, outputStream);
+            logStats(counter.get(), start);
+        } catch (StopStreamException e) {
+            LOGGER.error("Client aborted streaming: closing stream.", e);
+            entities.close();
+        } finally {
+            outputStream.close();
+            cleanUp();
+        }
+    }
+
+    protected void cleanUp() {
+    }
+
+    protected void setEntitySeparator(String separator) {
+        this.entitySeparator = separator;
+    }
+
+    private void writeEntities(Stream<T> entityCollection, OutputStream outputStream, Instant start, AtomicInteger counter) {
+        AtomicBoolean firstIteration = new AtomicBoolean(true);
+        entityCollection.forEach(entity -> {
+            try {
+                int currentCount = counter.getAndIncrement();
+                flushWhenNecessary(outputStream, currentCount);
+                logWhenNecessary(start, currentCount);
+
+                if (Objects.nonNull(entitySeparator)) {
+                    if (firstIteration.get()) {
+                        firstIteration.set(false);
+                    } else {
+                        outputStream.write(entitySeparator.getBytes());
+                    }
+                }
+
+                writeEntity(entity, outputStream);
+            } catch (Throwable e) {
+                throw new StopStreamException("Could not write entry: " + entity, e);
+            }
+        });
+    }
+
+    private void logWhenNecessary(Instant start, int currentCount) {
+        if (currentCount % LOG_INTERVAL == 0) {
+            logStats(currentCount, start);
+        }
+    }
+
+    private void flushWhenNecessary(OutputStream outputStream, int currentCount) throws IOException {
+        if (currentCount % FLUSH_INTERVAL == 0) {
+            outputStream.flush();
+        }
+    }
+
+
+    protected abstract void writeEntity(T entity, OutputStream outputStream) throws IOException;
 
     void logStats(int counter, Instant start) {
         Instant now = Instant.now();
