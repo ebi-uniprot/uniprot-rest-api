@@ -21,7 +21,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,17 +60,17 @@ public class UniProtEntryService {
 
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             List<String> accList = results.getContent().stream().map(doc -> doc.accession).collect(Collectors.toList());
-            context.setEntities(Stream.of(accList));
+            context.setEntities(results.getContent().stream().map(doc -> doc.accession));
             return QueryResult.of(accList, results.getPage(), results.getFacets());
         } else {
             QueryResult<UniProtEntry> queryResult = resultsConverter
                     .convertQueryResult(results, FieldsParser.parseForFilters(request.getFields()));
-            context.setEntities(Stream.of(queryResult.getContent()));
+            context.setEntities(queryResult.getContent().stream());
             return queryResult;
         }
     }
 
-    public Stream<Collection<?>> getByAccession(String accession, String fields, MediaType contentType) {
+    public Stream<?> getByAccession(String accession, String fields, MediaType contentType) {
         try {
             if (contentType.equals(LIST_MEDIA_TYPE)) {
                 return Stream.of(singletonList(accession));
@@ -85,7 +84,7 @@ public class UniProtEntryService {
                         .orElseThrow(() -> new ServiceException("Document found to be null"));
                 UniProtEntry uniProtEntry = optionalUniProtEntry
                         .orElseThrow(() -> new ServiceException("Entry found to be null"));
-                return Stream.of(singletonList(uniProtEntry));
+                return Stream.of(uniProtEntry);
             }
         } catch (Exception e) {
             String message = "Could not get accession for: [" + accession + "]";
@@ -97,7 +96,7 @@ public class UniProtEntryService {
         MediaType contentType = context.getContentType();
         boolean defaultFieldsRequested = FieldsParser
                 .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        context.setEntities((Stream<Collection<?>>)streamEntities(request, defaultFieldsRequested, contentType));
+        context.setEntities(streamEntities(request, defaultFieldsRequested, contentType));
 
         downloadTaskExecutor.execute(() -> {
             try {
