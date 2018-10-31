@@ -1,15 +1,15 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.request;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldsParserTest {
 
@@ -161,7 +161,7 @@ class FieldsParserTest {
 	}
 	@Test
 	void withGenes() {
-		String fields ="accession,protein_name,gene_name,gene_orf,gene_oln";
+		String fields ="accession,protein_name,gene_primary,gene_orf,gene_oln";
 		Map<String, List<String> > filters = FieldsParser.parseForFilters(fields);
 		assertEquals(3, filters.size());
 		assertTrue(filters.containsKey("protein_name"));

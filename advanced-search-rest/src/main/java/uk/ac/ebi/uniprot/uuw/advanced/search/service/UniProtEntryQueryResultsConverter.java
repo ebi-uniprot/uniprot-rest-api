@@ -11,8 +11,12 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FilterComponentType;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>} instances to
@@ -30,6 +34,10 @@ class UniProtEntryQueryResultsConverter {
     private final AvroByteArraySerializer<DefaultEntryObject> serializer =
             AvroByteArraySerializer.instanceOf(DefaultEntryObject.class);
     private final DefaultEntryConverter entryConverter = new DefaultEntryConverter();
+    private final RetryPolicy retryPolicy = new RetryPolicy()
+            .retryOn(IOException.class)
+            .withDelay(500,TimeUnit.MILLISECONDS)
+            .withMaxRetries(5);
 
     UniProtEntryQueryResultsConverter(UniProtStoreClient entryStore) {
         this.entryStore = entryStore;
@@ -72,7 +80,8 @@ class UniProtEntryQueryResultsConverter {
             }
             return Optional.of(uniEntry);
         } else {
-            return entryStore.getEntry(doc.accession);
+            //return entryStore.getEntry(doc.accession);            
+            return Failsafe.with(retryPolicy).get(() -> entryStore.getEntry(doc.accession));                     
         }
     }
 }

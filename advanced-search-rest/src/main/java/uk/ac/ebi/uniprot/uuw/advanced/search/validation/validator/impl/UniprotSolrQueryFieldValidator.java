@@ -1,15 +1,19 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.validation.validator.impl;
 
-import org.apache.lucene.search.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.dataservice.client.SearchFieldType;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.uuw.advanced.search.validation.validator.SolrQueryFieldValidator;
 
-import java.util.Arrays;
 import java.util.function.Predicate;
 
+/**
+ * This class is responsible to implement methods that are used to validate UNIPROT solr query fields in solr queries
+ * This is used in conjunction with @ValidSolrQueryFields request validator
+ *
+ * @author lgonzales
+ */
 public class UniprotSolrQueryFieldValidator  implements SolrQueryFieldValidator{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UniprotSolrQueryFieldValidator.class);
