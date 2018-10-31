@@ -19,7 +19,7 @@ class DownloadSimulation extends Simulation {
   val downloadFeeder = separatedValues(conf.getString("a.s.download.query.list"), '#').random
 
   def getRequestWithFormat(): ChainBuilder = {
-    val httpReqInfo: String = "url=${download_url}, format=${download_format}, encoding=${download_encoding}"
+    val httpReqInfo: String = "download, format=${download_format}, encoding=${download_encoding}"
     val queryRequestStr: String = "${download_url}"
 
     val request =
