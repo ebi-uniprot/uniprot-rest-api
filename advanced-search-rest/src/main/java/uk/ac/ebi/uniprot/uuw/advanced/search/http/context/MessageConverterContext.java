@@ -1,8 +1,8 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 
 import org.springframework.http.MediaType;
-import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
@@ -10,20 +10,20 @@ import java.util.stream.Stream;
  *
  * @author Edd
  */
-public class MessageConverterContext {
+public class MessageConverterContext<T> {
     private FileType fileType = FileType.FILE;
     private MediaType contentType;
-    private Stream<?> entities;
+    private Stream<Collection<T>> entities;
     private MessageConverterContextFactory.Resource resource;
-    private SearchRequestDTO requestDTO;
+    private String fields;
 
-    public MessageConverterContext asCopy() {
-        MessageConverterContext context = new MessageConverterContext();
+    public MessageConverterContext<T> asCopy() {
+        MessageConverterContext<T> context = new MessageConverterContext<>();
         context.resource = this.resource;
         context.entities = this.entities;
         context.contentType = this.contentType;
         context.fileType = this.fileType;
-        context.requestDTO = this.requestDTO;
+        context.fields = this.fields;
         return context;
     }
 
@@ -38,7 +38,7 @@ public class MessageConverterContext {
         if (contentType != null ? !contentType.equals(that.contentType) : that.contentType != null) return false;
         if (entities != null ? !entities.equals(that.entities) : that.entities != null) return false;
         if (resource != that.resource) return false;
-        return requestDTO != null ? requestDTO.equals(that.requestDTO) : that.requestDTO == null;
+        return fields != null ? fields.equals(that.fields) : that.fields == null;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MessageConverterContext {
         result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
         result = 31 * result + (entities != null ? entities.hashCode() : 0);
         result = 31 * result + (resource != null ? resource.hashCode() : 0);
-        result = 31 * result + (requestDTO != null ? requestDTO.hashCode() : 0);
+        result = 31 * result + (fields != null ? fields.hashCode() : 0);
         return result;
     }
 
@@ -67,11 +67,14 @@ public class MessageConverterContext {
         this.contentType = contentType;
     }
 
-    public Stream<?> getEntities() {
+    public Stream<Collection<T>> getEntities() {
         return entities;
     }
 
-    public void setEntities(Stream<?> entities) {
+    public void setEntities(Stream<Collection<T>> entities) {
+        this.entities = entities;
+    }
+    public void setEntities(Stream<Collection<T>> entities, Class<T> type) {
         this.entities = entities;
     }
 
@@ -83,11 +86,11 @@ public class MessageConverterContext {
         this.resource = resource;
     }
 
-    public SearchRequestDTO getRequestDTO() {
-        return requestDTO;
+    public String getFields() {
+        return fields;
     }
 
-    public void setRequestDTO(SearchRequestDTO requestDTO) {
-        this.requestDTO = requestDTO;
+    public void setFields(String fields) {
+        this.fields = fields;
     }
 }

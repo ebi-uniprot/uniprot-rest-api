@@ -1,6 +1,10 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,12 +12,7 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created 23/08/18
@@ -43,7 +42,7 @@ public class ListMessageConverter extends AbstractUUWHttpMessageConverter<Messag
                          OutputStream outputStream,
                          Instant start,
                          AtomicInteger counter) throws IOException {
-        Stream<String> entities = (Stream<String>) messageConfig.getEntities();
+        Stream<String> entities = null;//(Stream<String>) messageConfig.getEntities();
 
         try {
             entities.forEach(id -> {

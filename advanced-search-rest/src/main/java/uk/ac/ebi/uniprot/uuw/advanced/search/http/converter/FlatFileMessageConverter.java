@@ -1,6 +1,12 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import uk.ac.ebi.kraken.ffwriter.line.impl.UniProtFlatfileWriter;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,14 +15,7 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-
-import uk.ac.ebi.kraken.ffwriter.line.impl.UniProtFlatfileWriter;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created 21/08/18
@@ -46,7 +45,7 @@ public class FlatFileMessageConverter extends AbstractUUWHttpMessageConverter<Me
                          OutputStream outputStream,
                          Instant start,
                          AtomicInteger counter) throws IOException {
-        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
+        Stream<Collection<UniProtEntry>> entities = null;//(Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
 
         try {
             entities.forEach(items -> {

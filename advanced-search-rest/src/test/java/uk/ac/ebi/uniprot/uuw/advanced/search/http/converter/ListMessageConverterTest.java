@@ -45,7 +45,7 @@ public class ListMessageConverterTest {
     public void convertsEntrySuccessfully() throws IOException {
         String entry = "P12345";
         Stream<String> entries = Stream.of(entry);
-        when((Stream<String>)context.getEntities()).thenReturn(entries);
+//        when((Stream<String>)context.getEntities()).thenReturn(entries);
 
         doConversion();
 

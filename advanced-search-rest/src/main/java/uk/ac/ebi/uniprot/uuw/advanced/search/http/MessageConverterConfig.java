@@ -9,14 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.JsonMessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContextFactory;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.XmlMessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.*;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.ListMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter2.uniprotkb.*;
 
 import java.util.List;
 
@@ -59,14 +55,22 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new FlatFileMessageConverter());
+//                converters.add(new FlatFileMessageConverter());
+//                converters.add(new ListMessageConverter());
+//                converters.add(0, new XmlMessageConverter());
+//                converters.add(1, new JsonMessageConverter());
+//                converters.add(new TSVMessageConverter());
+//                converters.add(new XlsMessageConverter());
+//                converters.add(new UniProtFastaMessageConverter());
+//                converters.add(new GffMessageConverter());
+                converters.add(new UniProtKBFlatFileMessageConverter());
+                converters.add(new UniProtKBFastaMessageConverter());
                 converters.add(new ListMessageConverter());
-                converters.add(0, new XmlMessageConverter());
-                converters.add(1, new JsonMessageConverter());
-                converters.add(new TSVMessageConverter());
-                converters.add(new XlsMessageConverter());
-                converters.add(new FastaMessageConverter());
-                converters.add(new GffMessageConverter());
+                converters.add(new UniProtKBGffMessageConverter());
+                converters.add(new UniProtKBTsvMessageConverter());
+                converters.add(new UniProtKBXslMessageConverter());
+                converters.add(0, new UniProtKBXmlMessageConverter());
+                converters.add(1, new UniProtKBJsonMessageConverter());
             }
         };
     }
@@ -92,6 +96,7 @@ public class MessageConverterConfig {
         MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(FASTA_MEDIA_TYPE);
+//        converter.setType(UniProtEntry.class);
 
         return converter;
     }
@@ -112,27 +117,33 @@ public class MessageConverterConfig {
         return converter;
     }
 
-    private JsonMessageConverterContext uniprotJsonMessageConverterContext() {
-        JsonMessageConverterContext converter = new JsonMessageConverterContext();
-        converter.setHeader("{\"results\" : [");
-        converter.setFooter("]}");
+    private MessageConverterContext uniprotJsonMessageConverterContext() {
+//        JsonMessageConverterContext converter = new JsonMessageConverterContext();
+//        converter.setHeader("{\"results\" : [");
+//        converter.setFooter("]}");
+
+        MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
         converter.setContentType(MediaType.APPLICATION_JSON);
 
         return converter;
     }
 
-    private XmlMessageConverterContext uniProtXmlMessageConverterContext() {
-        XmlMessageConverterContext<UniProtEntry, Entry> converter = new XmlMessageConverterContext<>();
-        converter.setHeader("<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n");
-        converter.setFooter("<copyright>\n" +
-                                    "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms Distributed under the Creative Commons Attribution (CC BY 4.0) License\n" +
-                                    "</copyright>\n" +
-                                    "</uniprot>");
+    private MessageConverterContext uniProtXmlMessageConverterContext() {
+//        XmlMessageConverterContext<UniProtEntry, Entry> converter = new XmlMessageConverterContext<>();
+//        converter.setHeader("<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n");
+//        converter.setFooter("<copyright>\n" +
+//                                    "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms Distributed under the Creative Commons Attribution (CC BY 4.0) License\n" +
+//                                    "</copyright>\n" +
+//                                    "</uniprot>");
+//        converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
+//        converter.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
+//        final EntryXmlConverterImpl entryXmlConverter = new EntryXmlConverterImpl();
+//        converter.setConverter(entryXmlConverter::convert);
+
+
+        MessageConverterContext converter = new MessageConverterContext();
         converter.setResource(MessageConverterContextFactory.Resource.UNIPROT);
-        converter.setContext("uk.ac.ebi.kraken.xml.jaxb.uniprot");
-        final EntryXmlConverterImpl entryXmlConverter = new EntryXmlConverterImpl();
-        converter.setConverter(entryXmlConverter::convert);
         converter.setContentType(MediaType.APPLICATION_XML);
 
         return converter;

@@ -63,7 +63,7 @@ public class UniprotAdvancedSearchController {
         setPreviewInfo(searchRequest, preview);
 
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
-        context.setRequestDTO(searchRequest);
+        context.setFields(searchRequest.getFields());
         QueryResult<?> result = entryService.search(searchRequest, context, contentType);
 
         eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
@@ -79,9 +79,8 @@ public class UniprotAdvancedSearchController {
                                                  @RequestHeader("Accept") MediaType contentType,
                                                  @RequestParam(value = "fields", required = false) String fields) {
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
-        SearchRequestDTO requestDTO = new SearchRequestDTO();
-        requestDTO.setFields(fields);
-        context.setRequestDTO(requestDTO);
+        context.setFields(fields);
+
         context.setEntities(entryService.getByAccession(accession, fields, contentType));
 
         return ResponseEntity.ok()
@@ -107,7 +106,7 @@ public class UniprotAdvancedSearchController {
 
         MessageConverterContext context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
-        context.setRequestDTO(searchRequest);
+        context.setFields(searchRequest.getFields());
 
         entryService.stream(searchRequest, context, emitter);
 

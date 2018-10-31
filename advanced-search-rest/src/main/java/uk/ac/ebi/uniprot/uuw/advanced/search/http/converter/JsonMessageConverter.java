@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -33,7 +33,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<JsonMessageConverterContext> {
     private static final Logger LOGGER = getLogger(JsonMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
-    private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
+    private final BiFunction<UniProtEntry, Map<String, List<String>>, UPEntry> entryConverter = (entry, filters) -> {
+        EntryConverter ec = new EntryConverter();
+        UPEntry upEntry = ec.apply(entry);
+        if (filters != null && !filters.isEmpty()) {
+            EntryFilters.filterEntry(upEntry, filters);
+        }
+        return upEntry;
+    };
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JsonMessageConverter() {
@@ -56,10 +63,10 @@ public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<JsonMe
                          Instant start,
                          AtomicInteger counter) throws IOException {
         // fields requested
-        Map<String, List<String>> filters = FieldsParser.parseForFilters(messageConfig.getRequestDTO().getFields());
+        Map<String, List<String>> filters = FieldsParser.parseForFilters(messageConfig.getFields());
 
         // entries
-        Stream<Collection<UniProtEntry>> entriesStream = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
+        Stream<Collection<UniProtEntry>> entriesStream = null;//(Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
         AtomicBoolean firstIteration = new AtomicBoolean(true);
 
         try {
@@ -67,13 +74,7 @@ public class JsonMessageConverter extends AbstractUUWHttpMessageConverter<JsonMe
 
             entriesStream.forEach(items -> {
                 items.stream()
-                        .map(entryConverter)
-                        .map(upEntry -> {
-                            if (filters != null && !filters.isEmpty()) {
-                                EntryFilters.filterEntry(upEntry, filters);
-                            }
-                            return upEntry;
-                        })
+                        .map(entry -> entryConverter.apply(entry, filters))
                         .forEach(entry -> {
                             try {
                                 int currentCount = counter.getAndIncrement();

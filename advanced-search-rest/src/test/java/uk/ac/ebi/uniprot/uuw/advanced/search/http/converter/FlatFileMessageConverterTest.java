@@ -50,7 +50,7 @@ public class FlatFileMessageConverterTest {
     public void convertsEntrySuccessfully() throws IOException {
         UniProtEntry entry = UniProtEntryMocker.create(SP);
         Stream<Collection<UniProtEntry>> entries = Stream.of(singletonList(entry));
-        when((Stream<Collection<UniProtEntry>>)context.getEntities()).thenReturn(entries);
+//        when((Stream<Collection<UniProtEntry>>)context.getEntities()).thenReturn(entries);
 
         doConversion();
 

@@ -48,7 +48,7 @@ public class XmlMessageConverter<S, T> extends AbstractUUWHttpMessageConverter<X
                          AtomicInteger counter) throws IOException {
         initXmlMarshaller(messageConfig);
         final MutableWriteState writeState = new MutableWriteState();
-        Stream<Collection<S>> entities = (Stream<Collection<S>>)messageConfig.getEntities();
+        Stream<Collection<S>> entities = null;//(Stream<Collection<S>>)messageConfig.getEntities();
 
         try {
             entities.forEach(batch -> {

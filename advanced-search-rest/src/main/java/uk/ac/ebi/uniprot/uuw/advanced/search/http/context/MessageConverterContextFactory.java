@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Edd
  */
 public class MessageConverterContextFactory {
-    private final Map<Pair, MessageConverterContext> converters = new HashMap<>();
+    private final Map<Pair, MessageConverterContext<?>> converters = new HashMap<>();
 
     public void addMessageConverterContexts(List<MessageConverterContext> converters) {
         converters.forEach(converter -> {
@@ -30,6 +30,15 @@ public class MessageConverterContextFactory {
         MessageConverterContext messageConverterContext = converters.get(pair);
 
         return messageConverterContext.asCopy();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> MessageConverterContext<T> get2(Resource resource, MediaType contentType, Class<T> type) {
+        Pair pair = Pair.builder().contentType(contentType).resource(resource).build();
+
+        MessageConverterContext messageConverterContext = converters.get(pair);
+
+        return (MessageConverterContext<T>) messageConverterContext.asCopy();
     }
 
     @Data

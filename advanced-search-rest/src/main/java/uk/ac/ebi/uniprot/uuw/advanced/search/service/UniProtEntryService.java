@@ -21,6 +21,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.results.StoreStreamer;
 import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreClient;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +61,7 @@ public class UniProtEntryService {
 
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             List<String> accList = results.getContent().stream().map(doc -> doc.accession).collect(Collectors.toList());
-            context.setEntities(accList.stream());
+            context.setEntities(Stream.of(accList));
             return QueryResult.of(accList, results.getPage(), results.getFacets());
         } else {
             QueryResult<UniProtEntry> queryResult = resultsConverter
@@ -70,10 +71,10 @@ public class UniProtEntryService {
         }
     }
 
-    public Stream<?> getByAccession(String accession, String fields, MediaType contentType) {
+    public Stream<Collection<?>> getByAccession(String accession, String fields, MediaType contentType) {
         try {
             if (contentType.equals(LIST_MEDIA_TYPE)) {
-                return Stream.of(accession);
+                return Stream.of(singletonList(accession));
             } else {
                 Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
                 SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
@@ -96,7 +97,7 @@ public class UniProtEntryService {
         MediaType contentType = context.getContentType();
         boolean defaultFieldsRequested = FieldsParser
                 .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        context.setEntities(streamEntities(request, defaultFieldsRequested, contentType));
+        context.setEntities((Stream<Collection<?>>)streamEntities(request, defaultFieldsRequested, contentType));
 
         downloadTaskExecutor.execute(() -> {
             try {
@@ -114,6 +115,7 @@ public class UniProtEntryService {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             return storeStreamer.idsStream(query, sort);
         }
+
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
                 .equals(TSV_MEDIA_TYPE) ||contentType.equals(XLS_MEDIA_TYPE))) {
             return storeStreamer.defaultFieldStream(query, sort);

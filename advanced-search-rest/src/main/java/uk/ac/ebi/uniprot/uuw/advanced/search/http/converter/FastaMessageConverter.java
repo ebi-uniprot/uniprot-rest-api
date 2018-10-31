@@ -40,7 +40,7 @@ public class FastaMessageConverter extends AbstractUUWHttpMessageConverter<Messa
                          OutputStream outputStream,
                          Instant start,
                          AtomicInteger counter) throws IOException {
-        Stream<Collection<UniProtEntry>> entities = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
+        Stream<Collection<UniProtEntry>> entities = null;//(Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
 
         try {
             entities.forEach(items -> {

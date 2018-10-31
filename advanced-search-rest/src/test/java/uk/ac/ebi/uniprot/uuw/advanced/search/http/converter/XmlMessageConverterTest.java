@@ -52,7 +52,7 @@ public class XmlMessageConverterTest {
     @Test
     public void convertsEntrySuccessfully() throws IOException {
         Stream<Collection<FakeSource>> entries = Stream.of(singletonList(createFakeSource(1)));
-        when((Stream<Collection<FakeSource>>) context.getEntities()).thenReturn(entries);
+//        when((Stream<Collection<FakeSource>>) context.getEntities()).thenReturn(entries);
 
         doConversion();
 
@@ -64,7 +64,7 @@ public class XmlMessageConverterTest {
 
     @Test
     public void errorDuringWriteCausesStreamClosure() throws IOException {
-        when((Stream<Collection<FakeSource>>) context.getEntities()).thenReturn(Stream.of(singletonList(createFakeSource(1))));
+//        when((Stream<Collection<FakeSource>>) context.getEntities()).thenReturn(Stream.of(singletonList(createFakeSource(1))));
         doThrow(Error.class).when(outputStream).write(any());
 
         doConversion();

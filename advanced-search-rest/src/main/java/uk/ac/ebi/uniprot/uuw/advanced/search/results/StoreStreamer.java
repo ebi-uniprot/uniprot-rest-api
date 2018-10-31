@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
  * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored fields).
  * Clients of this class need not know what store they need to access. They need only provide the query that
  * needs answering, in addition to the sortable fields.
- *
+ * <p>
  * Created 22/08/18
  *
  * @author Edd
@@ -52,11 +52,20 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<String> idsStream(String query, Sort sort) {
+    public Stream<Collection<String>> idsStream(String query, Sort sort) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
             tupleStream.open();
-            return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
+
+            TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, id);
+            BatchIterable<String> batchIterable = new BatchIterable<String>(sourceIterable, streamerBatchSize) {
+                @Override
+                List<String> convertBatch(List<String> batch) {
+                    return batch;
+                }
+            };
+
+            return StreamSupport.stream(batchIterable.spliterator(), false);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

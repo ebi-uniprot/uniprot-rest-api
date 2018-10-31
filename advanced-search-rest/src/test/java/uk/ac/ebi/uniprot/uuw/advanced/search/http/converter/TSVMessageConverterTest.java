@@ -56,9 +56,9 @@ public class TSVMessageConverterTest {
     public void convertsEntrySuccessfully() throws IOException {
         UniProtEntry entry = UniProtEntryMocker.create(SP);
         Stream<Collection<UniProtEntry>> entries = Stream.of(singletonList(entry));
-        when((Stream<Collection<UniProtEntry>>) context.getEntities()).thenReturn(entries);
-        searchRequest.setFields(FIELDS);
-        when(context.getRequestDTO()).thenReturn(searchRequest);
+//        when((Stream<Collection<UniProtEntry>>) context.getEntities()).thenReturn(entries);
+//        searchRequest.setFields(FIELDS);
+//        when(context.getRequestDTO()).thenReturn(searchRequest);
 
         doConversion();
 
@@ -75,9 +75,9 @@ public class TSVMessageConverterTest {
     public void errorDuringWriteHeaderCausesStreamClosure() throws IOException {
         UniProtEntry entry = UniProtEntryMocker.create(SP);
         Stream<Collection<UniProtEntry>> entries = Stream.of(singletonList(entry));
-        when((Stream<Collection<UniProtEntry>>) context.getEntities()).thenReturn(entries);
-        searchRequest.setFields(FIELDS);
-        when(context.getRequestDTO()).thenReturn(searchRequest);
+//        when((Stream<Collection<UniProtEntry>>) context.getEntities()).thenReturn(entries);
+//        searchRequest.setFields(FIELDS);
+//        when(context.getRequestDTO()).thenReturn(searchRequest);
 
         doThrow(IOException.class).when(outputStream).write(any());
 
@@ -90,9 +90,9 @@ public class TSVMessageConverterTest {
     public void errorDuringWriteCausesStreamClosure() throws IOException {
         UniProtEntry entry = UniProtEntryMocker.create(SP);
         Stream<Collection<UniProtEntry>> entries = Stream.of(singletonList(entry));
-        when((Stream<Collection<UniProtEntry>>) context.getEntities()).thenReturn(entries);
-        searchRequest.setFields(FIELDS);
-        when(context.getRequestDTO()).thenReturn(searchRequest);
+//        when((Stream<Collection<UniProtEntry>>) context.getEntities()).thenReturn(entries);
+//        searchRequest.setFields(FIELDS);
+//        when(context.getRequestDTO()).thenReturn(searchRequest);
 
         doThrow(Error.class).when(outputStream).write(tsvBytesFor(entry));
 

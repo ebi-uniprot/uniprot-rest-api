@@ -57,10 +57,10 @@ public class XlsMessageConverter extends AbstractUUWHttpMessageConverter<Message
 	protected void write(MessageConverterContext messageConfig, OutputStream outputStream, Instant start,
 			AtomicInteger counter) throws IOException {
 		// fields requested
-		Map<String, List<String>> filters = FieldsParser.parseForFilters(messageConfig.getRequestDTO().getFields());
-		List<String> fields = FieldsParser.parse(messageConfig.getRequestDTO().getFields());
+		Map<String, List<String>> filters = FieldsParser.parseForFilters(messageConfig.getFields());
+		List<String> fields = FieldsParser.parse(messageConfig.getFields());
 		// entries
-		Stream<Collection<UniProtEntry>> entriesStream = (Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
+		Stream<Collection<UniProtEntry>> entriesStream = null;//(Stream<Collection<UniProtEntry>>) messageConfig.getEntities();
 		SXSSFWorkbook wb = new SXSSFWorkbook(500);
 		Sheet sh = wb.createSheet();
 		Row header = sh.createRow(0);

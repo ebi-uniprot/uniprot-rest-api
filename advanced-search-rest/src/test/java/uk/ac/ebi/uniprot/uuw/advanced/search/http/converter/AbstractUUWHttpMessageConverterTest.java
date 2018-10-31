@@ -78,7 +78,7 @@ public class AbstractUUWHttpMessageConverterTest {
     private MessageConverterContext createFakeMessageConverterContext(FileType fileType) {
         MessageConverterContext context = new MessageConverterContext();
         context.setFileType(fileType);
-        context.setEntities(charStream(ORIGINAL));
+//        context.setEntities(charStream(ORIGINAL));
         return context;
     }
 
@@ -91,7 +91,7 @@ public class AbstractUUWHttpMessageConverterTest {
         @SuppressWarnings("unchecked")
         @Override
         protected void write(MessageConverterContext messageConverterContext, OutputStream outputStream, Instant start, AtomicInteger counter) throws IOException {
-            Stream<Character> entities = (Stream<Character>) messageConverterContext.getEntities();
+            Stream<Character> entities = null;//(Stream<Character>) messageConverterContext.getEntities();
             entities.forEach(entity -> {
                 try {
                     outputStream.write(entity);
