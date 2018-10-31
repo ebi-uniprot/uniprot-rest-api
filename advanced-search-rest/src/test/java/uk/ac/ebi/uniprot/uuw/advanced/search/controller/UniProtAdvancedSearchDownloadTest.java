@@ -27,7 +27,6 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreConfig;
 
 import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -37,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.FF_MEDIA_TYPE;
 /**
  * Created 21/09/18
  *
@@ -50,7 +49,6 @@ import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaTyp
 public class UniProtAdvancedSearchDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
-    private static final String LIST = "list";
 
     @Autowired
     private MockMvc mockMvc;
@@ -98,6 +96,6 @@ public class UniProtAdvancedSearchDownloadTest {
 
     private void mockStreamerResponseOf(UniProtEntry... entries) {
         when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any()))
-                .thenReturn(Stream.of(asList(entries)));
+                .thenReturn(Stream.of(entries));
     }
 }

@@ -2,7 +2,6 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 
 import org.springframework.http.MediaType;
 
-import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
@@ -13,7 +12,7 @@ import java.util.stream.Stream;
 public class MessageConverterContext<T> {
     private FileType fileType = FileType.FILE;
     private MediaType contentType;
-    private Stream<Collection<T>> entities;
+    private Stream<T> entities;
     private MessageConverterContextFactory.Resource resource;
     private String fields;
 
@@ -67,14 +66,14 @@ public class MessageConverterContext<T> {
         this.contentType = contentType;
     }
 
-    public Stream<Collection<T>> getEntities() {
+    public Stream<T> getEntities() {
         return entities;
     }
 
-    public void setEntities(Stream<Collection<T>> entities) {
+    public void setEntities(Stream<T> entities) {
         this.entities = entities;
     }
-    public void setEntities(Stream<Collection<T>> entities, Class<T> type) {
+    public void setEntities(Stream<T> entities, Class<T> type) {
         this.entities = entities;
     }
 

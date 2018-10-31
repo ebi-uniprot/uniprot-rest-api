@@ -57,59 +57,58 @@ public class StoreStreamerTest {
     @Test
     public void canTransformSourceStreamWithUnaryBatchSize() {
         createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<Collection<String>> storeStream = storeStreamer
+        Stream<String> storeStream = storeStreamer
                 .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
-        List<Collection<String>> results = storeStream.collect(Collectors.toList());
+        List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
-                singletonList(transformString("a")),
-                singletonList(transformString("b")),
-                singletonList(transformString("c")),
-                singletonList(transformString("d")),
-                singletonList(transformString("e"))));
+                transformString("a"),
+                transformString("b"),
+                transformString("c"),
+                transformString("d"),
+                transformString("e")));
     }
 
     @Test
     public void canTransformSourceStreamWithIntermediateBatchSize() {
         createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<Collection<String>> storeStream = storeStreamer
+        Stream<String> storeStream = storeStreamer
                 .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
-        List<Collection<String>> results = storeStream.collect(Collectors.toList());
+        List<String> results = storeStream.collect(Collectors.toList());
         System.out.println(results);
         assertThat(results, contains(
-                asList(transformString("a"),
-                       transformString("b"),
-                       transformString("c")),
-                asList(transformString("d"),
-                       transformString("e"))));
+                transformString("a"),
+                transformString("b"),
+                transformString("c"),
+                transformString("d"),
+                transformString("e")));
     }
 
     @Test
     public void canTransformSourceStreamWithBiggerBatchSize() {
         createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<Collection<String>> storeStream = storeStreamer
+        Stream<String> storeStream = storeStreamer
                 .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
-        List<Collection<String>> results = storeStream.collect(Collectors.toList());
+        List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
-                asList(transformString("a"),
-                       transformString("b"),
-                       transformString("c"),
-                       transformString("d")),
-                singletonList(
-                        transformString("e"))));
+                transformString("a"),
+                transformString("b"),
+                transformString("c"),
+                transformString("d"),
+                transformString("e")));
     }
 
     @Test
     public void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
         createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<Collection<String>> storeStream = storeStreamer
+        Stream<String> storeStream = storeStreamer
                 .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
-        List<Collection<String>> results = storeStream.collect(Collectors.toList());
+        List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
-                asList(transformString("a"),
-                       transformString("b"),
-                       transformString("c"),
-                       transformString("d"),
-                       transformString("e"))));
+                transformString("a"),
+                transformString("b"),
+                transformString("c"),
+                transformString("d"),
+                transformString("e")));
     }
 
     private void createSearchStoreStream(int streamerBatchSize, TupleStream tupleStream) {

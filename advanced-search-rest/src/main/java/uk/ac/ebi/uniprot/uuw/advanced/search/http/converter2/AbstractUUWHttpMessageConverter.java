@@ -82,17 +82,14 @@ public abstract class AbstractUUWHttpMessageConverter<C extends MessageConverter
     protected void after(C context, OutputStream outputStream) throws IOException {
     }
 
-//    protected abstract Supplier<T> entitySupplier
-
     @SuppressWarnings("unchecked")
     protected void writeContents(C context, OutputStream outputStream, Instant start, AtomicInteger counter) throws IOException {
-        Stream<Collection<?>> entities = context.getEntities();
+        Stream<?> entities = context.getEntities();
 
         try {
             before(context, outputStream);
 
-            entities.forEach(
-                    entityCollection -> writeCollection((Collection<T>) entityCollection, outputStream, start, counter));
+            writeEntities((Stream<T>) entities, outputStream, start, counter);
 
             after(context, outputStream);
             logStats(counter.get(), start);
@@ -112,7 +109,7 @@ public abstract class AbstractUUWHttpMessageConverter<C extends MessageConverter
         this.entitySeparator = separator;
     }
 
-    private void writeCollection(Collection<T> entityCollection, OutputStream outputStream, Instant start, AtomicInteger counter) {
+    private void writeEntities(Stream<T> entityCollection, OutputStream outputStream, Instant start, AtomicInteger counter) {
         AtomicBoolean firstIteration = new AtomicBoolean(true);
         entityCollection.forEach(entity -> {
             try {

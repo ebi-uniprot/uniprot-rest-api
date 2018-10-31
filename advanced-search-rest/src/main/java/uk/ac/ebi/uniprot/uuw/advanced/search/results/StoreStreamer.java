@@ -37,7 +37,7 @@ public class StoreStreamer<T> {
     private TupleStreamTemplate tupleStreamTemplate;
 
     @SuppressWarnings("unchecked")
-    public Stream<Collection<T>> idsToStoreStream(String query, Sort sort) {
+    public Stream<T> idsToStoreStream(String query, Sort sort) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
             tupleStream.open();
@@ -46,32 +46,23 @@ public class StoreStreamer<T> {
                     new TupleStreamIterable(tupleStream, id),
                     storeClient,
                     streamerBatchSize);
-            return StreamSupport.stream(batchStoreIterable.spliterator(), false);
+            return StreamSupport.stream(batchStoreIterable.spliterator(), false).flatMap(Collection::stream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public Stream<Collection<String>> idsStream(String query, Sort sort) {
+    public Stream<String> idsStream(String query, Sort sort) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
             tupleStream.open();
-
-            TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, id);
-            BatchIterable<String> batchIterable = new BatchIterable<String>(sourceIterable, streamerBatchSize) {
-                @Override
-                List<String> convertBatch(List<String> batch) {
-                    return batch;
-                }
-            };
-
-            return StreamSupport.stream(batchIterable.spliterator(), false);
+            return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    public Stream<Collection<T>> defaultFieldStream(String query, Sort sort) {
+    public Stream<T> defaultFieldStream(String query, Sort sort) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(query, defaultsField, sort);
             tupleStream.open();
@@ -84,7 +75,7 @@ public class StoreStreamer<T> {
                 }
             };
 
-            return StreamSupport.stream(batchIterable.spliterator(), false);
+            return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
