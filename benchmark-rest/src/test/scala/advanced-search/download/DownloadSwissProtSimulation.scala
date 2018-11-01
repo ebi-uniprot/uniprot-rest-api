@@ -20,7 +20,7 @@ class DownloadSwissProtSimulation extends Simulation {
   val downloadFeeder = separatedValues(conf.getString("a.s.download.swissprot.query.list"), '#').random
 
   def getRequestWithFormat(): ChainBuilder = {
-    val httpReqInfo: String = "url=${download_sp_url}, format=${download_sp_format}"
+    val httpReqInfo: String = "download swissprot, format=${download_sp_format}"
     val filterGeneralRequestStr: String = "${download_sp_url}"
 
     val request =

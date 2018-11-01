@@ -20,7 +20,7 @@ class AccessionRetrievalSimulation extends Simulation {
   val feeder = separatedValues(conf.getString("a.s.accession.retrieval.list"), '#').random
 
   def getRequest(): ChainBuilder = {
-    val httpReqInfo: String = "url=${accession_url}, format=${accession_format}";
+    val httpReqInfo: String = "accession retrieval, format=${accession_format}";
     val requestStr: String = "${accession_url}";
 
     val request =
