@@ -9,6 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
@@ -54,6 +55,9 @@ public class UniProtEntryService {
 
     public QueryResult<?> search(SearchRequestDTO request, MessageConverterContext context, MediaType contentType) {
         SimpleQuery simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
+        if(request.needIsoformFilterQuery()) {
+            simpleQuery.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
+        }
         simpleQuery.addSort(getUniProtSort(request.getSort()));
         QueryResult<UniProtDocument> results = repository
                 .searchPage(simpleQuery, request.getCursor(), request.getSize());
@@ -110,15 +114,19 @@ public class UniProtEntryService {
 
     private Stream<?> streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType) {
         String query = request.getQuery();
+        String filterQuery = null;
+        if(request.needIsoformFilterQuery()) {
+            filterQuery = UniProtField.Search.is_isoform.name() + ":" + false;
+        }
         Sort sort = getUniProtSort(request.getSort());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            return storeStreamer.idsStream(query, sort);
+            return storeStreamer.idsStream(query,filterQuery, sort);
         }
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
                 .equals(TSV_MEDIA_TYPE) ||contentType.equals(XLS_MEDIA_TYPE))) {
-            return storeStreamer.defaultFieldStream(query, sort);
+            return storeStreamer.defaultFieldStream(query,filterQuery, sort);
         } else {
-            return storeStreamer.idsToStoreStream(query, sort);
+            return storeStreamer.idsToStoreStream(query,filterQuery, sort);
         }
     }
 

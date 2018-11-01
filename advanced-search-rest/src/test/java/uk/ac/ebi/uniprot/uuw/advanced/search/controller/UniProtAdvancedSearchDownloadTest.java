@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
-import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.*;
+import static uk.ac.ebi.uniprot.uuw.advanced.search.http.context.UniProtMediaType.FF_MEDIA_TYPE;
 /**
  * Created 21/09/18
  *
@@ -66,7 +66,7 @@ public class UniProtAdvancedSearchDownloadTest {
 
     @Before
     public void setUp() {
-        when(tupleStreamTemplate.create(any())).thenReturn(mock(TupleStream.class));
+        when(tupleStreamTemplate.create(any(),any())).thenReturn(mock(TupleStream.class));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UniProtAdvancedSearchDownloadTest {
     }
 
     private void mockStreamerResponseOf(UniProtEntry... entries) {
-        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any()))
+        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any(), any()))
                 .thenReturn(Stream.of(asList(entries)));
     }
 }

@@ -37,9 +37,9 @@ public class StoreStreamer<T> {
     private TupleStreamTemplate tupleStreamTemplate;
 
     @SuppressWarnings("unchecked")
-    public Stream<Collection<T>> idsToStoreStream(String query, Sort sort) {
+    public Stream<Collection<T>> idsToStoreStream(String query,String filterQuery, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, id, sort);
             tupleStream.open();
 
             BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
@@ -52,9 +52,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<String> idsStream(String query, Sort sort) {
+    public Stream<String> idsStream(String query, String filterQuery, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(query,filterQuery, id, sort);
             tupleStream.open();
             return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
         } catch (IOException e) {
@@ -62,9 +62,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<Collection<T>> defaultFieldStream(String query, Sort sort) {
+    public Stream<Collection<T>> defaultFieldStream(String query, String filterQuery, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, defaultsField, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, defaultsField, sort);
             tupleStream.open();
 
             TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, defaultsField);
