@@ -121,14 +121,14 @@ public class UniProtEntryService {
         }
         Sort sort = getUniProtSort(request.getSort());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(storeStreamer.idsStream(query, sort));
+            context.setEntityIds(storeStreamer.idsStream(query, filterQuery, sort));
         }
 
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
                 .equals(TSV_MEDIA_TYPE) ||contentType.equals(XLS_MEDIA_TYPE))) {
-            context.setEntities(storeStreamer.defaultFieldStream(query, sort));
+            context.setEntities(storeStreamer.defaultFieldStream(query, filterQuery, sort));
         } else {
-            context.setEntities(storeStreamer.idsToStoreStream(query, sort));
+            context.setEntities(storeStreamer.idsToStoreStream(query, filterQuery, sort));
         }
     }
 
