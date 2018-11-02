@@ -22,6 +22,15 @@ import java.util.zip.GZIPOutputStream;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
+ * <p>
+ * Abstract HTTP message converter extending {@link AbstractHttpMessageConverter} that implements a generic
+ * way of writing the entities obtained from a {@link MessageConverterContext}. The default implementation
+ * of this class makes use of a number of methods, which can be overriden in concrete classes to give the desired
+ * behaviour.
+ * <p>
+ * Typically, the {@link AbstractUUWHttpMessageConverter#writeEntity(Object, OutputStream)} method need only
+ * be overriden.
+ *
  * Created 10/09/18
  *
  * @author Edd
@@ -143,10 +152,9 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
         }
     }
 
-
     protected abstract void writeEntity(T entity, OutputStream outputStream) throws IOException;
 
-    void logStats(int counter, Instant start) {
+    private void logStats(int counter, Instant start) {
         Instant now = Instant.now();
         long millisDuration = Duration.between(start, now).toMillis();
         int secDuration = (int) millisDuration / 1000;
