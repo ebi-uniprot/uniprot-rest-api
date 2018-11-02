@@ -36,7 +36,6 @@ public class StoreStreamer<T> {
     private Function<String, T> defaultsConverter;
     private TupleStreamTemplate tupleStreamTemplate;
 
-    @SuppressWarnings("unchecked")
     public Stream<T> idsToStoreStream(String query, String filterQuery, Sort sort) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, id, sort);

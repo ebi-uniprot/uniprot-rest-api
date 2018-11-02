@@ -9,16 +9,16 @@ import java.util.stream.Stream;
  * Created 31/01/17
  * @author Edd
  */
-class StopStreamException extends RuntimeException {
-    StopStreamException() {
+public class StopStreamException extends RuntimeException {
+    public StopStreamException() {
         super();
     }
 
-    StopStreamException(String message) {
+    public StopStreamException(String message) {
         super(message);
     }
 
-    StopStreamException(String message, Throwable cause) {
+    public StopStreamException(String message, Throwable cause) {
         super(message, cause);
     }
 }

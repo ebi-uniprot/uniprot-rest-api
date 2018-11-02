@@ -16,6 +16,7 @@ import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.QueryResult;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.page.impl.CursorPage;
+import uk.ac.ebi.uniprot.uuw.advanced.search.query.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.uuw.advanced.search.repository.impl.uniprot.UniprotFacetConfig;
 
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDoc;
 import static uk.ac.ebi.uniprot.uuw.advanced.search.mockers.UniProtDocMocker.createDocs;
 
@@ -63,7 +66,7 @@ public class SolrQueryRepositoryIT {
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, createDoc(acc));
 
         // when
-        Optional<UniProtDocument> entry = queryRepo.getEntry(query("accession:" + acc));
+        Optional<UniProtDocument> entry = queryRepo.getEntry(queryWithFacets("accession:" + acc));
 
         // then
         assertThat(entry.isPresent(), is(true));
@@ -74,7 +77,7 @@ public class SolrQueryRepositoryIT {
     public void getEntryWhenNotPresent() {
         // when
         String acc = "XXXXXX";
-        Optional<UniProtDocument> entry = queryRepo.getEntry(query("accession:" + acc));
+        Optional<UniProtDocument> entry = queryRepo.getEntry(queryWithFacets("accession:" + acc));
 
         // then
         assertThat(entry.isPresent(), is(false));
@@ -97,13 +100,13 @@ public class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query(accQuery), null, 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithFacets(accQuery), null, 2);
         List<String> page1Accs = queryResult.getContent().stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
         String nextCursor = ((CursorPage) queryResult.getPage()).getEncryptedNextCursor();
 
         // ... and attempt to fetch page 2
-        queryResult = queryRepo.searchPage(query(accQuery), nextCursor, 2);
+        queryResult = queryRepo.searchPage(queryWithFacets(accQuery), nextCursor, 2);
         List<String> page2Accs = queryResult.getContent().stream().map(doc -> doc.accession)
                 .collect(Collectors.toList());
 
@@ -112,8 +115,44 @@ public class SolrQueryRepositoryIT {
         assertThat(page2Accs, is(expectedPage2Accs));
     }
 
-    private SimpleQuery query(String query) {
-        SimpleQuery simpleQuery = new SimpleQuery(query);
+    @Test
+    public void facetsNotRequested() {
+        // given
+        int docCount = 10;
+        List<UniProtDocument> docs = createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
+
+        // when attempt to fetch results with no facets
+        String accQuery = "accession:*";
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), null, 2);
+
+        // then
+        assertThat(queryResult.getFacets(), hasSize(0));
+    }
+
+    @Test
+    public void facetsRequested() {
+        // given
+        int docCount = 10;
+        List<UniProtDocument> docs = createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
+
+        // when attempt to fetch results with facets
+        String accQuery = "accession:*";
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithFacets(accQuery), null, 2);
+
+        // then
+        assertThat(queryResult.getFacets(), hasSize(greaterThan(0)));
+    }
+
+    private SimpleQuery queryWithFacets(String query) {
+        SimpleQuery simpleQuery = SolrQueryBuilder.of(query, facetConverter).build();
+        simpleQuery.addSort(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
+        return simpleQuery;
+    }
+
+    private SimpleQuery queryWithoutFacets(String query) {
+        SimpleQuery simpleQuery = SolrQueryBuilder.of(query).build();
         simpleQuery.addSort(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
         return simpleQuery;
     }

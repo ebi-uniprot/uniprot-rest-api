@@ -24,7 +24,6 @@ import java.util.Optional;
  * It was defined a common QueryResult object in order to be able to
  *
  * @param <T> Returned Solr entity
- *
  * @author lgonzales
  */
 public abstract class SolrQueryRepository<T> {
@@ -77,14 +76,14 @@ public abstract class SolrQueryRepository<T> {
     }
 
 
-    private SolrCallback<QueryResponse> getSolrCursorCallback(SimpleQuery query, String cursor,Integer pageSize) {
+    private SolrCallback<QueryResponse> getSolrCursorCallback(SimpleQuery query, String cursor, Integer pageSize) {
         return solrClient -> {
             DefaultQueryParser queryParser = new DefaultQueryParser();
             SolrQuery solrQuery = queryParser.doConstructSolrQuery(query);
 
-            if(cursor != null && !cursor.isEmpty()) {
+            if (cursor != null && !cursor.isEmpty()) {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
-            }else {
+            } else {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
             }
             solrQuery.setRows(pageSize);
@@ -93,8 +92,8 @@ public abstract class SolrQueryRepository<T> {
         };
     }
 
-    private void logSolrQuery(SimpleQuery query){
-        if(query != null) {
+    private void logSolrQuery(SimpleQuery query) {
+        if (query != null) {
             DefaultQueryParser queryParser = new DefaultQueryParser();
             LOGGER.debug("solrQuery: " + queryParser.getQueryString(query));
         }

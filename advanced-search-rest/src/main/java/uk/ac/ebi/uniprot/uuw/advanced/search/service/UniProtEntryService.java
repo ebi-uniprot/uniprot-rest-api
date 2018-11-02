@@ -54,13 +54,13 @@ public class UniProtEntryService {
 
     public QueryResult<?> search(SearchRequestDTO request, MessageConverterContext<UniProtEntry> context) {
         MediaType contentType = context.getContentType();
-        SimpleQuery simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
-        if(request.needIsoformFilterQuery()) {
-            simpleQuery.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
-        }
-        simpleQuery.addSort(getUniProtSort(request.getSort()));
+        SimpleQuery simpleQuery = createQuery(request);
+
         QueryResult<UniProtDocument> results = repository
                 .searchPage(simpleQuery, request.getCursor(), request.getSize());
+        if (request.isIncludeFacets()) {
+            context.setFacets(results.getFacets());
+        }
 
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             List<String> accList = results.getContent().stream().map(doc -> doc.accession).collect(Collectors.toList());
@@ -72,6 +72,22 @@ public class UniProtEntryService {
             context.setEntities(queryResult.getContent().stream());
             return queryResult;
         }
+    }
+
+    private SimpleQuery createQuery(SearchRequestDTO request) {
+        SimpleQuery simpleQuery;
+        if (request.isIncludeFacets()) {
+            simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
+        } else {
+            simpleQuery = SolrQueryBuilder.of(request.getQuery()).build();
+        }
+
+        if (request.needIsoformFilterQuery()) {
+            simpleQuery.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
+        }
+        simpleQuery.addSort(getUniProtSort(request.getSort()));
+
+        return simpleQuery;
     }
 
     public void getByAccession(String accession, String fields, MessageConverterContext<UniProtEntry> context) {
@@ -116,7 +132,7 @@ public class UniProtEntryService {
     private void streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType, MessageConverterContext<UniProtEntry> context) {
         String query = request.getQuery();
         String filterQuery = null;
-        if(request.needIsoformFilterQuery()) {
+        if (request.needIsoformFilterQuery()) {
             filterQuery = UniProtField.Search.is_isoform.name() + ":" + false;
         }
         Sort sort = getUniProtSort(request.getSort());
@@ -125,7 +141,7 @@ public class UniProtEntryService {
         }
 
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
-                .equals(TSV_MEDIA_TYPE) ||contentType.equals(XLS_MEDIA_TYPE))) {
+                .equals(TSV_MEDIA_TYPE) || contentType.equals(XLS_MEDIA_TYPE))) {
             context.setEntities(storeStreamer.defaultFieldStream(query, filterQuery, sort));
         } else {
             context.setEntities(storeStreamer.idsToStoreStream(query, filterQuery, sort));

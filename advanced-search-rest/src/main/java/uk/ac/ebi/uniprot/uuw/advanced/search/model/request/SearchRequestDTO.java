@@ -45,6 +45,9 @@ public class SearchRequestDTO {
     @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.includeIsoform}")
     private String includeIsoform;
 
+    // TODO: 02/11/18 VALIDATION -- only valid if using JSON response type
+    private boolean includeFacets;
+
     @Positive(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.positive}")
     private Integer size = DEFAULT_RESULTS_SIZE;
 

@@ -3,7 +3,9 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.http.context;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.http.MediaType;
+import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.facet.Facet;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
@@ -21,15 +23,17 @@ public class MessageConverterContext<T> {
     private Stream<String> entityIds;
     private MessageConverterContextFactory.Resource resource;
     private String fields;
+    private Collection<Facet> facets;
 
     public MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
                 .contentType(this.contentType)
                 .entities(this.entities)
                 .resource(this.resource)
-                .fileType(this.fileType == null? FileType.FILE : this.fileType)
+                .fileType(this.fileType == null ? FileType.FILE : this.fileType)
                 .fields(this.fields)
                 .entityIds(this.entityIds)
+                .facets(this.facets)
                 .build();
     }
 }

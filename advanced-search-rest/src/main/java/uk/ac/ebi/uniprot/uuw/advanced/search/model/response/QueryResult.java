@@ -17,25 +17,25 @@ public class QueryResult<T> {
     private final Collection<T> content;
     private final Collection<Facet> facets;
 
-    private  QueryResult(Collection<T> content, Page page,Collection<Facet> facets) {
+    private QueryResult(Collection<T> content, Page page, Collection<Facet> facets) {
         this.content = content;
         this.page = page;
         this.facets = facets;
     }
 
-    public static <T> QueryResult<T> of(Collection<T> content, Page page){
-        return new QueryResult<>(content,page,null);
+    public static <T> QueryResult<T> of(Collection<T> content, Page page) {
+        return new QueryResult<>(content, page, null);
     }
 
-    public static <T> QueryResult<T> of(Collection<T> content, Page page,Collection<Facet> facets){
-        return new QueryResult<>(content,page,facets);
+    public static <T> QueryResult<T> of(Collection<T> content, Page page, Collection<Facet> facets) {
+        return new QueryResult<>(content, page, facets);
     }
 
     public Page getPage() {
         return page;
     }
 
-    public Page getPageAndClean(){
+    public Page getPageAndClean() {
         Page result = this.page;
         this.page = null;
         return result;

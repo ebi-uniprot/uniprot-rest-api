@@ -15,23 +15,29 @@ public class SolrQueryBuilder {
     private final String query;
     private final UniprotFacetConfig uniprotFacetConfig;
 
-    private SolrQueryBuilder(String query, UniprotFacetConfig uniprotFacetConfig){
+    private SolrQueryBuilder(String query, UniprotFacetConfig uniprotFacetConfig) {
         this.query = query;
         this.uniprotFacetConfig = uniprotFacetConfig;
     }
 
-    public static SolrQueryBuilder of(String query, UniprotFacetConfig uniprotFacetConfig){
-        return new SolrQueryBuilder(query,uniprotFacetConfig);
+    public static SolrQueryBuilder of(String query) {
+        return new SolrQueryBuilder(query, null);
     }
 
-    public SimpleQuery build(){
+    public static SolrQueryBuilder of(String query, UniprotFacetConfig uniprotFacetConfig) {
+        return new SolrQueryBuilder(query, uniprotFacetConfig);
+    }
+
+    public SimpleQuery build() {
         SimpleQuery simpleQuery = new SimpleQuery(query);
-        simpleQuery = getSimpleFacetQuery(simpleQuery);
+        if (uniprotFacetConfig != null) {
+            simpleQuery = getSimpleFacetQuery(simpleQuery);
+        }
 
         return simpleQuery;
     }
 
-    private SimpleFacetQuery getSimpleFacetQuery(SimpleQuery simpleQuery){
+    private SimpleFacetQuery getSimpleFacetQuery(SimpleQuery simpleQuery) {
         SimpleFacetQuery simpleFacetQuery = new SimpleFacetQuery(simpleQuery.getCriteria());
 
         FacetOptions facetOptions = new FacetOptions();

@@ -1,5 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.uniprotkb;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
@@ -7,6 +9,7 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConvert
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.AbstractEntityHttpMessageConverter;
+import uk.ac.ebi.uniprot.uuw.advanced.search.http.converter.StopStreamException;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.EntryFilters;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter.FieldsParser;
 
@@ -17,9 +20,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
-    private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
+    private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
+    private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
 
     public UniProtKBJsonMessageConverter() {
         super(MediaType.APPLICATION_JSON);
@@ -28,22 +32,50 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
     @Override
     protected void init(MessageConverterContext context) {
         tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
-        setEntitySeparator(",");
     }
 
     @Override
     protected void before(MessageConverterContext context, OutputStream outputStream) throws IOException {
-        outputStream.write("{\"results\" : [".getBytes());
+        JsonGenerator generator = objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
+
+        generator.writeStartObject();
+
+        generator.writeFieldName("facets");
+        generator.writeStartArray();
+        if (context.getFacets() != null) {
+            context.getFacets().forEach(facet -> writeObject(generator, facet));
+        }
+        generator.writeEndArray();
+
+        generator.writeFieldName("results");
+        generator.writeStartArray();
+
+        tlJsonGenerator.set(generator);
     }
 
-    @Override
-    protected void after(MessageConverterContext context, OutputStream outputStream) throws IOException {
-        outputStream.write("]}".getBytes());
+    private void writeObject(JsonGenerator generator, Object facet) {
+        try {
+            generator.writeObject(facet);
+        } catch (IOException e) {
+            throw new StopStreamException("Failed to write Facet JSON object", e);
+        }
     }
 
     @Override
     protected void writeEntity(UniProtEntry entity, OutputStream outputStream) throws IOException {
-        outputStream.write(objectMapper.writeValueAsBytes(uniProtEntry2UPEntry(entity)));
+        JsonGenerator generator = tlJsonGenerator.get();
+
+        generator.writeObject(uniProtEntry2UPEntry(entity));
+    }
+
+    @Override
+    protected void after(MessageConverterContext context, OutputStream outputStream) throws IOException {
+        JsonGenerator generator = tlJsonGenerator.get();
+
+        generator.writeEndArray();
+        generator.writeEndObject();
+
+        generator.close();
     }
 
     private UPEntry uniProtEntry2UPEntry(UniProtEntry uniProtEntry) {
