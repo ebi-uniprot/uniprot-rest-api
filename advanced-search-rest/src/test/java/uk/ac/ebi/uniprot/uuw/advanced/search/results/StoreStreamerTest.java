@@ -35,6 +35,7 @@ public class StoreStreamerTest {
     private static final String ID = "id";
     private static final String DEFAULTS = "defaults";
     private static final String FAKE_QUERY = "any query";
+    private static final String FAKE_FILTER_QUERY = "any filter query";
     private static final Sort FAKE_SORT = new Sort(Sort.Direction.ASC, "any field");
     private FakeVoldemortClient fakeVoldemortClient;
     private StoreStreamer<String> storeStreamer;
@@ -58,7 +59,7 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithUnaryBatchSize() {
         createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer
-                .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
+                .idsToStoreStream(FAKE_QUERY, FAKE_FILTER_QUERY, FAKE_SORT);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),
@@ -72,9 +73,8 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithIntermediateBatchSize() {
         createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer
-                .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
+                .idsToStoreStream(FAKE_QUERY, FAKE_FILTER_QUERY, FAKE_SORT);
         List<String> results = storeStream.collect(Collectors.toList());
-        System.out.println(results);
         assertThat(results, contains(
                 transformString("a"),
                 transformString("b"),
@@ -87,7 +87,7 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithBiggerBatchSize() {
         createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer
-                .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
+                .idsToStoreStream(FAKE_QUERY, FAKE_FILTER_QUERY, FAKE_SORT);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),
@@ -101,7 +101,7 @@ public class StoreStreamerTest {
     public void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
         createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer
-                .idsToStoreStream(FAKE_QUERY, FAKE_SORT);
+                .idsToStoreStream(FAKE_QUERY, FAKE_FILTER_QUERY, FAKE_SORT);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),
@@ -113,7 +113,7 @@ public class StoreStreamerTest {
 
     private void createSearchStoreStream(int streamerBatchSize, TupleStream tupleStream) {
         TupleStreamTemplate mockTupleStreamTemplate = mock(TupleStreamTemplate.class);
-        when(mockTupleStreamTemplate.create(anyString(), anyString(), ArgumentMatchers.any())).thenReturn(tupleStream);
+        when(mockTupleStreamTemplate.create(anyString(),anyString(), anyString(), ArgumentMatchers.any())).thenReturn(tupleStream);
         this.storeStreamer = StoreStreamer.<String>builder()
                 .storeClient(fakeVoldemortClient)
                 .streamerBatchSize(streamerBatchSize)

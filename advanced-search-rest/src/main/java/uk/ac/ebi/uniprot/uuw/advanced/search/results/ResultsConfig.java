@@ -22,7 +22,7 @@ public class ResultsConfig {
     public TupleStreamTemplate cloudSolrStreamTemplate(RepositoryConfigProperties configProperties) {
         return TupleStreamTemplate.builder()
                 .collection("uniprot")
-                .key("accession")
+                .key("accession_id")
                 .requestHandler("/export")
                 .zookeeperHost(configProperties.getZookeperhost())
                 .build();

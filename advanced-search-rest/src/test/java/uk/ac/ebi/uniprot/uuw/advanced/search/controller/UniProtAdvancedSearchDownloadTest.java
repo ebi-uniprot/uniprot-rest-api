@@ -27,6 +27,7 @@ import uk.ac.ebi.uniprot.uuw.advanced.search.store.UniProtStoreConfig;
 
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -64,7 +65,7 @@ public class UniProtAdvancedSearchDownloadTest {
 
     @Before
     public void setUp() {
-        when(tupleStreamTemplate.create(any())).thenReturn(mock(TupleStream.class));
+        when(tupleStreamTemplate.create(any(),any())).thenReturn(mock(TupleStream.class));
     }
 
     @Test
@@ -95,7 +96,7 @@ public class UniProtAdvancedSearchDownloadTest {
     }
 
     private void mockStreamerResponseOf(UniProtEntry... entries) {
-        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any()))
+        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any(), any()))
                 .thenReturn(Stream.of(entries));
     }
 }

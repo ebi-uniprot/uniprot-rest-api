@@ -1,17 +1,9 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.model.response.filter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.base.Strings;
-
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldMaps;
+
+import java.util.*;
 
 public class FieldsParser {
 	private static final String COLON = ":";
@@ -19,7 +11,7 @@ public class FieldsParser {
 	private static final String XREF = "xref";
 	private static final String FEATURE = "feature";
 	private static final String COMMENT = "comment";
-	private static final String COMMA = ",";
+	private static final String COMMA = "\\s*,\\s*";
 
 	private static final String DR = "dr";
 	private static final String FT = "ft";

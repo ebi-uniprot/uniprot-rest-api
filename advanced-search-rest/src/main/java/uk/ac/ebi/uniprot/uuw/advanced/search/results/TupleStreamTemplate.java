@@ -4,8 +4,7 @@ import lombok.Builder;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.apache.solr.client.solrj.io.stream.expr.DefaultStreamFactory;
-import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
+import org.apache.solr.client.solrj.io.stream.expr.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -34,11 +33,11 @@ public class TupleStreamTemplate {
     private String key;
     private String collection;
 
-    public TupleStream create(String query) {
-        return create(query, key, new Sort(Sort.Direction.ASC, key));
+    public TupleStream create(String query,String filterQuery) {
+        return create(query, filterQuery, key, new Sort(Sort.Direction.ASC, key));
     }
 
-    public TupleStream create(String query, String key, Sort sort) {
+    public TupleStream create(String query, String filterQuery,String key, Sort sort) {
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
                 .zookeeperHost(zookeeperHost)
                 .collection(collection)
@@ -48,7 +47,7 @@ public class TupleStreamTemplate {
                 .streamContext(createStreamContext())
                 .build();
 
-        return streamBuilder.createFor(query);
+        return streamBuilder.createFor(query,filterQuery);
     }
 
     @Builder
@@ -60,15 +59,22 @@ public class TupleStreamTemplate {
         private String key;
         private StreamContext streamContext;
 
-        private TupleStream createFor(String query) {
+        private TupleStream createFor(String query,String filterQuery) {
             try {
                 StreamFactory streamFactory = new DefaultStreamFactory()
                         .withCollectionZkHost(collection, zookeeperHost);
-				String request =
-                        String.format("search(%s, q=\"%s\", fl=\"%s\", sort=\"%s\", qt=\"/export\")",
-                                      collection, query, fieldsToReturn(key, order), sortToString(order));
 
-                TupleStream tupleStream = streamFactory.constructStream(request);
+                StreamExpression requestExpression = new StreamExpression("search");
+                requestExpression.addParameter(new StreamExpressionValue(collection));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("q",query));
+                if(filterQuery != null && !filterQuery.isEmpty()) {
+                    requestExpression.addParameter(new StreamExpressionNamedParameter("fq", filterQuery));
+                }
+                requestExpression.addParameter(new StreamExpressionNamedParameter("fl",fieldsToReturn(key, order)));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("sort",sortToString(order)));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("qt","/export"));
+
+                TupleStream tupleStream = streamFactory.constructStream(requestExpression);
                 tupleStream.setStreamContext(streamContext);
                 return tupleStream;
             } catch (IOException e) {

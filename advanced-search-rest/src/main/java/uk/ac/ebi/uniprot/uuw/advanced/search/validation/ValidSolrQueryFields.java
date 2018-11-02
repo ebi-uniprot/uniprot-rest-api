@@ -1,8 +1,7 @@
 package uk.ac.ebi.uniprot.uuw.advanced.search.validation;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import uk.ac.ebi.uniprot.dataservice.client.SearchFieldType;
@@ -55,8 +54,8 @@ public @interface ValidSolrQueryFields {
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
             try{
-                QueryParser qp = new QueryParser("",new StandardAnalyzer());
-                Query query = qp.parse(queryString);
+                StandardQueryParser qp = new StandardQueryParser();
+                Query query = qp.parse(queryString,"");
                 isValid = hasValidateQueryField(query,context);
                 if(!isValid){
                     context.disableDefaultConstraintViolation();

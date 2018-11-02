@@ -10,6 +10,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ *  Unit Test class to validate UniProtSortUtil class behaviour
+ *
+ * @author lgonzales
+ */
 class UniProtSortUtilTest {
 
     @Test

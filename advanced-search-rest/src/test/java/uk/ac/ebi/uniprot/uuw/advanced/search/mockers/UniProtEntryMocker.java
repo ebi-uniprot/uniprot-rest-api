@@ -18,7 +18,8 @@ import java.util.Map;
  */
 public class UniProtEntryMocker {
     public enum Type {
-        SP("Q8DIA7.dat"), SP_COMPLEX("P97929.dat"), TR("F1Q0X3.dat");
+        SP("Q8DIA7.dat"), SP_COMPLEX("P97929.dat"), TR("F1Q0X3.dat"),
+        SP_CANONICAL("P21802.dat"),SP_ISOFORM("P21802-2.dat"),SP_CANONICAL_ISOFORM("P21802-1.dat");
 
         private final String fileName;
 

@@ -9,6 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uuw.advanced.search.http.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.uuw.advanced.search.model.request.SearchRequestDTO;
@@ -54,6 +55,9 @@ public class UniProtEntryService {
     public QueryResult<?> search(SearchRequestDTO request, MessageConverterContext<UniProtEntry> context) {
         MediaType contentType = context.getContentType();
         SimpleQuery simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
+        if(request.needIsoformFilterQuery()) {
+            simpleQuery.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
+        }
         simpleQuery.addSort(getUniProtSort(request.getSort()));
         QueryResult<UniProtDocument> results = repository
                 .searchPage(simpleQuery, request.getCursor(), request.getSize());
@@ -111,6 +115,10 @@ public class UniProtEntryService {
 
     private void streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType, MessageConverterContext<UniProtEntry> context) {
         String query = request.getQuery();
+        String filterQuery = null;
+        if(request.needIsoformFilterQuery()) {
+            filterQuery = UniProtField.Search.is_isoform.name() + ":" + false;
+        }
         Sort sort = getUniProtSort(request.getSort());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(storeStreamer.idsStream(query, sort));

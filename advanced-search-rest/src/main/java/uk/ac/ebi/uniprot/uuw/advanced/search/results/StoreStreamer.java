@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
  * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored fields).
  * Clients of this class need not know what store they need to access. They need only provide the query that
  * needs answering, in addition to the sortable fields.
- * <p>
+ *
  * Created 22/08/18
  *
  * @author Edd
@@ -37,9 +37,9 @@ public class StoreStreamer<T> {
     private TupleStreamTemplate tupleStreamTemplate;
 
     @SuppressWarnings("unchecked")
-    public Stream<T> idsToStoreStream(String query, Sort sort) {
+    public Stream<T> idsToStoreStream(String query, String filterQuery, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, id, sort);
             tupleStream.open();
 
             BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
@@ -52,9 +52,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<String> idsStream(String query, Sort sort) {
+    public Stream<String> idsStream(String query, String filterQuery, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, id, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(query,filterQuery, id, sort);
             tupleStream.open();
             return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
         } catch (IOException e) {
@@ -62,9 +62,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<T> defaultFieldStream(String query, Sort sort) {
+    public Stream<T> defaultFieldStream(String query, String filterQuery, Sort sort) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, defaultsField, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, defaultsField, sort);
             tupleStream.open();
 
             TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, defaultsField);
