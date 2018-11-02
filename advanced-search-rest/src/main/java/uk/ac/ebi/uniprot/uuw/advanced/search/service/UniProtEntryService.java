@@ -74,22 +74,6 @@ public class UniProtEntryService {
         }
     }
 
-    private SimpleQuery createQuery(SearchRequestDTO request) {
-        SimpleQuery simpleQuery;
-        if (request.isIncludeFacets()) {
-            simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
-        } else {
-            simpleQuery = SolrQueryBuilder.of(request.getQuery()).build();
-        }
-
-        if (request.needIsoformFilterQuery()) {
-            simpleQuery.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
-        }
-        simpleQuery.addSort(getUniProtSort(request.getSort()));
-
-        return simpleQuery;
-    }
-
     public void getByAccession(String accession, String fields, MessageConverterContext<UniProtEntry> context) {
         MediaType contentType = context.getContentType();
         try {
@@ -127,6 +111,22 @@ public class UniProtEntryService {
             }
             emitter.complete();
         });
+    }
+
+    private SimpleQuery createQuery(SearchRequestDTO request) {
+        SimpleQuery simpleQuery;
+        if (request.isIncludeFacets()) {
+            simpleQuery = SolrQueryBuilder.of(request.getQuery(), uniprotFacetConfig).build();
+        } else {
+            simpleQuery = SolrQueryBuilder.of(request.getQuery()).build();
+        }
+
+        if (request.needIsoformFilterQuery()) {
+            simpleQuery.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
+        }
+        simpleQuery.addSort(getUniProtSort(request.getSort()));
+
+        return simpleQuery;
     }
 
     private void streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType, MessageConverterContext<UniProtEntry> context) {
