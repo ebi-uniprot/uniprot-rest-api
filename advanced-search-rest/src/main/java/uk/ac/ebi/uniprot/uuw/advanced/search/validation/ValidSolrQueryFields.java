@@ -91,10 +91,7 @@ public @interface ValidSolrQueryFields {
                     }
                 }
             }else{
-                String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.type}";
-                ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-                contextImpl.addMessageParameter("searchClass",inputQuery.getClass().getName());
-                context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+                addQueryTypeErrorMessage(inputQuery, context);
                 validField = false;
             }
             return validField;
@@ -104,27 +101,46 @@ public @interface ValidSolrQueryFields {
             boolean validField = true;
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
             if(!fieldValidator.hasField(fieldName)){
-                String errorMessage = fieldValidator.getInvalidFieldErrorMessage(fieldName);
-                contextImpl.addMessageParameter("fieldName",fieldName);
-                contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+                addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
             }else if(!fieldValidator.hasValidFieldType(fieldName,type)){
-                String errorMessage = fieldValidator.getInvalidFieldTypeErrorMessage(fieldName,type);
-                String expectedFieldType = fieldValidator.getExpectedSearchFieldType(fieldName).name().toLowerCase();
-                contextImpl.addMessageParameter("fieldName",fieldName);
-                contextImpl.addMessageParameter("fieldType",type.name().toLowerCase());
-                contextImpl.addMessageParameter("expectedFieldType",expectedFieldType);
-                contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+                addFieldTypeErrorMessage(fieldName, type, contextImpl);
                 validField = false;
             }else if(!fieldValidator.hasValidFieldValue(fieldName,value)){
-                String errorMessage = fieldValidator.getInvalidFieldValueErrorMessage(fieldName,value);
-                contextImpl.addMessageParameter("fieldName",fieldName);
-                contextImpl.addMessageParameter("fieldValue",value);
-                contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+                addFieldValueErrorMessage(fieldName, value, contextImpl);
                 validField = false;
             }
 
             return validField;
+        }
+
+        void addFieldValueErrorMessage(String fieldName, String value, ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = fieldValidator.getInvalidFieldValueErrorMessage(fieldName,value);
+            contextImpl.addMessageParameter("fieldName",fieldName);
+            contextImpl.addMessageParameter("fieldValue",value);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        void addFieldTypeErrorMessage(String fieldName, SearchFieldType type, ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = fieldValidator.getInvalidFieldTypeErrorMessage(fieldName,type);
+            String expectedFieldType = fieldValidator.getExpectedSearchFieldType(fieldName).name().toLowerCase();
+            contextImpl.addMessageParameter("fieldName",fieldName);
+            contextImpl.addMessageParameter("fieldType",type.name().toLowerCase());
+            contextImpl.addMessageParameter("expectedFieldType",expectedFieldType);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        void addFieldNameErrorMessage(String fieldName, ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = fieldValidator.getInvalidFieldErrorMessage(fieldName);
+            contextImpl.addMessageParameter("fieldName",fieldName);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        void addQueryTypeErrorMessage(Query inputQuery, ConstraintValidatorContext context) {
+            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.type}";
+            ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
+            contextImpl.addMessageParameter("searchClass",inputQuery.getClass().getName());
+            context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
     }
