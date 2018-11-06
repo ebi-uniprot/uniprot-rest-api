@@ -3,7 +3,6 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.validation;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.queryparser.classic.QueryParserBase;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.Query;
@@ -48,10 +47,8 @@ public @interface ValidSolrQuerySyntax {
 
                 StandardQueryParser standardQueryParser = new StandardQueryParser();
                 standardQueryParser.parse(queryString,"");
-            }catch (QueryNodeException e){
+            }catch (QueryNodeException | ParseException e){
                 isValid = false;
-            }catch (ParseException qpe){
-                isValid  =false;
             }
 
             return isValid;
