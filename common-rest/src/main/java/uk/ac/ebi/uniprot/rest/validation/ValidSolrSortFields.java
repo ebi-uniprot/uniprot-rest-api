@@ -38,7 +38,21 @@ public @interface ValidSolrSortFields {
 
         private static final String SORT_FORMAT = "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
         private static final String SORT_ORDER = "^asc|desc$";
-        private List<String> valueList = null;
+        List<String> valueList = null;
+
+
+        @Override
+        public void initialize(ValidSolrSortFields constraintAnnotation) {
+            valueList = new ArrayList<>();
+            Class<? extends Enum<?>> enumClass = constraintAnnotation.sortFieldEnumClazz();
+
+            Enum[] enumValArr = enumClass.getEnumConstants();
+
+            for(Enum enumVal : enumValArr) {
+                valueList.add(enumVal.name().toLowerCase());
+            }
+
+        }
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -55,28 +69,45 @@ public @interface ValidSolrSortFields {
                         while (groups.size() > index){
                             String sortField = groups.get(++index);
                             if(!valueList.contains(sortField)){
-                                String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.field}";
-                                contextImpl.addMessageParameter("sortField",sortField);
-                                contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+                                addInvalidSortFieldErrorMessage(contextImpl, sortField);
                                 result = false;
                             }
 
                             String sortOrder = groups.get(++index);
                             if(!sortOrder.matches(SORT_ORDER)){
-                                String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.order}";
-                                contextImpl.addMessageParameter("sortOrder",sortOrder);
-                                contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+                                addInvalidSortOrderErrorMessage(contextImpl, sortOrder);
                                 result = false;
                             }
                             index++; //the comma is another group
                         }
-                        if(!result){
+                        if(!result && contextImpl != null){
                             contextImpl.disableDefaultConstraintViolation();
                         }
                     }
+                }else{
+                    addInvalidSortFormatErrorMessage(contextImpl,value);
+                    result =  false;
                 }
             }
             return result;
+        }
+
+        void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
+            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.format}";
+            contextImpl.addMessageParameter("value",value);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
+            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.order}";
+            contextImpl.addMessageParameter("sortOrder",sortOrder);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
+            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.field}";
+            contextImpl.addMessageParameter("sortField",sortField);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         private List<String> getMatchGroupList(Matcher matcher) {
@@ -89,17 +120,5 @@ public @interface ValidSolrSortFields {
             return groups;
         }
 
-        @Override
-        public void initialize(ValidSolrSortFields constraintAnnotation) {
-            valueList = new ArrayList<>();
-            Class<? extends Enum<?>> enumClass = constraintAnnotation.sortFieldEnumClazz();
-
-            Enum[] enumValArr = enumClass.getEnumConstants();
-
-            for(Enum enumVal : enumValArr) {
-                valueList.add(enumVal.name().toLowerCase());
-            }
-
-        }
     }
 }

@@ -47,10 +47,8 @@ public @interface ValidSolrQuerySyntax {
 
                 StandardQueryParser standardQueryParser = new StandardQueryParser();
                 standardQueryParser.parse(queryString,"");
-            }catch (QueryNodeException e){
+            }catch (QueryNodeException | ParseException e){
                 isValid = false;
-            }catch (ParseException qpe){
-                isValid  =false;
             }
 
             return isValid;
