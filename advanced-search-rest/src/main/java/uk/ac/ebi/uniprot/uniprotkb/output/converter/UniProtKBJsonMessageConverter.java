@@ -30,12 +30,9 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
     }
 
     @Override
-    protected void init(MessageConverterContext context) {
-        tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
-    }
-
-    @Override
     protected void before(MessageConverterContext context, OutputStream outputStream) throws IOException {
+        tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
+
         JsonGenerator generator = objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
 
         generator.writeStartObject();

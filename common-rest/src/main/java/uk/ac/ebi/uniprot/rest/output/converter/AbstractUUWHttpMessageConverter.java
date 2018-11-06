@@ -42,7 +42,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
     private static final int LOG_INTERVAL = 10000;
     private String entitySeparator;
 
-    public AbstractUUWHttpMessageConverter(MediaType mediaType) {
+    AbstractUUWHttpMessageConverter(MediaType mediaType) {
         super(mediaType);
     }
 
@@ -65,23 +65,14 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
         switch (context.getFileType()) {
             case GZIP:
                 try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
-                    writeContents(context, counter, start, gzipOutputStream);
+                    writeContents(context, gzipOutputStream, start, counter);
                 }
                 break;
             default:
-                writeContents(context, counter, start, outputStream);
+                writeContents(context, outputStream, start, counter);
         }
 
         logStats(counter.get(), start);
-    }
-
-    private void writeContents(MessageConverterContext<C> context, AtomicInteger counter, Instant start, OutputStream outputStream) throws IOException {
-        init(context);
-
-        writeContents(context, outputStream, start, counter);
-    }
-
-    protected void init(MessageConverterContext<C> context) {
     }
 
     protected void before(MessageConverterContext<C> context, OutputStream outputStream) throws IOException {
@@ -118,6 +109,8 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
         this.entitySeparator = separator;
     }
 
+    protected abstract void writeEntity(T entity, OutputStream outputStream) throws IOException;
+
     private void writeEntities(Stream<T> entityCollection, OutputStream outputStream, Instant start, AtomicInteger counter) {
         AtomicBoolean firstIteration = new AtomicBoolean(true);
         entityCollection.forEach(entity -> {
@@ -152,8 +145,6 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
             outputStream.flush();
         }
     }
-
-    protected abstract void writeEntity(T entity, OutputStream outputStream) throws IOException;
 
     private void logStats(int counter, Instant start) {
         Instant now = Instant.now();

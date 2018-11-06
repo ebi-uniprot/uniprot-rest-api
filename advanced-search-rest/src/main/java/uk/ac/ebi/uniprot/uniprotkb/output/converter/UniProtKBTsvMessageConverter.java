@@ -30,13 +30,9 @@ public class UniProtKBTsvMessageConverter extends AbstractEntityHttpMessageConve
     }
 
     @Override
-    protected void init(MessageConverterContext context) {
+    protected void before(MessageConverterContext context, OutputStream outputStream) throws IOException {
         tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
         tlFields.set(FieldsParser.parse(context.getFields()));
-    }
-
-    @Override
-    protected void before(MessageConverterContext context, OutputStream outputStream) throws IOException {
         outputStream.write(convertHeader(tlFields.get()).stream().collect(Collectors.joining("\t", "", "\n")).getBytes());
     }
 
