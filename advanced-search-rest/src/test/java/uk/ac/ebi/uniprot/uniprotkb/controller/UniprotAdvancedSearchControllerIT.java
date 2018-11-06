@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, AdvancedSearchREST.class})
 @WebAppConfiguration
@@ -112,7 +110,7 @@ public class UniprotAdvancedSearchControllerIT {
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
                         .param("query", "accession:" + acc)
-                        .param("fields", "gene")
+                        .param("fields", "gene_names")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
