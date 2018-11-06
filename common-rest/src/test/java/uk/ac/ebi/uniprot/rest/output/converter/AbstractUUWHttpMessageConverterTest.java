@@ -10,11 +10,16 @@ import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created 26/09/18
@@ -22,32 +27,115 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Edd
  */
 public class AbstractUUWHttpMessageConverterTest {
+    private static final String BEFORE = "before";
+    private static final String AFTER = "after";
+    private static final String ENTITY_SEPARATOR = ",";
     private static final MediaType ANY_MEDIA_TYPE = MediaType.ALL;
     private static final String ORIGINAL = "hello world";
+    private static final String SEPARATED_ORIGINAL = ORIGINAL
+            .codePoints()
+            .mapToObj(c -> String.valueOf((char) c))
+            .collect(Collectors.joining(ENTITY_SEPARATOR));
 
     @Test
-    public void overridenMethodsCalledInCorrectOrder_beforeThenWriteThenAfterThenCleanUp() {
-        
+    public void overridenMethodsCalledInCorrectOrder_beforeThenWriteThenAfterThenCleanUp() throws IOException {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
+        converter.setOverrideAfter(true);
+        converter.setOverrideBefore(true);
+        assertThat(converter.hasCleanedUp(), is(false));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
+        converter.writeInternal(context, httpOutputMessage(os));
+
+        assertThat(os.toString(), is(BEFORE + ORIGINAL + AFTER));
+        assertThat(converter.hasCleanedUp(), is(true));
     }
 
     @Test
     public void supportsMessageConvertersOnly() {
-
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
+        assertThat(converter.supports(MessageConverterContext.class), is(true));
+        assertThat(converter.supports(String.class), is(false));
     }
 
     @Test
-    public void writesCorrectNumberOfEntities() {
+    public void separatorUsedToSeparateEntities() throws IOException {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
+        converter.setEntitySeparator(ENTITY_SEPARATOR);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
+        converter.writeInternal(context, httpOutputMessage(os));
 
+        assertThat(os.toString(), is(SEPARATED_ORIGINAL));
     }
 
     @Test
-    public void errorDuringWritingCausesWritingToStopAndStreamToBeClosed() {
+    public void errorDuringBeforeWritingCausesStreamToBeClosedAndCleanUp() throws IOException {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE){
+            @Override
+            protected void before(MessageConverterContext<Character> context, OutputStream outputStream) throws IOException {
+                throw new IOException();
+            }
+        };
+        assertThat(converter.hasCleanedUp(), is(false));
+        assertThat(converter.isCharacterStreamIsClosed(), is(false));
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
+        converter.writeInternal(context, httpOutputMessage(mockOS));
 
+        verify(mockOS).close();
+        assertThat(converter.hasCleanedUp(), is(true));
+        assertThat(converter.isCharacterStreamIsClosed(), is(true));
     }
 
     @Test
-    public void separatorUsedToSeparateEntities() {
+    public void errorDuringAfterWritingCausesStreamToBeClosedAndCleanUp() throws IOException {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE){
+            @Override
+            protected void after(MessageConverterContext<Character> context, OutputStream outputStream) throws IOException {
+                throw new IOException();
+            }
+        };
+        assertThat(converter.hasCleanedUp(), is(false));
+        assertThat(converter.isCharacterStreamIsClosed(), is(false));
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
+        converter.writeInternal(context, httpOutputMessage(mockOS));
 
+        verify(mockOS).close();
+        assertThat(converter.hasCleanedUp(), is(true));
+        assertThat(converter.isCharacterStreamIsClosed(), is(true));
+    }
+
+    @Test
+    public void errorDuringWriteEntityCausesStreamToBeClosedAndCleanUp() throws IOException {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE){
+            @Override
+            protected void writeEntity(Character entity, OutputStream outputStream) throws IOException {
+                throw new IOException();
+            }
+        };
+        assertThat(converter.hasCleanedUp(), is(false));
+        assertThat(converter.isCharacterStreamIsClosed(), is(false));
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
+        converter.writeInternal(context, httpOutputMessage(mockOS));
+
+        verify(mockOS).close();
+        assertThat(converter.hasCleanedUp(), is(true));
+        assertThat(converter.isCharacterStreamIsClosed(), is(true));
+    }
+
+
+    @Test
+    public void writesCorrectNumberOfEntities() throws IOException {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
+        assertThat(converter.getCounter(), is(0));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
+        converter.writeInternal(context, httpOutputMessage(os));
+
+        assertThat(converter.getCounter(), is(ORIGINAL.length()));
     }
 
     @Test
@@ -103,18 +191,70 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     private static class FakeMessageConverter extends AbstractUUWHttpMessageConverter<Character, Character> {
+        private AtomicInteger counter = new AtomicInteger(0);
+        private boolean hasCleanedUp;
+        private boolean overrideBefore;
+        private boolean overrideAfter;
+
+        public boolean isCharacterStreamIsClosed() {
+            return characterStreamIsClosed;
+        }
+
+        private boolean characterStreamIsClosed;
+        private Stream<Character> characterStream = charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
+
         FakeMessageConverter(MediaType mediaType) {
             super(mediaType);
         }
 
+        int getCounter() {
+            return counter.get();
+        }
+
+        boolean hasCleanedUp() {
+            return hasCleanedUp;
+        }
+
+        void setOverrideBefore(boolean overrideBefore) {
+            this.overrideBefore = overrideBefore;
+        }
+
+        void setOverrideAfter(boolean overrideAfter) {
+            this.overrideAfter = overrideAfter;
+        }
+
         @Override
         protected Stream<Character> entitiesToWrite(MessageConverterContext<Character> context) {
-            return charStream(ORIGINAL);
+            return characterStream;
         }
 
         @Override
         protected void writeEntity(Character entity, OutputStream outputStream) throws IOException {
             outputStream.write(entity);
+        }
+
+        @Override
+        protected void writeContents(MessageConverterContext<Character> context, OutputStream outputStream, Instant start, AtomicInteger counter) throws IOException {
+            super.writeContents(context, outputStream, start, this.counter);
+        }
+
+        @Override
+        protected void before(MessageConverterContext<Character> context, OutputStream outputStream) throws IOException {
+            if (overrideBefore) {
+                outputStream.write(BEFORE.getBytes());
+            }
+        }
+
+        @Override
+        protected void after(MessageConverterContext<Character> context, OutputStream outputStream) throws IOException {
+            if (overrideAfter) {
+                outputStream.write(AFTER.getBytes());
+            }
+        }
+
+        @Override
+        protected void cleanUp() {
+            hasCleanedUp = true;
         }
     }
 }
