@@ -3,7 +3,7 @@ package uk.ac.ebi.uniprot.configure.api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
-import uk.ac.ebi.uniprot.rest.http.HttpCommonHeaderConfig;
+import uk.ac.ebi.uniprot.rest.output.header.HttpCommonHeaderConfig;
 
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class})
