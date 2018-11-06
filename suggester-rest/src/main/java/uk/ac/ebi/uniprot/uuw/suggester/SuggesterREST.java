@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import uk.ac.ebi.uniprot.rest.http.HttpCommonHeaderConfig;
+import uk.ac.ebi.uniprot.rest.output.header.HttpCommonHeaderConfig;
 
 /**
  * Starts the REST application.

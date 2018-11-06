@@ -20,26 +20,28 @@ import java.util.stream.Collectors;
 
 /**
  * This is the solr query validator that is responsible to verify if the query has.
- *  - valid field names
- *  - valid query field type
- *  - if applicable, expected value format, for example, boolean, numbers, valid accession, etc...
+ * - valid field names
+ * - valid query field type
+ * - if applicable, expected value format, for example, boolean, numbers, valid accession, etc...
  *
  * @author lgonzales
  */
 @Constraint(validatedBy = ValidSolrQueryFields.QueryFieldValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrQueryFields {
 
     Class<? extends SolrQueryFieldValidator> fieldValidatorClazz();
 
     String message() default "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.field}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
-    class QueryFieldValidator implements ConstraintValidator<ValidSolrQueryFields, String> {
+    public class QueryFieldValidator implements ConstraintValidator<ValidSolrQueryFields, String> {
 
-        SolrQueryFieldValidator fieldValidator = null;
+        public SolrQueryFieldValidator fieldValidator = null;
 
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
@@ -53,44 +55,44 @@ public @interface ValidSolrQueryFields {
         @Override
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
-            try{
+            try {
                 StandardQueryParser qp = new StandardQueryParser();
-                Query query = qp.parse(queryString,"");
-                isValid = hasValidateQueryField(query,context);
-                if(!isValid){
+                Query query = qp.parse(queryString, "");
+                isValid = hasValidateQueryField(query, context);
+                if (!isValid) {
                     context.disableDefaultConstraintViolation();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 //Syntax error is validated by ValidSolrQuerySyntax
             }
             return isValid;
         }
 
-        private boolean hasValidateQueryField(Query inputQuery,ConstraintValidatorContext context){
+        private boolean hasValidateQueryField(Query inputQuery, ConstraintValidatorContext context) {
             boolean validField = true;
-            if(inputQuery instanceof TermQuery){
+            if (inputQuery instanceof TermQuery) {
                 TermQuery termQuery = (TermQuery) inputQuery;
                 String fieldName = termQuery.getTerm().field();
                 String value = termQuery.getTerm().text();
-                validField = isValidField(context, fieldName,SearchFieldType.TERM, value);
-            }else if(inputQuery instanceof TermRangeQuery){
+                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+            } else if (inputQuery instanceof TermRangeQuery) {
                 TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;
                 String fieldName = rangeQuery.getField();
                 String value = rangeQuery.toString("");
-                validField = isValidField(context, fieldName,SearchFieldType.RANGE, value);
-            }else if(inputQuery instanceof PhraseQuery){
+                validField = isValidField(context, fieldName, SearchFieldType.RANGE, value);
+            } else if (inputQuery instanceof PhraseQuery) {
                 PhraseQuery phraseQuery = (PhraseQuery) inputQuery;
                 String fieldName = phraseQuery.getTerms()[0].field();
-                String value = Arrays.stream(phraseQuery.getTerms()).map(Term::text).collect(Collectors.joining( " "));
-                validField = isValidField(context, fieldName,SearchFieldType.TERM, value);
-            }else if(inputQuery instanceof BooleanQuery){
+                String value = Arrays.stream(phraseQuery.getTerms()).map(Term::text).collect(Collectors.joining(" "));
+                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+            } else if (inputQuery instanceof BooleanQuery) {
                 BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
                 for (BooleanClause clause : booleanQuery.clauses()) {
-                    if(!hasValidateQueryField(clause.getQuery(),context)){
+                    if (!hasValidateQueryField(clause.getQuery(), context)) {
                         validField = false;
                     }
                 }
-            }else{
+            } else {
                 addQueryTypeErrorMessage(inputQuery, context);
                 validField = false;
             }
@@ -100,13 +102,13 @@ public @interface ValidSolrQueryFields {
         private boolean isValidField(ConstraintValidatorContext context, String fieldName, SearchFieldType type, String value) {
             boolean validField = true;
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            if(!fieldValidator.hasField(fieldName)){
+            if (!fieldValidator.hasField(fieldName)) {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
-            }else if(!fieldValidator.hasValidFieldType(fieldName,type)){
+            } else if (!fieldValidator.hasValidFieldType(fieldName, type)) {
                 addFieldTypeErrorMessage(fieldName, type, contextImpl);
                 validField = false;
-            }else if(!fieldValidator.hasValidFieldValue(fieldName,value)){
+            } else if (!fieldValidator.hasValidFieldValue(fieldName, value)) {
                 addFieldValueErrorMessage(fieldName, value, contextImpl);
                 validField = false;
             }
@@ -114,34 +116,33 @@ public @interface ValidSolrQueryFields {
             return validField;
         }
 
-        void addFieldValueErrorMessage(String fieldName, String value, ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = fieldValidator.getInvalidFieldValueErrorMessage(fieldName,value);
-            contextImpl.addMessageParameter("fieldName",fieldName);
-            contextImpl.addMessageParameter("fieldValue",value);
+        public void addFieldValueErrorMessage(String fieldName, String value, ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = fieldValidator.getInvalidFieldValueErrorMessage(fieldName, value);
+            contextImpl.addMessageParameter("fieldName", fieldName);
+            contextImpl.addMessageParameter("fieldValue", value);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        void addFieldTypeErrorMessage(String fieldName, SearchFieldType type, ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = fieldValidator.getInvalidFieldTypeErrorMessage(fieldName,type);
+        public void addFieldTypeErrorMessage(String fieldName, SearchFieldType type, ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = fieldValidator.getInvalidFieldTypeErrorMessage(fieldName, type);
             String expectedFieldType = fieldValidator.getExpectedSearchFieldType(fieldName).name().toLowerCase();
-            contextImpl.addMessageParameter("fieldName",fieldName);
-            contextImpl.addMessageParameter("fieldType",type.name().toLowerCase());
-            contextImpl.addMessageParameter("expectedFieldType",expectedFieldType);
+            contextImpl.addMessageParameter("fieldName", fieldName);
+            contextImpl.addMessageParameter("fieldType", type.name().toLowerCase());
+            contextImpl.addMessageParameter("expectedFieldType", expectedFieldType);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        void addFieldNameErrorMessage(String fieldName, ConstraintValidatorContextImpl contextImpl) {
+        public void addFieldNameErrorMessage(String fieldName, ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = fieldValidator.getInvalidFieldErrorMessage(fieldName);
-            contextImpl.addMessageParameter("fieldName",fieldName);
+            contextImpl.addMessageParameter("fieldName", fieldName);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        void addQueryTypeErrorMessage(Query inputQuery, ConstraintValidatorContext context) {
+        public void addQueryTypeErrorMessage(Query inputQuery, ConstraintValidatorContext context) {
             String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.type}";
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            contextImpl.addMessageParameter("searchClass",inputQuery.getClass().getName());
+            contextImpl.addMessageParameter("searchClass", inputQuery.getClass().getName());
             context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
-
     }
 }

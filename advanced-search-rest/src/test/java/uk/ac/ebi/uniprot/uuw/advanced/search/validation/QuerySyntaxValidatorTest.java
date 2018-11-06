@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.uuw.advanced.search.validation;
 
 
 import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.rest.validation.ValidSolrQuerySyntax;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

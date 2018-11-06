@@ -38,7 +38,7 @@ public @interface ValidSolrSortFields {
 
         private static final String SORT_FORMAT = "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
         private static final String SORT_ORDER = "^asc|desc$";
-        List<String> valueList = null;
+        public List<String> valueList = null;
 
 
         @Override
@@ -92,19 +92,19 @@ public @interface ValidSolrSortFields {
             return result;
         }
 
-        void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
+        public void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
             String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.format}";
             contextImpl.addMessageParameter("value",value);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
+        public void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
             String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.order}";
             contextImpl.addMessageParameter("sortOrder",sortOrder);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
+        public void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
             String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.field}";
             contextImpl.addMessageParameter("sortField",sortField);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
