@@ -43,17 +43,14 @@ public class UniProtKBXslMessageConverter extends AbstractEntityHttpMessageConve
     }
 
     @Override
-    protected void init(MessageConverterContext context) {
+    protected void before(MessageConverterContext context, OutputStream outputStream) {
         tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
         tlFields.set(FieldsParser.parse(context.getFields()));
         SXSSFWorkbook workbook = new SXSSFWorkbook(500);
         tlWorkBook.set(workbook);
         tlSheet.set(workbook.createSheet());
         tlCounter.set(new AtomicInteger(0));
-    }
 
-    @Override
-    protected void before(MessageConverterContext context, OutputStream outputStream) {
         Row header = tlSheet.get().createRow(0);
         updateRow(header, convertHeader(tlFields.get()));
     }
