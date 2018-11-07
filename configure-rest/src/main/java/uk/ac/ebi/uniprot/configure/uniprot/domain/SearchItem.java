@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.configure.uniprot.domain;
 import java.util.List;
 
 public interface SearchItem {
+	String getId();
 	String getLabel();
 	SearchItemType getItemType();
 	String getTerm();

@@ -1,5 +1,6 @@
 [
 	{
+		"id": "id_accession",
 		"label": "UniProtKB AC",
 		"itemType": "single",
 		"term": "accession",
@@ -8,6 +9,7 @@
 		"example": "P12345"
 	},
 	{
+		"id": "id_mnemonic",
 		"label": "Entry Name [ID]",
 		"term": "mnemonic",
 		"dataType": "string",
@@ -15,6 +17,7 @@
 		"example": "P53_HUMAN"
 	},
 	{
+		"id": "id_name",
 		"label": "Protein Name [DE]",
 		"term": "name",
 		"dataType": "string",
@@ -22,6 +25,7 @@
 		"example": "mas5"
 	},
 	{
+		"id": "id_gene",
 		"label": "Gene Name [GN]",
 		"term": "gene",
 		"dataType": "string",
@@ -29,6 +33,7 @@
 		"example": "ydj1"
 	},
 	{
+		"id": "id_organism",
 		"label": "Organism [OS]",
 		"term": "organism",
 		"dataType": "string",
@@ -37,6 +42,7 @@
 		"example": "saccharomyces"
 	},
 	{
+		"id": "id_taxonomy",
 		"label": "Taxonomy [OC]",
 		"term": "taxonomy",
 		"dataType": "string",
@@ -45,6 +51,7 @@
 		"example": "human"
 	},
 	{
+		"id": "id_host",
 		"label": "Virus host",
 		"term": "host",
 		"dataType": "string",
@@ -53,6 +60,7 @@
 		"example": "human"
 	},
 	{
+		"id": "id_existence",
 		"label": "Protein Existence [PE]",
 		"term": "existence",
 		"dataType": "enum",
@@ -82,11 +90,13 @@
 		"example": "1"
 	},
 	{
+		"id": "id_group_function",
 		"label": "Function",
 		"itemType": "group",
 		"term": "",
 		"items": [
 			{
+				"id": "id_ec",
 				"label": "Enzyme classification [EC]",
 				"term": "ec",
 				"dataType": "string",
@@ -95,10 +105,12 @@
 				"example": "1.1.2.3"
 			},
 			{
+				"id": "id_group_cofactors",
 				"label": "Cofactors",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_cofactor_chebi",
 						"label": "ChEBI term",
 						"itemType": "comment",
 						"term": "cofactor_chebi",
@@ -109,6 +121,7 @@
 						"example": "29105"
 					},
 					{
+						"id": "id_cofactor_note",
 						"label": "Note",
 						"itemType": "comment",
 						"term": "cofactor_note",
@@ -120,10 +133,12 @@
 				]
 			},
 			{
+				"id": "id_group_bpcp",
 				"label": "Biophysicochemical properties",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_bpcp",
 						"label": "Any",
 						"itemType": "comment",
 						"term": "bpcp",
@@ -133,6 +148,7 @@
 						"example": "\"some value\""
 					},
 					{
+						"id": "id_bpcp_absorption",
 						"label": "Absorption",
 						"itemType": "comment",
 						"term": "bpcp_absorption",
@@ -142,6 +158,7 @@
 						"example": "prosthetic"
 					},
 					{
+						"id": "id_bpcp_kinetics",
 						"label": "Kinetics",
 						"itemType": "comment",
 						"term": "bpcp_kinetics",
@@ -151,6 +168,7 @@
 						"example": "aspartate"
 					},
 					{
+						"id": "id_bpcp_ph_dependence",
 						"label": "ph dependence",
 						"itemType": "comment",
 						"term": "bpcp_ph_dependence",
@@ -160,6 +178,7 @@
 						"example": "optimum"
 					},
 					{
+						"id": "id_bpcp_redox_potential",
 						"label": "Redox potential",
 						"itemType": "comment",
 						"term": "bpcp_redox_potential",
@@ -169,6 +188,7 @@
 						"example": "siroheme"
 					},
 					{
+						"id": "id_bpcp_temp_dependence",
 						"label": "Temperature dependence",
 						"itemType": "comment",
 						"term": "bpcp_temp_dependence",
@@ -180,6 +200,7 @@
 				]
 			},
 			{
+				"id": "id_catalytic_activity",
 				"label": "Catalytic Activity",
 				"itemType": "comment",
 				"term": "catalytic_activity",
@@ -188,6 +209,7 @@
 				"example": "tyrosine"
 			},
 			{
+				"id": "id_enzyme_regulation",
 				"label": "Activity regulation",
 				"itemType": "comment",
 				"term": "enzyme_regulation",
@@ -197,6 +219,7 @@
 				"example": "inhibited"
 			},
 			{
+				"id": "id_function_cc",
 				"label": "Function [CC]",
 				"itemType": "comment",
 				"term": "function",
@@ -206,6 +229,7 @@
 				"example": "enzyme"
 			},
 			{
+				"id": "id_caution",
 				"label": "Caution",
 				"itemType": "comment",
 				"term": "caution",
@@ -215,10 +239,12 @@
 				"example": "kinase"
 			},
 			{
+				"id": "id_group_sites",
 				"label": "Sites",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_sites",
 						"label": "Any",
 						"itemType": "feature",
 						"term": "sites",
@@ -229,6 +255,7 @@
 						"example": "translocation"
 					},
 					{
+						"id": "id_act_site",
 						"label": "Active site",
 						"itemType": "feature",
 						"term": "act_site",
@@ -239,6 +266,7 @@
 						"example": "phosphocysteine"
 					},
 					{
+						"id": "id_metal",
 						"label": "Metal binding",
 						"itemType": "feature",
 						"term": "metal",
@@ -249,6 +277,7 @@
 						"example": "phosphocysteine"
 					},
 					{
+						"id": "id_binding",
 						"label": "Binding site",
 						"itemType": "feature",
 						"term": "binding",
@@ -259,6 +288,7 @@
 						"example": "phosphocysteine"
 					},
 					{
+						"id": "id_site",
 						"label": "Other",
 						"itemType": "feature",
 						"term": "site",
@@ -271,6 +301,7 @@
 				]
 			},
 			{
+				"id": "id_ca_bind",
 				"label": "Calcium binding",
 				"itemType": "feature",
 				"term": "ca_bind",
@@ -281,6 +312,7 @@
 				"example": "site"
 			},
 			{
+				"id": "id_dna_bind",
 				"label": "DNA binding",
 				"itemType": "feature",
 				"term": "dna_bind",
@@ -291,6 +323,7 @@
 				"example": "*"
 			},
 			{
+				"id": "id_np_bind",
 				"label": "Nucleotide binding",
 				"itemType": "feature",
 				"term": "np_bind",
@@ -301,6 +334,7 @@
 				"example": "NADP"
 			},
 			{
+				"id": "id_pathway",
 				"label": "Pathway",
 				"itemType": "comment",
 				"term": "pathway",
@@ -310,6 +344,7 @@
 				"example": "metabolism"
 			},
 			{
+				"id": "id_miscellaneous",
 				"label": "Miscellaneous [CC]",
 				"itemType": "comment",
 				"term": "miscellaneous",
@@ -321,14 +356,17 @@
 		]
 	},
 	{
+		"id": "id_group_scl",
 		"label": "Subcellular location",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_group_scl_term_note",
 				"label": "Subcellular location [CC]",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_scl_term",
 						"label": "Subcellular location term",
 						"itemType": "comment",
 						"term": "scl_term",
@@ -339,6 +377,7 @@
 						"example": "membrane"
 					},
 					{
+						"id": "id_scl_note",
 						"label": "Subcellular location note",
 						"itemType": "comment",
 						"term": "scl_note",
@@ -350,6 +389,7 @@
 				]
 			},
 			{
+				"id": "id_transmem",
 				"label": "Transmembrane",
 				"itemType": "feature",
 				"term": "transmem",
@@ -360,6 +400,7 @@
 				"example": "forming"
 			},
 			{
+				"id": "id_topo_dom",
 				"label": "Topological domain",
 				"itemType": "feature",
 				"term": "topo_dom",
@@ -370,6 +411,7 @@
 				"example": "forming"
 			},
 			{
+				"id": "id_intramem",
 				"label": "Intramembrane",
 				"itemType": "feature",
 				"term": "intramem",
@@ -382,10 +424,12 @@
 		]
 	},
 	{
+		"id": "id_group_pathology",
 		"label": "Pathology & Biotech",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_disease",
 				"label": "Disease",
 				"itemType": "comment",
 				"term": "disease",
@@ -395,6 +439,7 @@
 				"example": "nephrotic"
 			},
 			{
+				"id": "id_allergen",
 				"label": "Alergenic properties",
 				"itemType": "comment",
 				"term": "allergen",
@@ -404,6 +449,7 @@
 				"example": "allergic"
 			},
 			{
+				"id": "id_toxic_dose",
 				"label": "Toxic dose",
 				"itemType": "comment",
 				"term": "toxic_dose",
@@ -413,6 +459,7 @@
 				"example": "intracistenal"
 			},
 			{
+				"id": "id_biotechnolog",
 				"label": "Biotechnological use",
 				"itemType": "comment",
 				"term": "biotechnolog",
@@ -422,6 +469,7 @@
 				"example": "vaccine"
 			},
 			{
+				"id": "id_pharmaceutical",
 				"label": "Pharmaceutical use",
 				"itemType": "comment",
 				"term": "pharmaceutical",
@@ -431,6 +479,7 @@
 				"example": "peptide"
 			},
 			{
+				"id": "id_disruption_phenotype",
 				"label": "Disruption phenotype",
 				"itemType": "comment",
 				"term": "disruption_phenotype",
@@ -440,6 +489,7 @@
 				"example": "infected"
 			},
 			{
+				"id": "id_mutagen",
 				"label": "Mutagenesis",
 				"itemType": "feature",
 				"term": "mutagen",
@@ -452,10 +502,12 @@
 		]
 	},
 	{
+		"id": "id_group_ptm_processing",
 		"label": "PTM/Processing",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_ptm",
 				"label": "Post-translational modification [CC]",
 				"itemType": "comment",
 				"term": "ptm",
@@ -465,6 +517,7 @@
 				"example": "mitosis"
 			},
 			{
+				"id": "id_mod_res",
 				"label": "Modified residue [FT]",
 				"itemType": "feature",
 				"term": "mod_res",
@@ -475,6 +528,7 @@
 				"example": "phosphoserine"
 			},
 			{
+				"id": "id_lipid",
 				"label": "Lipidation [FT]",
 				"itemType": "feature",
 				"term": "lipid",
@@ -485,6 +539,7 @@
 				"example": "cysteine"
 			},
 			{
+				"id": "id_carbohyd",
 				"label": "Glycosylation [FT]",
 				"itemType": "feature",
 				"term": "carbohyd",
@@ -495,6 +550,7 @@
 				"example": "cysteine"
 			},
 			{
+				"id": "id_disulfid",
 				"label": "Disulfide bond [FT]",
 				"itemType": "feature",
 				"term": "disulfid",
@@ -505,6 +561,7 @@
 				"example": "reversible"
 			},
 			{
+				"id": "id_crosslnk",
 				"label": "Cross-link [FT]",
 				"itemType": "feature",
 				"term": "crosslnk",
@@ -515,10 +572,12 @@
 				"example": "lysine"
 			},
 			{
+				"id": "id_group_molecule_processing",
 				"label": "Molecule Processing [FT]",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_molecule_processing",
 						"label": "Any molecule processing",
 						"itemType": "feature",
 						"term": "molecule_processing",
@@ -529,6 +588,7 @@
 						"example": "disulfide"
 					},
 					{
+						"id": "id_chain",
 						"label": "Chain",
 						"itemType": "feature",
 						"term": "chain",
@@ -539,6 +599,7 @@
 						"example": "kinase"
 					},
 					{
+						"id": "id_init_met",
 						"label": "Initiator methionine",
 						"itemType": "feature",
 						"term": "init_met",
@@ -549,6 +610,7 @@
 						"example": "Removed"
 					},
 					{
+						"id": "id_peptide",
 						"label": "Peptide",
 						"itemType": "feature",
 						"term": "peptide",
@@ -559,6 +621,7 @@
 						"example": "Removed"
 					},
 					{
+						"id": "id_signal",
 						"label": "Signal Peptide",
 						"itemType": "feature",
 						"term": "signal",
@@ -569,6 +632,7 @@
 						"example": "cleaved"
 					},
 					{
+						"id": "id_propep",
 						"label": "Propeptide",
 						"itemType": "feature",
 						"term": "propep",
@@ -579,6 +643,7 @@
 						"example": "Activation peptide"
 					},
 					{
+						"id": "id_transit",
 						"label": "Transit Peptide",
 						"itemType": "feature",
 						"term": "transit",
@@ -593,10 +658,12 @@
 		]
 	},
 	{
+		"id": "id_group_expression",
 		"label": "Expression",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_developmental_stage",
 				"label": "Developmental stage",
 				"itemType": "comment",
 				"term": "developmental_stage",
@@ -606,6 +673,7 @@
 				"example": "brain"
 			},
 			{
+				"id": "id_induction",
 				"label": "Induction",
 				"itemType": "comment",
 				"term": "induction",
@@ -615,6 +683,7 @@
 				"example": "calcium"
 			},
 			{
+				"id": "id_tissue_specificity",
 				"label": "Tissue specificity",
 				"itemType": "comment",
 				"term": "tissue_specificity",
@@ -626,10 +695,12 @@
 		]
 	},
 	{
+		"id": "id_group_interaction",
 		"label": "Interaction",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_interactor",
 				"label": "Binary Interaction",
 				"term": "interactor",
 				"dataType": "string",
@@ -638,6 +709,7 @@
 				"example": "EBI-1042898"
 			},
 			{
+				"id": "id_subunit",
 				"label": "Subunit structure",
 				"itemType": "comment",
 				"term": "subunit",
@@ -649,10 +721,12 @@
 		]
 	},
 	{
+		"id": "id_group_structure",
 		"label": "Structure",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_d3structure",
 				"label": "3D Structure",
 				"term": "d3structure",
 				"dataType": "enum",
@@ -671,10 +745,12 @@
 				"example": "true"
 			},
 			{
+				"id": "id_group_secondary_structure",
 				"label": "Secondary structure",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_secstruct",
 						"label": "Any",
 						"itemType": "feature",
 						"term": "secstruct",
@@ -685,6 +761,7 @@
 						"example": "*"
 					},
 					{
+						"id": "id_helix",
 						"label": "Helix",
 						"itemType": "feature",
 						"term": "helix",
@@ -695,6 +772,7 @@
 						"example": "*"
 					},
 					{
+						"id": "id_turn",
 						"label": "Turn",
 						"itemType": "feature",
 						"term": "turn",
@@ -705,6 +783,7 @@
 						"example": "*"
 					},
 					{
+						"id": "id_strand",
 						"label": "Beta strand",
 						"itemType": "feature",
 						"term": "strand",
@@ -719,10 +798,12 @@
 		]
 	},
 	{
+		"id": "id_group_sequence",
 		"label": "Sequence",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_mass",
 				"label": "Mass(Da)",
 				"term": "mass",
 				"dataType": "integer",
@@ -731,6 +812,7 @@
 				"example": "[441126 TO 441126]"
 			},
 			{
+				"id": "id_length",
 				"label": "Sequence length",
 				"term": "length",
 				"dataType": "integer",
@@ -739,10 +821,12 @@
 				"example": "[441 TO 450]"
 			},
 			{
+				"id": "id_group_alternative_products",
 				"label": "Alternative products (isoforms)",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_ap",
 						"label": "Any",
 						"itemType": "comment",
 						"term": "ap",
@@ -752,6 +836,7 @@
 						"example": "tissues"
 					},
 					{
+						"id": "id_ap_apu",
 						"label": "Alternative promoter usage",
 						"itemType": "comment",
 						"term": "ap_apu",
@@ -761,6 +846,7 @@
 						"example": "*"
 					},
 					{
+						"id": "id_ap_as",
 						"label": "Alternative splicing",
 						"itemType": "comment",
 						"term": "ap_as",
@@ -770,6 +856,7 @@
 						"example": "experimental"
 					},
 					{
+						"id": "id_ap_ai",
 						"label": "Alternative initiation",
 						"itemType": "comment",
 						"term": "ap_ai",
@@ -779,6 +866,7 @@
 						"example": "acetylalanine"
 					},
 					{
+						"id": "id_ap_rf",
 						"label": "Ribosomal frameshifting",
 						"itemType": "comment",
 						"term": "ap_rf",
@@ -790,10 +878,12 @@
 				]
 			},
 			{
+				"id": "id_group_sequence_caution",
 				"label": "Sequence caution",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_sc",
 						"label": "Any",
 						"itemType": "comment",
 						"term": "sc",
@@ -803,6 +893,7 @@
 						"example": "translated"
 					},
 					{
+						"id": "id_sc_framesh",
 						"label": "Framshift",
 						"itemType": "comment",
 						"term": "sc_framesh",
@@ -812,6 +903,7 @@
 						"example": "*"
 					},
 					{
+						"id": "id_sc_einit",
 						"label": "Erroneous initiation",
 						"itemType": "comment",
 						"term": "sc_einit",
@@ -821,6 +913,7 @@
 						"example": "extended"
 					},
 					{
+						"id": "id_sc_eterm",
 						"label": "Erroneous termination",
 						"itemType": "comment",
 						"term": "sc_eterm",
@@ -830,6 +923,7 @@
 						"example": "translated"
 					},
 					{
+						"id": "id_sc_epred",
 						"label": "Erroneous gene model prediction",
 						"itemType": "comment",
 						"term": "sc_epred",
@@ -839,6 +933,7 @@
 						"example": "*"
 					},
 					{
+						"id": "id_sc_etran",
 						"label": "Erroneous translation",
 						"itemType": "comment",
 						"term": "sc_etran",
@@ -848,6 +943,7 @@
 						"example": "choice"
 					},
 					{
+						"id": "id_sc_misc",
 						"label": "Miscellaneous Discrepancy",
 						"itemType": "comment",
 						"term": "sc_misc",
@@ -859,6 +955,7 @@
 				]
 			},
 			{
+				"id": "id_mass_spectrometry",
 				"label": "Mass spectrometry",
 				"itemType": "comment",
 				"term": "mass_spectrometry",
@@ -868,6 +965,7 @@
 				"example": "\"some value\""
 			},
 			{
+				"id": "id_polymorphism",
 				"label": "Polymorphism",
 				"itemType": "comment",
 				"term": "polymorphism",
@@ -877,6 +975,7 @@
 				"example": "transcripts"
 			},
 			{
+				"id": "id_rna_editing",
 				"label": "RNA Editing",
 				"itemType": "comment",
 				"term": "rna_editing",
@@ -886,10 +985,12 @@
 				"example": "embryos"
 			},
 			{
+				"id": "id_group_natural_variations",
 				"label": "Natural Variations",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_variants",
 						"label": "Any",
 						"itemType": "feature",
 						"term": "variants",
@@ -900,6 +1001,7 @@
 						"example": "colorectal"
 					},
 					{
+						"id": "id_variant",
 						"label": "Natural variant",
 						"itemType": "feature",
 						"term": "variant",
@@ -910,6 +1012,7 @@
 						"example": "colorectal"
 					},
 					{
+						"id": "id_var_seq",
 						"label": "Alternative sequence",
 						"itemType": "feature",
 						"term": "var_seq",
@@ -922,6 +1025,7 @@
 				]
 			},
 			{
+				"id": "id_non_std",
 				"label": "Non-standard residue",
 				"itemType": "feature",
 				"term": "non_std",
@@ -932,6 +1036,7 @@
 				"example": "selenocysteine"
 			},
 			{
+				"id": "id_non_ter",
 				"label": "Non-terminal residue",
 				"itemType": "feature",
 				"term": "non_ter",
@@ -942,6 +1047,7 @@
 				"example": "*"
 			},
 			{
+				"id": "id_non_cons",
 				"label": "Non-adjacent residue",
 				"itemType": "feature",
 				"term": "non_cons",
@@ -952,6 +1058,7 @@
 				"example": "*"
 			},
 			{
+				"id": "id_conflict",
 				"label": "Sequence conflict",
 				"itemType": "feature",
 				"term": "conflict",
@@ -962,6 +1069,7 @@
 				"example": "*"
 			},
 			{
+				"id": "id_unsure",
 				"label": "Sequence uncertainty,",
 				"itemType": "feature",
 				"term": "unsure",
@@ -972,6 +1080,7 @@
 				"example": "*"
 			},
 			{
+				"id": "id_positional",
 				"label": "Sequence features [FT]",
 				"itemType": "feature",
 				"term": "positional",
@@ -982,6 +1091,7 @@
 				"example": "colorectal"
 			},
 			{
+				"id": "id_fragment",
 				"label": "Fragment",
 				"term": "fragment",
 				"dataType": "enum",
@@ -999,6 +1109,7 @@
 				"example": "true"
 			},
 			{
+				"id": "id_organelle",
 				"label": "Encoded in",
 				"term": "organelle",
 				"dataType": "string",
@@ -1007,6 +1118,7 @@
 				"example": "mitochondrion"
 			},
 			{
+				"id": "id_precursor",
 				"label": "Precursor",
 				"term": "precursor",
 				"dataType": "enum",
@@ -1024,10 +1136,12 @@
 				"example": "true"
 			},
 			{
+				"id": "id_group_sequence_from",
 				"label": "Sequence from ... [RC]",
 				"itemType": "group",
 				"items": [
 					{
+						"id": "id_tissue",
 						"label": "Tissue",
 						"term": "tissue",
 						"dataType": "string",
@@ -1035,6 +1149,7 @@
 						"example": "head"
 					},
 					{
+						"id": "id_strain",
 						"label": "Strain",
 						"term": "strain",
 						"dataType": "string",
@@ -1042,6 +1157,7 @@
 						"example": "berkeley"
 					},
 					{
+						"id": "id_plasmid",
 						"label": "Plasmid",
 						"term": "plasmid",
 						"dataType": "string",
@@ -1049,6 +1165,7 @@
 						"example": "pO113"
 					},
 					{
+						"id": "id_transposon",
 						"label": "Transposon",
 						"term": "transposon",
 						"dataType": "string",
@@ -1060,10 +1177,12 @@
 		]
 	},
 	{
+		"id": "id_group_family_domains",
 		"label": "Family and Domains",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_domain_ft",
 				"label": "Domain [FT]",
 				"itemType": "feature",
 				"term": "domain",
@@ -1074,6 +1193,7 @@
 				"example": "phosphatase"
 			},
 			{
+				"id": "id_domain_cc",
 				"label": "Domain Comments [CC]",
 				"itemType": "comment",
 				"term": "domain",
@@ -1084,6 +1204,7 @@
 				"example": "conformation"
 			},
 			{
+				"id": "id_family",
 				"label": "Protein family",
 				"term": "family",
 				"dataType": "string",
@@ -1091,6 +1212,7 @@
 				"example": "pa28"
 			},
 			{
+				"id": "id_coiled",
 				"label": "Coiled-coil",
 				"itemType": "feature",
 				"term": "coiled",
@@ -1101,6 +1223,7 @@
 				"example": "*"
 			},
 			{
+				"id": "id_compbias",
 				"label": "Compositional bias",
 				"itemType": "feature",
 				"term": "compbias",
@@ -1111,6 +1234,7 @@
 				"example": "glu-rich"
 			},
 			{
+				"id": "id_motif",
 				"label": "Motif",
 				"itemType": "feature",
 				"term": "motif",
@@ -1121,6 +1245,7 @@
 				"example": "motif"
 			},
 			{
+				"id": "id_region",
 				"label": "Region",
 				"itemType": "feature",
 				"term": "region",
@@ -1131,6 +1256,7 @@
 				"example": "motif"
 			},
 			{
+				"id": "id_repeat",
 				"label": "Repeat",
 				"itemType": "feature",
 				"term": "repeat",
@@ -1141,6 +1267,7 @@
 				"example": "motif"
 			},
 			{
+				"id": "id_similarity",
 				"label": "Sequence similarity",
 				"itemType": "comment",
 				"term": "similarity",
@@ -1151,6 +1278,7 @@
 				"example": "phosphatase"
 			},
 			{
+				"id": "id_zn_fing",
 				"label": "Zinc finger",
 				"itemType": "feature",
 				"term": "zn_fing",
@@ -1163,11 +1291,13 @@
 		]
 	},
 	{
+		"id": "id_group_cross_references",
 		"label": "Cross-references",
 		"itemType": "group",
         "items" : []
 	},
 	{
+		"id": "id_webresource",
 		"label": "Web Resources",
 		"itemType": "comment",
 		"term": "webresource",
@@ -1176,10 +1306,12 @@
 		"example": "lck"
 	},
 	{
+		"id": "id_group_date_of",
 		"label": "Date Of",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_created",
 				"label": "Date Of Creation",
 				"term": "created",
 				"dataType": "date",
@@ -1188,6 +1320,7 @@
 				"example": "[2018-03-04 TO 2018-03-08]"
 			},
 			{
+				"id": "id_modified",
 				"label": "Date of last entry modification",
 				"term": "modified",
 				"dataType": "date",
@@ -1196,6 +1329,7 @@
 				"example": "[2018-03-04 TO 2018-03-08]"
 			},
 			{
+				"id": "id_sequence_modified",
 				"label": "Date of last sequence modification",
 				"term": "sequence_modified",
 				"dataType": "date",
@@ -1206,6 +1340,7 @@
 		]
 	},
 	{
+		"id": "id_go",
 		"label": "Gene Ontology [GO]",
 		"itemType": "goterm",
 		"term": "go",
@@ -1215,6 +1350,7 @@
 		"example": "0009986"
 	},
 	{
+		"id": "id_keyword",
 		"label": "Keyword [KW]",
 		"term": "keyword",
 		"dataType": "string",
@@ -1223,10 +1359,12 @@
 		"example": "chromosomal"
 	},
 	{
+		"id": "id_",
 		"label": "Literature Citation",
 		"itemType": "groupDisplay",
 		"items": [
 			{
+				"id": "id_lit_citation",
 				"label": "Title & Abstract",
 				"term": "lit_citation",
 				"dataType": "string",
@@ -1234,6 +1372,7 @@
 				"example": "somevalue"
 			},
 			{
+				"id": "id_lit_author",
 				"label": "Author",
 				"term": "lit_author",
 				"dataType": "string",
@@ -1241,6 +1380,7 @@
 				"example": "smith"
 			},
 			{
+				"id": "id_lit_journal",
 				"label": "Journal",
 				"term": "lit_journal",
 				"dataType": "string",
@@ -1248,6 +1388,7 @@
 				"example": "nature"
 			},
 			{
+				"id": "id_lit_pubdate",
 				"label": "Published",
 				"term": "lit_pubdate",
 				"dataType": "date",
@@ -1256,6 +1397,7 @@
 				"example": "[2017-01-01 TO 2010-12-31]"
 			},
 			{
+				"id": "id_lit_pubmed",
 				"label": "PubMed Id",
 				"term": "lit_pubmed",
 				"dataType": "string",
@@ -1263,6 +1405,7 @@
 				"example": "15165820"
 			},
 			{
+				"id": "id_lit_title",
 				"label": "Title",
 				"term": "lit_title",
 				"dataType": "string",
@@ -1272,10 +1415,12 @@
 		]
 	},
 	{
+		"id": "id_group_proteomes",
 		"label": "Proteomes",
 		"itemType": "group",
 		"items": [
 			{
+				"id": "id_proteome",
 				"label": "Proteome ID",
 				"term": "proteome",
 				"dataType": "string",
@@ -1283,6 +1428,7 @@
 				"example": "UP1234"
 			},
 			{
+				"id": "id_proteomecomponent",
 				"label": "Proteome Component",
 				"term": "proteomecomponent",
 				"dataType": "string",
@@ -1292,6 +1438,7 @@
 		]
 	},
 	{
+		"id": "id_scope",
 		"label": "Cited for",
 		"term": "scope",
 		"dataType": "string",
@@ -1299,6 +1446,7 @@
 		"example": "microtubule"
 	},
 	{
+		"id": "id_reviewed",
 		"label": "Reviewed",
 		"term": "reviewed",
 		"dataType": "enum",
@@ -1316,6 +1464,7 @@
 		"example": "true"
 	},
 	{
+		"id": "id_active",
 		"label": "Active",
 		"term": "active",
 		"dataType": "enum",

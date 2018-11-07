@@ -48,6 +48,8 @@ public enum UniProtSearchItems implements SearchItems {
 		for (DatabaseGroup databaseGroup : databases) {
 
 			UniProtSearchItem groupItem = new UniProtSearchItem();
+			String groupId = databaseGroup.getGroupName().replaceAll("\\W","_").toLowerCase();
+			groupItem.setId("id_group_"+groupId);
 			groupItem.setLabel(databaseGroup.getGroupName());
 			groupItem.setItemType(SearchItemType.GROUP);
 			groupItem.setDataType(SearchDataType.UNKNOWN);
@@ -56,11 +58,14 @@ public enum UniProtSearchItems implements SearchItems {
 			for (Tuple databaseItem : databaseGroup.getItems()) {
 				UniProtSearchItem databaseGroupItem = new UniProtSearchItem();
 
+				databaseGroupItem.setId("id_xref_"+databaseItem.getValue());
 				databaseGroupItem.setItemType(SearchItemType.DATABASE);
 				databaseGroupItem.setDataType(SearchDataType.STRING);
 				databaseGroupItem.setTerm("xref");
 				databaseGroupItem.setLabel(databaseItem.getName());
-				databaseGroupItem.setValuePrefix(databaseItem.getValue());
+				if(!databaseItem.getValue().equalsIgnoreCase("any")) {
+					databaseGroupItem.setValuePrefix(databaseItem.getValue());
+				}
 
 				groupItems.add(databaseGroupItem);
 			}

@@ -14,6 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UniProtSearchItem implements SearchItem {
 
+	private String id;
 	private String label;
 	private SearchItemType itemType = SearchItemType.SINGLE;
 	private String term;
@@ -27,6 +28,15 @@ public class UniProtSearchItem implements SearchItem {
 	private String autoComplete;
 	private String description;
 	private String example;
+
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getLabel() {
 		return label;
@@ -129,12 +139,6 @@ public class UniProtSearchItem implements SearchItem {
 		this.autoComplete = autoComplete;
 	}
 
-	// public int getCount() {
-	// if(itemType==SearchItemType.GROUP) {
-	// return items.stream().mapToInt(val->val.getCount()).sum();
-	// }else
-	// return 1;
-	// }
 	private boolean isNullOrEmpty(String val) {
 		return (val == null) || (val.length() == 0);
 	}
@@ -143,6 +147,10 @@ public class UniProtSearchItem implements SearchItem {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{\n");
+		if (!isNullOrEmpty(id)) {
+			sb.append("id:").append(id).append("\n");
+		}
+
 		if (!isNullOrEmpty(label)) {
 			sb.append("label:").append(label).append("\n");
 		}
