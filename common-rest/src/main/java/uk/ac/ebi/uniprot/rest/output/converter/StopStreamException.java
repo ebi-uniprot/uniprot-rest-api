@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.uniprotkb.output.converter;
+package uk.ac.ebi.uniprot.rest.output.converter;
 
 import java.util.stream.Stream;
 

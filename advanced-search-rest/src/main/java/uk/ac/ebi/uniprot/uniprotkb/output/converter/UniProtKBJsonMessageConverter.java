@@ -9,9 +9,9 @@ import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConvert
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
-import uk.ac.ebi.uniprot.uuw.uniprotkb.output.converter.StopStreamException;
-import uk.ac.ebi.uniprot.uniprotkb.service.filters.EntryFilters;
+import uk.ac.ebi.uniprot.rest.output.converter.StopStreamException;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.FieldsParser;
+import uk.ac.ebi.uniprot.uniprotkb.service.filters.EntryFilters;
 
 import java.io.IOException;
 import java.io.OutputStream;

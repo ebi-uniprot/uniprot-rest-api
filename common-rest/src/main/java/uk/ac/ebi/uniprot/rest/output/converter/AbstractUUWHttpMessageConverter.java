@@ -8,7 +8,6 @@ import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.uuw.uniprotkb.output.converter.StopStreamException;
 
 import java.io.IOException;
 import java.io.OutputStream;
