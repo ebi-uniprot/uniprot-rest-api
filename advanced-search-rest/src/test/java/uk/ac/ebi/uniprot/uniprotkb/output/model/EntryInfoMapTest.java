@@ -1,17 +1,17 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EntryInfo;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EntryInfo;
-
-class DownloadableEntryInfoTest {
+class EntryInfoMapTest {
 	@Test
 	void testFields() {
 		List<String> fields =  EntryInfoMap.FIELDS;

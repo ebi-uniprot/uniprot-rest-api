@@ -1,21 +1,17 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Test;
-
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EvidencedString;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Gene;
 
-class DownloadableGeneTest {
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class EntryGeneMapTest {
 	@Test
 	void testFields() {
 		List<String> fields = EntryGeneMap.FIELDS;

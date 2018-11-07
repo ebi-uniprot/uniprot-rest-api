@@ -1,19 +1,19 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Organism;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Organism.OrganismName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Organism;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Organism.OrganismName;
-
-class DownloadableOrganismTest {
+class EntryOrganismMapTest {
 
 	@Test
 	void testFields() {

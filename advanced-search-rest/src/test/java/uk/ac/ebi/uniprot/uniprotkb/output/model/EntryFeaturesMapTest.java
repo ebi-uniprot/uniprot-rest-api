@@ -1,19 +1,18 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.dataservice.restful.features.domain.DbReferenceObject;
+import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Evidence;
+import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Feature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.DbReferenceObject;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Evidence;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Feature;
-
-class DownloadableFeaturesTest {
+class EntryFeaturesMapTest {
 
 	@Test
 	void testGetData() {

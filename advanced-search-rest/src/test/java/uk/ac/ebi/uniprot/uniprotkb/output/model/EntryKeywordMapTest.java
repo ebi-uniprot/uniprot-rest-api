@@ -1,20 +1,16 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EvidencedString;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.Keyword;
 
-class DownloadableKeywordTest {
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class EntryKeywordMapTest {
 	@Test
 	void testFields() {
 		List<String> fields = EntryKeywordMap.FIELDS;

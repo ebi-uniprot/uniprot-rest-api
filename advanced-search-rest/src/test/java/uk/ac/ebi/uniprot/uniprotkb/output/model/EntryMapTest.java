@@ -1,21 +1,20 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.model.factories.DefaultUniProtFactory;
 import uk.ac.ebi.kraken.parser.UniProtParser;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
 
-class DownloadableEntryTest {
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class EntryMapTest {
 	private static UPEntry entryQ15758;
 	private static UPEntry entryP03431;
 	private static UPEntry entryQ84MC7;
@@ -23,21 +22,21 @@ class DownloadableEntryTest {
 	
 	@BeforeAll
 	static void setup() throws Exception {
-		 InputStream is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/Q15758.dat" );
+		 InputStream is = EntryMapTest.class.getResourceAsStream("/downloadIT/Q15758.dat" );
 	     UniProtEntry entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
 	     EntryConverter converter = new EntryConverter();
 	     entryQ15758 =converter.apply(entry);
 	     is.close();
 	     
-	     is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/P03431.dat" );
+	     is = EntryMapTest.class.getResourceAsStream("/downloadIT/P03431.dat" );
 	      entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
 	      entryP03431 =converter.apply(entry);
 	      is.close();
-	      is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/Q84MC7.dat" );
+	      is = EntryMapTest.class.getResourceAsStream("/downloadIT/Q84MC7.dat" );
 	      entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
 	      entryQ84MC7 =converter.apply(entry);
 	      is.close();
-	      is = DownloadableEntryTest.class.getResourceAsStream("/downloadIT/Q70KY3.dat" );
+	      is = EntryMapTest.class.getResourceAsStream("/downloadIT/Q70KY3.dat" );
 	      entry= UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
 	      entryQ70KY3 =converter.apply(entry);
 	      is.close();

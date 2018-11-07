@@ -1,17 +1,17 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EvidencedString;
+import uk.ac.ebi.uniprot.dataservice.restful.features.domain.DbReferenceObject;
+import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Evidence;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Evidence;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.EvidencedString;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.DbReferenceObject;
+import static org.junit.Assert.assertEquals;
 
-public class DownloadableUtilTest {
+public class EntryMapUtilTest {
 	@Test
 	void testEvidencesToString() {
 		String expected = "{ECO:0000269|PubMed:18258429, ECO:0000313|EMBL:AAC45250.1}";
