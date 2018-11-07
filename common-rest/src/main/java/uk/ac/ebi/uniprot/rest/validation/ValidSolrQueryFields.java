@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.uuw.uniprotkb.validation;
+package uk.ac.ebi.uniprot.rest.validation;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;

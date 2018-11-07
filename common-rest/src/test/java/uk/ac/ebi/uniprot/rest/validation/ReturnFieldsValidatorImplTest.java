@@ -1,11 +1,11 @@
-package uk.ac.ebi.uniprot.uniprotkb.validation;
+package uk.ac.ebi.uniprot.rest.validation;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
+import uk.ac.ebi.uniprot.rest.validation.validator.ReturnFieldsValidator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +20,7 @@ class ReturnFieldsValidatorImplTest {
     @Test
     void isValidNullValueReturnTrue() {
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
+        validator.fieldValidator = new FakeReturnFieldsValidator();
 
         boolean result = validator.isValid(null,null);
         assertEquals(true,result);
@@ -30,7 +30,7 @@ class ReturnFieldsValidatorImplTest {
     @Test
     void isValiEmptyValueReturnTrue() {
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
+        validator.fieldValidator = new FakeReturnFieldsValidator();
 
         boolean result = validator.isValid("",null);
         assertEquals(true,result);
@@ -39,7 +39,7 @@ class ReturnFieldsValidatorImplTest {
     @Test
     void isValidSingleValidFieldReturnTrue() {
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
+        validator.fieldValidator = new FakeReturnFieldsValidator();
 
         boolean result = validator.isValid("gene_primary",null);
         assertEquals(true,result);
@@ -48,7 +48,7 @@ class ReturnFieldsValidatorImplTest {
     @Test
     void isValidSingleInvalidValidFieldReturnFalse() {
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
+        validator.fieldValidator = new FakeReturnFieldsValidator();
         boolean result = validator.isValid("invalid_value",null);
         assertFalse(result);
 
@@ -61,16 +61,16 @@ class ReturnFieldsValidatorImplTest {
     @Test
     void isValidMultipleValidFieldReturnTrue() {
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
-        boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession,ft:non_ter,dr:embl",null);
+        validator.fieldValidator = new FakeReturnFieldsValidator();
+        boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession,ft:non_ter",null);
         assertEquals(true,result);
     }
 
     @Test
     void isValidMultipleInvalidFieldReturnFalse() {
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
-        boolean result = validator.isValid("accession, kinetics_invalid ,reviewed_invalid,cc:rna_editing",null);
+        validator.fieldValidator = new FakeReturnFieldsValidator();
+        boolean result = validator.isValid("accession, kinetics_invalid ,reviewed_invalid",null);
         assertFalse(result);
 
         List<String> invalidField = validator.getErrorFields();
@@ -78,16 +78,6 @@ class ReturnFieldsValidatorImplTest {
         assertTrue(invalidField.size() == 2);
         assertTrue(invalidField.get(0).equals("kinetics_invalid"));
         assertTrue(invalidField.get(1).equals("reviewed_invalid"));
-    }
-
-    @Test
-    void isValidAllCategoriesValidFieldReturnTrue() {
-        FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new UniprotReturnFieldsValidator();
-        boolean result = validator.isValid("protein_name,sequence_version,ft:dna_bind,cc:pathway," +
-                "keywordid,tax_id,cc:subunit,cc:induction,go_f,cc:toxic_dose,ft:top_dom,ft:peptide,3d," +
-                "date_create,ft:region,tl:family,dr:dbsnp",null);
-        assertTrue(result);
     }
 
     /**
@@ -110,6 +100,20 @@ class ReturnFieldsValidatorImplTest {
 
         List<String> getErrorFields() {
             return errorFields;
+        }
+    }
+
+    /**
+     *  this class is responsible to fake ReturnFieldsValidator to help with tests.
+     *
+     */
+    private static class FakeReturnFieldsValidator implements ReturnFieldsValidator{
+
+        List<String> fakeValidField = Arrays.asList("gene_primary","gene_names","kinetics","reviewed","accession","ft:non_ter");
+
+        @Override
+        public boolean hasValidReturnField(String fieldName) {
+            return fakeValidField.contains(fieldName);
         }
     }
 }

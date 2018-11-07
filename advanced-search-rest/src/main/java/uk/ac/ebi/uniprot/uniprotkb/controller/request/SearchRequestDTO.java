@@ -1,12 +1,12 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller.request;
 
 import lombok.Data;
+import uk.ac.ebi.uniprot.common.repository.search.SolrQueryUtil;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
+import uk.ac.ebi.uniprot.rest.validation.ValidReturnFields;
+import uk.ac.ebi.uniprot.rest.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.rest.validation.ValidSolrQuerySyntax;
 import uk.ac.ebi.uniprot.rest.validation.ValidSolrSortFields;
-import uk.ac.ebi.uniprot.common.repository.search.SolrQueryUtil;
-import uk.ac.ebi.uniprot.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.uuw.uniprotkb.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
 import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotSolrQueryFieldValidator;
 

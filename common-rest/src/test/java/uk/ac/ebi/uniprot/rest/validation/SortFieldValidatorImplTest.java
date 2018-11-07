@@ -1,9 +1,8 @@
-package uk.ac.ebi.uniprot.uuw.advanced.search.validation;
+package uk.ac.ebi.uniprot.rest.validation;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
-import uk.ac.ebi.uniprot.rest.validation.ValidSolrSortFields;
 
 import java.util.ArrayList;
 import java.util.Arrays;
