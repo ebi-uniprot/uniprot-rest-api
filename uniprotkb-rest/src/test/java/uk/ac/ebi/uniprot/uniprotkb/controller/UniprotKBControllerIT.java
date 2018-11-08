@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
+import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})

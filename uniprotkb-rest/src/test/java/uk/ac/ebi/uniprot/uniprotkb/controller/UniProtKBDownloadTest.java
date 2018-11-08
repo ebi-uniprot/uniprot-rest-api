@@ -36,14 +36,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
-import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
+import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 /**
  * Created 21/09/18
  *
  * @author Edd
  */
+//@Ignore
 @RunWith(SpringRunner.class)
-@WebMvcTest({UniprotAdvancedSearchController.class})
+@WebMvcTest({UniprotKBController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class})
 public class UniProtKBDownloadTest {

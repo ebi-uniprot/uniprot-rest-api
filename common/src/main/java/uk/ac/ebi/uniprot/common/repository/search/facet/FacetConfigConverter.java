@@ -16,6 +16,7 @@ import java.util.Map;
  *
  * @author lgonzales
  */
+// TODO: 08/11/18 test
 public interface FacetConfigConverter extends Converter<QueryResponse, List<Facet>> {
 
     /**

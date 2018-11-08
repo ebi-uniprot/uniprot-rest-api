@@ -28,7 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static uk.ac.ebi.uniprot.rest.output.UniProtMediaType.*;
 import static uk.ac.ebi.uniprot.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
+import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 /**
  * Controller for uniprot advanced search service.
@@ -37,7 +37,7 @@ import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchContro
  */
 @RestController
 @RequestMapping(UNIPROTKB_RESOURCE)
-public class UniprotAdvancedSearchController {
+public class UniprotKBController {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
     private final ApplicationEventPublisher eventPublisher;
@@ -46,9 +46,9 @@ public class UniprotAdvancedSearchController {
     private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
 
     @Autowired
-    public UniprotAdvancedSearchController(ApplicationEventPublisher eventPublisher,
-                                           UniProtEntryService entryService,
-                                           MessageConverterContextFactory<UniProtEntry> converterContextFactory) {
+    public UniprotKBController(ApplicationEventPublisher eventPublisher,
+                               UniProtEntryService entryService,
+                               MessageConverterContextFactory<UniProtEntry> converterContextFactory) {
         this.eventPublisher = eventPublisher;
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
