@@ -15,9 +15,9 @@ import java.util.stream.Stream;
  */
 @Builder
 @Data
-// TODO: 31/10/18 TEST this class, and asCopy -- seems default values with lombok not working. 
 public class MessageConverterContext<T> {
-    private FileType fileType = FileType.FILE;
+    public static final FileType DEFAULT_FILE_TYPE = FileType.FILE;
+    @Builder.Default private FileType fileType = DEFAULT_FILE_TYPE;
     private MediaType contentType;
     private Stream<T> entities;
     private Stream<String> entityIds;
@@ -25,12 +25,12 @@ public class MessageConverterContext<T> {
     private String fields;
     private Collection<Facet> facets;
 
-    public MessageConverterContext<T> asCopy() {
+    MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
                 .contentType(this.contentType)
                 .entities(this.entities)
                 .resource(this.resource)
-                .fileType(this.fileType == null ? FileType.FILE : this.fileType)
+                .fileType(this.fileType)
                 .fields(this.fields)
                 .entityIds(this.entityIds)
                 .facets(this.facets)
