@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
-import uk.ac.ebi.uniprot.uniprotkb.UniProtKbREST;
+import uk.ac.ebi.uniprot.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker;
 
@@ -27,9 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKbREST.class})
+@SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-public class UniprotKbControllerIT {
+public class UniprotKBControllerIT {
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 

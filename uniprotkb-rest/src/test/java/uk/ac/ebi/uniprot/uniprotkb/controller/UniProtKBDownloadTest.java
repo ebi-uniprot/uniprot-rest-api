@@ -46,7 +46,7 @@ import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchContro
 @WebMvcTest({UniprotAdvancedSearchController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class})
-public class UniProtKbDownloadTest {
+public class UniProtKBDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
 
