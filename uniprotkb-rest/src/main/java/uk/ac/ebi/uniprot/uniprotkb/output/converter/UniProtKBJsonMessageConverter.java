@@ -68,16 +68,8 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
         generator.writeEndArray();
         generator.writeEndObject();
 
+        generator.flush();
         generator.close();
-    }
-
-    @Override
-    protected void cleanUp() {
-        try {
-            tlJsonGenerator.get().flush();
-        } catch (IOException e) {
-            LOGGER.error("Problem flushing JSON generator.", e);
-        }
     }
 
     private void writeObject(JsonGenerator generator, Object facet) {
