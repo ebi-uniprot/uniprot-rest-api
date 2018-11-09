@@ -33,7 +33,7 @@ public @interface ValidSolrQueryFields {
 
     Class<? extends SolrQueryFieldValidator> fieldValidatorClazz();
 
-    String message() default "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.field}";
+    String message() default "{search.uniprot.invalid.query.field}";
 
     Class<?>[] groups() default {};
 
@@ -139,7 +139,7 @@ public @interface ValidSolrQueryFields {
         }
 
         public void addQueryTypeErrorMessage(Query inputQuery, ConstraintValidatorContext context) {
-            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.type}";
+            String errorMessage = "{search.uniprot.invalid.query.type}";
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
             contextImpl.addMessageParameter("searchClass", inputQuery.getClass().getName());
             context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();

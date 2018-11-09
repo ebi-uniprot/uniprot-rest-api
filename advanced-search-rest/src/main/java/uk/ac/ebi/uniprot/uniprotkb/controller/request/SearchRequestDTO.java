@@ -3,10 +3,7 @@ package uk.ac.ebi.uniprot.uniprotkb.controller.request;
 import lombok.Data;
 import uk.ac.ebi.uniprot.common.repository.search.SolrQueryUtil;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
-import uk.ac.ebi.uniprot.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.rest.validation.ValidSolrQueryFields;
-import uk.ac.ebi.uniprot.rest.validation.ValidSolrQuerySyntax;
-import uk.ac.ebi.uniprot.rest.validation.ValidSolrSortFields;
+import uk.ac.ebi.uniprot.rest.validation.*;
 import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
 import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotSolrQueryFieldValidator;
 
@@ -29,8 +26,8 @@ import javax.validation.constraints.Positive;
 public class SearchRequestDTO {
     private static final int DEFAULT_RESULTS_SIZE = 25;
     
-    @NotNull(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.required}")
-    @ValidSolrQuerySyntax(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.query}")
+    @NotNull(message = "{search.required}")
+    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(fieldValidatorClazz = UniprotSolrQueryFieldValidator.class)
     private String query;
 
@@ -42,13 +39,13 @@ public class SearchRequestDTO {
 
     private String cursor;
 
-    @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.includeIsoform}")
+    @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{search.invalid.includeIsoform}")
     private String includeIsoform;
 
-    // TODO: 02/11/18 VALIDATION -- only valid if using JSON response type
-    private boolean includeFacets;
+    @ValidIncludeFacets
+    private String includeFacets;
 
-    @Positive(message = "{uk.ac.ebi.uniprot.uuw.advanced.search.positive}")
+    @Positive(message = "{search.positive}")
     private Integer size = DEFAULT_RESULTS_SIZE;
 
     /**
@@ -75,5 +72,9 @@ public class SearchRequestDTO {
         }
 
         return result;
+    }
+
+    public boolean isIncludeFacets(){
+        return Boolean.valueOf(includeFacets);
     }
 }

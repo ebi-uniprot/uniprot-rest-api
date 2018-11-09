@@ -28,7 +28,7 @@ public @interface ValidReturnFields {
 
     Class<? extends ReturnFieldsValidator> fieldValidatorClazz();
 
-    String message() default "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.return.field}";
+    String message() default "{search.invalid.return.field}";
 
     Class<?>[] groups() default {};
 
@@ -72,7 +72,7 @@ public @interface ValidReturnFields {
         }
 
         public void buildErrorMessage(String field,ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.return.field}";
+            String errorMessage = "{search.invalid.return.field}";
             contextImpl.addMessageParameter("fieldName",field);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }

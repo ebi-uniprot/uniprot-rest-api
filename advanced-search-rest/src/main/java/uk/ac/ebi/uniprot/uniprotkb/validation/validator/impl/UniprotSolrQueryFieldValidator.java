@@ -31,7 +31,7 @@ public class UniprotSolrQueryFieldValidator  implements SolrQueryFieldValidator{
 
     @Override
     public String getInvalidFieldErrorMessage(String fieldName) {
-        return "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.field}";
+        return "{search.uniprot.invalid.query.field}";
     }
 
     @Override
@@ -42,7 +42,7 @@ public class UniprotSolrQueryFieldValidator  implements SolrQueryFieldValidator{
 
     @Override
     public String getInvalidFieldTypeErrorMessage(String fieldName, SearchFieldType searchFieldType) {
-        return "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.field.type}";
+        return "{search.uniprot.invalid.query.field.type}";
     }
 
     @Override
@@ -68,7 +68,7 @@ public class UniprotSolrQueryFieldValidator  implements SolrQueryFieldValidator{
 
     @Override
     public String getInvalidFieldValueErrorMessage(String fieldName, String value) {
-        return "{uk.ac.ebi.uniprot.uuw.advanced.search.uniprot.invalid.query.field.value."+fieldName+"}";
+        return "{search.uniprot.invalid.query.field.value."+fieldName+"}";
     }
 
 }

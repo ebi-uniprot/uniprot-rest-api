@@ -20,6 +20,7 @@ import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -564,29 +565,40 @@ public class UniprotAdvancedSearchControllerIT {
     }
 
     @Test
-    public void canSearchCanonicalIsoformByAccession() throws Exception {
+    public void canReturnFacetInformation() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         String acc = entry.getPrimaryUniProtAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:P21802-1&fields=accession,gene_primary")
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,gene_primary&includeFacets=true")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(not("\"accession\":\"P21802\"")))
-                .andExpect(content().string(containsString("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(containsString("\"accession\":\""+acc+"\"")))
+                .andExpect(content().string(containsString("\"facets\":[{\"label\":\"3D Structure\"")));
+    }
+
+    @Test
+    public void canNotReturnFacetInformationForXML() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryUniProtAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&includeFacets=true")
+                        .header(ACCEPT, APPLICATION_XML_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("facets are only supported by application/json format")));
     }
 
     @Test

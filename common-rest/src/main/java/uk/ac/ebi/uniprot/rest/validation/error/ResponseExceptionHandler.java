@@ -28,8 +28,8 @@ import java.util.Locale;
 public class ResponseExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ResponseExceptionHandler.class);
-    private static final String NOT_FOUND_MESSAGE = "uk.ac.ebi.uniprot.uuw.advanced.search.not.found";
-    private static final String INTERNAL_ERROR_MESSAGE = "uk.ac.ebi.uniprot.uuw.advanced.search.internal.error";
+    private static final String NOT_FOUND_MESSAGE = "search.not.found";
+    private static final String INTERNAL_ERROR_MESSAGE = "search.internal.error";
 
     private MessageSource messageSource;
 

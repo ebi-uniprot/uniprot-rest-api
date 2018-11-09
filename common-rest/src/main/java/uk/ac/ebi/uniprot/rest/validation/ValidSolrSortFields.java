@@ -28,7 +28,7 @@ public @interface ValidSolrSortFields {
 
     Class<? extends Enum<?>> sortFieldEnumClazz();
 
-    String message() default "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort}";
+    String message() default "{search.invalid.sort}";
 
     Class<?>[] groups() default {};
 
@@ -93,19 +93,19 @@ public @interface ValidSolrSortFields {
         }
 
         public void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
-            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.format}";
+            String errorMessage = "{search.invalid.sort.format}";
             contextImpl.addMessageParameter("value",value);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         public void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
-            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.order}";
+            String errorMessage = "{search.invalid.sort.order}";
             contextImpl.addMessageParameter("sortOrder",sortOrder);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         public void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
-            String errorMessage = "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.sort.field}";
+            String errorMessage = "{search.invalid.sort.field}";
             contextImpl.addMessageParameter("sortField",sortField);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }

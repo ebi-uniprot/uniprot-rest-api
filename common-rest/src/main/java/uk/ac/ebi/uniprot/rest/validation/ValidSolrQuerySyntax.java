@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrQuerySyntax {
 
-    String message() default "{uk.ac.ebi.uniprot.uuw.advanced.search.invalid.syntax.query}";
+    String message() default "{search.invalid.syntax.query}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
