@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
-import uk.ac.ebi.uniprot.uniprotkb.AdvancedSearchREST;
+import uk.ac.ebi.uniprot.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker;
 
@@ -25,12 +25,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotAdvancedSearchController.UNIPROTKB_RESOURCE;
+import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class, AdvancedSearchREST.class})
+@SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-public class UniprotAdvancedSearchControllerIT {
+public class UniprotKBControllerIT {
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 

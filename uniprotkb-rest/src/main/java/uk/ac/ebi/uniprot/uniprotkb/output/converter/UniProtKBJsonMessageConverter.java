@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.uniprotkb.output.converter;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
 import org.springframework.http.MediaType;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
@@ -19,7 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
+    private static final Logger LOGGER = getLogger(UniProtKBJsonMessageConverter.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
@@ -50,14 +54,6 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
         tlJsonGenerator.set(generator);
     }
 
-    private void writeObject(JsonGenerator generator, Object facet) {
-        try {
-            generator.writeObject(facet);
-        } catch (IOException e) {
-            throw new StopStreamException("Failed to write Facet JSON object", e);
-        }
-    }
-
     @Override
     protected void writeEntity(UniProtEntry entity, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
@@ -72,7 +68,16 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
         generator.writeEndArray();
         generator.writeEndObject();
 
+        generator.flush();
         generator.close();
+    }
+
+    private void writeObject(JsonGenerator generator, Object facet) {
+        try {
+            generator.writeObject(facet);
+        } catch (IOException e) {
+            throw new StopStreamException("Failed to write Facet JSON object", e);
+        }
     }
 
     private UPEntry uniProtEntry2UPEntry(UniProtEntry uniProtEntry) {

@@ -16,8 +16,8 @@ import uk.ac.ebi.uniprot.rest.output.header.HttpCommonHeaderConfig;
 @EnableSolrRepositories(basePackages = {"uk.ac.ebi.uniprot.uniprotkb.repository.search.impl"})
 @Import({HttpCommonHeaderConfig.class})
 @ComponentScan(basePackages = {"uk.ac.ebi.uniprot.uniprotkb","uk.ac.ebi.uniprot.rest"})
-public class AdvancedSearchREST {
+public class UniProtKBREST {
     public static void main(String[] args) {
-        SpringApplication.run(AdvancedSearchREST.class, args);
+        SpringApplication.run(UniProtKBREST.class, args);
     }
 }
