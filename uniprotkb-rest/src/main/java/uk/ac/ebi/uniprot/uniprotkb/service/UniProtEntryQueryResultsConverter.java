@@ -4,13 +4,13 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.model.common.SequenceImpl;
+import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
-import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
-import uk.ac.ebi.uniprot.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.FieldsParser;
+import uk.ac.ebi.uniprot.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.uniprotkb.service.filters.FilterComponentType;
 
 import java.io.IOException;
@@ -56,6 +56,7 @@ class UniProtEntryQueryResultsConverter {
         if (doc.active) {
             return convert2UPEntry(doc, filters);
         } else {
+            //TODO: We need to support inactive entries (We are waiting for the new model)
             return Optional.empty();
         }
     }

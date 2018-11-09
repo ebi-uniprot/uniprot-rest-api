@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
+import uk.ac.ebi.uniprot.dataservice.source.impl.inactiveentry.InactiveUniProtEntry;
 import uk.ac.ebi.uniprot.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
+import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.InactiveEntryMocker;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -611,6 +616,32 @@ public class UniprotKBControllerIT {
         // when
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,organism")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"accession\":\"Q8DIA7\"")))
+                .andExpect(content().string(containsString("\"organism\":{" +
+                        "\"taxonomy\":197221," +
+                        "\"names\":[{\"type\":\"scientific\"," +
+                        "\"value\":\"Thermosynechococcus elongatus (strain BP-1)\"" +
+                        "}]}")));
+    }
+
+    @Ignore //TODO: We need to support inactive entries (We are waiting for the new model)
+    @Test
+    public void searchForMergedInactiveEntriesAlsoReturnsActiveOne() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> mergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
+        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,mergedList);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:Q14301&fields=accession,organism")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
