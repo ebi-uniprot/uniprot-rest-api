@@ -9,6 +9,7 @@ import uk.ac.ebi.uniprot.uuw.suggester.SuggestionDictionary;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 /**
  * Created 18/07/18
@@ -39,7 +40,10 @@ public class SuggesterService {
                     solrClient.query(solrQuery)
                             .getSuggesterResponse()
                             .getSuggestedTerms()
-                            .get(dictionary.getId()));
+                            .get(dictionary.getId())
+                            .stream()
+                            .distinct()
+                            .collect(Collectors.toList()));
         } catch (SolrServerException | IOException e) {
             String message = "Could not get suggestions for: [" + dictionary.getId() + ", " + query + "]";
             LOGGER.error(message, e);

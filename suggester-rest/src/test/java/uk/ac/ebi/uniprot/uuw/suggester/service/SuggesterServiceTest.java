@@ -58,6 +58,22 @@ public class SuggesterServiceTest {
         assertThat(retrievedSuggestions.getSuggestions(), is(suggestions));
     }
 
+    @Test
+    public void createsSuggestionsWithoutDuplicatesWhenSolrFindsThemSuccessfully() throws IOException, SolrServerException {
+        SuggestionDictionary dict = taxonomy;
+        String query = "any string";
+        List<String> suggestions = asList("suggestion 1", "suggestion 2", "suggestion 1");
+        List<String> suggestionsWithoutDuplicates = asList("suggestion 1", "suggestion 2");
+
+        String dictStr = dict.name();
+        mockServiceQueryResponse(dict, suggestions);
+
+        Suggestions retrievedSuggestions = suggesterService.getSuggestions(dict, query);
+        assertThat(retrievedSuggestions.getDictionary(), is(dictStr));
+        assertThat(retrievedSuggestions.getQuery(), is(query));
+        assertThat(retrievedSuggestions.getSuggestions(), is(suggestionsWithoutDuplicates));
+    }
+
     @SuppressWarnings("unchecked")
     @Test(expected = SuggestionRetrievalException.class)
     public void suggestionThatCausesSolrExceptionCausesSuggestionRetrievalException() throws IOException, SolrServerException {
