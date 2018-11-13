@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ebi.uniprot.uuw.suggester.SuggestionDictionary.taxonomy;
@@ -40,7 +41,7 @@ public class SuggesterServiceTest {
 
     @Before
     public void setUp() {
-        this.suggesterService = new SuggesterService(solrClient);
+        this.suggesterService = new SuggesterService(solrClient, "anyCollection");
     }
 
     @Test
@@ -77,7 +78,7 @@ public class SuggesterServiceTest {
     @SuppressWarnings("unchecked")
     @Test(expected = SuggestionRetrievalException.class)
     public void suggestionThatCausesSolrExceptionCausesSuggestionRetrievalException() throws IOException, SolrServerException {
-        when(solrClient.query(any())).thenThrow(SolrServerException.class);
+        when(solrClient.query(anyString(), any())).thenThrow(SolrServerException.class);
         suggesterService.getSuggestions(taxonomy, "some text");
     }
 
@@ -88,6 +89,6 @@ public class SuggesterServiceTest {
         SuggesterResponse suggesterResponse = mock(SuggesterResponse.class);
         when(queryResponse.getSuggesterResponse()).thenReturn(suggesterResponse);
         when(suggesterResponse.getSuggestedTerms()).thenReturn(suggestionMap);
-        when(solrClient.query(any())).thenReturn(queryResponse);
+        when(solrClient.query(anyString(), any())).thenReturn(queryResponse);
     }
 }

@@ -22,9 +22,11 @@ public class SuggesterService {
     private static final String SUGGEST_DICTIONARY = "suggest.dictionary";
     private static final String SUGGEST_Q = "suggest.q";
     private final SolrClient solrClient;
+    private final String collection;
 
-    public SuggesterService(SolrClient solrClient) {
+    public SuggesterService(SolrClient solrClient, String collection) {
         this.solrClient = solrClient;
+        this.collection = collection;
     }
 
     public Suggestions getSuggestions(SuggestionDictionary dictionary, String query) {
@@ -37,7 +39,7 @@ public class SuggesterService {
             return Suggestions.createSuggestions(
                     dictionary,
                     query,
-                    solrClient.query(solrQuery)
+                    solrClient.query(collection, solrQuery)
                             .getSuggesterResponse()
                             .getSuggestedTerms()
                             .get(dictionary.getId())

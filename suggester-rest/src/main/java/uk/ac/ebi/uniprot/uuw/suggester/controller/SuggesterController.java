@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.suggester.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions;
 import uk.ac.ebi.uniprot.uuw.suggester.service.SuggesterService;
-import uk.ac.ebi.uniprot.uuw.suggester.service.SuggesterServiceConfig;
 
 import static uk.ac.ebi.uniprot.uuw.suggester.service.SuggestionValidator.getSuggestionDictionary;
 
@@ -21,7 +19,6 @@ import static uk.ac.ebi.uniprot.uuw.suggester.service.SuggestionValidator.getSug
  * @author Edd
  */
 @RestController
-@Import(SuggesterServiceConfig.class)
 public class SuggesterController {
     private final SuggesterService suggesterService;
 

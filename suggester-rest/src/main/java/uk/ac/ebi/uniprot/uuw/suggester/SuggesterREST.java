@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import uk.ac.ebi.uniprot.rest.output.header.HttpCommonHeaderConfig;
+import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfig;
+import uk.ac.ebi.uniprot.uuw.suggester.service.SuggesterServiceConfig;
 
 /**
  * Starts the REST application.
@@ -15,7 +17,7 @@ import uk.ac.ebi.uniprot.rest.output.header.HttpCommonHeaderConfig;
  * @author Edd
  */
 @SpringBootApplication
-@Import({HttpCommonHeaderConfig.class})
+@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, SuggesterServiceConfig.class})
 public class SuggesterREST {
     /**
      * Ensures that placeholders are replaced with property values
