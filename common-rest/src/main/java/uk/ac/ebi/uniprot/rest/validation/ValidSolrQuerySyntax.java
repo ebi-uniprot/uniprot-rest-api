@@ -43,8 +43,6 @@ public @interface ValidSolrQuerySyntax {
                 QueryParser qp = new QueryParser("",new StandardAnalyzer());
                 Query solrQueryParsed = qp.parse(queryString);
 
-                System.out.println(solrQueryParsed.toString());
-
                 StandardQueryParser standardQueryParser = new StandardQueryParser();
                 standardQueryParser.parse(queryString,"");
             }catch (QueryNodeException | ParseException e){

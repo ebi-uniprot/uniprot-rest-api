@@ -41,6 +41,7 @@ public @interface ValidSolrQueryFields {
 
     public class QueryFieldValidator implements ConstraintValidator<ValidSolrQueryFields, String> {
 
+        private static final String DEFAULT_FIELD_NAME = "default_field";
         public SolrQueryFieldValidator fieldValidator = null;
 
         @Override
@@ -57,7 +58,7 @@ public @interface ValidSolrQueryFields {
             boolean isValid = true;
             try {
                 StandardQueryParser qp = new StandardQueryParser();
-                Query query = qp.parse(queryString, "");
+                Query query = qp.parse(queryString, DEFAULT_FIELD_NAME);
                 isValid = hasValidateQueryField(query, context);
                 if (!isValid) {
                     context.disableDefaultConstraintViolation();
@@ -102,7 +103,7 @@ public @interface ValidSolrQueryFields {
         private boolean isValidField(ConstraintValidatorContext context, String fieldName, SearchFieldType type, String value) {
             boolean validField = true;
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            if (!fieldValidator.hasField(fieldName)) {
+            if (!fieldValidator.hasField(fieldName) && !fieldName.equals(DEFAULT_FIELD_NAME)) {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
             } else if (!fieldValidator.hasValidFieldType(fieldName, type)) {

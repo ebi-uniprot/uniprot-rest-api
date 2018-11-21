@@ -22,6 +22,16 @@ import static uk.ac.ebi.uniprot.rest.validation.QueryFieldValidatorTest.FakeQuer
 class QueryFieldValidatorTest {
 
     @Test
+    void isValidDefaultSearchQueryReturnTrue() {
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+
+        boolean result = validator.isValid("P21802-2", null);
+        assertEquals(true, result);
+    }
+
+
+    @Test
     void isValidSimpleAccessionQueryReturnTrue() {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.fieldValidator = new FakeSolrQueryFieldValidator();
