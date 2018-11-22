@@ -59,7 +59,7 @@ class FiltersWithDownloadSimulation extends Simulation {
 
     val request =
       feed(accessionFeeder)
-    feed(organismFeeder)
+    .feed(organismFeeder)
       .feed(generalSearchFeeder)
       .feed(taxonomyFeeder)
       .feed(geneNameFeeder)
@@ -84,7 +84,7 @@ class FiltersWithDownloadSimulation extends Simulation {
       .exec(http("gene field")
         .get("${gene_url}")
         .header("Accept", "${gene_format}"))
-      .pause(5 seconds, 15 seconds)
+      //.pause(5 seconds, 15 seconds)
       //          .exec(http("feature molecule processing field")
       //            .get(filterFeatureRequestStr)
       //            .header("Accept", format))
