@@ -63,4 +63,12 @@ class QuerySyntaxValidatorTest {
         boolean result = validator.isValid("((length:[1 TO ]) AND (gene:\"CDC7))",null);
         assertEquals(false,result);
     }
+
+    @Test
+    void isValidWithScapedSpecialChars(){
+        ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
+
+        boolean result = validator.isValid("gene:MT1558\\/MT1560",null);
+        assertEquals(true,result);
+    }
 }

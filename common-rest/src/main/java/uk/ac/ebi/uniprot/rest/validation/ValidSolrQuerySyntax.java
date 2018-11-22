@@ -1,11 +1,7 @@
 package uk.ac.ebi.uniprot.rest.validation;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
-import org.apache.lucene.search.Query;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -40,12 +36,9 @@ public @interface ValidSolrQuerySyntax {
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
             try{
-                QueryParser qp = new QueryParser("",new StandardAnalyzer());
-                Query solrQueryParsed = qp.parse(queryString);
-
                 StandardQueryParser standardQueryParser = new StandardQueryParser();
                 standardQueryParser.parse(queryString,"");
-            }catch (QueryNodeException | ParseException e){
+            }catch (QueryNodeException e){
                 isValid = false;
             }
 
