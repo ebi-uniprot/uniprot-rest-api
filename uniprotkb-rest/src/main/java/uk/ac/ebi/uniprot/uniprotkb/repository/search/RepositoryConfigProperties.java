@@ -11,8 +11,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "spring.data.solr")
 public class RepositoryConfigProperties {
+    private static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 1000 * 20;
+    private static final int DEFAULT_SOCKET_TIMEOUT_MILLIS = 1000 * 60 * 60;
 
-    private String zookeperhost;
+    private String zkHost;
 
     private String httphost;
 
@@ -20,4 +22,7 @@ public class RepositoryConfigProperties {
 
     private String password;
 
+    private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
+
+    private int socketTimeout = DEFAULT_SOCKET_TIMEOUT_MILLIS;
 }

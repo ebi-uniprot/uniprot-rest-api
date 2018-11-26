@@ -70,8 +70,6 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
             default:
                 writeContents(context, outputStream, start, counter);
         }
-
-        logStats(counter.get(), start);
     }
 
     protected void before(MessageConverterContext<C> context, OutputStream outputStream) throws IOException {

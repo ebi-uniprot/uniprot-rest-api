@@ -25,7 +25,7 @@ public class ResultsConfig {
                 .collection("uniprot")
                 .key("accession_id")
                 .requestHandler("/export")
-                .zookeeperHost(configProperties.getZookeperhost())
+                .zookeeperHost(configProperties.getZkHost())
                 .build();
     }
 
