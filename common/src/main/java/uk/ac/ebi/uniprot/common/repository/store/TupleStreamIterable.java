@@ -21,7 +21,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 public class TupleStreamIterable implements Iterable<String> {
+    private static final int MAX_RETRIES = 5;
     private static final Logger LOGGER = getLogger(TupleStreamIterable.class);
+    private static final int DELAY = 500;
     private final TupleStream tupleStream;
     private final String id;
     private final RetryPolicy retryPolicy;
@@ -34,8 +36,8 @@ public class TupleStreamIterable implements Iterable<String> {
         this.id = id;
             this.retryPolicy = new RetryPolicy()
                 .retryOn(IOException.class)
-                .withDelay(500, TimeUnit.MILLISECONDS)
-                .withMaxRetries(5);
+                .withDelay(DELAY, TimeUnit.MILLISECONDS)
+                .withMaxRetries(MAX_RETRIES);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class TupleStreamIterable implements Iterable<String> {
                     return Failsafe.with(retryPolicy).get(tupleStream::read);
                 } catch (Exception e) {
                     LOGGER.error("Error whilst iterating through Solr results stream", e);
+                    closeTupleStream();
                     throw new IllegalStateException(e);
                 }
             }
