@@ -92,9 +92,9 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
             logStats(counter.get(), start);
         } catch (StopStreamException | IOException e) {
             LOGGER.error("Error encountered when streaming data: closing stream.", e);
-            entities.close();
         } finally {
             outputStream.close();
+            entities.close();
             cleanUp();
         }
     }
