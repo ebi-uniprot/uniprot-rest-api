@@ -55,6 +55,9 @@ public class TupleStreamTemplate {
         if (streamFactory == null) {
             streamFactory = new DefaultStreamFactory()
                     .withCollectionZkHost(collection, zookeeperHost);
+            LOGGER.info("Created new DefaultStreamFactory");
+        } else {
+            LOGGER.info("DefaultStreamFactory already created");
         }
     }
 
