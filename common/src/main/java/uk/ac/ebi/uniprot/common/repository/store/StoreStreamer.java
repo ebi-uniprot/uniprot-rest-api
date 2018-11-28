@@ -4,6 +4,7 @@ import lombok.Builder;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored fields).
  * Clients of this class need not know what store they need to access. They need only provide the query that
@@ -29,6 +32,7 @@ import java.util.stream.StreamSupport;
  */
 @Builder
 public class StoreStreamer<T> {
+    private static final Logger LOGGER = getLogger(StoreStreamer.class);
     private VoldemortClient<T> storeClient;
     private int streamerBatchSize;
     private String id;
@@ -45,7 +49,10 @@ public class StoreStreamer<T> {
                     new TupleStreamIterable(tupleStream, id),
                     storeClient,
                     streamerBatchSize);
-            return StreamSupport.stream(batchStoreIterable.spliterator(), false).flatMap(Collection::stream);
+            return StreamSupport
+                    .stream(batchStoreIterable.spliterator(), false)
+                    .flatMap(Collection::stream)
+                    .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -55,7 +62,9 @@ public class StoreStreamer<T> {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(query,filterQuery, id, sort);
             tupleStream.open();
-            return StreamSupport.stream(new TupleStreamIterable(tupleStream, id).spliterator(), false);
+            return StreamSupport
+                    .stream(new TupleStreamIterable(tupleStream, id).spliterator(), false)
+                    .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -74,9 +83,22 @@ public class StoreStreamer<T> {
                 }
             };
 
-            return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
+            return StreamSupport
+                    .stream(batchIterable.spliterator(), false)
+                    .flatMap(Collection::stream)
+                    .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private void closeTupleStream(TupleStream tupleStream) {
+        try {
+            tupleStream.close();
+        } catch (IOException e) {
+            String message = "Error when closing TupleStream";
+            LOGGER.error(message, e);
+            throw new IllegalStateException(message, e);
         }
     }
 
@@ -134,5 +156,4 @@ public class StoreStreamer<T> {
 
         abstract List<T> convertBatch(List<String> batch);
     }
-
 }

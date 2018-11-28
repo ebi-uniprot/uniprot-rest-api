@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -62,6 +63,41 @@ public class TupleStreamIterableTest {
                 .collect(Collectors.toList());
 
         assertThat(contents, contains("accession1", "accession2"));
+        Mockito.verify(tupleStream).close();
+    }
+
+    @Test
+    public void closingTupleStreamWrappedAsStreamWillCloseTupleStream() throws IOException {
+        when(tupleStream.read())
+                .thenReturn(tuple("accession1"))  // when calling next()
+                .thenReturn(tuple("accession2"))  // when calling next() 2nd time
+                .thenReturn(endTuple());
+
+        TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
+        Stream<String> stream = StreamSupport
+                .stream(iterable.spliterator(), false)
+                .onClose(this::closeTupleStream);
+
+        stream.close();
+
+        Mockito.verify(tupleStream).close();
+    }
+
+    @Test
+    public void closingTupleStreamWrappedAsStreamAfterOneReadWillCloseTupleStream() throws IOException {
+        when(tupleStream.read())
+                .thenReturn(tuple("accession1"))  // when calling next()
+                .thenReturn(tuple("accession2"))  // when calling next() 2nd time
+                .thenReturn(endTuple());
+
+        TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
+        Stream<String> stream = StreamSupport
+                .stream(iterable.spliterator(), false)
+                .onClose(this::closeTupleStream);
+
+        stream.findFirst();
+        stream.close();
+
         Mockito.verify(tupleStream).close();
     }
 
@@ -137,6 +173,14 @@ public class TupleStreamIterableTest {
         assertThat(tupleStreamIterator.hasNext(), is(false));
 
         Mockito.verify(tupleStream).close();
+    }
+
+    private void closeTupleStream() {
+        try {
+            tupleStream.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private List<String> getContents(Iterable<String> iterable) {
