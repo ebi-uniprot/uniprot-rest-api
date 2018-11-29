@@ -45,7 +45,7 @@ public class TupleStreamTemplate {
                 .key(key)
                 .order(sort)
                 .requestHandler(requestHandler)
-                .streamContext(createStreamContext())
+                .streamContext(createStreamContext(zookeeperHost))
                 .build();
 
         return streamBuilder.createFor(query, filterQuery);
@@ -115,12 +115,13 @@ public class TupleStreamTemplate {
     /**
      * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
      */
-    private StreamContext createStreamContext() {
+    private StreamContext createStreamContext(String zookeeperHost) {
         StreamContext streamContext = new StreamContext();
         streamContext.workerID = collection
                 .hashCode(); // this should be the same for each collection, so that they share client caches
         streamContext.numWorkers = 1;
         SolrClientCache solrClientCache = new SolrClientCache();
+        solrClientCache.getCloudSolrClient(zookeeperHost);
         streamContext.setSolrClientCache(solrClientCache);
         return streamContext;
     }
