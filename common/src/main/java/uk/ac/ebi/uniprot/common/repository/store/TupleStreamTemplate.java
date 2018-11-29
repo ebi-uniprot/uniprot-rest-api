@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.common.repository.store;
 
 import lombok.Builder;
+import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -33,6 +34,8 @@ public class TupleStreamTemplate {
     private String key;
     private String collection;
     private StreamFactory streamFactory;
+    private StreamContext streamContext;
+    private HttpClient httpClient;
 
     public TupleStream create(String query, String filterQuery) {
         return create(query, filterQuery, key, new Sort(Sort.Direction.ASC, key));
@@ -40,12 +43,13 @@ public class TupleStreamTemplate {
 
     public TupleStream create(String query, String filterQuery, String key, Sort sort) {
         initTupleStreamFactory(zookeeperHost, collection);
+        initStreamContext(zookeeperHost, httpClient);
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
                 .streamFactory(streamFactory)
                 .key(key)
                 .order(sort)
                 .requestHandler(requestHandler)
-                .streamContext(createStreamContext(zookeeperHost))
+                .streamContext(streamContext)
                 .build();
 
         return streamBuilder.createFor(query, filterQuery);
@@ -115,14 +119,16 @@ public class TupleStreamTemplate {
     /**
      * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
      */
-    private StreamContext createStreamContext(String zookeeperHost) {
-        StreamContext streamContext = new StreamContext();
-        streamContext.workerID = collection
-                .hashCode(); // this should be the same for each collection, so that they share client caches
-        streamContext.numWorkers = 1;
-        SolrClientCache solrClientCache = new SolrClientCache();
-        solrClientCache.getCloudSolrClient(zookeeperHost);
-        streamContext.setSolrClientCache(solrClientCache);
-        return streamContext;
+    private void initStreamContext(String zookeeperHost, HttpClient httpClient) {
+        if (streamContext == null) {
+            StreamContext streamContext = new StreamContext();
+            streamContext.workerID = collection
+                    .hashCode(); // this should be the same for each collection, so that they share client caches
+            streamContext.numWorkers = 1;
+            SolrClientCache solrClientCache = new SolrClientCache(httpClient);
+            solrClientCache.getCloudSolrClient(zookeeperHost);
+            streamContext.setSolrClientCache(solrClientCache);
+            this.streamContext = streamContext;
+        }
     }
 }
