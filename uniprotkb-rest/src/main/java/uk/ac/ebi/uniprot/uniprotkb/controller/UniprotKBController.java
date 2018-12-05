@@ -2,14 +2,12 @@ package uk.ac.ebi.uniprot.uniprotkb.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContextFactory;
@@ -20,14 +18,13 @@ import uk.ac.ebi.uniprot.uniprotkb.service.UniProtEntryService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static uk.ac.ebi.uniprot.rest.output.UniProtMediaType.*;
 import static uk.ac.ebi.uniprot.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static uk.ac.ebi.uniprot.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static uk.ac.ebi.uniprot.rest.output.header.HeaderFactory.createHttpSearchHeader;
 import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 /**
@@ -119,42 +116,5 @@ public class UniprotKBController {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
-    }
-
-    private HttpHeaders createHttpSearchHeader(MediaType mediaType) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(mediaType);
-
-        // used so that gate-way caching uses accept/accept-encoding headers as a key
-        httpHeaders.add(VARY, ACCEPT);
-        httpHeaders.add(VARY, ACCEPT_ENCODING);
-        return httpHeaders;
-    }
-
-    private HttpHeaders createHttpDownloadHeader(MessageConverterContext context, HttpServletRequest request) {
-        MediaType mediaType = context.getContentType();
-        String suffix = "." + UniProtMediaType.getFileExtension(mediaType) + context.getFileType().getExtension();
-        String queryString = request.getQueryString();
-        String desiredFileName = "uniprot-" + queryString + suffix;
-        String actualFileName;
-        // truncate the file name if the query makes it too long -- instead use date + truncated query
-        if (desiredFileName.length() > 200) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd@HH:mm:ss.SS");
-            String timestamp = now.format(dateTimeFormatter);
-            int queryStrLength = queryString.length();
-            int queryStringTruncatePoint = queryStrLength > 50 ? 50 : queryStrLength;
-            actualFileName = "uniprot-" + timestamp + "-" + queryString.substring(0, queryStringTruncatePoint) + suffix;
-        } else {
-            actualFileName = desiredFileName;
-        }
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentDispositionFormData("attachment", actualFileName);
-        httpHeaders.setContentType(mediaType);
-
-        // used so that gate-way caching uses accept/accept-encoding headers as a key
-        httpHeaders.add(VARY, ACCEPT);
-        httpHeaders.add(VARY, ACCEPT_ENCODING);
-        return httpHeaders;
     }
 }
