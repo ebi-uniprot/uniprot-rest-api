@@ -10,9 +10,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.ac.ebi.uniprot.uuw.suggester.SuggestionDictionary;
+import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ public class SuggesterServiceTest {
         SuggestionDictionary dict = taxonomy;
         String query = "any string";
         List<String> suggestions = asList("suggestion 1", "suggestion 2");
+        List<Suggestion> expectedSuggestions = asSuggestionList(suggestions);
 
         String dictStr = dict.name();
         mockServiceQueryResponse(dict, suggestions);
@@ -56,7 +59,17 @@ public class SuggesterServiceTest {
         Suggestions retrievedSuggestions = suggesterService.getSuggestions(dict, query);
         assertThat(retrievedSuggestions.getDictionary(), is(dictStr));
         assertThat(retrievedSuggestions.getQuery(), is(query));
-        assertThat(retrievedSuggestions.getSuggestions(), is(suggestions));
+        assertThat(retrievedSuggestions.getSuggestions(), is(expectedSuggestions));
+    }
+
+    private List<Suggestion> asSuggestionList(List<String> suggestionStrings) {
+        List<Suggestion> suggestions = new ArrayList<>();
+        for (String suggestionString : suggestionStrings) {
+            Suggestion suggestion = new Suggestion();
+            suggestion.setValue(suggestionString);
+            suggestions.add(suggestion);
+        }
+        return suggestions;
     }
 
     @Test
@@ -64,7 +77,7 @@ public class SuggesterServiceTest {
         SuggestionDictionary dict = taxonomy;
         String query = "any string";
         List<String> suggestions = asList("suggestion 1", "suggestion 2", "suggestion 1");
-        List<String> suggestionsWithoutDuplicates = asList("suggestion 1", "suggestion 2");
+        List<Suggestion> suggestionsWithoutDuplicates = asSuggestionList(asList("suggestion 1", "suggestion 2"));
 
         String dictStr = dict.name();
         mockServiceQueryResponse(dict, suggestions);
