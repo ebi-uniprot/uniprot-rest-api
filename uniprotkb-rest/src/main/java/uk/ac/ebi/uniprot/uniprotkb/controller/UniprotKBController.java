@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller;
 
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -33,6 +34,7 @@ import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROT
  * @author lgonzales
  */
 @RestController
+@Api(tags = {"uniprotkb"})
 @RequestMapping(UNIPROTKB_RESOURCE)
 public class UniprotKBController {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
