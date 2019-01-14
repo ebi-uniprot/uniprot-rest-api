@@ -192,7 +192,7 @@ public class CursorPage implements Page {
                 }
                 stream.flush();
                 // convert it to hexadecimal
-                encrypted = new BigInteger(stream.toByteArray()).toString(16);
+                encrypted = new BigInteger(stream.toByteArray()).toString(36);
             } catch (IOException e) {
                 LOGGER.warn("Error compressing page cursor",e);
             } finally {
@@ -212,7 +212,7 @@ public class CursorPage implements Page {
             String encrypted = "";
 
             // convert to hexadecimal value to byte array
-            byte[] decodedValue = new BigInteger(encryptedValue, 16).toByteArray();
+            byte[] decodedValue = new BigInteger(encryptedValue, 36).toByteArray();
 
             // BEGIN: decompress byte array to original string
             Inflater decompressor = new Inflater();
@@ -240,4 +240,19 @@ public class CursorPage implements Page {
             return encrypted;
         }
     }
+
+/*    public static void main(String[] args) {
+        String initialCursorMark= "AoEmQTBBMDA5";
+        CursorPage p = CursorPage.of(null,10);
+        p.setNextCursor(initialCursorMark);
+        for(int i=0;i<100;i++){
+            String encryptedCursor = p.getEncryptedNextCursor();
+            p = CursorPage.of(encryptedCursor,10);
+            p.setNextCursor(initialCursorMark+i);
+            if(i%100 == 0){
+                System.out.println("count: "+i);
+            }
+        }
+        System.out.println(p.getEncryptedNextCursor().length());
+    }*/
 }
