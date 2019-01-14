@@ -2,7 +2,7 @@ ID   LAC1_MELAO              Reviewed;         623 AA.
 AC   Q70KY3; Q7SIE6;
 DT   16-MAY-2006, integrated into UniProtKB/Swiss-Prot.
 DT   05-JUL-2004, sequence version 1.
-DT   25-OCT-2017, entry version 73.
+DT   05-DEC-2018, entry version 74.
 DE   RecName: Full=Laccase-1;
 DE            EC=1.10.3.2;
 DE   AltName: Full=Benzenediol:oxygen oxidoreductase 1;
@@ -51,6 +51,11 @@ RT   intact trinuclear copper site.";
 RL   Nat. Struct. Biol. 9:601-605(2002).
 CC   -!- FUNCTION: Lignin degradation and detoxification of lignin-derived
 CC       products. {ECO:0000269|PubMed:15474046, ECO:0000305}.
+CC   -!- CATALYTIC ACTIVITY:
+CC       Reaction=4 hydroquinone + O2 = 4 benzosemiquinone + 2 H2O;
+CC         Xref=Rhea:RHEA:11276, ChEBI:CHEBI:15377, ChEBI:CHEBI:15379,
+CC         ChEBI:CHEBI:17594, ChEBI:CHEBI:17977; EC=1.10.3.2;
+CC         Evidence={ECO:0000269|PubMed:12111146};
 CC   -!- COFACTOR:
 CC       Name=Cu cation; Xref=ChEBI:CHEBI:23378;
 CC         Evidence={ECO:0000269|PubMed:12111146,
@@ -95,6 +100,10 @@ CC   -!- TISSUE SPECIFICITY: Secreted protein; extracellular space.
 CC       {ECO:0000269|PubMed:12111146}.
 CC   -!- SIMILARITY: Belongs to the multicopper oxidase family.
 CC       {ECO:0000255}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
+CC   -----------------------------------------------------------------------
 DR   EMBL; AJ571698; CAE00180.1; -; Genomic_DNA.
 DR   PDB; 1GW0; X-ray; 2.40 A; A/B=51-609.
 DR   PDB; 2IH8; X-ray; 2.00 A; A/B=51-609.

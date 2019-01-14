@@ -6,7 +6,7 @@ AC   Q9NZU3; Q9UD01; Q9UD02; Q9UIH3; Q9UIH4; Q9UIH5; Q9UIH6; Q9UIH7;
 AC   Q9UIH8; Q9UM87; Q9UMC6; Q9UNS7; Q9UQH7; Q9UQH8; Q9UQH9; Q9UQI0;
 DT   01-MAY-1991, integrated into UniProtKB/Swiss-Prot.
 DT   01-MAY-1991, sequence version 1.
-DT   07-NOV-2018, entry version 240.
+DT   05-DEC-2018, entry version 241.
 DE   RecName: Full=Fibroblast growth factor receptor 2;
 DE            Short=FGFR-2;
 DE            EC=2.7.10.1 {ECO:0000269|PubMed:16844695, ECO:0000269|PubMed:18056630, ECO:0000269|PubMed:19410646, ECO:0000269|PubMed:21454610};
@@ -857,11 +857,14 @@ CC       ECO:0000269|PubMed:17311277, ECO:0000269|PubMed:17623664,
 CC       ECO:0000269|PubMed:18374639, ECO:0000269|PubMed:19103595,
 CC       ECO:0000269|PubMed:19387476, ECO:0000269|PubMed:19410646,
 CC       ECO:0000269|PubMed:21596750, ECO:0000269|PubMed:8663044}.
-CC   -!- CATALYTIC ACTIVITY: ATP + a [protein]-L-tyrosine = ADP + a
-CC       [protein]-L-tyrosine phosphate. {ECO:0000255|PROSITE-
-CC       ProRule:PRU10028, ECO:0000269|PubMed:16844695,
-CC       ECO:0000269|PubMed:18056630, ECO:0000269|PubMed:19410646,
-CC       ECO:0000269|PubMed:21454610}.
+CC   -!- CATALYTIC ACTIVITY:
+CC       Reaction=ATP + L-tyrosyl-[protein] = ADP + H(+) + O-phospho-L-
+CC         tyrosyl-[protein]; Xref=Rhea:RHEA:10596, Rhea:RHEA-COMP:10136,
+CC         Rhea:RHEA-COMP:10137, ChEBI:CHEBI:15378, ChEBI:CHEBI:30616,
+CC         ChEBI:CHEBI:46858, ChEBI:CHEBI:82620, ChEBI:CHEBI:456216;
+CC         EC=2.7.10.1; Evidence={ECO:0000255|PROSITE-ProRule:PRU10028,
+CC         ECO:0000269|PubMed:16844695, ECO:0000269|PubMed:18056630,
+CC         ECO:0000269|PubMed:19410646, ECO:0000269|PubMed:21454610};
 CC   -!- ACTIVITY REGULATION: Present in an inactive conformation in the
 CC       absence of bound ligand. Ligand binding leads to dimerization and
 CC       activation by autophosphorylation on tyrosine residues. Inhibited
@@ -893,7 +896,7 @@ CC       ECO:0000269|PubMed:18056630, ECO:0000269|PubMed:19060208,
 CC       ECO:0000269|PubMed:19103595, ECO:0000269|PubMed:21454610,
 CC       ECO:0000269|PubMed:8663044, ECO:0000269|PubMed:8961926}.
 CC   -!- INTERACTION:
-CC       P03968:FGF1 (xeno); NbExp=2; IntAct=EBI-6354683, EBI-6358090;
+CC       P03968:FGF1 (xeno); NbExp=2; IntAct=EBI-1028658, EBI-6358090;
 CC       P05230:FGF1; NbExp=2; IntAct=EBI-1028658, EBI-698068;
 CC       P05230-1:FGF1; NbExp=2; IntAct=EBI-15489960, EBI-15489950;
 CC       O15520:FGF10; NbExp=2; IntAct=EBI-1028658, EBI-1035684;
@@ -1302,7 +1305,7 @@ DR   PDBsum; 5UHN; -.
 DR   PDBsum; 5UI0; -.
 DR   ProteinModelPortal; P21802; -.
 DR   SMR; P21802; -.
-DR   BioGrid; 108554; 91.
+DR   BioGrid; 108554; 94.
 DR   CORUM; P21802; -.
 DR   DIP; DIP-3788N; -.
 DR   IntAct; P21802; 30.
@@ -1402,7 +1405,7 @@ DR   Orphanet; 794; Saethre-Chotzen syndrome.
 DR   PharmGKB; PA28128; -.
 DR   eggNOG; KOG0200; Eukaryota.
 DR   eggNOG; COG0515; LUCA.
-DR   GeneTree; ENSGT00760000118923; -.
+DR   GeneTree; ENSGT00940000155447; -.
 DR   HOGENOM; HOG000263410; -.
 DR   HOVERGEN; HBG000345; -.
 DR   InParanoid; P21802; -.
@@ -1439,33 +1442,33 @@ DR   Proteomes; UP000005640; Chromosome 10.
 DR   Bgee; ENSG00000066468; Expressed in 222 organ(s), highest expression level in C1 segment of cervical spinal cord.
 DR   ExpressionAtlas; P21802; baseline and differential.
 DR   Genevisible; P21802; HS.
-DR   GO; GO:0005938; C:cell cortex; IDA:UniProtKB. {ECO:0000269|PubMed:17471512}
-DR   GO; GO:0009986; C:cell surface; IDA:UniProtKB. {ECO:0000269|PubMed:16597614}
-DR   GO; GO:0005737; C:cytoplasm; IDA:UniProtKB. {ECO:0000269|PubMed:16597614, ECO:0000269|PubMed:17471512}
+DR   GO; GO:0005938; C:cell cortex; IDA:UniProtKB.
+DR   GO; GO:0009986; C:cell surface; IDA:UniProtKB.
+DR   GO; GO:0005737; C:cytoplasm; IDA:UniProtKB.
 DR   GO; GO:0031410; C:cytoplasmic vesicle; IEA:UniProtKB-KW.
 DR   GO; GO:0060076; C:excitatory synapse; ISS:UniProtKB.
 DR   GO; GO:0005576; C:extracellular region; IEA:UniProtKB-SubCell.
 DR   GO; GO:0005794; C:Golgi apparatus; IEA:UniProtKB-SubCell.
-DR   GO; GO:0016021; C:integral component of membrane; NAS:UniProtKB. {ECO:0000269|PubMed:1697263}
-DR   GO; GO:0005887; C:integral component of plasma membrane; IDA:UniProtKB. {ECO:0000269|PubMed:15629145, ECO:0000269|PubMed:16844695}
+DR   GO; GO:0016021; C:integral component of membrane; NAS:UniProtKB.
+DR   GO; GO:0005887; C:integral component of plasma membrane; IDA:UniProtKB.
 DR   GO; GO:0043231; C:intracellular membrane-bounded organelle; IDA:HPA.
-DR   GO; GO:0016020; C:membrane; NAS:UniProtKB. {ECO:0000269|PubMed:8676562}
+DR   GO; GO:0016020; C:membrane; NAS:UniProtKB.
 DR   GO; GO:0005654; C:nucleoplasm; IDA:HPA.
-DR   GO; GO:0005634; C:nucleus; IDA:UniProtKB. {ECO:0000269|PubMed:16597614, ECO:0000269|PubMed:17471512}
+DR   GO; GO:0005634; C:nucleus; IDA:UniProtKB.
 DR   GO; GO:0005886; C:plasma membrane; TAS:Reactome.
-DR   GO; GO:0043235; C:receptor complex; IBA:GO_Central. {ECO:0000269|PubMed:21873635}
+DR   GO; GO:0043235; C:receptor complex; IBA:GO_Central.
 DR   GO; GO:0016303; F:1-phosphatidylinositol-3-kinase activity; TAS:Reactome.
 DR   GO; GO:0005524; F:ATP binding; IEA:UniProtKB-KW.
-DR   GO; GO:0017134; F:fibroblast growth factor binding; IDA:UniProtKB. {ECO:0000269|PubMed:8663044}
-DR   GO; GO:0005007; F:fibroblast growth factor-activated receptor activity; IDA:UniProtKB. {ECO:0000269|PubMed:15629145, ECO:0000269|PubMed:8663044}
+DR   GO; GO:0017134; F:fibroblast growth factor binding; IDA:UniProtKB.
+DR   GO; GO:0005007; F:fibroblast growth factor-activated receptor activity; IDA:UniProtKB.
 DR   GO; GO:0008201; F:heparin binding; IEA:UniProtKB-KW.
 DR   GO; GO:0042802; F:identical protein binding; IPI:IntAct.
 DR   GO; GO:0046934; F:phosphatidylinositol-4,5-bisphosphate 3-kinase activity; TAS:Reactome.
-DR   GO; GO:0042803; F:protein homodimerization activity; IPI:UniProtKB. {ECO:0000269|PubMed:16844695}
+DR   GO; GO:0042803; F:protein homodimerization activity; IPI:UniProtKB.
 DR   GO; GO:0004713; F:protein tyrosine kinase activity; TAS:Reactome.
 DR   GO; GO:0005088; F:Ras guanyl-nucleotide exchange factor activity; TAS:Reactome.
-DR   GO; GO:0004714; F:transmembrane receptor protein tyrosine kinase activity; IBA:GO_Central. {ECO:0000269|PubMed:21873635}
-DR   GO; GO:0004888; F:transmembrane signaling receptor activity; IBA:GO_Central. {ECO:0000269|PubMed:21873635}
+DR   GO; GO:0004714; F:transmembrane receptor protein tyrosine kinase activity; IBA:GO_Central.
+DR   GO; GO:0004888; F:transmembrane signaling receptor activity; IBA:GO_Central.
 DR   GO; GO:0001525; P:angiogenesis; ISS:UniProtKB.
 DR   GO; GO:0009887; P:animal organ morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0006915; P:apoptotic process; IEA:UniProtKB-KW.
@@ -1479,13 +1482,13 @@ DR   GO; GO:0060442; P:branching involved in prostate gland morphogenesis; ISS:U
 DR   GO; GO:0060445; P:branching involved in salivary gland morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0048755; P:branching morphogenesis of a nerve; ISS:UniProtKB.
 DR   GO; GO:0060449; P:bud elongation involved in lung branching; ISS:UniProtKB.
-DR   GO; GO:0030154; P:cell differentiation; IBA:GO_Central. {ECO:0000269|PubMed:21873635}
+DR   GO; GO:0030154; P:cell differentiation; IBA:GO_Central.
 DR   GO; GO:0045165; P:cell fate commitment; ISS:UniProtKB.
 DR   GO; GO:0007267; P:cell-cell signaling; ISS:UniProtKB.
 DR   GO; GO:0071300; P:cellular response to retinoic acid; IEA:Ensembl.
 DR   GO; GO:0071560; P:cellular response to transforming growth factor beta stimulus; IEA:Ensembl.
 DR   GO; GO:0048565; P:digestive tract development; ISS:UniProtKB.
-DR   GO; GO:0048701; P:embryonic cranial skeleton morphogenesis; IMP:BHF-UCL. {ECO:0000269|PubMed:7874170, ECO:0000269|PubMed:7987400}
+DR   GO; GO:0048701; P:embryonic cranial skeleton morphogenesis; IMP:BHF-UCL.
 DR   GO; GO:0048557; P:embryonic digestive tract morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0048568; P:embryonic organ development; ISS:UniProtKB.
 DR   GO; GO:0048562; P:embryonic organ morphogenesis; ISS:UniProtKB.
@@ -1495,10 +1498,10 @@ DR   GO; GO:0048730; P:epidermis morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0030855; P:epithelial cell differentiation; ISS:UniProtKB.
 DR   GO; GO:0060664; P:epithelial cell proliferation involved in salivary gland morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0001837; P:epithelial to mesenchymal transition; IEA:Ensembl.
-DR   GO; GO:0008543; P:fibroblast growth factor receptor signaling pathway; IDA:UniProtKB. {ECO:0000269|PubMed:15629145, ECO:0000269|PubMed:8663044}
+DR   GO; GO:0008543; P:fibroblast growth factor receptor signaling pathway; IDA:UniProtKB.
 DR   GO; GO:0035603; P:fibroblast growth factor receptor signaling pathway involved in hemopoiesis; ISS:UniProtKB.
 DR   GO; GO:0060595; P:fibroblast growth factor receptor signaling pathway involved in mammary gland specification; ISS:UniProtKB.
-DR   GO; GO:0035602; P:fibroblast growth factor receptor signaling pathway involved in negative regulation of apoptotic process in bone marrow; ISS:UniProtKB.
+DR   GO; GO:0035602; P:fibroblast growth factor receptor signaling pathway involved in negative regulation of apoptotic process in bone marrow cell; ISS:UniProtKB.
 DR   GO; GO:0035607; P:fibroblast growth factor receptor signaling pathway involved in orbitofrontal cortex development; ISS:UniProtKB.
 DR   GO; GO:0035604; P:fibroblast growth factor receptor signaling pathway involved in positive regulation of cell proliferation in bone marrow; ISS:UniProtKB.
 DR   GO; GO:0022612; P:gland morphogenesis; ISS:UniProtKB.
@@ -1522,27 +1525,27 @@ DR   GO; GO:0048333; P:mesodermal cell differentiation; IEA:Ensembl.
 DR   GO; GO:0030901; P:midbrain development; ISS:UniProtKB.
 DR   GO; GO:0016331; P:morphogenesis of embryonic epithelium; ISS:UniProtKB.
 DR   GO; GO:0035264; P:multicellular organism growth; ISS:UniProtKB.
-DR   GO; GO:0043066; P:negative regulation of apoptotic process; IBA:GO_Central. {ECO:0000269|PubMed:21873635}
+DR   GO; GO:0043066; P:negative regulation of apoptotic process; IBA:GO_Central.
 DR   GO; GO:0050680; P:negative regulation of epithelial cell proliferation; IEA:Ensembl.
-DR   GO; GO:0009968; P:negative regulation of signal transduction; IBA:GO_Central. {ECO:0000269|PubMed:21873635}
+DR   GO; GO:0009968; P:negative regulation of signal transduction; IBA:GO_Central.
 DR   GO; GO:0000122; P:negative regulation of transcription by RNA polymerase II; ISS:UniProtKB.
 DR   GO; GO:0042476; P:odontogenesis; ISS:UniProtKB.
 DR   GO; GO:0021769; P:orbitofrontal cortex development; ISS:UniProtKB.
 DR   GO; GO:0035265; P:organ growth; ISS:UniProtKB.
 DR   GO; GO:0030916; P:otic vesicle formation; ISS:UniProtKB.
 DR   GO; GO:0003148; P:outflow tract septum morphogenesis; ISS:UniProtKB.
-DR   GO; GO:0018108; P:peptidyl-tyrosine phosphorylation; IDA:UniProtKB. {ECO:0000269|PubMed:15629145, ECO:0000269|PubMed:16844695}
+DR   GO; GO:0018108; P:peptidyl-tyrosine phosphorylation; IDA:UniProtKB.
 DR   GO; GO:0090263; P:positive regulation of canonical Wnt signaling pathway; ISS:UniProtKB.
 DR   GO; GO:0060045; P:positive regulation of cardiac muscle cell proliferation; ISS:UniProtKB.
 DR   GO; GO:0045787; P:positive regulation of cell cycle; ISS:UniProtKB.
 DR   GO; GO:0051781; P:positive regulation of cell division; ISS:UniProtKB.
-DR   GO; GO:0008284; P:positive regulation of cell proliferation; IDA:UniProtKB. {ECO:0000269|PubMed:8663044}
+DR   GO; GO:0008284; P:positive regulation of cell proliferation; IDA:UniProtKB.
 DR   GO; GO:0050679; P:positive regulation of epithelial cell proliferation; ISS:UniProtKB.
 DR   GO; GO:0060501; P:positive regulation of epithelial cell proliferation involved in lung morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0070374; P:positive regulation of ERK1 and ERK2 cascade; ISS:UniProtKB.
-DR   GO; GO:0043410; P:positive regulation of MAPK cascade; IMP:UniProtKB. {ECO:0000269|PubMed:15629145}
+DR   GO; GO:0043410; P:positive regulation of MAPK cascade; IMP:UniProtKB.
 DR   GO; GO:0002053; P:positive regulation of mesenchymal cell proliferation; ISS:UniProtKB.
-DR   GO; GO:0010518; P:positive regulation of phospholipase activity; IMP:UniProtKB. {ECO:0000269|PubMed:16844695}
+DR   GO; GO:0010518; P:positive regulation of phospholipase activity; IMP:UniProtKB.
 DR   GO; GO:0051897; P:positive regulation of protein kinase B signaling; TAS:Reactome.
 DR   GO; GO:0048661; P:positive regulation of smooth muscle cell proliferation; IEA:Ensembl.
 DR   GO; GO:0045944; P:positive regulation of transcription by RNA polymerase II; ISS:UniProtKB.
@@ -1551,7 +1554,7 @@ DR   GO; GO:0009791; P:post-embryonic development; ISS:UniProtKB.
 DR   GO; GO:0060527; P:prostate epithelial cord arborization involved in prostate glandular acinus morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0060523; P:prostate epithelial cord elongation; ISS:UniProtKB.
 DR   GO; GO:0060512; P:prostate gland morphogenesis; ISS:UniProtKB.
-DR   GO; GO:0046777; P:protein autophosphorylation; IDA:UniProtKB. {ECO:0000269|PubMed:15629145}
+DR   GO; GO:0046777; P:protein autophosphorylation; IDA:UniProtKB.
 DR   GO; GO:0021860; P:pyramidal neuron development; ISS:UniProtKB.
 DR   GO; GO:0060687; P:regulation of branching involved in prostate gland morphogenesis; ISS:UniProtKB.
 DR   GO; GO:0010453; P:regulation of cell fate commitment; ISS:UniProtKB.
@@ -1559,14 +1562,14 @@ DR   GO; GO:0070372; P:regulation of ERK1 and ERK2 cascade; ISS:UniProtKB.
 DR   GO; GO:0040036; P:regulation of fibroblast growth factor receptor signaling pathway; ISS:UniProtKB.
 DR   GO; GO:0060688; P:regulation of morphogenesis of a branching structure; ISS:UniProtKB.
 DR   GO; GO:0040014; P:regulation of multicellular organism growth; ISS:UniProtKB.
-DR   GO; GO:0045667; P:regulation of osteoblast differentiation; TAS:UniProtKB. {ECO:0000269|PubMed:15190072}
-DR   GO; GO:0033688; P:regulation of osteoblast proliferation; TAS:UniProtKB. {ECO:0000269|PubMed:15190072}
+DR   GO; GO:0045667; P:regulation of osteoblast differentiation; TAS:UniProtKB.
+DR   GO; GO:0033688; P:regulation of osteoblast proliferation; TAS:UniProtKB.
 DR   GO; GO:0051150; P:regulation of smooth muscle cell differentiation; ISS:UniProtKB.
 DR   GO; GO:0008589; P:regulation of smoothened signaling pathway; ISS:UniProtKB.
 DR   GO; GO:0048608; P:reproductive structure development; ISS:UniProtKB.
 DR   GO; GO:0045471; P:response to ethanol; IEA:Ensembl.
 DR   GO; GO:0032496; P:response to lipopolysaccharide; IEA:Ensembl.
-DR   GO; GO:0048705; P:skeletal system morphogenesis; TAS:UniProtKB. {ECO:0000269|PubMed:15190072}
+DR   GO; GO:0048705; P:skeletal system morphogenesis; TAS:UniProtKB.
 DR   GO; GO:0060529; P:squamous basal epithelial stem cell differentiation involved in prostate gland acinus development; ISS:UniProtKB.
 DR   GO; GO:0001657; P:ureteric bud development; ISS:UniProtKB.
 DR   GO; GO:0055010; P:ventricular cardiac muscle tissue morphogenesis; ISS:UniProtKB.
@@ -1605,11 +1608,11 @@ KW   Cell membrane; Complete proteome; Craniosynostosis;
 KW   Cytoplasmic vesicle; Disease mutation; Disulfide bond;
 KW   Ectodermal dysplasia; Glycoprotein; Golgi apparatus; Heparin-binding;
 KW   Immunoglobulin domain; Kinase;
-KW   Lacrimo-auriculo-dento-digital syndrome; Membrane;
-KW   Mental retardation; Nucleotide-binding; Phosphoprotein; Polymorphism;
-KW   Proto-oncogene; Receptor; Reference proteome; Repeat; Secreted;
-KW   Signal; Transferase; Transmembrane; Transmembrane helix;
-KW   Tyrosine-protein kinase; Ubl conjugation.
+KW   Lacrimo-auriculo-dento-digital syndrome; Membrane; Mental retardation;
+KW   Nucleotide-binding; Phosphoprotein; Polymorphism; Proto-oncogene;
+KW   Receptor; Reference proteome; Repeat; Secreted; Signal; Transferase;
+KW   Transmembrane; Transmembrane helix; Tyrosine-protein kinase;
+KW   Ubl conjugation.
 FT   SIGNAL        1     21       {ECO:0000255}.
 FT   CHAIN        22    821       Fibroblast growth factor receptor 2.
 FT                                /FTId=PRO_0000016783.
@@ -1621,19 +1624,23 @@ FT   DOMAIN      154    247       Ig-like C2-type 2.
 FT   DOMAIN      256    358       Ig-like C2-type 3.
 FT   DOMAIN      481    770       Protein kinase. {ECO:0000255|PROSITE-
 FT                                ProRule:PRU00159}.
-FT   NP_BIND     487    495       ATP. {ECO:0000255|PROSITE-ProRule:
-FT                                PRU00159, ECO:0000269|PubMed:19060208}.
-FT   NP_BIND     565    567       ATP. {ECO:0000255|PROSITE-ProRule:
-FT                                PRU00159, ECO:0000269|PubMed:19060208}.
+FT   NP_BIND     487    495       ATP. {ECO:0000255|PROSITE-
+FT                                ProRule:PRU00159,
+FT                                ECO:0000269|PubMed:19060208}.
+FT   NP_BIND     565    567       ATP. {ECO:0000255|PROSITE-
+FT                                ProRule:PRU00159,
+FT                                ECO:0000269|PubMed:19060208}.
 FT   REGION      161    178       Heparin-binding.
 FT   ACT_SITE    626    626       Proton acceptor. {ECO:0000255|PROSITE-
 FT                                ProRule:PRU00159, ECO:0000255|PROSITE-
-FT                                ProRule:PRU10028, ECO:0000269|PubMed:
-FT                                19060208}.
-FT   BINDING     517    517       ATP. {ECO:0000255|PROSITE-ProRule:
-FT                                PRU00159, ECO:0000269|PubMed:19060208}.
-FT   BINDING     571    571       ATP. {ECO:0000255|PROSITE-ProRule:
-FT                                PRU00159, ECO:0000269|PubMed:19060208}.
+FT                                ProRule:PRU10028,
+FT                                ECO:0000269|PubMed:19060208}.
+FT   BINDING     517    517       ATP. {ECO:0000255|PROSITE-
+FT                                ProRule:PRU00159,
+FT                                ECO:0000269|PubMed:19060208}.
+FT   BINDING     571    571       ATP. {ECO:0000255|PROSITE-
+FT                                ProRule:PRU00159,
+FT                                ECO:0000269|PubMed:19060208}.
 FT   MOD_RES     466    466       Phosphotyrosine; by autocatalysis.
 FT                                {ECO:0000269|PubMed:19060208,
 FT                                ECO:0000269|PubMed:19410646}.
@@ -1655,8 +1662,8 @@ FT                                ECO:0000269|PubMed:19410646}.
 FT   MOD_RES     769    769       Phosphotyrosine; by autocatalysis.
 FT                                {ECO:0000269|PubMed:15629145,
 FT                                ECO:0000269|PubMed:19060208}.
-FT   MOD_RES     780    780       Phosphoserine. {ECO:0000244|PubMed:
-FT                                24275569}.
+FT   MOD_RES     780    780       Phosphoserine.
+FT                                {ECO:0000244|PubMed:24275569}.
 FT   CARBOHYD     83     83       N-linked (GlcNAc...) asparagine.
 FT                                {ECO:0000255}.
 FT   CARBOHYD    123    123       N-linked (GlcNAc...) asparagine.
@@ -1681,12 +1688,13 @@ FT                                ECO:0000269|PubMed:16384934}.
 FT   VAR_SEQ      37    152       EPPTKYQISQPEVYVAAPGESLEVRCLLKDAAVISWTKDGV
 FT                                HLGPNNRTVLIGEYLQIKGATPRDSGLYACTASRTVDSETW
 FT                                YFMVNVTDAISSGDDEDDTDGAEDFVSENSNNKR -> G
-FT                                (in isoform 20). {ECO:0000303|PubMed:
-FT                                15489334}.
+FT                                (in isoform 20).
+FT                                {ECO:0000303|PubMed:15489334}.
 FT                                /FTId=VSP_019608.
 FT   VAR_SEQ      37    125       Missing (in isoform 4, isoform 21 and
-FT                                isoform 22). {ECO:0000303|PubMed:
-FT                                14702039, ECO:0000303|PubMed:2377625}.
+FT                                isoform 22).
+FT                                {ECO:0000303|PubMed:14702039,
+FT                                ECO:0000303|PubMed:2377625}.
 FT                                /FTId=VSP_002964.
 FT   VAR_SEQ     250    361       Missing (in isoform 23).
 FT                                {ECO:0000303|Ref.14}.
@@ -1778,8 +1786,8 @@ FT                                /FTId=VSP_002981.
 FT   VAR_SEQ     768    821       EYLDLSQPLEQYSPSYPDTRSSCSSGDDSVFSPDPMPYEPC
 FT                                LPQYPHINGSVKT -> GRLPAWASQEKENSQTSLFAISHV
 FT                                TLSSISKTRSSAKRDEKPGSSPHLALVRSQGLPQSVVP
-FT                                (in isoform 11). {ECO:0000303|PubMed:
-FT                                10626794}.
+FT                                (in isoform 11).
+FT                                {ECO:0000303|PubMed:10626794}.
 FT                                /FTId=VSP_002982.
 FT   VAR_SEQ     768    821       EYLDLSQPLEQYSPSYPDTRSSCSSGDDSVFSPDPMPYEPC
 FT                                LPQYPHINGSVKT -> PLS (in isoform 12).
@@ -1805,8 +1813,8 @@ FT                                9). {ECO:0000303|PubMed:10626794}.
 FT                                /FTId=VSP_002980.
 FT   VAR_SEQ     769    821       YLDLSQPLEQYSPSYPDTRSSCSSGDDSVFSPDPMPYEPCL
 FT                                PQYPHINGSVKT -> EKKVSGAVDCHKPPCNPSHLPCVLA
-FT                                VDQ (in isoform 21). {ECO:0000303|PubMed:
-FT                                14702039}.
+FT                                VDQ (in isoform 21).
+FT                                {ECO:0000303|PubMed:14702039}.
 FT                                /FTId=VSP_041915.
 FT   VAR_SEQ     778    821       QYSPSYPDTRSSCSSGDDSVFSPDPMPYEPCLPQYPHINGS
 FT                                VKT -> PYSPCYPDPR (in isoform 6).
@@ -1824,8 +1832,8 @@ FT                                {ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:8946174}.
 FT                                /FTId=VAR_004112.
 FT   VARIANT     172    172       A -> F (in PS; requires 2 nucleotide
-FT                                substitutions). {ECO:0000269|PubMed:
-FT                                11781872}.
+FT                                substitutions).
+FT                                {ECO:0000269|PubMed:11781872}.
 FT                                /FTId=VAR_017259.
 FT   VARIANT     186    186       M -> T (in dbSNP:rs755793).
 FT                                {ECO:0000269|PubMed:11781872,
@@ -1847,17 +1855,19 @@ FT   VARIANT     252    252       S -> L (in dbSNP:rs79184941).
 FT                                {ECO:0000269|PubMed:9002682}.
 FT                                /FTId=VAR_004113.
 FT   VARIANT     252    252       S -> W (in APRS and PS; common mutation;
-FT                                dbSNP:rs79184941). {ECO:0000269|PubMed:
-FT                                11781872, ECO:0000269|PubMed:15190072,
+FT                                dbSNP:rs79184941).
+FT                                {ECO:0000269|PubMed:11781872,
+FT                                ECO:0000269|PubMed:15190072,
 FT                                ECO:0000269|PubMed:7668257,
 FT                                ECO:0000269|PubMed:7719344,
 FT                                ECO:0000269|PubMed:9452027,
 FT                                ECO:0000269|PubMed:9677057,
 FT                                ECO:0000269|PubMed:9719378}.
 FT                                /FTId=VAR_004115.
-FT   VARIANT     253    253       P -> R (in APRS; common mutation; dbSNP:
-FT                                rs77543610). {ECO:0000269|PubMed:
-FT                                11781872, ECO:0000269|PubMed:7668257,
+FT   VARIANT     253    253       P -> R (in APRS; common mutation;
+FT                                dbSNP:rs77543610).
+FT                                {ECO:0000269|PubMed:11781872,
+FT                                ECO:0000269|PubMed:7668257,
 FT                                ECO:0000269|PubMed:7719344,
 FT                                ECO:0000269|PubMed:9452027,
 FT                                ECO:0000269|PubMed:9677057}.
@@ -1868,11 +1878,11 @@ FT                                /FTId=VAR_017261.
 FT   VARIANT     267    267       S -> P (in CS; dbSNP:rs121918505).
 FT                                {ECO:0000269|PubMed:11781872}.
 FT                                /FTId=VAR_004118.
-FT   VARIANT     268    268       T -> TG (in CS). {ECO:0000269|PubMed:
-FT                                8644708}.
+FT   VARIANT     268    268       T -> TG (in CS).
+FT                                {ECO:0000269|PubMed:8644708}.
 FT                                /FTId=VAR_004119.
-FT   VARIANT     269    270       Missing (in SCS). {ECO:0000269|PubMed:
-FT                                9585583}.
+FT   VARIANT     269    270       Missing (in SCS).
+FT                                {ECO:0000269|PubMed:9585583}.
 FT                                /FTId=VAR_075856.
 FT   VARIANT     272    272       G -> V (in an ovarian serous carcinoma
 FT                                sample; somatic mutation).
@@ -1890,15 +1900,16 @@ FT   VARIANT     278    278       C -> F (in CS, JWS and PS; forms
 FT                                disulfide-linked dimers with constitutive
 FT                                kinase activity, is retained in an
 FT                                intracellular compartment and not
-FT                                detected at the cell surface; dbSNP:
-FT                                rs776587763). {ECO:0000269|PubMed:
-FT                                11173845, ECO:0000269|PubMed:11781872,
+FT                                detected at the cell surface;
+FT                                dbSNP:rs776587763).
+FT                                {ECO:0000269|PubMed:11173845,
+FT                                ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:16844695,
 FT                                ECO:0000269|PubMed:8644708,
 FT                                ECO:0000269|PubMed:9677057}.
 FT                                /FTId=VAR_004121.
-FT   VARIANT     278    278       C -> Y (in CS). {ECO:0000269|PubMed:
-FT                                11173845}.
+FT   VARIANT     278    278       C -> Y (in CS).
+FT                                {ECO:0000269|PubMed:11173845}.
 FT                                /FTId=VAR_017263.
 FT   VARIANT     281    281       Y -> C (in CS; dbSNP:rs1057519038).
 FT                                {ECO:0000269|PubMed:11380921,
@@ -1910,12 +1921,13 @@ FT                                {ECO:0000269|PubMed:17344846}.
 FT                                /FTId=VAR_042206.
 FT   VARIANT     287    289       Missing (in CS).
 FT                                /FTId=VAR_004122.
-FT   VARIANT     288    288       I -> S (in CS). {ECO:0000269|PubMed:
-FT                                11173845}.
+FT   VARIANT     288    288       I -> S (in CS).
+FT                                {ECO:0000269|PubMed:11173845}.
 FT                                /FTId=VAR_017265.
-FT   VARIANT     289    289       Q -> P (in CS and JWS; dbSNP:
-FT                                rs121918497). {ECO:0000269|PubMed:
-FT                                11173845, ECO:0000269|PubMed:11380921,
+FT   VARIANT     289    289       Q -> P (in CS and JWS;
+FT                                dbSNP:rs121918497).
+FT                                {ECO:0000269|PubMed:11173845,
+FT                                ECO:0000269|PubMed:11380921,
 FT                                ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:7581378,
 FT                                ECO:0000269|PubMed:8644708}.
@@ -1935,8 +1947,8 @@ FT                                /FTId=VAR_004125.
 FT   VARIANT     292    292       K -> E (in CS; dbSNP:rs121918500).
 FT                                {ECO:0000269|PubMed:9152842}.
 FT                                /FTId=VAR_004126.
-FT   VARIANT     301    301       Y -> C (in CS). {ECO:0000269|PubMed:
-FT                                9521581}.
+FT   VARIANT     301    301       Y -> C (in CS).
+FT                                {ECO:0000269|PubMed:9521581}.
 FT                                /FTId=VAR_004127.
 FT   VARIANT     314    314       A -> S (in craniosynostosis).
 FT                                {ECO:0000269|PubMed:9521581}.
@@ -1945,8 +1957,9 @@ FT   VARIANT     315    315       A -> S (in a non-syndromic
 FT                                craniosynostosis patient with abnormal
 FT                                intrauterine history; confers
 FT                                predisposition to craniosynostosis;
-FT                                dbSNP:rs121918504). {ECO:0000269|PubMed:
-FT                                10951518, ECO:0000269|PubMed:11781872}.
+FT                                dbSNP:rs121918504).
+FT                                {ECO:0000269|PubMed:10951518,
+FT                                ECO:0000269|PubMed:11781872}.
 FT                                /FTId=VAR_017267.
 FT   VARIANT     321    321       D -> A (in PS; dbSNP:rs121918510).
 FT                                {ECO:0000269|PubMed:7719333}.
@@ -1954,8 +1967,8 @@ FT                                /FTId=VAR_004129.
 FT   VARIANT     328    328       Y -> C (in CS; dbSNP:rs121918493).
 FT                                {ECO:0000269|PubMed:7874170}.
 FT                                /FTId=VAR_004130.
-FT   VARIANT     331    331       N -> I (in CS). {ECO:0000269|PubMed:
-FT                                8956050}.
+FT   VARIANT     331    331       N -> I (in CS).
+FT                                {ECO:0000269|PubMed:8956050}.
 FT                                /FTId=VAR_004131.
 FT   VARIANT     337    337       A -> ANA (in CS).
 FT                                /FTId=VAR_004132.
@@ -1970,8 +1983,9 @@ FT                                {ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:7581378,
 FT                                ECO:0000269|PubMed:9677057}.
 FT                                /FTId=VAR_015011.
-FT   VARIANT     340    340       Y -> C (in PS). {ECO:0000269|PubMed:
-FT                                10394936, ECO:0000269|PubMed:11781872}.
+FT   VARIANT     340    340       Y -> C (in PS).
+FT                                {ECO:0000269|PubMed:10394936,
+FT                                ECO:0000269|PubMed:11781872}.
 FT                                /FTId=VAR_017269.
 FT   VARIANT     340    340       Y -> H (in CS; dbSNP:rs121918489).
 FT                                {ECO:0000269|PubMed:11781872,
@@ -1990,9 +2004,10 @@ FT                                /FTId=VAR_004136.
 FT   VARIANT     342    342       C -> G (in PS; dbSNP:rs121918488).
 FT                                {ECO:0000269|PubMed:10394936}.
 FT                                /FTId=VAR_017270.
-FT   VARIANT     342    342       C -> R (in CS, JWS, PS and ABS2; dbSNP:
-FT                                rs121918488). {ECO:0000269|PubMed:
-FT                                10633130, ECO:0000269|PubMed:11173845,
+FT   VARIANT     342    342       C -> R (in CS, JWS, PS and ABS2;
+FT                                dbSNP:rs121918488).
+FT                                {ECO:0000269|PubMed:10633130,
+FT                                ECO:0000269|PubMed:11173845,
 FT                                ECO:0000269|PubMed:11380921,
 FT                                ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:7719345,
@@ -2001,9 +2016,10 @@ FT                                ECO:0000269|PubMed:8528214,
 FT                                ECO:0000269|PubMed:8644708,
 FT                                ECO:0000269|PubMed:9677057}.
 FT                                /FTId=VAR_004137.
-FT   VARIANT     342    342       C -> S (in CS, JWS, PS and ABS2; dbSNP:
-FT                                rs121918488). {ECO:0000269|PubMed:
-FT                                10633130, ECO:0000269|PubMed:11173845,
+FT   VARIANT     342    342       C -> S (in CS, JWS, PS and ABS2;
+FT                                dbSNP:rs121918488).
+FT                                {ECO:0000269|PubMed:10633130,
+FT                                ECO:0000269|PubMed:11173845,
 FT                                ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:7581378,
 FT                                ECO:0000269|PubMed:7987400,
@@ -2026,9 +2042,10 @@ FT                                ECO:0000269|PubMed:7987400,
 FT                                ECO:0000269|PubMed:8644708,
 FT                                ECO:0000269|PubMed:9677057}.
 FT                                /FTId=VAR_004139.
-FT   VARIANT     344    344       A -> G (in CS and JWS; dbSNP:
-FT                                rs121918492). {ECO:0000269|PubMed:
-FT                                7581378, ECO:0000269|PubMed:7874170}.
+FT   VARIANT     344    344       A -> G (in CS and JWS;
+FT                                dbSNP:rs121918492).
+FT                                {ECO:0000269|PubMed:7581378,
+FT                                ECO:0000269|PubMed:7874170}.
 FT                                /FTId=VAR_004140.
 FT   VARIANT     344    344       A -> P (in CS and PS).
 FT                                {ECO:0000269|PubMed:8644708}.
@@ -2037,9 +2054,10 @@ FT   VARIANT     347    347       S -> C (in CS; dbSNP:rs121918494).
 FT                                {ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:7874170}.
 FT                                /FTId=VAR_004142.
-FT   VARIANT     351    351       S -> C (in CS, PS and ABS2; dbSNP:
-FT                                rs121918502). {ECO:0000269|PubMed:
-FT                                10633130, ECO:0000269|PubMed:8946174,
+FT   VARIANT     351    351       S -> C (in CS, PS and ABS2;
+FT                                dbSNP:rs121918502).
+FT                                {ECO:0000269|PubMed:10633130,
+FT                                ECO:0000269|PubMed:8946174,
 FT                                ECO:0000269|PubMed:9693549}.
 FT                                /FTId=VAR_004143.
 FT   VARIANT     354    354       S -> C (in CS; dbSNP:rs121918490).
@@ -2049,32 +2067,33 @@ FT                                ECO:0000269|PubMed:7581378,
 FT                                ECO:0000269|PubMed:7987400,
 FT                                ECO:0000269|PubMed:8528214}.
 FT                                /FTId=VAR_004144.
-FT   VARIANT     354    354       S -> Y (in CS). {ECO:0000269|PubMed:
-FT                                11173845}.
+FT   VARIANT     354    354       S -> Y (in CS).
+FT                                {ECO:0000269|PubMed:11173845}.
 FT                                /FTId=VAR_017272.
-FT   VARIANT     356    358       Missing (in CS). {ECO:0000269|PubMed:
-FT                                8956050}.
+FT   VARIANT     356    358       Missing (in CS).
+FT                                {ECO:0000269|PubMed:8956050}.
 FT                                /FTId=VAR_004145.
 FT   VARIANT     359    359       V -> F (in CS and PS).
 FT                                {ECO:0000269|PubMed:11173845,
 FT                                ECO:0000269|PubMed:8644708}.
 FT                                /FTId=VAR_004146.
-FT   VARIANT     362    362       A -> S (in CS). {ECO:0000269|PubMed:
-FT                                10574673}.
+FT   VARIANT     362    362       A -> S (in CS).
+FT                                {ECO:0000269|PubMed:10574673}.
 FT                                /FTId=VAR_017273.
 FT   VARIANT     372    372       S -> C (in BSTVS; dbSNP:rs121913477).
 FT                                {ECO:0000269|PubMed:8696350}.
 FT                                /FTId=VAR_017274.
-FT   VARIANT     375    375       Y -> C (in PS and BSTVS; dbSNP:
-FT                                rs121913478). {ECO:0000269|PubMed:
-FT                                11781872, ECO:0000269|PubMed:12000365,
+FT   VARIANT     375    375       Y -> C (in PS and BSTVS;
+FT                                dbSNP:rs121913478).
+FT                                {ECO:0000269|PubMed:11781872,
+FT                                ECO:0000269|PubMed:12000365,
 FT                                ECO:0000269|PubMed:8696350}.
 FT                                /FTId=VAR_017275.
 FT   VARIANT     381    381       Y -> D (in BBDS; dbSNP:rs387906678).
 FT                                {ECO:0000269|PubMed:22387015}.
 FT                                /FTId=VAR_067977.
-FT   VARIANT     384    384       G -> R (in CS). {ECO:0000269|PubMed:
-FT                                8946174}.
+FT   VARIANT     384    384       G -> R (in CS).
+FT                                {ECO:0000269|PubMed:8946174}.
 FT                                /FTId=VAR_004147.
 FT   VARIANT     391    391       M -> R (in BBDS; the mutation selectively
 FT                                reduces plasma-membrane levels of the
@@ -2099,8 +2118,8 @@ FT                                {ECO:0000269|PubMed:11781872,
 FT                                ECO:0000269|PubMed:17803937}.
 FT                                /FTId=VAR_017277.
 FT   VARIANT     612    612       R -> T (in a lung adenocarcinoma sample;
-FT                                somatic mutation). {ECO:0000269|PubMed:
-FT                                17344846}.
+FT                                somatic mutation).
+FT                                {ECO:0000269|PubMed:17344846}.
 FT                                /FTId=VAR_046071.
 FT   VARIANT     613    613       G -> R. {ECO:0000269|PubMed:10626794,
 FT                                ECO:0000269|PubMed:1309608}.
@@ -2117,18 +2136,19 @@ FT                                /FTId=VAR_017278.
 FT   VARIANT     648    648       A -> T (in LADDS; dbSNP:rs121918508).
 FT                                {ECO:0000269|PubMed:16501574}.
 FT                                /FTId=VAR_029885.
-FT   VARIANT     649    650       RD -> S (in LADDS). {ECO:0000269|PubMed:
-FT                                16501574}.
+FT   VARIANT     649    650       RD -> S (in LADDS).
+FT                                {ECO:0000269|PubMed:16501574}.
 FT                                /FTId=VAR_029886.
 FT   VARIANT     659    659       K -> N (in craniosynostosis; constitutive
-FT                                kinase activity). {ECO:0000269|PubMed:
-FT                                11781872, ECO:0000269|PubMed:17803937}.
+FT                                kinase activity).
+FT                                {ECO:0000269|PubMed:11781872,
+FT                                ECO:0000269|PubMed:17803937}.
 FT                                /FTId=VAR_017279.
-FT   VARIANT     663    663       G -> E (in PS). {ECO:0000269|PubMed:
-FT                                11781872}.
+FT   VARIANT     663    663       G -> E (in PS).
+FT                                {ECO:0000269|PubMed:11781872}.
 FT                                /FTId=VAR_017280.
-FT   VARIANT     678    678       R -> G (in CS). {ECO:0000269|PubMed:
-FT                                11781872}.
+FT   VARIANT     678    678       R -> G (in CS).
+FT                                {ECO:0000269|PubMed:11781872}.
 FT                                /FTId=VAR_017281.
 FT   MUTAGEN     265    265       N->Q: Reduced N-glycosylation. Reduced
 FT                                expression at the cell surface.

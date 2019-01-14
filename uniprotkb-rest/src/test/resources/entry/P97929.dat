@@ -2,7 +2,7 @@ ID   BRCA2_MOUSE             Reviewed;        3329 AA.
 AC   P97929; F8VPU5; O35922; P97383;
 DT   15-DEC-1998, integrated into UniProtKB/Swiss-Prot.
 DT   03-OCT-2012, sequence version 2.
-DT   12-SEP-2018, entry version 170.
+DT   05-DEC-2018, entry version 172.
 DE   RecName: Full=Breast cancer type 2 susceptibility protein homolog;
 DE   AltName: Full=Fanconi anemia group D1 protein homolog;
 GN   Name=Brca2; Synonyms=Fancd1;
@@ -129,6 +129,10 @@ CC   -!- PTM: Ubiquitinated in the absence of DNA damage; this does not
 CC       lead to proteasomal degradation. In contrast, ubiquitination in
 CC       response to DNA damage leads to proteasomal degradation (By
 CC       similarity). {ECO:0000250}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
+CC   -----------------------------------------------------------------------
 DR   EMBL; U82270; AAB48306.1; -; mRNA.
 DR   EMBL; U65594; AAC23702.1; -; mRNA.
 DR   EMBL; U89652; AAB71377.1; -; mRNA.
@@ -175,10 +179,11 @@ DR   HOGENOM; HOG000139693; -.
 DR   HOVERGEN; HBG050731; -.
 DR   InParanoid; P97929; -.
 DR   KO; K08775; -.
-DR   OMA; HRQMLND; -.
+DR   OMA; KAFMEDG; -.
 DR   OrthoDB; EOG091G0C79; -.
 DR   TreeFam; TF105041; -.
 DR   Reactome; R-MMU-5685942; HDR through Homologous Recombination (HRR).
+DR   Reactome; R-MMU-5693554; Resolution of D-loop Structures through Synthesis-Dependent Strand Annealing (SDSA).
 DR   Reactome; R-MMU-5693568; Resolution of D-loop Structures through Holliday Junction Intermediates.
 DR   Reactome; R-MMU-5693579; Homologous DNA Pairing and Strand Exchange.
 DR   Reactome; R-MMU-5693616; Presynaptic phase of homologous DNA pairing and strand exchange.
@@ -236,9 +241,7 @@ DR   GO; GO:0006289; P:nucleotide-excision repair; ISO:MGI.
 DR   GO; GO:0001556; P:oocyte maturation; IMP:MGI.
 DR   GO; GO:0045931; P:positive regulation of mitotic cell cycle; IMP:MGI.
 DR   GO; GO:0045893; P:positive regulation of transcription, DNA-templated; ISO:MGI.
-DR   GO; GO:0042127; P:regulation of cell proliferation; IBA:GO_Central.
 DR   GO; GO:0032465; P:regulation of cytokinesis; IMP:MGI.
-DR   GO; GO:0006355; P:regulation of transcription, DNA-templated; IBA:GO_Central.
 DR   GO; GO:0048478; P:replication fork protection; IMP:MGI.
 DR   GO; GO:0010332; P:response to gamma radiation; IMP:MGI.
 DR   GO; GO:0010225; P:response to UV-C; IMP:MGI.
@@ -263,7 +266,7 @@ DR   Pfam; PF00634; BRCA2; 7.
 DR   Pfam; PF09121; Tower; 1.
 DR   PIRSF; PIRSF002397; BRCA2; 1.
 DR   SMART; SM01341; Tower; 1.
-DR   SUPFAM; SSF50249; SSF50249; 4.
+DR   SUPFAM; SSF50249; SSF50249; 3.
 DR   SUPFAM; SSF81872; SSF81872; 1.
 DR   PROSITE; PS50138; BRCA2_REPEAT; 6.
 PE   1: Evidence at protein level;

@@ -21,9 +21,10 @@
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons-codec.version>1.11</commons-codec.version>
-        <data-service.version>web-2018.10-SNAPSHOT</data-service.version>
-        <ujdk.version>2018.10-SNAPSHOT</ujdk.version>
+        <data-service.version>web-2019.2-SNAPSHOT</data-service.version>
+        <ujdk.version>2019.2-SNAPSHOT</ujdk.version>
         <poi.version>4.0.0</poi.version>
+        <core-model.version>0.1-SNAPSHOT</core-model.version>
     </properties>
 
     <dependencies>
@@ -72,14 +73,29 @@
             </exclusions>
         </dependency>
 
+<!--        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core-domain</artifactId>
+            <version>${core-model.version}</version>
+        </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ff-parser</artifactId>
+            <version>${core-model.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>json-parser</artifactId>
+            <version>${core-model.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>data-service-voldemort</artifactId>
             <version>${data-service.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>data-service-restful</artifactId>
             <version>${data-service.version}</version>
         </dependency>

@@ -13,7 +13,7 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
-        <data-service.version>web-2018.10-SNAPSHOT</data-service.version>
+        <data-service.version>web-2019.2-SNAPSHOT</data-service.version>
     </properties>
 
     <dependencies>

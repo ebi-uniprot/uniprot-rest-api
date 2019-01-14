@@ -59,7 +59,7 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("reviewed", 0, result);
-		verify("142", 1, result);
+		verify("185", 1, result);
 		verify("Evidence at protein level", 2, result);
 	}
 	@Test
@@ -168,57 +168,61 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
-		String altProd ="ALTERNATIVE PRODUCTS:  Event=Alternative splicing, Alternative initiation;"
-				+ " Named isoforms=3;Comment=TEST-altprod-comment-1: A number of isoforms are produced by"
-				+ " alternative initiation. {ECO:0000269|PubMed:11350958}. TEST-altprod-comment-2:"
-				+ " Isoforms start at multiple alternative CUG and GUG codons. {ECO:0000269|PubMed:14702039};"
-				+ "  Name=1; IsoId=Q15758-1; Sequence=displayed; Name=2; IsoId=Q15758-2; Sequence=VSP_046354;"
-				+ " Note=TEST-altprod-note-1: Derived from EST data. {ECO:0000269|PubMed:11350958}."
-				+ " TEST-altprod-note-2: No experimental confirmation available. {ECO:0000269|PubMed:14702039};"
-				+ " Name=3; IsoId=Q15758-3; Sequence=VSP_046851; Note=No experimental confirmation available.;" ;
 
+		String altProd = "ALTERNATIVE PRODUCTS: " +
+				" Event=Alternative splicing, Alternative initiation; Named isoforms=3;" +
+				"Comment=A number of isoforms are produced by alternative" +
+				" initiation. Isoforms start at multiple alternative CUG and GUG" +
+				" codons. {ECO:0000269|PubMed:11350958}; " +
+				" Name=1;" +
+				" IsoId=Q15758-1; Sequence=displayed;" +
+				" Name=2;" +
+				" IsoId=Q15758-2; Sequence=VSP_046354;" +
+				" Note=No experimental confirmation available.;" +
+				" Name=3;" +
+				" IsoId=Q15758-3; Sequence=VSP_046851;" +
+				" Note=No experimental confirmation available.;" ;
 		verify(altProd, 1, result);
 	}
 	
 	@Test
 	void testComments() {
-		List<String> fields= Arrays.asList("accession", "cc:function", "cc:domain", "cc:disease", "cc:rna_editing");
+		List<String> fields= Arrays.asList("accession", "cc:function", "cc:domain", "cc:subunit", "cc:interaction");
 		EntryMap dl =new EntryMap(entryQ15758, fields);
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
-		String cfunction ="FUNCTION: TEST-function-1: Sodium-dependent amino acids transporter"
-				+ " that has a broad substrate specificity, with a preference for zwitterionic amino acids."
-				+ " It accepts as substrates all neutral amino acids, including glutamine, asparagine, and"
-				+ " branched-chain and aromatic amino acids, and excludes methylated, anionic, and"
-				+ " cationic amino acids. May also be activated by insulin. Through binding of the"
-				+ " fusogenic protein syncytin-1/ERVW-1 may mediate trophoblasts syncytialization,"
-				+ " the spontaneous fusion of their plasma membranes, an essential process in placental"
-				+ " development (PubMed:10708449, PubMed:23492904) {ECO:0000269|PubMed:10051606,"
-				+ " ECO:0000269|PubMed:10196349}.; TEST-function-2: Acts as a cell surface receptor for"
-				+ " feline endogenous virus RD114, baboon M7 endogenous virus and type D simian retroviruses"
-				+ " (PubMed:10051606, PubMed:10196349) {ECO:0000269|PubMed:10708449, ECO:0000269|PubMed:23492904}.";
+		String cfunction ="FUNCTION: Sodium-dependent amino acids transporter that has a" +
+				" broad substrate specificity, with a preference for zwitterionic" +
+				" amino acids. It accepts as substrates all neutral amino acids," +
+				" including glutamine, asparagine, and branched-chain and aromatic" +
+				" amino acids, and excludes methylated, anionic, and cationic amino" +
+				" acids (PubMed:8702519, PubMed:29872227). Through binding of the" +
+				" fusogenic protein syncytin-1/ERVW-1 may mediate trophoblasts" +
+				" syncytialization, the spontaneous fusion of their plasma" +
+				" membranes, an essential process in placental development" +
+				" (PubMed:10708449, PubMed:23492904) {ECO:0000269|PubMed:10708449," +
+				" ECO:0000269|PubMed:23492904, ECO:0000269|PubMed:29872227," +
+				" ECO:0000269|PubMed:8702519}.;" +
+				" FUNCTION: (Microbial infection) Acts as a cell surface receptor" +
+				" for Feline endogenous virus RD114 {ECO:0000269|PubMed:10051606," +
+				" ECO:0000269|PubMed:10196349}.;" +
+				" FUNCTION: (Microbial infection) Acts as a cell surface receptor" +
+				" for Baboon M7 endogenous virus {ECO:0000269|PubMed:10196349}.;" +
+				" FUNCTION: (Microbial infection) Acts as a cell surface receptor" +
+				" for type D simian retroviruses {ECO:0000269|PubMed:10196349}.";
 
 		String cfomain ="";
-		String cdisease="DISEASE: Mental retardation, X-linked, associated with fragile site FRAXE (MRFRAXE) [MIM:309548]:"
-				+ " A form of mild to moderate mental retardation associated with learning difficulties, communication deficits,"
-				+ " attention problems, hyperactivity, and autistic behavior. It is associated with a fragile site on chromosome"
-				+ " Xq28. Mental retardation is characterized by significantly below average general intellectual functioning"
-				+ " associated with impairments in adaptive behavior and manifested during the developmental period."
-				+ " {ECO:0000255}. Note=TEST-disease-note-1: The disease is caused by mutations affecting"
-				+ " the gene represented in this entry. It is caused either by silencing of the AFF2 gene as"
-				+ " a consequence of a CCG expansion located upstream of this gene or by deletion within the gene"
-				+ " {ECO:0000255}.; TEST-disease-note-2: Loss of AFF2 expression is correlated with FRAXE CCG(N) expansion."
-				+ " Normal individuals have 6-35 copies of the repeat, whereas cytogenetically positive, developmentally delayed"
-				+ " males have more than 200 copies and show methylation of the associated CPG island {ECO:0000269|PubMed:10051606}.";
+		String csubunit="SUBUNIT: Homotrimer (Probable) (PubMed:29872227). Interacts with" +
+				" ERVH48-1/suppressyn; may negatively regulate syncytialization" +
+				" (PubMed:23492904) {ECO:0000269|PubMed:23492904," +
+				" ECO:0000269|PubMed:29872227, ECO:0000305|PubMed:28424515}.";
 	
-		String crnaediting ="RNA EDITING: Modified_positions=381 {ECO:0000269|PubMed:10708449, ECO:0000269|PubMed:11350958},"
-				+ " 398 {ECO:0000269|PubMed:10708449, ECO:0000269|PubMed:11350958}; Note=TEST-rna-editing-note-1: "
-				+ "Partially edited {ECO:0000255}. TEST-rna-editing-note-2: Target of Adar {ECO:0000269|PubMed:10051606};" ;
+		String cinteraction ="Q99942" ;
 		verify(cfunction, 1, result);
 		verify(cfomain, 2, result);
-		verify(cdisease, 3, result);
-		verify(crnaediting, 4, result);	
+		verify(csubunit, 3, result);
+		verify(cinteraction, 4, result);
 	}
 	
 	@Test
@@ -258,9 +262,8 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q84MC7", 0, result);
-		String seqCaution ="SEQUENCE CAUTION:  Sequence=AAF97339.1; Type=Erroneous initiation; Note=Translation N-terminally extended.;"
-				+ " Evidence={ECO:0000305};" ; 
-		String seqCaution2="SEQUENCE CAUTION:  Sequence=AAG51053.1; Type=Erroneous gene model prediction; Evidence={ECO:0000305};";
+		String seqCaution ="SEQUENCE CAUTION:  Sequence=AAF97339.1; Type=ERRONEOUS_INITIATION; Note=Translation N-terminally extended.; Evidence={ECO:0000305};" ;
+		String seqCaution2="SEQUENCE CAUTION:  Sequence=AAM65514.1; Type=ERRONEOUS_PREDICTION; Evidence={ECO:0000305};";
 		
 		
 		verify(seqCaution, 1, result);
@@ -309,37 +312,49 @@ class EntryMapTest {
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
 		String chain ="CHAIN 1 541 Neutral amino acid transporter B(0). /FTId=PRO_0000202082.";
-		String topo_dom ="TOPO_DOM 1 52 Cytoplasmic. {ECO:0000255}.; TOPO_DOM 154 224 Extracellular. {ECO:0000255}.";
-		String transmem ="TRANSMEM 53 73 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 99 119 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 133 153 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 225 245 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 266 286 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 306 326 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 336 356 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 377 397 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 399 419 Helical. {ECO:0000255}.;"
-				+ " TRANSMEM 426 446 Helical. {ECO:0000255}." ;
-		String modRes="MOD_RES 1 1 N-acetylmethionine. {ECO:0000269|PubMed:19413330, ECO:0000269|PubMed:22814378}.;"
-				+ " MOD_RES 493 493 Phosphoserine. {ECO:0000269|PubMed:21406692}.;"
-				+ " MOD_RES 503 503 Phosphoserine. {ECO:0000269|PubMed:19690332}.;"
-				+ " MOD_RES 535 535 Phosphoserine. {ECO:0000269|PubMed:17081983,"
-				+ " ECO:0000269|PubMed:18669648, ECO:0000269|PubMed:19690332,"
-				+ " ECO:0000269|PubMed:20068231}." ; 
-		String carbohyd ="CARBOHYD 163 163 N-linked (GlcNAc...). {ECO:0000255}.;"
-				+ " CARBOHYD 212 212 N-linked (GlcNAc...). {ECO:0000269|PubMed:19349973}." ;
+		String topo_dom ="TOPO_DOM 1 51 Cytoplasmic. {ECO:0000305}.;" +
+				" TOPO_DOM 82 94 Extracellular. {ECO:0000305}.;" +
+				" TOPO_DOM 117 130 Cytoplasmic. {ECO:0000305}.;" +
+				" TOPO_DOM 154 224 Extracellular. {ECO:0000305}.;" +
+				" TOPO_DOM 249 257 Cytoplasmic. {ECO:0000305}.;" +
+				" TOPO_DOM 286 306 Extracellular. {ECO:0000305}.;" +
+				" TOPO_DOM 329 333 Cytoplasmic. {ECO:0000305}.;" +
+				" TOPO_DOM 365 373 Cytoplasmic. {ECO:0000305}.;" +
+				" TOPO_DOM 401 413 Extracellular. {ECO:0000305}.;" +
+				" TOPO_DOM 448 460 Extracellular. {ECO:0000305}.;" +
+				" TOPO_DOM 483 541 Cytoplasmic. {ECO:0000305}.";
+		String transmem ="TRANSMEM 52 81 Helical; Name=1. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 95 116 Helical; Name=2. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 131 153 Helical; Name=3. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 225 248 Helical; Name=4. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 258 285 Helical; Name=5. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 307 328 Helical; Name=6. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 374 400 Helical; Name=7. {ECO:0000305|PubMed:29872227}.;" +
+				" TRANSMEM 461 482 Helical; Name=8. {ECO:0000305|PubMed:29872227}." ;
+		String modRes="MOD_RES 1 1 N-acetylmethionine. {ECO:0000244|PubMed:19413330, ECO:0000244|PubMed:22814378}.;" +
+				" MOD_RES 493 493 Phosphoserine. {ECO:0000244|PubMed:21406692, ECO:0000244|PubMed:23186163}.;" +
+				" MOD_RES 494 494 Phosphothreonine. {ECO:0000244|PubMed:23186163}.;" +
+				" MOD_RES 503 503 Phosphoserine. {ECO:0000244|PubMed:19690332}.;" +
+				" MOD_RES 535 535 Phosphoserine. {ECO:0000244|PubMed:17081983, ECO:0000244|PubMed:18669648," +
+					" ECO:0000244|PubMed:19690332, ECO:0000244|PubMed:20068231, ECO:0000244|PubMed:23186163}.;" +
+				" MOD_RES 539 539 Phosphoserine. {ECO:0000244|PubMed:23186163}." ;
+		String carbohyd ="CARBOHYD 163 163 N-linked (GlcNAc...) asparagine. {ECO:0000255}.; " +
+				"CARBOHYD 212 212 N-linked (GlcNAc...) asparagine. {ECO:0000269|PubMed:19349973}." ;
 		String varSeq="VAR_SEQ 1 228 Missing (in isoform 3). {ECO:0000303|PubMed:14702039}. /FTId=VSP_046851.;"
 				+ " VAR_SEQ 1 203 MVADPPRDSKGLAAAEPTANGGLALASIEDQGAAAGGYCGSRDQVRRCLRANLLVLLTVVAVVAGVALGLGVSGAGGALA"
 				+ "LGPERLSAFVFPGELLLRLLRMIILPLVVCSLIGGAASLDPGALGRLGAWALLFFLVTTLLASALGVGLALALQPGAASAAINASVGAAGSAENAP"
 				+ "SKEVLDSFLDLARNIFPSNLVSAAFRS -> M (in isoform 2). {ECO:0000303|PubMed:14702039}. /FTId=VSP_046354." 
 				;
-		String variant ="VARIANT 17 17 P -> A (in dbSNP:rs3027956). /FTId=VAR_020439.;"
-				+ " VARIANT 512 512 V -> L (in dbSNP:rs3027961)."
-				+ " {ECO:0000269|PubMed:14702039, ECO:0000269|PubMed:19690332}. /FTId=VAR_013517." ;
-		String conflict ="CONFLICT 18 24 TANGGLA -> PPTGAWQ (in Ref. 1; AAC50629). {ECO:0000305}.;"
-				+ " CONFLICT 44 44 Q -> L (in Ref. 1; AAC50629). {ECO:0000305}.;"
-				+ " CONFLICT 84 87 ERLS -> GALE (in Ref. 1; AAC50629). {ECO:0000305}.;"
-				+ " CONFLICT 341 341 V -> A (in Ref. 5; BAH14917). {ECO:0000305}." ;
+		String variant ="VARIANT 17 17 P -> A (in dbSNP:rs3027956). /FTId=VAR_020439.;" +
+				" VARIANT 512 512 V -> L (in dbSNP:rs3027961). {ECO:0000244|PubMed:19690332, ECO:0000269|PubMed:14702039}. /FTId=VAR_013517." ;
+		String conflict ="CONFLICT 18 24 TANGGLA -> PPTGAWQ (in Ref. 1; AAC50629). {ECO:0000305}.;" +
+				" CONFLICT 44 44 Q -> L (in Ref. 1; AAC50629). {ECO:0000305}.;" +
+				" CONFLICT 84 87 ERLS -> GALE (in Ref. 1; AAC50629). {ECO:0000305}.;" +
+				" CONFLICT 341 341 V -> A (in Ref. 5; BAH14917). {ECO:0000305}.;" +
+				" CONFLICT 453 453 I -> V (in Ref. 2; AAD09812). {ECO:0000305}.;" +
+				" CONFLICT 460 460 D -> G (in Ref. 2; AAD09812). {ECO:0000305}.;" +
+				" CONFLICT 463 463 V -> A (in Ref. 2; AAD09812). {ECO:0000305}.;" +
+				" CONFLICT 508 508 D -> G (in Ref. 2; AAD09812). {ECO:0000305}." ;
 		String domain ="";
 		verify(chain, 1, result);
 		verify(topo_dom, 2, result);
@@ -360,9 +375,10 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
-		String numOfFeature ="Alternative sequence (2); Chain (1); Glycosylation (2);"
-				+ " Modified residue (4); Natural variant (2); Sequence conflict (4);"
-				+ " Topological domain (2); Transmembrane (10)";
+		String numOfFeature ="Alternative sequence (2); Beta strand (2); Chain (1); Glycosylation (2);"
+				+ " Helix (11); Intramembrane (2); Metal binding (5);"
+				+ " Modified residue (6); Natural variant (2); Sequence conflict (8);"
+				+ " Topological domain (11); Transmembrane (8)";
 		verify(numOfFeature, 1, result);
 	}
 	@Test
@@ -372,9 +388,9 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
-		String pmids ="8702519; 10051606; 10196349; 14702039; 15057824; 15489334;"
-				+ " 11350958; 10708449; 17081983; 17081065; 18669648; 19413330; 19349973;"
-				+ " 19690332; 20068231; 21269460; 21406692; 22814378; 23492904";
+		String pmids ="8702519; 10051606; 10196349; 14702039; 15057824; 15489334; 11350958; 10708449;" +
+				" 17081983; 17081065; 18669648; 19413330; 19349973; 19690332; 20068231; 21269460;" +
+				" 21406692; 22814378; 23186163; 23492904; 25944712; 28424515; 29872227";
 		verify(pmids, 1, result);
 	}
 	
@@ -385,48 +401,53 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
-		String go="extracellular vesicular exosome [GO:0070062];"
-				+ " Golgi apparatus [GO:0005794];"
-				+ " integral component of plasma membrane [GO:0005887];"
-				+ " melanosome [GO:0042470]; membrane [GO:0016020];"
-				+ " plasma membrane [GO:0005886];"
-				+ " L-glutamine transmembrane transporter activity [GO:0015186];"
-				+ " L-serine transmembrane transporter activity [GO:0015194];"
-				+ " neutral amino acid transmembrane transporter activity [GO:0015175];"
-				+ " protein binding [GO:0005515];"
-				+ " receptor activity [GO:0004872];"
-				+ " sodium:dicarboxylate symporter activity [GO:0017153];"
-				+ " virus receptor activity [GO:0001618];"
-				+ " amino acid transport [GO:0006865];"
-				+ " extracellular amino acid transport [GO:0006860];"
-				+ " glutamine transport [GO:0006868];"
-				+ " ion transport [GO:0006811];"
-				+ " neutral amino acid transport [GO:0015804];"
-				+ " transmembrane transport [GO:0055085]";
+		String go="extracellular exosome [GO:0070062];" +
+				" integral component of membrane [GO:0016021];" +
+				" integral component of plasma membrane [GO:0005887];" +
+				" melanosome [GO:0042470];" +
+				" membrane [GO:0016020];" +
+				" plasma membrane [GO:0005886];" +
+				" amino acid transmembrane transporter activity [GO:0015171];" +
+				" L-glutamine transmembrane transporter activity [GO:0015186];" +
+				" L-serine transmembrane transporter activity [GO:0015194];" +
+				" metal ion binding [GO:0046872];" +
+				" neutral amino acid transmembrane transporter activity [GO:0015175];" +
+				" signaling receptor activity [GO:0038023];" +
+				" symporter activity [GO:0015293];" +
+				" virus receptor activity [GO:0001618];" +
+				" amino acid transport [GO:0006865];" +
+				" glutamine secretion [GO:0010585];" +
+				" glutamine transport [GO:0006868];" +
+				" L-glutamine import across plasma membrane [GO:1903803];" +
+				" neutral amino acid transport [GO:0015804];" +
+				" protein homotrimerization [GO:0070207]";
 			
-		String go_c="extracellular vesicular exosome [GO:0070062];"
-				+ " Golgi apparatus [GO:0005794];"
-				+ " integral component of plasma membrane [GO:0005887];"
-				+ " melanosome [GO:0042470];"
-				+ " membrane [GO:0016020];"
-				+ " plasma membrane [GO:0005886]" ;
-		String go_f ="L-glutamine transmembrane transporter activity [GO:0015186];"
-				+ " L-serine transmembrane transporter activity [GO:0015194];"
-				+ " neutral amino acid transmembrane transporter activity [GO:0015175];"
-				+ " protein binding [GO:0005515]; receptor activity [GO:0004872];"
-				+ " sodium:dicarboxylate symporter activity [GO:0017153];"
-				+ " virus receptor activity [GO:0001618]" ;
-		String go_p ="amino acid transport [GO:0006865];"
-				+ " extracellular amino acid transport [GO:0006860];"
-				+ " glutamine transport [GO:0006868];"
-				+ " ion transport [GO:0006811];"
-				+ " neutral amino acid transport [GO:0015804];"
-				+ " transmembrane transport [GO:0055085]" ;
+		String go_c= "extracellular exosome [GO:0070062];" +
+				" integral component of membrane [GO:0016021];" +
+				" integral component of plasma membrane [GO:0005887];" +
+				" melanosome [GO:0042470];" +
+				" membrane [GO:0016020];" +
+				" plasma membrane [GO:0005886]" ;
 
-		String go_id ="GO:0001618; GO:0004872; GO:0005515; GO:0005794; GO:0005886;"
-				+ " GO:0005887; GO:0006811; GO:0006860; GO:0006865; GO:0006868;"
-				+ " GO:0015175; GO:0015186; GO:0015194; GO:0015804; GO:0016020;"
-				+ " GO:0017153; GO:0042470; GO:0055085; GO:0070062" ;
+		String go_f ="amino acid transmembrane transporter activity [GO:0015171];" +
+				" L-glutamine transmembrane transporter activity [GO:0015186];" +
+				" L-serine transmembrane transporter activity [GO:0015194];" +
+				" metal ion binding [GO:0046872];" +
+				" neutral amino acid transmembrane transporter activity [GO:0015175];" +
+				" signaling receptor activity [GO:0038023];" +
+				" symporter activity [GO:0015293];" +
+				" virus receptor activity [GO:0001618]" ;
+
+		String go_p = "amino acid transport [GO:0006865];" +
+				" glutamine secretion [GO:0010585];" +
+				" glutamine transport [GO:0006868];" +
+				" L-glutamine import across plasma membrane [GO:1903803];" +
+				" neutral amino acid transport [GO:0015804];" +
+				" protein homotrimerization [GO:0070207]";
+
+		String go_id ="GO:0001618; GO:0005886; GO:0005887; GO:0006865; GO:0006868; GO:0010585; " +
+				"GO:0015171; GO:0015175; GO:0015186; GO:0015194; GO:0015293; GO:0015804; GO:0016020; " +
+				"GO:0016021; GO:0038023; GO:0042470; GO:0046872; GO:0070062; GO:0070207; GO:1903803" ;
 		verify(go, 1, result);
 		verify(go_c, 2, result);
 		verify(go_f, 3, result);
@@ -442,8 +463,8 @@ class EntryMapTest {
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
 		String embl ="U53347;AF102826;AF105423;GQ919058;AK292690;AK299137;AK301661;AK316546;AC008622;CH471126;BC000062;AF334818;";
-		String ccds="CCDS12692.1;CCDS46125.1;CCDS46126.1;";
-		String refseq="NP_001138616.1;NP_001138617.1;NP_005619.1;";
+		String ccds="CCDS12692.1 [Q15758-1];CCDS46125.1 [Q15758-2];CCDS46126.1 [Q15758-3];";
+		String refseq="NP_001138616.1 [Q15758-3];NP_001138617.1 [Q15758-2];NP_005619.1 [Q15758-1];";
 		String unigen="Hs.631582;";
 		String proteinmodelportal ="Q15758;";
 		verify(embl, 1, result);
@@ -463,8 +484,8 @@ class EntryMapTest {
 		String smr ="Q15758;";
 		String biogrid="112401;";
 		String intact="Q15758;";
-		String mint="MINT-5001314;";
-		String string ="9606.ENSP00000303623;";
+		String mint="Q15758;";
+		String string ="9606.ENSP00000444408;";
 		verify(smr, 1, result);
 		verify(biogrid, 2, result);
 		verify(intact, 3, result);
@@ -517,9 +538,9 @@ class EntryMapTest {
 		List<String> result= dl.getData();
 		assertEquals(fields.size(), result.size());
 		verify("Q15758", 0, result);
-		String ensembl ="ENST00000412532;ENST00000434726;ENST00000542575;" ;
-		String reactome="REACT_13796;";
-		String interpro="IPR001991;IPR018107;";
+		String ensembl ="ENST00000412532 [Q15758-3];ENST00000434726 [Q15758-2];ENST00000542575 [Q15758-1];" ;
+		String reactome="R-HSA-352230;";
+		String interpro="IPR001991;IPR018107;IPR036458;";
 		String prosite="PS00713;PS00714;";
 		String pfam ="PF00375;";
 		verify(ensembl, 1, result);

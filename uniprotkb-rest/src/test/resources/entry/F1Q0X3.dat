@@ -2,7 +2,7 @@ ID   F1Q0X3_CANLF            Unreviewed;      3446 AA.
 AC   F1Q0X3;
 DT   03-MAY-2011, integrated into UniProtKB/TrEMBL.
 DT   03-MAY-2011, sequence version 1.
-DT   12-SEP-2018, entry version 59.
+DT   05-DEC-2018, entry version 61.
 DE   SubName: Full=BRCA2, DNA repair associated {ECO:0000313|Ensembl:ENSCAFP00000009557};
 GN   Name=BRCA2 {ECO:0000313|Ensembl:ENSCAFP00000009557,
 GN   ECO:0000313|VGNC:VGNC:38517};
@@ -67,6 +67,10 @@ RP   IDENTIFICATION.
 RC   STRAIN=Boxer {ECO:0000313|Ensembl:ENSCAFP00000009557};
 RG   Ensembl;
 RL   Submitted (JUL-2011) to UniProtKB.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
+CC   -----------------------------------------------------------------------
 DR   EMBL; AAEX03014218; -; NOT_ANNOTATED_CDS; Genomic_DNA.
 DR   SMR; F1Q0X3; -.
 DR   STRING; 9615.ENSCAFP00000009557; -.
@@ -77,7 +81,7 @@ DR   eggNOG; KOG4751; Eukaryota.
 DR   eggNOG; ENOG410Y06W; LUCA.
 DR   GeneTree; ENSGT00390000003602; -.
 DR   InParanoid; F1Q0X3; -.
-DR   OMA; HRQMLND; -.
+DR   OMA; KAFMEDG; -.
 DR   OrthoDB; EOG091G0C79; -.
 DR   TreeFam; TF105041; -.
 DR   Reactome; R-CFA-5685942; HDR through Homologous Recombination (HRR).
@@ -88,14 +92,14 @@ DR   Reactome; R-CFA-5693616; Presynaptic phase of homologous DNA pairing and st
 DR   Proteomes; UP000002254; Chromosome 25.
 DR   Bgee; ENSCAFG00000006383; Expressed in 3 organ(s), highest expression level in liver.
 DR   GO; GO:0033593; C:BRCA2-MAGE-D1 complex; IEA:Ensembl.
-DR   GO; GO:0005813; C:centrosome; IBA:GO_Central.
+DR   GO; GO:0005813; C:centrosome; IEA:Ensembl.
 DR   GO; GO:0005829; C:cytosol; IEA:Ensembl.
 DR   GO; GO:0000800; C:lateral element; IEA:Ensembl.
 DR   GO; GO:0000784; C:nuclear chromosome, telomeric region; IEA:Ensembl.
 DR   GO; GO:0005654; C:nucleoplasm; IEA:Ensembl.
 DR   GO; GO:0005634; C:nucleus; IBA:GO_Central.
 DR   GO; GO:0030141; C:secretory granule; IEA:Ensembl.
-DR   GO; GO:0043015; F:gamma-tubulin binding; IBA:GO_Central.
+DR   GO; GO:0043015; F:gamma-tubulin binding; IEA:Ensembl.
 DR   GO; GO:0010484; F:H3 histone acetyltransferase activity; IEA:Ensembl.
 DR   GO; GO:0010485; F:H4 histone acetyltransferase activity; IEA:Ensembl.
 DR   GO; GO:0042802; F:identical protein binding; IEA:Ensembl.
@@ -104,11 +108,11 @@ DR   GO; GO:0008022; F:protein C-terminus binding; IEA:Ensembl.
 DR   GO; GO:0003697; F:single-stranded DNA binding; IBA:GO_Central.
 DR   GO; GO:0007420; P:brain development; IEA:Ensembl.
 DR   GO; GO:0007569; P:cell aging; IEA:Ensembl.
-DR   GO; GO:0051298; P:centrosome duplication; IBA:GO_Central.
+DR   GO; GO:0051298; P:centrosome duplication; IEA:Ensembl.
 DR   GO; GO:0006978; P:DNA damage response, signal transduction by p53 class mediator resulting in transcription of p21 class mediator; IEA:Ensembl.
 DR   GO; GO:0000724; P:double-strand break repair via homologous recombination; IBA:GO_Central.
-DR   GO; GO:0070200; P:establishment of protein localization to telomere; IEA:Ensembl.
-DR   GO; GO:0008585; P:female gonad development; IEA:Ensembl.
+DR   GO; GO:0070200; P:establishment of protein localization to telomere; IBA:GO_Central.
+DR   GO; GO:0008585; P:female gonad development; IBA:GO_Central.
 DR   GO; GO:0030097; P:hemopoiesis; IEA:Ensembl.
 DR   GO; GO:0001833; P:inner cell mass cell proliferation; IEA:Ensembl.
 DR   GO; GO:0042771; P:intrinsic apoptotic signaling pathway in response to DNA damage by p53 class mediator; IEA:Ensembl.
@@ -120,14 +124,12 @@ DR   GO; GO:0006289; P:nucleotide-excision repair; IEA:Ensembl.
 DR   GO; GO:0001556; P:oocyte maturation; IEA:Ensembl.
 DR   GO; GO:0045931; P:positive regulation of mitotic cell cycle; IEA:Ensembl.
 DR   GO; GO:0045893; P:positive regulation of transcription, DNA-templated; IEA:Ensembl.
-DR   GO; GO:0042127; P:regulation of cell proliferation; IBA:GO_Central.
 DR   GO; GO:0032465; P:regulation of cytokinesis; IEA:Ensembl.
-DR   GO; GO:0006355; P:regulation of transcription, DNA-templated; IBA:GO_Central.
 DR   GO; GO:0048478; P:replication fork protection; IEA:Ensembl.
 DR   GO; GO:0010332; P:response to gamma radiation; IEA:Ensembl.
 DR   GO; GO:0010225; P:response to UV-C; IEA:Ensembl.
 DR   GO; GO:0010165; P:response to X-ray; IEA:Ensembl.
-DR   GO; GO:0007283; P:spermatogenesis; IEA:Ensembl.
+DR   GO; GO:0007283; P:spermatogenesis; IBA:GO_Central.
 DR   GO; GO:0000722; P:telomere maintenance via recombination; IEA:Ensembl.
 DR   CDD; cd04493; BRCA2DBD_OB1; 1.
 DR   CDD; cd04495; BRCA2DBD_OB3; 1.
@@ -147,7 +149,7 @@ DR   Pfam; PF00634; BRCA2; 7.
 DR   Pfam; PF09121; Tower; 1.
 DR   PIRSF; PIRSF002397; BRCA2; 1.
 DR   SMART; SM01341; Tower; 1.
-DR   SUPFAM; SSF50249; SSF50249; 4.
+DR   SUPFAM; SSF50249; SSF50249; 3.
 DR   SUPFAM; SSF81872; SSF81872; 1.
 DR   PROSITE; PS50138; BRCA2_REPEAT; 7.
 PE   4: Predicted;

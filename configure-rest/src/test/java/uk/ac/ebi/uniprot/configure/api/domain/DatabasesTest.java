@@ -1,21 +1,18 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.Databases;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.Databases;
+import static org.junit.Assert.*;
 
 class DatabasesTest {
 	private static Databases instance;
@@ -49,7 +46,7 @@ class DatabasesTest {
 		List<DatabaseGroup> groups = instance.getDatabases();
 		assertEquals(18, groups.size());
 		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
-		assertEquals(155, nDb);
+		assertEquals(156, nDb);
 		instance.getDatabases().forEach(System.out::println);
 	}
 	@Test

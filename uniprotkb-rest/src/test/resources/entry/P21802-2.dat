@@ -2,7 +2,7 @@ ID   FGFR2-2_HUMAN           Reviewed;         768 AA.
 AC   P21802-2;
 DT   01-MAY-1991, integrated into UniProtKB/Swiss-Prot.
 DT   01-MAY-1991, sequence version 1.
-DT   07-NOV-2018, entry version 240.
+DT   05-DEC-2018, entry version 241.
 DE   RecName: Full=Isoform 2 of Fibroblast growth factor receptor 2;
 DE            Short=FGFR-2;
 DE            EC=2.7.10.1 {ECO:0000269|PubMed:16844695, ECO:0000269|PubMed:18056630, ECO:0000269|PubMed:19410646, ECO:0000269|PubMed:21454610};
@@ -908,4 +908,3 @@ SQ   SEQUENCE   768 AA;  86130 MW;  8D4734CBEA8E8C8F CRC64;
      TNGRLPVKWM APEALFDRVY THQSDVWSFG VLMWEIFTLG GSPYPGIPVE ELFKLLKEGH
      RMDKPANCTN ELYMMMRDCW HAVPSQRPTF KQLVEDLDRI LTLTTNEI
 //
-

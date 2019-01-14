@@ -1,21 +1,18 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.assertj.core.util.Strings;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.assertj.core.util.Strings;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
+import static org.junit.Assert.*;
 
 class UniProtResultFieldsTest {
 	private static UniProtResultFields instance;
@@ -134,7 +131,7 @@ class UniProtResultFieldsTest {
 		verifyGroupSize(groups, "PTM", 7);
 		verifyGroupSize(groups, "Polymorphism and mutation", 3);
 		verifyGroupSize(groups, "2D gel", 7);
-		verifyGroupSize(groups, "Proteomic", 8);
+		verifyGroupSize(groups, "Proteomic", 9);
 		verifyGroupSize(groups, "Protocols and materials", 1);
 		verifyGroupSize(groups, "Genome annotation", 14);
 		verifyGroupSize(groups, "Organism-specific", 37);

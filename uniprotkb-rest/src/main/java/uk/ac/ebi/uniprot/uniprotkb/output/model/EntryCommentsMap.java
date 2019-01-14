@@ -1,31 +1,15 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.model;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import com.google.common.base.Strings;
+import uk.ac.ebi.kraken.interfaces.uniprot.comments.CommentType;
+import uk.ac.ebi.kraken.interfaces.uniprot.comments.SequenceCautionType;
+import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.*;
+import uk.ac.ebi.uniprot.rest.output.model.NamedValueMap;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import com.google.common.base.Strings;
-
-import uk.ac.ebi.kraken.interfaces.uniprot.comments.CommentType;
-import uk.ac.ebi.kraken.interfaces.uniprot.comments.SequenceCautionType;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.APComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.BioPhyChemPropComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.CofactorComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.Comment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.DiseaseComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.IntActComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.MassSpecComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.RnaEdComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.SeqCautionComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.SubcellLocationComment;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.TextComment;
-import uk.ac.ebi.uniprot.rest.output.model.NamedValueMap;
 
 public class EntryCommentsMap implements NamedValueMap {
 	public static final List<String> FIELDS = Arrays.asList("cc:alternative_products", "cc:mass_spectrometry",
@@ -61,6 +45,9 @@ public class EntryCommentsMap implements NamedValueMap {
 			case BIOPHYSICOCHEMICAL_PROPERTIES:
 				List<BioPhyChemPropComment> bpcpComments = getComments(type);
 				updateBioPhyChemPropComments(map, type, bpcpComments);
+				break;
+			case CATALYTIC_ACTIVITY:
+				//TODO: Jie can you please help us with this?
 				break;
 			case COFACTOR:
 				List<CofactorComment> cfComments = getComments(type);
@@ -215,7 +202,7 @@ public class EntryCommentsMap implements NamedValueMap {
 		if ((scComments == null) || scComments.isEmpty())
 			return;
 		List<String> result= scComments.stream()
-				.filter(val -> !SequenceCautionType.ERRONEOUS_PREDICTION.toDisplayName().equals(val.getConflictType()))
+				.filter(val -> !SequenceCautionType.ERRONEOUS_PREDICTION.name().equals(val.getConflictType()))
 				.map(SeqCautionComment::toString)
 				.collect(Collectors.toList());
 		if(!result.isEmpty()) {
@@ -224,7 +211,7 @@ public class EntryCommentsMap implements NamedValueMap {
 		map.put("cc:sequence_caution", result3);
 		}
 		List<String> result1= scComments.stream()
-				.filter(val -> SequenceCautionType.ERRONEOUS_PREDICTION.toDisplayName().equals(val.getConflictType()))
+				.filter(val -> SequenceCautionType.ERRONEOUS_PREDICTION.name().equals(val.getConflictType()))
 				.map(SeqCautionComment::toString)
 				.collect(Collectors.toList());
 		if(!result1.isEmpty()) {

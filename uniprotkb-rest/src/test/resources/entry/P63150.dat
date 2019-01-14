@@ -2,7 +2,7 @@ ID   2ABA_RABIT              Reviewed;         447 AA.
 AC   P63150; P50409; Q00007;
 DT   27-SEP-2004, integrated into UniProtKB/Swiss-Prot.
 DT   27-SEP-2004, sequence version 1.
-DT   10-OCT-2018, entry version 89.
+DT   05-DEC-2018, entry version 91.
 DE   RecName: Full=Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B alpha isoform;
 DE   AltName: Full=PP2A subunit B isoform B55-alpha;
 DE   AltName: Full=PP2A subunit B isoform PR55-alpha;
@@ -54,7 +54,7 @@ DR   KEGG; ocu:100328616; -.
 DR   CTD; 5520; -.
 DR   eggNOG; KOG1354; Eukaryota.
 DR   eggNOG; COG5170; LUCA.
-DR   GeneTree; ENSGT00390000006311; -.
+DR   GeneTree; ENSGT00940000153436; -.
 DR   HOGENOM; HOG000089745; -.
 DR   HOVERGEN; HBG000012; -.
 DR   InParanoid; P63150; -.
@@ -79,11 +79,12 @@ DR   PANTHER; PTHR11871; PTHR11871; 1.
 DR   PIRSF; PIRSF037309; PP2A_PR55; 1.
 DR   PRINTS; PR00600; PP2APR55.
 DR   SMART; SM00320; WD40; 7.
-DR   SUPFAM; SSF50978; SSF50978; 3.
+DR   SUPFAM; SSF50978; SSF50978; 1.
 DR   PROSITE; PS01024; PR55_1; 1.
 DR   PROSITE; PS01025; PR55_2; 1.
 PE   2: Evidence at transcript level;
-KW   Acetylation; Complete proteome; Reference proteome; Repeat; WD repeat.
+KW   Acetylation; Complete proteome; Reference proteome; Repeat;
+KW   WD repeat.
 FT   INIT_MET      1      1       Removed. {ECO:0000250|UniProtKB:P63151}.
 FT   CHAIN         2    447       Serine/threonine-protein phosphatase 2A
 FT                                55 kDa regulatory subunit B alpha
@@ -96,8 +97,8 @@ FT   REPEAT      224    264       WD 4.
 FT   REPEAT      283    321       WD 5.
 FT   REPEAT      338    379       WD 6.
 FT   REPEAT      414    446       WD 7.
-FT   MOD_RES       2      2       N-acetylalanine.
-FT                                {ECO:0000250|UniProtKB:P63151}.
+FT   MOD_RES       2      2       N-acetylalanine. {ECO:0000250|UniProtKB:
+FT                                P63151}.
 SQ   SEQUENCE   447 AA;  51692 MW;  F4D407FF7ADA4ED6 CRC64;
      MAGAGGGNDI QWCFSQVKGA VDDDVAEADI ISTVEFNHSG ELLATGDKGG RVVIFQQEQE
      NKIQSHSRGE YNVYSTFQSH EPEFDYLKSL EIEEKINKIR WLPQKNAAQF LLSTNDKTIK
