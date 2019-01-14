@@ -13,6 +13,7 @@ import uk.ac.ebi.uniprot.uuw.suggester.service.SuggesterService;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -40,9 +41,13 @@ public class SuggesterControllerIT {
     @Test
     public void canRetrieveSuggestionsOkay() throws Exception {
         String query = "some text";
-        List<String> results = asList("some text 1", "some text 2");
+        String value1 = "some text 1";
+        String value2 = "some text 2";
+        String id1 = "1234";
+        List<String> results = asList(value1 + " [" + id1 + "]", value2);
         Suggestions suggestions = createSuggestions(taxonomy, query, results);
         given(suggesterService.getSuggestions(taxonomy, query)).willReturn(suggestions);
+
 
         mockMvc.perform(get("/suggester")
                                 .param("dict", "taxonomy")
@@ -51,7 +56,10 @@ public class SuggesterControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.query", is(query)))
                 .andExpect(jsonPath("$.dictionary", is(taxonomy.name())))
-                .andExpect(jsonPath("$.suggestions.*", is(results)));
+                .andExpect(jsonPath("$.suggestions[0].value", is(value1)))
+                .andExpect(jsonPath("$.suggestions[0].id", is(id1)))
+                .andExpect(jsonPath("$.suggestions[1].value", is(value2)))
+                .andExpect(jsonPath("$.suggestions[1].id", is(nullValue())));
     }
 
     @Test

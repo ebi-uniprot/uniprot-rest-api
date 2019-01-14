@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.repository;
 
+import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override production ones.
  * For example, this allows us to use embedded Solr data stores or in memory Voldemort instances, rather than ones
@@ -42,6 +45,12 @@ public class DataStoreTestConfig {
     public DataStoreManager dataStoreManager() throws IOException {
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
         return new DataStoreManager(sdsm);
+    }
+
+    @Bean
+    @Profile("offline")
+    public HttpClient httpClient() {
+        return mock(HttpClient.class);
     }
 
     @Bean

@@ -12,8 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.core.SolrTemplate;
 
-import java.util.Collections;
 import java.util.Optional;
+
+import static java.util.Arrays.asList;
 
 /**
  * Configure spring-data-solr repository beans, that are used to retrieve data from a solr instance.
@@ -45,15 +46,19 @@ public class RepositoryConfig {
     @Bean
     @Profile("live")
     public SolrClient uniProtSolrClient(HttpClient httpClient, RepositoryConfigProperties config) {
-        if (!config.getZookeperhost().isEmpty()) {
-            return new CloudSolrClient.Builder(Collections.singletonList(config.getZookeperhost()), Optional.empty())
+        String zookeeperhost = config.getZkHost();
+        if (!zookeeperhost.isEmpty()) {
+            String[] zookeeperHosts = zookeeperhost.split(",");
+            return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
                     .withHttpClient(httpClient)
+                    .withConnectionTimeout(config.getConnectionTimeout())
+                    .withSocketTimeout(config.getSocketTimeout())
                     .build();
         } else if (!config.getHttphost().isEmpty()) {
             return new HttpSolrClient.Builder().withHttpClient(httpClient).withBaseSolrUrl(config.getHttphost())
                     .build();
         } else {
-            throw new BeanCreationException("make sure your application.properties has eight solr zookeperhost or httphost properties");
+            throw new BeanCreationException("make sure your application.properties has eight solr zookeeperhost or httphost properties");
         }
     }
 

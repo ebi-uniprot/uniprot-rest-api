@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.common.repository.store;
 
 import lombok.Builder;
+import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -20,7 +21,7 @@ import java.util.stream.StreamSupport;
  * e.g., zookeeper address and collection, in {@link ResultsConfig}. This template instance can then be used to
  * create specific {@link TupleStream}s for a given query, using the original configuration details specified in the
  * template.
- *
+ * <p>
  * Created 21/08/18
  *
  * @author Edd
@@ -32,47 +33,57 @@ public class TupleStreamTemplate {
     private String requestHandler;
     private String key;
     private String collection;
+    private StreamFactory streamFactory;
+    private StreamContext streamContext;
+    private HttpClient httpClient;
 
-    public TupleStream create(String query,String filterQuery) {
+    public TupleStream create(String query, String filterQuery) {
         return create(query, filterQuery, key, new Sort(Sort.Direction.ASC, key));
     }
 
-    public TupleStream create(String query, String filterQuery,String key, Sort sort) {
+    public TupleStream create(String query, String filterQuery, String key, Sort sort) {
+        initTupleStreamFactory(zookeeperHost, collection);
+        initStreamContext(zookeeperHost, httpClient);
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
-                .zookeeperHost(zookeeperHost)
-                .collection(collection)
+                .streamFactory(streamFactory)
                 .key(key)
                 .order(sort)
                 .requestHandler(requestHandler)
-                .streamContext(createStreamContext())
+                .streamContext(streamContext)
                 .build();
 
-        return streamBuilder.createFor(query,filterQuery);
+        return streamBuilder.createFor(query, filterQuery);
+    }
+
+    private void initTupleStreamFactory(String zookeeperHost, String collection) {
+        if (streamFactory == null) {
+            streamFactory = new DefaultStreamFactory()
+                    .withCollectionZkHost(collection, zookeeperHost);
+            LOGGER.info("Created new DefaultStreamFactory");
+        } else {
+            LOGGER.info("DefaultStreamFactory already created");
+        }
     }
 
     @Builder
     static class TupleStreamBuilder {
-        private final String collection;
-        private String zookeeperHost;
+        private StreamFactory streamFactory;
         private String requestHandler;
         private Sort order;
         private String key;
         private StreamContext streamContext;
 
-        private TupleStream createFor(String query,String filterQuery) {
+        private TupleStream createFor(String query, String filterQuery) {
             try {
-                StreamFactory streamFactory = new DefaultStreamFactory()
-                        .withCollectionZkHost(collection, zookeeperHost);
-
                 StreamExpression requestExpression = new StreamExpression("search");
-                requestExpression.addParameter(new StreamExpressionValue(collection));
-                requestExpression.addParameter(new StreamExpressionNamedParameter("q",query));
-                if(filterQuery != null && !filterQuery.isEmpty()) {
+                requestExpression.addParameter(new StreamExpressionValue(streamFactory.getDefaultCollection()));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("q", query));
+                if (filterQuery != null && !filterQuery.isEmpty()) {
                     requestExpression.addParameter(new StreamExpressionNamedParameter("fq", filterQuery));
                 }
-                requestExpression.addParameter(new StreamExpressionNamedParameter("fl",fieldsToReturn(key, order)));
-                requestExpression.addParameter(new StreamExpressionNamedParameter("sort",sortToString(order)));
-                requestExpression.addParameter(new StreamExpressionNamedParameter("qt","/export"));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("fl", fieldsToReturn(key, order)));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("sort", sortToString(order)));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("qt", requestHandler));
 
                 TupleStream tupleStream = streamFactory.constructStream(requestExpression);
                 tupleStream.setStreamContext(streamContext);
@@ -108,13 +119,16 @@ public class TupleStreamTemplate {
     /**
      * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
      */
-    private StreamContext createStreamContext() {
-        StreamContext streamContext = new StreamContext();
-        streamContext.workerID = collection
-                .hashCode(); // this should be the same for each collection, so that they share client caches
-        streamContext.numWorkers = 1;
-        SolrClientCache solrClientCache = new SolrClientCache();
-        streamContext.setSolrClientCache(solrClientCache);
-        return streamContext;
+    private void initStreamContext(String zookeeperHost, HttpClient httpClient) {
+        if (streamContext == null) {
+            StreamContext streamContext = new StreamContext();
+            streamContext.workerID = collection
+                    .hashCode(); // this should be the same for each collection, so that they share client caches
+            streamContext.numWorkers = 1;
+            SolrClientCache solrClientCache = new SolrClientCache(httpClient);
+            solrClientCache.getCloudSolrClient(zookeeperHost);
+            streamContext.setSolrClientCache(solrClientCache);
+            this.streamContext = streamContext;
+        }
     }
 }

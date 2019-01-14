@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,12 +38,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
 import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
 /**
  * Created 21/09/18
  *
  * @author Edd
  */
-//@Ignore
 @RunWith(SpringRunner.class)
 @WebMvcTest({UniprotKBController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,

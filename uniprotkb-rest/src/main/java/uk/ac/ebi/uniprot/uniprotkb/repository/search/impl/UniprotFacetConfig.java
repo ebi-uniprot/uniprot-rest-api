@@ -9,6 +9,7 @@ import uk.ac.ebi.uniprot.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.common.repository.search.facet.FacetProperty;
 import uk.ac.ebi.uniprot.common.repository.search.facet.GenericFacetConfig;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,4 +33,8 @@ public class UniprotFacetConfig extends GenericFacetConfig implements FacetConfi
         return uniprot;
     }
 
+    @Override
+    public Collection<String> getFacetNames() {
+        return uniprot.keySet();
+    }
 }

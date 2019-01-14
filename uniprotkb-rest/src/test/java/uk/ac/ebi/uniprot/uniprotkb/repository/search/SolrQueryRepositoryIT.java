@@ -18,13 +18,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.common.repository.search.SolrCollection;
+import uk.ac.ebi.uniprot.common.repository.search.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.common.repository.search.SolrQueryRepository;
 import uk.ac.ebi.uniprot.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
-import uk.ac.ebi.uniprot.uniprotkb.repository.search.impl.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtDocMocker;
 
