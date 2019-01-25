@@ -75,7 +75,7 @@ class UniProtSearchItemsTest {
 		Optional<Tuple> tuple = item.get().getValues().stream()
 				.filter(val -> val.getName().equals("Inferred from homology")).findFirst();
 		assertTrue(tuple.isPresent());
-		assertEquals("3", tuple.get().getValue());
+		assertEquals("homology", tuple.get().getValue());
 	}
 
 	@Test

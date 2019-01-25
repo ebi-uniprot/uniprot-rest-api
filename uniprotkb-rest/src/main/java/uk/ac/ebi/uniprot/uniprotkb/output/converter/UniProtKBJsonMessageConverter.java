@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.converter;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,13 +25,15 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private static final Logger LOGGER = getLogger(UniProtKBJsonMessageConverter.class);
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
 
     public UniProtKBJsonMessageConverter() {
         super(MediaType.APPLICATION_JSON);
+         this.objectMapper = new ObjectMapper();
+         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 
     @Override
