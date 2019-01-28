@@ -43,10 +43,9 @@ public enum UniProtSearchItems implements SearchItems {
 
 	private List<UniProtSearchItem> getDatabaseSearchItems() {
 		List<UniProtSearchItem> searchGroupItems = new ArrayList<>();
-
+		searchGroupItems.add(getAnyDatabaseSearchItem());
 		List<DatabaseGroup> databases = Databases.INSTANCE.getDatabases();
-		for (DatabaseGroup databaseGroup : databases) {
-
+		databases.stream().filter(databaseGroup -> !databaseGroup.getGroupName().equals("Any")).forEach(databaseGroup -> {
 			UniProtSearchItem groupItem = new UniProtSearchItem();
 			String groupId = databaseGroup.getGroupName().replaceAll("\\W","_").toLowerCase();
 			groupItem.setId("id_group_"+groupId);
@@ -71,8 +70,19 @@ public enum UniProtSearchItems implements SearchItems {
 			}
 			groupItem.setItems(groupItems);
 			searchGroupItems.add(groupItem);
-		}
+		});
 		return searchGroupItems;
+	}
+
+	private UniProtSearchItem getAnyDatabaseSearchItem() {
+		UniProtSearchItem anyItem = new UniProtSearchItem();
+		anyItem.setId("id_xref_any");
+		anyItem.setLabel("Any cross-reference");
+		anyItem.setItemType(SearchItemType.DATABASE);
+		anyItem.setTerm("xref");
+		anyItem.setDataType(SearchDataType.STRING);
+		anyItem.setValuePrefix("any");
+		return anyItem;
 	}
 
 	public List<SearchItem> getSearchItems() {
