@@ -12,9 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.SolrQueryRepositoryIT;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtDocMocker;
@@ -69,7 +69,7 @@ public class DataStoreManagerIT {
     @Test
     public void canAddAndFetchEntriesInSolr() throws IOException, SolrServerException {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String accession = entry.getPrimaryUniProtAccession().getValue();
+        String accession = entry.getPrimaryAccession().getValue();
         storeManager.saveEntriesInSolr(StoreType.UNIPROT, entry);
         QueryResponse response = storeManager.querySolr(StoreType.UNIPROT, "*:*");
         List<String> results = response.getBeans(UniProtDocument.class).stream().map(doc -> doc.accession)
@@ -80,7 +80,7 @@ public class DataStoreManagerIT {
     @Test
     public void canAddAndFetchEntriesInVoldemort() {
         UniProtEntry entry = UniProtEntryMocker.create(Type.SP);
-        String accession = entry.getPrimaryUniProtAccession().getValue();
+        String accession = entry.getPrimaryAccession().getValue();
         storeManager.saveToVoldemort(StoreType.UNIPROT, entry);
         List<UniProtEntry> voldemortEntries = storeManager.getVoldemortEntries(StoreType.UNIPROT, accession);
         assertThat(voldemortEntries, hasSize(1));
@@ -90,7 +90,7 @@ public class DataStoreManagerIT {
     @Test
     public void canAddAndFetchEntriesInSolrAndVoldemort() throws IOException, SolrServerException {
         UniProtEntry entry = UniProtEntryMocker.create(Type.SP);
-        String accession = entry.getPrimaryUniProtAccession().getValue();
+        String accession = entry.getPrimaryAccession().getValue();
         storeManager.save(StoreType.UNIPROT, entry);
 
         QueryResponse response = storeManager.querySolr(StoreType.UNIPROT, "*:*");

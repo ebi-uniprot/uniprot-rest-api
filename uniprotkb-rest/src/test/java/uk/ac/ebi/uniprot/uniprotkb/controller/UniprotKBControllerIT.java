@@ -12,9 +12,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.dataservice.source.impl.inactiveentry.InactiveUniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.InactiveEntryMocker;
@@ -67,7 +67,7 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
     }
 
     @Test
@@ -84,10 +84,10 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.accession", contains(acc)))
-                .andExpect(jsonPath("$.results.*.gene").exists())
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)))
+                .andExpect(jsonPath("$.results.*.genes").exists())
                 // ensure other parts of the entry were not returned (using one example)
-                .andExpect(jsonPath("$.results.*.lineage").doesNotExist());
+                .andExpect(jsonPath("$.results.*.organism").doesNotExist());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
     }
 
     @Test
@@ -122,15 +122,15 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.accession", contains(acc)))
-                .andExpect(jsonPath("$.results.*.gene").exists())
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)))
+                .andExpect(jsonPath("$.results.*.genes").exists())
                 // ensure other parts of the entry were not returned (using one example)
-                .andExpect(jsonPath("$.results.*.lineage").doesNotExist());
+                .andExpect(jsonPath("$.results.*.organism").doesNotExist());
     }
 
     private String saveEntry() {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
         return acc;
     }
@@ -139,7 +139,7 @@ public class UniprotKBControllerIT {
     public void queryWithInvalidQueryFormat() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -157,7 +157,7 @@ public class UniprotKBControllerIT {
     public void queryWithInvalidFilterType() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -176,7 +176,7 @@ public class UniprotKBControllerIT {
     public void queryWithInvalidFieldName() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -195,7 +195,7 @@ public class UniprotKBControllerIT {
     public void queryWithWrongFieldType() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -213,7 +213,7 @@ public class UniprotKBControllerIT {
     public void queryWithWrongAccessionFieldValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -231,7 +231,7 @@ public class UniprotKBControllerIT {
     public void queryWithWrongProteomeFieldValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -249,7 +249,7 @@ public class UniprotKBControllerIT {
     public void queryWithWrongBooleanFieldValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -267,7 +267,7 @@ public class UniprotKBControllerIT {
     public void queryWithWrongNumberFieldValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -285,7 +285,7 @@ public class UniprotKBControllerIT {
     public void sortWithCorrectValues() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -296,14 +296,14 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
     }
 
     @Test
     public void sortWithMultipleCorrectValues() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -314,14 +314,14 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"" + acc + "\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
     }
 
     @Test
     public void sortWithIncorrectValues() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -340,7 +340,7 @@ public class UniprotKBControllerIT {
     public void sortWithMultipleIncorrectValues() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -362,7 +362,7 @@ public class UniprotKBControllerIT {
     public void returnFieldsWithSingleIncorrectValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -380,7 +380,7 @@ public class UniprotKBControllerIT {
     public void returnFieldsWithMultipleIncorrectValues() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -399,7 +399,7 @@ public class UniprotKBControllerIT {
     public void searchInvalidIncludeIsoformParamterValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -417,7 +417,7 @@ public class UniprotKBControllerIT {
     public void defaultCanonicalOnly() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -434,16 +434,16 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"P21802\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-2\"")));
     }
 
     @Test
     public void searchSecondaryAccession() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -460,16 +460,16 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"P21802\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-2\"")));
     }
 
     @Test
     public void searchCanonicalIsoformAccession() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -486,16 +486,16 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(not("\"accession\":\"P21802\"")))
-                .andExpect(content().string(containsString("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-1\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-2\"")));
     }
 
     @Test
     public void includeCanonicalAndIsoForm() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -512,16 +512,16 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"P21802\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(containsString("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-2\"")));
     }
 
     @Test
     public void searchByAccessionAndIncludeIsoForm() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -538,16 +538,16 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"P21802\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(containsString("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-2\"")));
     }
 
     @Test
     public void isoFormOnly() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -564,16 +564,16 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(not("\"accession\":\"P21802\"")))
-                .andExpect(content().string(not("\"accession\":\"P21802-1\"")))
-                .andExpect(content().string(containsString("\"accession\":\"P21802-2\"")));
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-2\"")));
     }
 
     @Test
     public void canReturnFacetInformation() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -584,7 +584,7 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\""+acc+"\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\""+acc+"\"")))
                 .andExpect(content().string(containsString("\"facets\":[{\"label\":\"3D Structure\"")));
     }
 
@@ -592,7 +592,7 @@ public class UniprotKBControllerIT {
     public void canNotReturnFacetInformationForXML() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -610,7 +610,7 @@ public class UniprotKBControllerIT {
     public void returnFieldsWithCorrectValues() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -621,12 +621,12 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"Q8DIA7\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"Q8DIA7\"")))
                 .andExpect(content().string(containsString("\"organism\":{" +
-                        "\"taxonomy\":197221," +
-                        "\"names\":[{\"type\":\"scientific\"," +
-                        "\"value\":\"Thermosynechococcus elongatus (strain BP-1)\"" +
-                        "}]}")));
+                        "\"scientificName\":\"Thermosynechococcus elongatus (strain BP-1)\"," +
+                        "\"taxonId\":197221," +
+                        "\"lineage\":[\"Bacteria\",\"Cyanobacteria\",\"Synechococcales\",\"Synechococcaceae\"," +
+                        "\"Thermosynechococcus\"]}")));
     }
 
     @Ignore //TODO: We need to support inactive entries (We are waiting for the new model)
@@ -647,7 +647,7 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"accession\":\"Q8DIA7\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"Q8DIA7\"")))
                 .andExpect(content().string(containsString("\"organism\":{" +
                         "\"taxonomy\":197221," +
                         "\"names\":[{\"type\":\"scientific\"," +

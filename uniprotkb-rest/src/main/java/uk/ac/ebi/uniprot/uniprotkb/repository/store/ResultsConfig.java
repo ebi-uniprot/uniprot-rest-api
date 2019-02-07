@@ -1,18 +1,18 @@
 package uk.ac.ebi.uniprot.uniprotkb.repository.store;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.HttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.common.repository.store.TupleStreamTemplate;
-import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
-import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.json.parser.uniprot.UniprotJsonConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfigProperties;
 
+import java.io.IOException;
 import java.util.Base64;
 
 /**
@@ -52,13 +52,14 @@ public class ResultsConfig {
     }
 
     private UniProtEntry convertDefaultAvroToUniProtEntry(String s) {
-        DefaultEntryConverter defaultEntryConverter = new DefaultEntryConverter();
-        AvroByteArraySerializer<DefaultEntryObject> avroDeserializer =
-                AvroByteArraySerializer.instanceOf(DefaultEntryObject.class);
-
-        byte[] avroBinaryBytes = Base64.getDecoder().decode(s.getBytes());
-        DefaultEntryObject avroObject = avroDeserializer.fromByteArray(avroBinaryBytes);
-        return defaultEntryConverter.fromAvro(avroObject);
+        UniProtEntry result = null;
+        try {
+            ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getObjectMapper();
+            result = jsonMapper.readValue(Base64.getDecoder().decode(s),UniProtEntry.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

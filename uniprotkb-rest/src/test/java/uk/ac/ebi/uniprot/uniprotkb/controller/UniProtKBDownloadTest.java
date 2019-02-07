@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +12,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.common.repository.store.TupleStreamTemplate;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uniprotkb.output.MessageConverterConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfig;
@@ -72,7 +71,7 @@ public class UniProtKBDownloadTest {
     @Test
     public void canReachDownloadEndpoint() throws Exception {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryUniProtAccession().getValue();
+        String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         mockStreamerResponseOf(entry);

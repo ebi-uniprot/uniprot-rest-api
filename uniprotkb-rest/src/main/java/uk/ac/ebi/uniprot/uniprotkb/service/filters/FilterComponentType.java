@@ -11,7 +11,6 @@ public enum FilterComponentType {
 	GENE,
 	ORGANISM,
 	ORGANISM_HOST,
-	LINEAGE,
 	GENE_LOCATION,
 	COMMENT(true),
 	KEYWORD,

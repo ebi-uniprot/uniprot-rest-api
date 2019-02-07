@@ -5,17 +5,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.parser.tsv.uniprot.EntryMap;
 import uk.ac.ebi.uniprot.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
-import uk.ac.ebi.uniprot.uniprotkb.output.model.EntryMap;
-import uk.ac.ebi.uniprot.uniprotkb.service.filters.EntryFilters;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.FieldsParser;
+import uk.ac.ebi.uniprot.uniprotkb.service.filters.EntryFilters;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,15 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class UniProtKBXslMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private static final Logger LOGGER = getLogger(UniProtKBXslMessageConverter.class);
-    
-    private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
+
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
     private ThreadLocal<SXSSFWorkbook> tlWorkBook = new ThreadLocal<>();
@@ -97,8 +93,7 @@ public class UniProtKBXslMessageConverter extends AbstractEntityHttpMessageConve
             return field;
     }
 
-    private List<String> entry2TsvStrings(UniProtEntry upEntry, Map<String, List<String>> filterParams, List<String> fields) {
-        UPEntry entry = entryConverter.apply(upEntry);
+    private List<String> entry2TsvStrings(UniProtEntry entry, Map<String, List<String>> filterParams, List<String> fields) {
         if ((filterParams != null) && !filterParams.isEmpty())
             EntryFilters.filterEntry(entry, filterParams);
         EntryMap dlEntry = new EntryMap(entry, fields);

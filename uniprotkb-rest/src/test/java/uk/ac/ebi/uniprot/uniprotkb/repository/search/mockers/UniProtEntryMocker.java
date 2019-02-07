@@ -1,12 +1,15 @@
 package uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers;
 
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.model.factories.DefaultUniProtFactory;
-import uk.ac.ebi.kraken.model.uniprot.UniProtEntryImpl;
-import uk.ac.ebi.kraken.parser.UniProtParser;
-import uk.ac.ebi.kraken.parser.UniProtParserException;
+
+import org.apache.commons.io.IOUtils;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
+import uk.ac.ebi.uniprot.parser.UniProtParser;
+import uk.ac.ebi.uniprot.parser.impl.DefaultUniProtParser;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,22 +38,27 @@ public class UniProtEntryMocker {
         for (Type type : Type.values()) {
             InputStream is = UniProtEntryMocker.class.getResourceAsStream("/entry/" + type.fileName);
             try {
-                UniProtEntry entry = UniProtParser.parse(is, DefaultUniProtFactory.getInstance());
+                UniProtParser parser = new DefaultUniProtParser("","","",true);
+                UniProtEntry entry = parser.parse(IOUtils.toString(is, Charset.defaultCharset()));
                 entryMap.put(type, entry);
-            } catch (UniProtParserException e) {
+            } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
         }
     }
 
     public static UniProtEntry create(String accession) {
-        UniProtEntryImpl uniProtEntry = new UniProtEntryImpl(entryMap.get(Type.SP));
-        uniProtEntry.getPrimaryUniProtAccession().setValue(accession);
-        return uniProtEntry;
+        UniProtEntry entry =  entryMap.get(Type.SP);
+        UniProtEntryBuilder builder = new UniProtEntryBuilder().from(entry);
+        return builder.primaryAccession(new UniProtAccessionBuilder(accession).build())
+                .uniProtId(entry.getUniProtId())
+                .active()
+                .build();
     }
 
     public static UniProtEntry create(Type type) {
-        return new UniProtEntryImpl(entryMap.get(type));
+        UniProtEntryBuilder.ActiveEntryBuilder builder = new UniProtEntryBuilder().from(entryMap.get(type));
+        return builder.build();
     }
 
     public static Collection<UniProtEntry> createEntries() {

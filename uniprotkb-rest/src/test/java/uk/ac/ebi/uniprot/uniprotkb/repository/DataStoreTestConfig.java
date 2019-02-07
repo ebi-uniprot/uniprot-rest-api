@@ -10,8 +10,7 @@ import uk.ac.ebi.uniprot.common.repository.search.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.common.repository.search.SolrCollection;
 import uk.ac.ebi.uniprot.common.repository.search.SolrDataStoreManager;
 import uk.ac.ebi.uniprot.dataservice.document.impl.InactiveEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.serializer.avro.EntryConverter;
+import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverterNew;
 import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileReader;
 import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileRepo;
 import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationRepo;
@@ -65,13 +64,13 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
         UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
-                                                                               .getInstance("avro-uniprot"), new EntryConverter());
+                                                                               .getInstance("avro-uniprot"));
         dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
         return storeClient;
     }
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
-        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(taxonomyRepo(), goRelationRepo()));
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverterNew(taxonomyRepo(), goRelationRepo()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);

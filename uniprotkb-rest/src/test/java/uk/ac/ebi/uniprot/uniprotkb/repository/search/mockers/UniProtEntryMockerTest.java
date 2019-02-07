@@ -1,17 +1,16 @@
 package uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers;
 
 import org.junit.Test;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 
 import java.util.Collection;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker.Type.SP;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 /**
  * Created 19/09/18
@@ -30,7 +29,7 @@ public class UniProtEntryMockerTest {
         String accession = "P12345";
         UniProtEntry uniProtEntry = UniProtEntryMocker.create(accession);
         assertThat(uniProtEntry, is(notNullValue()));
-        assertThat(uniProtEntry.getPrimaryUniProtAccession().getValue(), is(accession));
+        assertThat(uniProtEntry.getPrimaryAccession().getValue(), is(accession));
     }
 
     @Test

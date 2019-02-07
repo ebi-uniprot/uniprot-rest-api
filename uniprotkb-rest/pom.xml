@@ -24,7 +24,7 @@
         <data-service.version>web-2019.2-SNAPSHOT</data-service.version>
         <ujdk.version>2019.2-SNAPSHOT</ujdk.version>
         <poi.version>4.0.0</poi.version>
-        <core-model.version>0.1-SNAPSHOT</core-model.version>
+        <core.version>0.1-SNAPSHOT</core.version>
     </properties>
 
     <dependencies>
@@ -72,45 +72,48 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-<!--        <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-domain</artifactId>
-            <version>${core-model.version}</version>
+            <version>${core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core-common</artifactId>
+            <version>${core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ff-parser</artifactId>
-            <version>${core-model.version}</version>
+            <version>${core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>json-parser</artifactId>
-            <version>${core-model.version}</version>
-        </dependency>-->
+            <version>${core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core-parser</artifactId>
+            <version>${core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>xml-parser</artifactId>
+            <version>${core.version}</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>data-service-voldemort</artifactId>
             <version>${data-service.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>data-service-restful</artifactId>
-            <version>${data-service.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>data-service-common-avro</artifactId>
-            <version>${data-service.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.avro</groupId>
-                    <artifactId>avro-tools</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>tools-annotation-score</artifactId>

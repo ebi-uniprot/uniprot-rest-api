@@ -2,19 +2,18 @@ package uk.ac.ebi.uniprot.uniprotkb.output.converter;
 
 import com.sun.xml.bind.marshaller.DataWriter;
 import org.springframework.http.MediaType;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.xml.jaxb.uniprot.Entry;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.EntryXmlConverter;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.EntryXmlConverterImpl;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
+import uk.ac.ebi.uniprot.xml.jaxb.uniprot.Entry;
+import uk.ac.ebi.uniprot.xmlparser.uniprot.UniProtEntryConverter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.*;
 
 public class UniProtKBXmlMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
-    private final EntryXmlConverter converter;
+    private final UniProtEntryConverter converter;
     private final Marshaller marshaller;
     private static final String XML_CONTEXT = "uk.ac.ebi.kraken.xml.jaxb.uniprot";
     private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n";
@@ -25,7 +24,7 @@ public class UniProtKBXmlMessageConverter extends AbstractEntityHttpMessageConve
 
     public UniProtKBXmlMessageConverter() {
         super(MediaType.APPLICATION_XML);
-        converter = new EntryXmlConverterImpl();
+        converter = new UniProtEntryConverter();
         marshaller = createMarshaller(XML_CONTEXT);
     }
 
@@ -46,7 +45,7 @@ public class UniProtKBXmlMessageConverter extends AbstractEntityHttpMessageConve
 
     String getXmlString(UniProtEntry uniProtEntry) {
         try {
-            Entry entry = converter.convert(uniProtEntry);
+            Entry entry = converter.toXml(uniProtEntry);
             StringWriter xmlString = new StringWriter();
             Writer out = new BufferedWriter(xmlString);
             DataWriter writer = new DataWriter(out, "UTF-8");

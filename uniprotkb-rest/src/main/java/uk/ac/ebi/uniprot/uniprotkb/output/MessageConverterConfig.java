@@ -9,12 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.uniprotkb.output.converter.*;
 import uk.ac.ebi.uniprot.common.concurrency.TaskExecutorProperties;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.rest.output.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.uniprotkb.output.converter.*;
 
 import java.util.List;
 

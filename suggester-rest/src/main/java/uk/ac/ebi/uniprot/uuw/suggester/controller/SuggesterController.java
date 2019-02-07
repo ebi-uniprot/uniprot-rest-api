@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions;
 import uk.ac.ebi.uniprot.uuw.suggester.service.SuggesterService;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.ac.ebi.uniprot.uuw.suggester.service.SuggestionValidator.getSuggestionDictionary;
 
 /**
@@ -28,7 +28,7 @@ public class SuggesterController {
         this.suggesterService = suggesterService;
     }
 
-    @RequestMapping(value = "/suggester", produces = {APPLICATION_JSON})
+    @RequestMapping(value = "/suggester", produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<Suggestions> suggester(
             @RequestParam(value = "dict", required = true) String dict,
             @RequestParam(value = "query", required = true) String query) {

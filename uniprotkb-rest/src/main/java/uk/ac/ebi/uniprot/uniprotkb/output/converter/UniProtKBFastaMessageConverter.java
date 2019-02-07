@@ -1,7 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.converter;
 
-import uk.ac.ebi.kraken.ffwriter.UniprotFasta;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.parser.fasta.uniprot.UniprotFastaParser;
 import uk.ac.ebi.uniprot.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
 
@@ -15,6 +15,6 @@ public class UniProtKBFastaMessageConverter extends AbstractEntityHttpMessageCon
 
     @Override
     protected void writeEntity(UniProtEntry entity, OutputStream outputStream) throws IOException {
-        outputStream.write((UniprotFasta.create(entity).toString() + "\n").getBytes());
+        outputStream.write((UniprotFastaParser.create(entity).toString() + "\n").getBytes());
     }
 }

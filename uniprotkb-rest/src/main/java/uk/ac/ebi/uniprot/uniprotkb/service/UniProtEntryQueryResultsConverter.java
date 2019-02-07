@@ -1,14 +1,22 @@
 package uk.ac.ebi.uniprot.uniprotkb.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.model.common.SequenceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
-import uk.ac.ebi.uniprot.dataservice.serializer.avro.DefaultEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.serializer.impl.AvroByteArraySerializer;
-import uk.ac.ebi.uniprot.services.data.serializer.model.entry.DefaultEntryObject;
+import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.EntryInactiveReason;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtAccession;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtId;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.EntryInactiveReasonBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtIdBuilder;
+import uk.ac.ebi.uniprot.json.parser.uniprot.UniprotJsonConfig;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.uniprotkb.service.filters.FilterComponentType;
@@ -30,10 +38,9 @@ import java.util.stream.Collectors;
  * @author Edd
  */
 class UniProtEntryQueryResultsConverter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UniProtEntryQueryResultsConverter.class);
+
     private final UniProtStoreClient entryStore;
-    private final AvroByteArraySerializer<DefaultEntryObject> serializer =
-            AvroByteArraySerializer.instanceOf(DefaultEntryObject.class);
-    private final DefaultEntryConverter entryConverter = new DefaultEntryConverter();
     private final RetryPolicy retryPolicy = new RetryPolicy()
             .retryOn(IOException.class)
             .withDelay(500,TimeUnit.MILLISECONDS)
@@ -54,34 +61,53 @@ class UniProtEntryQueryResultsConverter {
 
     Optional<UniProtEntry> convertDoc(UniProtDocument doc, Map<String, List<String>> filters) {
         if (doc.active) {
-            return convert2UPEntry(doc, filters);
+            return getEntryFromStore(doc, filters);
         } else {
-            //TODO: We need to support inactive entries (We are waiting for the new model)
-            return Optional.empty();
+            return getInactiveUniProtEntry(doc);
         }
     }
+    //TODO: need to implement Inactive Reason... lgonzales
+    private Optional<UniProtEntry> getInactiveUniProtEntry(UniProtDocument doc) {
+        UniProtAccession accession = new UniProtAccessionBuilder(doc.accession).build();
+        UniProtId uniProtId = new UniProtIdBuilder(doc.id).build();
+        EntryInactiveReason inactiveReason = new EntryInactiveReasonBuilder()
+                .addMergeDemergeTo("//TODO: need to implement it")
+                .build();
 
-    private Optional<UniProtEntry> convert2UPEntry(UniProtDocument doc, Map<String, List<String>> filters) {
+        UniProtEntryBuilder.InactiveEntryBuilder entryBuilder = new UniProtEntryBuilder()
+                .primaryAccession(accession)
+                .uniProtId(uniProtId)
+                .inactive()
+                .inactiveReason(inactiveReason);
+        return Optional.of(entryBuilder.build());
+    }
+
+    private Optional<UniProtEntry> getEntryFromStore(UniProtDocument doc, Map<String, List<String>> filters) {
         if (FieldsParser.isDefaultFilters(filters) && (doc.avro_binary != null)) {
-            byte[] avroBinaryBytes = Base64.getDecoder().decode(doc.avro_binary.getBytes());
-            DefaultEntryObject avroObject = serializer.fromByteArray(avroBinaryBytes);
-            UniProtEntry uniEntry = entryConverter.fromAvro(avroObject);
+            UniProtEntry uniProtEntry = null;
 
-            if (Objects.isNull(uniEntry)) {
+            try {
+                byte[] decodeEntry = Base64.getDecoder().decode(doc.avro_binary);
+                ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getObjectMapper();
+                uniProtEntry = jsonMapper.readValue(decodeEntry, UniProtEntry.class);
+            }catch (IOException e){
+                LOGGER.info("Error converting solr avro_binary default UniProtEntry",e);
+            }
+            if (Objects.isNull(uniProtEntry)) {
                 return Optional.empty();
             }
             if (filters.containsKey(FilterComponentType.MASS.name().toLowerCase())
                     || filters.containsKey(FilterComponentType.LENGTH.name().toLowerCase())) {
                 char[] fakeSeqArrayWithCorrectLength = new char[doc.seqLength];
                 Arrays.fill(fakeSeqArrayWithCorrectLength, 'X');
-                SequenceImpl seq = new SequenceImpl();
-                seq.setValue(new String(fakeSeqArrayWithCorrectLength));
-                seq.setMolecularWeight(doc.seqMass);
-                uniEntry.setSequence(seq);
+                SequenceBuilder seq = new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
+                seq.molWeight(doc.seqMass);
+                UniProtEntryBuilder.ActiveEntryBuilder entryBuilder = new UniProtEntryBuilder().from(uniProtEntry);
+                entryBuilder.sequence(seq.build());
+                uniProtEntry = entryBuilder.build();
             }
-            return Optional.of(uniEntry);
+            return Optional.of(uniProtEntry);
         } else {
-            //return entryStore.getEntry(doc.accession);            
             return Failsafe.with(retryPolicy).get(() -> entryStore.getEntry(doc.accession));                     
         }
     }

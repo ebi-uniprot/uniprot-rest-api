@@ -1,14 +1,12 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.converter;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.springframework.http.MediaType;
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.converter.EntryConverter;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.json.parser.uniprot.UniprotJsonConfig;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
 import uk.ac.ebi.uniprot.rest.output.converter.StopStreamException;
@@ -19,21 +17,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private static final Logger LOGGER = getLogger(UniProtKBJsonMessageConverter.class);
-    private final ObjectMapper objectMapper;
-    private final Function<UniProtEntry, UPEntry> entryConverter = new EntryConverter();
+    private final ObjectMapper objectMapper = UniprotJsonConfig.getInstance().getPrettyObjectMapper();
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
 
     public UniProtKBJsonMessageConverter() {
         super(MediaType.APPLICATION_JSON);
-         this.objectMapper = new ObjectMapper();
-         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 
     @Override
@@ -60,8 +54,7 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
     @Override
     protected void writeEntity(UniProtEntry entity, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
-
-        generator.writeObject(uniProtEntry2UPEntry(entity));
+        generator.writeObject(filterEntryContent(entity));
     }
 
     @Override
@@ -83,12 +76,11 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
         }
     }
 
-    private UPEntry uniProtEntry2UPEntry(UniProtEntry uniProtEntry) {
-        UPEntry upEntry = entryConverter.apply(uniProtEntry);
+    private UniProtEntry filterEntryContent(UniProtEntry uniProtEntry) {
         Map<String, List<String>> filters = tlFilters.get();
         if (filters != null && !filters.isEmpty()) {
-            EntryFilters.filterEntry(upEntry, filters);
+            uniProtEntry = EntryFilters.filterEntry(uniProtEntry, filters);
         }
-        return upEntry;
+        return uniProtEntry;
     }
 }

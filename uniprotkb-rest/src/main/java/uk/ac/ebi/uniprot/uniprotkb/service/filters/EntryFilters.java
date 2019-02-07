@@ -1,11 +1,10 @@
 package uk.ac.ebi.uniprot.uniprotkb.service.filters;
 
-import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.DbReference;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.UPEntry;
-import uk.ac.ebi.uniprot.dataservice.restful.entry.domain.model.comment.Comment;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.Feature;
-import uk.ac.ebi.uniprot.dataservice.restful.response.adapter.JsonDataAdapter;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.comment.Comment;
+import uk.ac.ebi.uniprot.domain.uniprot.feature.Feature;
+import uk.ac.ebi.uniprot.domain.uniprot.xdb.UniProtDBCrossReference;
 
 import java.util.List;
 import java.util.Map;
@@ -14,46 +13,49 @@ import java.util.function.Predicate;
 public class EntryFilters {
 	private static final String ALL = "all";
 
-	public static UPEntry convertAndFilter(JsonDataAdapter<UniProtEntry, UPEntry> uniProtJsonAdaptor,
-			UniProtEntry upEntry,  Map<String, List<String>> filterParams) {
-		UPEntry entry  = uniProtJsonAdaptor.convertEntity(upEntry, filterParams);
-		if((filterParams ==null ) || filterParams.isEmpty())
-			return entry;
-		filterEntry(entry, filterParams);
-	
-		return entry;
-	}
-	public static void filterEntry(UPEntry entry, Map<String, List<String>> filterParams) {
-		for (FilterComponentType component : FilterComponentType.values()) {
-			if (!filterParams.containsKey(component.name().toLowerCase())) {
-				remove(entry, component);
-			} else if (component == FilterComponentType.COMMENT) {
-				List<String> values = filterParams.get(component.name().toLowerCase());
-				Predicate<Comment> filter = createCommentFilter(values);
-				entry.getComments().removeIf(comment -> !filter.test(comment));
 
-			} else if (component == FilterComponentType.FEATURE) {
-				List<String> values = filterParams.get(component.name().toLowerCase());
-				Predicate<Feature> filter = createFeatureFilter(values);
-				entry.getFeatures().removeIf(feature -> !filter.test(feature));
-			} else if (component == FilterComponentType.XREF) {
-				List<String> values = filterParams.get(component.name().toLowerCase());
-				Predicate<DbReference> filter = createDbReferenceFilter(values);
-				entry.getDbReferences().removeIf(xref -> !filter.test(xref));
+	public static UniProtEntry filterEntry(UniProtEntry entry, Map<String, List<String>> filterParams) {
+		if((filterParams !=null ) && !filterParams.isEmpty()) {
+			UniProtEntryBuilder.ActiveEntryBuilder builder = new UniProtEntryBuilder().from(entry);
+			for (FilterComponentType component : FilterComponentType.values()) {
+				if (!filterParams.containsKey(component.name().toLowerCase())) {
+					remove(builder, component);
+				} else if (component == FilterComponentType.COMMENT) {
+					List<String> values = filterParams.get(component.name().toLowerCase());
+					Predicate<Comment> filter = createCommentFilter(values);
+					List<Comment> comments = entry.getComments();
+					comments.removeIf(comment -> !filter.test(comment));
+					builder.comments(comments);
+				} else if (component == FilterComponentType.FEATURE) {
+					List<String> values = filterParams.get(component.name().toLowerCase());
+					Predicate<Feature> filter = createFeatureFilter(values);
+					List<Feature> features = entry.getFeatures();
+					features.removeIf(feature -> !filter.test(feature));
+					builder.features(features);
+				} else if (component == FilterComponentType.XREF) {
+					List<String> values = filterParams.get(component.name().toLowerCase());
+					Predicate<UniProtDBCrossReference> filter = createDbReferenceFilter(values);
+					List<UniProtDBCrossReference> crossReferences = entry.getDatabaseCrossReferences();
+					crossReferences.removeIf(xref -> !filter.test(xref));
+					builder.databaseCrossReferences(crossReferences);
+				}
 			}
+			return builder.build();
+		}else {
+			return entry;
 		}
 	}
 	
 	
-	private static Predicate<DbReference> createDbReferenceFilter(List<String> values) {
-		return (DbReference v) -> createXrefPredicate(v, values);
+	private static Predicate<UniProtDBCrossReference> createDbReferenceFilter(List<String> values) {
+		return v -> createXrefPredicate(v, values);
 	}
 
-	private static boolean createXrefPredicate(DbReference v, List<String> values) {
+	private static boolean createXrefPredicate(UniProtDBCrossReference v, List<String> values) {
 		if (values.contains(ALL)) {
 			return true;
 		}
-		return values.contains(v.getType().toLowerCase());
+		return values.contains(v.getDatabaseType().getName().toLowerCase());
 	}
 
 	private static Predicate<Feature> createFeatureFilter(List<String> values) {
@@ -64,7 +66,7 @@ public class EntryFilters {
 		if (values.contains(ALL)) {
 			return true;
 		}
-		return values.contains(v.getType().toLowerCase());
+		return values.contains(v.getType().name().toLowerCase());
 	}
 
 	private static Predicate<Comment> createCommentFilter(List<String> values) {
@@ -75,55 +77,49 @@ public class EntryFilters {
 		if (values.contains(ALL)) {
 			return true;
 		}
-		return values.contains(v.getType().name().toLowerCase());
+		return values.contains(v.getCommentType().name().toLowerCase());
 	}
 
-	private static void remove(UPEntry entry, FilterComponentType type) {
+	private static void remove(UniProtEntryBuilder.ActiveEntryBuilder builder, FilterComponentType type) {
 		switch (type) {
 		case PROTEIN_EXISTENCE:
-			entry.setProteinExistence(null);
+			builder.proteinExistence(null);
 			break;
 		case SECONDARY_ACCESSION:
-			entry.setSecondaryAccession(null);
+			builder.secondaryAccessions(null);
 			break;
 		case PROTEIN_NAME:
-			entry.setProtein(null);
-			break;
-		case LINEAGE:
-			entry.setLineage(null);
+			builder.proteinDescription(null);
 			break;
 		case GENE:
-			entry.setGene(null);
+			builder.genes(null);
 			break;
 		case ORGANISM:
-			entry.setOrganism(null);
+			builder.organism(null);
 			break;
 		case ORGANISM_HOST:
-			entry.setOrganismHost(null);
+			builder.organismHosts(null);
 			break;
 		case GENE_LOCATION:
-			entry.setGeneLocations(null);
+			builder.geneLocations(null);
 			break;
-	//	case ENTRY_INFO:
-	//		entry.setInfo(null);
-	//		break;
 		case COMMENT:
-			entry.setComments(null);
+			builder.comments(null);
 			break;
 		case KEYWORD:
-			entry.setKeywords(null);
+			builder.keywords(null);
 			break;
 		case FEATURE:
-			entry.setFeatures(null);
+			builder.features(null);
 			break;
 		case SEQUENCE:
-			entry.setSequence(null);
+			builder.sequence(null);
 			break;
 		case XREF:
-			entry.setDbReferences(null);
+			builder.databaseCrossReferences(null);
 			break;
 		case REFERENCE:
-			entry.setReferences(null);
+			builder.references(null);
 			break;
 		default:
 			break;
