@@ -16,6 +16,7 @@ public class FieldsParser {
 	private static final String DR = "dr";
 	private static final String FT = "ft";
 	private static final String CC = "cc";
+	private static String DEFAULT_FIELDS = "accession,id,reviewed,protein_name,gene_names,organism,length";
 	private static Set<String> DEFAULTFILTERS =new HashSet<>();
 	static {
 		DEFAULTFILTERS.add("accession");
@@ -58,6 +59,9 @@ public class FieldsParser {
 
 	}
 	public static List<String> parse(String fields) {
+		if (Strings.isNullOrEmpty(fields)) {
+			fields = DEFAULT_FIELDS;
+		}
 		return Arrays.asList( fields.split(COMMA));
 	}
 
