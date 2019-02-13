@@ -5,8 +5,8 @@ import org.apache.commons.io.IOUtils;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
-import uk.ac.ebi.uniprot.parser.UniProtParser;
-import uk.ac.ebi.uniprot.parser.impl.DefaultUniProtParser;
+import uk.ac.ebi.uniprot.flatfile.parser.UniProtParser;
+import uk.ac.ebi.uniprot.flatfile.parser.impl.DefaultUniProtParser;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

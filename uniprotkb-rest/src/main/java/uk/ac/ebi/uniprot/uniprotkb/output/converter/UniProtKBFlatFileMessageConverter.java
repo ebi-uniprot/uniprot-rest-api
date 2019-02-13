@@ -1,7 +1,7 @@
 package uk.ac.ebi.uniprot.uniprotkb.output.converter;
 
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.parser.ffwriter.impl.UniProtFlatfileWriter;
+import uk.ac.ebi.uniprot.flatfile.parser.ffwriter.impl.UniProtFlatfileWriter;
 import uk.ac.ebi.uniprot.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
 
