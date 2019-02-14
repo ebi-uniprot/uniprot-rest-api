@@ -21,8 +21,8 @@
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons-codec.version>1.11</commons-codec.version>
-        <data-service.version>web-2019.2-SNAPSHOT</data-service.version>
-        <ujdk.version>2019.2-SNAPSHOT</ujdk.version>
+        <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
+        <ujdk.version>2019.3-SNAPSHOT</ujdk.version>
         <poi.version>4.0.0</poi.version>
         <core.version>0.1-SNAPSHOT</core.version>
     </properties>
