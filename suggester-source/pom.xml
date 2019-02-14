@@ -19,23 +19,30 @@
         <streamex.version>0.6.7</streamex.version>
         <start-class>uk.ac.ebi.uniprot.uuw.suggester.SuggesterManager</start-class>
         <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
+        <core.version>0.1-SNAPSHOT</core.version>
     </properties>
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core-domain</artifactId>
+            <version>${core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>interfaces</artifactId>
-            <version>${ujdk.version}</version>
+            <artifactId>configure-rest</artifactId>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>database</artifactId>
             <version>${ujdk.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>data-service-restful</artifactId>
-            <version>${data-service.version}</version>
         </dependency>
         <dependency>
             <groupId>one.util</groupId>

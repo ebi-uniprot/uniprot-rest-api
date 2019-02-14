@@ -5,10 +5,9 @@ import com.beust.jcommander.Parameter;
 import one.util.streamex.StreamEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseType;
-import uk.ac.ebi.kraken.interfaces.uniprot.comments.CommentType;
-import uk.ac.ebi.kraken.interfaces.uniprot.features.FeatureType;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.FeatureCategory;
+import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
+import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureCategory;
+import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.BufferedWriter;
@@ -55,9 +54,9 @@ public class MainSearchSuggestions {
         try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
-
-            StreamEx.of(enumToSuggestions(new DatabaseTypeToSuggestion()))
-                    .append(enumToSuggestions(new FeatureCategoryToSuggestion()))
+//            StreamEx.of(enumToSuggestions(new DatabaseTypeToSuggestion()))
+//                    .append(enumToSuggestions(new FeatureCategoryToSuggestion()))
+            StreamEx.of(enumToSuggestions(new FeatureCategoryToSuggestion()))
                     .append(enumToSuggestions(new FeatureTypeToSuggestion()))
                     .append(enumToSuggestions(new CommentTypeToSuggestion()))
                     .map(Suggestion::toSuggestionLine)
@@ -79,7 +78,8 @@ public class MainSearchSuggestions {
         Class<T> getEnumType();
     }
 
-    static class DatabaseTypeToSuggestion implements EnumSuggestionFunction<DatabaseType> {
+    //TODO: Need to figure out how to add databases to the main search... because database is no longer an ENUM
+/*    static class DatabaseTypeToSuggestion implements EnumSuggestionFunction<DatabaseType> {
         @Override
         public Optional<Suggestion> apply(DatabaseType value) {
             return value == DatabaseType.UNKNOWN ?
@@ -103,7 +103,7 @@ public class MainSearchSuggestions {
                 return displayName.substring(0, charIndex);
             }
         }
-    }
+    }*/
 
     static class FeatureCategoryToSuggestion implements EnumSuggestionFunction<FeatureCategory> {
         @Override

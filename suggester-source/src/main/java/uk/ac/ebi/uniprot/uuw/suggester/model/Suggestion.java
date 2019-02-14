@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.uuw.suggester.model;
 
-import joptsimple.internal.Strings;
+import com.google.common.base.Strings;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

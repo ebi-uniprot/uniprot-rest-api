@@ -5,10 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseType;
-import uk.ac.ebi.kraken.interfaces.uniprot.comments.CommentType;
-import uk.ac.ebi.kraken.interfaces.uniprot.features.FeatureType;
-import uk.ac.ebi.uniprot.dataservice.restful.features.domain.FeatureCategory;
+import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
+import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureCategory;
+import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.PrintWriter;
@@ -46,26 +45,19 @@ public class MainSearchSuggestionsTest {
         ));
     }
 
-    @Test
-    public void givenRegularDatabaseType_whenCreateSuggestion_thenGetNonEmptyOptional() {
+    //@Test TODO: need to verify how to handle database.....  see comment at MainSearchSuggestions.DatabaseTypeToSuggestion
+/*    public void givenRegularDatabaseType_whenCreateSuggestion_thenGetNonEmptyOptional() {
         MainSearchSuggestions.DatabaseTypeToSuggestion db2Suggestion = new MainSearchSuggestions.DatabaseTypeToSuggestion();
         DatabaseType agd = DatabaseType.AGD;
         Optional<Suggestion> optionalSuggestion = db2Suggestion.apply(agd);
         assertThat(optionalSuggestion.isPresent(), is(true));
         assertThat(optionalSuggestion.get().toSuggestionLine(), is("Database: "+ agd));
-    }
-
-    @Test
-    public void givenUnknownDatabaseType_whenCreateSuggestion_thenGetEmptyOptional() {
-        MainSearchSuggestions.DatabaseTypeToSuggestion db2Suggestion = new MainSearchSuggestions.DatabaseTypeToSuggestion();
-        Optional<Suggestion> optionalSuggestion = db2Suggestion.apply(DatabaseType.UNKNOWN);
-        assertThat(optionalSuggestion.isPresent(), is(false));
-    }
+    }*/
 
     @Test
     public void givenRegularFeatureCategory_whenCreateSuggestion_thenGetNonEmptyOptional() {
         MainSearchSuggestions.FeatureCategoryToSuggestion converter = new MainSearchSuggestions.FeatureCategoryToSuggestion();
-        FeatureCategory value = FeatureCategory.DOMAINS_AND_SITES;
+        FeatureCategory value = FeatureCategory.SITES;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
         assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature category: "+ value));
