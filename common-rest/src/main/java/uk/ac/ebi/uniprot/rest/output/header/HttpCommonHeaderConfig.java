@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
@@ -38,6 +39,7 @@ public class HttpCommonHeaderConfig {
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
+                response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords");
                 chain.doFilter(request, response);
             }
         };
