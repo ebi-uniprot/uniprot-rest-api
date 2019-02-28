@@ -38,7 +38,7 @@ public class UniProtEntryMocker {
         for (Type type : Type.values()) {
             InputStream is = UniProtEntryMocker.class.getResourceAsStream("/entry/" + type.fileName);
             try {
-                UniProtParser parser = new DefaultUniProtParser("","","",true);
+                UniProtParser parser = new DefaultUniProtParser("","","", "", true);
                 UniProtEntry entry = parser.parse(IOUtils.toString(is, Charset.defaultCharset()));
                 entryMap.put(type, entry);
             } catch (Exception e) {

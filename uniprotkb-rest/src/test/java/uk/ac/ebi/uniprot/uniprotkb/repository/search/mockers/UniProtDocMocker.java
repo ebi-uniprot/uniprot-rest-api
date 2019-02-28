@@ -3,7 +3,9 @@ package uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 
 /**
  * A class used for mocking {@link UniProtDocument} instances. Used in tests and for simplifying our interaction with
@@ -17,7 +19,7 @@ public class UniProtDocMocker {
     public static UniProtDocument createDoc(String accession) {
         UniProtDocument document = new UniProtDocument();
         document.accession = accession;
-        document.proteinNames = "Phosphoribosylformylglycinamidine synthase subunit PurQ";
+        document.proteinNames = Arrays.asList( "Phosphoribosylformylglycinamidine synthase subunit PurQ");
         document.avro_binary = "pretend base 64 string";
         document.active = true;
         document.reviewed = true;
