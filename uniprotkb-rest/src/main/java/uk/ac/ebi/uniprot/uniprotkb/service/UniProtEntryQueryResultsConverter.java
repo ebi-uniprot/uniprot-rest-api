@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
-import uk.ac.ebi.uniprot.domain.uniprot.EntryInactiveReason;
-import uk.ac.ebi.uniprot.domain.uniprot.UniProtAccession;
-import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
-import uk.ac.ebi.uniprot.domain.uniprot.UniProtId;
+import uk.ac.ebi.uniprot.domain.uniprot.*;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.EntryInactiveReasonBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
@@ -69,9 +66,18 @@ class UniProtEntryQueryResultsConverter {
     //TODO: need to implement Inactive Reason... lgonzales
     private Optional<UniProtEntry> getInactiveUniProtEntry(UniProtDocument doc) {
         UniProtAccession accession = new UniProtAccessionBuilder(doc.accession).build();
+        List<String> mergeDemergeList = new ArrayList<>();
+
+        String[] reasonItems =  doc.inactiveReason.split(":");
+        InactiveReasonType type = InactiveReasonType.valueOf(reasonItems[0].toUpperCase());
+        if(reasonItems.length > 1){
+            mergeDemergeList.addAll(Arrays.asList(reasonItems[1].split(",")));
+        }
+
         UniProtId uniProtId = new UniProtIdBuilder(doc.id).build();
         EntryInactiveReason inactiveReason = new EntryInactiveReasonBuilder()
-                .addMergeDemergeTo("//TODO: need to implement it")
+                .type(type)
+                .mergeDemergeTo(mergeDemergeList)
                 .build();
 
         UniProtEntryBuilder.InactiveEntryBuilder entryBuilder = new UniProtEntryBuilder()

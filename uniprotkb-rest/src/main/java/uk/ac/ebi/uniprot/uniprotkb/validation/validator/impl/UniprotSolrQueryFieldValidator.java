@@ -2,9 +2,9 @@ package uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.uniprot.dataservice.client.SearchFieldType;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
+import uk.ac.ebi.uniprot.rest.SearchFieldType;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
+import uk.ac.ebi.uniprot.uniprotkb.configuration.UniProtField;
 
 import java.util.function.Predicate;
 

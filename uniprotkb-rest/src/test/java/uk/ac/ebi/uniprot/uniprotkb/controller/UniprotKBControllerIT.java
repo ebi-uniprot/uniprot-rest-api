@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -629,7 +628,6 @@ public class UniprotKBControllerIT {
                         "\"Thermosynechococcus\"]}")));
     }
 
-    @Ignore //TODO: We need to support inactive entries (We are waiting for the new model)
     @Test
     public void searchForMergedInactiveEntriesAlsoReturnsActiveOne() throws Exception {
         // given
@@ -647,11 +645,7 @@ public class UniprotKBControllerIT {
         // then
         response.andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"Q8DIA7\"")))
-                .andExpect(content().string(containsString("\"organism\":{" +
-                        "\"taxonomy\":197221," +
-                        "\"names\":[{\"type\":\"scientific\"," +
-                        "\"value\":\"Thermosynechococcus elongatus (strain BP-1)\"" +
-                        "}]}")));
+                .andExpect(content().string(not("\"primaryAccession\":\"P21802\"")))
+                .andExpect(content().string(containsString("\"primaryAccession\":\"Q14301\"")));
     }
 }

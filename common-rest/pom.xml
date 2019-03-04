@@ -15,7 +15,7 @@
     <properties>
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <solrj.version>7.5.0</solrj.version>
-        <data-service.version>web-2019.2-SNAPSHOT</data-service.version>
+        <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
     </properties>
 
     <dependencies>
@@ -44,12 +44,6 @@
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>data-service-common-public</artifactId>
-            <version>${data-service.version}</version>
         </dependency>
 
         <!-- Solr -->

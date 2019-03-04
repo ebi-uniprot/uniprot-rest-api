@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.service;
 
+import com.google.common.base.Strings;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.SimpleField;
@@ -12,10 +13,10 @@ import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.common.repository.search.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.common.service.ServiceException;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.uniprotkb.configuration.UniProtField;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.impl.UniprotFacetConfig;
@@ -150,6 +151,10 @@ public class UniProtEntryService {
     }
 
     private Sort getUniProtSort(String sortStr) {
-        return UniProtSortUtil.createSort(sortStr).orElse(UniProtSortUtil.createDefaultSort());
+        if (Strings.isNullOrEmpty(sortStr)) {
+            return UniProtSortUtil.createDefaultSort();
+        } else {
+            return UniProtSortUtil.createSort(sortStr);
+        }
     }
 }

@@ -2,9 +2,7 @@ package uk.ac.ebi.uniprot.uniprotkb.service;
 
 import com.google.common.base.Strings;
 import org.springframework.data.domain.Sort;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
-
-import java.util.Optional;
+import uk.ac.ebi.uniprot.uniprotkb.configuration.UniProtField;
 
 public class UniProtSortUtil {
 
@@ -17,11 +15,11 @@ public class UniProtSortUtil {
         }
     }
 
-    public static Optional<Sort> createSort(String sortFields) {
+    public static Sort createSort(String sortFields) {
         if (Strings.isNullOrEmpty(sortFields)) {
-            return Optional.empty();
+            return null;
         }
-        Sort sort = null;
+        Sort sort = new Sort(Sort.Direction.DESC, "score");
         boolean hasAccession = false;
         String[] tokens = sortFields.split("\\s*,\\s*");
         for (String token : tokens) {
@@ -34,15 +32,10 @@ public class UniProtSortUtil {
                 sort = addSort(sort, Sort.Direction.ASC, UniProtField.Sort.valueOf(sortedField[0]));
             }
         }
-        if (sort != null && !hasAccession) {
+        if (!hasAccession) {
             sort = addSort(sort, Sort.Direction.ASC, UniProtField.Sort.accession);
         }
-
-        if (sort == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(sort);
-        }
+        return sort;
     }
 
     private static boolean isDescendentSort(String[] sortedField) {
@@ -50,7 +43,8 @@ public class UniProtSortUtil {
     }
 
     public static Sort createDefaultSort() {
-        return new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName())
+        return new Sort(Sort.Direction.DESC, "score")
+                .and(new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName()))
                 .and(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
     }
 

@@ -4,7 +4,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import uk.ac.ebi.uniprot.dataservice.client.SearchFieldType;
+import uk.ac.ebi.uniprot.rest.SearchFieldType;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
 
 import javax.validation.Constraint;

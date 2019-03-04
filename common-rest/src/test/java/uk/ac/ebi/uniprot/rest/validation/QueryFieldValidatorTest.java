@@ -3,8 +3,8 @@ package uk.ac.ebi.uniprot.rest.validation;
 import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.dataservice.client.SearchFieldType;
-import uk.ac.ebi.uniprot.dataservice.client.uniprot.UniProtField;
+import uk.ac.ebi.uniprot.rest.SearchFieldType;
+import uk.ac.ebi.uniprot.rest.validation.validator.FieldValueValidator;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
 
 import javax.validation.ConstraintValidatorContext;
@@ -205,11 +205,39 @@ class QueryFieldValidatorTest {
      */
     static class FakeSolrQueryFieldValidator implements SolrQueryFieldValidator{
 
-        @Override
+        enum FakeSearchFields {
+            active(SearchFieldType.TERM,FieldValueValidator::isBooleanValue),
+            accession(SearchFieldType.TERM, FieldValueValidator::isAccessionValid),
+            organism_id(SearchFieldType.TERM, null),
+            organism_name(SearchFieldType.TERM, null),
+            taxonomy_id(SearchFieldType.TERM, FieldValueValidator::isNumberValue),
+            gene(SearchFieldType.TERM,null),
+            cc_bpcp_kinetics(SearchFieldType.TERM,null),
+            ccev_bpcp_kinetics(SearchFieldType.TERM,null),
+            proteome(SearchFieldType.TERM,FieldValueValidator::isProteomeIdValue);
+
+            private final Predicate<String> fieldValueValidator;
+            private final SearchFieldType searchFieldType;
+
+            FakeSearchFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator){
+                this.searchFieldType = searchFieldType;
+                this.fieldValueValidator  = fieldValueValidator;
+            }
+
+            public Predicate<String> getFieldValueValidator(){
+                return this.fieldValueValidator;
+            }
+
+            public SearchFieldType getSearchFieldType(){
+                return this.searchFieldType;
+            }
+        }
+
+            @Override
         public boolean hasField(String fieldName) {
             boolean result = true;
             try{
-                UniProtField.Search.valueOf(fieldName);
+                FakeSearchFields.valueOf(fieldName);
             } catch (Exception e){
                 result = false;
             }
@@ -223,7 +251,7 @@ class QueryFieldValidatorTest {
 
         @Override
         public boolean hasValidFieldType(String fieldName, SearchFieldType searchFieldType) {
-            UniProtField.Search search = UniProtField.Search.valueOf(fieldName);
+            FakeSearchFields search = FakeSearchFields.valueOf(fieldName);
             return search.getSearchFieldType().equals(searchFieldType);
         }
 
@@ -234,12 +262,12 @@ class QueryFieldValidatorTest {
 
         @Override
         public SearchFieldType getExpectedSearchFieldType(String fieldName) {
-            return UniProtField.Search.valueOf(fieldName).getSearchFieldType();
+            return FakeSearchFields.valueOf(fieldName).getSearchFieldType();
         }
 
         @Override
         public boolean hasValidFieldValue(String fieldName, String value) {
-            UniProtField.Search search = UniProtField.Search.valueOf(fieldName);
+            FakeSearchFields search = FakeSearchFields.valueOf(fieldName);
             Predicate<String> fieldValueValidator = search.getFieldValueValidator();
             if(fieldValueValidator != null) {
                 try {

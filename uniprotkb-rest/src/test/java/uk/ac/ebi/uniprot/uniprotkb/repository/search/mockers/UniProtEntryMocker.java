@@ -7,6 +7,7 @@ import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
 import uk.ac.ebi.uniprot.flatfile.parser.UniProtParser;
 import uk.ac.ebi.uniprot.flatfile.parser.impl.DefaultUniProtParser;
+import uk.ac.ebi.uniprot.flatfile.parser.impl.SupportingDataMapImpl;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -38,7 +39,7 @@ public class UniProtEntryMocker {
         for (Type type : Type.values()) {
             InputStream is = UniProtEntryMocker.class.getResourceAsStream("/entry/" + type.fileName);
             try {
-                UniProtParser parser = new DefaultUniProtParser("","","",true);
+                UniProtParser parser = new DefaultUniProtParser(new SupportingDataMapImpl(),true);
                 UniProtEntry entry = parser.parse(IOUtils.toString(is, Charset.defaultCharset()));
                 entryMap.put(type, entry);
             } catch (Exception e) {
