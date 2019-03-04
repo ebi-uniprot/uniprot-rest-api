@@ -3,20 +3,20 @@ package uk.ac.ebi.uniprot.uuw.suggester;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureCategory;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
+import uk.ac.ebi.uniprot.domain.uniprot.xdb.UniProtXDbTypes;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  * Created 04/10/18
@@ -26,9 +26,6 @@ import static org.hamcrest.Matchers.is;
 @RunWith(MockitoJUnitRunner.class)
 public class MainSearchSuggestionsTest {
     private MainSearchSuggestions suggestions;
-
-    @Mock
-    private PrintWriter out;
 
     @Before
     public void setUp() {
@@ -45,14 +42,17 @@ public class MainSearchSuggestionsTest {
         ));
     }
 
-    //@Test TODO: need to verify how to handle database.....  see comment at MainSearchSuggestions.DatabaseTypeToSuggestion
-/*    public void givenRegularDatabaseType_whenCreateSuggestion_thenGetNonEmptyOptional() {
-        MainSearchSuggestions.DatabaseTypeToSuggestion db2Suggestion = new MainSearchSuggestions.DatabaseTypeToSuggestion();
-        DatabaseType agd = DatabaseType.AGD;
-        Optional<Suggestion> optionalSuggestion = db2Suggestion.apply(agd);
+    @Test
+    public void givenCommonDatabase_whenCreateSuggestions_thenCommonDatabaseMustBePresent() {
+        List<Suggestion> suggestions = MainSearchSuggestions.databaseSuggestions();
+        assertThat(suggestions, hasSize(UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().size()));
+        String embl = "EMBL";
+        Optional<Suggestion> optionalSuggestion = suggestions.stream()
+                .filter(suggestion -> suggestion.getName().equals(embl))
+                .findFirst();
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Database: "+ agd));
-    }*/
+        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Database: " + embl));
+    }
 
     @Test
     public void givenRegularFeatureCategory_whenCreateSuggestion_thenGetNonEmptyOptional() {
@@ -60,7 +60,7 @@ public class MainSearchSuggestionsTest {
         FeatureCategory value = FeatureCategory.SITES;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature category: "+ value));
+        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature category: " + value));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class MainSearchSuggestionsTest {
         FeatureType value = FeatureType.ACT_SITE;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature type: "+ value.getDisplayName()));
+        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature type: " + value.getDisplayName()));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class MainSearchSuggestionsTest {
         CommentType value = CommentType.ALLERGEN;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Comment type: "+ value.toXmlDisplayName()));
+        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Comment type: " + value.toXmlDisplayName()));
     }
 
     private static class FakeEnumToSuggestion implements MainSearchSuggestions.EnumSuggestionFunction<FakeEnum> {
@@ -98,5 +98,4 @@ public class MainSearchSuggestionsTest {
     enum FakeEnum {
         ONE, TWO, IGNORE_VALUE
     }
-
 }

@@ -20,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-public class TupleStreamIterable implements Iterable<String> {
+class TupleStreamIterable implements Iterable<String> {
     private static final int MAX_RETRIES = 5;
     private static final Logger LOGGER = getLogger(TupleStreamIterable.class);
     private static final int DELAY = 500;

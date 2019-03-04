@@ -6,6 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created 02/10/18
  *
@@ -19,15 +22,22 @@ public class Suggestion {
     String prefix;
     String id;
     String name;
+    private static final Pattern TRAILING_DOTS = Pattern.compile("(.*?)\\.+$");
 
     public String toSuggestionLine() {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalStateException("Cannot have empty name");
+        } else {
+            Matcher matcher = TRAILING_DOTS.matcher(name);
+            if (matcher.matches()) {
+                name = matcher.group(1);
+            }
         }
 
         String suggestionLine = Strings.isNullOrEmpty(prefix) ? "" : prefix + ": ";
         suggestionLine = suggestionLine + (Strings.isNullOrEmpty(name) ? "NULL" : name + " ");
         suggestionLine = suggestionLine + (Strings.isNullOrEmpty(id) ? "" : "[" + id + "]");
+        suggestionLine = suggestionLine.trim();
         return suggestionLine.trim();
     }
 }

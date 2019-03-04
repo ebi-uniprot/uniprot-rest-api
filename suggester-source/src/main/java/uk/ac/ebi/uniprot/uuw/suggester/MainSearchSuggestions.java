@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureCategory;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
+import uk.ac.ebi.uniprot.domain.uniprot.xdb.UniProtXDbTypes;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.BufferedWriter;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 /**
  * Generates file used for the main search box suggestions. Depends on {@link FeatureType},
  * {@link CommentType}, {@link FeatureCategory} and {@link DatabaseType}.
- *
+ * <p>
  * Created 28/09/18
  *
  * @author Edd
@@ -50,20 +51,13 @@ public class MainSearchSuggestions {
         suggestions.createFile();
     }
 
-    private void createFile() {
-        try (FileWriter fw = new FileWriter(outputFile);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter out = new PrintWriter(bw)) {
-//            StreamEx.of(enumToSuggestions(new DatabaseTypeToSuggestion()))
-//                    .append(enumToSuggestions(new FeatureCategoryToSuggestion()))
-            StreamEx.of(enumToSuggestions(new FeatureCategoryToSuggestion()))
-                    .append(enumToSuggestions(new FeatureTypeToSuggestion()))
-                    .append(enumToSuggestions(new CommentTypeToSuggestion()))
-                    .map(Suggestion::toSuggestionLine)
-                    .forEach(out::println);
-        } catch (IOException e) {
-            LOGGER.error("Problem writing main search suggestions file.", e);
-        }
+    static List<Suggestion> databaseSuggestions() {
+        return UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
+                .map(type -> Suggestion.builder()
+                        .prefix("Database")
+                        .name(removeTerminalSemiColon(type.getDisplayName()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     <T extends Enum<T>> List<Suggestion> enumToSuggestions(EnumSuggestionFunction<T> typeToSuggestion) {
@@ -74,36 +68,33 @@ public class MainSearchSuggestions {
                 .collect(Collectors.toList());
     }
 
+    private static String removeTerminalSemiColon(String displayName) {
+        int charIndex = displayName.indexOf(';');
+        if (charIndex < 0) {
+            return displayName;
+        } else {
+            return displayName.substring(0, charIndex);
+        }
+    }
+
+    private void createFile() {
+        try (FileWriter fw = new FileWriter(outputFile);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter out = new PrintWriter(bw)) {
+            StreamEx.of(enumToSuggestions(new FeatureCategoryToSuggestion()))
+                    .append(enumToSuggestions(new FeatureTypeToSuggestion()))
+                    .append(enumToSuggestions(new CommentTypeToSuggestion()))
+                    .append(databaseSuggestions())
+                    .map(Suggestion::toSuggestionLine)
+                    .forEach(out::println);
+        } catch (IOException e) {
+            LOGGER.error("Problem writing main search suggestions file.", e);
+        }
+    }
+
     interface EnumSuggestionFunction<T> extends Function<T, Optional<Suggestion>> {
         Class<T> getEnumType();
     }
-
-    //TODO: Need to figure out how to add databases to the main search... because database is no longer an ENUM
-/*    static class DatabaseTypeToSuggestion implements EnumSuggestionFunction<DatabaseType> {
-        @Override
-        public Optional<Suggestion> apply(DatabaseType value) {
-            return value == DatabaseType.UNKNOWN ?
-                    Optional.empty() :
-                    Optional.of(Suggestion.builder()
-                                        .prefix("Database")
-                                        .name(removeTerminalSemiColon(value.getDisplayName()))
-                                        .build());
-        }
-
-        @Override
-        public Class<DatabaseType> getEnumType() {
-            return DatabaseType.class;
-        }
-
-        private String removeTerminalSemiColon(String displayName) {
-            int charIndex = displayName.indexOf(';');
-            if (charIndex < 0) {
-                return displayName;
-            } else {
-                return displayName.substring(0, charIndex);
-            }
-        }
-    }*/
 
     static class FeatureCategoryToSuggestion implements EnumSuggestionFunction<FeatureCategory> {
         @Override
@@ -127,7 +118,7 @@ public class MainSearchSuggestions {
                                        .prefix("Feature type")
                                        .name(value.getDisplayName())
                                        .build());
-        }                                                                                                                                     
+        }
 
         @Override
         public Class<FeatureType> getEnumType() {
