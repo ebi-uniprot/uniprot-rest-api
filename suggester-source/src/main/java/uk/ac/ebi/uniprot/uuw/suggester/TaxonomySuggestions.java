@@ -31,6 +31,7 @@ import static java.util.Collections.emptySet;
  * @author Edd
  */
 public class TaxonomySuggestions {
+    static final String NAME_DELIMITER = " ``` ";
     private static final Logger LOGGER = LoggerFactory.getLogger(TaxonomySuggestions.class);
     private static final int STATS_REPORT_CHUNK_SIZE = 10000;
     private static final String ALL_TAX_QUERY = "select t.tax_id, t.ncbi_scientific, t.ncbi_common," +
@@ -38,8 +39,6 @@ public class TaxonomySuggestions {
             " from taxonomy.v_public_node t";
     private static final String DEFAULT_TAXON_SYNONYMS_FILE = "default-taxon-synonyms.txt";
     private static final String COMMENT_LINE_PREFIX = "#";
-    static final String NAME_DELIMITER = " ``` ";
-
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
     private String outputFile = "taxon-suggestions.txt";
 
@@ -68,24 +67,7 @@ public class TaxonomySuggestions {
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
-//        Collections.sort(suggestionLines);
         suggestions.print(suggestionLines);
-    }
-
-    private static void insertSuggestions(Map<String, Suggestion> suggestionMap, Set<Suggestion> suggestions) {
-        for (Suggestion suggestion : suggestions) {
-            suggestionMap.putIfAbsent(suggestion.getName() + suggestion.getId(), suggestion);
-        }
-    }
-
-    private static class SuggestionComparator implements Comparator<Suggestion> {
-        @Override
-        public int compare(Suggestion o1, Suggestion o2) {
-            if (o1.getWeight() > o2.getWeight()) {
-
-            }
-            return 0;
-        }
     }
 
     Set<Suggestion> createTaxSuggestions(TaxEntity taxEntity) {
@@ -107,6 +89,12 @@ public class TaxonomySuggestions {
         return createSuggestions(taxEntity.getTaxId(), scientific, common, synonym);
     }
 
+    private static void insertSuggestions(Map<String, Suggestion> suggestionMap, Set<Suggestion> suggestions) {
+        for (Suggestion suggestion : suggestions) {
+            suggestionMap.putIfAbsent(suggestion.getName() + suggestion.getId(), suggestion);
+        }
+    }
+
     private void print(List<String> suggestionLines) {
         try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
@@ -126,7 +114,6 @@ public class TaxonomySuggestions {
             try (Stream<String> lines = new BufferedReader(new InputStreamReader(inputStream)).lines()) {
                 return lines.map(this::createDefaultSuggestion)
                         .filter(Objects::nonNull)
-//                        .map(Suggestion::toSuggestionLine)
                         .collect(Collectors.toSet());
             }
         }
@@ -144,7 +131,6 @@ public class TaxonomySuggestions {
             while (resultSet.next()) {
                 TaxEntity taxEntity = convertRecord(resultSet);
                 createTaxSuggestions(taxEntity)//.stream()
-//                        .map(Suggestion::toSuggestionLine)
                         .forEach(suggestion -> {
                             int currentCount = counter.getAndIncrement();
                             if (currentCount % STATS_REPORT_CHUNK_SIZE == 0) {
