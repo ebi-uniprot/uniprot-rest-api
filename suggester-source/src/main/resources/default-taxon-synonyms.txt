@@ -1,0 +1,173 @@
+Homo sapiens,9606,Human
+Homo sapiens,9606,Man
+#9606,H. Sapiens
+#9606,sapiens
+
+Caenorhabditis elegans,6239,Roundworm
+Caenorhabditis elegans,6239,C. elegans
+#6239,elegans
+
+Caenorhabditis briggsae,6238,C. briggsae
+#6238,briggsae
+
+Drosophila melanogaster,7227,Fruit fly
+Drosophila melanogaster,7227,D. melanogaster
+#7227,melanogaster
+
+Danio rerio,7955,Zebrafish
+#7955,Zebra fish
+Danio rerio,7955,D. rerio
+#7955,rerio
+Danio rerio,7955,Brachydanio rerio
+
+Xenopus laevis,8355,African clawed frog
+Xenopus laevis,8355,Clawed frog
+Xenopus laevis,8355,X. laevis
+#8355,laevis
+
+Xenopus tropicalis,8364,Western clawed frog
+Xenopus tropicalis,8364,Tropical clawed frog
+Xenopus tropicalis,8364,X. tropicalis
+#8364,tropicalis
+Xenopus tropicalis,8364,Xenopus laevis tropicalis
+Xenopus tropicalis,8364,Silurana tropicalis
+
+Mus musculus,10090,Mouse
+Mus musculus,10090,Laboratory mouse
+Mus musculus,10090,House mouse
+10090,M. musculus
+#10090,musculus
+
+Rattus norvegicus,10116,Rat
+Rattus norvegicus,10116,Brown rat
+Rattus norvegicus,10116,Laboratory rat
+Rattus norvegicus,10116,Norway rat
+Rattus norvegicus,10116,Buffalo rat
+Rattus norvegicus,10116,R. norvegicus
+#10116,norvegicus
+
+Saccharomyces cerevisiae,4932,Baker’s yeast
+Saccharomyces cerevisiae,4932,Brewer’s yeast
+Saccharomyces cerevisiae,4932,S. cerevisiae
+#4932,cerevisiae
+
+Schizosaccharomyces pombe,4896,Fission yeast
+Schizosaccharomyces pombe,4896,S. pombe
+#4896,pombe
+
+Candida albicans,5476,Yeast
+Candida albicans,5476,C. albicans
+#5476,albicans
+
+Arabidopsis thaliana,3702,Mouse-ear cress
+Arabidopsis thaliana,3702,Thale cress
+Arabidopsis thaliana,3702,Arabidopsis
+Arabidopsis thaliana,3702,A. Thaliana
+#3702,thaliana
+
+Oryza sativa,39947,Rice
+Oryza sativa,39947,Japanese rice
+Oryza sativa,39947,Japonica rice
+Oryza sativa,39947,O. sativa
+#39947,sativa
+
+Escherichia coli,83333,E. coli
+
+Bacillus subtilis,224308,B. subtilis
+
+Human immunodeficiency virus 1,11676,AIDS virus
+Human immunodeficiency virus 1,11676,HIV
+
+Staphylococcus aureus,1280,Staph. aureus
+Staphylococcus aureus,1280,S. aureus
+
+Bos taurus,9913,Cow
+Bos taurus,9913,Dairy cow
+Bos taurus,9913,Cattle
+Bos taurus,9913,Domestic cow
+Bos taurus,9913,B. taurus
+#9913,taurus
+
+Pan troglodytes,9598,Chimpanzee
+Pan troglodytes,9598,Chimp
+Pan troglodytes,9598,P. troglodytes
+#9598,troglodytes
+
+Echinus esculentus,7648,Sea urchin
+Echinus esculentus,7648,E. esculentus
+#7648,esculentus
+
+Gorilla gorilla gorilla,9595,Gorilla
+Gorilla gorilla gorilla,9595,Western lowland gorilla
+Gorilla gorilla gorilla,9595,G. gorilla
+
+Gallus gallus,9031,Chicken
+#9031,Chick
+Gallus gallus,9031,G. gallus
+Gallus gallus,9031,Gallus domesticus
+#9031,gallus
+
+Canis lupus familiaris,9615,Dog
+Canis lupus familiaris,9615,Domestic dog
+Canis lupus familiaris,9615,Beagle dog
+Canis lupus familiaris,9615,Canis familiaris
+9615,C. familiaris
+#9615,familiaris
+
+Felis catus,9695,Cat
+Felis catus,9695,Domestic cat
+Felis catus,9695,Feline
+Felis catus,9695,F. catus
+#9695,catus
+
+Mesocricetus auratus,10036,Hamster
+Mesocricetus auratus,10036,Golden hamster
+Mesocricetus auratus,10036,Syrian hamster
+Mesocricetus auratus,10036,M. auratus
+#10036,auratus
+
+Cricetulus longicaudatus,10030,Hamster
+Cricetulus longicaudatus,10030,Chinese hamster
+Cricetulus longicaudatus,10030,Long-tailed dwarf hamster
+Cricetulus longicaudatus,10030,C. longicaudatus
+#10030,longicaudatus
+
+Equus asinus,9793,Donkey
+Equus asinus,9793,Ass
+Equus asinus,9793,African donkey
+Equus asinus,9793,African ass
+Equus asinus,9793,E. asinus
+#9793,asinus
+
+Oryctolagus cuniculus,9989,Rabbit
+Oryctolagus cuniculus,9989,Domestic rabbit
+Oryctolagus cuniculus,9989,European rabbit
+Oryctolagus cuniculus,9989,O. cuniculus
+#9989,cuniculus
+
+Sus scrofa,9823,Pig
+Sus scrofa,9823,Swine
+Sus scrofa,9823,Wild boar
+Sus scrofa,9823,S. scrofa
+#9823,scrofa
+
+Ovis aries,9940,Sheep
+Ovis aries,9940,Lamb
+Ovis aries,9940,O. aries
+
+Ambystoma mexicanum,8296,Axolotl
+Ambystoma mexicanum,8296,A. mexicanum
+#8296,mexicanum
+
+Heterocephalus glaber,10181,Naked mole rat
+Heterocephalus glaber,10181,H. glaber
+#10181,glaber
+
+Macaca mulatta,9544,Rhesus monkey
+Macaca mulatta,9544,Rhesus macaque
+Macaca mulatta,9544,M. mulatta
+#9544,mulatta
+
+Dictyostelium discoideum,44689,Slime mold
+Dictyostelium discoideum,44689,D. discoideum
+#44689,discoideum
