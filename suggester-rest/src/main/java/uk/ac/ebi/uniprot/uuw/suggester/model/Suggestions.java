@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
  * @author Edd
  */
 public class Suggestions {
+    static final String VALUE_DELIMITER = " ``` ";
     private static final Pattern SUGGESTION_FORMAT = Pattern.compile("(.*) \\[(.*)\\].*");
     private final String query;
     private final String dictionary;
@@ -50,7 +51,13 @@ public class Suggestions {
         Suggestion suggestion = new Suggestion();
         Matcher matcher = SUGGESTION_FORMAT.matcher(stringSuggestion);
         if (matcher.matches()) {
-            suggestion.setValue(matcher.group(1));
+            String rawName = matcher.group(1);
+            String name = rawName;
+            String[] nameParts = rawName.split(VALUE_DELIMITER);
+            if (nameParts.length == 2) {
+                name = nameParts[1] + " (" + nameParts[0] + ")";
+            }
+            suggestion.setValue(name);
             suggestion.setId(matcher.group(2));
         } else {
             suggestion.setValue(stringSuggestion);

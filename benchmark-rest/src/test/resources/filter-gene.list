@@ -1,0 +1,2 @@
+gene_url,gene_format
+http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=gene:cwc-15,application/json

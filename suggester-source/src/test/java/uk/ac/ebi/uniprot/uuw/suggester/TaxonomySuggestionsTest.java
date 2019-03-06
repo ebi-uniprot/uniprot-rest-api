@@ -4,12 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static uk.ac.ebi.uniprot.uuw.suggester.TaxonomySuggestions.NAME_DELIMITER;
 
 /**
  * Created 03/10/18
@@ -33,11 +32,12 @@ class TaxonomySuggestionsTest {
                 .ncbiScientific("ncbi scientific")
                 .taxId(taxId)
                 .build();
-        List<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
+        Set<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
 
         assertThat(taxSuggestions, hasSize(1));
-        assertThat(taxSuggestions.get(0).getName(), is(scientificName));
-        assertThat(taxSuggestions.get(0).getId(), is(String.valueOf(taxId)));
+        Suggestion suggestion = taxSuggestions.iterator().next();
+        assertThat(suggestion.getName(), is(scientificName));
+        assertThat(suggestion.getId(), is(String.valueOf(taxId)));
     }
 
     @Test
@@ -49,11 +49,12 @@ class TaxonomySuggestionsTest {
                 .ncbiScientific(ncbiScientific)
                 .taxId(taxId)
                 .build();
-        List<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
+        Set<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
 
         assertThat(taxSuggestions, hasSize(1));
-        assertThat(taxSuggestions.get(0).getName(), is(ncbiScientific));
-        assertThat(taxSuggestions.get(0).getId(), is(String.valueOf(taxId)));
+        Suggestion suggestion = taxSuggestions.iterator().next();
+        assertThat(suggestion.getName(), is(ncbiScientific));
+        assertThat(suggestion.getId(), is(String.valueOf(taxId)));
     }
 
 
@@ -66,11 +67,12 @@ class TaxonomySuggestionsTest {
                 .ncbiCommon("ncbi common")
                 .taxId(taxId)
                 .build();
-        List<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
+        Set<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
 
         assertThat(taxSuggestions, hasSize(1));
-        assertThat(taxSuggestions.get(0).getName(), is(commonName));
-        assertThat(taxSuggestions.get(0).getId(), is(String.valueOf(taxId)));
+        Suggestion suggestion = taxSuggestions.iterator().next();
+        assertThat(suggestion.getName(), is(commonName));
+        assertThat(suggestion.getId(), is(String.valueOf(taxId)));
     }
 
     @Test
@@ -82,11 +84,12 @@ class TaxonomySuggestionsTest {
                 .ncbiCommon(ncbiCommon)
                 .taxId(taxId)
                 .build();
-        List<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
+        Set<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
 
         assertThat(taxSuggestions, hasSize(1));
-        assertThat(taxSuggestions.get(0).getName(), is(ncbiCommon));
-        assertThat(taxSuggestions.get(0).getId(), is(String.valueOf(taxId)));
+        Suggestion suggestion = taxSuggestions.iterator().next();
+        assertThat(suggestion.getName(), is(ncbiCommon));
+        assertThat(suggestion.getId(), is(String.valueOf(taxId)));
     }
 
     @Test
@@ -100,11 +103,14 @@ class TaxonomySuggestionsTest {
                 .sptrSynonym(synonymName)
                 .build();
 
-        List<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
+        Set<Suggestion> taxSuggestions = this.taxSuggestions.createTaxSuggestions(taxEntity);
 
-        assertThat(taxSuggestions, hasSize(2));
-        Suggestion scientificSuggestion = Suggestion.builder().id(String.valueOf(taxId)).name(scientificName).build();
-        Suggestion synonymSuggestion = Suggestion.builder().id(String.valueOf(taxId)).name(synonymName).build();
-        assertThat(taxSuggestions, containsInAnyOrder(scientificSuggestion, synonymSuggestion));
+        assertThat(taxSuggestions, hasSize(1));
+        String name = synonymName + NAME_DELIMITER + scientificName;
+        Suggestion scientificSuggestion = Suggestion.builder().id(String.valueOf(taxId))
+                .name(name)
+                .weight(100 - name.length())
+                .build();
+        assertThat(taxSuggestions, contains(scientificSuggestion));
     }
 }

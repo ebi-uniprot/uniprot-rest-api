@@ -10,39 +10,41 @@ import uk.ac.ebi.kraken.database.util.DbConnInfos;
 import uk.ac.ebi.kraken.database.util.DbConnectionInfo;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptySet;
 
 /**
  * Generates file used for taxonomy suggestions. Depends on a UniProt DB, e.g., SWPREAD, using data from
  * TAXONOMY.V_PUBLIC_NODE.
- *
+ * <p>
  * Created 28/09/18
  *
  * @author Edd
  */
 public class TaxonomySuggestions {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaxonomySuggestions.class);
-    private static final int STATS_REPORT_CHUNK_SIZE = 100000;
+    private static final int STATS_REPORT_CHUNK_SIZE = 10000;
     private static final String ALL_TAX_QUERY = "select t.tax_id, t.ncbi_scientific, t.ncbi_common," +
             "t.sptr_scientific,t.sptr_common,t.sptr_synonym" +
             " from taxonomy.v_public_node t";
+    private static final String DEFAULT_TAXON_SYNONYMS_FILE = "default-taxon-synonyms.txt";
+    private static final String COMMENT_LINE_PREFIX = "#";
+    static final String NAME_DELIMITER = " ``` ";
 
     @Parameter(names = {"--output-file", "-o"}, description = "The destination file")
     private String outputFile = "taxon-suggestions.txt";
 
-    @Parameter(names = {"--tax-connection", "-c"}, description = "The connection details to the taxonomy DB", required = true)
+    @Parameter(names = {"--tax-connection",
+                        "-c"}, description = "The connection details to the taxonomy DB", required = true)
     private String taxonomyConnectionStr;
 
     @Parameter(names = "--help", help = true)
@@ -58,76 +60,167 @@ public class TaxonomySuggestions {
             jCommander.usage();
             return;
         }
-        suggestions.createFile();
+        Map<String, Suggestion> suggestionMap = new HashMap<>();
+        insertSuggestions(suggestionMap, suggestions.loadDefaultSynonyms());
+        insertSuggestions(suggestionMap, suggestions.loadFromDB());
+        List<String> suggestionLines = suggestionMap.values().stream()
+                .map(Suggestion::toSuggestionLine)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+//        Collections.sort(suggestionLines);
+        suggestions.print(suggestionLines);
     }
 
-    private void createFile() throws SQLException {
+    private static void insertSuggestions(Map<String, Suggestion> suggestionMap, Set<Suggestion> suggestions) {
+        for (Suggestion suggestion : suggestions) {
+            suggestionMap.putIfAbsent(suggestion.getName() + suggestion.getId(), suggestion);
+        }
+    }
+
+    private static class SuggestionComparator implements Comparator<Suggestion> {
+        @Override
+        public int compare(Suggestion o1, Suggestion o2) {
+            if (o1.getWeight() > o2.getWeight()) {
+
+            }
+            return 0;
+        }
+    }
+
+    Set<Suggestion> createTaxSuggestions(TaxEntity taxEntity) {
+        // scientific name
+        String scientific = taxEntity.getSptrScientific();
+        if (Objects.isNull(scientific)) {
+            scientific = taxEntity.getNcbiScientific();
+        }
+
+        // common name
+        String common = taxEntity.getSptrCommon();
+        if (Objects.isNull(common)) {
+            common = taxEntity.getNcbiCommon();
+        }
+
+        // synonym
+        String synonym = taxEntity.getSptrSynonym();
+
+        return createSuggestions(taxEntity.getTaxId(), scientific, common, synonym);
+    }
+
+    private void print(List<String> suggestionLines) {
+        try (FileWriter fw = new FileWriter(outputFile);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter out = new PrintWriter(bw)) {
+            for (String suggestionLine : suggestionLines) {
+                out.println(suggestionLine);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to create taxonomy suggestions file, " + outputFile, e);
+        }
+    }
+
+    private Set<Suggestion> loadDefaultSynonyms() {
+        InputStream inputStream = TaxonomySuggestions.class.getClassLoader()
+                .getResourceAsStream(DEFAULT_TAXON_SYNONYMS_FILE);
+        if (inputStream != null) {
+            try (Stream<String> lines = new BufferedReader(new InputStreamReader(inputStream)).lines()) {
+                return lines.map(this::createDefaultSuggestion)
+                        .filter(Objects::nonNull)
+//                        .map(Suggestion::toSuggestionLine)
+                        .collect(Collectors.toSet());
+            }
+        }
+        return emptySet();
+    }
+
+    private Set<Suggestion> loadFromDB() throws SQLException {
         DbConnectionInfo dbConnectionInfo = DbConnInfos.getConnection(taxonomyConnectionStr);
         AtomicInteger counter = new AtomicInteger();
 
+        Set<Suggestion> suggestions = new HashSet<>();
         try (Connection conn = dbConnectionInfo.createConnection();
              Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery(ALL_TAX_QUERY);
-             FileWriter fw = new FileWriter(outputFile);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter out = new PrintWriter(bw)) {
+             ResultSet resultSet = statement.executeQuery(ALL_TAX_QUERY)) {
             while (resultSet.next()) {
                 TaxEntity taxEntity = convertRecord(resultSet);
-                createTaxSuggestions(taxEntity).stream()
-                        .map(Suggestion::toSuggestionLine)
+                createTaxSuggestions(taxEntity)//.stream()
+//                        .map(Suggestion::toSuggestionLine)
                         .forEach(suggestion -> {
                             int currentCount = counter.getAndIncrement();
                             if (currentCount % STATS_REPORT_CHUNK_SIZE == 0) {
                                 LOGGER.info("Added {} taxonomy suggestions.", currentCount);
                             }
-                            out.println(suggestion);
+                            suggestions.add(suggestion);
                         });
             }
-        } catch (IOException e) {
-            LOGGER.error("Failed to create taxonomy suggestions file, " + taxonomyConnectionStr, e);
         }
-    }
-
-    List<Suggestion> createTaxSuggestions(TaxEntity taxEntity) {
-        List<Suggestion> suggestions = new ArrayList<>();
-
-        // scientific name
-        Suggestion scientificSuggestion = createSuggestion(taxEntity, TaxEntity::getSptrScientific);
-        if (Objects.isNull(scientificSuggestion)) {
-            scientificSuggestion = createSuggestion(taxEntity, TaxEntity::getNcbiScientific);
-        }
-        if (Objects.nonNull(scientificSuggestion)) {
-            suggestions.add(scientificSuggestion);
-        }
-
-        // common name
-        Suggestion commonSuggestion = createSuggestion(taxEntity, TaxEntity::getSptrCommon);
-        if (Objects.isNull(commonSuggestion)) {
-            commonSuggestion = createSuggestion(taxEntity, TaxEntity::getNcbiCommon);
-        }
-        if (Objects.nonNull(commonSuggestion)) {
-            suggestions.add(commonSuggestion);
-        }
-
-        // synonym
-        Suggestion synonymSuggestion = createSuggestion(taxEntity, TaxEntity::getSptrSynonym);
-        if (Objects.nonNull(synonymSuggestion)) {
-            suggestions.add(synonymSuggestion);
-        }
-
         return suggestions;
     }
 
-    private Suggestion createSuggestion(TaxEntity taxEntity, Function<TaxEntity, String> nameGetter) {
-        Suggestion suggestion = null;
-        if (Objects.nonNull(nameGetter.apply(taxEntity))) {
-            suggestion = Suggestion.builder()
-                    .name(nameGetter.apply(taxEntity))
-                    .id(taxEntity.getTaxId().toString())
-                    .build();
-        }
+    private Set<Suggestion> createSuggestions(Integer taxId, String scientific, String common, String synonym) {
+        Set<Suggestion> suggestions = new HashSet<>();
+        if (scientific != null) {
+            if (common != null) {
+                suggestions.add(createSuggestion(taxId, scientific, common));
+            }
+            if (synonym != null) {
+                suggestions.add(createSuggestion(taxId, scientific, synonym));
+            }
+            if (suggestions.isEmpty()) {
+                suggestions.add(createSuggestion(taxId, scientific));
+            }
 
-        return suggestion;
+        } else {
+            if (common != null) {
+                suggestions.add(createSuggestion(taxId, common));
+            }
+            if (synonym != null) {
+                suggestions.add(createSuggestion(taxId, synonym));
+            }
+        }
+        return suggestions;
+    }
+
+    private Suggestion createSuggestion(Integer taxId, String scientific, String alternativeName) {
+        String name = createName(scientific, alternativeName);
+        return Suggestion.builder()
+                .id(taxId.toString())
+                .name(name)
+                .weight(computeWeightForName(name))
+                .build();
+    }
+
+    private Suggestion createSuggestion(Integer taxId, String scientific) {
+        return Suggestion.builder()
+                .id(taxId.toString())
+                .name(scientific)
+                .weight(computeWeightForName(scientific))
+                .build();
+    }
+
+    private Suggestion createDefaultSuggestion(String csvLine) {
+        String[] lineParts = csvLine.split(",");
+        if (!csvLine.startsWith(COMMENT_LINE_PREFIX) && lineParts.length == 3) {
+            return Suggestion.builder()
+                    .name(createName(lineParts[0], lineParts[2]))
+                    .id(lineParts[1])
+                    .weight(100)
+                    .build();
+        } else {
+            return null;
+        }
+    }
+
+    private String createName(String scientific, String alternativeName) {
+        return alternativeName + NAME_DELIMITER + scientific;
+    }
+
+    private double computeWeightForName(String name) {
+        int weight = 100 - name.length();
+        if (weight < 1) {
+            weight = 1;
+        }
+        return weight;
     }
 
     private TaxEntity convertRecord(ResultSet resultSet) throws SQLException {

@@ -1,0 +1,283 @@
+Database: EMBL 
+Database: PIR 
+Database: RefSeq 
+Database: UniGene 
+Database: PDB 
+Database: HSSP 
+Database: SMR 
+Database: DisProt 
+Database: DIP 
+Database: IntAct 
+Database: MEROPS 
+Database: PeroxiBase 
+Database: PptaseDB 
+Database: REBASE 
+Database: TRANSFAC 
+Database: GlycoSuiteDB 
+Database: PhosSite 
+Database: SWISS-2DPAGE 
+Database: Aarhus/Ghent-2DPAGE 
+Database: ANU-2DPAGE 
+Database: COMPLUYEAST-2DPAGE 
+Database: Cornea-2DPAGE 
+Database: DOSAC-COBS-2DPAGE 
+Database: ECO2DBASE 
+Database: HSC-2DPAGE 
+Database: OGP 
+Database: PHCI-2DPAGE 
+Database: PMMA-2DPAGE 
+Database: Rat-heart-2DPAGE 
+Database: REPRODUCTION-2DPAGE 
+Database: Siena-2DPAGE 
+Database: PeptideAtlas 
+Database: Ensembl 
+Database: GeneID 
+Database: GenomeReviews 
+Database: KEGG 
+Database: TIGR 
+Database: AGD 
+Database: BuruList 
+Database: CYGD 
+Database: dictyBase 
+Database: EchoBASE 
+Database: EcoGene 
+Database: euHCVdb 
+Database: FlyBase 
+Database: GeneDB_Spombe 
+Database: GeneFarm 
+Database: Gramene 
+Database: H-InvDB 
+Database: HGNC 
+Database: HIV 
+Database: HPA 
+Database: LegioList 
+Database: Leproma 
+Database: ListiList 
+Database: MaizeGDB 
+Database: MIM 
+Database: MGI 
+Database: MypuList 
+Database: Orphanet 
+Database: PharmGKB 
+Database: PhotoList 
+Database: PseudoCAP 
+Database: RGD 
+Database: SagaList 
+Database: SGD 
+Database: StyGene 
+Database: SubtiList 
+Database: TAIR 
+Database: TubercuList 
+Database: WormBase 
+Database: WormPep 
+Database: ZFIN 
+Database: BioCyc 
+Database: Reactome 
+Database: DrugBank 
+Database: LinkHub 
+Database: CleanEx 
+Database: GermOnline 
+Database: GO 
+Database: HAMAP 
+Database: InterPro 
+Database: Gene3D 
+Database: PANTHER 
+Database: Pfam 
+Database: PIRSF 
+Database: PRINTS 
+Database: ProDom 
+Database: SMART 
+Database: TIGRFAMs 
+Database: PROSITE 
+Database: Maize-2DPAGE 
+Database: RZPD-ProtExp 
+Database: UniPep 
+Database: PDBsum 
+Database: GCRDb 
+Database: CarbBank 
+Database: Genew 
+Database: GK 
+Database: MaizeDB 
+Database: Mendel 
+Database: MGD 
+Database: YEPD 
+Database: VectorBase 
+Database: World-2DPAGE 
+Database: PhosphoSitePlus 
+Database: 2DBase-Ecoli 
+Database: ProMEX 
+Database: NMPDR 
+Database: CGD 
+Database: HOGENOM 
+Database: HOVERGEN 
+Database: BindingDB 
+Database: NextBio 
+Database: Xenbase 
+Database: GeneCards 
+Database: PRIDE 
+Database: BRENDA 
+Database: Bgee 
+Database: IPI 
+Database: TCDB 
+Database: Pathway_Interaction_DB 
+Database: CAZy 
+Database: OMA 
+Database: PMAP-CutDB 
+Database: UCSC 
+Database: CTD 
+Database: STRING 
+Database: PhylomeDB 
+Database: OrthoDB 
+Database: eggNOG 
+Database: InParanoid 
+Database: ArachnoServer 
+Database: EuPathDB 
+Database: ProtClustDB 
+Database: SUPFAM 
+Database: GenoList 
+Database: MINT 
+Database: ConoServer 
+Database: UCD-2DPAGE 
+Database: EnsemblBacteria 
+Database: EnsemblFungi 
+Database: EnsemblMetazoa 
+Database: EnsemblPlants 
+Database: EnsemblProtists 
+Database: ProteinModelPortal 
+Database: Allergome 
+Database: neXtProt 
+Database: GeneTree 
+Database: KO 
+Database: DMDM 
+Database: PATRIC 
+Database: PomBase 
+Database: DNASU 
+Database: EvolutionaryTrace 
+Database: UniPathway 
+Database: GenomeRNAi 
+Database: ChEMBL 
+Database: PaxDb 
+Database: mycoCLAP 
+Database: SABIO-RK 
+Database: ChiTaRS 
+Database: SignaLink 
+Database: UniCarbKB 
+Database: GeneWiki 
+Database: PRO 
+Database: GuidetoPHARMACOLOGY 
+Database: TreeFam 
+Database: BioGrid 
+Database: MaxQB 
+Database: GeneReviews 
+Database: CCDS 
+Database: ExpressionAtlas 
+Database: Proteomes 
+Database: MoonProt 
+Database: DEPOD 
+Database: WBParaSite 
+Database: BioMuta 
+Database: ESTHER 
+Database: Genevisible 
+Database: SwissPalm 
+Database: EPD 
+Database: TopDownProteomics 
+Database: SIGNOR 
+Database: CDD 
+Database: SwissLipids 
+Database: MalaCards 
+Database: iPTMnet 
+Database: CollecTF 
+Database: GeneDB 
+Database: OpenTargets 
+Database: DisGeNET 
+Database: SFLD 
+Database: Araport 
+Database: IMGT_GENE-DB 
+Database: ELM 
+Database: CORUM 
+Database: GlycoProtDB 
+Database: VGNC 
+Database: CarbonylDB 
+Database: GlyConnect 
+Database: MoonDB 
+Database: ComplexPortal 
+Database: ProteomicsDB 
+Database: UniLectin 
+Database: PathwayCommons 
+Feature category: MOLECULE_PROCESSING 
+Feature category: STRUCTURAL 
+Feature category: DOMAINS_AND_SITES 
+Feature category: MUTAGENESIS 
+Feature category: PTM 
+Feature category: SEQUENCE_INFORMATION 
+Feature category: TOPOLOGY 
+Feature category: VARIANTS 
+Feature type: initiator methionine 
+Feature type: signal peptide 
+Feature type: propeptide 
+Feature type: transit peptide 
+Feature type: chain 
+Feature type: peptide 
+Feature type: topological domain 
+Feature type: transmembrane region 
+Feature type: Other domain of interest 
+Feature type: repeat 
+Feature type: calcium-binding region 
+Feature type: zinc finger region 
+Feature type: DNA-binding region 
+Feature type: Nucleotide-binding region 
+Feature type: region of interest 
+Feature type: coiled-coil region 
+Feature type: short sequence motif 
+Feature type: compositionally biased region 
+Feature type: active site 
+Feature type: metal ion-binding site 
+Feature type: Other binding site 
+Feature type: Other site of interest 
+Feature type: non-standard amino acid 
+Feature type: Post-translationally modified residue 
+Feature type: lipid moiety-binding region 
+Feature type: glycosylation site 
+Feature type: disulfide bond 
+Feature type: cross-link 
+Feature type: splice variant 
+Feature type: Sequence variation 
+Feature type: mutagenesis site 
+Feature type: Uncertainty in sequence 
+Feature type: sequence conflict 
+Feature type: non-consecutive residues 
+Feature type: non-terminal residue 
+Feature type: helix 
+Feature type: turn 
+Feature type: strand 
+Feature type: intramembrane region 
+Comment type: function 
+Comment type: catalytic activity 
+Comment type: cofactor 
+Comment type: enzyme regulation 
+Comment type: biophysicochemical properties 
+Comment type: pathway 
+Comment type: subunit 
+Comment type: interaction 
+Comment type: subcellular location 
+Comment type: alternative products 
+Comment type: tissue specificity 
+Comment type: developmental stage 
+Comment type: induction 
+Comment type: domain 
+Comment type: PTM 
+Comment type: RNA editing 
+Comment type: mass spectrometry 
+Comment type: polymorphism 
+Comment type: disease 
+Comment type: disruption phenotype 
+Comment type: allergen 
+Comment type: toxic dose 
+Comment type: biotechnology 
+Comment type: pharmaceutical 
+Comment type: miscellaneous 
+Comment type: similarity 
+Comment type: caution 
+Comment type: sequence caution 
+Comment type: online information 
+Comment type: page 

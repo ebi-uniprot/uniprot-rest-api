@@ -1,0 +1,2 @@
+taxon_url,taxon_format
+http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=taxonomy_id:1283662,application/json

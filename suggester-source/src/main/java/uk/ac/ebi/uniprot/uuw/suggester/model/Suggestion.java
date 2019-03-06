@@ -20,8 +20,10 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode
 public class Suggestion {
     String prefix;
-    String id;
     String name;
+    String id;
+    @Builder.Default
+    double weight = -1d;
     private static final Pattern TRAILING_DOTS = Pattern.compile("(.*?)\\.+$");
 
     public String toSuggestionLine() {
@@ -37,6 +39,7 @@ public class Suggestion {
         String suggestionLine = Strings.isNullOrEmpty(prefix) ? "" : prefix + ": ";
         suggestionLine = suggestionLine + (Strings.isNullOrEmpty(name) ? "NULL" : name + " ");
         suggestionLine = suggestionLine + (Strings.isNullOrEmpty(id) ? "" : "[" + id + "]");
+        suggestionLine += weight != -1d ? "\t" + weight : "";
         suggestionLine = suggestionLine.trim();
         return suggestionLine.trim();
     }

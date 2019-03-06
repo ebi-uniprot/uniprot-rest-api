@@ -1,0 +1,2 @@
+download_sp_url,download_sp_format
+http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/download?query=reviewed:true,text/flatfile

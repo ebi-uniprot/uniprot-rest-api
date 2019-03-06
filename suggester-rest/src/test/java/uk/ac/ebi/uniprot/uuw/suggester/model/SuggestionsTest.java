@@ -7,6 +7,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.VALUE_DELIMITER;
 import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.createSuggestions;
 
 /**
@@ -49,6 +50,22 @@ class SuggestionsTest {
 
         Suggestion expectedSuggestion = new Suggestion();
         expectedSuggestion.setValue(suggestionValue);
+        expectedSuggestion.setId(suggestionId);
+        assertThat(suggestions.getSuggestions(), is(singletonList(expectedSuggestion)));
+    }
+
+    @Test
+    void canCreateSuggestionWithNamePartsAndId() {
+        String altName = "alternative-name";
+        String sciName = "scientific-name";
+        String suggestionValue = altName + VALUE_DELIMITER + sciName;
+        String suggestionId = "11111";
+        String suggestion = suggestionValue + " [" + suggestionId + "]";
+
+        Suggestions suggestions = createSuggestions(SuggestionDictionary.ec, "anything", singletonList(suggestion));
+
+        Suggestion expectedSuggestion = new Suggestion();
+        expectedSuggestion.setValue(sciName + " (" + altName + ")");
         expectedSuggestion.setId(suggestionId);
         assertThat(suggestions.getSuggestions(), is(singletonList(expectedSuggestion)));
     }
