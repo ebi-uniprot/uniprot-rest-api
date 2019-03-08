@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.service;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.uniprotkb.configuration.UniProtField;
@@ -14,10 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author lgonzales
  */
-@Ignore
 class UniProtSortUtilTest {
 
-    @Ignore
+    @Disabled
     @Test
     void testCreateSingleAccessionSortAsc() {
         Sort sort = UniProtSortUtil.createSort("accession asc");
@@ -39,7 +38,7 @@ class UniProtSortUtilTest {
         assertEquals(sortIterator.hasNext(), false);
     }
 
-    @Ignore
+    @Disabled
     @Test
     void testCreateSingleMnemonicSortDescAlsoAddAccessionAsc() {
         Sort sort = UniProtSortUtil.createSort("mnemonic desc");
@@ -67,7 +66,7 @@ class UniProtSortUtilTest {
         assertEquals(sortIterator.hasNext(), false);
     }
 
-    @Ignore
+    @Disabled
     @Test
     void testCreateCompositeAccessionSortAscAndGeneDesc() {
         Sort sort = UniProtSortUtil.createSort("accession desc,gene asc");
@@ -94,7 +93,7 @@ class UniProtSortUtilTest {
         assertEquals(sortIterator.hasNext(), false);
     }
 
-    @Ignore
+    @Disabled
     @Test
     void testCreateCompositeMnemonicSortDescAlsoAddAccessionAsc() {
         Sort sort = UniProtSortUtil.createSort("organism asc,mass desc , accession asc");
@@ -127,7 +126,7 @@ class UniProtSortUtilTest {
         assertEquals(sortIterator.hasNext(), false);
     }
 
-    @Ignore
+    @Disabled
     @Test
     void testCreateDefaultSort() {
         Sort defaultSort = UniProtSortUtil.createDefaultSort();
