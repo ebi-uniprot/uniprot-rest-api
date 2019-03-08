@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptySet;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
 
 /**
  * Generates file used for taxonomy suggestions. Depends on a UniProt DB, e.g., SWPREAD, using data from
@@ -199,14 +200,6 @@ public class TaxonomySuggestions {
 
     private String createName(String scientific, String alternativeName) {
         return alternativeName + NAME_DELIMITER + scientific;
-    }
-
-    private double computeWeightForName(String name) {
-        int weight = 100 - name.length();
-        if (weight < 1) {
-            weight = 1;
-        }
-        return weight;
     }
 
     private TaxEntity convertRecord(ResultSet resultSet) throws SQLException {

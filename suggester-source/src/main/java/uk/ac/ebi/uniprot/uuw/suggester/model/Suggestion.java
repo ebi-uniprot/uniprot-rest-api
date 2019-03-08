@@ -43,4 +43,12 @@ public class Suggestion {
         suggestionLine = suggestionLine.trim();
         return suggestionLine.trim();
     }
+
+    public static double computeWeightForName(String name) {
+        int weight = 100 - name.length();
+        if (weight < 1) {
+            weight = 1;
+        }
+        return weight;
+    }
 }
