@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.uniprotkb.service;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.uniprotkb.configuration.UniProtField;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author lgonzales
  */
+@Ignore
 class UniProtSortUtilTest {
 
     @Test
