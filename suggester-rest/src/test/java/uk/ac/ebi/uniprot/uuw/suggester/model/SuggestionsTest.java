@@ -44,7 +44,7 @@ class SuggestionsTest {
     void canCreateSuggestionWithId() {
         String suggestionValue = "some suggestion with id";
         String suggestionId = "GO:0000001";
-        String suggestion = suggestionValue + " [" + suggestionId + "]";
+        String suggestion = suggestionValue + " [ " + suggestionId + " ]";
 
         Suggestions suggestions = createSuggestions(SuggestionDictionary.ec, "anything", singletonList(suggestion));
 
@@ -60,7 +60,7 @@ class SuggestionsTest {
         String sciName = "scientific-name";
         String suggestionValue = altName + VALUE_DELIMITER + sciName;
         String suggestionId = "11111";
-        String suggestion = suggestionValue + " [" + suggestionId + "]";
+        String suggestion = suggestionValue + " [ " + suggestionId + " ]";
 
         Suggestions suggestions = createSuggestions(SuggestionDictionary.ec, "anything", singletonList(suggestion));
 

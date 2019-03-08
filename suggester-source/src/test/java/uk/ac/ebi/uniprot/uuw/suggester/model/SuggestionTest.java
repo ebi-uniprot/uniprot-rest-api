@@ -23,7 +23,7 @@ class SuggestionTest {
                 .id(id)
                 .build();
 
-        assertThat(suggestion.toSuggestionLine(), is(prefix + ": " + name + " [" + id + "]"));
+        assertThat(suggestion.toSuggestionLine(), is(prefix + ": " + name + " [ " + id + " ]"));
     }
 
     @Test
@@ -47,7 +47,7 @@ class SuggestionTest {
                 .id(id)
                 .build();
 
-        assertThat(suggestion.toSuggestionLine(), is(name + " [" + id + "]"));
+        assertThat(suggestion.toSuggestionLine(), is(name + " [ " + id + " ]"));
     }
 
     @Test

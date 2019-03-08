@@ -38,7 +38,7 @@ public class Suggestion {
 
         String suggestionLine = Strings.isNullOrEmpty(prefix) ? "" : prefix + ": ";
         suggestionLine = suggestionLine + (Strings.isNullOrEmpty(name) ? "NULL" : name + " ");
-        suggestionLine = suggestionLine + (Strings.isNullOrEmpty(id) ? "" : "[" + id + "]");
+        suggestionLine = suggestionLine + (Strings.isNullOrEmpty(id) ? "" : "[ " + id + " ]");
         suggestionLine += weight != -1d ? "\t" + weight : "";
         suggestionLine = suggestionLine.trim();
         return suggestionLine.trim();

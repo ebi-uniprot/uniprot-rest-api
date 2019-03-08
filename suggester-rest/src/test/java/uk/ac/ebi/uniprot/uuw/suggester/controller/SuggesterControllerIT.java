@@ -44,7 +44,7 @@ public class SuggesterControllerIT {
         String value1 = "some text 1";
         String value2 = "some text 2";
         String id1 = "1234";
-        List<String> results = asList(value1 + " [" + id1 + "]", value2);
+        List<String> results = asList(value1 + " [ " + id1 + " ]", value2);
         Suggestions suggestions = createSuggestions(taxonomy, query, results);
         given(suggesterService.getSuggestions(taxonomy, query)).willReturn(suggestions);
 

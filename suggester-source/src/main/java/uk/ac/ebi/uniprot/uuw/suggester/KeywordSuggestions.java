@@ -8,6 +8,8 @@ import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.*;
 
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
+
 /**
  * Generates file used for keyword suggestions. Depends on keywlist.txt file, located in
  * /ebi/ftp/private/uniprot/current_release/knowledgebase/complete/docs.
@@ -60,6 +62,7 @@ public class KeywordSuggestions {
     Suggestion.SuggestionBuilder process(String line, Suggestion.SuggestionBuilder lineBuilder, PrintWriter out) {
         if (line.startsWith("ID") || line.startsWith("IC")) {
             lineBuilder.name(removePrefixFrom(line));
+            lineBuilder.weight(computeWeightForName(line));
         } else if (line.startsWith("AC")) {
             lineBuilder.id(removePrefixFrom(line));
         }

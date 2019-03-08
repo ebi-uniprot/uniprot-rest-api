@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class Suggestions {
     static final String VALUE_DELIMITER = " ``` ";
-    private static final Pattern SUGGESTION_FORMAT = Pattern.compile("(.*) \\[(.*)\\].*");
+    private static final Pattern SUGGESTION_FORMAT = Pattern.compile("(.*) \\[ (.*) \\].*");
     private final String query;
     private final String dictionary;
     private final List<Suggestion> suggestions;

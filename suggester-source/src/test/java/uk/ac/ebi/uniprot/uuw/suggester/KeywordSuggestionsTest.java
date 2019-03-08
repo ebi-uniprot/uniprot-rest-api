@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
 
 /**
  * Created 03/10/18
@@ -46,7 +47,7 @@ public class KeywordSuggestionsTest {
         verify(out, times(0)).println(anyString());
 
         keywordSuggestions.process("//", suggestionBuilder, out);
-        Suggestion expectedSuggestion = Suggestion.builder().name(kwId).id(kwAc).build();
+        Suggestion expectedSuggestion = Suggestion.builder().name(kwId).id(kwAc).weight(computeWeightForName(kwId)).build();
         verify(out, times(1)).println(expectedSuggestion.toSuggestionLine());
     }
 }
