@@ -10,13 +10,14 @@ import java.util.Iterator;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *  Unit Test class to validate UniProtSortUtil class behaviour
+ * Unit Test class to validate UniProtSortUtil class behaviour
  *
  * @author lgonzales
  */
 @Ignore
 class UniProtSortUtilTest {
 
+    @Ignore
     @Test
     void testCreateSingleAccessionSortAsc() {
         Sort sort = UniProtSortUtil.createSort("accession asc");
@@ -25,19 +26,20 @@ class UniProtSortUtilTest {
         Iterator<Sort.Order> sortIterator = sort.iterator();
         assertNotNull(sortIterator);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         Sort.Order order = sortIterator.next();
         assertEquals(order.getProperty(), "score");
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
-        assertEquals(sortIterator.hasNext(),false);
+        assertEquals(sortIterator.hasNext(), false);
     }
 
+    @Ignore
     @Test
     void testCreateSingleMnemonicSortDescAlsoAddAccessionAsc() {
         Sort sort = UniProtSortUtil.createSort("mnemonic desc");
@@ -46,25 +48,26 @@ class UniProtSortUtilTest {
         Iterator<Sort.Order> sortIterator = sort.iterator();
         assertNotNull(sortIterator);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         Sort.Order order = sortIterator.next();
         assertEquals(order.getProperty(), "score");
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.mnemonic.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
-        assertEquals(sortIterator.hasNext(),false);
+        assertEquals(sortIterator.hasNext(), false);
     }
 
+    @Ignore
     @Test
     void testCreateCompositeAccessionSortAscAndGeneDesc() {
         Sort sort = UniProtSortUtil.createSort("accession desc,gene asc");
@@ -73,24 +76,25 @@ class UniProtSortUtilTest {
         Iterator<Sort.Order> sortIterator = sort.iterator();
         assertNotNull(sortIterator);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         Sort.Order order = sortIterator.next();
         assertEquals(order.getProperty(), "score");
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.gene.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
-        assertEquals(sortIterator.hasNext(),false);
+        assertEquals(sortIterator.hasNext(), false);
     }
 
+    @Ignore
     @Test
     void testCreateCompositeMnemonicSortDescAlsoAddAccessionAsc() {
         Sort sort = UniProtSortUtil.createSort("organism asc,mass desc , accession asc");
@@ -99,30 +103,31 @@ class UniProtSortUtilTest {
         Iterator<Sort.Order> sortIterator = sort.iterator();
         assertNotNull(sortIterator);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         Sort.Order order = sortIterator.next();
         assertEquals(order.getProperty(), "score");
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.organism.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.mass.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
-        assertEquals(sortIterator.hasNext(),true);
+        assertEquals(sortIterator.hasNext(), true);
         order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
-        assertEquals(sortIterator.hasNext(),false);
+        assertEquals(sortIterator.hasNext(), false);
     }
 
+    @Ignore
     @Test
     void testCreateDefaultSort() {
         Sort defaultSort = UniProtSortUtil.createDefaultSort();
@@ -148,5 +153,4 @@ class UniProtSortUtilTest {
 
         assertFalse(sortIterator.hasNext());
     }
-
 }
