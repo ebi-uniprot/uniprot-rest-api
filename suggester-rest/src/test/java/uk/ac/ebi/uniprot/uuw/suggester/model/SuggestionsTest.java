@@ -7,8 +7,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.VALUE_DELIMITER;
-import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.createSuggestions;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.*;
 
 /**
  * Created 17/12/18
@@ -44,7 +43,7 @@ class SuggestionsTest {
     void canCreateSuggestionWithId() {
         String suggestionValue = "some suggestion with id";
         String suggestionId = "GO:0000001";
-        String suggestion = suggestionValue + " [ " + suggestionId + " ]";
+        String suggestion = suggestionId + " " + ID_VALUE_SEPARATOR + " " + suggestionValue;
 
         Suggestions suggestions = createSuggestions(SuggestionDictionary.ec, "anything", singletonList(suggestion));
 
@@ -60,7 +59,7 @@ class SuggestionsTest {
         String sciName = "scientific-name";
         String suggestionValue = altName + VALUE_DELIMITER + sciName;
         String suggestionId = "11111";
-        String suggestion = suggestionValue + " [ " + suggestionId + " ]";
+        String suggestion = suggestionId + " " + ID_VALUE_SEPARATOR + " " + suggestionValue;
 
         Suggestions suggestions = createSuggestions(SuggestionDictionary.ec, "anything", singletonList(suggestion));
 

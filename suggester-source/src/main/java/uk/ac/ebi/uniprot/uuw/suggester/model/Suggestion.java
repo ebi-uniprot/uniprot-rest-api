@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 @ToString
 @EqualsAndHashCode
 public class Suggestion {
+    public static final String ID_VALUE_SEPARATOR = " @@ ";
     String prefix;
     String name;
     String id;
@@ -36,9 +37,9 @@ public class Suggestion {
             }
         }
 
-        String suggestionLine = Strings.isNullOrEmpty(prefix) ? "" : prefix + ": ";
-        suggestionLine = suggestionLine + (Strings.isNullOrEmpty(name) ? "NULL" : name + " ");
-        suggestionLine = suggestionLine + (Strings.isNullOrEmpty(id) ? "" : "[ " + id + " ]");
+        String suggestionLine = (Strings.isNullOrEmpty(id) ? ID_VALUE_SEPARATOR : id + ID_VALUE_SEPARATOR);
+        suggestionLine += Strings.isNullOrEmpty(prefix) ? "" : prefix + ": ";
+        suggestionLine = suggestionLine + (Strings.isNullOrEmpty(name) ? "NULL" : name + "");
         suggestionLine += weight != -1d ? "\t" + weight : "";
         suggestionLine = suggestionLine.trim();
         return suggestionLine.trim();
@@ -50,5 +51,13 @@ public class Suggestion {
             weight = 1;
         }
         return weight;
+    }
+
+    public static class Comparator implements java.util.Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.substring(o1.indexOf("@@") + 1).compareTo(o2.substring(o2.indexOf("@@") + 1));
+        }
+
     }
 }

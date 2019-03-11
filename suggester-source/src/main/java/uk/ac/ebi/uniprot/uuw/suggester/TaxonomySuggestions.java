@@ -60,13 +60,14 @@ public class TaxonomySuggestions {
             jCommander.usage();
             return;
         }
+
         Map<String, Suggestion> suggestionMap = new HashMap<>();
         insertSuggestions(suggestionMap, suggestions.loadDefaultSynonyms());
         insertSuggestions(suggestionMap, suggestions.loadFromDB());
         List<String> suggestionLines = suggestionMap.values().stream()
                 .map(Suggestion::toSuggestionLine)
                 .distinct()
-                .sorted()
+                .sorted(new Suggestion.Comparator())
                 .collect(Collectors.toList());
         suggestions.print(suggestionLines);
     }
@@ -100,8 +101,13 @@ public class TaxonomySuggestions {
         try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
+            AtomicInteger counter = new AtomicInteger();
             for (String suggestionLine : suggestionLines) {
                 out.println(suggestionLine);
+                int currentCount = counter.getAndIncrement();
+                if (currentCount % STATS_REPORT_CHUNK_SIZE == 0) {
+                    LOGGER.info("Written {} taxonomy suggestions.", currentCount);
+                }
             }
         } catch (IOException e) {
             LOGGER.error("Failed to create taxonomy suggestions file, " + outputFile, e);
@@ -123,7 +129,6 @@ public class TaxonomySuggestions {
 
     private Set<Suggestion> loadFromDB() throws SQLException {
         DbConnectionInfo dbConnectionInfo = DbConnInfos.getConnection(taxonomyConnectionStr);
-        AtomicInteger counter = new AtomicInteger();
 
         Set<Suggestion> suggestions = new HashSet<>();
         try (Connection conn = dbConnectionInfo.createConnection();
@@ -131,14 +136,8 @@ public class TaxonomySuggestions {
              ResultSet resultSet = statement.executeQuery(ALL_TAX_QUERY)) {
             while (resultSet.next()) {
                 TaxEntity taxEntity = convertRecord(resultSet);
-                createTaxSuggestions(taxEntity)//.stream()
-                        .forEach(suggestion -> {
-                            int currentCount = counter.getAndIncrement();
-                            if (currentCount % STATS_REPORT_CHUNK_SIZE == 0) {
-                                LOGGER.info("Added {} taxonomy suggestions.", currentCount);
-                            }
-                            suggestions.add(suggestion);
-                        });
+                createTaxSuggestions(taxEntity)
+                        .forEach(suggestions::add);
             }
         }
         return suggestions;

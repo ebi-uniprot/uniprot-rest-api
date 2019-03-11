@@ -27,7 +27,7 @@ public class ECSuggestionsTest {
     private ECSuggestions ecSuggestions;
 
     @Mock
-    private Collection<String> out;
+    private Collection<String> suggestions;
 
     @Before
     public void setUp() {
@@ -40,20 +40,20 @@ public class ECSuggestionsTest {
         String ecName = "Alcohol dehydrogenase.";
 
         Suggestion.SuggestionBuilder suggestionBuilder = Suggestion.builder();
-        suggestionBuilder = ecSuggestions.processEnzymeDatLine("ID   " + ec, suggestionBuilder, out);
-        verify(out, times(0)).add(anyString());
+        suggestionBuilder = ecSuggestions.processEnzymeDatLine("ID   " + ec, suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        suggestionBuilder = ecSuggestions.processEnzymeDatLine("DE   " + ecName, suggestionBuilder, out);
-        verify(out, times(0)).add(anyString());
+        suggestionBuilder = ecSuggestions.processEnzymeDatLine("DE   " + ecName, suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
         suggestionBuilder = ecSuggestions
-                .processEnzymeDatLine("ANY OTHER LINE THAT IS NOT '//'", suggestionBuilder, out);
-        verify(out, times(0)).add(anyString());
+                .processEnzymeDatLine("ANY OTHER LINE THAT IS NOT '//'", suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        ecSuggestions.processEnzymeDatLine("//", suggestionBuilder, out);
+        ecSuggestions.processEnzymeDatLine("//", suggestionBuilder, suggestions);
         Suggestion expectedSuggestion = Suggestion.builder().name(ecName).id(ec).weight(computeWeightForName(ecName))
                 .build();
-        verify(out, times(1)).add(expectedSuggestion.toSuggestionLine());
+        verify(suggestions, times(1)).add(expectedSuggestion.toSuggestionLine());
     }
 
     @Test

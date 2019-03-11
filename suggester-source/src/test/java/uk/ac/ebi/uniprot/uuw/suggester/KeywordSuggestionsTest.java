@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
-import java.io.PrintWriter;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -24,7 +24,7 @@ public class KeywordSuggestionsTest {
     private KeywordSuggestions keywordSuggestions;
 
     @Mock
-    private PrintWriter out;
+    private List<String> suggestions;
 
     @Before
     public void setUp() {
@@ -34,20 +34,21 @@ public class KeywordSuggestionsTest {
     @Test
     public void givenIDAndACValue_whenProcess_thenWriteSuggestion() {
         String kwId = "Abscisic acid signaling pathway";
-        String kwAc = "KW-0938";
+        String id = "938";
+        String kwAc = "KW-0" + id;
 
         Suggestion.SuggestionBuilder suggestionBuilder = Suggestion.builder();
-        suggestionBuilder = keywordSuggestions.process("ID   " + kwId, suggestionBuilder, out);
-        verify(out, times(0)).println(anyString());
+        suggestionBuilder = keywordSuggestions.process("ID   " + kwId, suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        suggestionBuilder = keywordSuggestions.process("AC   " + kwAc, suggestionBuilder, out);
-        verify(out, times(0)).println(anyString());
+        suggestionBuilder = keywordSuggestions.process("AC   " + kwAc, suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        suggestionBuilder = keywordSuggestions.process("ANY OTHER LINE THAT IS NOT '//'", suggestionBuilder, out);
-        verify(out, times(0)).println(anyString());
+        suggestionBuilder = keywordSuggestions.process("ANY OTHER LINE THAT IS NOT '//'", suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        keywordSuggestions.process("//", suggestionBuilder, out);
-        Suggestion expectedSuggestion = Suggestion.builder().name(kwId).id(kwAc).weight(computeWeightForName(kwId)).build();
-        verify(out, times(1)).println(expectedSuggestion.toSuggestionLine());
+        keywordSuggestions.process("//", suggestionBuilder, suggestions);
+        Suggestion expectedSuggestion = Suggestion.builder().name(kwId).id(id).weight(computeWeightForName(kwId)).build();
+        verify(suggestions, times(1)).add(expectedSuggestion.toSuggestionLine());
     }
 }

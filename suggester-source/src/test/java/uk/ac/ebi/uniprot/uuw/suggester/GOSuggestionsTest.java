@@ -12,6 +12,7 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
 
 /**
  * Created 03/10/18
@@ -31,13 +32,14 @@ public class GOSuggestionsTest {
 
     @Test
     public void givenGOLine_whenProcess_thenGenerateExpectedSuggestion() {
-        String goId = "GO:0051536";
+        String id = "51536";
+        String goId = "GO:00" + id;
         String goName = "iron-sulfur cluster binding";
-        String input = "A0A007    DR   GO; " + goId + "; F:" + goName + "; IEA:InterPro.";
+        String input = " " + goId + " F:" + goName;
 
         goSuggestions.process(input, suggestionsSet);
 
-        String suggestionLine = Suggestion.builder().id(goId).name(goName).build().toSuggestionLine();
+        String suggestionLine = Suggestion.builder().id(id).name(goName).weight(computeWeightForName(goName)).build().toSuggestionLine();
         assertThat(suggestionsSet, contains(suggestionLine));
     }
 
@@ -48,19 +50,5 @@ public class GOSuggestionsTest {
         goSuggestions.process(input, suggestionsSet);
 
         assertThat(suggestionsSet, hasSize(0));
-    }
-
-    @Test
-    public void givenDuplicateGOLines_whenProcess_thenGenerateOnly1Suggestion() {
-        String goId = "GO:0051536";
-        String goName = "iron-sulfur cluster binding";
-        String input1 = "AAAAAA    DR   GO; " + goId + "; F:" + goName + "; IEA:InterPro.";
-        String input2 = "ZZZZZZ    DR   GO; " + goId + "; F:" + goName + "; IEA:InterPro.";
-
-        goSuggestions.process(input1, suggestionsSet);
-        goSuggestions.process(input2, suggestionsSet);
-
-        String suggestionLine = Suggestion.builder().id(goId).name(goName).build().toSuggestionLine();
-        assertThat(suggestionsSet, contains(suggestionLine));
     }
 }

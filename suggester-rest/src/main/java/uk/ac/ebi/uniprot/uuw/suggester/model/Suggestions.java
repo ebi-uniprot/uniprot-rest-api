@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
  * @author Edd
  */
 public class Suggestions {
+    public static final String ID_VALUE_SEPARATOR = "@@";
     static final String VALUE_DELIMITER = " ``` ";
-    private static final Pattern SUGGESTION_FORMAT = Pattern.compile("(.*) \\[ (.*) \\].*");
+    private static final Pattern SUGGESTION_FORMAT = Pattern.compile("(.*) ?" + ID_VALUE_SEPARATOR + " (.*)");
     private final String query;
     private final String dictionary;
     private final List<Suggestion> suggestions;
@@ -51,14 +52,14 @@ public class Suggestions {
         Suggestion suggestion = new Suggestion();
         Matcher matcher = SUGGESTION_FORMAT.matcher(stringSuggestion);
         if (matcher.matches()) {
-            String rawName = matcher.group(1);
+            String rawName = matcher.group(2);
             String name = rawName;
             String[] nameParts = rawName.split(VALUE_DELIMITER);
             if (nameParts.length == 2) {
                 name = nameParts[1] + " (" + nameParts[0] + ")";
             }
-            suggestion.setValue(name);
-            suggestion.setId(matcher.group(2));
+            suggestion.setValue(name.trim());
+            suggestion.setId(matcher.group(1).trim());
         } else {
             suggestion.setValue(stringSuggestion);
         }
