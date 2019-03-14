@@ -25,11 +25,6 @@ class UniProtSortUtilTest {
 
         assertEquals(sortIterator.hasNext(),true);
         Sort.Order order = sortIterator.next();
-        assertEquals(order.getProperty(), "score");
-        assertEquals(order.getDirection(), Sort.Direction.DESC);
-
-        assertEquals(sortIterator.hasNext(),true);
-        order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
@@ -46,11 +41,6 @@ class UniProtSortUtilTest {
 
         assertEquals(sortIterator.hasNext(),true);
         Sort.Order order = sortIterator.next();
-        assertEquals(order.getProperty(), "score");
-        assertEquals(order.getDirection(), Sort.Direction.DESC);
-
-        assertEquals(sortIterator.hasNext(),true);
-        order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.mnemonic.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
@@ -73,11 +63,6 @@ class UniProtSortUtilTest {
 
         assertEquals(sortIterator.hasNext(),true);
         Sort.Order order = sortIterator.next();
-        assertEquals(order.getProperty(), "score");
-        assertEquals(order.getDirection(), Sort.Direction.DESC);
-
-        assertEquals(sortIterator.hasNext(),true);
-        order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 
@@ -99,11 +84,6 @@ class UniProtSortUtilTest {
 
         assertEquals(sortIterator.hasNext(),true);
         Sort.Order order = sortIterator.next();
-        assertEquals(order.getProperty(), "score");
-        assertEquals(order.getDirection(), Sort.Direction.DESC);
-
-        assertEquals(sortIterator.hasNext(),true);
-        order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.organism.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.ASC);
 
