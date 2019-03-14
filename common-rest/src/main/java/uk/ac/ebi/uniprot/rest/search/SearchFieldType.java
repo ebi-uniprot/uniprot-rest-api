@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.rest;
+package uk.ac.ebi.uniprot.rest.search;
 
 /**
  * Define what is the type of the expected query search.

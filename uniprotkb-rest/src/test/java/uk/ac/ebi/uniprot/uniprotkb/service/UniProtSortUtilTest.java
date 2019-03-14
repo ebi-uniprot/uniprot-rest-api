@@ -122,8 +122,8 @@ class UniProtSortUtilTest {
     }
 
     @Test
-    void testCreateDefaultSort() {
-        Sort defaultSort = UniProtSortUtil.createDefaultSort();
+    void testCreateDefaultSortWithScore() {
+        Sort defaultSort = UniProtSortUtil.createDefaultSort(true);
         assertNotNull(defaultSort);
 
         Iterator<Sort.Order> sortIterator = defaultSort.iterator();
@@ -136,6 +136,27 @@ class UniProtSortUtilTest {
 
         assertTrue(sortIterator.hasNext());
         order = sortIterator.next();
+        assertEquals(order.getProperty(), UniProtField.Sort.annotation_score.getSolrFieldName());
+        assertEquals(order.getDirection(), Sort.Direction.DESC);
+
+        assertTrue(sortIterator.hasNext());
+        order = sortIterator.next();
+        assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
+        assertEquals(order.getDirection(), Sort.Direction.ASC);
+
+        assertFalse(sortIterator.hasNext());
+    }
+
+    @Test
+    void testCreateDefaultSortWithoutScore() {
+        Sort defaultSort = UniProtSortUtil.createDefaultSort(false);
+        assertNotNull(defaultSort);
+
+        Iterator<Sort.Order> sortIterator = defaultSort.iterator();
+        assertNotNull(sortIterator);
+
+        assertTrue(sortIterator.hasNext());
+        Sort.Order order = sortIterator.next();
         assertEquals(order.getProperty(), UniProtField.Sort.annotation_score.getSolrFieldName());
         assertEquals(order.getDirection(), Sort.Direction.DESC);
 

@@ -3,7 +3,9 @@ package uk.ac.ebi.uniprot.rest.validation.error;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -11,10 +13,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.common.exception.ResourceNotFoundException;
+import uk.ac.ebi.uniprot.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.common.repository.search.QueryRetrievalException;
-import uk.ac.ebi.uniprot.common.service.ServiceException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +59,9 @@ public class ResponseExceptionHandler {
 
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
 
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(getContentTypeFromRequest(request))
+                .body(error);
     }
 
     /**
@@ -80,7 +88,43 @@ public class ResponseExceptionHandler {
         addDebugError(request,ex,messages);
 
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(getContentTypeFromRequest(request))
+                .body(error);
+    }
+
+    private MediaType getContentTypeFromRequest(HttpServletRequest request) {
+        MediaType result = MediaType.APPLICATION_JSON;
+        String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);;
+        if(Utils.notEmpty(acceptHeader)){
+            result = MediaType.valueOf(acceptHeader);
+        }
+        return result;
+    }
+
+    /**
+     * Bad Request exception handler that was catch during request
+     *
+     * @param ex throw exception
+     * @param request http request
+     * @return 400 Bad request error response with error message details
+     */
+    @ExceptionHandler(value = { ConstraintViolationException.class })
+    public ResponseEntity<ErrorInfo> constraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
+        List<String> messages = new ArrayList<>();
+
+        for (ConstraintViolation error : ex.getConstraintViolations()) {
+            if(error.getMessage() != null) {
+                messages.add(error.getMessage());
+            }
+        }
+
+        addDebugError(request,ex,messages);
+
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(getContentTypeFromRequest(request))
+                .body(error);
     }
 
     /**
@@ -90,16 +134,15 @@ public class ResponseExceptionHandler {
      * @param request http request
      * @return 404 Not Found error response with error message details
      */
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorInfo> noHandlerFoundException(NoHandlerFoundException ex, HttpServletRequest request) {
+    @ExceptionHandler(value = {NoHandlerFoundException.class, ResourceNotFoundException.class})
+    public ResponseEntity<ErrorInfo> noHandlerFoundException(Exception ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(NOT_FOUND_MESSAGE,null, Locale.getDefault()));
-
-        addDebugError(request,ex,messages);
-
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
-
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        addDebugError(request,ex,messages);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(getContentTypeFromRequest(request))
+                .body(error);
     }
 
     /**

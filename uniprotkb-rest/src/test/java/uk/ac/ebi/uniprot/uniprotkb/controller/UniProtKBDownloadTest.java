@@ -16,6 +16,7 @@ import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.common.repository.store.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.uniprotkb.configuration.UniprotKBConfig;
 import uk.ac.ebi.uniprot.uniprotkb.output.MessageConverterConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfig;
@@ -46,7 +47,7 @@ import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROT
 @RunWith(SpringRunner.class)
 @WebMvcTest({UniprotKBController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
-         UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class})
+         UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class, UniprotKBConfig.class})
 public class UniProtKBDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
@@ -96,7 +97,7 @@ public class UniProtKBDownloadTest {
     }
 
     private void mockStreamerResponseOf(UniProtEntry... entries) {
-        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any(), any()))
+        when(uniProtEntryStoreStreamer.idsToStoreStream(any()))
                 .thenReturn(Stream.of(entries));
     }
 }

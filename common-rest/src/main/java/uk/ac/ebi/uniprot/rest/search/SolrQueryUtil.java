@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.common.repository.search;
+package uk.ac.ebi.uniprot.rest.search;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -15,7 +15,7 @@ import java.util.List;
 public class SolrQueryUtil {
 
     public static boolean hasFieldTerms(String inputQuery, String... terms) {
-        boolean isValid = true;
+        boolean isValid = false;
         try {
             QueryParser qp = new QueryParser("", new StandardAnalyzer());
             Query query = qp.parse(inputQuery);
@@ -51,4 +51,5 @@ public class SolrQueryUtil {
         }
         return hasTerm;
     }
+
 }

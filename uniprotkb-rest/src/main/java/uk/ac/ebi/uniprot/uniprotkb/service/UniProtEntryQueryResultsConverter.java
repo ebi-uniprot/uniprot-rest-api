@@ -63,7 +63,7 @@ class UniProtEntryQueryResultsConverter {
             return getInactiveUniProtEntry(doc);
         }
     }
-    //TODO: need to implement Inactive Reason... lgonzales
+
     private Optional<UniProtEntry> getInactiveUniProtEntry(UniProtDocument doc) {
         UniProtAccession accession = new UniProtAccessionBuilder(doc.accession).build();
         List<String> mergeDemergeList = new ArrayList<>();

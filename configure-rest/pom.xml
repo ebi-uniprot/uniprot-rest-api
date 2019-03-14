@@ -16,7 +16,7 @@
     <description>UniProt Rest API Configuration</description>
 
     <properties>
-        <uniprot.core.version>2019.2-SNAPSHOT</uniprot.core.version>
+        <uniprot.core.version>2019.3-SNAPSHOT</uniprot.core.version>
     </properties>
 
     <dependencies>

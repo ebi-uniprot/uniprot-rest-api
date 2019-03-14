@@ -32,8 +32,8 @@ public class InactiveEntryMocker {
         entryMap.put(InactiveType.MERGED,mergedEntries);
 
         List<InactiveUniProtEntry> demergedEntries = new ArrayList<>();
-        mergedEntries.add(InactiveUniProtEntry.from("Q00007","2ABA_HUMAN","merged","P63150"));
-        mergedEntries.add(InactiveUniProtEntry.from("Q00007","2ABA_HUMAN","merged","P63151"));
+        demergedEntries.add(InactiveUniProtEntry.from("Q00007","2ABA_HUMAN","merged","P63150"));
+        demergedEntries.add(InactiveUniProtEntry.from("Q00007","2ABA_HUMAN","merged","P63151"));
         entryMap.put(InactiveType.DEMERGED, Collections.singletonList(InactiveUniProtEntry.merge(demergedEntries)));
     }
     public static List<InactiveUniProtEntry> create(InactiveType inactiveType){

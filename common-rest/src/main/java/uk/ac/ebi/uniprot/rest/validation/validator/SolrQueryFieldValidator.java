@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.rest.validation.validator;
 
-import uk.ac.ebi.uniprot.rest.SearchFieldType;
+import uk.ac.ebi.uniprot.rest.search.SearchFieldType;
 
 /**
  * This interface is responsible to define methods that are used to validate solr query fields in solr queries

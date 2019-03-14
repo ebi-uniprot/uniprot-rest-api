@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.common.service;
+package uk.ac.ebi.uniprot.common.exception;
 
 /**
  * Represents a problem when executing a service.

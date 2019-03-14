@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.rest.validation;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import uk.ac.ebi.uniprot.common.Utils;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -35,13 +36,14 @@ public @interface ValidSolrQuerySyntax {
         @Override
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
-            try{
-                StandardQueryParser standardQueryParser = new StandardQueryParser();
-                standardQueryParser.parse(queryString,"");
-            }catch (QueryNodeException e){
-                isValid = false;
+            if(Utils.notEmpty(queryString)) {
+                try {
+                    StandardQueryParser standardQueryParser = new StandardQueryParser();
+                    standardQueryParser.parse(queryString, "");
+                } catch (QueryNodeException e) {
+                    isValid = false;
+                }
             }
-
             return isValid;
         }
     }

@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,15 +29,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-public class UniprotKBControllerIT {
-    private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
+public class UniprotKBSearchControllerIT {
+
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
     @Autowired
@@ -54,42 +55,6 @@ public class UniprotKBControllerIT {
     }
 
     @Test
-    public void canReachAccessionEndpoint() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + acc)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
-    }
-
-    @Test
-    public void canFilterEntryFromAccessionEndpoint() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + acc)
-                        .param("fields", "gene")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)))
-                .andExpect(jsonPath("$.results.*.genes").exists())
-                // ensure other parts of the entry were not returned (using one example)
-                .andExpect(jsonPath("$.results.*.organism").doesNotExist());
-    }
-
-    @Test
     public void canReachSearchEndpoint() throws Exception {
         // given
         String acc = saveEntry();
@@ -102,8 +67,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)));
     }
 
     @Test
@@ -120,18 +86,49 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)))
                 .andExpect(jsonPath("$.results.*.genes").exists())
                 // ensure other parts of the entry were not returned (using one example)
                 .andExpect(jsonPath("$.results.*.organism").doesNotExist());
     }
 
-    private String saveEntry() {
+    @Test
+    public void queryIsRequired() throws Exception {
+        // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-        return acc;
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("query is a required parameter")));
+    }
+
+    @Test
+    public void allowQueryAllDocuments() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE+"?query=*:*")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession").exists());
     }
 
     @Test
@@ -148,8 +145,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("query parameter has an invalid syntax")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("query parameter has an invalid syntax")));
     }
 
     @Test
@@ -166,8 +164,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("'org.apache.lucene.search.BoostQuery' " +
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("'org.apache.lucene.search.BoostQuery' " +
                         "is currently not an accepted search type, please contact us if you require it")));
     }
 
@@ -185,9 +184,11 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("'invalidfield' is not a valid search field")))
-                .andExpect(content().string(containsString("'invalidfield2' is not a valid search field")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",
+                        containsInAnyOrder("'invalidfield' is not a valid search field",
+                                "'invalidfield2' is not a valid search field")));
     }
 
     @Test
@@ -204,8 +205,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("'created' filter type 'term' is invalid. Expected 'range' filter type")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("'created' filter type 'term' is invalid. Expected 'range' filter type")));
     }
 
     @Test
@@ -222,8 +224,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("The 'accession' filter value 'invalidValue' has invalid format. It should be a valid UniProtKB accession")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("The 'accession' filter value 'invalidValue' has invalid format. It should be a valid UniProtKB accession")));
     }
 
     @Test
@@ -240,8 +243,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("The 'proteome' filter value has invalid format. It should match the regular expression UP[0-9]{9}")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("The 'proteome' filter value has invalid format. It should match the regular expression UP[0-9]{9}")));
     }
 
     @Test
@@ -258,8 +262,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("The 'active' parameter can only be true or false")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("The 'active' parameter can only be true or false")));
     }
 
     @Test
@@ -276,8 +281,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("The 'organism_id' filter value should be a number")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("The 'organism_id' filter value should be a number")));
     }
 
     @Test
@@ -294,8 +300,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)));
     }
 
     @Test
@@ -312,8 +319,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"" + acc + "\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains(acc)));
     }
 
     @Test
@@ -330,9 +338,10 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("Invalid sort field invalidfield")))
-                .andExpect(content().string(containsString("Invalid sort field order invalidsort. Expected asc or desc")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",containsInAnyOrder("Invalid sort field invalidfield"
+                        ,"Invalid sort field order invalidsort. Expected asc or desc")));
     }
 
     @Test
@@ -349,13 +358,36 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("Invalid sort field order invalidsort1. Expected asc or desc")))
-                .andExpect(content().string(containsString("Invalid sort field invalidfield")))
-                .andExpect(content().string(containsString("Invalid sort field invalidfield1")))
-                .andExpect(content().string(containsString("Invalid sort field order invalidsort. Expected asc or desc")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",
+                        containsInAnyOrder("Invalid sort field order invalidsort1. Expected asc or desc",
+                                "Invalid sort field invalidfield",
+                                "Invalid sort field invalidfield1",
+                                "Invalid sort field order invalidsort. Expected asc or desc")));
     }
 
+    @Test
+    public void returnFieldsWithCorrectValues() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,organism")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q8DIA7")))
+                .andExpect(jsonPath("$.results.*.organism.scientificName", contains("Thermosynechococcus elongatus (strain BP-1)")))
+                .andExpect(jsonPath("$.results.*.organism.taxonId",contains(197221)))
+                .andExpect(jsonPath("$.results.*.organism.lineage", hasItem(hasItems("Thermosynechococcus","Synechococcaceae"))));
+    }
 
     @Test
     public void returnFieldsWithSingleIncorrectValue() throws Exception {
@@ -371,8 +403,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("Invalid fields parameter value 'invalidField'")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("Invalid fields parameter value 'invalidField'")));
     }
 
     @Test
@@ -389,13 +422,15 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("Invalid fields parameter value 'invalidField'")))
-                .andExpect(content().string(containsString("Invalid fields parameter value 'otherInvalid'")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",
+                        containsInAnyOrder("Invalid fields parameter value 'invalidField'",
+                                "Invalid fields parameter value 'otherInvalid'")));
     }
 
     @Test
-    public void searchInvalidIncludeIsoformParamterValue() throws Exception {
+    public void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
@@ -408,34 +443,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("Invalid includeIsoform parameter value. Expected true or false")));
-    }
-
-    @Test
-    public void defaultCanonicalOnly() throws Exception {
-        // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=gene:FGFR2&fields=accession,gene_primary")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-2\"")));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("Invalid includeIsoform parameter value. Expected true or false")));
     }
 
     @Test
@@ -458,10 +468,38 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-2\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
+    }
+
+    @Test
+    public void searchCanonicalOnly() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:P21802&fields=accession,gene_primary")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
     }
 
     @Test
@@ -479,19 +517,20 @@ public class UniprotKBControllerIT {
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:P21802-1&fields=accession,gene_primary")
+                get(SEARCH_RESOURCE + "?query=accession_id:P21802-1&fields=accession,gene_primary")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-1\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-2\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
     }
 
     @Test
-    public void includeCanonicalAndIsoForm() throws Exception {
+    public void searchIncludeCanonicalAndIsoForm() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
@@ -510,10 +549,10 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-2\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",containsInAnyOrder("P21802","P21802-2")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")));
     }
 
     @Test
@@ -536,14 +575,14 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-2\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",containsInAnyOrder("P21802","P21802-2")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")));
     }
 
     @Test
-    public void isoFormOnly() throws Exception {
+    public void searchIsoFormOnly() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
@@ -562,16 +601,36 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802-1\"")))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"P21802-2\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802-2")));
+    }
+
+    @Test
+    public void searchWithInvalidFacetRequest() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        String acc = entry.getPrimaryAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&includeFacets=invalid")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("Invalid includeFacets parameter value. Expected true or false")));
     }
 
     @Test
     public void canReturnFacetInformation() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -582,9 +641,12 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\""+acc+"\"")))
-                .andExpect(content().string(containsString("\"facets\":[{\"label\":\"3D Structure\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains(acc)))
+                .andExpect(jsonPath("$.facets",notNullValue()))
+                .andExpect(jsonPath("$.facets",not(empty())))
+                .andExpect(jsonPath("$.facets.*.name",hasItems("d3structure","fragment","reviewed")));
     }
 
     @Test
@@ -601,31 +663,9 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_XML_VALUE))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_XML_VALUE))
                 .andExpect(content().string(containsString("facets are only supported by application/json format")));
-    }
-
-    @Test
-    public void returnFieldsWithCorrectValues() throws Exception {
-        // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,organism")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"Q8DIA7\"")))
-                .andExpect(content().string(containsString("\"organism\":{" +
-                        "\"scientificName\":\"Thermosynechococcus elongatus (strain BP-1)\"," +
-                        "\"taxonId\":197221," +
-                        "\"lineage\":[\"Bacteria\",\"Cyanobacteria\",\"Synechococcales\",\"Synechococcaceae\"," +
-                        "\"Thermosynechococcus\"]}")));
     }
 
     @Test
@@ -644,8 +684,62 @@ public class UniprotKBControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(content().string(not("\"primaryAccession\":\"P21802\"")))
-                .andExpect(content().string(containsString("\"primaryAccession\":\"Q14301\"")));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802","Q14301")));
+    }
+
+    @Test
+    public void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> demergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
+        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,demergedList);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=accession:Q00007&fields=accession,organism")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q00007")))
+                .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
+                .andExpect(jsonPath("$.results.*.inactiveReason.inactiveReasonType", contains("DEMERGED")))
+                .andExpect(jsonPath("$.results.*.inactiveReason.mergeDemergeTo", contains(contains("P63150","P63151"))));
+    }
+
+    @Test
+    public void searchForDeletedInactiveEntriesReturnItself() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> deletedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
+        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,deletedList);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=mnemonic:I8FBX2_YERPE&fields=accession,organism")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")))
+                .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
+                .andExpect(jsonPath("$.results.*.inactiveReason.inactiveReasonType", contains("DELETED")));
+    }
+
+    private String saveEntry() {
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        String acc = entry.getPrimaryAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        return acc;
     }
 }

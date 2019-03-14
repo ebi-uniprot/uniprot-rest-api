@@ -30,10 +30,14 @@ public class FieldsParser {
 	}
 	
 	public static boolean isDefaultFilters(Map<String, List<String>> filters) {
-		boolean notDefault= filters.keySet().stream()
-		.anyMatch(val ->!DEFAULTFILTERS.contains(val) );
-		
-		return !notDefault;
+		if(filters != null && !filters.isEmpty()) {
+			boolean notDefault = filters.keySet().stream()
+					.anyMatch(val -> !DEFAULTFILTERS.contains(val));
+
+			return !notDefault;
+		}else{
+			return false;
+		}
 	}
 
 	public static Map<String, List<String>> parseForFilters(String fields) {
