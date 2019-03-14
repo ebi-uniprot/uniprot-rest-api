@@ -37,22 +37,18 @@ public class TupleStreamTemplate {
     private StreamContext streamContext;
     private HttpClient httpClient;
 
-    public TupleStream create(String query, String filterQuery) {
-        return create(query, filterQuery, key, new Sort(Sort.Direction.ASC, key));
-    }
-
-    public TupleStream create(String query, String filterQuery, String key, Sort sort) {
+    public TupleStream create(StreamRequest request, String key) {
         initTupleStreamFactory(zookeeperHost, collection);
         initStreamContext(zookeeperHost, httpClient);
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
                 .streamFactory(streamFactory)
                 .key(key)
-                .order(sort)
+                .order(request.getSort())
                 .requestHandler(requestHandler)
                 .streamContext(streamContext)
                 .build();
 
-        return streamBuilder.createFor(query, filterQuery);
+        return streamBuilder.createFor(request);
     }
 
     private void initTupleStreamFactory(String zookeeperHost, String collection) {
@@ -73,13 +69,16 @@ public class TupleStreamTemplate {
         private String key;
         private StreamContext streamContext;
 
-        private TupleStream createFor(String query, String filterQuery) {
+        private TupleStream createFor(StreamRequest request) {
             try {
                 StreamExpression requestExpression = new StreamExpression("search");
                 requestExpression.addParameter(new StreamExpressionValue(streamFactory.getDefaultCollection()));
-                requestExpression.addParameter(new StreamExpressionNamedParameter("q", query));
-                if (filterQuery != null && !filterQuery.isEmpty()) {
-                    requestExpression.addParameter(new StreamExpressionNamedParameter("fq", filterQuery));
+                requestExpression.addParameter(new StreamExpressionNamedParameter("q", request.getQuery()));
+                if(request.hasDefaultQueryOperator()) {
+                    requestExpression.addParameter(new StreamExpressionNamedParameter("q.op", request.getDefaultQueryOperator()));
+                }
+                if (request.hasFilterQuery()) {
+                    requestExpression.addParameter(new StreamExpressionNamedParameter("fq", request.getFilterQuery()));
                 }
                 requestExpression.addParameter(new StreamExpressionNamedParameter("fl", fieldsToReturn(key, order)));
                 requestExpression.addParameter(new StreamExpressionNamedParameter("sort", sortToString(order)));

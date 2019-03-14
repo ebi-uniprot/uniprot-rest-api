@@ -36,17 +36,19 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
 
         JsonGenerator generator = objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
 
-        generator.writeStartObject();
+        if(!context.isEntityOnly()) {
+            generator.writeStartObject();
 
-        if (context.getFacets() != null) {
-            generator.writeFieldName("facets");
+            if (context.getFacets() != null) {
+                generator.writeFieldName("facets");
+                generator.writeStartArray();
+                context.getFacets().forEach(facet -> writeObject(generator, facet));
+                generator.writeEndArray();
+            }
+
+            generator.writeFieldName("results");
             generator.writeStartArray();
-            context.getFacets().forEach(facet -> writeObject(generator, facet));
-            generator.writeEndArray();
         }
-
-        generator.writeFieldName("results");
-        generator.writeStartArray();
 
         tlJsonGenerator.set(generator);
     }
@@ -61,9 +63,10 @@ public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConv
     protected void after(MessageConverterContext context, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
 
-        generator.writeEndArray();
-        generator.writeEndObject();
-
+        if(!context.isEntityOnly()) {
+            generator.writeEndArray();
+            generator.writeEndObject();
+        }
         generator.flush();
         generator.close();
     }

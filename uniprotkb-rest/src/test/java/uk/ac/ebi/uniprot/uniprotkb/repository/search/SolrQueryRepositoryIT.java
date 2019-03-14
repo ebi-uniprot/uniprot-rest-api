@@ -149,13 +149,13 @@ public class SolrQueryRepositoryIT {
     }
 
     private SimpleQuery queryWithFacets(String query) {
-        SimpleQuery simpleQuery = SolrQueryBuilder.of(query, facetConverter).build();
+        SimpleQuery simpleQuery = new SolrQueryBuilder().query(query).facetConfig(facetConverter).build();
         simpleQuery.addSort(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
         return simpleQuery;
     }
 
     private SimpleQuery queryWithoutFacets(String query) {
-        SimpleQuery simpleQuery = SolrQueryBuilder.of(query).build();
+        SimpleQuery simpleQuery = new SolrQueryBuilder().query(query).build();
         simpleQuery.addSort(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
         return simpleQuery;
     }

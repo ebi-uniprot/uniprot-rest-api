@@ -8,6 +8,8 @@ package uk.ac.ebi.uniprot.rest.validation.validator;
  */
 public class FieldValueValidator {
 
+    public static final String ACCESSION_REGEX = "([O,P,Q][0-9][A-Z|0-9]{3}[0-9]|[A-N,R-Z]([0-9][A-Z][A-Z|0-9]{2}){1,2}[0-9])(-\\d+)*";
+
     /**
      *  This method is responsible to validate any accession value
      *
@@ -16,9 +18,8 @@ public class FieldValueValidator {
      */
     public static boolean isAccessionValid(String value){
         boolean result = false;
-        String accessionRegex = "([O,P,Q][0-9][A-Z|0-9]{3}[0-9]|[A-N,R-Z]([0-9][A-Z][A-Z|0-9]{2}){1,2}[0-9])(-\\d+)*";
         if(value != null) {
-            result = value.toUpperCase().matches(accessionRegex);
+            result = value.toUpperCase().matches(ACCESSION_REGEX);
         }
         return result;
     }

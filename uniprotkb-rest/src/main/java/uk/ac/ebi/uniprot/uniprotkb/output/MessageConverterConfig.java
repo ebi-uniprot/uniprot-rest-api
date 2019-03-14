@@ -13,6 +13,7 @@ import uk.ac.ebi.uniprot.common.concurrency.TaskExecutorProperties;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.rest.output.converter.ErrorMessageConverter;
 import uk.ac.ebi.uniprot.rest.output.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.uniprotkb.output.converter.*;
 
@@ -66,6 +67,7 @@ public class MessageConverterConfig {
                 converters.add(new UniProtKBGffMessageConverter());
                 converters.add(new UniProtKBTsvMessageConverter());
                 converters.add(new UniProtKBXslMessageConverter());
+                converters.add(new ErrorMessageConverter());
                 converters.add(0, new UniProtKBXmlMessageConverter());
                 converters.add(1, new UniProtKBJsonMessageConverter());
             }

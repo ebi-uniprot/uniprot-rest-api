@@ -1,9 +1,15 @@
 package uk.ac.ebi.uniprot.common.repository.search;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.FacetOptions;
+import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFacetQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.common.repository.search.facet.GenericFacetConfig;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is responsible for parsing a request query string and creating a corresponding {@link SimpleQuery}
@@ -12,20 +18,47 @@ import uk.ac.ebi.uniprot.common.repository.search.facet.GenericFacetConfig;
  */
 public class SolrQueryBuilder {
 
-    private final String query;
-    private final GenericFacetConfig facetConfig;
+    private String query;
+    private GenericFacetConfig facetConfig;
+    private List<SimpleQuery> filterQuery = new ArrayList<>();
+    private Sort sort;
+    private Query.Operator defaultOperator = Query.Operator.AND;
 
-    private SolrQueryBuilder(String query, GenericFacetConfig facetConfig) {
+    public SolrQueryBuilder(){
+    }
+
+    public SolrQueryBuilder query(String query){
         this.query = query;
+        return this;
+    }
+
+    public SolrQueryBuilder facetConfig(GenericFacetConfig facetConfig){
         this.facetConfig = facetConfig;
+        return this;
     }
 
-    public static SolrQueryBuilder of(String query) {
-        return new SolrQueryBuilder(query, null);
+    public SolrQueryBuilder filterQuery(List<SimpleQuery> filterQuery){
+        this.filterQuery = Utils.nonNullList(filterQuery);
+        return this;
     }
 
-    public static SolrQueryBuilder of(String query, GenericFacetConfig uniprotFacetConfig) {
-        return new SolrQueryBuilder(query, uniprotFacetConfig);
+    public SolrQueryBuilder addFilterQuery(SimpleQuery filterQuery){
+        Utils.nonNullAdd(filterQuery,this.filterQuery);
+        return this;
+    }
+
+    public SolrQueryBuilder defaultOperator(Query.Operator defaultOperator){
+        this.defaultOperator  =defaultOperator;
+        return this;
+    }
+
+    public SolrQueryBuilder addSort(Sort sort) {
+        if(this.sort == null){
+            this.sort = sort;
+        }else{
+            this.sort.and(sort);
+        }
+        return this;
     }
 
     public SimpleQuery build() {
@@ -33,7 +66,10 @@ public class SolrQueryBuilder {
         if (facetConfig != null) {
             simpleQuery = getSimpleFacetQuery(simpleQuery);
         }
+        filterQuery.forEach(simpleQuery::addFilterQuery);
 
+        simpleQuery.addSort(this.sort);
+        simpleQuery.setDefaultOperator(defaultOperator);
         return simpleQuery;
     }
 
