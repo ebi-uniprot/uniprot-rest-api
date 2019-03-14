@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -95,8 +96,7 @@ public class UniprotKBContentTypesControllerIT {
         // when
         ResultActions response = mockMvc.perform(
                 get(ACCESSION_RESOURCE + "P05067")
-                        .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE)
-                        .param("query", "accession:P12345"));
+                        .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE));
 
         // then
         response.andDo(print())
@@ -105,7 +105,344 @@ public class UniprotKBContentTypesControllerIT {
                 .andExpect(content().string(isEmptyString()));
     }
 
+    @Test
+    public void canReturnFlatFileFormat() throws Exception {
+        // given
+        String acc = saveEntry();
 
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.FF_MEDIA_TYPE)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.FF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString("ID   PURL_THEEB              Reviewed;         761 AA.\n" +
+                        "AC   Q8DIA7;\n" +
+                        "DT   07-JUN-2005, integrated into UniProtKB/Swiss-Prot.\n" +
+                        "DT   01-MAR-2003, sequence version 1.\n" +
+                        "DT   05-DEC-2018, entry version 101.")));
+    }
+
+    @Test
+    public void flatFileBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.FF_MEDIA_TYPE)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.FF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void flatFileNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P05067")
+                        .header(ACCEPT, UniProtMediaType.FF_MEDIA_TYPE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.FF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void canReturnGffFormat() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.GFF_MEDIA_TYPE)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.GFF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString("##gff-version 3\n" +
+                        "##sequence-region Q8DIA7 1 761\n" +
+                        "Q8DIA7\tUniProtKB\tChain\t1\t761\t.\t.\t.\tID=PRO_0000100496;Note=Phosphoribosylformylglycinamidine synthase subunit PurL")));
+    }
+
+    @Test
+    public void gffBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.GFF_MEDIA_TYPE)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.GFF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void gffNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P05067")
+                        .header(ACCEPT, UniProtMediaType.GFF_MEDIA_TYPE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.GFF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void canReturnListFormat() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.LIST_MEDIA_TYPE)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString("Q8DIA7")));
+    }
+
+    @Test
+    public void listBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.LIST_MEDIA_TYPE)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void listNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P12343")
+                        .header(ACCEPT, UniProtMediaType.LIST_MEDIA_TYPE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void canReturnTsvFormat() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString("Q8DIA7")));
+    }
+
+    @Test
+    public void tsvFormatBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void tsvFormatNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P12343")
+                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void canReturnXlsFormat() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.XLS_MEDIA_TYPE)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.XLS_MEDIA_TYPE_VALUE));
+    }
+
+    @Test
+    public void xlsFormatBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, UniProtMediaType.XLS_MEDIA_TYPE)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void xlsFormatNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P12343")
+                        .header(ACCEPT, UniProtMediaType.XLS_MEDIA_TYPE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(isEmptyString()));
+    }
+
+
+
+    @Test
+    public void canReturnXmlFormat() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, MediaType.APPLICATION_XML)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("<accession>Q8DIA7</accession>")));
+    }
+
+    @Test
+    public void xmlFormatBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, MediaType.APPLICATION_XML)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("<messages>'invalid' is not a valid search field</messages>")));
+    }
+
+    @Test
+    public void xmlFormatNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P12343")
+                        .header(ACCEPT, MediaType.APPLICATION_XML));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("<messages>Resource not found</messages>")));
+    }
+
+
+    @Test
+    public void canReturnJsonFormat() throws Exception {
+        // given
+        String acc = saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "accession:" + acc));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("{\"entryType\":\"Swiss-Prot\"," +
+                        "\"primaryAccession\":\"Q8DIA7\"," +
+                        "\"uniProtId\":\"PURL_THEEB\"")));
+    }
+
+    @Test
+    public void jsonFormatBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "invalid:invalid"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"messages\":[\"'invalid' is not a valid search field\"]")));
+    }
+
+    @Test
+    public void jsonFormatNotFoundRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ACCESSION_RESOURCE + "P12343")
+                        .header(ACCEPT, MediaType.APPLICATION_JSON));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().string(containsString("\"messages\":[\"Resource not found\"]")));
+    }
     private String saveEntry() {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         String acc = entry.getPrimaryAccession().getValue();
