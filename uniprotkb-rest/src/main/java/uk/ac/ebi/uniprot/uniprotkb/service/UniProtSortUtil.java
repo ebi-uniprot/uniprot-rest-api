@@ -19,7 +19,7 @@ public class UniProtSortUtil {
         if (Strings.isNullOrEmpty(sortFields)) {
             return null;
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "score");
+        Sort sort = null;
         boolean hasAccession = false;
         String[] tokens = sortFields.split("\\s*,\\s*");
         for (String token : tokens) {
