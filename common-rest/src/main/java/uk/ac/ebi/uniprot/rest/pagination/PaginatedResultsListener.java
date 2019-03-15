@@ -28,9 +28,6 @@ public class PaginatedResultsListener implements ApplicationListener<PaginatedRe
 
         StringBuilder linkHeader = new StringBuilder();
 
-        Optional<String> prevPageLink = page.getPreviousPageLink(uriBuilder);
-        prevPageLink.ifPresent(s -> linkHeader.append(createLinkHeader(s, "prev")));
-
         Optional<String> nextPageLink = page.getNextPageLink(uriBuilder);
         nextPageLink.ifPresent(s -> linkHeader.append(createLinkHeader(s, "next")));
 

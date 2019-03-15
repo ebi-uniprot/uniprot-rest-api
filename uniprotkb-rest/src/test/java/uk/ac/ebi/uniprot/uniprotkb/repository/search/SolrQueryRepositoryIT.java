@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.common.repository.search.SolrCollection;
@@ -28,12 +29,14 @@ import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtDocMocker;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created 17/09/18
@@ -86,36 +89,86 @@ public class SolrQueryRepositoryIT {
         assertThat(entry.isPresent(), CoreMatchers.is(false));
     }
 
-    // searchCursorPage -------------------
     @Test
-    public void searchCursorPageSucceeds() {
+    public void singlePageResult() {
         // given
-        int docCount = 10;
+        int docCount = 2;
         List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
-        List<String> savedAccs =
-                docs
-                        .stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
+        List<String> savedAccs = docs.stream()
+                .map(doc -> doc.accession)
+                .collect(Collectors.toList());
+
         List<String> expectedPage1Accs = asList(savedAccs.get(0), savedAccs.get(1));
-        List<String> expectedPage2Accs = asList(savedAccs.get(2), savedAccs.get(3));
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithFacets(accQuery), null, 2);
-        List<String> page1Accs = queryResult.getContent().stream().map(doc -> doc.accession)
+        CursorPage page = CursorPage.of(null,2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithFacets(accQuery), page.getCursor(), 2);
+        List<String> page1Accs = queryResult.getContent().stream()
+                .map(doc -> doc.accession)
                 .collect(Collectors.toList());
-        String nextCursor = ((CursorPage) queryResult.getPage()).getEncryptedNextCursor();
+
+        assertNotNull(queryResult.getPage());
+        page = (CursorPage) queryResult.getPage();
+        assertFalse(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+
+        // then
+        assertThat(page1Accs, CoreMatchers.is(expectedPage1Accs));
+    }
+
+
+    @Test
+    public void iterateOverAllThreePages() {
+        // given
+        int docCount = 5;
+        List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
+        List<String> savedAccs = docs.stream()
+                        .map(doc -> doc.accession)
+                        .collect(Collectors.toList());
+
+        List<String> expectedPage1Accs = asList(savedAccs.get(0), savedAccs.get(1));
+        List<String> expectedPage2Accs = asList(savedAccs.get(2), savedAccs.get(3));
+        List<String> expectedPage3Accs = Collections.singletonList(savedAccs.get(4));
+
+        // when attempt to fetch page 1
+        String accQuery = "accession:*";
+        CursorPage page = CursorPage.of(null,2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithFacets(accQuery), page.getCursor(), 2);
+        List<String> page1Accs = queryResult.getContent().stream()
+                                            .map(doc -> doc.accession)
+                                            .collect(Collectors.toList());
+
+        assertNotNull(queryResult.getPage());
+        page = (CursorPage) queryResult.getPage();
+        assertTrue(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        String nextCursor = page.getEncryptedNextCursor();
 
         // ... and attempt to fetch page 2
         queryResult = queryRepo.searchPage(queryWithFacets(accQuery), nextCursor, 2);
-        List<String> page2Accs = queryResult.getContent().stream().map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        List<String> page2Accs = queryResult.getContent().stream()
+                                            .map(doc -> doc.accession)
+                                            .collect(Collectors.toList());
+
+        assertNotNull(queryResult.getPage());
+        page = (CursorPage) queryResult.getPage();
+        assertTrue(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        nextCursor = page.getEncryptedNextCursor();
+
+        // ... and attempt to fetch last page 3
+        queryResult = queryRepo.searchPage(queryWithFacets(accQuery), nextCursor, 2);
+        List<String> page3Accs = queryResult.getContent().stream()
+                                            .map(doc -> doc.accession)
+                                            .collect(Collectors.toList());
+
+        page = (CursorPage) queryResult.getPage();
+        assertFalse(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
 
         // then
         assertThat(page1Accs, CoreMatchers.is(expectedPage1Accs));
         assertThat(page2Accs, CoreMatchers.is(expectedPage2Accs));
+        assertThat(page3Accs, CoreMatchers.is(expectedPage3Accs));
     }
 
     @Test

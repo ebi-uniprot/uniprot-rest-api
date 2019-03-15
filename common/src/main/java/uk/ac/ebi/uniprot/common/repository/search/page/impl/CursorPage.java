@@ -5,18 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.uniprot.common.repository.search.page.Page;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.Stack;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 /**
- * This class implements a cursor page with string nextCursor, previousCursor, pageSize  and totalElements capabilities
+ * This class implements a cursor page with string nextCursor, pageSize  and totalElements capabilities
  * to navigate over result.
  *
  * @author lgonzales
@@ -28,18 +21,16 @@ public class CursorPage implements Page {
     private static final String SIZE_PARAM_NAME = "size";
     private static final String DELIMITER = ",";
 
-    private final Stack<String> cursorStack;
     private String cursor;
     private String nextCursor;
     private Integer pageSize;
     private Long totalElements;
+    private Long offset;
 
-    private CursorPage(Stack<String> cursorStack, Integer pageSize){
-        this.cursorStack = cursorStack;
-        if(!cursorStack.isEmpty()) {
-            this.cursor = cursorStack.peek();
-        }
+    private CursorPage(String cursor, Long offset,Integer pageSize){
+        this.cursor = cursor;
         this.pageSize = pageSize;
+        this.offset = offset;
     }
 
     /**
@@ -50,13 +41,18 @@ public class CursorPage implements Page {
      * @return CursorPage object
      */
     public static CursorPage of(String cursor, Integer pageSize){
-        Stack<String> cursorStack = new Stack<>();
-        if(cursor != null && !cursor.isEmpty()){
-            String stringCursor = CursorEncryptor.decryptCursor(cursor);
+        if(cursor == null) { //if is first page...
+            return new CursorPage(null, 0L, pageSize);
+        }else {
+            byte[] bytes = new BigInteger(cursor, 36).toByteArray();
+            String encryptedCursor = new String(bytes);
+            String[] parsedCursor = encryptedCursor.split(DELIMITER);
 
-            cursorStack.addAll(Arrays.asList(stringCursor.split(DELIMITER)));
+            Long offset = Long.valueOf(parsedCursor[0]);
+            String solrCursor = parsedCursor[1];
+
+            return new CursorPage(solrCursor, offset, pageSize);
         }
-        return new CursorPage(cursorStack,pageSize);
     }
 
     /**
@@ -69,50 +65,11 @@ public class CursorPage implements Page {
     public Optional<String> getNextPageLink(UriComponentsBuilder uriBuilder) {
         Optional<String> nextPageLink = Optional.empty();
         if(hasNextPage()) {
-            String nextPageCursor = getEncryptedNextCursor();
-
-            cursorStack.pop();
-
-            uriBuilder.replaceQueryParam(CURSOR_PARAM_NAME, nextPageCursor);
+            uriBuilder.replaceQueryParam(CURSOR_PARAM_NAME, getEncryptedNextCursor());
             uriBuilder.replaceQueryParam(SIZE_PARAM_NAME, pageSize);
             nextPageLink = Optional.of(uriBuilder.build().encode().toUriString());
         }
         return nextPageLink;
-    }
-
-    public String getEncryptedNextCursor() {
-        cursorStack.push(nextCursor);
-        String nextPageCursor = String.join(DELIMITER, cursorStack);
-        nextPageCursor = CursorEncryptor.encryptCursor(nextPageCursor);
-        return nextPageCursor;
-    }
-
-    /**
-     *  if has previous page, return its link
-     *
-     * @param uriBuilder URL without pagination parameters
-     * @return previous page link URL
-     */
-    @Override
-    public Optional<String> getPreviousPageLink(UriComponentsBuilder uriBuilder) {
-        Optional<String> previousPageLink = Optional.empty();
-        if(hasPreviousPage()) {
-            if(isFirstPage()){
-                previousPageLink = Optional.of(uriBuilder.build().encode().toUriString());
-            }else {
-                cursorStack.pop();
-                String previousPageCursor = String.join(DELIMITER, cursorStack);
-
-                previousPageCursor = CursorEncryptor.encryptCursor(previousPageCursor);
-
-                uriBuilder.replaceQueryParam(CURSOR_PARAM_NAME, previousPageCursor);
-                uriBuilder.replaceQueryParam(SIZE_PARAM_NAME, pageSize);
-                previousPageLink = Optional.of(uriBuilder.build().encode().toUriString());
-
-                cursorStack.push(this.cursor);
-            }
-        }
-        return previousPageLink;
     }
 
     public String getCursor(){
@@ -121,6 +78,12 @@ public class CursorPage implements Page {
 
     public void setNextCursor(String nextCursor){
         this.nextCursor = nextCursor;
+    }
+
+    public String getEncryptedNextCursor(){
+        Long nextOffset = (offset+pageSize);
+        String concatenatedCursor = nextOffset+DELIMITER+nextCursor;
+        return new BigInteger(concatenatedCursor.getBytes()).toString(36);
     }
 
     public void setTotalElements(Long totalElements){
@@ -135,124 +98,10 @@ public class CursorPage implements Page {
     /**
      * Check if should have next page link
      *
-     * @return true if numberOfPages * pageSize <= totalElements
+     * @return true if (offset + pageSize)  < totalElements
      */
     private boolean hasNextPage() {
-        int numberOfPages = this.cursorStack.size() + 1;
-        return (numberOfPages * pageSize)  <= totalElements;
+        return (offset + pageSize)  < totalElements;
     }
 
-    /**
-     * Check if should have previous page link
-     *
-     * @return true if there is at least current cursor is in the cursor stack
-     */
-    private boolean hasPreviousPage() {
-        return !cursorStack.isEmpty();
-    }
-
-
-    /**
-     * Check if should have previous page link
-     *
-     * @return true if there is at current cursor in the cursor stack
-     */
-    private boolean isFirstPage() {
-        return cursorStack.size() == 1;
-    }
-
-    /**
-     * This class is responsible to encrypt and decrypter Cursor page cursor
-     *
-     */
-    private static class CursorEncryptor {
-
-        /**
-         * The encrypt compress String byte array and convert it to hexadecimal value
-         *
-         * @param valueToEnc value to be encrypted
-         * @return encrypted value
-         */
-        private static String encryptCursor(String valueToEnc) {
-            String encrypted = "";
-
-            // convert string to byte array
-            byte[] input = valueToEnc.getBytes();
-
-            //BEGIN: compress byte array
-            Deflater compressor = new Deflater();
-            try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
-                compressor.setInput(input);
-                compressor.finish();
-                byte[] buffer = new byte[1024];
-                int count = 0;
-                while (!compressor.finished()) {
-                    count = compressor.deflate(buffer);
-                    stream.write(buffer, 0, count);
-                }
-                stream.flush();
-                // convert it to hexadecimal
-                encrypted = new BigInteger(stream.toByteArray()).toString(36);
-            } catch (IOException e) {
-                LOGGER.warn("Error compressing page cursor",e);
-            } finally {
-                compressor.end();
-            }
-            //END: compress byte array
-            return encrypted;
-        }
-
-        /**
-         * The decrypt convert the hexadecimal to byte array and decompress it.
-         *
-         * @param encryptedValue encrypted value
-         * @return decrypted value
-         */
-        private static String decryptCursor(String encryptedValue) {
-            String encrypted = "";
-
-            // convert to hexadecimal value to byte array
-            byte[] decodedValue = new BigInteger(encryptedValue, 36).toByteArray();
-
-            // BEGIN: decompress byte array to original string
-            Inflater decompressor = new Inflater();
-            try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
-                decompressor.setInput(decodedValue);
-                final byte[] buf = new byte[1024];
-                while (!decompressor.finished()) {
-                    int count = 0;
-                    try {
-                        count = decompressor.inflate(buf);
-                    } catch (DataFormatException e) {
-                        LOGGER.error("Problem encountered during decompression", e);
-                    }
-                    stream.write(buf, 0, count);
-                }
-                stream.flush();
-                encrypted = new String(stream.toByteArray());
-            } catch (IOException e) {
-                LOGGER.warn("Error decompressing page cursor",e);
-            } finally {
-                decompressor.end();
-            }
-            // END: decompress byte array to original string
-
-            return encrypted;
-        }
-    }
-
-/*    public static void main(String[] args) {
-        String initialCursorMark= "AoEmQTBBMDA5";
-        CursorPage p = CursorPage.of(null,10);
-        p.setNextCursor(initialCursorMark);
-        for(int i=0;i<100;i++){
-            String encryptedCursor = p.getEncryptedNextCursor();
-            p = CursorPage.of(encryptedCursor,10);
-            p.setNextCursor(initialCursorMark+i);
-            if(i%100 == 0){
-                System.out.println("count: "+i);
-            }
-        }
-        System.out.println(p.getEncryptedNextCursor().length());
-    }*/
 }
