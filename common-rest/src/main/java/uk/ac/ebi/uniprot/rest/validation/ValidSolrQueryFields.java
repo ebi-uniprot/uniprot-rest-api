@@ -4,7 +4,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import uk.ac.ebi.uniprot.rest.SearchFieldType;
+import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.rest.search.SearchFieldType;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
 
 import javax.validation.Constraint;
@@ -56,15 +57,19 @@ public @interface ValidSolrQueryFields {
         @Override
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
-            try {
-                StandardQueryParser qp = new StandardQueryParser();
-                Query query = qp.parse(queryString, DEFAULT_FIELD_NAME);
-                isValid = hasValidateQueryField(query, context);
-                if (!isValid) {
-                    context.disableDefaultConstraintViolation();
+            if(Utils.notEmpty(queryString)) {
+                try {
+                    StandardQueryParser qp = new StandardQueryParser();
+                    Query query = qp.parse(queryString, DEFAULT_FIELD_NAME);
+                    if(!(query instanceof MatchAllDocsQuery)) {
+                        isValid = hasValidateQueryField(query, context);
+                    }
+                    if (!isValid) {
+                        context.disableDefaultConstraintViolation();
+                    }
+                } catch (Exception e) {
+                    //Syntax error is validated by ValidSolrQuerySyntax
                 }
-            } catch (Exception e) {
-                //Syntax error is validated by ValidSolrQuerySyntax
             }
             return isValid;
         }

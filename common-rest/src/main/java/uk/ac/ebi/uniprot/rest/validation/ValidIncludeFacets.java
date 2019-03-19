@@ -52,7 +52,6 @@ public @interface ValidIncludeFacets {
                 if(value.matches("^(?i:true|false)$")){
                     if(value.equalsIgnoreCase("true")){
                         String accept = getRequest().getHeader("Accept");
-                        System.out.println("LEO ACCEPT:"+accept);
                         if(accept == null || !accept.equalsIgnoreCase("application/json")){
                             buildUnsuportedContentTypeErrorMessage(accept,contextImpl);
                             isValid = false;

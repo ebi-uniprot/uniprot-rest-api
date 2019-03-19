@@ -47,7 +47,7 @@ public class RepositoryConfig {
     @Profile("live")
     public SolrClient uniProtSolrClient(HttpClient httpClient, RepositoryConfigProperties config) {
         String zookeeperhost = config.getZkHost();
-        if (!zookeeperhost.isEmpty()) {
+        if (zookeeperhost != null && !zookeeperhost.isEmpty()) {
             String[] zookeeperHosts = zookeeperhost.split(",");
             return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
                     .withHttpClient(httpClient)

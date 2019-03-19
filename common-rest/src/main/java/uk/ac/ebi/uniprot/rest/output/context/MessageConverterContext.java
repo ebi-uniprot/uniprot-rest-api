@@ -25,6 +25,7 @@ public class MessageConverterContext<T> {
     private MessageConverterContextFactory.Resource resource;
     private String fields;
     private Collection<Facet> facets;
+    private boolean entityOnly;
 
     MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
@@ -35,6 +36,7 @@ public class MessageConverterContext<T> {
                 .fields(this.fields)
                 .entityIds(this.entityIds)
                 .facets(this.facets)
+                .entityOnly(this.entityOnly)
                 .build();
     }
 }

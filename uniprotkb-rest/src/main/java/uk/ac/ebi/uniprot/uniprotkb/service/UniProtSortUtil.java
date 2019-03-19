@@ -42,10 +42,13 @@ public class UniProtSortUtil {
         return (sortedField.length == 2) && sortedField[1].equalsIgnoreCase(Sort.Direction.DESC.name());
     }
 
-    public static Sort createDefaultSort() {
-        return new Sort(Sort.Direction.DESC, "score")
-                .and(new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName()))
+    public static Sort createDefaultSort(boolean hasScore) {
+        Sort sort = new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName())
                 .and(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
+        if(hasScore){
+            sort = new Sort(Sort.Direction.DESC, "score").and(sort);
+        }
+        return sort;
     }
 
 }

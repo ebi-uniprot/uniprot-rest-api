@@ -3,7 +3,7 @@ package uk.ac.ebi.uniprot.rest.validation;
 import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.rest.SearchFieldType;
+import uk.ac.ebi.uniprot.rest.search.SearchFieldType;
 import uk.ac.ebi.uniprot.rest.validation.validator.FieldValueValidator;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
 

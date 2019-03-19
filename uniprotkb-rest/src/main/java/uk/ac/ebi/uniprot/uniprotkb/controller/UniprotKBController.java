@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.common.repository.search.QueryResult;
@@ -13,12 +14,16 @@ import uk.ac.ebi.uniprot.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.rest.pagination.PaginatedResultsEvent;
+import uk.ac.ebi.uniprot.rest.validation.ValidReturnFields;
+import uk.ac.ebi.uniprot.rest.validation.validator.FieldValueValidator;
 import uk.ac.ebi.uniprot.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.uniprotkb.service.UniProtEntryService;
+import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
@@ -35,6 +40,7 @@ import static uk.ac.ebi.uniprot.uniprotkb.controller.UniprotKBController.UNIPROT
  */
 @RestController
 @Api(tags = {"uniprotkb"})
+@Validated
 @RequestMapping(UNIPROTKB_RESOURCE)
 public class UniprotKBController {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
@@ -75,11 +81,21 @@ public class UniprotKBController {
     @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
                         APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
-    public ResponseEntity<Object> getByAccession(@PathVariable("accession") String accession,
-                                                 @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
-                                                 @RequestParam(value = "fields", required = false) String fields) {
+    public ResponseEntity<Object> getByAccession(@PathVariable("accession")
+                                                 @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX,
+                                                        flags = {Pattern.Flag.CASE_INSENSITIVE},
+                                                        message ="{search.invalid.accession.value}")
+                                                 String accession,
+                                                 @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
+                                                 @RequestParam(value = "fields", required = false)
+                                                 String fields,
+                                                 @RequestHeader(value = "Accept",
+                                                         defaultValue = APPLICATION_JSON_VALUE)
+                                                 MediaType contentType
+                                                 ) {
         MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
         context.setFields(fields);
+        context.setEntityOnly(true);
         entryService.getByAccession(accession, fields, context);
 
         return ResponseEntity.ok()

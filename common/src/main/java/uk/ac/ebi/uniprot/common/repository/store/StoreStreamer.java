@@ -5,7 +5,6 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.slf4j.Logger;
-import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 
 import java.io.IOException;
@@ -40,9 +39,9 @@ public class StoreStreamer<T> {
     private Function<String, T> defaultsConverter;
     private TupleStreamTemplate tupleStreamTemplate;
 
-    public Stream<T> idsToStoreStream(String query, String filterQuery, Sort sort) {
+    public Stream<T> idsToStoreStream(StreamRequest request) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, id, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(request, id);
             tupleStream.open();
 
             BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
@@ -58,9 +57,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<String> idsStream(String query, String filterQuery, Sort sort) {
+    public Stream<String> idsStream(StreamRequest request) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query,filterQuery, id, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(request, id);
             tupleStream.open();
             return StreamSupport
                     .stream(new TupleStreamIterable(tupleStream, id).spliterator(), false)
@@ -70,9 +69,9 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<T> defaultFieldStream(String query, String filterQuery, Sort sort) {
+    public Stream<T> defaultFieldStream(StreamRequest request) {
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(query, filterQuery, defaultsField, sort);
+            TupleStream tupleStream = tupleStreamTemplate.create(request, defaultsField);
             tupleStream.open();
 
             TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, defaultsField);

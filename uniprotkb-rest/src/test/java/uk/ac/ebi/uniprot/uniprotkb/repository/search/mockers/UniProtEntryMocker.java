@@ -2,7 +2,9 @@ package uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers;
 
 
 import org.apache.commons.io.IOUtils;
+import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntryType;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
 import uk.ac.ebi.uniprot.flatfile.parser.UniProtParser;
@@ -54,6 +56,8 @@ public class UniProtEntryMocker {
         return builder.primaryAccession(new UniProtAccessionBuilder(accession).build())
                 .uniProtId(entry.getUniProtId())
                 .active()
+                .entryType(UniProtEntryType.TREMBL)
+                .sequence(new SequenceBuilder("AAAAA").build())
                 .build();
     }
 
