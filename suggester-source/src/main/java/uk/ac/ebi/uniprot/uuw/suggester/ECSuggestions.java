@@ -4,16 +4,17 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.uniprot.cv.ec.EC;
+import uk.ac.ebi.uniprot.cv.ec.ECCache;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.regex.Matcher;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
@@ -52,124 +53,40 @@ public class ECSuggestions {
             return;
         }
 
-        Set<String> suggestions = ecSuggestions.createSuggestionsForEnzymeClassFile();
-        suggestions.addAll(ecSuggestions.createSuggestionsForEnzymeDatFile());
-        List<String> orderedSuggestions = new ArrayList<>(suggestions);
-        Collections.sort(orderedSuggestions);
-
-        ecSuggestions.writeSuggestions(orderedSuggestions);
+        ecSuggestions.writeSuggestions(getECs());
     }
 
-    Suggestion.SuggestionBuilder processEnzymeDatLine(String line, Suggestion.SuggestionBuilder lineBuilder, Collection<String> suggestions) {
-        if (line.startsWith("ID")) {
-            lineBuilder.id(removePrefixFrom(line));
-        } else if (line.startsWith("DE")) {
-            String name = removePrefixFrom(line);
-            lineBuilder.name(name);
-            lineBuilder.weight(computeWeightForName(name));
-        }
-        if (line.startsWith("//")) {
-            Suggestion suggestion = lineBuilder.build();
-            if (Objects.nonNull(suggestion.getId()) && Objects.nonNull(suggestion.getName())) {
-                suggestions.add(suggestion.toSuggestionLine());
-                lineBuilder = Suggestion.builder();
-            }
-        }
-        return lineBuilder;
+    static List<EC> getECs() {
+        List<EC> orderedSuggestions = new ArrayList<>(ECCache.INSTANCE.get());
+        orderedSuggestions.sort(new ECComparator());
+        return orderedSuggestions;
     }
 
-    private void writeSuggestions(List<String> suggestions) {
+    private void writeSuggestions(List<EC> suggestions) {
         try (FileWriter fw = new FileWriter(outputFile);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
-
-            suggestions.stream().forEachOrdered(out::println);
+            writeSuggestionsToOutputStream(suggestions, out);
         } catch (IOException e) {
             LOGGER.error(FAILED_TO_CREATE_EC_SUGGESTIONS_FILE + sourceDir, e);
         }
     }
 
-    private Set<String> createSuggestionsForEnzymeClassFile() throws IOException {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long time = timestamp.getTime();
+    void writeSuggestionsToOutputStream(List<EC> suggestions, PrintWriter out) {
+        suggestions.stream().forEachOrdered(ecSuggestion -> {
+            Suggestion suggestion = Suggestion.builder()
+                    .name(ecSuggestion.label())
+                    .weight(computeWeightForName(ecSuggestion.label()))
+                    .id(ecSuggestion.id())
+                    .build();
+            out.println(suggestion.toSuggestionLine());
+        });
+    }
 
-        Path directory = Files.createTempDirectory("ec-tmp" + time);
-        Path tempECFile = Paths.get(directory.toAbsolutePath().toString(), "ec-file-class.txt");
-
-        addDeleteDirOnExitHook(directory);
-
-        Files.copy(new URL(sourceDir + ENZCLASS_TXT).openStream(), tempECFile);
-
-        Set<String> suggestions = new HashSet<>();
-        try (BufferedReader in = Files.newBufferedReader(tempECFile)) {
-            String line;
-
-            while ((line = in.readLine()) != null) {
-                String enzymeLine = processEnzymeClassLine(line);
-                if (enzymeLine != null) {
-                    suggestions.add(enzymeLine);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error(FAILED_TO_CREATE_EC_SUGGESTIONS_FILE + sourceDir, e);
+    private static class ECComparator implements Comparator<EC> {
+        @Override
+        public int compare(EC o1, EC o2) {
+            return (o1.label() + o1.id()).compareTo(o2.label() + o2.id());
         }
-        return suggestions;
-    }
-
-    String processEnzymeClassLine(String line) {
-        Matcher matcher = ENZYME_CLASS_PATTERN.matcher(line);
-        if (matcher.matches() && matcher.groupCount() == 5) {
-            return Suggestion.builder()
-                    .id(matcher.group(1) + matcher.group(2) + matcher.group(3) + matcher.group(4))
-                    .name(matcher.group(5))
-                    .weight(computeWeightForName(matcher.group(5)))
-                    .build()
-                    .toSuggestionLine();
-        }
-        return null;
-    }
-
-    private Set<String> createSuggestionsForEnzymeDatFile() throws IOException {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        long time = timestamp.getTime();
-
-        Path directory = Files.createTempDirectory("ec-tmp" + time);
-        Path tempECFile = Paths.get(directory.toAbsolutePath().toString(), "ec-file-dat.txt");
-
-        addDeleteDirOnExitHook(directory);
-
-        Files.copy(new URL(sourceDir + ENZYME_DAT).openStream(), tempECFile);
-
-        Set<String> suggestions = new HashSet<>();
-        try (BufferedReader in = Files.newBufferedReader(tempECFile)) {
-            String line;
-            Suggestion.SuggestionBuilder lineBuilder = Suggestion.builder();
-
-            while ((line = in.readLine()) != null) {
-                lineBuilder = processEnzymeDatLine(line, lineBuilder, suggestions);
-            }
-        } catch (IOException e) {
-            LOGGER.error(FAILED_TO_CREATE_EC_SUGGESTIONS_FILE + sourceDir, e);
-        }
-        return suggestions;
-    }
-
-    private void addDeleteDirOnExitHook(Path directory) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                Files.walk(directory)
-                        .sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-
-                LOGGER.debug("deleted temporary directory {}.", directory);
-            } catch (IOException e) {
-                LOGGER.error("Problem during temporary directory cleanup", e);
-            }
-        }));
-    }
-
-    private String removePrefixFrom(String line) {
-        return line.substring(5);
     }
 }
