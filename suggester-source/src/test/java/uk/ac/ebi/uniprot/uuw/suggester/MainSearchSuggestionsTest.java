@@ -17,6 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.ID_VALUE_SEPARATOR;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
 
 /**
  * Created 04/10/18
@@ -51,7 +53,8 @@ public class MainSearchSuggestionsTest {
                 .filter(suggestion -> suggestion.getName().equals(embl))
                 .findFirst();
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Database: " + embl));
+        assertThat(optionalSuggestion.get()
+                           .toSuggestionLine(), is((ID_VALUE_SEPARATOR + "Database: " + embl + "\t" + computeWeightForName(embl)).trim()));
     }
 
     @Test
@@ -60,7 +63,8 @@ public class MainSearchSuggestionsTest {
         FeatureCategory value = FeatureCategory.SITES;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature category: " + value));
+        assertThat(optionalSuggestion.get()
+                           .toSuggestionLine(), is((ID_VALUE_SEPARATOR + "Feature category: " + value + "\t" + computeWeightForName(value.name())).trim()));
     }
 
     @Test
@@ -69,7 +73,8 @@ public class MainSearchSuggestionsTest {
         FeatureType value = FeatureType.ACT_SITE;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Feature type: " + value.getDisplayName()));
+        assertThat(optionalSuggestion.get().toSuggestionLine(), is((ID_VALUE_SEPARATOR + "Feature type: " + value
+                .getDisplayName() + "\t" + computeWeightForName(value.getDisplayName())).trim()));
     }
 
     @Test
@@ -78,7 +83,8 @@ public class MainSearchSuggestionsTest {
         CommentType value = CommentType.ALLERGEN;
         Optional<Suggestion> optionalSuggestion = converter.apply(value);
         assertThat(optionalSuggestion.isPresent(), is(true));
-        assertThat(optionalSuggestion.get().toSuggestionLine(), is("Comment type: " + value.toXmlDisplayName()));
+        assertThat(optionalSuggestion.get().toSuggestionLine(), is((ID_VALUE_SEPARATOR + "Comment type: " + value
+                .toXmlDisplayName() + "\t" + computeWeightForName(value.toXmlDisplayName())).trim()));
     }
 
     private static class FakeEnumToSuggestion implements MainSearchSuggestions.EnumSuggestionFunction<FakeEnum> {

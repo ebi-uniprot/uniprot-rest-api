@@ -7,11 +7,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
-import java.io.PrintWriter;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
 
 /**
  * Created 03/10/18
@@ -23,7 +24,7 @@ public class SubCellSuggestionsTest {
     private SubCellSuggestions subCellSuggestions;
 
     @Mock
-    private PrintWriter out;
+    private List<String> suggestions;
 
     @Before
     public void setUp() {
@@ -33,20 +34,23 @@ public class SubCellSuggestionsTest {
     @Test
     public void givenIDAndACValue_whenProcess_thenWriteSuggestion() {
         String subcellId = "Z line";
-        String subcellAc = "SL-0314";
+        String id = "314";
+        String subcellAc = "SL-0" + id;
 
         Suggestion.SuggestionBuilder suggestionBuilder = Suggestion.builder();
-        suggestionBuilder = subCellSuggestions.process("ID   " + subcellId, suggestionBuilder, out);
-        verify(out, times(0)).println(anyString());
+        suggestionBuilder = subCellSuggestions.process("ID   " + subcellId, suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        suggestionBuilder = subCellSuggestions.process("AC   " + subcellAc, suggestionBuilder, out);
-        verify(out, times(0)).println(anyString());
+        suggestionBuilder = subCellSuggestions.process("AC   " + subcellAc, suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        suggestionBuilder = subCellSuggestions.process("ANY OTHER LINE THAT IS NOT '//'", suggestionBuilder, out);
-        verify(out, times(0)).println(anyString());
+        suggestionBuilder = subCellSuggestions
+                .process("ANY OTHER LINE THAT IS NOT '//'", suggestionBuilder, suggestions);
+        verify(suggestions, times(0)).add(anyString());
 
-        subCellSuggestions.process("//", suggestionBuilder, out);
-        Suggestion expectedSuggestion = Suggestion.builder().name(subcellId).id(subcellAc).build();
-        verify(out, times(1)).println(expectedSuggestion.toSuggestionLine());
+        subCellSuggestions.process("//", suggestionBuilder, suggestions);
+        Suggestion expectedSuggestion = Suggestion.builder().name(subcellId).id(id)
+                .weight(computeWeightForName(subcellId)).build();
+        verify(suggestions, times(1)).add(expectedSuggestion.toSuggestionLine());
     }
 }
