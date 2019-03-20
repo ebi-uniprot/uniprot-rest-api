@@ -35,6 +35,17 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>controlled-vocabulary</artifactId>
+            <version>${core.version}</version>
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.slf4j</groupId>-->
+                    <!--<artifactId>slf4j-simple</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        </dependency>
+        <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>configure-rest</artifactId>
             <version>${version}</version>

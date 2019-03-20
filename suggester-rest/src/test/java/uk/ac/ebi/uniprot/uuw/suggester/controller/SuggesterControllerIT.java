@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.uniprot.uuw.suggester.SuggestionDictionary.taxonomy;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.ID_VALUE_SEPARATOR;
 import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestions.createSuggestions;
 
 
@@ -44,7 +45,7 @@ public class SuggesterControllerIT {
         String value1 = "some text 1";
         String value2 = "some text 2";
         String id1 = "1234";
-        List<String> results = asList(value1 + " [" + id1 + "]", value2);
+        List<String> results = asList(id1 + " " + ID_VALUE_SEPARATOR + " " + value1, value2);
         Suggestions suggestions = createSuggestions(taxonomy, query, results);
         given(suggesterService.getSuggestions(taxonomy, query)).willReturn(suggestions);
 

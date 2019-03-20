@@ -21,6 +21,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForName;
+
 /**
  * Generates file used for the main search box suggestions. Depends on {@link FeatureType},
  * {@link CommentType}, {@link FeatureCategory} and {@link DatabaseType}.
@@ -53,10 +55,14 @@ public class MainSearchSuggestions {
 
     static List<Suggestion> databaseSuggestions() {
         return UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
-                .map(type -> Suggestion.builder()
-                        .prefix("Database")
-                        .name(removeTerminalSemiColon(type.getDisplayName()))
-                        .build())
+                .map(type -> {
+                    String name = removeTerminalSemiColon(type.getDisplayName());
+                    return Suggestion.builder()
+                            .prefix("Database")
+                            .name(name)
+                            .weight(computeWeightForName(name))
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
@@ -86,7 +92,8 @@ public class MainSearchSuggestions {
                     .append(enumToSuggestions(new CommentTypeToSuggestion()))
                     .append(databaseSuggestions())
                     .map(Suggestion::toSuggestionLine)
-                    .forEach(out::println);
+                    .sorted(new Suggestion.Comparator())
+                    .forEachOrdered(out::println);
         } catch (IOException e) {
             LOGGER.error("Problem writing main search suggestions file.", e);
         }
@@ -99,9 +106,11 @@ public class MainSearchSuggestions {
     static class FeatureCategoryToSuggestion implements EnumSuggestionFunction<FeatureCategory> {
         @Override
         public Optional<Suggestion> apply(FeatureCategory value) {
+            String name = value.name();
             return Optional.of(Suggestion.builder()
                                        .prefix("Feature category")
-                                       .name(value.name())
+                                       .name(name)
+                                       .weight(computeWeightForName(name))
                                        .build());
         }
 
@@ -114,9 +123,11 @@ public class MainSearchSuggestions {
     static class FeatureTypeToSuggestion implements EnumSuggestionFunction<FeatureType> {
         @Override
         public Optional<Suggestion> apply(FeatureType value) {
+            String name = value.getDisplayName();
             return Optional.of(Suggestion.builder()
                                        .prefix("Feature type")
-                                       .name(value.getDisplayName())
+                                       .name(name)
+                                       .weight(computeWeightForName(name))
                                        .build());
         }
 
@@ -129,11 +140,13 @@ public class MainSearchSuggestions {
     static class CommentTypeToSuggestion implements EnumSuggestionFunction<CommentType> {
         @Override
         public Optional<Suggestion> apply(CommentType value) {
+            String name = value.toXmlDisplayName();
             return value == CommentType.UNKNOWN ?
                     Optional.empty() :
                     Optional.of(Suggestion.builder()
                                         .prefix("Comment type")
-                                        .name(value.toXmlDisplayName())
+                                        .name(name)
+                                        .weight(computeWeightForName(name))
                                         .build());
         }
 
