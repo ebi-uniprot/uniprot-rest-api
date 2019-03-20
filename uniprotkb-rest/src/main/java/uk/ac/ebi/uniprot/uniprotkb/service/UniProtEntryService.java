@@ -69,7 +69,7 @@ public class UniProtEntryService {
 
         QueryResult<UniProtDocument> results = repository
                 .searchPage(simpleQuery, request.getCursor(), request.getSize());
-        if (request.isIncludeFacets()) {
+        if (request.hasFacets()) {
             context.setFacets(results.getFacets());
         }
 
@@ -150,10 +150,10 @@ public class UniProtEntryService {
         builder.query(requestedQuery);
         builder.addSort(getUniProtSort(request.getSort(),hasScore));
 
-        if (request.isIncludeFacets()) {
+        if(request.hasFacets()) {
+            builder.facets(request.getFacetList());
             builder.facetConfig(uniprotFacetConfig);
         }
-
         return builder.build();
     }
 

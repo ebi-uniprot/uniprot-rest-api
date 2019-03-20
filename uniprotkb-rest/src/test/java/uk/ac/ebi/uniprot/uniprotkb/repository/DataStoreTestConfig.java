@@ -9,23 +9,16 @@ import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.common.repository.search.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.common.repository.search.SolrCollection;
 import uk.ac.ebi.uniprot.common.repository.search.SolrDataStoreManager;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.GoRelationsRepoMocker;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.dataservice.document.impl.InactiveEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileReader;
-import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationFileRepo;
-import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationRepo;
-import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoTermFileReader;
-import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.FileNodeIterable;
-import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyMapRepo;
-import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyRepo;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import uk.ac.ebi.uniprot.uniprotkb.repository.store.UniProtStoreClient;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import static org.mockito.Mockito.mock;
 
@@ -70,28 +63,12 @@ public class DataStoreTestConfig {
     }
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
-        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(taxonomyRepo(), goRelationRepo()));
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(), GoRelationsRepoMocker.getGoRelationRepo()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, uniProtSolrClient);
     }
 
-    private File getTaxonomyFile() throws URISyntaxException {
-        URL url = ClassLoader.getSystemClassLoader().getResource("taxonomy/taxonomy.dat");
-        return new File(url.toURI());
-    }
 
-    private GoRelationRepo goRelationRepo() {
-        String gotermPath = ClassLoader.getSystemClassLoader().getResource("goterm").getFile();
-        return GoRelationFileRepo.create(new GoRelationFileReader(gotermPath),
-                                                              new GoTermFileReader(gotermPath));
-    }
-
-    private TaxonomyRepo taxonomyRepo() throws URISyntaxException {
-        File taxonomicFile = getTaxonomyFile();
-
-        FileNodeIterable taxonomicNodeIterable = new FileNodeIterable(taxonomicFile);
-        return new TaxonomyMapRepo(taxonomicNodeIterable);
-    }
 }

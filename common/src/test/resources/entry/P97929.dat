@@ -1,0 +1,473 @@
+ID   BRCA2_MOUSE             Reviewed;        3329 AA.
+AC   P97929; F8VPU5; O35922; P97383;
+DT   15-DEC-1998, integrated into UniProtKB/Swiss-Prot.
+DT   03-OCT-2012, sequence version 2.
+DT   05-DEC-2018, entry version 172.
+DE   RecName: Full=Breast cancer type 2 susceptibility protein homolog;
+DE   AltName: Full=Fanconi anemia group D1 protein homolog;
+GN   Name=Brca2; Synonyms=Fancd1;
+OS   Mus musculus (Mouse).
+OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+OC   Mammalia; Eutheria; Euarchontoglires; Glires; Rodentia; Myomorpha;
+OC   Muroidea; Muridae; Murinae; Mus; Mus.
+OX   NCBI_TaxID=10090;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [MRNA].
+RC   STRAIN=129;
+RX   PubMed=9063750; DOI=10.1093/hmg/6.2.291;
+RA   Connor F., Smith A., Wooster R., Stratton M., Dixon A., Campbell E.,
+RA   Tait T.M., Freeman T., Ashworth A.;
+RT   "Cloning, chromosomal mapping and expression pattern of the mouse
+RT   Brca2 gene.";
+RL   Hum. Mol. Genet. 6:291-300(1997).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [MRNA].
+RC   STRAIN=C57BL/6J;
+RX   PubMed=9119389; DOI=10.1006/geno.1996.4573;
+RA   Sharan S.K., Bradley A.;
+RT   "Murine Brca2: sequence, map position, and expression pattern.";
+RL   Genomics 40:234-241(1997).
+RN   [3]
+RP   NUCLEOTIDE SEQUENCE [MRNA].
+RC   STRAIN=129/Sv;
+RX   PubMed=9242436;
+RA   McAllister K.A., Haugen-Strano A., Hagevik S., Brownlee H.A.,
+RA   Collins N.K., Futreal P.A., Bennett L.M., Wiseman R.W.;
+RT   "Characterization of the rat and mouse homologues of the BRCA2 breast
+RT   cancer susceptibility gene.";
+RL   Cancer Res. 57:3121-3125(1997).
+RN   [4]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RC   STRAIN=C57BL/6J;
+RX   PubMed=19468303; DOI=10.1371/journal.pbio.1000112;
+RA   Church D.M., Goodstadt L., Hillier L.W., Zody M.C., Goldstein S.,
+RA   She X., Bult C.J., Agarwala R., Cherry J.L., DiCuccio M., Hlavina W.,
+RA   Kapustin Y., Meric P., Maglott D., Birtle Z., Marques A.C., Graves T.,
+RA   Zhou S., Teague B., Potamousis K., Churas C., Place M., Herschleb J.,
+RA   Runnheim R., Forrest D., Amos-Landgraf J., Schwartz D.C., Cheng Z.,
+RA   Lindblad-Toh K., Eichler E.E., Ponting C.P.;
+RT   "Lineage-specific biology revealed by a finished genome assembly of
+RT   the mouse.";
+RL   PLoS Biol. 7:E1000112-E1000112(2009).
+RN   [5]
+RP   NUCLEOTIDE SEQUENCE [MRNA] OF 18-200.
+RX   PubMed=8917547; DOI=10.1073/pnas.93.23.13078;
+RA   Rajan J.V., Wang M., Marquis S.T., Chodosh L.A.;
+RT   "Brca2 is coordinately regulated with Brca1 during proliferation and
+RT   differentiation in mammary epithelial cells.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 93:13078-13083(1996).
+RN   [6]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA / MRNA] OF 569-625.
+RX   PubMed=9196008; DOI=10.1007/s003359900497;
+RA   McAllister K.A., Ramachandran S., Haugen-Strano A., Fiedorek F.T. Jr.,
+RA   Wiseman R.W.;
+RT   "Genetic mapping of the Brca2 breast cancer susceptibility gene on
+RT   mouse chromosome 5.";
+RL   Mamm. Genome 8:540-541(1997).
+RN   [7]
+RP   PROTEIN SEQUENCE OF 784-790, AND IDENTIFICATION BY MASS SPECTROMETRY.
+RC   STRAIN=OF1; TISSUE=Hippocampus;
+RA   Lubec G., Sunyer B., Chen W.-Q.;
+RL   Submitted (JAN-2009) to UniProtKB.
+RN   [8]
+RP   X-RAY CRYSTALLOGRAPHY (3.1 ANGSTROMS) OF 2378-3115 IN COMPLEX WITH
+RP   SEM1, AND INTERACTION WITH SEM1.
+RX   PubMed=12228710; DOI=10.1126/science.297.5588.1837;
+RA   Yang H., Jeffrey P.D., Miller J., Kinnucan E., Sun Y., Thoma N.H.,
+RA   Zheng N., Chen P.L., Lee W.H., Pavletich N.P.;
+RT   "BRCA2 function in DNA binding and recombination from a BRCA2-DSS1-
+RT   ssDNA structure.";
+RL   Science 297:1837-1848(2002).
+CC   -!- FUNCTION: Involved in double-strand break repair and/or homologous
+CC       recombination. Binds RAD51 and potentiates recombinational DNA
+CC       repair by promoting assembly of RAD51 onto single-stranded DNA
+CC       (ssDNA). Acts by targeting RAD51 to ssDNA over double-stranded
+CC       DNA, enabling RAD51 to displace replication protein-A (RPA) from
+CC       ssDNA and stabilizing RAD51-ssDNA filaments by blocking ATP
+CC       hydrolysis. Part of a PALB2-scaffolded HR complex containing
+CC       RAD51C and which is thought to play a role in DNA repair by HR.
+CC       May participate in S phase checkpoint activation. Binds
+CC       selectively to ssDNA, and to ssDNA in tailed duplexes and
+CC       replication fork structures. May play a role in the extension step
+CC       after strand invasion at replication-dependent DNA double-strand
+CC       breaks; together with PALB2 is involved in both POLH localization
+CC       at collapsed replication forks and DNA polymerization activity. In
+CC       concert with NPM1, regulates centrosome duplication. Interacts
+CC       with the TREX-2 complex (transcription and export complex 2)
+CC       subunits PCID2 and SEM1, and is required to prevent R-loop-
+CC       associated DNA damage and thus transcription-associated genomic
+CC       instability, independently of its known role in homologous
+CC       recombination (By similarity). {ECO:0000250,
+CC       ECO:0000250|UniProtKB:P51587}.
+CC   -!- SUBUNIT: Monomer and dimer. Interacts with RAD51; regulates RAD51
+CC       recruitment and function at sites of DNA repair. Interacts with
+CC       SEM1, WDR16, USP11, DMC1, ROCK2 and NPM1. Interacts with both
+CC       nonubiquitinated and monoubiquitinated FANCD2; this complex also
+CC       includes XRCC3 and phosphorylated FANCG. Part of a BRCA complex
+CC       containing BRCA1, BRCA2 and PALB2. Interacts directly with PALB2
+CC       which may serve as a scaffold for a HR complex containing PALB2,
+CC       BRCA2, RAD51C, RAD51 and XRCC3. Interacts with BRCA1 only in the
+CC       presence of PALB2 which serves as the bridging protein. Interacts
+CC       with POLH; the interaction is direct. Interacts with the TREX-2
+CC       complex subunits PCID2 and SEM1 (By similarity). {ECO:0000250,
+CC       ECO:0000250|UniProtKB:P51587, ECO:0000269|PubMed:12228710}.
+CC   -!- SUBCELLULAR LOCATION: Cytoplasm, cytoskeleton, microtubule
+CC       organizing center, centrosome {ECO:0000250}. Nucleus
+CC       {ECO:0000250}.
+CC   -!- TISSUE SPECIFICITY: Widely expressed. Highest expression in
+CC       cerebellum, testis, ileum, appendix, epididymis, ovary and mammary
+CC       gland. No expression in lung.
+CC   -!- DEVELOPMENTAL STAGE: In the mammary gland, expression increases
+CC       dramatically during pregnancy.
+CC   -!- PTM: Phosphorylation by CHEK1 and CHEK2 regulates interaction with
+CC       RAD51. Phosphorylation at Ser-3214 by CDK1 and CDK2 is low in S
+CC       phase when recombination is active, but increases as cells
+CC       progress towards mitosis; this phosphorylation prevents homologous
+CC       recombination-dependent repair during S phase and G2 by inhibiting
+CC       RAD51 binding (By similarity). {ECO:0000250}.
+CC   -!- PTM: Ubiquitinated in the absence of DNA damage; this does not
+CC       lead to proteasomal degradation. In contrast, ubiquitination in
+CC       response to DNA damage leads to proteasomal degradation (By
+CC       similarity). {ECO:0000250}.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
+CC   -----------------------------------------------------------------------
+DR   EMBL; U82270; AAB48306.1; -; mRNA.
+DR   EMBL; U65594; AAC23702.1; -; mRNA.
+DR   EMBL; U89652; AAB71377.1; -; mRNA.
+DR   EMBL; AC154885; -; NOT_ANNOTATED_CDS; Genomic_DNA.
+DR   EMBL; U72947; AAB40720.1; -; mRNA.
+DR   EMBL; U89503; AAC53276.1; -; Genomic_DNA.
+DR   CCDS; CCDS39411.1; -.
+DR   PIR; T30835; T30835.
+DR   PIR; T30904; T30904.
+DR   PIR; T42205; T42205.
+DR   RefSeq; NP_001074470.1; NM_001081001.2.
+DR   RefSeq; NP_033895.2; NM_009765.3.
+DR   RefSeq; XP_017176117.1; XM_017320628.1.
+DR   UniGene; Mm.236256; -.
+DR   PDB; 1MIU; X-ray; 3.10 A; A=2378-3115.
+DR   PDB; 1MJE; X-ray; 3.50 A; A=2378-3113.
+DR   PDBsum; 1MIU; -.
+DR   PDBsum; 1MJE; -.
+DR   ProteinModelPortal; P97929; -.
+DR   SMR; P97929; -.
+DR   BioGrid; 198384; 7.
+DR   ComplexPortal; CPX-972; BRCC ubiquitin ligase complex.
+DR   IntAct; P97929; 2.
+DR   MINT; P97929; -.
+DR   STRING; 10090.ENSMUSP00000038576; -.
+DR   iPTMnet; P97929; -.
+DR   PhosphoSitePlus; P97929; -.
+DR   EPD; P97929; -.
+DR   MaxQB; P97929; -.
+DR   PaxDb; P97929; -.
+DR   PeptideAtlas; P97929; -.
+DR   PRIDE; P97929; -.
+DR   Ensembl; ENSMUST00000044620; ENSMUSP00000038576; ENSMUSG00000041147.
+DR   Ensembl; ENSMUST00000202313; ENSMUSP00000144150; ENSMUSG00000041147.
+DR   GeneID; 12190; -.
+DR   KEGG; mmu:12190; -.
+DR   UCSC; uc009aty.2; mouse.
+DR   CTD; 675; -.
+DR   MGI; MGI:109337; Brca2.
+DR   eggNOG; KOG4751; Eukaryota.
+DR   eggNOG; ENOG410Y06W; LUCA.
+DR   GeneTree; ENSGT00390000003602; -.
+DR   HOGENOM; HOG000139693; -.
+DR   HOVERGEN; HBG050731; -.
+DR   InParanoid; P97929; -.
+DR   KO; K08775; -.
+DR   OMA; KAFMEDG; -.
+DR   OrthoDB; EOG091G0C79; -.
+DR   TreeFam; TF105041; -.
+DR   Reactome; R-MMU-5685942; HDR through Homologous Recombination (HRR).
+DR   Reactome; R-MMU-5693554; Resolution of D-loop Structures through Synthesis-Dependent Strand Annealing (SDSA).
+DR   Reactome; R-MMU-5693568; Resolution of D-loop Structures through Holliday Junction Intermediates.
+DR   Reactome; R-MMU-5693579; Homologous DNA Pairing and Strand Exchange.
+DR   Reactome; R-MMU-5693616; Presynaptic phase of homologous DNA pairing and strand exchange.
+DR   EvolutionaryTrace; P97929; -.
+DR   PRO; PR:P97929; -.
+DR   Proteomes; UP000000589; Chromosome 5.
+DR   Bgee; ENSMUSG00000041147; Expressed in 215 organ(s), highest expression level in embryo.
+DR   CleanEx; MM_BRCA2; -.
+DR   ExpressionAtlas; P97929; baseline and differential.
+DR   Genevisible; P97929; MM.
+DR   GO; GO:0033593; C:BRCA2-MAGE-D1 complex; ISO:MGI.
+DR   GO; GO:0005813; C:centrosome; ISS:UniProtKB.
+DR   GO; GO:0005737; C:cytoplasm; IDA:MGI.
+DR   GO; GO:0005829; C:cytosol; ISO:MGI.
+DR   GO; GO:0000800; C:lateral element; ISO:MGI.
+DR   GO; GO:0000784; C:nuclear chromosome, telomeric region; ISO:MGI.
+DR   GO; GO:0005654; C:nucleoplasm; ISO:MGI.
+DR   GO; GO:0005634; C:nucleus; IDA:MGI.
+DR   GO; GO:0032991; C:protein-containing complex; ISO:MGI.
+DR   GO; GO:0030141; C:secretory granule; ISO:MGI.
+DR   GO; GO:0043015; F:gamma-tubulin binding; ISO:MGI.
+DR   GO; GO:0010484; F:H3 histone acetyltransferase activity; ISO:MGI.
+DR   GO; GO:0010485; F:H4 histone acetyltransferase activity; ISO:MGI.
+DR   GO; GO:0042802; F:identical protein binding; ISO:MGI.
+DR   GO; GO:0002020; F:protease binding; ISO:MGI.
+DR   GO; GO:0008022; F:protein C-terminus binding; ISO:MGI.
+DR   GO; GO:0003697; F:single-stranded DNA binding; ISO:MGI.
+DR   GO; GO:0007420; P:brain development; IMP:MGI.
+DR   GO; GO:0007569; P:cell aging; IMP:MGI.
+DR   GO; GO:0008283; P:cell proliferation; IMP:MGI.
+DR   GO; GO:0006974; P:cellular response to DNA damage stimulus; IDA:UniProtKB.
+DR   GO; GO:0051298; P:centrosome duplication; ISO:MGI.
+DR   GO; GO:0043009; P:chordate embryonic development; IMP:MGI.
+DR   GO; GO:0051276; P:chromosome organization; IMP:MGI.
+DR   GO; GO:0006978; P:DNA damage response, signal transduction by p53 class mediator resulting in transcription of p21 class mediator; IMP:MGI.
+DR   GO; GO:0006310; P:DNA recombination; ISO:MGI.
+DR   GO; GO:0006302; P:double-strand break repair; IMP:MGI.
+DR   GO; GO:0000724; P:double-strand break repair via homologous recombination; IMP:MGI.
+DR   GO; GO:0070200; P:establishment of protein localization to telomere; IDA:BHF-UCL.
+DR   GO; GO:0008585; P:female gonad development; IMP:MGI.
+DR   GO; GO:0030097; P:hemopoiesis; IMP:MGI.
+DR   GO; GO:0043966; P:histone H3 acetylation; ISO:MGI.
+DR   GO; GO:0043967; P:histone H4 acetylation; ISO:MGI.
+DR   GO; GO:0031619; P:homologous chromosome orientation involved in meiotic metaphase I plate congression; ISO:MGI.
+DR   GO; GO:0001833; P:inner cell mass cell proliferation; IMP:MGI.
+DR   GO; GO:0008630; P:intrinsic apoptotic signaling pathway in response to DNA damage; IGI:MGI.
+DR   GO; GO:0042771; P:intrinsic apoptotic signaling pathway in response to DNA damage by p53 class mediator; IMP:MGI.
+DR   GO; GO:0007141; P:male meiosis I; IMP:MGI.
+DR   GO; GO:0030879; P:mammary gland development; ISO:MGI.
+DR   GO; GO:0000281; P:mitotic cytokinesis; ISO:MGI.
+DR   GO; GO:1990426; P:mitotic recombination-dependent replication fork processing; ISO:MGI.
+DR   GO; GO:0035264; P:multicellular organism growth; ISO:MGI.
+DR   GO; GO:0033600; P:negative regulation of mammary gland epithelial cell proliferation; ISO:MGI.
+DR   GO; GO:0006289; P:nucleotide-excision repair; ISO:MGI.
+DR   GO; GO:0001556; P:oocyte maturation; IMP:MGI.
+DR   GO; GO:0045931; P:positive regulation of mitotic cell cycle; IMP:MGI.
+DR   GO; GO:0045893; P:positive regulation of transcription, DNA-templated; ISO:MGI.
+DR   GO; GO:0032465; P:regulation of cytokinesis; IMP:MGI.
+DR   GO; GO:0048478; P:replication fork protection; IMP:MGI.
+DR   GO; GO:0010332; P:response to gamma radiation; IMP:MGI.
+DR   GO; GO:0010225; P:response to UV-C; IMP:MGI.
+DR   GO; GO:0010165; P:response to X-ray; IMP:MGI.
+DR   GO; GO:0007283; P:spermatogenesis; IMP:MGI.
+DR   GO; GO:0000722; P:telomere maintenance via recombination; IGI:BHF-UCL.
+DR   CDD; cd04493; BRCA2DBD_OB1; 1.
+DR   CDD; cd04495; BRCA2DBD_OB3; 1.
+DR   InterPro; IPR015525; BRCA2.
+DR   InterPro; IPR015252; BRCA2_hlx.
+DR   InterPro; IPR036315; BRCA2_hlx_sf.
+DR   InterPro; IPR015187; BRCA2_OB_1.
+DR   InterPro; IPR015188; BRCA2_OB_3.
+DR   InterPro; IPR002093; BRCA2_repeat.
+DR   InterPro; IPR012340; NA-bd_OB-fold.
+DR   InterPro; IPR015205; Tower_dom.
+DR   PANTHER; PTHR11289; PTHR11289; 1.
+DR   Pfam; PF09169; BRCA-2_helical; 1.
+DR   Pfam; PF09103; BRCA-2_OB1; 1.
+DR   Pfam; PF09104; BRCA-2_OB3; 1.
+DR   Pfam; PF00634; BRCA2; 7.
+DR   Pfam; PF09121; Tower; 1.
+DR   PIRSF; PIRSF002397; BRCA2; 1.
+DR   SMART; SM01341; Tower; 1.
+DR   SUPFAM; SSF50249; SSF50249; 3.
+DR   SUPFAM; SSF81872; SSF81872; 1.
+DR   PROSITE; PS50138; BRCA2_REPEAT; 6.
+PE   1: Evidence at protein level;
+KW   3D-structure; Cell cycle; Complete proteome; Cytoplasm; Cytoskeleton;
+KW   Direct protein sequencing; DNA damage; DNA recombination; DNA repair;
+KW   DNA-binding; Nucleus; Phosphoprotein; Polymorphism;
+KW   Reference proteome; Repeat; Tumor suppressor; Ubl conjugation.
+FT   CHAIN         1   3329       Breast cancer type 2 susceptibility
+FT                                protein homolog.
+FT                                /FTId=PRO_0000064985.
+FT   REPEAT      981   1015       BRCA2 1.
+FT   REPEAT     1192   1226       BRCA2 2.
+FT   REPEAT     1394   1428       BRCA2 3.
+FT   REPEAT     1491   1525       BRCA2 4.
+FT   REPEAT     1623   1657       BRCA2 5.
+FT   REPEAT     1924   1958       BRCA2 6.
+FT   REPEAT     2004   2038       BRCA2 7.
+FT   REGION        1     40       Interaction with PALB2. {ECO:0000250}.
+FT   REGION      628    979       Interaction with NPM1. {ECO:0000250}.
+FT   REGION     2298   2466       Interaction with FANCD2. {ECO:0000250}.
+FT   REGION     2402   2753       Interaction with SEM1.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOTIF      2603   2619       Nuclear export signal; masked by
+FT                                interaction with SEM1.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOD_RES     435    435       Phosphoserine.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOD_RES     481    481       Phosphoserine.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOD_RES     735    735       Phosphoserine.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOD_RES    2048   2048       Phosphoserine.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOD_RES    3214   3214       Phosphoserine; by CDK1 and CDK2.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   MOD_RES    3241   3241       Phosphoserine.
+FT                                {ECO:0000250|UniProtKB:P51587}.
+FT   VARIANT      44     44       S -> F (in strain: C57BL/6 and 129/Sv).
+FT   VARIANT     340    340       T -> P (in strain: 129/Sv).
+FT   VARIANT     377    377       N -> H (in strain: C57BL/6).
+FT   VARIANT     407    407       H -> P (in strain: C57BL/6).
+FT   VARIANT     661    661       I -> V (in strain: C57BL/6).
+FT   VARIANT     739    739       P -> H (in strain: C57BL/6).
+FT   VARIANT    1198   1199       GF -> RI (in strain: C57BL/6).
+FT   VARIANT    1257   1257       Q -> P (in strain: C57BL/6).
+FT   VARIANT    1392   1392       Q -> R (in strain: C57BL/6).
+FT   VARIANT    1520   1521       FD -> CG (in strain: C57BL/6).
+FT   VARIANT    1583   1583       R -> W (in strain: C57BL/6).
+FT   VARIANT    1613   1613       C -> W (in strain: C57BL/6).
+FT   VARIANT    1686   1686       S -> R (in strain: C57BL/6).
+FT   VARIANT    1799   1799       S -> F (in strain: 129/Sv).
+FT   VARIANT    1881   1881       P -> L (in strain: C57BL/6).
+FT   VARIANT    1894   1894       S -> F (in strain: 129/Sv).
+FT   VARIANT    2141   2141       Q -> K (in strain: C57BL/6).
+FT   VARIANT    2392   2392       S -> R (in strain: C57BL/6).
+FT   VARIANT    2605   2605       K -> Q (in strain: C57BL/6).
+FT   VARIANT    2648   2648       A -> P (in strain: C57BL/6).
+FT   VARIANT    2717   2717       R -> C (in strain: 129/Sv).
+FT   VARIANT    2729   2729       L -> M (in strain: 129/Sv).
+FT   VARIANT    2814   2814       Q -> H (in strain: C57BL/6).
+FT   VARIANT    2827   2827       A -> P (in strain: C57BL/6).
+FT   VARIANT    2907   2907       S -> I (in strain: 129/Sv).
+FT   VARIANT    2929   2929       H -> L (in strain: 129/Sv).
+FT   VARIANT    3058   3058       A -> G (in strain: C57BL/6).
+FT   VARIANT    3071   3071       A -> G (in strain: C57BL/6).
+FT   VARIANT    3081   3081       K -> E (in strain: C57BL/6).
+FT   VARIANT    3089   3089       T -> S (in strain: C57BL/6).
+FT   VARIANT    3105   3109       DSPKW -> SQSQV (in strain: C57BL/6).
+FT   VARIANT    3220   3220       A -> G (in strain: 129/Sv).
+FT   VARIANT    3238   3238       E -> K (in strain: 129/Sv).
+FT   VARIANT    3243   3243       Missing (in strain: C57BL/6).
+FT   VARIANT    3245   3245       R -> K (in strain: 129/Sv).
+FT   CONFLICT   1038   1038       L -> I (in Ref. 1; AAB48306).
+FT                                {ECO:0000305}.
+FT   HELIX      2404   2420       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2430   2435       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2446   2448       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2456   2458       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     2462   2464       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2468   2472       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2475   2480       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2486   2489       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2490   2492       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2495   2497       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     2503   2505       {ECO:0000244|PDB:1MJE}.
+FT   TURN       2512   2514       {ECO:0000244|PDB:1MJE}.
+FT   HELIX      2518   2527       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2538   2554       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2560   2562       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2564   2569       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2570   2584       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2585   2587       {ECO:0000244|PDB:1MJE}.
+FT   HELIX      2592   2597       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2606   2608       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2640   2643       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     2648   2653       {ECO:0000244|PDB:1MJE}.
+FT   HELIX      2655   2662       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2671   2674       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     2675   2677       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2679   2681       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2696   2699       {ECO:0000244|PDB:1MJE}.
+FT   HELIX      2701   2703       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2704   2707       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     2713   2715       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2726   2728       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2731   2733       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2736   2746       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2751   2754       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     2756   2758       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2760   2763       {ECO:0000244|PDB:1MJE}.
+FT   HELIX      2767   2778       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2782   2791       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2813   2817       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2822   2830       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2833   2835       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2836   2840       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2848   2850       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2851   2853       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2855   2858       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2861   2871       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2873   2876       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2877   2881       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2889   2900       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2904   2910       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2913   2918       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2924   2930       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2938   2940       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2945   2957       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2961   2964       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2965   2967       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      2977   2980       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2981   2983       {ECO:0000244|PDB:1MIU}.
+FT   TURN       2986   2989       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     2990   3001       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3004   3006       {ECO:0000244|PDB:1MJE}.
+FT   STRAND     3009   3013       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3015   3017       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3019   3026       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3037   3044       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3050   3052       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3056   3058       {ECO:0000244|PDB:1MIU}.
+FT   STRAND     3063   3067       {ECO:0000244|PDB:1MIU}.
+FT   TURN       3071   3073       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      3074   3080       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      3082   3085       {ECO:0000244|PDB:1MIU}.
+FT   HELIX      3090   3102       {ECO:0000244|PDB:1MIU}.
+SQ   SEQUENCE   3329 AA;  370664 MW;  50A32E8BADE2CF7E CRC64;
+     MPVEYKRRPT FWEIFKARCS TADLGPISLN WFEELSSEAP PYNSEPPEES EYKPHGYEPQ
+     LFKTPQRNPP YHQFASTPIM FKERSQTLPL DQSPFRELGK VVASSKHKTH SKKKTKVDPV
+     VDVASPPLKS CLSESPLTLR CTQAVLQREK PVVSGSLFYT PKLKEGQTPK PISESLGVEV
+     DPDMSWTSSL ATPPTLSSTV LIARDEEARS SVTPADSPAT LKSCFSNHNE SPQKNDRSVP
+     SVIDSENKNQ QEAFSQGLGK MLGDSSGKRN SFKDCLRKPI PNILEDGETA VDTSEEDSFS
+     LCFPKRRTRN LQKMRMGKTR KKIFSETRTD ELSEEARRQT DDKNSFVFEM ELRESDPLDP
+     GVTSQKPFYS QNEEICNEAV QCSDSRWSQS NLSGLNETQT GKITLPHISS HSQNISEDFI
+     DMKKEGTGSI TSEKSLPHIS SLPEPEKMFS EETVVDKEHE GQHFESLEDS IAGKQMVSRT
+     SQAACLSPSI RKSIFKMREP LDETLGTVFS DSMTNSTFTE EHEASACGLG ILTACSQRED
+     SICPSSVDTG SWPTTLTDTS ATVKNAGLIS TLKNKKRKFI YSVSDDASLQ GKKLQTHRQL
+     ELTNLSAQLE ASAFEVPLTF TNVNSGIPDS SDKKRCLPND PEEPSLTNSF GTATSKEISY
+     IHALISQDLN DKEAIVIEEK PQPYTAREAD FLLCLPERTC ENDQKSPKVS NGKEKVLVSA
+     CLPSAVQLSS ISFESQENPL GDHNGTSTLK LTPSSKLPLS KADMVSREKM CKMPEKLQCE
+     SCKVNIELSK NILEVNEICI LSENSKTPGL LPPGENIIEV ASSMKSQFNQ NAKIVIQKDQ
+     KGSPFISEVA VNMNSEELFP DSGNNFAFQV TNKCNKPDLG SSVELQEEDL SHTQGPSLKN
+     SPMAVDEDVD DAHAAQVLIT KDSDSLAVVH DYTEKSRNNI EQHQKGTEDK DFKSNSSLNM
+     KSDGNSDCSD KWSEFLDPVL NHNFGGSFRT ASNKEIKLSE HNVKKSKMFF KDIEEQYPTR
+     LACIDIVNTL PLANQKKLSE PHIFDLKSVT TVSTQSHNQS SVSHEDTDTA PQMLSSKQDF
+     HSNNLTTSQK AEITELSTIL EESGSQFEFT QFRKPSHIAQ NTSEVPGNQM VVLSTASKEW
+     KDTDLHLPVD PSVGQTDHSK QFEGSAGVKQ SFPHLLEDTC NKNTSCFLPN INEMEFGGFC
+     SALGTKLSVS NEALRKAMKL FSDIENSEEP SAKVGPRGFS SSAHHDSVAS VFKIKKQNTE
+     KSFDEKSSKC QVTLQNNIEM TTCIFVGRNP EKYIKNTKHE DSYTSSQRNN LENSDGSMSS
+     TSGPVYIHKG DSDLPADQGS KCPESCTQYA REENTQIKEN ISDLTCLEIM KAEETCMKSS
+     DKKQLPSDKM EQNIKEFNIS FQTASGKNTR VSKESLNKSV NIFNRETDEL TVISDSLNSK
+     ILHGINKDKM HTSCHKKAIS IKKVFEDHFP IVTVSQLPAQ QHPEYEIEST KEPTLLSFHT
+     ASGKKVKIMQ ESLDKVKNLF DETQYVRKTA SFSQGSKPLK DSKKELTLAY EKIEVTASKC
+     EEMQNFVSKE TEMLPQQNYH MYRQTENLKT SNGTSSKVQE NIENNVEKNP RICCICQSSY
+     PVTEDSALAY YTEDSRKTCV RESSLSKGRK WLREQGDKLG TRNTIKIECV KEHTEDFAGN
+     ASYEHSLVII RTEIDTNHVS ENQVSTLLSD PNVCHSYLSQ SSFCHCDDMH NDSGYFLKNK
+     IDSDVPPDMK NAEGNTISPR VSATKERNLH PQTINEYCVQ KLETNTSPHA NKDVAIDPSL
+     LDSRNCKVGS LVFITAHSQE TERTKEIVTD NCYKIVEQNR QSKPDTCQTS CHKVLDDSKD
+     FICPSSSGDV CINSRKDSFC PHNEQILQHN QSMSGLKKAA TPPVGLETWD TSKSIREPPQ
+     AAHPSRTYGI FSTASGKAIQ VSDASLEKAR QVFSEMDGDA KQLSSMVSLE GNEKPHHSVK
+     RENSVVHSTQ GVLSLPKPLP GNVNSSVFSG FSTAGGKLVT VSESALHKVK GMLEEFDLIR
+     TEHTLQHSPI PEDVSKILPQ PCAEIRTPEY PVNSKLQKTY NDKSSLPSNY KESGSSGNTQ
+     SIEVSLQLSQ MERNQDTQLV LGTKVSHSKA NLLGKEQTLP QNIKVKTDEM KTFSDVPVKT
+     NVGEYYSKES ENYFETEAVE SAKAFMEDDE LTDSEQTHAK CSLFTCPQNE TLFNSRTRKR
+     GGVTVDAVGQ PPIKRSLLNE FDRIIESKGK SLTPSKSTPD GTVKDRSLFT HHMSLEPVTC
+     GPFCSSKERQ GAQRPHLTSP AQELLSKGHP WRHSALEKSP SSPIVSILPA HDVSATRTER
+     TRHSGKSTKV FVPPFKMKSQ FHGDEHFNSK NVNLEGKNQK STDGDREDGN DSHVRQFNKD
+     LMSSLQSARD LQDMRIKNKE RRHLRLQPGS LYLTKSSTLP RISLQAAVGD RAPSACSPKQ
+     LYIYGVSKEC INVNSKNAEY FQFDIQDHFG KEDLCAGKGF QLADGGWLIP SNDGKAGKEE
+     FYRALCDTPG VDPKLISSIW VANHYRWIVW KLAAMEFAFP KEFANRCLNP ERVLLQLKYR
+     YDVEIDNSRR SALKKILERD DTAAKTLVLC ISDIISPSTK VSETSGGKTS GEDANKVDTI
+     ELTDGWYAVR AQLDPPLMAL VKSGKLTVGQ KIITQGAELV GSPDACAPLE APDSLRLKIS
+     ANSTRPARWH SRLGFFRDPR PFPLPLSSLF SDGGNVGCVD IIVQRVYPLQ WVEKTVSGLY
+     IFRSEREEEK EALRFAEAQQ KKLEALFTKV HTEFKDHEED TTQRCVLSRT LTRQQVHALQ
+     DGAELYAAVQ YASDPDHLEA CFSEEQLRAL NNYRQMLNDK KQARIQSEFR KALESAEKEE
+     GLSRDVTTVW KLRVTSYKKK EKSALLSIWR PSSDLSSLLT EGKRYRIYHL AVSKSKSKFE
+     RPSIQLTATK RTQYQQLPVS SETLLQVYQP RESLHFSRLS DPAFQPPCSE VDVVGVVVSV
+     VKPIGLAPLV YLSDECLNLL VVKFGIDLNE DIKPRVLIAA SNLQCQPEST SGVPTLFAGH
+     FSIFSASPKE AYFQEKVNNL KHAIENIDTF YKEAEKKLIH VLEGDSPKWS TPNKDPTREP
+     HAASTCCASD LLGSGGQFLR ISPTGQQSYQ SPLSHCTLKG KSMPLAHSAQ MAAKSWSGEN
+     EIDDPKTCRK RRALDFLSRL PLPSPVSPIC TFVSPAAQKA FQPPRSCGTK YATPIKKEPS
+     SPRRRTPFQK TSGVSLPDCD SVADEELALL STQALTPDSV GGNEQAFPGD STRNPQPAQR
+     PDQQVGPRSR KESLRDCRGD SSEKLAVES
+//

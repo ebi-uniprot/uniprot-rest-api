@@ -1,14 +1,19 @@
 package uk.ac.ebi.uniprot.uniprotkb.controller.request;
 
 import lombok.Data;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.rest.validation.*;
 import uk.ac.ebi.uniprot.uniprotkb.configuration.UniProtField;
+import uk.ac.ebi.uniprot.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
 import uk.ac.ebi.uniprot.uniprotkb.validation.validator.impl.UniprotSolrQueryFieldValidator;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Search cursor request Entity
@@ -41,17 +46,26 @@ public class SearchRequestDTO {
     @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{search.invalid.includeIsoform}")
     private String includeIsoform;
 
-    @ValidIncludeFacets
-    private String includeFacets;
+    @ValidFacets(facetConfig = UniprotFacetConfig.class)
+    private String facets;
 
     @Positive(message = "{search.positive}")
     private Integer size = DEFAULT_RESULTS_SIZE;
 
-    public boolean isIncludeFacets(){
-        return Boolean.valueOf(includeFacets);
-    }
-
     public boolean isIncludeIsoform(){
         return Boolean.valueOf(includeIsoform);
     }
+
+    public List<String> getFacetList(){
+        if(hasFacets()){
+            return Arrays.asList(facets.split(("\\s*,\\s*")));
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+    public boolean hasFacets() {
+        return Utils.notEmpty(facets);
+    }
+
 }

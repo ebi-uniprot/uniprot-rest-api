@@ -14,12 +14,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.InactiveEntryMocker;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.UniProtEntryMocker;
 import uk.ac.ebi.uniprot.dataservice.source.impl.inactiveentry.InactiveUniProtEntry;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
-import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.InactiveEntryMocker;
-import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker;
 
 import java.util.List;
 

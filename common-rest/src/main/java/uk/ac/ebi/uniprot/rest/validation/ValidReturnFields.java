@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.rest.validation;
 
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.rest.validation.validator.ReturnFieldsValidator;
 
 import javax.validation.Constraint;
@@ -51,9 +52,9 @@ public @interface ValidReturnFields {
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if(value != null && !value.isEmpty()){
+            if(Utils.notEmpty(value)){
                 ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-                String fieldList[] = value.split("\\s*,\\s*");
+                String[] fieldList = value.split("\\s*,\\s*");
                 for (String field : fieldList) {
                     if(!fieldValidator.hasValidReturnField(field)){
                         buildErrorMessage(field,contextImpl);
