@@ -72,15 +72,15 @@ class CursorPageTest {
 
         CursorPage page = CursorPage.of(currentCursor,10);
         assertNotNull(page);
-        assertNotNull(page.getCursor());
         assertNull(page.getTotalElements());
-
-        page.setTotalElements(30L);
-        assertThat(page.getTotalElements(),CoreMatchers.is(30L));
+        assertNotNull(page.getCursor());
 
         page.setNextCursor("nextCursorItem");
         String nextCursor = page.getEncryptedNextCursor();
         assertThat(nextCursor,CoreMatchers.is("ljsr8c2ptesfv2u00i1d261sod"));
+
+        page.setTotalElements(30L);
+        assertThat(page.getTotalElements(),CoreMatchers.is(30L));
 
         String decryptedNextCursor = new String(new BigInteger(nextCursor, 36).toByteArray());
         assertThat(decryptedNextCursor,CoreMatchers.is("30,nextCursorItem"));
