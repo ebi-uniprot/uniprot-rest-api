@@ -455,10 +455,10 @@ public class UniprotKBSearchControllerIT {
         String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -470,9 +470,8 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
+                .andExpect(jsonPath("$.results.size()",is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")));
     }
 
     @Test
@@ -497,6 +496,7 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()",is(1)))
                 .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
                 .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
                 .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));

@@ -38,13 +38,13 @@ public class UniprotKBSearchPaginationControllerIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
-    @Autowired
-    private DataStoreManager storeManager;
+    private MockMvc mockMvc;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private MockMvc mockMvc;
+    @Autowired
+    private DataStoreManager storeManager;
 
     @Before
     public void setUp() {
