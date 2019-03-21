@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.OngoingStubbing;
+import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 
@@ -23,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created 22/08/18
@@ -39,7 +41,7 @@ public class StoreStreamerTest {
     private FakeVoldemortClient fakeVoldemortClient;
     private StoreStreamer<String> storeStreamer;
     private StreamRequest streamRequest;
-
+    private static final Logger LOGGER = getLogger(StoreStreamerTest.class);
     public static String transformString(String id) {
         return id + "-transformed";
     }
@@ -131,13 +133,13 @@ public class StoreStreamerTest {
         try {
             OngoingStubbing<Tuple> ongoingStubbing = when(mockTupleStream.read());
             for (String value : values) {
-                System.out.println("hello " + value);
+                LOGGER.debug("hello " + value);
                 ongoingStubbing = ongoingStubbing.thenReturn(tuple(value));
             }
 
-            ongoingStubbing = ongoingStubbing.thenReturn(endTuple());
+            ongoingStubbing.thenReturn(endTuple());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error when tupleStream",e);
         }
 
         return mockTupleStream;

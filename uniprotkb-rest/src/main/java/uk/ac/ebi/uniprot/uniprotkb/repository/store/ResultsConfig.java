@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.uniprotkb.repository.store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.HttpClient;
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -15,6 +16,8 @@ import uk.ac.ebi.uniprot.uniprotkb.repository.search.RepositoryConfigProperties;
 import java.io.IOException;
 import java.util.Base64;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Created 21/08/18
  *
@@ -23,6 +26,8 @@ import java.util.Base64;
 @Configuration
 @Import(RepositoryConfig.class)
 public class ResultsConfig {
+    private static final Logger LOGGER = getLogger(ResultsConfig.class);
+
     @Bean
     public TupleStreamTemplate cloudSolrStreamTemplate(RepositoryConfigProperties configProperties, HttpClient httpClient) {
         return TupleStreamTemplate.builder()
@@ -57,7 +62,7 @@ public class ResultsConfig {
             ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getObjectMapper();
             result = jsonMapper.readValue(Base64.getDecoder().decode(s),UniProtEntry.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error converting DefaultAvro to UniProtEntry",e);
         }
         return result;
     }

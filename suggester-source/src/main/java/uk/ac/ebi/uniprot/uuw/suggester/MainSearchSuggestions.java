@@ -5,10 +5,10 @@ import com.beust.jcommander.Parameter;
 import one.util.streamex.StreamEx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypes;
 import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureCategory;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
-import uk.ac.ebi.uniprot.domain.uniprot.xdb.UniProtXDbTypes;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.io.BufferedWriter;
@@ -25,7 +25,7 @@ import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.computeWeightForN
 
 /**
  * Generates file used for the main search box suggestions. Depends on {@link FeatureType},
- * {@link CommentType}, {@link FeatureCategory} and {@link DatabaseType}.
+ * {@link CommentType}, {@link FeatureCategory} and {@link uk.ac.ebi.uniprot.domain.DatabaseType}.
  * <p>
  * Created 28/09/18
  *

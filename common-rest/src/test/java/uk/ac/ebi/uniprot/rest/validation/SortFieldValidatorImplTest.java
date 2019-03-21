@@ -2,13 +2,13 @@ package uk.ac.ebi.uniprot.rest.validation;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour
@@ -19,77 +19,95 @@ class SortFieldValidatorImplTest {
 
     @Test
     void isValidNullValueReturnTrue() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid(null, null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
     void isValidSimpleFieldAscSortReturnTrue() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("accession asc", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
     void isValidSimpleFieldDescSortReturnTrue() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("name DESC", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
     void isValidMultipleFieldMultiplesCommaSpacesDescSortReturnTrue() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("accession desc,mnemonic DESC, name DesC , annotation_score dESc", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
     void isValidMultipleFieldMultiplesCommaSpacesAscSortReturnTrue() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("gene asc,length asc ,mass AsC , organism aSc", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
     void isValidInvalidSortOrderReturnFalse() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("gene invalid", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.errorFields.size());
     }
 
     @Test
     void isValidInvalidFieldNameReturnFalse() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("invalid asc", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.errorFields.size());
     }
 
     @Test
     void isValidInvalidFormatReturnFalse() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("gene asc organism desc", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.errorFields.size());
     }
 
     @Test
     void isValidInvalidMultipleSortOrderReturnFalse() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("gene invalid , organism invalid2", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(2, validator.errorFields.size());
         assertEquals("invalid", validator.errorFields.get(0));
         assertEquals("invalid2", validator.errorFields.get(1));
@@ -97,10 +115,12 @@ class SortFieldValidatorImplTest {
 
     @Test
     void isValidInvalidMultipleFieldNameReturnFalse() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("invalid asc, invalid2 desc", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(2, validator.errorFields.size());
         assertEquals("invalid", validator.errorFields.get(0));
         assertEquals("invalid2", validator.errorFields.get(1));
@@ -108,13 +128,24 @@ class SortFieldValidatorImplTest {
 
     @Test
     void isValidInvalidMultipleErrorsReturnFalse() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
-        validator.valueList = Arrays.stream(FakeSort.values()).map(Enum::name).collect(Collectors.toList());
+        validator.initialize(validSolrSortFields);
+
         boolean result = validator.isValid("invalidField asc ,gene invalidOrder", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(2, validator.errorFields.size());
         assertEquals("invalidfield", validator.errorFields.get(0));
         assertEquals("invalidorder", validator.errorFields.get(1));
+    }
+
+    private ValidSolrSortFields getMockedValidSolrQueryFields() {
+        ValidSolrSortFields validSolrSortFields = Mockito.mock(ValidSolrSortFields.class);
+
+        Class<? extends Enum> returnFieldValidator = FakeSort.class;
+        OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validSolrSortFields.sortFieldEnumClazz());
+        ongoingStubbing.thenReturn(returnFieldValidator);
+        return validSolrSortFields;
     }
 
     /**

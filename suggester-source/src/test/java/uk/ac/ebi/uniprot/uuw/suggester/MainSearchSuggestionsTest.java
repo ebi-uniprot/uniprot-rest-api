@@ -4,10 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypes;
 import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureCategory;
 import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
-import uk.ac.ebi.uniprot.domain.uniprot.xdb.UniProtXDbTypes;
 import uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion;
 
 import java.util.List;
