@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldGroupImpl;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldImpl;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
 
 import java.util.List;
@@ -66,7 +68,7 @@ class UniProtResultFieldsTest {
 	private void verifyGroupSize(List<FieldGroup> groups, String groupName, int size) {
 		Optional<FieldGroup> group = getGroup(groups, groupName);
 		assertTrue(group.isPresent());
-		assertEquals(size, group.get().getFields().size());
+		assertEquals(size, group.orElse(new FieldGroupImpl()).getFields().size());
 	}
 
 	@Test
@@ -75,17 +77,17 @@ class UniProtResultFieldsTest {
 		assertEquals(16, groups.size());
 		System.out.println(
 		groups.stream().flatMap(val->val.getFields().stream())
-		.map(val->val.getName())
+		.map(Field::getName)
 		.filter(val ->val.startsWith("ft:"))
 		.map(val -> "\"" + val +"\"")
 		.collect(Collectors.joining(", ")));
 	
 		Optional<FieldGroup> seqGroup = getGroup(groups, "Sequences");
 		assertTrue(seqGroup.isPresent());
-		assertEquals(19, seqGroup.get().getFields().size());
-		Optional<Field> massField = getField(seqGroup.get(), "Mass");
+		assertEquals(19, seqGroup.orElse(new FieldGroupImpl()).getFields().size());
+		Optional<Field> massField = getField(seqGroup.orElse(new FieldGroupImpl()), "Mass");
 		assertTrue(massField.isPresent());
-		assertEquals("mass", massField.get().getName());
+		assertEquals("mass", massField.orElse(new FieldImpl()).getName());
 	}
 
 	@Test
@@ -168,9 +170,9 @@ class UniProtResultFieldsTest {
 	private void verifyField(List<FieldGroup> groups, String groupName, String label, String name) {
 		Optional<FieldGroup> group = getGroup(groups, groupName);
 		assertTrue(group.isPresent());
-		Optional<Field> field = getField(group.get(), label);
+		Optional<Field> field = getField(group.orElse(new FieldGroupImpl()), label);
 		assertTrue(field.isPresent());
-		assertEquals(name, field.get().getName());
+		assertEquals(name, field.orElse(new FieldImpl()).getName());
 	}
 
 	private Optional<FieldGroup> getGroup(List<FieldGroup> groups, String groupName) {

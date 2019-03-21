@@ -70,7 +70,7 @@ class SolrQueryRepositoryTest {
 
         // then
         assertThat(entry.isPresent(), CoreMatchers.is(true));
-        assertThat(entry.get().accession, CoreMatchers.is(acc));
+        assertThat(entry.orElse(new UniProtDocument()).accession, CoreMatchers.is(acc));
     }
 
     @Test

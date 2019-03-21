@@ -7,6 +7,7 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
 
 import java.util.List;
@@ -47,8 +48,8 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Gene Name [GN]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("gene", item.get().getTerm());
-		assertEquals(SearchDataType.STRING, item.get().getDataType());
+		assertEquals("gene", item.orElse(new UniProtSearchItem()).getTerm());
+		assertEquals(SearchDataType.STRING, item.orElse(new UniProtSearchItem()).getDataType());
 	}
 
 	@Test
@@ -56,10 +57,10 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Organism [OS]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("organism", item.get().getTerm());
-		assertEquals(SearchDataType.STRING, item.get().getDataType());
-		assertNotNull(item.get().getAutoComplete());
-		assertEquals("/uniprot/api/suggester?dict=taxonomy&query=?", item.get().getAutoComplete());
+		assertEquals("organism", item.orElse(new UniProtSearchItem()).getTerm());
+		assertEquals(SearchDataType.STRING, item.orElse(new UniProtSearchItem()).getDataType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getAutoComplete());
+		assertEquals("/uniprot/api/suggester?dict=taxonomy&query=?", item.orElse(new UniProtSearchItem()).getAutoComplete());
 	}
 
 	@Test
@@ -67,12 +68,12 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Protein Existence [PE]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("existence", item.get().getTerm());
-		assertEquals(SearchDataType.ENUM, item.get().getDataType());
-		assertNull(item.get().getAutoComplete());
-		assertNotNull(item.get().getValues());
-		assertEquals(5, item.get().getValues().size());
-		Optional<Tuple> tuple = item.get().getValues().stream()
+		assertEquals("existence", item.orElse(new UniProtSearchItem()).getTerm());
+		assertEquals(SearchDataType.ENUM, item.orElse(new UniProtSearchItem()).getDataType());
+		assertNull(item.orElse(new UniProtSearchItem()).getAutoComplete());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getValues());
+		assertEquals(5, item.orElse(new UniProtSearchItem()).getValues().size());
+		Optional<Tuple> tuple = item.orElse(new UniProtSearchItem()).getValues().stream()
 				.filter(val -> val.getName().equals("Inferred from homology")).findFirst();
 		assertTrue(tuple.isPresent());
 		assertEquals("homology", tuple.get().getValue());
@@ -83,9 +84,9 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Function")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream()
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Catalytic Activity")).findFirst();
 		assertTrue(subItem.isPresent());
 		assertEquals(SearchDataType.STRING, subItem.get().getDataType());
@@ -99,9 +100,9 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Function")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream().filter(val -> val.getLabel().equals("Cofactors"))
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream().filter(val -> val.getLabel().equals("Cofactors"))
 				.findFirst();
 		assertTrue(subItem.isPresent());
 		assertEquals(SearchItemType.GROUP, subItem.get().getItemType());
@@ -122,9 +123,9 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Structure")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream()
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Secondary structure")).findFirst();
 		assertTrue(subItem.isPresent());
 		assertEquals(SearchItemType.GROUP, subItem.get().getItemType());
@@ -146,8 +147,8 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Cross-references")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertThat(item.get().getItems().size(), Matchers.is(Matchers.greaterThan(0)));
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertThat(item.orElse(new UniProtSearchItem()).getItems().size(), Matchers.is(Matchers.greaterThan(0)));
 	}
 
 	@Test
@@ -155,9 +156,9 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Date Of")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream()
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Date of last entry modification")).findFirst();
 		assertTrue(subItem.isPresent());
 		assertEquals(SearchDataType.DATE, subItem.get().getDataType());
@@ -171,9 +172,9 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Literature Citation")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP_DISPLAY, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream().filter(val -> val.getLabel().equals("Published"))
+		assertEquals(SearchItemType.GROUP_DISPLAY, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream().filter(val -> val.getLabel().equals("Published"))
 				.findFirst();
 		assertTrue(subItem.isPresent());
 		assertEquals(SearchDataType.DATE, subItem.get().getDataType());
