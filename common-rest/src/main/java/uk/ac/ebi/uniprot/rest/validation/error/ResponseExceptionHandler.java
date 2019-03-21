@@ -87,15 +87,12 @@ public class ResponseExceptionHandler {
 
         addDebugError(request,ex,messages);
 
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .contentType(getContentTypeFromRequest(request))
-                .body(error);
+        return getBadRequestResponseEntity(request, messages);
     }
 
     private MediaType getContentTypeFromRequest(HttpServletRequest request) {
         MediaType result = MediaType.APPLICATION_JSON;
-        String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);;
+        String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
         if(Utils.notEmpty(acceptHeader)){
             result = MediaType.valueOf(acceptHeader);
         }
@@ -121,6 +118,10 @@ public class ResponseExceptionHandler {
 
         addDebugError(request,ex,messages);
 
+        return getBadRequestResponseEntity(request, messages);
+    }
+
+    private ResponseEntity<ErrorInfo> getBadRequestResponseEntity(HttpServletRequest request, List<String> messages) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(getContentTypeFromRequest(request))
