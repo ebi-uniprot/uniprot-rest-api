@@ -46,18 +46,19 @@ class ResponseExceptionHandlerTest {
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
         Mockito.when(request.getParameter("debugError")).thenReturn("true");
         NullPointerException causedBy = new NullPointerException("Null Pointer");
-        Throwable error = new Throwable("Error Message",causedBy);
+        Throwable error = new Throwable("Throwable error message",causedBy);
 
         ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler.handleInternalServerError(error,request);
 
         //then
         assertNotNull(responseEntity);
-        assertNotNull(responseEntity.getStatusCode());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getHeaders());
         assertEquals(1,responseEntity.getHeaders().size());
         assertEquals(MediaType.APPLICATION_JSON,responseEntity.getHeaders().getContentType());
+
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getBody());
         ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
@@ -80,6 +81,7 @@ class ResponseExceptionHandlerTest {
         BindException error = new BindException("target","objectName");
         error.addError(new FieldError("objectName1","field1","Error With field 1"));
         error.addError(new FieldError("objectName2","field2","Error With field 2"));
+        error.addError(new FieldError("objectName3","field3","Error With field 3"));
 
 
         ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler.handleBindExceptionBadRequest(error,request);
@@ -99,10 +101,11 @@ class ResponseExceptionHandlerTest {
         assertEquals(REQUEST_URL,errorMessage.getUrl());
 
         assertNotNull(errorMessage.getMessages());
-        assertEquals(2,errorMessage.getMessages().size());
+        assertEquals(3,errorMessage.getMessages().size());
 
         assertEquals("Error With field 1",errorMessage.getMessages().get(0));
         assertEquals("Error With field 2",errorMessage.getMessages().get(1));
+        assertEquals("Error With field 3",errorMessage.getMessages().get(2));
     }
 
     @Test
@@ -110,10 +113,11 @@ class ResponseExceptionHandlerTest {
         //when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+        Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.APPLICATION_XML_VALUE);
 
         Set<ConstraintViolation<?>> constraintViolations = new HashSet<>();
         constraintViolations.add(ConstraintViolationImpl.forBeanValidation("",null,
-                null,"Error Message",null,null,null,null,null,null,null,null));
+                null,"Field Error Message",null,null,null,null,null,null,null,null));
         ConstraintViolationException error = new ConstraintViolationException(constraintViolations);
 
 
@@ -126,7 +130,7 @@ class ResponseExceptionHandlerTest {
 
         assertNotNull(responseEntity.getHeaders());
         assertEquals(1,responseEntity.getHeaders().size());
-        assertEquals(MediaType.APPLICATION_JSON,responseEntity.getHeaders().getContentType());
+        assertEquals(MediaType.APPLICATION_XML,responseEntity.getHeaders().getContentType());
 
         assertNotNull(responseEntity.getBody());
         ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
@@ -136,9 +140,7 @@ class ResponseExceptionHandlerTest {
         assertNotNull(errorMessage.getMessages());
         assertEquals(1,errorMessage.getMessages().size());
 
-        assertEquals("Error Message",errorMessage.getMessages().get(0));
-
-
+        assertEquals("Field Error Message",errorMessage.getMessages().get(0));
 
 
     }
@@ -155,12 +157,13 @@ class ResponseExceptionHandlerTest {
 
         //then
         assertNotNull(responseEntity);
-        assertNotNull(responseEntity.getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND,responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getHeaders());
         assertEquals(1,responseEntity.getHeaders().size());
         assertEquals(MediaType.APPLICATION_XML,responseEntity.getHeaders().getContentType());
+
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND,responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getBody());
         ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
