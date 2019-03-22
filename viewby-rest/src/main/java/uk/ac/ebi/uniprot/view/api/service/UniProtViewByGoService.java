@@ -19,7 +19,7 @@ public class UniProtViewByGoService implements  UniProtViewByService {
 	private final SolrClient solrClient;
 	private final String uniprotCollection;
 	private final  GoService goService;
-	private final static String URL_PREFIX ="https://www.ebi.ac.uk/QuickGO/term/";
+	public final static String URL_PREFIX ="https://www.ebi.ac.uk/QuickGO/term/";
 	private final static String GO_PREFIX= "GO:";
 			
 	
@@ -30,7 +30,7 @@ public class UniProtViewByGoService implements  UniProtViewByService {
 		this.goService = goService;
 	}
 
-
+	
 	@Override
 	public List<ViewBy> get(String queryStr, String parent) {
 		

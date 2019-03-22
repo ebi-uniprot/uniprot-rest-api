@@ -12,23 +12,20 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.springframework.web.client.RestTemplate;
 
-import uk.ac.ebi.uniprot.view.api.model.Taxonomies;
 import uk.ac.ebi.uniprot.view.api.model.TaxonomyNode;
 import uk.ac.ebi.uniprot.view.api.model.ViewBy;
 
 public class UniProtViewByTaxonomyService implements  UniProtViewByService {
 	private final SolrClient solrClient;
 	private final String uniprotCollection;
-	private final RestTemplate restTemplate;
-	private final static String URL_PREFIX ="https://www.uniprot.org/taxonomy/";
-	private static final String TAXONOMY_API_PREFIX="https://www.ebi.ac.uk/proteins/api/taxonomy/id/";
+	private final TaxonomyService taxonomyService;
+	public final static String URL_PREFIX ="https://www.uniprot.org/taxonomy/";
 	
-	public UniProtViewByTaxonomyService(SolrClient solrClient, String uniprotCollection, RestTemplate restTemplate) {
+	public UniProtViewByTaxonomyService(SolrClient solrClient, String uniprotCollection, TaxonomyService taxonomyService) {
 		this.solrClient = solrClient;
 		this.uniprotCollection = uniprotCollection;
-		this.restTemplate =restTemplate;
+		this.taxonomyService =taxonomyService;
 	}
 
 	@Override
@@ -88,17 +85,17 @@ public class UniProtViewByTaxonomyService implements  UniProtViewByService {
 		return viewBy;
 	}
 	
-	boolean hasChildren(TaxonomyNode node) {
+	private boolean hasChildren(TaxonomyNode node) {
 		return (node.getChildrenLinks() !=null) && !node.getChildrenLinks().isEmpty();
 	}
 	
 	public List<TaxonomyNode> getChildren(String taxId){
-		
-		String url = TAXONOMY_API_PREFIX + taxId +"/children";
-		Taxonomies taxonomies =restTemplate.getForObject(url, Taxonomies.class);
-		if(taxonomies ==null) {
-			return Collections.emptyList();
-		}else
-			return taxonomies.getTaxonomies();
+		return taxonomyService.getChildren(taxId);
+//		String url = TAXONOMY_API_PREFIX + taxId +"/children";
+//		Taxonomies taxonomies =restTemplate.getForObject(url, Taxonomies.class);
+//		if(taxonomies ==null) {
+//			return Collections.emptyList();
+//		}else
+//			return taxonomies.getTaxonomies();
 	}
 }

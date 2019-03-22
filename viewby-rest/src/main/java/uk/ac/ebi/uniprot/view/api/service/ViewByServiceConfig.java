@@ -71,8 +71,14 @@ public class ViewByServiceConfig {
 	    }
 	    
 	    @Bean
-	    public UniProtViewByTaxonomyService uniProtViewByTaxonomyService(SolrClient solrClient, ConfigProperties configProperties, RestTemplate restTemplate) {
-	        return new UniProtViewByTaxonomyService(solrClient, configProperties.getUniprotCollection(), restTemplate);
+	    public TaxonomyService taxonomyService(RestTemplate restTemplate) {
+	        return new TaxonomyService( restTemplate);
+	    }
+	    
+	    
+	    @Bean
+	    public UniProtViewByTaxonomyService uniProtViewByTaxonomyService(SolrClient solrClient, ConfigProperties configProperties,TaxonomyService taxonomyService) {
+	        return new UniProtViewByTaxonomyService(solrClient, configProperties.getUniprotCollection(), taxonomyService);
 	    }
 	    
 }

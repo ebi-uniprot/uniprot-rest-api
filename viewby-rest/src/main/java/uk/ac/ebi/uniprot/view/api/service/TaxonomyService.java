@@ -8,21 +8,23 @@ import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.uniprot.view.api.model.Taxonomies;
 import uk.ac.ebi.uniprot.view.api.model.TaxonomyNode;
 
-public class TaxonomyRestClient {
+public class TaxonomyService {
 	private final RestTemplate restTemplate;
-	private static final String URL_PREFIX="https://www.ebi.ac.uk/proteins/api/taxonomy/id/";
-	public TaxonomyRestClient(RestTemplate restTemplate) {
+	private static final String TAXONOMY_API_PREFIX="https://www.ebi.ac.uk/proteins/api/taxonomy/id/";
+	
+	
+	public TaxonomyService(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
 	}
 	
-	public List<TaxonomyNode> getChildren(long taxId){
-		String url = URL_PREFIX + taxId +"/children";
+	
+	public List<TaxonomyNode> getChildren(String taxId){
+		
+		String url = TAXONOMY_API_PREFIX + taxId +"/children";
 		Taxonomies taxonomies =restTemplate.getForObject(url, Taxonomies.class);
 		if(taxonomies ==null) {
 			return Collections.emptyList();
 		}else
 			return taxonomies.getTaxonomies();
-		
-		
 	}
 }

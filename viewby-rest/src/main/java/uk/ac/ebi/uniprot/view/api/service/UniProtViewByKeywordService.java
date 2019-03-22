@@ -23,7 +23,7 @@ public class UniProtViewByKeywordService  implements  UniProtViewByService {
 	private final SolrClient solrClient;
 	private final String uniprotCollection;
 	private final  KeywordService keywordService;
-	private final static String URL_PREFIX ="https://www.uniprot.org/keywords/";
+	public final static String URL_PREFIX ="https://www.uniprot.org/keywords/";
 			
 	
 	public UniProtViewByKeywordService(SolrClient solrClient, String uniprotCollection, KeywordService keywordService) {

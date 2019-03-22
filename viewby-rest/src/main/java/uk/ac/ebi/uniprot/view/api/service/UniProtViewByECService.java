@@ -23,7 +23,7 @@ public class UniProtViewByECService implements  UniProtViewByService {
 	private final SolrClient solrClient;
 	private final String uniprotCollection;
 	private final ECService ecService;
-	private final static String URL_PREFIX ="https://enzyme.expasy.org/EC/";
+	public final static String URL_PREFIX ="https://enzyme.expasy.org/EC/";
 	
 	
 	public UniProtViewByECService(SolrClient solrClient, String uniprotCollection, ECService ecService) {
@@ -59,7 +59,7 @@ public class UniProtViewByECService implements  UniProtViewByService {
 				List<FacetField.Count> counts = ff.getValues();
 				return counts.stream()
 						//.filter(val -> val.getCount()>0)
-						.map(this::convertEc).sorted(ViewBy.SORT_BY_ID).collect(Collectors.toList());
+						.map(this::convert).sorted(ViewBy.SORT_BY_ID).collect(Collectors.toList());
 			}
 		} catch (SolrServerException | IOException e) {
 			throw new UniProtViewByServiceException(e);
@@ -86,7 +86,7 @@ public class UniProtViewByECService implements  UniProtViewByService {
 		return temp;
 	}
 	
-	private ViewBy convertEc(FacetField.Count count) {
+	private ViewBy convert(FacetField.Count count) {
 		ViewBy viewBy = new ViewBy();
 		String ecId = count.getName();
 		String fullEc = ecAddDashIfAbsent(ecId);
