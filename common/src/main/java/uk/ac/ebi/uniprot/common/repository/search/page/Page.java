@@ -25,13 +25,5 @@ public interface Page {
      */
     Optional<String> getNextPageLink(UriComponentsBuilder uriBuilder);
 
-    /**
-     *  if has previous page, return its link
-     *
-     * @param uriBuilder URL without pagination parameters
-     * @return previous page link URL
-     */
-    Optional<String> getPreviousPageLink(UriComponentsBuilder uriBuilder);
-
 
 }

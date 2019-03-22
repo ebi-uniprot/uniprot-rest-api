@@ -3,6 +3,8 @@ package uk.ac.ebi.uniprot.rest.validation;
 import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 import uk.ac.ebi.uniprot.rest.search.SearchFieldType;
 import uk.ac.ebi.uniprot.rest.validation.validator.FieldValueValidator;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
@@ -23,8 +25,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidDefaultSearchQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("P21802-2", null);
         assertEquals(true, result);
@@ -33,8 +36,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidSimpleAccessionQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("accession:P21802-2", null);
         assertEquals(true, result);
@@ -42,8 +46,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanAndQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("((organism_id:9606) AND (gene:\"CDC7\"))", null);
         assertEquals(true, result);
@@ -51,8 +56,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanOrQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("((organism_id:9606) OR (gene:\"CDC7\"))", null);
         assertEquals(true, result);
@@ -60,8 +66,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanSubQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("((organism_id:9606) OR " +
                                                    "(gene:\"CDC7\") OR " +
@@ -71,8 +78,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanMultiSubQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("(((organism_id:9606) OR (organism_id:1234)) AND " +
                                                    "(gene:\"CDC7\") AND " +
@@ -82,8 +90,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidUnsuportedBoostQueryTypeReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("organism_name:human^2", null);
         assertEquals(false, result);
@@ -93,8 +102,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidOrganismNameRangeQueryFilterTypeReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("organism_name:[a TO z]", null);
         assertEquals(false, result);
@@ -104,8 +114,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidFieldNameReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("invalid:P21802", null);
         assertEquals(false, result);
@@ -115,8 +126,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidAccessionReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("accession:P21802 OR " +
                                                    "accession:invalidValue", null);
@@ -127,8 +139,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidProteomeReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("proteome:UP123456789 OR " +
                                                    "proteome:notProteomeId", null);
@@ -139,8 +152,9 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidBooleanFieldReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("active:notBoolean", null);
         assertEquals(false, result);
@@ -150,13 +164,23 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidIntegerFieldReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
-        validator.fieldValidator = new FakeSolrQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("taxonomy_id:notInteger", null);
         assertEquals(false, result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("taxonomy_id", validator.getErrorFields(ErrorType.VALUE).get(0));
+    }
+
+    private ValidSolrQueryFields getMockedValidSolrQueryFields() {
+        ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
+
+        Class<? extends SolrQueryFieldValidator> returnFieldValidator = FakeSolrQueryFieldValidator.class;
+        OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validReturnFields.fieldValidatorClazz());
+        ongoingStubbing.thenReturn(returnFieldValidator);
+        return validReturnFields;
     }
 
     /**

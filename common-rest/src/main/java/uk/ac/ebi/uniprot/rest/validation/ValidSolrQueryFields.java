@@ -4,6 +4,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.slf4j.Logger;
 import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.rest.search.SearchFieldType;
 import uk.ac.ebi.uniprot.rest.validation.validator.SolrQueryFieldValidator;
@@ -18,6 +19,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * This is the solr query validator that is responsible to verify if the query has.
@@ -42,15 +45,16 @@ public @interface ValidSolrQueryFields {
 
     public class QueryFieldValidator implements ConstraintValidator<ValidSolrQueryFields, String> {
 
+        private static final Logger LOGGER = getLogger(QueryFieldValidator.class);
         private static final String DEFAULT_FIELD_NAME = "default_field";
-        public SolrQueryFieldValidator fieldValidator = null;
+        private SolrQueryFieldValidator fieldValidator;
 
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
             try {
                 fieldValidator = constraintAnnotation.fieldValidatorClazz().newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error initializing QueryFieldValidator",e);
             }
         }
 

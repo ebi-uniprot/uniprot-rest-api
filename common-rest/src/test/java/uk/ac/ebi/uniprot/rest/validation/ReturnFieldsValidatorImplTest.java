@@ -2,6 +2,8 @@ package uk.ac.ebi.uniprot.rest.validation;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 import uk.ac.ebi.uniprot.rest.validation.validator.ReturnFieldsValidator;
 
 import java.util.ArrayList;
@@ -19,67 +21,88 @@ class ReturnFieldsValidatorImplTest {
 
     @Test
     void isValidNullValueReturnTrue() {
+        ValidReturnFields validReturnFields = getMockedValidReturnFields();
+
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new FakeReturnFieldsValidator();
+        validator.initialize(validReturnFields);
 
         boolean result = validator.isValid(null,null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
 
 
     @Test
     void isValiEmptyValueReturnTrue() {
+        ValidReturnFields validReturnFields = getMockedValidReturnFields();
+
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new FakeReturnFieldsValidator();
+        validator.initialize(validReturnFields);
 
         boolean result = validator.isValid("",null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
 
     @Test
     void isValidSingleValidFieldReturnTrue() {
+        ValidReturnFields validReturnFields = getMockedValidReturnFields();
+
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new FakeReturnFieldsValidator();
+        validator.initialize(validReturnFields);
 
         boolean result = validator.isValid("gene_primary",null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
 
     @Test
     void isValidSingleInvalidValidFieldReturnFalse() {
+        ValidReturnFields validReturnFields = getMockedValidReturnFields();
+
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new FakeReturnFieldsValidator();
+        validator.initialize(validReturnFields);
         boolean result = validator.isValid("invalid_value",null);
         assertFalse(result);
 
         List<String> invalidField = validator.getErrorFields();
         assertNotNull(invalidField);
-        assertTrue(invalidField.size() == 1);
-        assertTrue(invalidField.get(0).equals("invalid_value"));
+        assertEquals(1, invalidField.size());
+        assertEquals("invalid_value", invalidField.get(0));
     }
 
     @Test
     void isValidMultipleValidFieldReturnTrue() {
+        ValidReturnFields validReturnFields = getMockedValidReturnFields();
+
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new FakeReturnFieldsValidator();
+        validator.initialize(validReturnFields);
         boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession,ft:non_ter",null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
 
     @Test
     void isValidMultipleInvalidFieldReturnFalse() {
+        ValidReturnFields validReturnFields = getMockedValidReturnFields();
+
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
-        validator.fieldValidator = new FakeReturnFieldsValidator();
+        validator.initialize(validReturnFields);
         boolean result = validator.isValid("accession, kinetics_invalid ,reviewed_invalid",null);
         assertFalse(result);
 
         List<String> invalidField = validator.getErrorFields();
         assertNotNull(invalidField);
-        assertTrue(invalidField.size() == 2);
-        assertTrue(invalidField.get(0).equals("kinetics_invalid"));
-        assertTrue(invalidField.get(1).equals("reviewed_invalid"));
+        assertEquals(2, invalidField.size());
+        assertEquals("kinetics_invalid", invalidField.get(0));
+        assertEquals("reviewed_invalid", invalidField.get(1));
     }
 
+
+    private ValidReturnFields getMockedValidReturnFields() {
+        ValidReturnFields validReturnFields = Mockito.mock(ValidReturnFields.class);
+
+        Class<? extends ReturnFieldsValidator> returnFieldValidator = FakeReturnFieldsValidator.class;
+        OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validReturnFields.fieldValidatorClazz());
+        ongoingStubbing.thenReturn(returnFieldValidator);
+        return validReturnFields;
+    }
     /**
      *  this class is responsible to fake buildErrorMessage to help tests with
      *
@@ -108,6 +131,10 @@ class ReturnFieldsValidatorImplTest {
      *
      */
     private static class FakeReturnFieldsValidator implements ReturnFieldsValidator{
+
+        FakeReturnFieldsValidator(){
+            super();
+        }
 
         List<String> fakeValidField = Arrays.asList("gene_primary","gene_names","kinetics","reviewed","accession","ft:non_ter");
 

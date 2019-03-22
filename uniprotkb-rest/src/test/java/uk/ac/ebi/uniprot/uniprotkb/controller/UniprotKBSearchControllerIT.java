@@ -14,12 +14,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.uniprot.common.repository.DataStoreManager;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.InactiveEntryMocker;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.UniProtEntryMocker;
 import uk.ac.ebi.uniprot.dataservice.source.impl.inactiveentry.InactiveUniProtEntry;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.uniprotkb.repository.DataStoreTestConfig;
-import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.InactiveEntryMocker;
-import uk.ac.ebi.uniprot.uniprotkb.repository.search.mockers.UniProtEntryMocker;
 
 import java.util.List;
 
@@ -455,10 +455,10 @@ public class UniprotKBSearchControllerIT {
         String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -470,9 +470,8 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
+                .andExpect(jsonPath("$.results.size()",is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")));
     }
 
     @Test
@@ -497,6 +496,7 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()",is(1)))
                 .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
                 .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
                 .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
@@ -617,14 +617,18 @@ public class UniprotKBSearchControllerIT {
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&includeFacets=invalid")
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&facets=d3structure,invalid,invalid2")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",contains("Invalid includeFacets parameter value. Expected true or false")));
+                .andExpect(jsonPath("$.messages.*",containsInAnyOrder("Invalid facet name 'invalid'. " +
+                        "Expected value can be [d3structure, fragment, existence, reviewed, " +
+                        "annotation_score, other_organism, popular_organism].",
+                        "Invalid facet name 'invalid2'. Expected value can be [d3structure, fragment, existence, " +
+                                "reviewed, annotation_score, other_organism, popular_organism].")));
     }
 
     @Test
@@ -636,7 +640,7 @@ public class UniprotKBSearchControllerIT {
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,gene_primary&includeFacets=true")
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&fields=accession,gene_primary&facets=reviewed, d3structure ,fragment")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -646,7 +650,7 @@ public class UniprotKBSearchControllerIT {
                 .andExpect(jsonPath("$.results.*.primaryAccession",contains(acc)))
                 .andExpect(jsonPath("$.facets",notNullValue()))
                 .andExpect(jsonPath("$.facets",not(empty())))
-                .andExpect(jsonPath("$.facets.*.name",hasItems("d3structure","fragment","reviewed")));
+                .andExpect(jsonPath("$.facets.*.name",contains("reviewed","d3structure","fragment")));
     }
 
     @Test
@@ -658,7 +662,7 @@ public class UniprotKBSearchControllerIT {
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&includeFacets=true")
+                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&facets=reviewed")
                         .header(ACCEPT, APPLICATION_XML_VALUE));
 
         // then

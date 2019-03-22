@@ -20,6 +20,7 @@ public class SolrQueryBuilder {
 
     private String query;
     private GenericFacetConfig facetConfig;
+    private List<String> facets;
     private List<SimpleQuery> filterQuery = new ArrayList<>();
     private Sort sort;
     private Query.Operator defaultOperator = Query.Operator.AND;
@@ -29,6 +30,11 @@ public class SolrQueryBuilder {
 
     public SolrQueryBuilder query(String query){
         this.query = query;
+        return this;
+    }
+
+    public SolrQueryBuilder facets(List<String> facets){
+        this.facets = facets;
         return this;
     }
 
@@ -63,7 +69,7 @@ public class SolrQueryBuilder {
 
     public SimpleQuery build() {
         SimpleQuery simpleQuery = new SimpleQuery(query);
-        if (facetConfig != null) {
+        if (Utils.notEmpty(facets)) {
             simpleQuery = getSimpleFacetQuery(simpleQuery);
         }
         filterQuery.forEach(simpleQuery::addFilterQuery);
@@ -77,7 +83,7 @@ public class SolrQueryBuilder {
         SimpleFacetQuery simpleFacetQuery = new SimpleFacetQuery(simpleQuery.getCriteria());
 
         FacetOptions facetOptions = new FacetOptions();
-        facetOptions.addFacetOnFlieldnames(facetConfig.getFacetNames());
+        facetOptions.addFacetOnFlieldnames(facets);
         facetOptions.setFacetMinCount(facetConfig.getMincount());
         facetOptions.setFacetLimit(facetConfig.getLimit());
         simpleFacetQuery.setFacetOptions(facetOptions);

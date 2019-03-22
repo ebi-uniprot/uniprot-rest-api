@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -61,6 +62,9 @@ class TupleStreamIterable implements Iterable<String> {
                     current = next;
                 } else {
                     current = nextTupleFromStream();
+                    if(current == null){
+                        throw new NoSuchElementException();
+                    }
                 }
                 return current.getString(id);
             }

@@ -38,7 +38,7 @@ public @interface ValidSolrSortFields {
 
         private static final String SORT_FORMAT = "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
         private static final String SORT_ORDER = "^asc|desc$";
-        public List<String> valueList = null;
+        private List<String> valueList ;
 
 
         @Override

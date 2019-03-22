@@ -1,17 +1,17 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceItem;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.AnnotationEvidences;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.EvidenceGroupImpl;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceItem;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.AnnotationEvidences;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 class AnnotationEvidencesTest {
 
@@ -47,11 +47,11 @@ class AnnotationEvidencesTest {
 				.filter(val -> val.getGroupName().equals("Automatic assertions")).findFirst();
 
 		assertTrue(aaGroup.isPresent());
-		assertEquals(4, aaGroup.get().getItems().size());
-		Optional<EvidenceItem> item = aaGroup.get().getItems().stream()
+		assertEquals(4, aaGroup.orElse(new EvidenceGroupImpl()).getItems().size());
+		Optional<EvidenceItem> item = aaGroup.orElse(new EvidenceGroupImpl()).getItems().stream()
 				.filter(val -> val.getName().equals("Sequence model")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("ECO_0000256", item.get().getCode());
+		assertEquals("ECO_0000256", item.orElse(new EvidenceGroupImpl.EvidenceItemImpl()).getCode());
 	}
 
 }

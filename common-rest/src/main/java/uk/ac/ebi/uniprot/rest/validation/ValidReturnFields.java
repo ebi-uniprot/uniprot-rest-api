@@ -2,6 +2,8 @@ package uk.ac.ebi.uniprot.rest.validation;
 
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.slf4j.Logger;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.rest.validation.validator.ReturnFieldsValidator;
 
 import javax.validation.Constraint;
@@ -12,6 +14,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * This Return Fields Constraint Validator class is responsible to verify
@@ -37,23 +41,24 @@ public @interface ValidReturnFields {
 
     public class ReturnFieldsValidatorImpl implements ConstraintValidator<ValidReturnFields, String> {
 
-        public ReturnFieldsValidator fieldValidator = null;
+        private static final Logger LOGGER = getLogger(ReturnFieldsValidatorImpl.class);
+        private ReturnFieldsValidator fieldValidator;
 
         @Override
         public void initialize(ValidReturnFields constraintAnnotation) {
             try {
                 fieldValidator = constraintAnnotation.fieldValidatorClazz().newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error initializing ReturnFieldsValidator",e);
             }
         }
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if(value != null && !value.isEmpty()){
+            if(Utils.notEmpty(value)){
                 ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-                String fieldList[] = value.split("\\s*,\\s*");
+                String[] fieldList = value.split("\\s*,\\s*");
                 for (String field : fieldList) {
                     if(!fieldValidator.hasValidReturnField(field)){
                         buildErrorMessage(field,contextImpl);

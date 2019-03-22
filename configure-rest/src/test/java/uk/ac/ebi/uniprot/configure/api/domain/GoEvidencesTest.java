@@ -1,18 +1,16 @@
 package uk.ac.ebi.uniprot.configure.api.domain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceItem;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.EvidenceGroupImpl;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.GoEvidences;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceItem;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.GoEvidences;
+import static org.junit.Assert.*;
 
 class GoEvidencesTest {
 	private static GoEvidences instance;
@@ -52,10 +50,10 @@ class GoEvidencesTest {
 		aaGroup = groups.stream()
 				.filter(val -> val.getGroupName().equals("Manual assertions")).findFirst();
 		assertTrue(aaGroup.isPresent());
-		assertEquals(20, aaGroup.get().getItems().size());
-		Optional<EvidenceItem> item = aaGroup.get().getItems().stream()
+		assertEquals(20, aaGroup.orElse(new EvidenceGroupImpl()).getItems().size());
+		Optional<EvidenceItem> item = aaGroup.orElse(new EvidenceGroupImpl()).getItems().stream()
 				.filter(val -> val.getName().equals("Inferred from high throughput genetic interaction [HGI]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("HGI", item.get().getCode());
+		assertEquals("HGI", item.orElse(new EvidenceGroupImpl.EvidenceItemImpl()).getCode());
 	}
 }

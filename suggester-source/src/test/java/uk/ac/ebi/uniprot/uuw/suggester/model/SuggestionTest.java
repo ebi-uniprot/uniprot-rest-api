@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static uk.ac.ebi.uniprot.uuw.suggester.model.Suggestion.ID_VALUE_SEPARATOR;
 
 /**
  * Created 04/10/18
@@ -23,7 +24,7 @@ class SuggestionTest {
                 .id(id)
                 .build();
 
-        assertThat(suggestion.toSuggestionLine(), is(prefix + ": " + name + " [" + id + "]"));
+        assertThat(suggestion.toSuggestionLine(), is(id + ID_VALUE_SEPARATOR + prefix + ": " + name));
     }
 
     @Test
@@ -35,7 +36,7 @@ class SuggestionTest {
                 .name(name)
                 .build();
 
-        assertThat(suggestion.toSuggestionLine(), is(prefix + ": " + name));
+        assertThat(suggestion.toSuggestionLine(), is("@@ " + prefix + ": " + name));
     }
 
     @Test
@@ -47,7 +48,7 @@ class SuggestionTest {
                 .id(id)
                 .build();
 
-        assertThat(suggestion.toSuggestionLine(), is(name + " [" + id + "]"));
+        assertThat(suggestion.toSuggestionLine(), is(id + ID_VALUE_SEPARATOR + name));
     }
 
     @Test

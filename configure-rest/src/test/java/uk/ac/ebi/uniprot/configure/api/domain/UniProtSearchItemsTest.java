@@ -7,6 +7,8 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.TupleImpl;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
 
 import java.util.List;
@@ -47,8 +49,8 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Gene Name [GN]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("gene", item.get().getTerm());
-		assertEquals(SearchDataType.STRING, item.get().getDataType());
+		assertEquals("gene", item.orElse(new UniProtSearchItem()).getTerm());
+		assertEquals(SearchDataType.STRING, item.orElse(new UniProtSearchItem()).getDataType());
 	}
 
 	@Test
@@ -56,10 +58,10 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Organism [OS]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("organism", item.get().getTerm());
-		assertEquals(SearchDataType.STRING, item.get().getDataType());
-		assertNotNull(item.get().getAutoComplete());
-		assertEquals("/uniprot/api/suggester?dict=taxonomy&query=?", item.get().getAutoComplete());
+		assertEquals("organism", item.orElse(new UniProtSearchItem()).getTerm());
+		assertEquals(SearchDataType.STRING, item.orElse(new UniProtSearchItem()).getDataType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getAutoComplete());
+		assertEquals("/uniprot/api/suggester?dict=taxonomy&query=?", item.orElse(new UniProtSearchItem()).getAutoComplete());
 	}
 
 	@Test
@@ -67,15 +69,15 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Protein Existence [PE]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("existence", item.get().getTerm());
-		assertEquals(SearchDataType.ENUM, item.get().getDataType());
-		assertNull(item.get().getAutoComplete());
-		assertNotNull(item.get().getValues());
-		assertEquals(5, item.get().getValues().size());
-		Optional<Tuple> tuple = item.get().getValues().stream()
+		assertEquals("existence", item.orElse(new UniProtSearchItem()).getTerm());
+		assertEquals(SearchDataType.ENUM, item.orElse(new UniProtSearchItem()).getDataType());
+		assertNull(item.orElse(new UniProtSearchItem()).getAutoComplete());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getValues());
+		assertEquals(5, item.orElse(new UniProtSearchItem()).getValues().size());
+		Optional<Tuple> tuple = item.orElse(new UniProtSearchItem()).getValues().stream()
 				.filter(val -> val.getName().equals("Inferred from homology")).findFirst();
 		assertTrue(tuple.isPresent());
-		assertEquals("homology", tuple.get().getValue());
+		assertEquals("homology", tuple.orElse(new TupleImpl()).getValue());
 	}
 
 	@Test
@@ -83,15 +85,15 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Function")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream()
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Catalytic Activity")).findFirst();
 		assertTrue(subItem.isPresent());
-		assertEquals(SearchDataType.STRING, subItem.get().getDataType());
-		assertEquals(SearchItemType.COMMENT, subItem.get().getItemType());
-		assertEquals("catalytic_activity", subItem.get().getTerm());
-		assertTrue(subItem.get().isHasEvidence());
+		assertEquals(SearchDataType.STRING, subItem.orElse(new UniProtSearchItem()).getDataType());
+		assertEquals(SearchItemType.COMMENT, subItem.orElse(new UniProtSearchItem()).getItemType());
+		assertEquals("catalytic_activity", subItem.orElse(new UniProtSearchItem()).getTerm());
+		assertTrue(subItem.orElse(new UniProtSearchItem()).isHasEvidence());
 	}
 
 	@Test
@@ -99,22 +101,22 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Function")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream().filter(val -> val.getLabel().equals("Cofactors"))
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream().filter(val -> val.getLabel().equals("Cofactors"))
 				.findFirst();
 		assertTrue(subItem.isPresent());
-		assertEquals(SearchItemType.GROUP, subItem.get().getItemType());
-		assertNotNull(subItem.get().getItems());
+		assertEquals(SearchItemType.GROUP, subItem.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(subItem.orElse(new UniProtSearchItem()).getItems());
 
-		Optional<SearchItem> subSubItem = subItem.get().getItems().stream()
+		Optional<SearchItem> subSubItem = subItem.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("ChEBI term")).findFirst();
 		assertTrue(subSubItem.isPresent());
-		assertEquals(SearchDataType.STRING, subSubItem.get().getDataType());
-		assertEquals(SearchItemType.COMMENT, subSubItem.get().getItemType());
-		assertEquals("/uniprot/api/suggester?dict=chebi&query=?", subSubItem.get().getAutoComplete());
-		assertEquals("cofactor_chebi", subSubItem.get().getTerm());
-		assertTrue(subSubItem.get().isHasEvidence());
+		assertEquals(SearchDataType.STRING, subSubItem.orElse(new UniProtSearchItem()).getDataType());
+		assertEquals(SearchItemType.COMMENT, subSubItem.orElse(new UniProtSearchItem()).getItemType());
+		assertEquals("/uniprot/api/suggester?dict=chebi&query=?", subSubItem.orElse(new UniProtSearchItem()).getAutoComplete());
+		assertEquals("cofactor_chebi", subSubItem.orElse(new UniProtSearchItem()).getTerm());
+		assertTrue(subSubItem.orElse(new UniProtSearchItem()).isHasEvidence());
 	}
 
 	@Test
@@ -122,23 +124,23 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Structure")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream()
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Secondary structure")).findFirst();
 		assertTrue(subItem.isPresent());
-		assertEquals(SearchItemType.GROUP, subItem.get().getItemType());
-		assertNotNull(subItem.get().getItems());
+		assertEquals(SearchItemType.GROUP, subItem.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(subItem.orElse(new UniProtSearchItem()).getItems());
 
-		Optional<SearchItem> subSubItem = subItem.get().getItems().stream().filter(val -> val.getLabel().equals("Turn"))
+		Optional<SearchItem> subSubItem = subItem.orElse(new UniProtSearchItem()).getItems().stream().filter(val -> val.getLabel().equals("Turn"))
 				.findFirst();
 		assertTrue(subSubItem.isPresent());
-		assertEquals(SearchDataType.STRING, subSubItem.get().getDataType());
-		assertEquals(SearchItemType.FEATURE, subSubItem.get().getItemType());
+		assertEquals(SearchDataType.STRING, subSubItem.orElse(new UniProtSearchItem()).getDataType());
+		assertEquals(SearchItemType.FEATURE, subSubItem.orElse(new UniProtSearchItem()).getItemType());
 
-		assertEquals("turn", subSubItem.get().getTerm());
-		assertTrue(subSubItem.get().isHasEvidence());
-		assertTrue(subSubItem.get().isHasRange());
+		assertEquals("turn", subSubItem.orElse(new UniProtSearchItem()).getTerm());
+		assertTrue(subSubItem.orElse(new UniProtSearchItem()).isHasEvidence());
+		assertTrue(subSubItem.orElse(new UniProtSearchItem()).isHasRange());
 	}
 
 	@Test
@@ -146,8 +148,8 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Cross-references")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertThat(item.get().getItems().size(), Matchers.is(Matchers.greaterThan(0)));
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertThat(item.orElse(new UniProtSearchItem()).getItems().size(), Matchers.is(Matchers.greaterThan(0)));
 	}
 
 	@Test
@@ -155,15 +157,15 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Date Of")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream()
+		assertEquals(SearchItemType.GROUP, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Date of last entry modification")).findFirst();
 		assertTrue(subItem.isPresent());
-		assertEquals(SearchDataType.DATE, subItem.get().getDataType());
-		assertEquals(SearchItemType.SINGLE, subItem.get().getItemType());
-		assertEquals("modified", subItem.get().getTerm());
-		assertTrue(subItem.get().isHasRange());
+		assertEquals(SearchDataType.DATE, subItem.orElse(new UniProtSearchItem()).getDataType());
+		assertEquals(SearchItemType.SINGLE, subItem.orElse(new UniProtSearchItem()).getItemType());
+		assertEquals("modified", subItem.orElse(new UniProtSearchItem()).getTerm());
+		assertTrue(subItem.orElse(new UniProtSearchItem()).isHasRange());
 	}
 
 	@Test
@@ -171,15 +173,15 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> item = searchItems.getSearchItems().stream()
 				.filter(val -> val.getLabel().equals("Literature Citation")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals(SearchItemType.GROUP_DISPLAY, item.get().getItemType());
-		assertNotNull(item.get().getItems());
-		Optional<SearchItem> subItem = item.get().getItems().stream().filter(val -> val.getLabel().equals("Published"))
+		assertEquals(SearchItemType.GROUP_DISPLAY, item.orElse(new UniProtSearchItem()).getItemType());
+		assertNotNull(item.orElse(new UniProtSearchItem()).getItems());
+		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream().filter(val -> val.getLabel().equals("Published"))
 				.findFirst();
 		assertTrue(subItem.isPresent());
-		assertEquals(SearchDataType.DATE, subItem.get().getDataType());
-		assertEquals(SearchItemType.SINGLE, subItem.get().getItemType());
-		assertEquals("lit_pubdate", subItem.get().getTerm());
-		assertTrue(subItem.get().isHasRange());
+		assertEquals(SearchDataType.DATE, subItem.orElse(new UniProtSearchItem()).getDataType());
+		assertEquals(SearchItemType.SINGLE, subItem.orElse(new UniProtSearchItem()).getItemType());
+		assertEquals("lit_pubdate", subItem.orElse(new UniProtSearchItem()).getTerm());
+		assertTrue(subItem.orElse(new UniProtSearchItem()).isHasRange());
 	}
 
 }

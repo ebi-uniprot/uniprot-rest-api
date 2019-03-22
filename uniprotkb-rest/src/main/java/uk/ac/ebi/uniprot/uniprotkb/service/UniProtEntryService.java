@@ -69,7 +69,7 @@ public class UniProtEntryService {
 
         QueryResult<UniProtDocument> results = repository
                 .searchPage(simpleQuery, request.getCursor(), request.getSize());
-        if (request.isIncludeFacets()) {
+        if (request.hasFacets()) {
             context.setFacets(results.getFacets());
         }
 
@@ -88,26 +88,26 @@ public class UniProtEntryService {
     public void getByAccession(String accession, String fields, MessageConverterContext<UniProtEntry> context) {
         MediaType contentType = context.getContentType();
         try {
-            if (contentType.equals(LIST_MEDIA_TYPE)) {
-                context.setEntityIds(Stream.of(accession));
-            } else {
-                Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
-                SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
-                Optional<UniProtDocument> optionalDoc = repository.getEntry(simpleQuery);
-                Optional<UniProtEntry> optionalUniProtEntry = optionalDoc
-                        .map(doc -> resultsConverter.convertDoc(doc, filters))
-                        .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
-                if(optionalUniProtEntry.isPresent()){
+            Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
+            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
+            Optional<UniProtDocument> optionalDoc = repository.getEntry(simpleQuery);
+            Optional<UniProtEntry> optionalUniProtEntry = optionalDoc
+                    .map(doc -> resultsConverter.convertDoc(doc, filters))
+                    .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+            if(optionalUniProtEntry.isPresent()){
+                if (contentType.equals(LIST_MEDIA_TYPE)) {
+                    context.setEntityIds(Stream.of(accession));
+                } else {
                     UniProtEntry uniProtEntry = optionalUniProtEntry.get();
-                    if(isInactiveAndMergedEntry(uniProtEntry)){
+                    if (isInactiveAndMergedEntry(uniProtEntry)) {
                         String mergedAccession = uniProtEntry.getInactiveReason().getMergeDemergeTo().get(0);
-                        getByAccession(mergedAccession,fields,context);
-                    }else{
+                        getByAccession(mergedAccession, fields, context);
+                    } else {
                         context.setEntities(Stream.of(uniProtEntry));
                     }
-                }else{
-                    throw new ResourceNotFoundException("{search.not.found}");
                 }
+            }else{
+                throw new ResourceNotFoundException("{search.not.found}");
             }
         } catch (ResourceNotFoundException e) {
             throw e;
@@ -150,10 +150,10 @@ public class UniProtEntryService {
         builder.query(requestedQuery);
         builder.addSort(getUniProtSort(request.getSort(),hasScore));
 
-        if (request.isIncludeFacets()) {
+        if(request.hasFacets()) {
+            builder.facets(request.getFacetList());
             builder.facetConfig(uniprotFacetConfig);
         }
-
         return builder.build();
     }
 
