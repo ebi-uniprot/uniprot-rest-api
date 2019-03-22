@@ -34,7 +34,7 @@ class UniProtConfigureServiceTest {
 
 	@Test
 	void testGetDatabases() {
-		assertEquals(18, service.getDatabases().size());
+		assertEquals(19, service.getDatabases().size());
 	}
 
 }
