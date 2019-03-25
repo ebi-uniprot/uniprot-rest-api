@@ -39,10 +39,6 @@ public class UniProtConfigureController {
 		return service.getDatabases();
 	}
 	
-	@GetMapping("/databasefields")
-	public  List<FieldGroup>  getDatabaseFields(){
-		return service.getDatabaseFields();
-	}
 	@GetMapping("/resultfields")
 	public  List<FieldGroup>  getResultFields(){
 		List<FieldGroup> resultFields = service.getResultFields();
