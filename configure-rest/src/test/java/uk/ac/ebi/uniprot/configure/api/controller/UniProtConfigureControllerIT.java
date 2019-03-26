@@ -97,18 +97,6 @@ public class UniProtConfigureControllerIT {
     }
 
     @Test
-    public void canGetDatabasesFields() throws Exception {
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(BASIC_RESOURCE+"/databasefields")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
-    }
-
-    @Test
     public void canGetResultFields() throws Exception {
 
         // when
