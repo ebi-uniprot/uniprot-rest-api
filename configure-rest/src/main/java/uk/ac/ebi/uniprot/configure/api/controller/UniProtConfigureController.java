@@ -14,7 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/uniprotkb")
 public class UniProtConfigureController {
-	UniProtConfigureService service;
+
+	private UniProtConfigureService service;
 
 	public UniProtConfigureController(UniProtConfigureService service) {
 		this.service = service;

@@ -33,6 +33,10 @@ public class SolrQueryUtil {
             TermQuery termQuery = (TermQuery) inputQuery;
             String fieldName = termQuery.getTerm().field();
             hasTerm = termList.contains(fieldName);
+        } else if (inputQuery instanceof WildcardQuery) {
+            WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
+            String fieldName = wildcardQuery.getTerm().field();
+            hasTerm = termList.contains(fieldName);
         } else if (inputQuery instanceof TermRangeQuery) {
             TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;
             String fieldName = rangeQuery.getField();

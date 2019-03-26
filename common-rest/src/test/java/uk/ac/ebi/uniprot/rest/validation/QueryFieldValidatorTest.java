@@ -13,7 +13,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.ebi.uniprot.rest.validation.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
 
 /**
@@ -30,7 +30,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("P21802-2", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
 
@@ -41,7 +41,17 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("accession:P21802-2", null);
-        assertEquals(true, result);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidSimpleAccessionWildcardQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("gene:*", null);
+        assertTrue(result);
     }
 
     @Test
@@ -51,7 +61,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("((organism_id:9606) AND (gene:\"CDC7\"))", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
@@ -61,7 +71,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("((organism_id:9606) OR (gene:\"CDC7\"))", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
@@ -73,7 +83,7 @@ class QueryFieldValidatorTest {
         boolean result = validator.isValid("((organism_id:9606) OR " +
                                                    "(gene:\"CDC7\") OR " +
                                                    "((cc_bpcp_kinetics:\"value\" AND ccev_bpcp_kinetics:\"value\")))", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
@@ -85,7 +95,7 @@ class QueryFieldValidatorTest {
         boolean result = validator.isValid("(((organism_id:9606) OR (organism_id:1234)) AND " +
                                                    "(gene:\"CDC7\") AND " +
                                                    "((cc_bpcp_kinetics:1234 AND ccev_bpcp_kinetics:\"the value\")))", null);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
@@ -95,7 +105,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("organism_name:human^2", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.INVALID_TYPE).size());
         assertEquals("org.apache.lucene.search.BoostQuery", validator.getErrorFields(ErrorType.INVALID_TYPE).get(0));
     }
@@ -107,7 +117,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("organism_name:[a TO z]", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.TYPE).size());
         assertEquals("organism_name", validator.getErrorFields(ErrorType.TYPE).get(0));
     }
@@ -119,7 +129,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("invalid:P21802", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.FIELD).size());
         assertEquals("invalid", validator.getErrorFields(ErrorType.FIELD).get(0));
     }
@@ -132,7 +142,7 @@ class QueryFieldValidatorTest {
 
         boolean result = validator.isValid("accession:P21802 OR " +
                                                    "accession:invalidValue", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("accession", validator.getErrorFields(ErrorType.VALUE).get(0));
     }
@@ -145,7 +155,7 @@ class QueryFieldValidatorTest {
 
         boolean result = validator.isValid("proteome:UP123456789 OR " +
                                                    "proteome:notProteomeId", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("proteome", validator.getErrorFields(ErrorType.VALUE).get(0));
     }
@@ -157,7 +167,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("active:notBoolean", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("active", validator.getErrorFields(ErrorType.VALUE).get(0));
     }
@@ -169,7 +179,7 @@ class QueryFieldValidatorTest {
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("taxonomy_id:notInteger", null);
-        assertEquals(false, result);
+        assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("taxonomy_id", validator.getErrorFields(ErrorType.VALUE).get(0));
     }
