@@ -129,18 +129,18 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Secondary structure")).findFirst();
 		assertTrue(subItem.isPresent());
-		assertEquals(SearchItemType.GROUP, subItem.orElse(new UniProtSearchItem()).getItemType());
 		assertNotNull(subItem.orElse(new UniProtSearchItem()).getItems());
+		assertEquals(SearchItemType.GROUP, subItem.orElse(new UniProtSearchItem()).getItemType());
 
 		Optional<SearchItem> subSubItem = subItem.orElse(new UniProtSearchItem()).getItems().stream().filter(val -> val.getLabel().equals("Turn"))
 				.findFirst();
 		assertTrue(subSubItem.isPresent());
-		assertEquals(SearchDataType.STRING, subSubItem.orElse(new UniProtSearchItem()).getDataType());
 		assertEquals(SearchItemType.FEATURE, subSubItem.orElse(new UniProtSearchItem()).getItemType());
+		assertEquals(SearchDataType.STRING, subSubItem.orElse(new UniProtSearchItem()).getDataType());
 
 		assertEquals("turn", subSubItem.orElse(new UniProtSearchItem()).getTerm());
-		assertTrue(subSubItem.orElse(new UniProtSearchItem()).isHasEvidence());
 		assertTrue(subSubItem.orElse(new UniProtSearchItem()).isHasRange());
+		assertTrue(subSubItem.orElse(new UniProtSearchItem()).isHasEvidence());
 	}
 
 	@Test
@@ -162,9 +162,9 @@ class UniProtSearchItemsTest {
 		Optional<SearchItem> subItem = item.orElse(new UniProtSearchItem()).getItems().stream()
 				.filter(val -> val.getLabel().equals("Date of last entry modification")).findFirst();
 		assertTrue(subItem.isPresent());
+		assertEquals("modified", subItem.orElse(new UniProtSearchItem()).getTerm());
 		assertEquals(SearchDataType.DATE, subItem.orElse(new UniProtSearchItem()).getDataType());
 		assertEquals(SearchItemType.SINGLE, subItem.orElse(new UniProtSearchItem()).getItemType());
-		assertEquals("modified", subItem.orElse(new UniProtSearchItem()).getTerm());
 		assertTrue(subItem.orElse(new UniProtSearchItem()).isHasRange());
 	}
 

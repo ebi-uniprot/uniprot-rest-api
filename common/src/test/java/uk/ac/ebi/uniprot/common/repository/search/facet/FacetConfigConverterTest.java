@@ -92,8 +92,8 @@ class FacetConfigConverterTest {
         }
         if(Arrays.binarySearch(name,"fragment") >= 0) {
             FacetField ffield = new FacetField("fragment");
-            ffield.add("true", 11L);
             ffield.add("false", 21L);
+            ffield.add("true", 11L);
             fieldList.add(ffield);
         }
         if(Arrays.binarySearch(name,"popular_organism") >= 0) {

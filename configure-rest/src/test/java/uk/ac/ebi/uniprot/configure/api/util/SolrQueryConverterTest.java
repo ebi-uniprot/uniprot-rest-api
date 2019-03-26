@@ -49,8 +49,8 @@ class SolrQueryConverterTest {
         SolrJsonQuery jsonQuery =  SolrQueryConverter.convert(allDocumentsQuery);
 
         assertNotNull(jsonQuery);
-        assertEquals("termQuery",jsonQuery.getType());
         assertEquals("",jsonQuery.getField());
+        assertEquals("termQuery",jsonQuery.getType());
         assertEquals("foo",jsonQuery.getValue());
     }
 
@@ -68,8 +68,8 @@ class SolrQueryConverterTest {
         assertNotNull(booleanQueryItem);
         assertEquals("NOT",booleanQueryItem.getQueryOperator());
         assertEquals("termQuery",booleanQueryItem.getType());
-        assertEquals("",booleanQueryItem.getField());
         assertEquals("foo",booleanQueryItem.getValue());
+        assertEquals("",booleanQueryItem.getField());
     }
 
     @Test
@@ -79,8 +79,8 @@ class SolrQueryConverterTest {
 
         assertNotNull(jsonQuery);
         assertEquals("termQuery",jsonQuery.getType());
-        assertEquals("mnemonic",jsonQuery.getField());
         assertEquals("blah",jsonQuery.getValue());
+        assertEquals("mnemonic",jsonQuery.getField());
     }
 
     @Test
@@ -89,16 +89,16 @@ class SolrQueryConverterTest {
         SolrJsonQuery jsonQuery =  SolrQueryConverter.convert(allDocumentsQuery);
 
         assertNotNull(jsonQuery);
+        assertNotNull(jsonQuery.getBooleanQuery());
         assertEquals("booleanQuery",jsonQuery.getType());
 
-        assertNotNull(jsonQuery.getBooleanQuery());
         List<SolrJsonQuery> solrJsonQueries = jsonQuery.getBooleanQuery();
         assertEquals(1,solrJsonQueries.size());
 
         SolrJsonQuery booleanQueryItem = solrJsonQueries.get(0);
         assertNotNull(booleanQueryItem);
-        assertEquals("NOT",booleanQueryItem.getQueryOperator());
         assertEquals("termQuery",booleanQueryItem.getType());
+        assertEquals("NOT",booleanQueryItem.getQueryOperator());
         assertEquals("mnemonic",booleanQueryItem.getField());
         assertEquals("blah",booleanQueryItem.getValue());
     }
@@ -145,10 +145,10 @@ class SolrQueryConverterTest {
         assertEquals("AND",booleanQueryItem.getQueryOperator());
         assertEquals("rangeQuery",booleanQueryItem.getType());
         assertEquals("length",booleanQueryItem.getField());
-        assertEquals("1",booleanQueryItem.getFrom());
         assertTrue(booleanQueryItem.getFromInclude());
-        assertEquals("10",booleanQueryItem.getTo());
+        assertEquals("1",booleanQueryItem.getFrom());
         assertTrue(booleanQueryItem.getToInclude());
+        assertEquals("10",booleanQueryItem.getTo());
 
         booleanQueryItem = solrJsonQueries.get(1);
         assertNotNull(booleanQueryItem);
@@ -174,15 +174,15 @@ class SolrQueryConverterTest {
         assertNotNull(booleanQueryItem);
         assertEquals("OR",booleanQueryItem.getQueryOperator());
         assertEquals("termQuery",booleanQueryItem.getType());
-        assertEquals("mnemonic",booleanQueryItem.getField());
         assertEquals("blah",booleanQueryItem.getValue());
+        assertEquals("mnemonic",booleanQueryItem.getField());
 
         booleanQueryItem = solrJsonQueries.get(1);
         assertNotNull(booleanQueryItem);
-        assertEquals("OR",booleanQueryItem.getQueryOperator());
         assertEquals("termQuery",booleanQueryItem.getType());
         assertEquals("mnemonic",booleanQueryItem.getField());
         assertEquals("foo",booleanQueryItem.getValue());
+        assertEquals("OR",booleanQueryItem.getQueryOperator());
     }
 
 
@@ -200,16 +200,16 @@ class SolrQueryConverterTest {
 
         SolrJsonQuery booleanQueryItem = solrJsonQueries.get(0);
         assertNotNull(booleanQueryItem);
-        assertEquals("OR",booleanQueryItem.getQueryOperator());
         assertEquals("termQuery",booleanQueryItem.getType());
         assertEquals("mnemonic",booleanQueryItem.getField());
         assertEquals("blah",booleanQueryItem.getValue());
+        assertEquals("OR",booleanQueryItem.getQueryOperator());
 
         booleanQueryItem = solrJsonQueries.get(1);
         assertNotNull(booleanQueryItem);
-        assertEquals("NOT",booleanQueryItem.getQueryOperator());
         assertEquals("termQuery",booleanQueryItem.getType());
         assertEquals("mnemonic",booleanQueryItem.getField());
+        assertEquals("NOT",booleanQueryItem.getQueryOperator());
         assertEquals("foo",booleanQueryItem.getValue());
     }
 
