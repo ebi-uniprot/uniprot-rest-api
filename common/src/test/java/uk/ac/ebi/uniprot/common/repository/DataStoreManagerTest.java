@@ -10,6 +10,8 @@ import uk.ac.ebi.uniprot.common.repository.search.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.common.repository.search.SolrCollection;
 import uk.ac.ebi.uniprot.common.repository.search.SolrDataStoreManager;
 import uk.ac.ebi.uniprot.common.repository.search.mockers.GoRelationsRepoMocker;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.KeywordRepoMocker;
+import uk.ac.ebi.uniprot.common.repository.search.mockers.PathwayRepoMocker;
 import uk.ac.ebi.uniprot.common.repository.search.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.common.repository.search.mockers.UniProtDocMocker;
 import uk.ac.ebi.uniprot.common.repository.search.mockers.UniProtEntryMocker;
@@ -44,7 +46,9 @@ class DataStoreManagerTest {
                     .getInstance("avro-uniprot"));
             storeManager.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
 
-            storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(), GoRelationsRepoMocker.getGoRelationRepo()));
+            storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+            		GoRelationsRepoMocker.getGoRelationRepo(), KeywordRepoMocker.getKeywordRepo(),
+            		PathwayRepoMocker.getPathwayRepo()));
         } catch (Exception e) {
             fail("Error to setup DataStoreManagerTest",e);
         }
