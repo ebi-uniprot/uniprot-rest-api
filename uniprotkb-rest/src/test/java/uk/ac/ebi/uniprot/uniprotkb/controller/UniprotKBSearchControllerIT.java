@@ -132,6 +132,24 @@ public class UniprotKBSearchControllerIT {
     }
 
     @Test
+    public void allowWildcardQueryAllDocuments() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE+"?query=cc_catalytic_activity:*")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession").exists());
+    }
+
+    @Test
     public void queryWithInvalidQueryFormat() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);

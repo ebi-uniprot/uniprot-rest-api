@@ -3,7 +3,8 @@ package uk.ac.ebi.uniprot.rest.validation;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuerySyntaxValidatorTest {
 
@@ -12,7 +13,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("accession:P21802-2",null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
 
     @Test
@@ -20,7 +21,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((organism_id:9606) AND (gene:\"CDC7\"))",null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
 
 
@@ -29,7 +30,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((organism_id:9606) AND (gene:\"CDC7\")",null);
-        assertEquals(false,result);
+        assertFalse(result);
     }
 
     @Test
@@ -37,7 +38,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((organism_id:9606) AND (gene:\"CDC7))",null);
-        assertEquals(false,result);
+        assertFalse(result);
     }
 
     @Test
@@ -45,7 +46,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((organism_id 9606) AND (gene:\"CDC7))",null);
-        assertEquals(false,result);
+        assertFalse(result);
     }
 
     @Test
@@ -53,7 +54,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((length:[1 TO 20) AND (gene:\"CDC7))",null);
-        assertEquals(false,result);
+        assertFalse(result);
     }
 
     @Test
@@ -61,7 +62,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((length:[1 TO ]) AND (gene:\"CDC7))",null);
-        assertEquals(false,result);
+        assertFalse(result);
     }
 
     @Test
@@ -69,6 +70,15 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("gene:MT1558\\/MT1560",null);
-        assertEquals(true,result);
+        assertTrue(result);
     }
+
+    @Test
+    void isValidWildcardQueryReturnTrue() {
+        ValidSolrQuerySyntax.QuerySyntaxValidator validator = new ValidSolrQuerySyntax.QuerySyntaxValidator();
+
+        boolean result = validator.isValid("accession:*",null);
+        assertTrue(result);
+    }
+
 }

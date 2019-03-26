@@ -64,6 +64,7 @@ public @interface ValidSolrQueryFields {
             if(Utils.notEmpty(queryString)) {
                 try {
                     StandardQueryParser qp = new StandardQueryParser();
+                    qp.setAllowLeadingWildcard(true);
                     Query query = qp.parse(queryString, DEFAULT_FIELD_NAME);
                     if(!(query instanceof MatchAllDocsQuery)) {
                         isValid = hasValidateQueryField(query, context);
@@ -84,6 +85,11 @@ public @interface ValidSolrQueryFields {
                 TermQuery termQuery = (TermQuery) inputQuery;
                 String fieldName = termQuery.getTerm().field();
                 String value = termQuery.getTerm().text();
+                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+            } else if (inputQuery instanceof WildcardQuery) {
+                WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
+                String fieldName = wildcardQuery.getTerm().field();
+                String value = wildcardQuery.getTerm().text();
                 validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
             } else if (inputQuery instanceof TermRangeQuery) {
                 TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;
