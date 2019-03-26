@@ -1,19 +1,14 @@
 package uk.ac.ebi.uniprot.configure.uniprot.domain.impl;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
+
+import java.io.InputStream;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public enum UniProtResultFields {
 	INSTANCE;
@@ -26,7 +21,7 @@ public enum UniProtResultFields {
 	}
 
 	void init() {
-		final ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = JsonConfig.getJsonMapper();
 		try (InputStream is = UniProtResultFields.class.getClassLoader().getResourceAsStream(FILENAME);) {
 			List<FieldGroupImpl> fields = objectMapper.readValue(is,
 					new TypeReference<List<FieldGroupImpl>>() {

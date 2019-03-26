@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.EvidenceGroupImpl;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.EvidenceItemImpl;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.GoEvidences;
 
 import java.util.List;
@@ -54,6 +55,6 @@ class GoEvidencesTest {
 		Optional<EvidenceItem> item = aaGroup.orElse(new EvidenceGroupImpl()).getItems().stream()
 				.filter(val -> val.getName().equals("Inferred from high throughput genetic interaction [HGI]")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("HGI", item.orElse(new EvidenceGroupImpl.EvidenceItemImpl()).getCode());
+		assertEquals("HGI", item.orElse(new EvidenceItemImpl()).getCode());
 	}
 }

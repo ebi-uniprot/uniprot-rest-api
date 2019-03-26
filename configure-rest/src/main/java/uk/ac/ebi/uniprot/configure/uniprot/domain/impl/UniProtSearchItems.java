@@ -20,7 +20,7 @@ public enum UniProtSearchItems implements SearchItems {
 	}
 
 	void init() {
-		final ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = JsonConfig.getJsonMapper();
 		try (InputStream is = UniProtSearchItems.class.getClassLoader().getResourceAsStream(FILENAME);) {
 			List<UniProtSearchItem> items = objectMapper.readValue(is, new TypeReference<List<UniProtSearchItem>>() {});
 			this.searchItems.addAll(items);

@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.configure.uniprot.domain.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class UniProtSearchItem implements SearchItem {
 
 	private String id;
@@ -29,174 +31,16 @@ public class UniProtSearchItem implements SearchItem {
 	private String description;
 	private String example;
 
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public SearchItemType getItemType() {
-		return itemType;
-	}
-
-	public void setItemType(SearchItemType itemType) {
-		this.itemType = itemType;
-	}
-
-	public String getTerm() {
-		return term;
-	}
-
-	public void setTerm(String term) {
-		this.term = term;
-	}
-
-	public SearchDataType getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(SearchDataType type) {
-		this.dataType = type;
-	}
-
-	public List<Tuple> getValues() {
-		return values;
-	}
-
-	public void setValues(List<TupleImpl> values) {
-		this.values = new ArrayList<>();
-		this.values.addAll(values);
-	}
-
-	public List<SearchItem> getItems() {
-		return items;
-	}
-
-	public void setItems(List<UniProtSearchItem> items) {
-		this.items = new ArrayList<>();
-		this.items.addAll(items);
-	}
-
 	public Boolean isHasRange() {
 		return hasRange;
-	}
-
-	public void setHasRange(Boolean isRange) {
-		this.hasRange = isRange;
 	}
 
 	public Boolean isHasEvidence() {
 		return hasEvidence;
 	}
 
-	public void setHasEvidence(Boolean hasEvidence) {
-		this.hasEvidence = hasEvidence;
+	public void setItems(List<UniProtSearchItem> items) {
+		this.items = new ArrayList<>();
+		this.items.addAll(items);
 	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	@Override
-	public String getValuePrefix() {
-		return this.valuePrefix;
-	}
-
-	public void setValuePrefix(String valuePrefix) {
-		this.valuePrefix = valuePrefix;
-	}
-	public String getExample() {
-		return example;
-	}
-
-	public void setExample(String example) {
-		if (example.contains(":")) {
-			System.err.println(example);
-		}
-		this.example = example;
-	}
-
-	public String getAutoComplete() {
-		return autoComplete;
-	}
-
-	public void setAutoComplete(String autoComplete) {
-		this.autoComplete = autoComplete;
-	}
-
-	private boolean isNullOrEmpty(String val) {
-		return (val == null) || (val.length() == 0);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{\n");
-		if (!isNullOrEmpty(id)) {
-			sb.append("id:").append(id).append("\n");
-		}
-
-		if (!isNullOrEmpty(label)) {
-			sb.append("label:").append(label).append("\n");
-		}
-
-		sb.append("itemType:").append(itemType).append("\n");
-
-		if (!isNullOrEmpty(term)) {
-			sb.append("term:").append(term).append("\n");
-		}
-		if (dataType != SearchDataType.UNKNOWN) {
-			sb.append("dataType:").append(dataType.getName()).append("\n");
-		}
-
-		if (!isNullOrEmpty(description)) {
-			sb.append("description:").append(description).append("\n");
-		}
-
-		if (values != null && !values.isEmpty()) {
-			sb.append("values:[\n");
-			values.forEach(val -> sb.append("\t").append(val).append("\n"));
-			sb.append("]\n");
-		}
-
-		if (hasRange != null && hasRange) {
-			sb.append("hasRange: true\n");
-		}
-		if (hasEvidence != null && hasEvidence) {
-			sb.append("hasEvidence: true\n");
-		}
-		if (!isNullOrEmpty(autoComplete)) {
-			sb.append("autoComplete:").append(autoComplete).append("\n");
-		}
-		if (!isNullOrEmpty(example)) {
-			sb.append("example:").append(example).append("\n");
-		}
-
-		if (items != null && !items.isEmpty()) {
-			sb.append("items:[");
-			items.forEach(val -> sb.append(val).append("\n"));
-			sb.append("]\n");
-		}
-		if (!isNullOrEmpty(valuePrefix)) {
-			sb.append("valuePrefix:").append(valuePrefix).append("\n");
-		}
-		sb.append("}");
-		return sb.toString();
-	}
-
 }

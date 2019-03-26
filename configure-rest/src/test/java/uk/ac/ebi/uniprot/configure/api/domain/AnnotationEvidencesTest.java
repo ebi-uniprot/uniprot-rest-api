@@ -6,6 +6,7 @@ import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceGroup;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.EvidenceItem;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.AnnotationEvidences;
 import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.EvidenceGroupImpl;
+import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.EvidenceItemImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +52,7 @@ class AnnotationEvidencesTest {
 		Optional<EvidenceItem> item = aaGroup.orElse(new EvidenceGroupImpl()).getItems().stream()
 				.filter(val -> val.getName().equals("Sequence model")).findFirst();
 		assertTrue(item.isPresent());
-		assertEquals("ECO_0000256", item.orElse(new EvidenceGroupImpl.EvidenceItemImpl()).getCode());
+		assertEquals("ECO_0000256", item.orElse(new EvidenceItemImpl()).getCode());
 	}
 
 }
