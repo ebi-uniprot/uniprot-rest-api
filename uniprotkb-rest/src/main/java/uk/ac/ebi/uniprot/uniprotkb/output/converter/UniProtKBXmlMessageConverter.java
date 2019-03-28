@@ -6,7 +6,7 @@ import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.rest.output.converter.AbstractEntityHttpMessageConverter;
 import uk.ac.ebi.uniprot.xml.jaxb.uniprot.Entry;
-import uk.ac.ebi.uniprot.xmlparser.uniprot.UniProtEntryConverter;
+import uk.ac.ebi.uniprot.xml.uniprot.UniProtEntryConverter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
