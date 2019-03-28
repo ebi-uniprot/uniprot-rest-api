@@ -3,11 +3,12 @@ package uk.ac.ebi.uniprot.configure.api.domain;
 import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.FieldGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldGroupImpl;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldImpl;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtResultFields;
+
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldGroupImpl;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldImpl;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 
 import java.util.List;
 import java.util.Map;

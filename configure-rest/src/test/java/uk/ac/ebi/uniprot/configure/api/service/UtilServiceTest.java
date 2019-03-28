@@ -1,7 +1,9 @@
 package uk.ac.ebi.uniprot.configure.api.service;
 
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.query.SolrJsonQuery;
+
+import uk.ac.ebi.uniprot.api.configure.service.UtilService;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
 
 import static org.junit.jupiter.api.Assertions.*;
 

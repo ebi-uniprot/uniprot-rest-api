@@ -3,13 +3,14 @@ package uk.ac.ebi.uniprot.configure.api.domain;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchDataType;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItem;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.SearchItemType;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.TupleImpl;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItem;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.UniProtSearchItems;
+
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.SearchDataType;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.SearchItem;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.SearchItemType;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Tuple;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.TupleImpl;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtSearchItem;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtSearchItems;
 
 import java.util.List;
 import java.util.Optional;

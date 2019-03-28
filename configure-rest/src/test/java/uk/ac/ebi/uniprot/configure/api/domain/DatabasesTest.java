@@ -2,10 +2,11 @@ package uk.ac.ebi.uniprot.configure.api.domain;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.DatabaseGroup;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Field;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.Tuple;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.Databases;
+
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.DatabaseGroup;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Tuple;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.Databases;
 
 import java.util.List;
 import java.util.Map;

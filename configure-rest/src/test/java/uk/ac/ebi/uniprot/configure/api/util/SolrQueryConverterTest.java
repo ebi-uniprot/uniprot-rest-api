@@ -7,7 +7,9 @@ import org.apache.lucene.search.Query;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.uniprot.configure.uniprot.domain.query.SolrJsonQuery;
+
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
+import uk.ac.ebi.uniprot.api.configure.util.SolrQueryConverter;
 
 import java.util.List;
 

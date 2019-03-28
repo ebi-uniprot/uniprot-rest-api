@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import uk.ac.ebi.uniprot.configure.uniprot.domain.impl.FieldMaps;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldMaps;
 
 class FieldMapsTest {
 	private static FieldMaps instance;
