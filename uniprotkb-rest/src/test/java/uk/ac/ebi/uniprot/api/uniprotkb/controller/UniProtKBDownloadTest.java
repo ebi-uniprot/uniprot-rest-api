@@ -22,6 +22,7 @@ import uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController;
 import uk.ac.ebi.uniprot.api.uniprotkb.output.MessageConverterConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.RepositoryConfig;
+import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.ResultsConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
@@ -48,7 +49,7 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest({UniprotKBController.class})
-@Import({DataStoreTestConfig.class, RepositoryConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
+@Import({DataStoreTestConfig.class, RepositoryConfig.class, UniprotFacetConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class, UniprotKBConfig.class})
 public class UniProtKBDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
