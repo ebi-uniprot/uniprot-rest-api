@@ -5,8 +5,7 @@ import uk.ac.ebi.uniprot.dataservice.source.impl.keyword.KeywordRepo;
 
 public class KeywordRepoMocker {
 	public static KeywordRepo getKeywordRepo() {
-		 String filePath= Thread.currentThread().getContextClassLoader().getResource("keywlist.txt").getFile();
-		 
-		 return new KeywordFileRepo(filePath);
+	//	 String filePath= KeywordRepoMocker.class.getClassLoader().getResource("keywlist.txt").getFile();		 
+		 return new KeywordFileRepo("keywlist.txt");
 	}
 }
