@@ -30,7 +30,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class DataStoreManager {
     public enum StoreType {
-        UNIPROT, INACTIVE_UNIPROT,UNIPARC, UNIREF
+        UNIPROT, INACTIVE_UNIPROT,UNIPARC, UNIREF,CROSSREF
     }
 
     private static final Logger LOGGER = getLogger(DataStoreManager.class);
