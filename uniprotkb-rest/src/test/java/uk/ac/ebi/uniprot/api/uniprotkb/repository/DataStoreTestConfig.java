@@ -17,6 +17,7 @@ import uk.ac.ebi.uniprot.api.common.repository.search.mockers.TaxonomyRepoMocker
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.dataservice.document.impl.InactiveEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
+import uk.ac.ebi.uniprot.dataservice.main.uniref.UniProtUniRefMap;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
@@ -67,7 +68,7 @@ public class DataStoreTestConfig {
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(), KeywordRepoMocker.getKeywordRepo(),
+                GoRelationsRepoMocker.getGoRelationRepo(), UniProtUniRefMap.builder(true).build(), KeywordRepoMocker.getKeywordRepo(),
                 PathwayRepoMocker.getPathwayRepo()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
