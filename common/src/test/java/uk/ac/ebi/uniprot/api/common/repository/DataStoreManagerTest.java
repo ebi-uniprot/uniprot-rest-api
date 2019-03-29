@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import net.openhft.chronicle.map.ChronicleMap;
 import uk.ac.ebi.uniprot.api.common.repository.search.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrCollection;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrDataStoreManager;
@@ -19,6 +20,11 @@ import uk.ac.ebi.uniprot.api.common.repository.search.mockers.UniProtEntryMocker
 import uk.ac.ebi.uniprot.api.common.repository.store.UUWStoreClient;
 import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
 import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.dataservice.main.uniref.UniProtUniRefMap;
+import uk.ac.ebi.uniprot.dataservice.source.impl.go.GoRelationRepo;
+import uk.ac.ebi.uniprot.dataservice.source.impl.keyword.KeywordRepo;
+import uk.ac.ebi.uniprot.dataservice.source.impl.pathway.PathwayRepo;
+import uk.ac.ebi.uniprot.dataservice.source.impl.taxonomy.TaxonomyRepo;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
@@ -48,13 +54,18 @@ class DataStoreManagerTest {
             storeManager.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
 
             storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-            		GoRelationsRepoMocker.getGoRelationRepo(), KeywordRepoMocker.getKeywordRepo(),
+            		GoRelationsRepoMocker.getGoRelationRepo(), uniprotUniRefMap(), KeywordRepoMocker.getKeywordRepo(),
             		PathwayRepoMocker.getPathwayRepo()));
         } catch (Exception e) {
             fail("Error to setup DataStoreManagerTest",e);
         }
     }
 
+    
+    private static UniProtUniRefMap uniprotUniRefMap() {
+    	return  UniProtUniRefMap.builder(true).build();
+
+    }
     @AfterEach
     void cleanUp() {
         storeManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
