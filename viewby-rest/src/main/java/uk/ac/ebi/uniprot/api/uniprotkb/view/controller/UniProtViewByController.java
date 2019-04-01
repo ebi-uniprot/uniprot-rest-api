@@ -21,8 +21,8 @@ import uk.ac.ebi.uniprot.api.uniprotkb.view.service.UniProtViewByPathwayService;
 import uk.ac.ebi.uniprot.api.uniprotkb.view.service.UniProtViewByTaxonomyService;
 
 @RestController
-@Api(tags = {"view"})
-@RequestMapping("/view")
+@Api(tags = {"uniprotkb/view"})
+@RequestMapping("/uniprotkb/view")
 public class UniProtViewByController {
 	
 	 private final UniProtViewByECService viewByECService;

@@ -7,14 +7,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import uk.ac.ebi.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.RepositoryConfig;
+//import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.RepositoryConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
 
 
 
 
 @SpringBootApplication
-@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ViewByServiceConfig.class})
+//@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ViewByServiceConfig.class})
 
 public class ViewByRestApplication {
 	   @Bean
