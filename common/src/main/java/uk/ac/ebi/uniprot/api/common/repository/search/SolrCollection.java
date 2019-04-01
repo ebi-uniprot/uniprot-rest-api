@@ -7,5 +7,6 @@ package uk.ac.ebi.uniprot.api.common.repository.search;
  */
 public enum SolrCollection {
     uniprot,
-    uniparc
+    uniparc,
+    crossref
 }
