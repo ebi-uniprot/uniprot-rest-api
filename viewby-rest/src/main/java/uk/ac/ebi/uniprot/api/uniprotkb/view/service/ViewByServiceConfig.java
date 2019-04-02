@@ -1,5 +1,7 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.view.service;
 
+import java.io.InputStream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +38,12 @@ public class ViewByServiceConfig {
 	  
 	  @Bean
 	    public UniPathwayService pathwayService() {
-	        return new UniPathwayServiceImpl("src/main/resources/unipathway.txt");
+		  String filepath = "unipathway.txt";
+			InputStream inputStream = ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
+			if(inputStream !=null) {
+				filepath =  ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
+			}
+	        return new UniPathwayServiceImpl(filepath);
 	    }
 	  
 	  @Bean
@@ -46,7 +53,12 @@ public class ViewByServiceConfig {
 	  
 	  @Bean
 	    public GoService goService() {
-	        return new GoServiceImpl("src/main/resources/go");
+		  String filepath ="go";
+			InputStream inputStream = ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
+			if(inputStream !=null) {
+				filepath =  ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
+			}
+	        return new GoServiceImpl(filepath);
 	    }
 	  
 	    @Bean

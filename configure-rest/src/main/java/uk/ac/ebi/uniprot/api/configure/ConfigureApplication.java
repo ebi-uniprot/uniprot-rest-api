@@ -9,7 +9,7 @@ import uk.ac.ebi.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class})
-@ComponentScan(basePackages = {"uk.ac.ebi.uniprot.api.configure","uk.ac.ebi.uniprot.api.rest"})
+@ComponentScan(basePackages = {"uk.ac.ebi.uniprot","uk.ac.ebi.uniprot.api.rest"})
 public class ConfigureApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ConfigureApplication.class, args);
