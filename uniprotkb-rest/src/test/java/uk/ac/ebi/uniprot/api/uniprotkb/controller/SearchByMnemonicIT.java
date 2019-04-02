@@ -94,6 +94,27 @@ public class SearchByMnemonicIT {
     }
     
     @Test
+    public void canReachSearchEndpointMixCase() throws Exception {
+    
+       // when
+       ResultActions response = mockMvc.perform(
+               get(SEARCH_RESOURCE)
+                       .header(ACCEPT, APPLICATION_JSON_VALUE)
+                       .param("query", "mnemonic:cYc_Human" ));
+
+       // then
+       response.andDo(print())
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+               .andExpect(jsonPath("$.results.*.primaryAccession", contains(TARGET_ACCESSION)));
+   }
+    
+   
+   
+  
+   
+    
+    @Test
     public void canReachSearchEndpointWithDefault() throws Exception {
     
        // when
@@ -101,6 +122,38 @@ public class SearchByMnemonicIT {
                get(SEARCH_RESOURCE)
                        .header(ACCEPT, APPLICATION_JSON_VALUE)
                        .param("query", "mnemonic_default:AATM_RABIT"));
+
+       // then
+       response.andDo(print())
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+               .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q197F6")));
+   }
+    
+    @Test
+    public void canReachSearchEndpointPartNotAvailable() throws Exception {
+    
+       // when
+       ResultActions response = mockMvc.perform(
+               get(SEARCH_RESOURCE)
+                       .header(ACCEPT, APPLICATION_JSON_VALUE)
+                       .param("query", "mnemonic:AATM" ));
+     
+       // then
+       response.andDo(print())
+       .andExpect(status().is(HttpStatus.OK.value()))
+       .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+
+       .andExpect(jsonPath("$.results.*.primaryAccession").doesNotExist());
+   } 
+    @Test
+    public void canReachSearchEndpointWithDefaultPart() throws Exception {
+    
+       // when
+       ResultActions response = mockMvc.perform(
+               get(SEARCH_RESOURCE)
+                       .header(ACCEPT, APPLICATION_JSON_VALUE)
+                       .param("query", "mnemonic_default:AATM"));
 
        // then
        response.andDo(print())
