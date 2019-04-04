@@ -57,7 +57,6 @@
         <module>common-rest</module>
         <module>suggester-source</module>
         <module>common</module>
-    <module>viewby-rest</module>
   </modules>
 
     <dependencyManagement>
