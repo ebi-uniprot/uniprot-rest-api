@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 
 import uk.ac.ebi.uniprot.api.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.api.common.repository.store.TupleStreamTemplate;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.RepositoryConfig;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.RepositoryConfigProperties;
+import uk.ac.ebi.uniprot.api.rest.respository.RepositoryConfig;
+import uk.ac.ebi.uniprot.api.rest.respository.RepositoryConfigProperties;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.json.parser.uniprot.UniprotJsonConfig;
 

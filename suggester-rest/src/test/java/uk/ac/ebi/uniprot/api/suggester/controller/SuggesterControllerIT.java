@@ -8,9 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import uk.ac.ebi.uniprot.api.suggester.controller.SuggesterController;
 import uk.ac.ebi.uniprot.api.suggester.model.Suggestions;
 import uk.ac.ebi.uniprot.api.suggester.service.SuggesterService;
+import uk.ac.ebi.uniprot.api.support_data.controller.SuggesterController;
 
 import java.util.List;
 

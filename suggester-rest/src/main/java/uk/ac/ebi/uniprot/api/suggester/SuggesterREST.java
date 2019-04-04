@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import uk.ac.ebi.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
+import uk.ac.ebi.uniprot.api.rest.respository.RepositoryConfig;
 import uk.ac.ebi.uniprot.api.suggester.service.SuggesterServiceConfig;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.RepositoryConfig;
 
 /**
  * Starts the REST application.

@@ -15,9 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import uk.ac.ebi.uniprot.api.configure.ConfigureApplication;
-import uk.ac.ebi.uniprot.crossref.model.CrossRef;
-import uk.ac.ebi.uniprot.crossref.service.CrossRefService;
+
+import uk.ac.ebi.uniprot.api.crossref.controller.CrossRefController;
+import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
+import uk.ac.ebi.uniprot.api.crossref.service.CrossRefService;
+import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 
 import java.util.UUID;
 
@@ -26,7 +28,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes=ConfigureApplication.class)
+@ContextConfiguration(classes=SupportDataApplication.class)
 @WebMvcTest(CrossRefController.class)
 public class CrossRefControllerTest {
     @Autowired

@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.uniprotkb.repository.search;
+package uk.ac.ebi.uniprot.api.rest.respository;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;

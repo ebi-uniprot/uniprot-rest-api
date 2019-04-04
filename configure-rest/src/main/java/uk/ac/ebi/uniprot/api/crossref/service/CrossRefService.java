@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.crossref.service;
+package uk.ac.ebi.uniprot.api.crossref.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.solr.core.query.Criteria;
@@ -6,8 +6,8 @@ import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
-import uk.ac.ebi.uniprot.crossref.model.CrossRef;
-import uk.ac.ebi.uniprot.crossref.repository.CrossRefRepository;
+import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
+import uk.ac.ebi.uniprot.api.crossref.repository.CrossRefRepository;
 
 import java.util.Optional;
 

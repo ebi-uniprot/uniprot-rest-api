@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.uniprotkb.repository.search;
+package uk.ac.ebi.uniprot.api.rest.respository;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

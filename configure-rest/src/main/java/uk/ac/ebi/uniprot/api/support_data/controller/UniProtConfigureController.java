@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.configure.controller;
+package uk.ac.ebi.uniprot.api.support_data.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

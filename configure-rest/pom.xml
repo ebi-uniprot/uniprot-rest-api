@@ -11,9 +11,9 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <artifactId>configure-rest</artifactId>
+    <artifactId>support-data-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <description>UniProt Rest API Configuration</description>
+    <description>UniProt Rest API for support data</description>
 
     <properties>
         <uniprot.core.version>2019.3-SNAPSHOT</uniprot.core.version>

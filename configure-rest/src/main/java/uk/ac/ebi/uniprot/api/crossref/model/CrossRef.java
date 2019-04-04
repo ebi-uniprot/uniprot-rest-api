@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.crossref.model;
+package uk.ac.ebi.uniprot.api.crossref.model;
 
 import lombok.Builder;
 import lombok.Getter;

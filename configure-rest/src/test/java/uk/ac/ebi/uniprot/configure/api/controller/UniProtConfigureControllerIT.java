@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import uk.ac.ebi.uniprot.api.configure.ConfigureApplication;
+import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author lgonzales
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {ConfigureApplication.class})
+@SpringBootTest(classes = {SupportDataApplication.class})
 @WebAppConfiguration
 public class UniProtConfigureControllerIT {
 
