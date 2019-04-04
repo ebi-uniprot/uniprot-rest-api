@@ -17,16 +17,10 @@
     <description>UniProt Rest API for support data</description>
 
     <properties>
-        <uniprot.core.version>2019.3-SNAPSHOT</uniprot.core.version>
         <controlled-vocab-version>0.1-SNAPSHOT</controlled-vocab-version>
     </properties>
 
     <dependencies>
-    	 <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>interfaces</artifactId>
-            <version>${uniprot.core.version}</version>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>controlled-vocabulary</artifactId>

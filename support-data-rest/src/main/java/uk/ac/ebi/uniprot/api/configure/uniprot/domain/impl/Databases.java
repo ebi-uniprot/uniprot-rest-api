@@ -9,12 +9,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseCategory;
-import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseType;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.DatabaseGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Tuple;
+import uk.ac.ebi.uniprot.cv.xdb.DatabaseCategory;
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypeDetail;
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypes;
 
 public enum Databases {
 	INSTANCE;
@@ -34,7 +35,7 @@ public enum Databases {
 		databases.add(getAnyGroup());
 		for (DatabaseCategory category : DatabaseCategory.values()) {
 			if (category != DatabaseCategory.UNKNOWN) {
-				List<DatabaseType> types = DatabaseType.getDatabaseTypes(category);
+				List<UniProtXDbTypeDetail> types = UniProtXDbTypes.INSTANCE.getDBTypesByCategory(category);
 				List<Tuple> databaseTypes = types.stream().map(this::convertTuple).collect(Collectors.toList());
 				databases.add(new DatabaseGroupImpl(category.getName(), databaseTypes));
 				List<Field> fields = types.stream().map(this::convertField).collect(Collectors.toList());
@@ -54,11 +55,11 @@ public enum Databases {
 		}else
 			return category;
 	}
-	private Field convertField(DatabaseType type) {
-		return new FieldImpl(type.getName(), DR+type.name().toLowerCase());
+	private Field convertField(UniProtXDbTypeDetail type) {
+		return new FieldImpl(type.getDisplayName(), DR+type.getName().toLowerCase());
 	}
-	private Tuple convertTuple(DatabaseType type) {
-		return new TupleImpl(type.getName(), type.name().toLowerCase());
+	private Tuple convertTuple(UniProtXDbTypeDetail type) {
+		return new TupleImpl(type.getDisplayName(), type.getName().toLowerCase());
 	}
 
 	private DatabaseGroup getAnyGroup() {
