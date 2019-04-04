@@ -51,9 +51,8 @@
     </properties>
 
     <modules>
-        <module>configure-rest</module>
+        <module>support-data-rest</module>
         <module>uniprotkb-rest</module>
-        <module>suggester-rest</module>
         <module>common-rest</module>
         <module>suggester-source</module>
         <module>common</module>
