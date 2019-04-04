@@ -55,7 +55,6 @@
         <module>uniprotkb-rest</module>
         <module>common-rest</module>
         <module>suggester-source</module>
-        <module>common</module>
   </modules>
 
     <dependencyManagement>
