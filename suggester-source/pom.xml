@@ -17,7 +17,7 @@
         <data-service.version>web-2018.7-SNAPSHOT</data-service.version>
         <jcommander.version>1.71</jcommander.version>
         <streamex.version>0.6.7</streamex.version>
-        <start-class>uk.ac.ebi.uniprot.uuw.suggester.SuggesterManager</start-class>
+        <start-class>uk.ac.ebi.uniprot.api.suggester.SuggesterManager</start-class>
         <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
         <core.version>0.1-SNAPSHOT</core.version>
     </properties>
