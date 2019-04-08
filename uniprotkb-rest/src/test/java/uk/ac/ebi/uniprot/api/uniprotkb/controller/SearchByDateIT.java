@@ -15,7 +15,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,6 +40,7 @@ import uk.ac.ebi.uniprot.flatfile.parser.ffwriter.LineType;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
+@Ignore
 public class SearchByDateIT {
 	  private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 	  private static final String UNIPROT_FLAT_FILE_ENTRY_PATH = "/it/P0A377.43.dat";

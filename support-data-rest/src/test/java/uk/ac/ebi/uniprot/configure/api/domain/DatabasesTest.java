@@ -45,16 +45,16 @@ class DatabasesTest {
 	@Test
 	void testSize() {
 		List<DatabaseGroup> groups = instance.getDatabases();
-		assertEquals(18, groups.size());
+		assertEquals(20, groups.size());
 		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
-		assertEquals(156, nDb);
+		assertEquals(158, nDb);
 		instance.getDatabases().forEach(System.out::println);
 	}
 	@Test
 	void testGroup() {
 		List<DatabaseGroup> groups = instance.getDatabases();
-		assertTrue(groups.stream().anyMatch(val -> val.getGroupName().equals("Sequence databases")));
-		assertTrue(groups.stream().anyMatch(val -> val.getGroupName().equals("Genome annotation databases")));
+		assertTrue(groups.stream().anyMatch(val -> val.getGroupName().equals("SEQ")));
+		assertTrue(groups.stream().anyMatch(val -> val.getGroupName().equals("GMA")));
 		assertFalse(groups.stream().anyMatch(val -> val.getGroupName().equals("Proteomic database")));
 
 	}
@@ -62,7 +62,7 @@ class DatabasesTest {
 	void testDatabase() {
 		List<DatabaseGroup> groups = instance.getDatabases();
 		Optional<DatabaseGroup> ppGroup = groups.stream()
-				.filter(val -> val.getGroupName().equals("Protein family/group databases")).findFirst();
+				.filter(val -> val.getGroupName().equals("PFAM")).findFirst();
 
 		assertTrue(ppGroup.isPresent());
 		assertEquals(12, ppGroup.get().getItems().size());

@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -51,6 +52,7 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
 @WebMvcTest({UniprotKBController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniprotFacetConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
          UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class, UniprotKBConfig.class})
+@AutoConfigureWebClient
 public class UniProtKBDownloadTest {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";

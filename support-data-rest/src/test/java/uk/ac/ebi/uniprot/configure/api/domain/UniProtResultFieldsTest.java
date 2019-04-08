@@ -125,47 +125,49 @@ class UniProtResultFieldsTest {
 	@Test
 	void testDatabaseFieldSize() {
 		List<FieldGroup> groups = instance.getDatabaseFields();
-		assertEquals(17, groups.size());
-		verifyGroupSize(groups, "Sequence", 5);
-		verifyGroupSize(groups, "3D structure", 5);
-		verifyGroupSize(groups, "Protein-protein interaction", 8);
-		verifyGroupSize(groups, "Chemistry", 5);
-		verifyGroupSize(groups, "Protein family/group", 12);
+		assertEquals(19, groups.size());
+		verifyGroupSize(groups, "SEQ", 5);
+		verifyGroupSize(groups, "3DS", 5);
+		verifyGroupSize(groups, "PPI", 8);
+		verifyGroupSize(groups, "CHEMISTRY", 5);
+		verifyGroupSize(groups, "PFAM", 12);
 		verifyGroupSize(groups, "PTM", 7);
-		verifyGroupSize(groups, "Polymorphism and mutation", 3);
-		verifyGroupSize(groups, "2D gel", 7);
-		verifyGroupSize(groups, "Proteomic", 9);
-		verifyGroupSize(groups, "Protocols and materials", 1);
-		verifyGroupSize(groups, "Genome annotation", 14);
-		verifyGroupSize(groups, "Organism-specific", 37);
-		verifyGroupSize(groups, "Phylogenomic", 10);
-		verifyGroupSize(groups, "Enzyme and pathway", 7);
-		verifyGroupSize(groups, "Other", 6);
-		verifyGroupSize(groups, "Gene expression", 5);
-		verifyGroupSize(groups, "Family and domain", 14);
+		verifyGroupSize(groups, "PMD", 3);
+		verifyGroupSize(groups, "2DG", 7);
+		verifyGroupSize(groups, "PROTEOMIC", 9);
+		verifyGroupSize(groups, "PAM", 1);
+		verifyGroupSize(groups, "GMA", 14);
+		verifyGroupSize(groups, "ORG", 37);
+		verifyGroupSize(groups, "PLG", 10);
+		verifyGroupSize(groups, "EAP", 7);
+		verifyGroupSize(groups, "OTHER", 7);
+		verifyGroupSize(groups, "GEP", 5);
+		verifyGroupSize(groups, "FMD", 14);
+		verifyGroupSize(groups, "OTG", 1);
+		verifyGroupSize(groups, "PRM", 0);
 	}
 
 	@Test
 	void testDatabaseField() {
 		List<FieldGroup> groups = instance.getDatabaseFields();
-		assertEquals(17, groups.size());
-		verifyField(groups, "Sequence", "EMBL", "dr:embl");
-		verifyField(groups, "3D structure", "PDB", "dr:pdb");
-		verifyField(groups, "Protein-protein interaction", "CORUM", "dr:corum");
-		verifyField(groups, "Chemistry", "ChEMBL", "dr:chembl");
-		verifyField(groups, "Protein family/group", "IMGT_GENE-DB", "dr:imgt_gene_db");
+		assertEquals(19, groups.size());
+		verifyField(groups, "SEQ", "EMBL", "dr:embl");
+		verifyField(groups, "3DS", "PDB", "dr:pdb");
+		verifyField(groups, "PPI", "CORUM", "dr:corum");
+		verifyField(groups, "CHEMISTRY", "ChEMBL", "dr:chembl");
+		verifyField(groups, "PFAM", "IMGT_GENE-DB", "dr:imgt_gene-db");
 		verifyField(groups, "PTM", "GlyConnect", "dr:glyconnect");
-		verifyField(groups, "Polymorphism and mutation", "dbSNP", "dr:dbsnp");
-		verifyField(groups, "2D gel", "SWISS-2DPAGE", "dr:swiss2dpage");
-		verifyField(groups, "Proteomic", "PRIDE", "dr:pride");
-		verifyField(groups, "Protocols and materials", "DNASU", "dr:dnasu");
-		verifyField(groups, "Genome annotation", "Ensembl", "dr:ensembl");
-		verifyField(groups, "Organism-specific", "DisGeNET", "dr:disgenet");
-		verifyField(groups, "Phylogenomic", "KO", "dr:ko");
-		verifyField(groups, "Enzyme and pathway", "BRENDA", "dr:brenda");
-		verifyField(groups, "Other", "GeneWiki", "dr:genewiki");
-		verifyField(groups, "Gene expression", "Bgee", "dr:bgee");
-		verifyField(groups, "Family and domain", "HAMAP", "dr:hamap");
+		verifyField(groups, "PMD", "dbSNP", "dr:dbsnp");
+		verifyField(groups, "2DG", "SWISS-2DPAGE", "dr:swiss-2dpage");
+		verifyField(groups, "PROTEOMIC", "PRIDE", "dr:pride");
+		verifyField(groups, "PAM", "DNASU", "dr:dnasu");
+		verifyField(groups, "GMA", "Ensembl", "dr:ensembl");
+		verifyField(groups, "ORG", "DisGeNET", "dr:disgenet");
+		verifyField(groups, "PLG", "KO", "dr:ko");
+		verifyField(groups, "EAP", "BRENDA", "dr:brenda");
+		verifyField(groups, "OTHER", "GeneWiki", "dr:genewiki");
+		verifyField(groups, "GEP", "Bgee", "dr:bgee");
+		verifyField(groups, "FMD", "HAMAP", "dr:hamap");
 	}
 
 	private void verifyField(List<FieldGroup> groups, String groupName, String label, String name) {
