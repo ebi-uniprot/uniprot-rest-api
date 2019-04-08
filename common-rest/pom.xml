@@ -50,7 +50,17 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>data-service-voldemort</artifactId>
+            <version>${data-service.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
