@@ -10,22 +10,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import uk.ac.ebi.uniprot.api.uniprotkb.controller.UniProtViewByController;
 import uk.ac.ebi.uniprot.api.uniprotkb.view.ViewBy;
 import uk.ac.ebi.uniprot.api.uniprotkb.view.service.MockServiceHelper;
 import uk.ac.ebi.uniprot.api.uniprotkb.view.service.UniProtViewByECService;
@@ -37,7 +29,6 @@ import uk.ac.ebi.uniprot.api.uniprotkb.view.service.UniProtViewByTaxonomyService
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtViewByController.class)
 @AutoConfigureWebClient
-@Disabled
 class UniProtViewByControllerIT {
 	@Autowired
 	private MockMvc mockMvc;
@@ -56,22 +47,6 @@ class UniProtViewByControllerIT {
 
 	@MockBean
 	private UniProtViewByTaxonomyService taxonService;
-
-	@MockBean
-	private UniProtViewByController viewByController;
-
-//	@BeforeEach
-//	public void setup() {
-//		ecService = Mockito.mock(UniProtViewByECService.class);
-//		kwService = Mockito.mock(UniProtViewByKeywordService.class);
-//		pwService = Mockito.mock(UniProtViewByPathwayService.class);
-//		goService = Mockito.mock(UniProtViewByGoService.class);
-//		taxonService = Mockito.mock(UniProtViewByTaxonomyService.class);
-//
-//		this.mockMvc = MockMvcBuilders
-//				.standaloneSetup(new UniProtViewByController(ecService, kwService, pwService, goService, taxonService))
-//				.build();
-//	}
 
 	@Test
 	void testGetEC() throws Exception {
@@ -104,7 +79,7 @@ class UniProtViewByControllerIT {
 		String query = "organism_id:9606";
 		String parent = "KW-0123";
 	
-		mockMvc.perform(get("/view/keyword").param("query", query).param("parent", parent)).andDo(print())
+		mockMvc.perform(get("/uniprotkb/view/keyword").param("query", query).param("parent", parent)).andDo(print())
 				.andExpect(jsonPath("$[0].id", is("KW-0128")))
 				.andExpect(jsonPath("$[0].label", is("Catecholamine metabolism")))
 				.andExpect(jsonPath("$[1].id", is("KW-0131")))
@@ -128,7 +103,7 @@ class UniProtViewByControllerIT {
 		String query = "organism_id:9606";
 		String parent = "3";
 	
-		mockMvc.perform(get("/view/pathway").param("query", query).param("parent", parent)).andDo(print())
+		mockMvc.perform(get("/uniprotkb/view/pathway").param("query", query).param("parent", parent)).andDo(print())
 				.andExpect(jsonPath("$[0].id", is("289")))
 				.andExpect(jsonPath("$[0].label", is("Amine and polyamine biosynthesis")))
 				.andExpect(jsonPath("$[1].id", is("456")))
@@ -150,7 +125,7 @@ class UniProtViewByControllerIT {
 		String query = "organism_id:9606";
 		String parent = "GO:0002150";
 	
-		mockMvc.perform(get("/view/go").param("query", query).param("parent", parent)).andDo(print())
+		mockMvc.perform(get("/uniprotkb/view/go").param("query", query).param("parent", parent)).andDo(print())
 				.andExpect(jsonPath("$[0].id", is("GO:0008150")))
 				.andExpect(jsonPath("$[0].label", is("biological_process")))
 				.andExpect(jsonPath("$[1].id", is("GO:0005575")))
@@ -172,7 +147,7 @@ class UniProtViewByControllerIT {
 		String query = "organism_id:9606";
 		String parent = "9605";
 	
-		mockMvc.perform(get("/view/taxonomy").param("query", query).param("parent", parent)).andDo(print())
+		mockMvc.perform(get("/uniprotkb/view/taxonomy").param("query", query).param("parent", parent)).andDo(print())
 				.andExpect(jsonPath("$[0].id", is("1425170")))
 				.andExpect(jsonPath("$[0].label", is("Homo heidelbergensis")))
 				.andExpect(jsonPath("$[1].id", is("9606")))

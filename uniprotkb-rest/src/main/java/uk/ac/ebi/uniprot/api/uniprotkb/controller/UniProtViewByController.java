@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,33 +44,34 @@ public class UniProtViewByController {
 	        this.viewByGoService = viewByGoService;
 	        this.viewByTaxonomyService = viewByTaxonomyService;
 	    }
-	@RequestMapping(value = "/ec", produces = {APPLICATION_JSON_VALUE})
+	@GetMapping(value = "/ec", produces = {APPLICATION_JSON_VALUE})
 	public ResponseEntity<List<ViewBy> > getEC(
 			  @RequestParam(value = "query", required = true) String query, 
 			  @RequestParam(value = "parent", required = false) String parent){
-		return  new ResponseEntity<> (viewByECService.get(query, parent),  HttpStatus.OK);
+		List<ViewBy> viewBys = viewByECService.get(query, parent);
+		return  new ResponseEntity<> (viewBys,  HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/keyword", produces = {APPLICATION_JSON_VALUE})
+	@GetMapping(value = "/keyword", produces = {APPLICATION_JSON_VALUE})
 	public ResponseEntity<List<ViewBy> > getKeyword(
 			  @RequestParam(value = "query", required = true) String query, 
 			  @RequestParam(value = "parent", required = false) String parent){	
 		return  new ResponseEntity<> (viewByKeywordService.get(query, parent),  HttpStatus.OK);
 	}
-	@RequestMapping(value = "/pathway", produces = {APPLICATION_JSON_VALUE})
+	@GetMapping(value = "/pathway", produces = {APPLICATION_JSON_VALUE})
 	public  ResponseEntity<List<ViewBy> > getPathway(
 			  @RequestParam(value = "query", required = true) String query, 
 			  @RequestParam(value = "parent", required = false) String parent){
 		return  new ResponseEntity<> (viewByPathwayService.get(query, parent),  HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/go", produces = {APPLICATION_JSON_VALUE})
+	@GetMapping(value = "/go", produces = {APPLICATION_JSON_VALUE})
 	public  ResponseEntity<List<ViewBy> > getGo(
 			  @RequestParam(value = "query", required = true) String query, 
 			  @RequestParam(value = "parent", required = false) String parent){
 		return  new ResponseEntity<> (viewByGoService.get(query, parent),  HttpStatus.OK);
 	}
-	@RequestMapping(value = "/taxonomy", produces = {APPLICATION_JSON_VALUE})
+	@GetMapping(value = "/taxonomy", produces = {APPLICATION_JSON_VALUE})
 	public ResponseEntity<List<ViewBy> > getTaxonomy(
 			  @RequestParam(value = "query", required = true) String query, 
 			  @RequestParam(value = "parent", required = false) String parent){
