@@ -10,8 +10,6 @@ import org.springframework.web.client.RestTemplate;
 
 import uk.ac.ebi.uniprot.cv.ec.ECService;
 import uk.ac.ebi.uniprot.cv.ec.impl.ECServiceImpl;
-import uk.ac.ebi.uniprot.cv.go.GoService;
-import uk.ac.ebi.uniprot.cv.go.impl.GoServiceImpl;
 import uk.ac.ebi.uniprot.cv.keyword.KeywordService;
 import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordServiceImpl;
 import uk.ac.ebi.uniprot.cv.pathway.UniPathwayService;
@@ -52,13 +50,8 @@ public class ViewByServiceConfig {
 		}
 	  
 	  @Bean
-	    public GoService goService() {
-		  String filepath ="go";
-			InputStream inputStream = ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
-			if(inputStream !=null) {
-				filepath =  ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
-			}
-	        return new GoServiceImpl(filepath);
+	    public GoService goService(RestTemplate restTemplate) {
+		  return new GoService( restTemplate);
 	    }
 	  
 	    @Bean
