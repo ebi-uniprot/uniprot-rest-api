@@ -40,7 +40,6 @@ import uk.ac.ebi.uniprot.flatfile.parser.ffwriter.LineType;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-@Ignore
 public class SearchByDateIT {
 	  private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 	  private static final String UNIPROT_FLAT_FILE_ENTRY_PATH = "/it/P0A377.43.dat";
@@ -217,7 +216,7 @@ public class SearchByDateIT {
 	    @Test
 	    public void searchForCreatedAfter31MAR2014Returns1Document() throws Exception {
 	    	
-	    	 LocalDate creationDate =  LocalDate.of(2014, 3, 31);
+	    	 LocalDate creationDate =  LocalDate.of(2014, 3, 30);
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  creationDate.atStartOfDay().format(DATE_FORMAT), false, "*", false);	    	  
 	    	    verifyTest(query,ACCESSION_BST);
@@ -227,10 +226,10 @@ public class SearchByDateIT {
 
 	    @Test
 	    public void searchForCreatedAfter30JUL2003Returns3Documents() throws Exception {
-	    	LocalDate creationDate =  LocalDate.of(2003, 7, 30);
+	    	LocalDate creationDate =  LocalDate.of(2003, 7, 29);
 	    	  String query = buildQuery(UniProtField.Search.created.name(), 
 	    			  creationDate.atStartOfDay().format(DATE_FORMAT), false,  "*", false);	    	  
-	    	    verifyTest(query,ACCESSION2, ACCESSION_BST, ACCESSION_GMT, ACCESSION_BST_DUBIOUS);
+	    	    verifyTest(query, ACCESSION2, ACCESSION_GMT, ACCESSION_BST);
 	    }
 
 	    @Test
@@ -239,33 +238,33 @@ public class SearchByDateIT {
 	    	LocalDate creationDate =  LocalDate.of(1999, 3, 15);
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  creationDate.atStartOfDay().format(DATE_FORMAT) , true, "*", true);	    	  
-	    	    verifyTest(query, ACCESSION2, ACCESSION3, ACCESSION_BST, ACCESSION_GMT, ACCESSION_BST_DUBIOUS);
+	    	    verifyTest(query, ACCESSION2, ACCESSION3, ACCESSION_GMT, ACCESSION_BST);
 	    	
 	     
 	    }
 
 	    @Test
 	    public void searchForUpdatedAfter02APR2014Returns3Documents() throws Exception {
-	    	LocalDate updateDate =  LocalDate.of(2014, 4, 2);
+	    	LocalDate updateDate =  LocalDate.of(2014, 4, 1);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  updateDate.atStartOfDay().format(DATE_FORMAT), true, "*" , true);	    	  
-	    	    verifyTest(query, ACCESSION_BST, ACCESSION_BST_DUBIOUS, ACCESSION_GMT);
+	    	    verifyTest(query, ACCESSION_GMT, ACCESSION_BST);
 	    }
 
 	    @Test
 	    public void searchForUpdatedAfter01JAN2013Returns3Documents() throws Exception {
-	    	LocalDate updateDate =  LocalDate.of(2013, 1, 1);
+	    	LocalDate updateDate =  LocalDate.of(2012, 12, 31);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  updateDate.atStartOfDay().format(DATE_FORMAT) , true, "*", true);	    	  
-	    	    verifyTest(query, ACCESSION2, ACCESSION_BST, ACCESSION_GMT, ACCESSION_BST_DUBIOUS);
+	    	    verifyTest(query, ACCESSION2, ACCESSION_GMT, ACCESSION_BST);
 	    }
 
 	    @Test
 	    public void searchForUpdatedAfter07FEB2006Returns4Documents() throws Exception {
-	    	LocalDate updateDate =  LocalDate.of(2006, 2, 7);
+	    	LocalDate updateDate =  LocalDate.of(2006, 2, 6);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  updateDate.atStartOfDay().format(DATE_FORMAT) , true, "*", true);	    	  
-	    	    verifyTest(query, ACCESSION1, ACCESSION2, ACCESSION_BST, ACCESSION_GMT, ACCESSION_BST_DUBIOUS);
+	    	    verifyTest(query, ACCESSION1, ACCESSION2, ACCESSION_GMT, ACCESSION_BST);
 	    }
 
 	    @Test
@@ -352,7 +351,7 @@ public class SearchByDateIT {
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  startDate.atStartOfDay().format(DATE_FORMAT) , true, 
 	    			  endDate.atStartOfDay().format(DATE_FORMAT), true);	    	  
-	    	    verifyTest(query, ACCESSION_BST_DUBIOUS, ACCESSION_GMT);
+	    	    verifyTest(query, ACCESSION_GMT);
 	    }
 
 	    @Test
@@ -363,7 +362,7 @@ public class SearchByDateIT {
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  startDate.atStartOfDay().format(DATE_FORMAT) , true, 
 	    			  endDate.atStartOfDay().format(DATE_FORMAT), true);	    	  
-	    	    verifyTest(query, ACCESSION_BST_DUBIOUS, ACCESSION_GMT);
+	    	    verifyTest(query, ACCESSION_GMT);
 	    	
 	    }
 
@@ -380,13 +379,13 @@ public class SearchByDateIT {
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  startDate.atStartOfDay().format(DATE_FORMAT) , true, 
 	    			  endDate.atStartOfDay().format(DATE_FORMAT), true);	    	  
-	    	    verifyTest(query, ACCESSION_BST, ACCESSION_BST_DUBIOUS);
+	    	    verifyTest(query, ACCESSION_BST);
 	    }
 
 	    @Test
 	    public void searchExplicitBSTEntryTestExactDay() throws Exception {
-	    	LocalDate startDate = LocalDate.of(2014, 3, 31);
-	    	LocalDate endDate = LocalDate.of(2014, 4, 1);
+	    	LocalDate startDate = LocalDate.of(2014, 3, 30);
+	    	LocalDate endDate = LocalDate.of(2014, 3, 31);
 
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  startDate.atStartOfDay().format(DATE_FORMAT) , true, 
@@ -402,12 +401,12 @@ public class SearchByDateIT {
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
 	    			  startDate.atStartOfDay().format(DATE_FORMAT) , true, 
 	    			  endDate.atStartOfDay().format(DATE_FORMAT), true);	    	  
-	    	    verifyTest(query, ACCESSION_BST, ACCESSION_BST_DUBIOUS);
+	    	    verifyTest(query, ACCESSION_BST);
 	    }
 
 	    @Test
 	    public void searchExplicitBSTEntryTestLowerBound() throws Exception {
-	    	LocalDate startDate = LocalDate.of(2014, 3, 31);
+	    	LocalDate startDate = LocalDate.of(2014, 3, 30);
 	    	LocalDate endDate = LocalDate.of(2014, 4, 1);
 
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
