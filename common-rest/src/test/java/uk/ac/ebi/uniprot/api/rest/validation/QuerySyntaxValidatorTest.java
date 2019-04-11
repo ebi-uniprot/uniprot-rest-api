@@ -3,8 +3,6 @@ package uk.ac.ebi.uniprot.api.rest.validation;
 
 import org.junit.jupiter.api.Test;
 
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

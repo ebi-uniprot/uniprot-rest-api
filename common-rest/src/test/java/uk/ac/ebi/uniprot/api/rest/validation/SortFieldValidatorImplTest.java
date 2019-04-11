@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
-
 import java.util.ArrayList;
 import java.util.List;
 

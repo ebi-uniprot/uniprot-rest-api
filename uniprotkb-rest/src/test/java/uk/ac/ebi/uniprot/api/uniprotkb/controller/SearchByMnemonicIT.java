@@ -27,10 +27,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import uk.ac.ebi.uniprot.api.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.api.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.flatfile.parser.ffwriter.LineType;
+import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 
 
 @RunWith(SpringRunner.class)

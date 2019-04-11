@@ -12,16 +12,19 @@ import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.ebi.uniprot.api.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryRetrievalException;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrCollection;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryBuilder;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
-import uk.ac.ebi.uniprot.api.common.repository.search.mockers.UniProtDocMocker;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
-import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
+import uk.ac.ebi.uniprot.indexer.DataStoreManager;
+import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
+import uk.ac.ebi.uniprot.indexer.DataStoreManager.StoreType;
+import uk.ac.ebi.uniprot.indexer.uniprot.mockers.UniProtDocMocker;
+import uk.ac.ebi.uniprot.search.document.SolrCollection;
+import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
 import java.util.Arrays;
 import java.util.Collections;

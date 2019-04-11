@@ -1,7 +1,7 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.validation.validator.impl;
 
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
-import uk.ac.ebi.uniprot.api.rest.validation.validator.ReturnFieldsValidator;
+import uk.ac.ebi.uniprot.search.field.validator.ReturnFieldsValidator;
 
 /**
  * This class is responsible to implement methods that are used to validate UNIPROT returned fields in the request

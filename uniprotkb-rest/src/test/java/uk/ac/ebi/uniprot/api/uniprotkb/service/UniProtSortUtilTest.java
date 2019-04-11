@@ -3,8 +3,8 @@ package uk.ac.ebi.uniprot.api.uniprotkb.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 
-import uk.ac.ebi.uniprot.api.uniprotkb.configuration.UniProtField;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtSortUtil;
+import uk.ac.ebi.uniprot.search.field.UniProtField;
 
 import java.util.Iterator;
 

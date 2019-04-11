@@ -2,7 +2,7 @@ package uk.ac.ebi.uniprot.api.uniprotkb.service;
 
 import com.google.common.base.Strings;
 
-import uk.ac.ebi.uniprot.api.uniprotkb.configuration.UniProtField;
+import uk.ac.ebi.uniprot.search.field.UniProtField;
 
 import org.springframework.data.domain.Sort;
 

@@ -4,8 +4,8 @@ package uk.ac.ebi.uniprot.api.rest.validation;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
 
-import uk.ac.ebi.uniprot.api.rest.validation.validator.ReturnFieldsValidator;
 import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.search.field.validator.ReturnFieldsValidator;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

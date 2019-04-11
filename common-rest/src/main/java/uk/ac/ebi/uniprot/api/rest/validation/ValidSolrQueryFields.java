@@ -6,9 +6,9 @@ import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
 
-import uk.ac.ebi.uniprot.api.rest.search.SearchFieldType;
-import uk.ac.ebi.uniprot.api.rest.validation.validator.SolrQueryFieldValidator;
 import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.search.field.SearchFieldType;
+import uk.ac.ebi.uniprot.search.field.validator.SolrQueryFieldValidator;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

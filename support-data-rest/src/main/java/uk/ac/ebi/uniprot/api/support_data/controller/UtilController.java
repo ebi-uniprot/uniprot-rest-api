@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import uk.ac.ebi.uniprot.api.configure.service.UtilService;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import uk.ac.ebi.uniprot.search.validation.ValidSolrQuerySyntax;
 
 import javax.validation.constraints.NotNull;
 

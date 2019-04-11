@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 
-import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.api.rest.validation.validator.ReturnFieldsValidator;
+import uk.ac.ebi.uniprot.search.field.validator.ReturnFieldsValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;

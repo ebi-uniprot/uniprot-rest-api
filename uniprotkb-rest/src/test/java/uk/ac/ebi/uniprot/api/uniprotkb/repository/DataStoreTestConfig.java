@@ -6,25 +6,24 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
-import uk.ac.ebi.uniprot.api.common.repository.DataStoreManager;
-import uk.ac.ebi.uniprot.api.common.repository.search.ClosableEmbeddedSolrClient;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrCollection;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrDataStoreManager;
-import uk.ac.ebi.uniprot.api.common.repository.search.mockers.GoRelationsRepoMocker;
-import uk.ac.ebi.uniprot.api.common.repository.search.mockers.KeywordRepoMocker;
-import uk.ac.ebi.uniprot.api.common.repository.search.mockers.PathwayRepoMocker;
-import uk.ac.ebi.uniprot.api.common.repository.search.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
-import uk.ac.ebi.uniprot.dataservice.document.impl.InactiveEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.document.impl.UniprotEntryConverter;
-import uk.ac.ebi.uniprot.dataservice.main.uniref.UniProtUniRefMap;
 import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
-
+import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
+import uk.ac.ebi.uniprot.indexer.DataStoreManager;
+import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
+import uk.ac.ebi.uniprot.indexer.uniprot.mockers.GoRelationsRepoMocker;
+import uk.ac.ebi.uniprot.indexer.uniprot.mockers.KeywordRepoMocker;
+import uk.ac.ebi.uniprot.indexer.uniprot.mockers.PathwayRepoMocker;
+import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import uk.ac.ebi.uniprot.search.document.SolrCollection;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import uk.ac.ebi.uniprot.indexer.document.impl.InactiveEntryConverter;
+import uk.ac.ebi.uniprot.indexer.document.impl.UniprotEntryConverter;
 import static org.mockito.Mockito.mock;
+
 
 /**
  * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override production ones.
@@ -62,13 +61,13 @@ public class DataStoreTestConfig {
     public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
         UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
                                                                                .getInstance("avro-uniprot"));
-        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
+     //   dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
         return storeClient;
     }
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(), UniProtUniRefMap.builder(true).build(), KeywordRepoMocker.getKeywordRepo(),
+                GoRelationsRepoMocker.getGoRelationRepo(),  KeywordRepoMocker.getKeywordRepo(),
                 PathwayRepoMocker.getPathwayRepo()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 

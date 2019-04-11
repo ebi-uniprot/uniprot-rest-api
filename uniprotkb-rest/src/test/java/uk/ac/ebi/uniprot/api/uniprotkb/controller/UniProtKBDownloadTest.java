@@ -14,8 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import uk.ac.ebi.uniprot.api.common.repository.DataStoreManager;
-import uk.ac.ebi.uniprot.api.common.repository.search.mockers.UniProtEntryMocker;
 import uk.ac.ebi.uniprot.api.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.api.common.repository.store.TupleStreamTemplate;
 import uk.ac.ebi.uniprot.api.rest.respository.RepositoryConfig;
@@ -29,6 +27,8 @@ import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.ResultsConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.indexer.DataStoreManager;
+import uk.ac.ebi.uniprot.indexer.uniprot.mockers.UniProtEntryMocker;
 
 import java.util.stream.Stream;
 

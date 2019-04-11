@@ -16,9 +16,21 @@
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <solrj.version>7.5.0</solrj.version>
         <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
+        <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
     </properties>
 
     <dependencies>
+    	<dependency>
+    		   <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-search</artifactId>
+            <version>${uniprot-search.version}</version>
+    	</dependency>
+    	<dependency>
+    		   <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+            <version>${uniprot-search.version}</version>
+            <scope>test</scope>
+    	</dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -90,14 +102,14 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>stax2-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
+<!--                 <exclusion> -->
+<!--                     <groupId>org.codehaus.woodstox</groupId> -->
+<!--                     <artifactId>stax2-api</artifactId> -->
+<!--                 </exclusion> -->
+<!--                 <exclusion> -->
+<!--                     <groupId>org.codehaus.woodstox</groupId> -->
+<!--                     <artifactId>woodstox-core-asl</artifactId> -->
+<!--                 </exclusion> -->
             </exclusions>
         </dependency>
 
@@ -115,12 +127,12 @@
         </dependency>
 
         <!-- Tests -->
-           <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>data-service</artifactId>
-            <version>${data-service.version}</version>
-            <scope>test</scope>
-        </dependency>
+<!--            <dependency> -->
+<!--             <groupId>uk.ac.ebi.uniprot</groupId> -->
+<!--             <artifactId>data-service</artifactId> -->
+<!--             <version>${data-service.version}</version> -->
+<!--             <scope>test</scope> -->
+<!--         </dependency> -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -146,32 +158,32 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>unpack-dependencies</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>uk.ac.ebi.uniprot</groupId>
-                                    <artifactId>data-service-deployments</artifactId>
-                                    <version>${data-service.version}</version>
-                                    <type>tar.gz</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--             <plugin> -->
+<!--                 <groupId>org.apache.maven.plugins</groupId> -->
+<!--                 <artifactId>maven-dependency-plugin</artifactId> -->
+<!--                 <version>${maven-dependency-plugin.version}</version> -->
+<!--                 <executions> -->
+<!--                     <execution> -->
+<!--                         <id>unpack-dependencies</id> -->
+<!--                         <phase>generate-test-resources</phase> -->
+<!--                         <goals> -->
+<!--                             <goal>unpack</goal> -->
+<!--                         </goals> -->
+<!--                         <configuration> -->
+<!--                             <artifactItems> -->
+<!--                                 <artifactItem> -->
+<!--                                     <groupId>uk.ac.ebi.uniprot</groupId> -->
+<!--                                     <artifactId>data-service-deployments</artifactId> -->
+<!--                                     <version>${data-service.version}</version> -->
+<!--                                     <type>tar.gz</type> -->
+<!--                                     <overWrite>true</overWrite> -->
+<!--                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory> -->
+<!--                                 </artifactItem> -->
+<!--                             </artifactItems> -->
+<!--                         </configuration> -->
+<!--                     </execution> -->
+<!--                 </executions> -->
+<!--             </plugin> -->
         </plugins>
     </build>
 </project>

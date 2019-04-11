@@ -30,12 +30,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import uk.ac.ebi.uniprot.api.common.repository.DataStoreManager;
 import uk.ac.ebi.uniprot.api.uniprotkb.UniProtKBREST;
-import uk.ac.ebi.uniprot.api.uniprotkb.configuration.UniProtField;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.flatfile.parser.ffwriter.LineType;
+import uk.ac.ebi.uniprot.indexer.DataStoreManager;
+import uk.ac.ebi.uniprot.search.field.UniProtField;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})

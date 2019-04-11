@@ -10,7 +10,6 @@ import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.filters.FilterComponentType;
-import uk.ac.ebi.uniprot.dataservice.document.uniprot.UniProtDocument;
 import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.*;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.EntryInactiveReasonBuilder;
@@ -18,6 +17,7 @@ import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtAccessionBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtIdBuilder;
 import uk.ac.ebi.uniprot.json.parser.uniprot.UniprotJsonConfig;
+import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
 import java.io.IOException;
 import java.util.*;

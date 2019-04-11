@@ -15,11 +15,11 @@ import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.api.rest.validation.validator.FieldValueValidator;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.api.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
