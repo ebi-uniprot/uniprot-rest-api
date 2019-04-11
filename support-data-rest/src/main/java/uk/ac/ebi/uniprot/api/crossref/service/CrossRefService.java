@@ -6,8 +6,12 @@ import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
+import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryBuilder;
+import uk.ac.ebi.uniprot.api.crossref.config.CrossRefFacetConfig;
 import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
 import uk.ac.ebi.uniprot.api.crossref.repository.CrossRefRepository;
+import uk.ac.ebi.uniprot.api.crossref.request.CrossRefSearchRequest;
 
 import java.util.Optional;
 
@@ -16,6 +20,10 @@ public class CrossRefService {
     private static final String ACCESSION_STR = "accession";
     @Autowired
     private CrossRefRepository crossRefRepository;
+    @Autowired
+    private CrossRefFacetConfig crossRefFacetConfig;
+    @Autowired
+    private CrossRefSolrSortClause solrSortClause;
 
     public CrossRef findByAccession(final String accession) {
         try {
@@ -34,5 +42,28 @@ public class CrossRefService {
             throw new ServiceException(message, e);
         }
     }
+
+    public QueryResult<CrossRef> search(CrossRefSearchRequest request) {
+        SimpleQuery simpleQuery = createQuery(request);
+
+        QueryResult<CrossRef> results = crossRefRepository.searchPage(simpleQuery, request.getCursor(), request.getSize());
+
+        return results;
+    }
+
+    private SimpleQuery createQuery(CrossRefSearchRequest request) {
+        SolrQueryBuilder builder = new SolrQueryBuilder();
+        String requestedQuery = request.getQuery();
+
+        builder.query(requestedQuery);
+        builder.addSort(this.solrSortClause.getSort(request.getSort(), false));
+
+        if(request.hasFacets()) {
+            builder.facets(request.getFacetList());
+            builder.facetConfig(this.crossRefFacetConfig);
+        }
+        return builder.build();
+    }
+
 
 }

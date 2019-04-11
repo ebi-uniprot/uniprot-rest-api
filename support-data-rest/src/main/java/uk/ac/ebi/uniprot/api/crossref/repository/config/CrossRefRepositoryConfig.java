@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Configuration
-public class XrefRepositoryConfig {
+public class CrossRefRepositoryConfig {
     @Value("${spring.data.solr.zkHost}")
     private String zkHostString;
 
