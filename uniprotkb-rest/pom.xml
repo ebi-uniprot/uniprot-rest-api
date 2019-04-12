@@ -235,8 +235,8 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>uk.ac.ebi.uniprot</groupId>
-                                    <artifactId>data-service-deployments</artifactId>
-                                    <version>${data-service.version}</version>
+                                    <artifactId>uniprot-index-config</artifactId>
+                                    <version>${uniprot-search.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
