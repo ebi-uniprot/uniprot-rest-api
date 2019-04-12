@@ -1,7 +1,7 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.repository.store;
 
 import uk.ac.ebi.uniprot.api.common.repository.store.UUWStoreClient;
-import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
+import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 
 /**

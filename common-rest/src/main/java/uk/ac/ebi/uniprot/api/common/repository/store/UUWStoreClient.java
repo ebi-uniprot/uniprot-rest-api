@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.api.common.repository.store;
 
-import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
+import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.util.List;
 import java.util.Map;

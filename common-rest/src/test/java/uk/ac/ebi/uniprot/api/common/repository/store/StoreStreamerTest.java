@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 import uk.ac.ebi.uniprot.api.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.api.common.repository.store.StreamRequest;
 import uk.ac.ebi.uniprot.api.common.repository.store.TupleStreamTemplate;
-import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
+import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;
 import java.util.*;

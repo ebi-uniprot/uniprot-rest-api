@@ -21,14 +21,13 @@
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons-codec.version>1.11</commons-codec.version>
-        <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
-        <ujdk.version>2019.3-SNAPSHOT</ujdk.version>
         <poi.version>4.0.0</poi.version>
         <core.version>0.1-SNAPSHOT</core.version>
-             <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
+        <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
     </properties>
 
     <dependencies>
+    
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -55,17 +54,6 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-<!--         <dependency> -->
-<!--             <groupId>uk.ac.ebi.uniprot</groupId> -->
-<!--             <artifactId>data-service-common-document</artifactId> -->
-<!--             <version>${data-service.version}</version> -->
-<!--             <exclusions> -->
-<!--                 <exclusion> -->
-<!--                     <groupId>org.apache.solr</groupId> -->
-<!--                     <artifactId>solr-solrj</artifactId> -->
-<!--                 </exclusion> -->
-<!--             </exclusions> -->
-<!--         </dependency> -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-domain</artifactId>
@@ -73,7 +61,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -86,11 +74,23 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ff-parser</artifactId>
             <version>${core.version}</version>
+              <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>json-parser</artifactId>
             <version>${core.version}</version>
+              <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -104,16 +104,9 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>data-service-voldemort</artifactId>
-            <version>${data-service.version}</version>
+            <artifactId>uniprot-datastore</artifactId>
+            <version>${uniprot-search.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>tools-annotation-score</artifactId>
-            <version>${ujdk.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>failsafe</artifactId>
@@ -184,13 +177,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
-<!--         <dependency> -->
-<!--             <groupId>uk.ac.ebi.uniprot</groupId> -->
-<!--             <artifactId>data-service</artifactId> -->
-<!--             <version>${data-service.version}</version> -->
-<!--             <scope>test</scope> -->
-<!--         </dependency> -->
         
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -4,13 +4,16 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
-import uk.ac.ebi.kraken.interfaces.uniprot.DatabaseType;
-import uk.ac.ebi.kraken.interfaces.uniprot.ProteinExistence;
-import uk.ac.ebi.kraken.interfaces.uniprot.comments.CommentType;
-import uk.ac.ebi.kraken.interfaces.uniprot.features.FeatureType;
+
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypeDetail;
+import uk.ac.ebi.uniprot.domain.uniprot.ProteinExistence;
+import uk.ac.ebi.uniprot.domain.uniprot.comment.CommentType;
+import uk.ac.ebi.uniprot.domain.uniprot.feature.FeatureType;
+import uk.ac.ebi.uniprot.domain.uniprot.xdb.UniProtXDbDisplayOrder;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -414,9 +417,12 @@ public class RequestQueryParser {
         boolean isFieldNameType = termQuery.getTerm().field().equalsIgnoreCase("type");
 
         String value = termQuery.getTerm().text();
-        boolean isValueAValidDatabase = Arrays.stream(DatabaseType.values())
-                .anyMatch(databaseType -> databaseType.getName().equalsIgnoreCase(value) ||
-                        databaseType.name().equalsIgnoreCase(value));
+        List<UniProtXDbTypeDetail> dbxrefs= UniProtXDbDisplayOrder.INSTANCE.getOrderedDatabases();
+        
+        
+        boolean isValueAValidDatabase = dbxrefs.stream().map(UniProtXDbTypeDetail::getName)
+                .anyMatch(databaseType -> databaseType.equalsIgnoreCase(value) ||
+                        databaseType.equalsIgnoreCase(value));
 
         return isFieldNameType && isValueAValidDatabase;
     }

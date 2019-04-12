@@ -5,7 +5,7 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.slf4j.Logger;
-import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
+import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;
 import java.util.ArrayList;

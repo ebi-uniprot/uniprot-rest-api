@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
-import uk.ac.ebi.uniprot.dataservice.voldemort.VoldemortClient;
-import uk.ac.ebi.uniprot.dataservice.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
+import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
+import uk.ac.ebi.uniprot.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;

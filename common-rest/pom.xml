@@ -25,12 +25,34 @@
             <artifactId>uniprot-search</artifactId>
             <version>${uniprot-search.version}</version>
     	</dependency>
+    	  <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-datastore</artifactId>
+            <version>${uniprot-search.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.hibernate</groupId>
+                   <artifactId>hibernate-validator</artifactId>
+                   </exclusion>
+            </exclusions>
+        </dependency>
     	<dependency>
     		   <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
     	</dependency>
+    	   <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+             <version>${uniprot-search.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -73,18 +95,31 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>data-service-voldemort</artifactId>
-            <version>${data-service.version}</version>
-            <exclusions>
+                        <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>*</artifactId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>org.apache.logging.log4j</groupId>
+                  <artifactId>log4j-core</artifactId>
+                </exclusion>
+                   <exclusion>
+                	<groupId>org.apache.logging.log4j</groupId>
+                  <artifactId>log4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
+
+      
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
@@ -102,14 +137,10 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
-<!--                 <exclusion> -->
-<!--                     <groupId>org.codehaus.woodstox</groupId> -->
-<!--                     <artifactId>stax2-api</artifactId> -->
-<!--                 </exclusion> -->
-<!--                 <exclusion> -->
-<!--                     <groupId>org.codehaus.woodstox</groupId> -->
-<!--                     <artifactId>woodstox-core-asl</artifactId> -->
-<!--                 </exclusion> -->
+                <exclusion>
+                	<groupId>org.apache.logging.log4j</groupId>
+                  <artifactId>log4j-1.2-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -147,17 +178,17 @@
     </dependencies>
      <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--             <plugin> -->
+<!--                 <groupId>org.apache.maven.plugins</groupId> -->
+<!--                 <artifactId>maven-jar-plugin</artifactId> -->
+<!--                 <executions> -->
+<!--                     <execution> -->
+<!--                         <goals> -->
+<!--                             <goal>test-jar</goal> -->
+<!--                         </goals> -->
+<!--                     </execution> -->
+<!--                 </executions> -->
+<!--             </plugin> -->
 <!--             <plugin> -->
 <!--                 <groupId>org.apache.maven.plugins</groupId> -->
 <!--                 <artifactId>maven-dependency-plugin</artifactId> -->
