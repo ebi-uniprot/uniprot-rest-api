@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author lgonzales
  */
-class SolrQueryRepositoryTest {
+class SolrQueryRepositoryIT {
 
     private static GeneralSolrQueryRepository queryRepo;
 

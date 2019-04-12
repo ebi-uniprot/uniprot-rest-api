@@ -36,7 +36,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 @RunWith(MockitoJUnitRunner.class)
-public class StoreStreamerTest {
+public class StoreStreamerIT {
     private static final String ID = "id";
     private static final String DEFAULTS = "defaults";
     private static final String FAKE_QUERY = "any query";
@@ -45,7 +45,7 @@ public class StoreStreamerTest {
     private FakeVoldemortClient fakeVoldemortClient;
     private StoreStreamer<String> storeStreamer;
     private StreamRequest streamRequest;
-    private static final Logger LOGGER = getLogger(StoreStreamerTest.class);
+    private static final Logger LOGGER = getLogger(StoreStreamerIT.class);
     public static String transformString(String id) {
         return id + "-transformed";
     }
@@ -175,7 +175,7 @@ public class StoreStreamerTest {
         @Override
         public List<String> getEntries(Iterable<String> iterable) {
             return StreamSupport.stream(iterable.spliterator(), false)
-                    .map(StoreStreamerTest::transformString)
+                    .map(StoreStreamerIT::transformString)
                     .collect(Collectors.toList());
         }
 

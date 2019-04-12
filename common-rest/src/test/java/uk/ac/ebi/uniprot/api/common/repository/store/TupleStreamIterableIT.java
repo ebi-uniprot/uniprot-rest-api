@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
  * @author Edd
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TupleStreamIterableTest {
+public class TupleStreamIterableIT {
     private final static String ID = "id";
 
     @Rule
