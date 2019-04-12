@@ -23,7 +23,7 @@ import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager.StoreType;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.UniProtDocMocker;
-import uk.ac.ebi.uniprot.search.document.SolrCollection;
+import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
 import java.util.Arrays;

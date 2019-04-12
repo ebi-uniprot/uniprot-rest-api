@@ -2,8 +2,8 @@ package uk.ac.ebi.uniprot.api.crossref.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.ac.ebi.uniprot.api.crossref.model.CrossRefAllFields;
-import uk.ac.ebi.uniprot.api.rest.search.SearchFieldType;
-import uk.ac.ebi.uniprot.api.rest.validation.validator.SolrQueryFieldValidator;
+import uk.ac.ebi.uniprot.search.field.SearchFieldType;
+import uk.ac.ebi.uniprot.search.field.validator.SolrQueryFieldValidator;
 
 /**
  * This is used in conjunction with @ValidSolrQueryFields request validator

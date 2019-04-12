@@ -16,7 +16,8 @@ import uk.ac.ebi.uniprot.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.KeywordRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.PathwayRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import uk.ac.ebi.uniprot.search.document.SolrCollection;
+import uk.ac.ebi.uniprot.search.SolrCollection;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 
