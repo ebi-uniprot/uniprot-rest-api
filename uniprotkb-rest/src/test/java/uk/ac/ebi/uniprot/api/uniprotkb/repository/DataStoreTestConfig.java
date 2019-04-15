@@ -62,7 +62,7 @@ public class DataStoreTestConfig {
     public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
         UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
                                                                                .getInstance("avro-uniprot"));
-     //   dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
+       dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
         return storeClient;
     }
 
