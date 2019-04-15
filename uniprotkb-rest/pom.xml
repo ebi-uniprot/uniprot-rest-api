@@ -42,18 +42,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>configure-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>common-rest</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
+		 <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>support-data-rest</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-domain</artifactId>
@@ -168,7 +166,12 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
-
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-core</artifactId>
+    <version>2.27.0</version>
+    <scope>test</scope>
+</dependency>
         <!-- Tests -->
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>

@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.contains;
 
 class FieldsParserTest {
 
@@ -43,7 +44,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("comment"));
 		List<String> comments = filters.get("comment");
-		assertThat(comments, hasItems("function","domain" ));
+		assertThat(comments, contains("function","domain" ));
 	}
 	
 	@Test
@@ -55,7 +56,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("comment"));
 		List<String> comments = filters.get("comment");
-		assertThat(comments, hasItems("function","domain" ));
+		assertThat(comments, contains("function","domain" ));
 	}
 	
 	@Test
@@ -67,7 +68,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("comment"));
 		List<String> comments = filters.get("comment");
-		assertThat(comments, hasItems("function","domain" ));
+		assertThat(comments, contains("function","domain" ));
 	}
 	
 	
@@ -91,7 +92,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("feature"));
 		List<String> comments = filters.get("feature");
-		assertThat(comments, hasItems("binding","signal" ));
+		assertThat(comments, contains("binding","signal" ));
 	}
 	@Test
 	void withFeatureFTSpecific() {
@@ -102,7 +103,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("feature"));
 		List<String> comments = filters.get("feature");
-		assertThat(comments, hasItems("binding","signal" ));
+		assertThat(comments, contains("binding","signal" ));
 	}
 	@Test
 	void withFTSpecific() {
@@ -113,7 +114,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("feature"));
 		List<String> comments = filters.get("feature");
-		assertThat(comments, hasItems("binding","signal" ));
+		assertThat(comments, contains("binding","signal" ));
 	}
 	
 	@Test
@@ -136,7 +137,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("xref"));
 		List<String> comments = filters.get("xref");
-		assertThat(comments, hasItems("embl","pdb" ));
+		assertThat(comments, contains("embl","pdb" ));
 	}
 	@Test
 	void withXrefDRSpecific() {
@@ -147,7 +148,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("xref"));
 		List<String> comments = filters.get("xref");
-		assertThat(comments, hasItems("embl","pdb" ));
+		assertThat(comments, contains("embl","pdb" ));
 	}
 	@Test
 	void withDRSpecific() {
@@ -158,7 +159,7 @@ class FieldsParserTest {
 		assertTrue(filters.containsKey("organism"));
 		assertTrue(filters.containsKey("xref"));
 		List<String> comments = filters.get("xref");
-		assertThat(comments, hasItems("embl","pdb" ));
+		assertThat(comments, contains("embl","pdb" ));
 	}
 	@Test
 	void withGenes() {
