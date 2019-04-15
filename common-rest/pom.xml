@@ -162,7 +162,12 @@
             <version>2.21.0</version>
             <scope>test</scope>
         </dependency>
- 
+   		 <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+             <version>${uniprot-search.version}</version>
+            <scope>test</scope>
+        </dependency>
     	   <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
