@@ -26,6 +26,7 @@ import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryReposi
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.ResultsConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtEntryService;
+import uk.ac.ebi.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.UniProtEntryMocker;
@@ -51,9 +52,10 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
 @RunWith(SpringRunner.class)
 @WebMvcTest({UniprotKBController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniprotFacetConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
-         UniProtStoreConfig.class, ResultsConfig.class, MessageConverterConfig.class, UniprotKBConfig.class})
+         UniProtStoreConfig.class, ResultsConfig.class,
+         MessageConverterConfig.class, UniprotKBConfig.class})
 @AutoConfigureWebClient
-public class UniProtKBDownloadTest {
+public class UniProtKBDownloadIT {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
 
