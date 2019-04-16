@@ -20,7 +20,6 @@ import uk.ac.ebi.uniprot.api.crossref.controller.CrossRefController;
 import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
 import uk.ac.ebi.uniprot.api.crossref.service.CrossRefService;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
-import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 
 import java.util.UUID;
 
@@ -40,7 +39,7 @@ public class CrossRefControllerTest {
     @Test
     void testGetCrossRefByAccession() throws Exception {
         String accession = "DB-1234";
-        CrossRefDocument crossRef = createDBXRef();
+        CrossRef crossRef = createDBXRef();
         Mockito.when(this.crossRefService.findByAccession(accession)).thenReturn(crossRef);
 
         ResultActions response = this.mockMvc.perform(
@@ -52,7 +51,7 @@ public class CrossRefControllerTest {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
-                .andExpect(jsonPath("$.name", equalTo(crossRef.getNameOnly())))
+                .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))
                 .andExpect(jsonPath("$.pubMedId", equalTo(crossRef.getPubMedId())))
                 .andExpect(jsonPath("$.doiId", equalTo(crossRef.getDoiId())))
                 .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
@@ -61,7 +60,7 @@ public class CrossRefControllerTest {
                 .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())));
     }
 
-    private CrossRefDocument createDBXRef(){
+    private CrossRef createDBXRef(){
         String random = UUID.randomUUID().toString();
         String ac = random + "-AC-";
         String ab = random + "-AB-";
@@ -73,9 +72,9 @@ public class CrossRefControllerTest {
         String du = random + "-DU-";
         String ct = random + "-CT-";
 
-        CrossRefDocument.CrossRefDocumentBuilder builder = CrossRefDocument.builder();
+        CrossRef.CrossRefBuilder builder = CrossRef.builder();
         builder.abbrev(ab).accession(ac).category(ct).dbUrl(du);
-        builder.doiId(di).linkType(lt).nameOnly(nm).pubMedId(pb).server(sr);
+        builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
         return builder.build();
     }
 }

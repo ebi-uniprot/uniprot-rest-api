@@ -12,7 +12,6 @@ import uk.ac.ebi.uniprot.api.crossref.config.CrossRefFacetConfig;
 import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
 import uk.ac.ebi.uniprot.api.crossref.repository.CrossRefRepository;
 import uk.ac.ebi.uniprot.api.crossref.request.CrossRefSearchRequest;
-import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 
 import java.util.Optional;
 
@@ -26,10 +25,10 @@ public class CrossRefService {
     @Autowired
     private CrossRefSolrSortClause solrSortClause;
 
-    public CrossRefDocument findByAccession(final String accession) {
+    public CrossRef findByAccession(final String accession) {
         try {
             SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION_STR).is(accession.toUpperCase()));
-            Optional<CrossRefDocument> optionalDoc = crossRefRepository.getEntry(simpleQuery);
+            Optional<CrossRef> optionalDoc = crossRefRepository.getEntry(simpleQuery);
 
             if (optionalDoc.isPresent()) {
                 return optionalDoc.get();
@@ -44,10 +43,10 @@ public class CrossRefService {
         }
     }
 
-    public QueryResult<CrossRefDocument> search(CrossRefSearchRequest request) {
+    public QueryResult<CrossRef> search(CrossRefSearchRequest request) {
         SimpleQuery simpleQuery = createQuery(request);
 
-        QueryResult<CrossRefDocument> results = crossRefRepository.searchPage(simpleQuery, request.getCursor(), request.getSize());
+        QueryResult<CrossRef> results = crossRefRepository.searchPage(simpleQuery, request.getCursor(), request.getSize());
 
         return results;
     }

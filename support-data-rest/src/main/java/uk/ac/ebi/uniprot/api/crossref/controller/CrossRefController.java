@@ -10,7 +10,6 @@ import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
 import uk.ac.ebi.uniprot.api.crossref.request.CrossRefSearchRequest;
 import uk.ac.ebi.uniprot.api.crossref.service.CrossRefService;
 import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
-import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,16 +25,16 @@ public class CrossRefController {
     private ApplicationEventPublisher eventPublisher;
 
     @GetMapping(value = "/accession/{accessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CrossRefDocument getByAccession(@PathVariable("accessionId") String accession){
-        CrossRefDocument crossRef = crossRefService.findByAccession(accession);
+    public CrossRef getByAccession(@PathVariable("accessionId") String accession){
+        CrossRef crossRef = crossRefService.findByAccession(accession);
         return crossRef;
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public QueryResult<CrossRefDocument> searchCursor(@Valid CrossRefSearchRequest searchRequest,
+    public QueryResult<CrossRef> searchCursor(@Valid CrossRefSearchRequest searchRequest,
                                               HttpServletRequest request, HttpServletResponse response) {
 
-        QueryResult<CrossRefDocument> result = crossRefService.search(searchRequest);
+        QueryResult<CrossRef> result = crossRefService.search(searchRequest);
 
         this.eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
 
