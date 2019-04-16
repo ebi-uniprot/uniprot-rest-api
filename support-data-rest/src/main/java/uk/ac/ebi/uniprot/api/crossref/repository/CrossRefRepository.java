@@ -6,7 +6,6 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
 
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
-import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 

@@ -4,20 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import uk.ac.ebi.uniprot.api.crossref.controller.CrossRefController;
-import uk.ac.ebi.uniprot.api.crossref.model.CrossRef;
 import uk.ac.ebi.uniprot.api.crossref.service.CrossRefService;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
@@ -25,7 +21,6 @@ import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
@@ -52,7 +47,7 @@ public class CrossRefControllerTest {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
-                .andExpect(jsonPath("$.name", equalTo(crossRef.getNameOnly())))
+                .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))
                 .andExpect(jsonPath("$.pubMedId", equalTo(crossRef.getPubMedId())))
                 .andExpect(jsonPath("$.doiId", equalTo(crossRef.getDoiId())))
                 .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
@@ -75,7 +70,7 @@ public class CrossRefControllerTest {
 
         CrossRefDocument.CrossRefDocumentBuilder builder = CrossRefDocument.builder();
         builder.abbrev(ab).accession(ac).category(ct).dbUrl(du);
-        builder.doiId(di).linkType(lt).nameOnly(nm).pubMedId(pb).server(sr);
+        builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
         return builder.build();
     }
 }
