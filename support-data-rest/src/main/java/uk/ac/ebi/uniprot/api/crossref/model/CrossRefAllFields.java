@@ -3,7 +3,7 @@ package uk.ac.ebi.uniprot.api.crossref.model;
 public enum CrossRefAllFields {
     ACCESSION("accession", true, true),
     ABBREV("abbrev", true, true),
-    NAME("name", true, true),
+    NAME("nameOnly", true, true),
     DOIID("doi_id", true, true),
     PUBMEDID("pubmed_id", true, true),
     LINKTYPE("link_type", true, true),
