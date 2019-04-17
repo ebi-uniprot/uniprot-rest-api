@@ -3,7 +3,7 @@ package uk.ac.ebi.uniprot.api.crossref.model;
 public enum CrossRefValidSortFields {
     ACCESSION("accession"),
     ABBREV("abbrev"),
-    NAME("name"),
+    NAME("nameOnly"),
     DOIID("doi_id"),
     PUBMEDID("pubmed_id"),
     LINKTYPE("link_type"),
