@@ -21,8 +21,8 @@ import uk.ac.ebi.uniprot.search.SolrCollection;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import uk.ac.ebi.uniprot.indexer.document.impl.InactiveEntryConverter;
-import uk.ac.ebi.uniprot.indexer.document.impl.UniprotEntryConverter;
+import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.InactiveEntryConverter;
+import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.UniProtEntryConverter;
 import static org.mockito.Mockito.mock;
 
 
@@ -67,7 +67,7 @@ public class DataStoreTestConfig {
     }
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
-        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniprotEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
                 GoRelationsRepoMocker.getGoRelationRepo(),  KeywordRepoMocker.getKeywordRepo(),
                 PathwayRepoMocker.getPathwayRepo()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
