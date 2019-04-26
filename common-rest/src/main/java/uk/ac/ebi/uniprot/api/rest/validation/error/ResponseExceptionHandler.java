@@ -13,7 +13,6 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryRetrievalException;
@@ -22,7 +21,10 @@ import uk.ac.ebi.uniprot.common.Utils;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -174,9 +176,14 @@ public class ResponseExceptionHandler {
      *
      * @author lgonzales
      */
+    @XmlRootElement
     public static class ErrorInfo {
         private final String url;
         private final List<String> messages;
+
+        private ErrorInfo(){
+            this("", Collections.emptyList());
+        }
 
         ErrorInfo(String url, List<String> messages) {
             assert url != null : "Error URL cannot be null";
@@ -186,10 +193,12 @@ public class ResponseExceptionHandler {
             this.messages = messages;
         }
 
+        @XmlElement
         public String getUrl() {
             return url;
         }
 
+        @XmlElement
         public List<String> getMessages() {
             return messages;
         }

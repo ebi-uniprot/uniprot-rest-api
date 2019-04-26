@@ -9,11 +9,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageConverter;
+import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.api.uniprotkb.output.converter.*;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
@@ -69,6 +69,7 @@ public class MessageConverterConfig {
                 converters.add(new UniProtKBTsvMessageConverter());
                 converters.add(new UniProtKBXslMessageConverter());
                 converters.add(new ErrorMessageConverter());
+                converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(0, new UniProtKBXmlMessageConverter());
                 converters.add(1, new UniProtKBJsonMessageConverter());
             }

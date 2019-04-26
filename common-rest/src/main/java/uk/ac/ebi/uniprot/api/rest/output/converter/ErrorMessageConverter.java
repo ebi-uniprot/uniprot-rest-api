@@ -5,7 +5,6 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.rest.validation.error.ResponseExceptionHandler;
 
@@ -13,7 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * This class is reponsible to write error message body for http status BAD REQUESTS (400)
+ * This class is responsible to write error message body for http status BAD REQUESTS (400)
  *
  * @author lgonzales
  */
