@@ -23,7 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class UniProtKBJsonMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     private static final Logger LOGGER = getLogger(UniProtKBJsonMessageConverter.class);
-    private final ObjectMapper objectMapper = UniprotJsonConfig.getInstance().getPrettyObjectMapper();
+    private final ObjectMapper objectMapper = UniprotJsonConfig.getInstance().getSimpleObjectMapper();
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
 
