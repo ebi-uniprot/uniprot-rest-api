@@ -3,10 +3,7 @@ package uk.ac.ebi.uniprot.api.rest.pagination;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
-import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
-import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsListener;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +40,7 @@ class PaginatedResultsListenerTest {
         assertEquals("120",response.getHeader("X-TotalRecords"));
 
         assertNotNull(response.getHeader("Link"));
-        String expectedNextLink = "<http://localhost/test?cursor=apidd3vzjype5ypqugz6&size=10>; rel=\"next\"";
+        String expectedNextLink = "<https://localhost/test?cursor=apidd3vzjype5ypqugz6&size=10>; rel=\"next\"";
         assertEquals(expectedNextLink,response.getHeader("Link"));
     }
 

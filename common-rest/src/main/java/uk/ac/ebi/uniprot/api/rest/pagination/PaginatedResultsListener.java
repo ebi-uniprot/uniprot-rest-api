@@ -3,7 +3,6 @@ package uk.ac.ebi.uniprot.api.rest.pagination;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.page.Page;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +50,10 @@ public class PaginatedResultsListener implements ApplicationListener<PaginatedRe
      *
      * @return the complete url
      */
-    private static String createLinkHeader(final String uri, final String rel) {
+    private static String createLinkHeader(String uri, String rel) {
+        if(uri.startsWith("http:")) {
+            uri = uri.replaceFirst("http", "https");
+        }
         return "<" + uri + ">; rel=\"" + rel + "\"";
     }
 

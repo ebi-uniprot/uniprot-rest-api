@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import uk.ac.ebi.uniprot.api.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
@@ -71,7 +70,7 @@ public class UniprotKBSearchPaginationControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords","26"))
                 .andExpect(header().string(HttpHeaders.LINK,notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK,is("<http://localhost/uniprotkb/search?query=*:*" +
+                .andExpect(header().string(HttpHeaders.LINK,is("<https://localhost/uniprotkb/search?query=*:*" +
                         "&cursor=tov32hc7k09uw9s4h3dh2mqy7i5vh&size=25>; rel=\"next\"")))
                 .andExpect(jsonPath("$.results.size()", is(25)));
     }
@@ -117,7 +116,7 @@ public class UniprotKBSearchPaginationControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords","6"))
                 .andExpect(header().string(HttpHeaders.LINK,notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK,is("<http://localhost/uniprotkb/search?query=*:*" +
+                .andExpect(header().string(HttpHeaders.LINK,is("<https://localhost/uniprotkb/search?query=*:*" +
                         "&cursor=4f6ow1f2ng27h9w20bdqm103jdbx&size=5>; rel=\"next\"")))
                 .andExpect(jsonPath("$.results.size()", is(5)));
 
