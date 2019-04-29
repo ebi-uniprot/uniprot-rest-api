@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.crossref.repository.config;
+package uk.ac.ebi.uniprot.api.configure.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Configuration
-public class CrossRefRepositoryConfig {
+public class SupportingDataRepositoryConfig {
     @Value("${spring.data.solr.zkHost}")
     private String zkHostString;
 
