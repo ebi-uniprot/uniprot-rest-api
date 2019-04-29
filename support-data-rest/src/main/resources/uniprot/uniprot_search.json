@@ -459,10 +459,10 @@
 				"example": "intracistenal"
 			},
 			{
-				"id": "id_biotechnolog",
+				"id": "id_biotechnology",
 				"label": "Biotechnological use",
 				"itemType": "comment",
-				"term": "biotechnolog",
+				"term": "biotechnology",
 				"dataType": "string",
 				"hasEvidence": true,
 				"description": "Search by Comment Biotechnological use",

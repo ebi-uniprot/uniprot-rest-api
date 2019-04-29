@@ -95,7 +95,7 @@ class UniProtEntryQueryResultsConverter {
 
             try {
                 byte[] decodeEntry = Base64.getDecoder().decode(doc.avro_binary);
-                ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getObjectMapper();
+                ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getFullObjectMapper();
                 uniProtEntry = jsonMapper.readValue(decodeEntry, UniProtEntry.class);
             }catch (IOException e){
                 LOGGER.info("Error converting solr avro_binary default UniProtEntry",e);

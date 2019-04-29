@@ -60,7 +60,7 @@ public class ResultsConfig {
     private UniProtEntry convertDefaultAvroToUniProtEntry(String s) {
         UniProtEntry result = null;
         try {
-            ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getObjectMapper();
+            ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getFullObjectMapper();
             result = jsonMapper.readValue(Base64.getDecoder().decode(s),UniProtEntry.class);
         } catch (IOException e) {
             LOGGER.error("Error converting DefaultAvro to UniProtEntry",e);

@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-
 import uk.ac.ebi.uniprot.api.crossref.controller.CrossRefController;
 import uk.ac.ebi.uniprot.api.crossref.service.CrossRefService;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
@@ -20,13 +19,13 @@ import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes=SupportDataApplication.class)
 @WebMvcTest(CrossRefController.class)
-public class CrossRefControllerTest {
+class CrossRefControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -40,7 +39,7 @@ public class CrossRefControllerTest {
 
         ResultActions response = this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/v1/xref/accession/" + accession)
+                        .get("/xref/accession/" + accession)
                         .param("accessionId", accession)
         );
 
@@ -53,7 +52,9 @@ public class CrossRefControllerTest {
                 .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
                 .andExpect(jsonPath("$.server", equalTo(crossRef.getServer())))
                 .andExpect(jsonPath("$.dbUrl", equalTo(crossRef.getDbUrl())))
-                .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())));
+                .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
+                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
+                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
     }
 
     private CrossRefDocument createDBXRef(){
@@ -71,6 +72,7 @@ public class CrossRefControllerTest {
         CrossRefDocument.CrossRefDocumentBuilder builder = CrossRefDocument.builder();
         builder.abbrev(ab).accession(ac).category(ct).dbUrl(du);
         builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
+        builder.reviewedProteinCount(2L).unreviewedProteinCount(3L);
         return builder.build();
     }
 }

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/v1/xref")
+@RequestMapping("/xref")
 @Validated
 public class CrossRefController {
     @Autowired
