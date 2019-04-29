@@ -1,13 +1,12 @@
 package uk.ac.ebi.uniprot.configure.api.util;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
 import uk.ac.ebi.uniprot.api.configure.util.SolrQueryConverter;
 
@@ -216,7 +215,7 @@ class SolrQueryConverterTest {
     }
 
     private static Query getQueryFromString(String query){
-        QueryParser qp = new QueryParser("", new StandardAnalyzer());
+        QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
         qp.setAllowLeadingWildcard(true);
         try {
             return qp.parse(query);

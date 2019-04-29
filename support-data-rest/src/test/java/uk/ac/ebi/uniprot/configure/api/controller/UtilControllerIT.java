@@ -52,7 +52,7 @@ class UtilControllerIT {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.type",is("termQuery")))
                 .andExpect(jsonPath("$.field",is("accession")))
-                .andExpect(jsonPath("$.value",is("p21802")));
+                .andExpect(jsonPath("$.value",is("P21802")));
     }
 
     @Test
