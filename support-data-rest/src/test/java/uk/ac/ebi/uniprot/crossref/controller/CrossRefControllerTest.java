@@ -39,7 +39,7 @@ class CrossRefControllerTest {
 
         ResultActions response = this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/v1/xref/accession/" + accession)
+                        .get("/xref/accession/" + accession)
                         .param("accessionId", accession)
         );
 
@@ -52,7 +52,9 @@ class CrossRefControllerTest {
                 .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
                 .andExpect(jsonPath("$.server", equalTo(crossRef.getServer())))
                 .andExpect(jsonPath("$.dbUrl", equalTo(crossRef.getDbUrl())))
-                .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())));
+                .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
+                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
+                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
     }
 
     private CrossRefDocument createDBXRef(){
@@ -70,6 +72,7 @@ class CrossRefControllerTest {
         CrossRefDocument.CrossRefDocumentBuilder builder = CrossRefDocument.builder();
         builder.abbrev(ab).accession(ac).category(ct).dbUrl(du);
         builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
+        builder.reviewedProteinCount(2L).unreviewedProteinCount(3L);
         return builder.build();
     }
 }
