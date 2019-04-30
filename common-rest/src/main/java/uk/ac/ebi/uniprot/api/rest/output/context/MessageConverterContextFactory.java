@@ -37,6 +37,6 @@ public class MessageConverterContextFactory<T> {
     }
 
     public enum Resource {
-        UNIPROT, UNIREF, UNIPARC
+        UNIPROT, UNIREF, UNIPARC, PROTEOME
     }
 }

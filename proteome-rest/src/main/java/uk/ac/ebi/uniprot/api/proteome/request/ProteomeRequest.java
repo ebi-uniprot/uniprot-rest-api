@@ -10,6 +10,7 @@ import javax.validation.constraints.Positive;
 import lombok.Data;
 import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
+import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
@@ -35,6 +36,9 @@ public class ProteomeRequest {
 	    private String sort;
 
 	    private String cursor;
+	    
+	    @ValidReturnFields(fieldValidatorClazz = ProteomeReturnFieldsValidator.class)
+	    private String fields;
 
 	    @ValidFacets(facetConfig = ProteomeFacetConfig.class)
 	    private String facets;
