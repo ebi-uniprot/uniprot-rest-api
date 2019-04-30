@@ -75,6 +75,7 @@ public class UniprotKBByAccessionControllerIT {
                 .andExpect(jsonPath("$.messages.*",contains("Resource not found")));
     }
 
+    @Test
     public void invalidAccessionParametersFromAccessionEndpointReturnBadRequest() throws Exception {
         // given
         String acc = saveEntry();

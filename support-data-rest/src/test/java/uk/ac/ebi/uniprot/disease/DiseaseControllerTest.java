@@ -6,12 +6,16 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.disease.DiseaseController;
 import uk.ac.ebi.uniprot.api.disease.DiseaseService;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
@@ -24,8 +28,11 @@ import uk.ac.ebi.uniprot.domain.builder.DiseaseBuilder;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes=SupportDataApplication.class)
@@ -58,6 +65,40 @@ class DiseaseControllerTest {
                 .andExpect(jsonPath("$.crossReferences.size()", equalTo(disease.getCrossReferences().size())))
                 .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(disease.getReviewedProteinCount().toString()))))
                 .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(disease.getUnreviewedProteinCount().toString()))));
+    }
+
+    @Test
+    void invalidAccessionFormat() throws Exception {
+        // Wrong format other than DI-xxxxx
+        String accession = "RANDOM";
+
+        // when
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.
+                get("/disease/accession/" + accession)
+                .param("accessionId", accession));
+
+        // then
+        response.andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages[0]",
+                        equalTo("Invalid accession format. Expected DI-xxxxx")));
+    }
+
+    @Test
+    void nonExistingAccession() throws Exception {
+        String accession = "DI-00000";
+        Mockito.when(this.diseaseService.findByAccession(accession)).thenThrow(new ResourceNotFoundException("{search.not.found}"));
+        // when
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.
+                get("/disease/accession/" + accession)
+                .param("accessionId", accession));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("Resource not found")));
     }
 
     private Disease createDisease(){
