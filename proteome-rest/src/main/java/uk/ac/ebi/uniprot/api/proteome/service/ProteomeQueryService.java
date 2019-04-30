@@ -38,10 +38,10 @@ public class ProteomeQueryService {
 	private final ProteomeSortClause solrSortClause;
 
 	public ProteomeQueryService(ProteomeQueryRepository repository, ProteomeFacetConfig facetConfig,
-			ProteomeEntryConverter proteomeConverter, ProteomeSortClause solrSortClause) {
+			ProteomeSortClause solrSortClause) {
 		this.repository = repository;
 		this.facetConfig = facetConfig;
-		this.proteomeConverter = proteomeConverter;
+		this.proteomeConverter =new  ProteomeEntryConverter();
 		this.solrSortClause = solrSortClause;
 	}
 
@@ -87,7 +87,13 @@ public class ProteomeQueryService {
 		try {
 		Optional<ProteomeDocument> optionalDoc = repository.getEntry(simpleQuery);
 		if(optionalDoc.isPresent()) {
-			return proteomeConverter.apply(optionalDoc.get());
+			ProteomeEntry entry = proteomeConverter.apply(optionalDoc.get());
+			if(entry ==null) {
+				 String message = "Could not convert Proteome entry from document for: [" + upid + "]";
+				 throw new ServiceException(message);
+			}
+			else
+				return entry;
 		}else {
 			throw new ResourceNotFoundException("{search.not.found}");
 		}
