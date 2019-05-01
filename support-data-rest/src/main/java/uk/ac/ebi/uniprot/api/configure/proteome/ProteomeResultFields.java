@@ -26,7 +26,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.JsonConfig;
 
 public enum ProteomeResultFields {
 	INSTANCE;
-	private static final String FILENAME = "proteome/prtoeome_result_field.json";
+	private static final String FILENAME = "proteome/proteome_result_field.json";
 	private List<FieldGroup> resultFields = new ArrayList<>();
 	private Map<String, Field> fieldMap = new HashMap<>();
 
@@ -37,8 +37,9 @@ public enum ProteomeResultFields {
 	void init() {
 		ObjectMapper objectMapper = JsonConfig.getJsonMapper();
 		try (InputStream is = ProteomeResultFields.class.getClassLoader().getResourceAsStream(FILENAME);) {
-			List<FieldGroupImpl> fields = objectMapper.readValue(is, new TypeReference<List<FieldGroupImpl>>() {
-			});
+			List<FieldGroupImpl> fields = objectMapper.readValue(is,
+					new TypeReference<List<FieldGroupImpl>>() {
+					});
 			this.resultFields.addAll(fields);
 			this.fieldMap = this.resultFields.stream().flatMap(val -> val.getFields().stream())
 					.collect(Collectors.toMap(Field::getName, Function.identity()));

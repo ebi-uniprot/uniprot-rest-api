@@ -2,11 +2,14 @@ package uk.ac.ebi.uniprot.api.proteome.controller;
 
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,6 +35,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import uk.ac.ebi.uniprot.api.proteome.ProteomeRestApplication;
+import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.xml.XmlChainIterator;
 import uk.ac.ebi.uniprot.xml.jaxb.proteome.Proteome;
@@ -100,7 +104,56 @@ public class ProteomeControllerIT {
 	                .andExpect(status().is(HttpStatus.OK.value()))
 	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
 	                .andExpect(jsonPath("$.results.*.id.value", hasItem(upid)));
+	        
+	        
+
+	        
+	        
 	    }
+	    
+	    @Test
+	    public void searchByOragnismIdAndTsv() throws Exception {
+	        // given
+	        String upid = saveEntry("UP000001940.xml","UP000001941"  );
+	     
+	        String resource=  SEARCH_RESOURCE + "?query=organism_id:6239";
+
+	        
+
+	        // when
+	        ResultActions  response = mockMvc.perform(
+	                get(resource)
+	                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE_VALUE));
+
+	        // then
+	        response.andDo(print())
+	                .andExpect(status().is(HttpStatus.OK.value()))
+	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+	                .andExpect(content().string(containsString(upid)));        	        
+	    }
+	    
+	    
+	    @Test
+	    public void searchByOragnismIdAndXml() throws Exception {
+	        // given
+	        String upid = saveEntry("UP000001940.xml","UP000001942"  );
+	     
+	        String resource=  SEARCH_RESOURCE + "?query=organism_id:6239";
+
+	        
+
+	        // when
+	        ResultActions  response = mockMvc.perform(
+	                get(resource)
+	                        .header(ACCEPT, APPLICATION_XML_VALUE));
+
+	        // then
+	        response.andDo(print())
+	                .andExpect(status().is(HttpStatus.OK.value()))
+	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+	                .andExpect(content().string(containsString(upid)));        	        
+	    }
+	    
 	    
 	    private List<String> saveEntries(String file) {
 	    	  List<String> files = Arrays.asList(
