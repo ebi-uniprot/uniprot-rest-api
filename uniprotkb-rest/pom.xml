@@ -21,7 +21,6 @@
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons-codec.version>1.11</commons-codec.version>
-        <poi.version>4.0.0</poi.version>
         <core.version>0.1-SNAPSHOT</core.version>
         <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
     </properties>
@@ -153,18 +152,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
-        </dependency>
-
-        <!-- Excel writer -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
         </dependency>
 
         <!-- Tests -->

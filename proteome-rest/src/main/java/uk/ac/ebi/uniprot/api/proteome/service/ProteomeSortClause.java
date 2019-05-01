@@ -1,6 +1,12 @@
 package uk.ac.ebi.uniprot.api.proteome.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 
 import uk.ac.ebi.uniprot.api.rest.search.AbstractSolrSortClause;
 import uk.ac.ebi.uniprot.search.field.ProteomeField;
@@ -11,17 +17,25 @@ import uk.ac.ebi.uniprot.search.field.ProteomeField;
  * @date: 29 Apr 2019
  *
 */
-
+@Component
 public class ProteomeSortClause extends AbstractSolrSortClause {
 
 	@Override
 	protected Sort createDefaultSort(boolean hasScore) {
-		 Sort sort = new Sort(Sort.Direction.DESC, ProteomeField.Sort.annotation_score.getSolrFieldName());
-	        if(hasScore){
-	            sort =sort.and( new Sort(Sort.Direction.DESC, "score"));
-	        }
-	        return sort;
+		  return new Sort(Sort.Direction.DESC, ProteomeField.Sort.annotation_score.getSolrFieldName())
+	                .and(new Sort(Sort.Direction.ASC, ProteomeField.Sort.upid.getSolrFieldName()));
 	}
-
+	@Override
+	  protected List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
+		List<Pair<String, Sort.Direction>> fieldSortPairs =super.parseSortClause(sortClause);
+		if (fieldSortPairs.stream().anyMatch(val -> val.getLeft().equals(ProteomeField.Sort.upid.getSolrFieldName()))) {
+			return fieldSortPairs;
+		}else {
+			List<Pair<String, Sort.Direction>> newFieldSortPairs =new ArrayList<>();
+			newFieldSortPairs.addAll(fieldSortPairs);
+			newFieldSortPairs.add(new ImmutablePair<>(ProteomeField.Sort.upid.getSolrFieldName(),Sort.Direction.ASC ));
+			return newFieldSortPairs;
+		}
+	}
 }
 

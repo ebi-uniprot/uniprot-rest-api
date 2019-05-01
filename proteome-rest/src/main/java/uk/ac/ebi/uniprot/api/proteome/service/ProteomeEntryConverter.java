@@ -31,7 +31,7 @@ public class ProteomeEntryConverter implements Function<ProteomeDocument, Proteo
 
 	public ProteomeEntryConverter(boolean filterGene) {
 		this.filterGene =filterGene;
-		objectMapper = ProteomeJsonConfig.getInstance().getDefaultFullObjectMapper();
+		objectMapper = ProteomeJsonConfig.getInstance().getFullObjectMapper();
 		
 	}
 

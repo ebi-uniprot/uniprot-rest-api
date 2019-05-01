@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.api.proteome.controller;
 
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -49,6 +50,7 @@ import uk.ac.ebi.uniprot.xml.jaxb.proteome.Proteome;
 @WebAppConfiguration
 public class ProteomeControllerIT {
 	 private static final String UPID_RESOURCE = "/proteome/";
+	 private static final String SEARCH_RESOURCE = "/proteome/search";
 	 static final String PROTEOME_ROOT_ELEMENT = "proteome";
 	    @Autowired
 	    private DataStoreManager storeManager;
@@ -66,28 +68,43 @@ public class ProteomeControllerIT {
 	    }
 	    
 	    @Test
-	    public void canFilterEntryFromAccessionEndpoint() throws Exception {
+	    public void canSearchUpid() throws Exception {
 	        // given
-	        List<String> upids = saveEntries();
-	        String upid = upids.get(0);
-
+	        String upid = saveEntry("UP000001806.xml");
+	        String resource=  UPID_RESOURCE + upid;
 	        // when
 	        ResultActions response = mockMvc.perform(
-	                get(UPID_RESOURCE + upid)
-	                        .param("fields", "upid")
+	                get(resource)
 	                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
 	        // then
 	        response.andDo(print())
 	                .andExpect(status().is(HttpStatus.OK.value()))
 	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-	                .andExpect(jsonPath("$.id", is(upid)));
+	                .andExpect(jsonPath("$.id.value", is(upid)));
 	    }
 
+	    @Test
+	    public void searchByOragnismId() throws Exception {
+	        // given
+	        String upid = saveEntry("UP000001940.xml");
+	     
+	        String resource=  SEARCH_RESOURCE + "?query=organism_id:6239";
+	        // when
+	        ResultActions response = mockMvc.perform(
+	                get(resource)
+	                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+	        // then
+	        response.andDo(print())
+	                .andExpect(status().is(HttpStatus.OK.value()))
+	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+	                .andExpect(jsonPath("$.results.*.id.value", hasItem(upid)));
+	    }
 	    
-	    private List<String> saveEntries() {
+	    private List<String> saveEntries(String file) {
 	    	  List<String> files = Arrays.asList(
-	                  "it/pds_sample.xml"
+	                  "it/" +file
 	                 
 	          );
 
@@ -108,6 +125,39 @@ public class ProteomeControllerIT {
 	        		  .map(val ->val.getUpid()).collect(Collectors.toList());
 	    	storeManager.save(DataStoreManager.StoreType.PROTEOME, proteomes);
 	    	return upids;
+	    }
+	    
+	    private String saveEntry(String file) {
+	    	return saveEntry(file, null);
+	    }
+	    	
+	    private String saveEntry(String file, String upid) {
+	    	  List<String> files = Arrays.asList(
+	                  "it/" +file
+	                 
+	          );
+
+	          XmlChainIterator<Proteome, Proteome>  chainingIterators =
+	          		new XmlChainIterator<>(new XmlChainIterator.FileInputStreamIterator(files),
+	                          Proteome.class, PROTEOME_ROOT_ELEMENT, Function.identity() );
+	          		
+	                  new XmlChainIterator<>(new XmlChainIterator.FileInputStreamIterator(files),
+	                          Proteome.class,
+	                          PROTEOME_ROOT_ELEMENT, Function.identity() );
+
+	          List<Proteome> proteomes = new ArrayList<>();
+	       
+	          while (chainingIterators.hasNext()) {
+	        	  Proteome proteome = chainingIterators.next();
+	        	  if(upid !=null) {
+	        		  proteome.setUpid(upid);
+	        	  }
+	              proteomes.add( proteome);
+	          }
+	          List<String> upids = proteomes.stream()
+	        		  .map(val ->val.getUpid()).collect(Collectors.toList());
+	    	storeManager.save(DataStoreManager.StoreType.PROTEOME, proteomes);
+	    	return upids.get(0);
 	    }
 }
 
