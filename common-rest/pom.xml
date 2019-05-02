@@ -18,6 +18,7 @@
         <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
         <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
           <poi.version>4.0.0</poi.version>
+           <jaxb.version>2.3.0</jaxb.version>
     </properties>
 
     <dependencies>
@@ -157,7 +158,17 @@
             <version>${poi.version}</version>
         </dependency>
         
-
+<!--  xml marshaller -->
+   <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.version}</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
         <!-- Tests -->
 <!--            <dependency> -->
 <!--             <groupId>uk.ac.ebi.uniprot</groupId> -->
