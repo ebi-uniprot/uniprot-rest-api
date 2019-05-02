@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.domain.proteome.ProteomeEntry;
 
 /**
  *

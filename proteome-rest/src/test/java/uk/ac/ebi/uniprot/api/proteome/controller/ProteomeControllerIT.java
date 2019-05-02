@@ -110,7 +110,7 @@ public class ProteomeControllerIT {
 	    @Test
 	    public void searchByGenomeAssembly2() throws Exception {
 	        // given
-	        String upid = saveEntry("UP000001806.xml", "UP000001808");
+	         saveEntry("UP000001806.xml", "UP000001808");
 	     
 	        String resource=  SEARCH_RESOURCE + "?query=genome_assembly:gca_000009605";
 	        // when
@@ -204,32 +204,7 @@ public class ProteomeControllerIT {
 	                .andExpect(content().string(containsString(upid)));        	        
 	    }
 	    
-	    
-	    private List<String> saveEntries(String file) {
-	    	  List<String> files = Arrays.asList(
-	                  "it/" +file
-	                 
-	          );
-
-	          XmlChainIterator<Proteome, Proteome>  chainingIterators =
-	          		new XmlChainIterator<>(new XmlChainIterator.FileInputStreamIterator(files),
-	                          Proteome.class, PROTEOME_ROOT_ELEMENT, Function.identity() );
-	          		
-	                  new XmlChainIterator<>(new XmlChainIterator.FileInputStreamIterator(files),
-	                          Proteome.class,
-	                          PROTEOME_ROOT_ELEMENT, Function.identity() );
-
-	          List<Proteome> proteomes = new ArrayList<>();
-	       
-	          while (chainingIterators.hasNext()) {
-	              proteomes.add( chainingIterators.next());
-	          }
-	          List<String> upids = proteomes.stream()
-	        		  .map(val ->val.getUpid()).collect(Collectors.toList());
-	    	storeManager.save(DataStoreManager.StoreType.PROTEOME, proteomes);
-	    	return upids;
-	    }
-	    
+	
 	    private String saveEntry(String file) {
 	    	return saveEntry(file, null);
 	    }
