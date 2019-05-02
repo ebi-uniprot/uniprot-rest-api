@@ -17,6 +17,8 @@
         <solrj.version>7.5.0</solrj.version>
         <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
         <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
+          <poi.version>4.0.0</poi.version>
+           <jaxb.version>2.3.0</jaxb.version>
     </properties>
 
     <dependencies>
@@ -143,14 +145,27 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
+          <!-- Excel writer -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        
+<!--  xml marshaller -->
+          <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
         <!-- Tests -->
-<!--            <dependency> -->
-<!--             <groupId>uk.ac.ebi.uniprot</groupId> -->
-<!--             <artifactId>data-service</artifactId> -->
-<!--             <version>${data-service.version}</version> -->
-<!--             <scope>test</scope> -->
-<!--         </dependency> -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

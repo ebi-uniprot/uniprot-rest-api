@@ -1,0 +1,41 @@
+[
+	{
+		"groupName": "Names & Taxonomy",
+		"fields": [
+			{
+				"label": "Organism",
+				"name": "organism"
+			},
+			{
+				"label": "Organism ID",
+				"name": "organism_id"
+			},
+			
+			{
+				"label": "proteome_components",
+				"name": "component"
+			},
+			{
+				"label": "Taxon mnemonic",
+				"name": "taxon_mnemonic"
+			},
+			{
+				"label": "Taxonomic lineage",
+				"name": "lineage"
+			}
+		]
+	},
+	{
+		"groupName": "Miscellaneous",
+		"fields": [
+			{
+				"label": "Genome assembly ID",
+				"name": "genome_assembly_id"
+			},
+			{
+				"label": "Protein count",
+				"name": "protein_count"
+			}
+		]
+	}
+]

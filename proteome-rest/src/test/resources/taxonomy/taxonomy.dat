@@ -1,0 +1,61 @@
+1	\N	1	0	no rank	1	0	root	\N	root	\N	\N	9ZZZZ	1	2506016
+2	1	0	0	superkingdom	11	0	Bacteria	eubacteria	Bacteria	\N	\N	9BACT	17987	771760
+6	335928	0	0	genus	11	0	Azorhizobium	\N	Azorhizobium	\N	\N	\N	532256	532439
+7	6	1	0	species	11	0	Azorhizobium caulinodans	\N	Azorhizobium caulinodans	\N	\N	AZOCA	532287	532290
+9	32199	1	0	species	11	0	Buchnera aphidicola	\N	Buchnera aphidicola	\N	\N	\N	749867	750404
+10	135621	0	0	genus	11	0	Cellvibrio	\N	Cellvibrio	\N	\N	\N	601720	601815
+11	1707	1	0	species	11	0	[Cellvibrio] gilvus	\N	[Cellvibrio] gilvus	\N	\N	\N	132015	132018
+13	203488	0	0	genus	11	0	Dictyoglomus	\N	Dictyoglomus	\N	\N	\N	21568	21597
+14	13	1	0	species	11	0	Dictyoglomus thermophilum	\N	Dictyoglomus thermophilum	\N	\N	DICTH	21577	21580
+16	32011	0	0	genus	11	0	Methylophilus	\N	Methylophilus	\N	\N	\N	570760	570857
+17	16	1	0	species	11	0	Methylophilus methylotrophus	\N	Methylophilus methylotrophus	\N	Bacterium W3A1	METME	570803	570808
+18	213423	0	0	genus	11	0	Pelobacter	\N	Pelobacter	\N	\N	\N	576997	577040
+19	18	1	0	species	11	0	Pelobacter carbinolicus	\N	Pelobacter carbinolicus	\N	\N	PELCA	577028	577031
+20	76892	0	0	genus	11	0	Phenylobacterium	\N	Phenylobacterium	\N	\N	\N	488090	488201
+21	20	1	0	species	11	0	Phenylobacterium immobile	\N	Phenylobacterium immobile	\N	\N	PHEIM	488111	488112
+22	267890	0	0	genus	11	0	Shewanella	\N	Shewanella	\N	\N	\N	677562	680375
+23	22	1	0	species	11	0	Shewanella colwelliana	\N	Shewanella colwelliana	\N	Alteromonas colwelliana	SHECO	678123	678126
+24	22	1	0	species	11	0	Shewanella putrefaciens	\N	Shewanella putrefaciens	\N	Pseudomonas putrefaciens	SHEPU	678067	678078
+25	22	1	0	species	11	0	Shewanella hanedai	\N	Shewanella hanedai	\N	Alteromonas hanedai	SHEHA	678089	678090
+27	49928	1	0	species	11	0	halophilic eubacterium NRCC 41227	\N	Halophilic eubacterium NRCC 41227	\N	\N	HALEU	368040	368041
+28	49928	1	0	species	11	0	halophilic eubacterium	\N	halophilic eubacterium	\N	\N	\N	383264	383265
+29	28221	0	0	order	11	0	Myxococcales	fruiting gliding bacteria	Myxococcales	fruiting gliding bacteria	\N	\N	575287	576550
+31	80811	0	0	family	11	0	Myxococcaceae	\N	Myxococcaceae	\N	\N	\N	575289	576020
+32	31	0	0	genus	11	0	Myxococcus	\N	Myxococcus	\N	\N	\N	575290	575899
+33	32	1	0	species	11	0	Myxococcus fulvus	\N	Myxococcus fulvus	\N	\N	MYXFU	575375	575380
+34	32	1	0	species	11	0	Myxococcus xanthus	\N	Myxococcus xanthus	\N	\N	MYXXA	575391	575400
+35	83461	1	0	species	11	0	Corallococcus macrosporus	\N	Corallococcus macrosporus	\N	\N	\N	575921	575924
+38	42	1	0	species	11	0	Angiococcus disciformis	\N	Angiococcus disciformis	\N	\N	\N	576065	576066
+39	80811	0	0	family	11	0	Cystobacteraceae	\N	Cystobacteraceae	\N	\N	\N	576021	576166
+40	39	0	0	genus	11	0	Stigmatella	\N	Stigmatella	\N	\N	\N	576022	576043
+41	40	1	0	species	11	0	Stigmatella aurantiaca	\N	Stigmatella aurantiaca	\N	\N	STIAU	576025	576030
+42	39	0	0	genus	11	0	Cystobacter	\N	Cystobacter	\N	\N	\N	576044	576113
+43	42	1	0	species	11	0	Cystobacter fuscus	\N	Cystobacter fuscus	\N	\N	\N	576049	576052
+44	39	0	0	genus	11	0	Melittangium	\N	Melittangium	\N	\N	\N	576114	576129
+45	44	1	0	species	11	0	Melittangium lichenicola	\N	Melittangium lichenicola	\N	\N	\N	576121	576122
+47	39	0	0	genus	11	0	Archangium	\N	Archangium	\N	\N	\N	576130	576145
+48	47	1	0	species	11	0	Archangium gephyra	\N	Archangium gephyra	\N	\N	\N	576131	576132
+49	80812	0	0	family	11	0	Polyangiaceae	\N	Polyangiaceae	\N	\N	\N	576207	576314
+50	49	0	0	genus	11	0	Chondromyces	\N	Chondromyces	\N	\N	\N	576258	576277
+51	50	1	0	species	11	0	Chondromyces apiculatus	\N	Chondromyces apiculatus	\N	\N	\N	576259	576262
+52	50	1	0	species	11	0	Chondromyces crocatus	\N	Chondromyces crocatus	\N	\N	CHOCO	576269	576270
+53	224463	0	0	genus	11	0	Nannocystis	\N	Nannocystis	\N	\N	\N	576476	576507
+54	53	1	0	species	11	0	Nannocystis exedens	\N	Nannocystis exedens	\N	\N	\N	576491	576494
+55	49	0	0	genus	11	0	Polyangium	\N	Polyangium	\N	\N	\N	576208	576243
+56	39643	1	0	species	11	0	Sorangium cellulosum	\N	Sorangium cellulosum	\N	Polyangium cellulosum	SORCE	576283	576288
+57	55	1	0	species	11	0	Polyangium sp.	\N	Polyangium sp.	\N	\N	\N	576209	576210
+59	481	0	0	genus	11	0	Vitreoscilla	\N	Vitreoscilla	\N	\N	\N	572420	572447
+2759	1	0	0	superkingdom	11	0	Eukaryota	eucaryotes	Eukaryota	\N	\N	\N	1	2
+7711	33208	0	0	phylum	11	0	Chordata	chordates	Chordata	\N	\N	\N	1	2
+33208	2759	0	0	kingdom	11	0	Metazoa	metazoans	Metazoa	\N	\N	\N	1	2
+7787	7711	1	0	species	11	0	Torpedo californica	Pacific electric ray	Torpedo californica	Pacific electric ray	\N	\N	\N	1	2
+11308	1	0	0	family	11	0	Orthomyxoviridae	\N	Orthomyxoviridae	\N	\N	\N	1	2
+11320	197911	1	0	species	11	0	Influenza A virus	\N	Influenza A virus	\N	\N	\N	1	2
+11552	197913	1	0	species	11	0	Influenza C virus	\N	\N	\N	\N	\N	1	2
+197911	11308	0	0	genus	11	0	Influenzavirus A	\N	\N	\N	\N	\N	1	2
+197913	11308	0	0	genus	11	0	Influenzavirus C	\N	\N	\N	\N	\N	1	2
+93838	11320	1	0	no rank	11	0	Influenza A virus (A/goose/Guangdong/1/1996(H5N1))	\N	Influenza A virus (strain A/Goose/Guangdong/1/1996 H5N1 genotype Gs/Gd)	\N	\N	\N	1	2
+100673	11552	1	0	no rank	11	0	Influenza C virus (C/Johannesburg/1/66)	\N	Influenza C virus (strain C/Johannesburg/1/1966)	\N	\N	\N	1	2
+90371	59201	1	0	no rank	11	0	Salmonella enterica subsp. enterica serovar Typhimurium	\N	Salmonella typhimurium	\N	\N	SALTM	490329	490654
+353569	59201	1	0	no rank	11	0	Salmonella enterica subsp. enterica serovar 4,12:i:-	\N	Salmonella enterica subsp. enterica serovar 4,12:i:-	\N	\N	\N	492935	492936
+984236	192955	1	0	no rank	11	0	Salmonella enterica subsp. enterica serovar Kentucky str. ATCC 9263	\N	Salmonella enterica subsp. enterica serovar Kentucky str. ATCC 9263\N	\N	\N	492704	492705

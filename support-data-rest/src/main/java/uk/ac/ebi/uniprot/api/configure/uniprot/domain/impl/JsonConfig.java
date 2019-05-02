@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.*;
 
-class JsonConfig {
+public class JsonConfig {
 
-    static ObjectMapper getJsonMapper(){
+    public static ObjectMapper getJsonMapper(){
         final ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule mod = new SimpleModule();
         mod.addAbstractTypeMapping(EvidenceGroup.class,EvidenceGroupImpl.class);

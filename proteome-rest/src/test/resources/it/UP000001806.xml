@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proteomes xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<proteome upid="UP000001806" modified="2016-06-13Z" taxonomy="107806" superregnum="bacteria">
+   <name>Buchnera aphidicola Tokyo 1998</name>
+   <description>Pea aphids are a major agricultural pest, feeding on a variety of legumes (Fabaceae) worldwide. Plant phloem sap feeding insects such as pea aphids depend on their obligate endosymbionts to furnish them with essential amino acids and/or vitamin cofactors. Pea aphids have only one major, often sole microbial symbiont, Buchnera, a maternally-transmitted gammaproteobacteria related to the Enterobacteriaceae. Depending on the aphid-Buchnera pair the capacity to synthesize at least 5 essential amino acids can be shared between the 2 partners. The aphid-Buchnera association has persisted for at least 160 million years and is obligate for both partners. This strain is an endosymbiont of the pea aphid Acyrthosiphon pisum, and was isolated from aphids growing on Vicia faba (L.) (adapted from PMIDs 10993077 and 21392141). Buchnera from A. pisum and S. graminum have a three membrane system (one originating from the host, see PMID 22229056).</description>
+   <isReferenceProteome>true</isReferenceProteome>
+   <isRepresentativeProteome>true</isRepresentativeProteome>
+   <strain>APS</strain>
+   <dbReference type="GCSetAcc" id="GCA_000009605.1"/>
+   <dbReference type="AssemblyId" id="ASM960v1"/>
+   <component name="Chromosome">
+      <description>Buchnera aphidicola str. APS (Acyrthosiphon pisum) genomic DNA</description>
+      <biosampleId></biosampleId>
+      <genomeAccession>BA000003</genomeAccession>
+      <protein accession="P57208" entryType="Swiss-Prot"/>
+      <protein accession="P57410" entryType="Swiss-Prot"/>
+      <protein accession="P57267" entryType="Swiss-Prot"/>
+      <protein accession="P57256" entryType="Swiss-Prot"/>
+      <protein accession="P57427" entryType="Swiss-Prot"/>
+      <protein accession="P57649" entryType="Swiss-Prot"/>
+   </component>
+   <component name="Plasmid pLeu">
+      <description>Buchnera aphidicola str. APS (Acyrthosiphon pisum) plasmid pLeu DNA</description>
+      <biosampleId></biosampleId>
+      <genomeAccession>AP001071</genomeAccession>
+      <protein accession="P56936" entryType="Swiss-Prot"/>
+      <protein accession="Q9ZEY9" entryType="Swiss-Prot"/>
+      <protein accession="Q9ZEY8" entryType="Swiss-Prot"/>
+      <protein accession="Q9ZEZ0" entryType="Swiss-Prot"/>
+      <protein accession="P56935" entryType="Swiss-Prot"/>
+      <protein accession="P56933" entryType="Swiss-Prot"/>
+      <protein accession="P56934" entryType="Swiss-Prot"/>
+   </component>
+   <component name="Plasmid pTrp">
+      <description>Buchnera aphidicola str. APS (Acyrthosiphon pisum) plasmid pTrp DNA</description>
+      <biosampleId></biosampleId>
+      <genomeAccession>AP001070</genomeAccession>
+      <protein accession="Q44695" entryType="Swiss-Prot"/>
+      <protein accession="Q44696" entryType="Swiss-Prot"/>
+   </component>
+   <reference date="2000">
+      <journal name="Nature" volume="407" first="81" last="86">
+         <title>Genome sequence of the endocellular bacterial symbiont of aphids Buchnera sp. APS.</title>
+         <dbReference type="PubMed" id="10993077"/>
+         <dbReference type="DOI" id="10.1038/35024074"/>
+      </journal>
+      <authorList>
+         <person name="Shigenobu S."/>
+         <person name="Watanabe H."/>
+         <person name="Hattori M."/>
+         <person name="Sakaki Y."/>
+         <person name="Ishikawa H."/>
+      </authorList>
+   </reference>
+   <redundantProteome upid="UP000006522" similarity="0.94527197"/>
+   <redundantProteome upid="UP000006519" similarity="0.9429962"/>
+   <redundantProteome upid="UP000006521" similarity="0.9488528"/>
+   <redundantProteome upid="UP000002455" similarity="0.9722999"/>
+   <redundantProteome upid="UP000006520" similarity="0.9504177"/>
+   <redundantProteome upid="UP000006904" similarity="0.9726173"/>
+   <canonicalGene>
+      <gene accession="P57199" entryType="Swiss-Prot" length="186" geneName="BAB12817" geneNameType="Ensembl"/>
+      <relatedGene accession="P57199" entryType="Swiss-Prot" length="186" geneName="BU098" geneNameType="OLN"/>
+   </canonicalGene>
+   <canonicalGene>
+      <gene accession="P57416" entryType="Swiss-Prot" length="350" geneName="BU334" geneNameType="OLN"/>
+      <relatedGene accession="P57416" entryType="Swiss-Prot" length="350" geneName="pyrC" geneNameType="Gene name"/>
+      <relatedGene accession="P57416" entryType="Swiss-Prot" length="350" geneName="BAB13039" geneNameType="Ensembl"/>
+   </canonicalGene>
+   <canonicalGene>
+      <gene accession="P57304" entryType="Swiss-Prot" length="265" geneName="BU208" geneNameType="OLN"/>
+      <relatedGene accession="P57304" entryType="Swiss-Prot" length="265" geneName="speD" geneNameType="Gene name"/>
+      <relatedGene accession="P57304" entryType="Swiss-Prot" length="265" geneName="BAB12925" geneNameType="Ensembl"/>
+   </canonicalGene>
+   <canonicalGene>
+      <gene accession="P57484" entryType="Swiss-Prot" length="57" geneName="csrA" geneNameType="Gene name"/>
+      <relatedGene accession="P57484" entryType="Swiss-Prot" length="57" geneName="BU404" geneNameType="OLN"/>
+      <relatedGene accession="P57484" entryType="Swiss-Prot" length="57" geneName="BAB13107" geneNameType="Ensembl"/>
+   </canonicalGene>
+   <canonicalGene>
+      <gene accession="P57430" entryType="Swiss-Prot" length="314" geneName="rluC" geneNameType="Gene name"/>
+      <relatedGene accession="P57430" entryType="Swiss-Prot" length="314" geneName="BU348" geneNameType="OLN"/>
+      <relatedGene accession="P57430" entryType="Swiss-Prot" length="314" geneName="BAB13053" geneNameType="Ensembl"/>
+   </canonicalGene>
+</proteome>
+</proteomes>

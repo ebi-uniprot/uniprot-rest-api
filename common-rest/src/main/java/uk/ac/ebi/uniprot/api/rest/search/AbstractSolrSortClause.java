@@ -33,10 +33,10 @@ public abstract class AbstractSolrSortClause {
         return sort;
     }
 
-    private List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
+    protected List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
 
         if (StringUtils.isEmpty(sortClause)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         List<Pair<String, Sort.Direction>> fieldSortPairs = new ArrayList<>();
