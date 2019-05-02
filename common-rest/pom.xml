@@ -159,23 +159,13 @@
         </dependency>
         
 <!--  xml marshaller -->
-   <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>${jaxb.version}</version><!--$NO-MVN-MAN-VER$-->
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
+          <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb.version}</version>
         </dependency>
         <!-- Tests -->
-<!--            <dependency> -->
-<!--             <groupId>uk.ac.ebi.uniprot</groupId> -->
-<!--             <artifactId>data-service</artifactId> -->
-<!--             <version>${data-service.version}</version> -->
-<!--             <scope>test</scope> -->
-<!--         </dependency> -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
