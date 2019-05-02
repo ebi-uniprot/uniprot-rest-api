@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.api.proteome.controller;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -87,7 +88,61 @@ public class ProteomeControllerIT {
 	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
 	                .andExpect(jsonPath("$.id.value", is(upid)));
 	    }
+	    @Test
+	    public void searchByGenomeAssembly() throws Exception {
+	        // given
+	        String upid = saveEntry("UP000001806.xml", "UP000001807");
+	     
+	        String resource=  SEARCH_RESOURCE + "?query=genome_assembly:gca_000009605.1";
+	        // when
+	        ResultActions response = mockMvc.perform(
+	                get(resource)
+	                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+	     
+	        // then
+	        response.andDo(print())
+	                .andExpect(status().is(HttpStatus.OK.value()))
+	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+	                .andExpect(jsonPath("$.results.*.id.value", hasItem(upid)));
+	                
+	    }
+	    
+	    @Test
+	    public void searchByGenomeAssembly2() throws Exception {
+	        // given
+	        String upid = saveEntry("UP000001806.xml", "UP000001808");
+	     
+	        String resource=  SEARCH_RESOURCE + "?query=genome_assembly:gca_000009605";
+	        // when
+	        ResultActions response = mockMvc.perform(
+	                get(resource)
+	                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
+	        // then
+	        response.andDo(print())
+	                .andExpect(status().is(HttpStatus.OK.value()))
+	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+	                .andExpect(jsonPath("$.results", empty()));
+	    }
+	    @Test
+	    public void searchByGenomeAccession() throws Exception {
+	        // given
+	        String upid = saveEntry("UP000001806.xml", "UP000001808");
+	     
+	        String resource=  SEARCH_RESOURCE + "?query=genome_accession:ba000003";
+	        // when
+	        ResultActions response = mockMvc.perform(
+	                get(resource)
+	                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+	     
+	        // then
+	        response.andDo(print())
+	                .andExpect(status().is(HttpStatus.OK.value()))
+	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+	                .andExpect(jsonPath("$.results.*.id.value", hasItem(upid)));
+	                
+	    }
+	    
 	    @Test
 	    public void searchByOragnismId() throws Exception {
 	        // given
@@ -104,11 +159,6 @@ public class ProteomeControllerIT {
 	                .andExpect(status().is(HttpStatus.OK.value()))
 	                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
 	                .andExpect(jsonPath("$.results.*.id.value", hasItem(upid)));
-	        
-	        
-
-	        
-	        
 	    }
 	    
 	    @Test
