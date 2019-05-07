@@ -15,4 +15,5 @@ public class DiseaseRepository extends SolrQueryRepository<DiseaseDocument> {
     public DiseaseRepository(SolrTemplate solrTemplate) {
         super(solrTemplate, SolrCollection.disease, DiseaseDocument.class, () -> new HashMap<>());
     }
+
 }

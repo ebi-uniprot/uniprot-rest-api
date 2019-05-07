@@ -1,0 +1,1532 @@
+---------------------------------------------------------------------------
+        UniProt Knowledgebase
+        SIB Swiss Institute of Bioinformatics; Geneva, Switzerland
+        European Bioinformatics Institute (EBI); Hinxton, United Kingdom
+        Protein Information Resource (PIR); Washington DC, USA
+---------------------------------------------------------------------------
+
+Description: Controlled vocabulary of human diseases
+Name:        humdisease.txt
+Release:     2018_10 of 07-Nov-2018
+
+---------------------------------------------------------------------------
+
+  This document lists the controlled vocabulary that is used for the
+  annotation of human diseases in UniProtKB/Swiss-Prot.
+
+  It follows the format below:
+
+  ---------  ---------------------------     ------------------------------
+  Line code  Content                         Occurrence in an entry
+  ---------  ---------------------------     ------------------------------
+  ID         Identifier                      Once; starts an entry
+  AC         Accession (DI-xxxxx)            Once
+  AR         Acronym                         Once
+  DE         Definition                      Once or more
+  SY         Alternative name(s)             Optional; once or more
+  DR         Cross-reference(s)              Once or more
+  KW         Associated keyword (accession)  Optional; Once or more
+  //         Terminator                      Once; ends an entry
+
+  Sources: OMIM, Scientific articles, Dorland's Medical Dictionary,
+  Orphanet.
+
+___________________________________________________________________________
+
+ID   2,4-dienoyl-CoA reductase deficiency.
+AC   DI-04240
+AR   DECRD.
+DE   A rare, autosomal recessive, inborn error of polyunsaturated fatty
+DE   acids and lysine metabolism, resulting in mitochondrial dysfunction.
+DE   Affected individuals have a severe encephalopathy with neurologic and
+DE   metabolic abnormalities beginning in early infancy. Laboratory studies
+DE   show increased C10:2 carnitine levels and hyperlysinemia.
+DR   MIM; 616034; phenotype.
+DR   MedGen; CN037048.
+DR   MeSH; D020167.
+DR   MeSH; D028361.
+//
+ID   2-aminoadipic 2-oxoadipic aciduria.
+AC   DI-03673
+AR   AMOXAD.
+DE   A metabolic disorder characterized by increased levels of 2-oxoadipate
+DE   and 2-hydroxyadipate in the urine, and elevated 2-aminoadipate in the
+DE   plasma. Patients can have mild to severe intellectual disability,
+DE   muscular hypotonia, developmental delay, ataxia, and epilepsy. Most
+DE   cases are asymptomatic.
+DR   MIM; 204750; phenotype.
+DR   MedGen; C1859817.
+DR   MeSH; D000592.
+//
+ID   3-alpha-hydroxyacyl-CoA dehydrogenase deficiency.
+AC   DI-00002
+AR   HADH deficiency.
+DE   An autosomal recessive, metabolic disorder with various clinical
+DE   presentations including hypoglycemia, hepatoencephalopathy, myopathy
+DE   or cardiomyopathy, and in some cases sudden death.
+SY   HAD deficiency.
+SY   Hydroxyacyl-coenzyme A dehydrogenase deficiency.
+SY   SCHAD deficiency.
+DR   MIM; 231530; phenotype.
+DR   MedGen; C1291230.
+DR   MeSH; D008659.
+//
+ID   3-hydroxy-3-methylglutaryl-CoA lyase deficiency.
+AC   DI-00003
+AR   HMGCLD.
+DE   An autosomal recessive disease affecting ketogenesis and L-leucine
+DE   catabolism. The disease usually appears in the first year of life
+DE   after a fasting period and its clinical acute symptoms include
+DE   vomiting, seizures, metabolic acidosis, hypoketotic hypoglycemia and
+DE   lethargy. These symptoms sometimes progress to coma, with fatal
+DE   outcome in some cases.
+SY   HL deficiency.
+SY   HMGCL deficiency.
+SY   HMG-CoA lyase deficiency.
+SY   Hydroxymethylglutaricaciduria.
+SY   Hydroxymethylglutaric aciduria.
+DR   MIM; 246450; phenotype.
+DR   MedGen; C0268601.
+DR   MeSH; D000592.
+//
+ID   3-hydroxy-3-methylglutaryl-CoA synthase-2 deficiency.
+AC   DI-01751
+AR   HMGCS2D.
+DE   A metabolic disorder characterized by severe hypoketotic hypoglycemia,
+DE   encephalopathy, and hepatomegaly.
+SY   HMG-CoA synthase deficiency.
+SY   HMGCS2 deficiency.
+SY   HMGCS deficiency.
+SY   Mitochondrial 3-hydroxy-3-methylglutaryl-CoA synthase 2 deficiency.
+SY   Mitochondrial HMG-CoA synthase deficiency.
+DR   MIM; 605911; phenotype.
+DR   MedGen; C2751532.
+DR   MeSH; D007003.
+DR   MeSH; D008661.
+DR   MeSH; D028361.
+//
+ID   3-hydroxyisobutryl-CoA hydrolase deficiency.
+AC   DI-01740
+AR   HIBCHD.
+DE   An autosomal recessive inborn error of valine metabolism. It causes
+DE   severely delayed psychomotor development, neurodegeneration, increased
+DE   lactic acid, and brain lesions in the basal ganglia.
+SY   Beta-hydroxyisobutyryl CoA deacylase deficiency.
+SY   Deficiency of beta-hydroxyisobutyryl CoA deacylase.
+SY   HIBCH deficiency.
+SY   Methacrylic acid toxicity.
+SY   Methacrylic aciduria.
+SY   Valine metabolic defect.
+DR   MIM; 250620; phenotype.
+DR   MedGen; C0342738.
+DR   MeSH; D000592.
+//
+ID   3-ketothiolase deficiency.
+AC   DI-00009
+AR   3KTD.
+DE   An autosomal recessive inborn error of isoleucine catabolism
+DE   characterized by intermittent ketoacidotic attacks associated with
+DE   unconsciousness. Some patients die during an attack or are mentally
+DE   retarded. Urinary excretion of 2-methyl-3-hydroxybutyric acid, 2-
+DE   methylacetoacetic acid, triglylglycine, butanone is increased. It
+DE   seems likely that the severity of this disease correlates better with
+DE   the environmental or acquired factors than with the ACAT1 genotype.
+SY   Alpha-methylacetoaceticaciduria.
+DR   MIM; 203750; phenotype.
+DR   MedGen; C1536500.
+DR   MeSH; D000592.
+//
+ID   3-methylcrotonoyl-CoA carboxylase 1 deficiency.
+AC   DI-00742
+AR   MCC1D.
+DE   An autosomal recessive disorder of leucine catabolism. The phenotype
+DE   is variable, ranging from neonatal onset with severe neurological
+DE   involvement to asymptomatic adults. There is a characteristic organic
+DE   aciduria with massive excretion of 3-hydroxyisovaleric acid and 3-
+DE   methylcrotonylglycine, usually in combination with a severe secondary
+DE   carnitine deficiency.
+SY   3-methylcrotonylglycinuria type I.
+SY   MCC1 deficiency.
+SY   MCCD type 1.
+SY   MCGI.
+SY   Methylcrotonylglycinuria type I.
+DR   MIM; 210200; phenotype.
+DR   MedGen; C0268600.
+DR   MedGen; CN028786.
+DR   MeSH; D000592.
+//
+ID   3-methylcrotonoyl-CoA carboxylase 2 deficiency.
+AC   DI-00743
+AR   MCC2D.
+DE   An autosomal recessive disorder of leucine catabolism. The phenotype
+DE   is variable, ranging from neonatal onset with severe neurological
+DE   involvement to asymptomatic adults. There is a characteristic organic
+DE   aciduria with massive excretion of 3-hydroxyisovaleric acid and 3-
+DE   methylcrotonylglycine, usually in combination with a severe secondary
+DE   carnitine deficiency.
+SY   3-methylcrotonylglycinuria type II.
+SY   MCC2 deficiency.
+SY   MCGII.
+SY   Methylcrotonylglycinuria type II.
+DR   MIM; 210210; phenotype.
+DR   MedGen; C1859499.
+DR   MeSH; D000592.
+//
+ID   3-methylglutaconic aciduria 1.
+AC   DI-00004
+AR   MGA1.
+DE   An inborn error of leucine metabolism. It leads to an autosomal
+DE   recessive syndrome with variable clinical phenotype, ranging from
+DE   delayed speech development to severe psychomotor retardation, coma,
+DE   failure to thrive, metabolic acidosis and dystonia. MGA1 can be
+DE   distinguished from other forms of MGA by the pattern of metabolite
+DE   excretion: 3-methylglutaconic acid levels are higher than those
+DE   detected in other forms, whereas methylglutaric acid levels are
+DE   usually only slightly elevated and there is a high level of 3-
+DE   hydroxyisovaleric acid excretion (not present in other MGA forms).
+SY   3-alpha-methylglutaconic aciduria type 1.
+SY   3-alpha-methylglutaconyl-CoA hydratase deficiency.
+SY   3-methylglutaconyl-CoA hydratase deficiency.
+SY   3MG-CoA hydratase deficiency.
+SY   MGA type I.
+SY   MGCA1.
+DR   MIM; 250950; phenotype.
+DR   MedGen; C0342727.
+DR   MeSH; D000592.
+//
+ID   3-methylglutaconic aciduria 3.
+AC   DI-00006
+AR   MGA3.
+DE   An autosomal recessive metabolic disorder that causes a neuro-
+DE   ophthalmologic syndrome consisting of early-onset bilateral optic
+DE   atrophy, spasticity, extrapyramidal dysfunction and cognitive deficit.
+DE   Urinary excretion of 3-methylglutaconic acid and 3-methylglutaric acid
+DE   is increased. MGA3 can be distinguished from MGA1 by the absence of
+DE   increase of 3-hydroxyisovaleric acid levels.
+SY   3-alpha-methylglutaconic aciduria type 3.
+SY   Costeff optic atrophy syndrome.
+SY   Costeff syndrome.
+SY   MGA type III.
+SY   MGCA3.
+SY   Optic atrophy 3 autosomal recessive.
+SY   Optic atrophy plus syndrome.
+DR   MIM; 258501; phenotype.
+DR   MedGen; C0574084.
+DR   MeSH; D015418.
+//
+ID   3-methylglutaconic aciduria 5.
+AC   DI-00007
+AR   MGA5.
+DE   An autosomal recessive disorder characterized by early-onset dilated
+DE   cardiomyopathy, growth failure, cerebellar ataxia causing significant
+DE   motor delays, testicular dysgenesis, growth failure and significant
+DE   increases in urine organic acids, particularly 3-methylglutaconic acid
+DE   and 3-methylglutaric acid.
+SY   3-alpha-methylglutaconic aciduria type 5.
+SY   DCMA.
+SY   Dilated cardiomyopathy with ataxia.
+SY   MGA type V.
+SY   MGCA5.
+DR   MIM; 610198; phenotype.
+DR   MedGen; C1857776.
+DR   MeSH; D002311.
+KW   KW-0122:Cardiomyopathy.
+//
+ID   3-methylglutaconic aciduria 8.
+AC   DI-04904
+AR   MGCA8.
+DE   An autosomal recessive inborn error of metabolism resulting in early
+DE   death. Clinical features include extreme hypertonia observed at birth,
+DE   alternating with hypotonia, subsequent appearance of extrapyramidal
+DE   symptoms, lack of psychomotor development, microcephaly, and
+DE   intractable seizures. Patients show lactic acidemia, 3-
+DE   methylglutaconic aciduria, intermittent neutropenia, and progressive
+DE   brain atrophy.
+SY   3-methylglutaconic aciduria, type VII.
+DR   MIM; 617248; phenotype.
+DR   MedGen; CN239573.
+DR   MeSH; D008661.
+KW   KW-0887:Epilepsy.
+//
+ID   3-methylglutaconic aciduria 9.
+AC   DI-05109
+AR   MGCA9.
+DE   An autosomal recessive disease characterized by early-onset seizures,
+DE   severely delayed psychomotor development and intellectual disability.
+DE   Patients have hypotonia or spasticity, and laboratory investigations
+DE   show increased serum lactate and 3-methylglutaconic aciduria.
+SY   3-methylglutaconic aciduria, type IX.
+DR   MIM; 617698; phenotype.
+DR   MedGen; CN510468.
+DR   MeSH; D008661.
+KW   KW-0887:Epilepsy.
+KW   KW-0991:Mental retardation.
+//
+ID   3-methylglutaconic aciduria with cataracts, neurologic involvement and neutropenia.
+AC   DI-04365
+AR   MEGCANN.
+DE   An autosomal recessive inborn error of metabolism with a highly
+DE   variable phenotype. Primary disease symptoms are increased levels of
+DE   3-methylglutaconic acid, neurologic deterioration and neutropenia.
+DE   Other common features include progressive encephalopathy, movement
+DE   abnormalities, delayed psychomotor development, cataracts, seizures,
+DE   and recurrent infections.
+SY   3-methylglutaconic aciduria, type VII.
+SY   3-methylglutaconic aciduria, type VII, with cataracts, neurologic involvement and neutropenia.
+SY   3-methylglutaconic aciduria 7.
+SY   MGCA7.
+DR   MIM; 616271; phenotype.
+DR   MedGen; CN228597.
+DR   MeSH; D008661.
+KW   KW-0887:Epilepsy.
+KW   KW-0898:Cataract.
+//
+ID   3-methylglutaconic aciduria with deafness, encephalopathy, and Leigh-like syndrome.
+AC   DI-03495
+AR   MEGDEL.
+DE   An autosomal recessive disorder characterized by childhood onset of
+DE   delayed psychomotor development or psychomotor regression,
+DE   sensorineural deafness, spasticity or dystonia, and increased
+DE   excretion of 3-methylglutaconic acid. Brain imaging shows cerebral and
+DE   cerebellar atrophy as well as lesions in the basal ganglia reminiscent
+DE   of Leigh syndrome. Laboratory studies show increased serum lactate and
+DE   alanine, mitochondrial oxidative phosphorylation defects, abnormal
+DE   mitochondria, abnormal phosphatidylglycerol and cardiolipin profiles
+DE   in fibroblasts, and abnormal accumulation of unesterified cholesterol
+DE   within cells.
+SY   3-methylglutaconic aciduria, type VI.
+SY   3-methylglutaconic aciduria with dystonia-deafness, hepatopathy, encephalopathy, and Leigh-like syndrome.
+SY   MEGDHEL.
+SY   MGCA6.
+DR   MIM; 614739; phenotype.
+DR   MedGen; C3553597.
+DR   MedGen; CN130585.
+DR   MeSH; D008661.
+KW   KW-0209:Deafness.
+//
+ID   3M syndrome 1.
+AC   DI-00011
+AR   3M1.
+DE   An autosomal recessive disorder characterized by severe pre- and
+DE   postnatal growth retardation, facial dysmorphism, large head
+DE   circumference, and normal intelligence and endocrine function.
+DE   Skeletal changes include long slender tubular bones and tall vertebral
+DE   bodies.
+SY   3M syndrome-1.
+SY   Dolichospondylic dysplasia.
+SY   Gloomy face syndrome.
+SY   Le Merrer syndrome.
+SY   Miller-McKusick-Malvaux syndrome.
+SY   Three M syndrome.
+SY   Three M syndrome 1.
+SY   Yakut short stature syndrome.
+DR   MIM; 273750; phenotype.
+DR   MedGen; C1848862.
+DR   MedGen; C2678312.
+DR   MeSH; D004392.
+KW   KW-0242:Dwarfism.
+//
+ID   3M syndrome 2.
+AC   DI-02472
+AR   3M2.
+DE   An autosomal recessive disorder characterized by severe pre- and
+DE   postnatal growth retardation, facial dysmorphism, large head
+DE   circumference, and normal intelligence and endocrine function.
+DE   Skeletal changes include long slender tubular bones and tall vertebral
+DE   bodies.
+SY   3M syndrome-2.
+SY   Three M syndrome 2.
+DR   MIM; 612921; phenotype.
+DR   MedGen; C2752041.
+DR   MeSH; D004392.
+KW   KW-0242:Dwarfism.
+//
+ID   3M syndrome 3.
+AC   DI-03220
+AR   3M3.
+DE   A disorder characterized by poor postnatal growth and distinctive
+DE   facial features, including triangular facies, frontal bossing, fleshy
+DE   tipped nose, and fleshy lips. Other features may include skeletal
+DE   anomalies and prominent heels.
+SY   3M syndrome-3.
+SY   Three M syndrome 3.
+DR   MIM; 614205; phenotype.
+DR   MedGen; C3280146.
+DR   MeSH; D004392.
+KW   KW-0242:Dwarfism.
+//
+ID   3MC syndrome 1.
+AC   DI-03129
+AR   3MC1.
+DE   A form of 3MC syndrome, an autosomal recessive disorder characterized
+DE   by facial dysmorphism, craniosynostosis, learning disability, and
+DE   genital, limb and vesicorenal anomalies. Facial features include
+DE   hypertelorism, blepharophimosis, blepharoptosis and highly arched
+DE   eyebrows, cleft lip and/or palate. The term 3MC syndrome includes
+DE   Carnevale, Mingarelli, Malpuech, and Michels syndromes.
+SY   Craniosynostosis with lid anomalies.
+SY   Michels syndrome.
+SY   Oculopalatoskeletal syndrome.
+DR   MIM; 257920; phenotype.
+DR   MedGen; C0796059.
+DR   MeSH; D003398.
+DR   MeSH; D005141.
+//
+ID   3MC syndrome 2.
+AC   DI-03130
+AR   3MC2.
+DE   A form of 3MC syndrome, an autosomal recessive disorder characterized
+DE   by facial dysmorphism, craniosynostosis, learning disability, and
+DE   genital, limb and vesicorenal anomalies. Facial features include
+DE   hypertelorism, blepharophimosis, blepharoptosis and highly arched
+DE   eyebrows, cleft lip and/or palate. The term 3MC syndrome includes
+DE   Carnevale, Mingarelli, Malpuech, and Michels syndromes.
+SY   Carnevale Krajewska Fischetto syndrome.
+SY   Carnevale syndrome.
+SY   Oculo-skeletal-abdominal syndrome.
+SY   OSA syndrome.
+SY   Ptosis of eyelids with diastasis recti and hip dysplasia.
+DR   MIM; 265050; phenotype.
+DR   MedGen; C0796279.
+DR   MeSH; D003398.
+DR   MeSH; D005141.
+//
+ID   3MC syndrome 3.
+AC   DI-04982
+AR   3MC3.
+DE   A form of 3MC syndrome, an autosomal recessive disorder characterized
+DE   by facial dysmorphism, craniosynostosis, learning disability, and
+DE   genital, limb and vesicorenal anomalies. Facial features include
+DE   hypertelorism, blepharophimosis, blepharoptosis and highly arched
+DE   eyebrows, cleft lip and/or palate. The term 3MC syndrome includes
+DE   Carnevale, Mingarelli, Malpuech, and Michels syndromes.
+SY   Facial clefting syndrome Gypsy type.
+SY   Malpuech facial clefting syndrome.
+SY   Malpuech syndrome.
+DR   MIM; 248340; phenotype.
+DR   MedGen; C0796032.
+DR   MeSH; D003398.
+DR   MeSH; D005141.
+//
+ID   46,XX sex reversal 1.
+AC   DI-02395
+AR   SRXX1.
+DE   A condition in which male gonads develop in a genetic female (female
+DE   to male sex reversal).
+SY   46,XX gonadal dysgenesis complete SRY-positive.
+SY   46,XX sex reversal SRY-positive.
+SY   46,XX testicular disorder of sex development.
+SY   46,XX true hermaphroditism SRY-positive.
+SY   Ovotesticular disorder of sex development.
+SY   Ovotesticular DSD.
+SY   XX male SRY-positive.
+DR   MIM; 400045; phenotype.
+DR   MedGen; C2748895.
+DR   MedGen; C3495659.
+DR   MeSH; D023961.
+DR   MeSH; D050090.
+//
+ID   46,XX sex reversal 2.
+AC   DI-03053
+AR   SRXX2.
+DE   A condition in which male gonads develop in a genetic female (female
+DE   to male sex reversal).
+SY   46,XX sex reversal partial or complete SOX9-related.
+DR   MIM; 278850; phenotype.
+DR   MedGen; C2749215.
+DR   MeSH; D058531.
+//
+ID   46,XX sex reversal 3.
+AC   DI-03008
+AR   SRXX3.
+DE   A condition in which male gonads develop in a genetic female (female
+DE   to male sex reversal).
+SY   46,XX male sex reversal SOX3-related.
+DR   MIM; 300833; phenotype.
+DR   MedGen; C3151782.
+DR   MedGen; C3151783.
+DR   MeSH; D058531.
+//
+ID   46,XX sex reversal 4.
+AC   DI-05002
+AR   SRXX4.
+DE   A condition in which male gonads develop in a genetic female (female
+DE   to male sex reversal).
+SY   46,XX sex reversal SRY-negative.
+DR   MIM; 617480; phenotype.
+DR   MedGen; CN244002.
+DR   MeSH; D058531.
+//
+ID   46,XX sex reversal with dysgenesis of kidneys, adrenals, and lungs.
+AC   DI-01613
+AR   SERKAL.
+DE   A disease characterized by the association of female-to-male sex
+DE   reversal with dysgenesis of kidneys, adrenals, and lungs.
+SY   SERKAL syndrome.
+DR   MIM; 611812; phenotype.
+DR   MedGen; C2678492.
+DR   MeSH; D058531.
+//
+ID   46,XY sex reversal 1.
+AC   DI-01682
+AR   SRXY1.
+DE   A condition characterized by male-to-female sex reversal in the
+DE   presence of a normal 46,XY karyotype. Patients manifest rapid and
+DE   early degeneration of their gonads, which are present in the adult as
+DE   'streak gonads', consisting mainly of fibrous tissue and variable
+DE   amounts of ovarian stroma. As a result these patients do not develop
+DE   secondary sexual characteristics at puberty. The external genitalia in
+DE   these subjects are completely female, and Muellerian structures are
+DE   normal.
+SY   46,XY gonadal dysgenesis complete SRY-related.
+SY   46,XY sex reversal SRY-related.
+SY   46,XY true hermaphroditism SRY-related.
+SY   Gonadal dysgenesis XY female type.
+SY   Swyer syndrome.
+SY   XY females.
+DR   MIM; 400044; phenotype.
+DR   MedGen; C2748896.
+DR   MedGen; C2748897.
+DR   MedGen; C2748898.
+DR   MedGen; C2748899.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 10.
+AC   DI-04458
+AR   SRXY10.
+DE   A disorder of sex development. Affected individuals have a 46,XY
+DE   karyotype, show gonadal dysgenesis with streak gonads, look like
+DE   normal females at birth, do not develop secondary sexual
+DE   characteristics at puberty and do not menstruate.
+SY   Chromosome 17q24 deletion syndrome.
+DR   MIM; 616425; phenotype.
+DR   MedGen; CN231316.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 2.
+AC   DI-02751
+AR   SRXY2.
+DE   A condition characterized by male-to-female sex reversal in the
+DE   presence of a normal 46,XY karyotype.
+SY   46,XY sex reversal DAX1-related.
+SY   Dosage-sensitive sex reversal.
+SY   DSS.
+DR   MIM; 300018; phenotype.
+DR   MedGen; C1848296.
+DR   MeSH; D058490.
+//
+ID   46,XY sex reversal 3.
+AC   DI-02465
+AR   SRXY3.
+DE   A condition characterized by male-to-female sex reversal in the
+DE   presence of a normal 46,XY karyotype.
+SY   46,XY disorder of sex development.
+SY   46,XY sex reversal partial or complete NR5A1-related.
+SY   Complete or partial 46,XY gonadal dysgenesis with or without adrenal failure.
+SY   XY sex reversal with or without adrenal failure.
+DR   MIM; 612965; phenotype.
+DR   MedGen; C2751824.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 4.
+AC   DI-03328
+AR   SRXY4.
+DE   A condition characterized by male-to-female sex reversal in the
+DE   presence of a normal 46,XY karyotype. Patients display complete or
+DE   partial gonadal dysgenesis and a chromosome 9p deletion.
+SY   46,XY gonadal dysgenesis complete or partial with 9p24.3 deletion.
+SY   Chromosome 9p24.3 deletion syndrome.
+DR   MIM; 154230; phenotype.
+DR   MedGen; C2752149.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 5.
+AC   DI-02807
+AR   SRXY5.
+DE   A disorder of sex development. Affected individuals have a 46,XY
+DE   karyotype but present as phenotypically normal females.
+SY   46,XY gonadal dysgenesis complete CBX2-related.
+SY   46,XY sex reversal CBX2-related.
+SY   Disorder of sex development 46,XY CBX2-related.
+SY   Sex reversal XY CBX2-related.
+DR   MIM; 613080; phenotype.
+DR   MedGen; C2751317.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 6.
+AC   DI-03052
+AR   SRXY6.
+DE   A disorder of sex development. Affected individuals have a 46,XY
+DE   karyotype but present as phenotypically normal females.
+SY   46,XY gonadal dysgenesis partial or complete MAP3K1-related.
+SY   46,XY sex reversal partial or complete MAP3K1-related.
+DR   MIM; 613762; phenotype.
+DR   MedGen; C3151064.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 7.
+AC   DI-01379
+AR   SRXY7.
+DE   A disorder of sex development. Affected individuals have a 46,XY
+DE   karyotype but present as phenotypically normal females. SRXY7 patients
+DE   have no functional gonads.
+SY   46,XY gonadal dysgenesis, partial or complete, DHH-related.
+SY   46,XY sex reversal, partial or complete, DHH-related.
+SY   Complete pure gonadal dysgenesis 46,XY type.
+SY   GDXYM.
+SY   Male-limited gonadal dysgenesis 46,XY.
+DR   MIM; 233420; phenotype.
+DR   MedGen; C1856273.
+DR   MedGen; CN068862.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 8.
+AC   DI-03279
+AR   SRXY8.
+DE   A disorder of sex development. Affected individuals have a 46,XY
+DE   karyotype but present as phenotypically normal females.
+SY   Male pseudohermaphroditism due to deficiency of testicular 17,20-desmolase.
+SY   TDD.
+DR   MIM; 614279; phenotype.
+DR   MedGen; C1839840.
+DR   MeSH; D006061.
+//
+ID   46,XY sex reversal 9.
+AC   DI-04251
+AR   SRXY9.
+DE   A disorder of sex development. Affected individuals have a 46,XY
+DE   karyotype but present as phenotypically normal females or have
+DE   ambiguous external genitalia.
+SY   46,XY sex reversal, ZFPM2-related.
+DR   MIM; 616067; phenotype.
+DR   MedGen; CN220529.
+DR   MeSH; D006061.
+//
+ID   5-oxoprolinase deficiency.
+AC   DI-03412
+AR   OPLAHD.
+DE   A disorder characterized by calcium oxalate/carbonate urolithiasis,
+DE   and excessive urinary 5-oxo-L-proline. Affected individuals have
+DE   recurrent episodes of vomiting, diarrhea, and abdominal pain.
+SY   Oxoprolinuria due to oxoprolinase deficiency.
+DR   MIM; 260005; phenotype.
+DR   MedGen; C0268525.
+DR   MeSH; D000592.
+//
+ID   Aaland island eye disease.
+AC   DI-01163
+AR   AIED.
+DE   A retinal disease characterized by a combination of fundus
+DE   hypopigmentation, decreased visual acuity due to foveal hypoplasia,
+DE   nystagmus, astigmatism, protan color vision defect, myopia, and
+DE   defective dark adaptation. Except for progression of axial myopia, the
+DE   disease can be considered to be a stationary condition.
+DE   Electroretinography reveals abnormalities in both photopic and
+DE   scotopic functions.
+SY   Aland island eye disease.
+SY   Forsius-Eriksson type ocular albinism.
+DR   MIM; 300600; phenotype.
+DR   MedGen; C0268505.
+DR   MeSH; D014786.
+//
+ID   Aarskog-Scott syndrome.
+AC   DI-00012
+AR   AAS.
+DE   An X-linked recessive, rare multisystemic disorder characterized by
+DE   disproportionately short stature, and by facial, skeletal and
+DE   urogenital anomalies. Some patients manifest mental retardation,
+DE   attention deficit disorder and hyperactivity.
+SY   Faciodigitogenital syndrome.
+SY   Faciogenital dysplasia.
+SY   Faciogenital dysplasia with attention deficit-hyperactivity disorder.
+DR   MIM; 305400; phenotype.
+DR   MedGen; C0175701.
+DR   MedGen; C1844569.
+DR   MedGen; C3275558.
+DR   MedGen; CN069557.
+DR   MeSH; D001289.
+//
+ID   ABCD syndrome.
+AC   DI-00013
+AR   ABCDS.
+DE   An autosomal recessive syndrome characterized by albinism, black lock
+DE   at temporal occipital region, bilateral deafness, aganglionosis of the
+DE   large intestine and total absence of neurocytes and nerve fibers in
+DE   the small intestine.
+SY   Albinism, black lock, cell migration disorder of the neurocytes of the gut and deafness.
+DR   MIM; 600501; phenotype.
+DR   MedGen; C1838099.
+DR   MedGen; C3179507.
+DR   MeSH; D014849.
+KW   KW-0015:Albinism.
+KW   KW-0209:Deafness.
+KW   KW-0367:Hirschsprung disease.
+//
+ID   Abdominal obesity-metabolic syndrome 3.
+AC   DI-04090
+AR   AOMS3.
+DE   A form of abdominal obesity-metabolic syndrome, a disorder
+DE   characterized by abdominal obesity, high triglycerides, low levels of
+DE   high density lipoprotein cholesterol, high blood pressure, and
+DE   elevated fasting glucose levels. AOMS3 is characterized by early-onset
+DE   coronary artery disease, central obesity, hypertension, and diabetes.
+SY   Central obesity, type 2 diabetes, hypertension, and early-onset coronary artery disease.
+DR   MIM; 615812; phenotype.
+DR   MedGen; CN188185.
+DR   MeSH; D024821.
+KW   KW-0219:Diabetes mellitus.
+KW   KW-0550:Obesity.
+//
+ID   Abetalipoproteinemia.
+AC   DI-00014
+AR   ABL.
+DE   An autosomal recessive disorder of lipoprotein metabolism. Affected
+DE   individuals produce virtually no circulating apolipoprotein B-
+DE   containing lipoproteins (chylomicrons, VLDL, LDL, lipoprotein(A)).
+DE   Malabsorption of the antioxidant vitamin E occurs, leading to
+DE   spinocerebellar and retinal degeneration.
+SY   Acanthocytosis.
+SY   Bassen-Kornzweig syndrome.
+SY   Microsomal triglyceride transfer protein deficiency.
+SY   MTP deficiency.
+DR   MIM; 200100; phenotype.
+DR   MedGen; C0000744.
+DR   MeSH; D000012.
+//
+ID   Ablepharon-macrostomia syndrome.
+AC   DI-04542
+AR   AMS.
+DE   A congenital ectodermal dysplasia characterized by absent eyelids,
+DE   macrostomia, microtia, redundant skin, sparse hair, dysmorphic nose
+DE   and ears, variable abnormalities of the nipples, genitalia, fingers,
+DE   and hands, largely normal intellectual and motor development, and poor
+DE   growth.
+DR   MIM; 200110; phenotype.
+DR   MedGen; C1860224.
+DR   MeSH; D005124.
+DR   MeSH; D008265.
+KW   KW-0038:Ectodermal dysplasia.
+//
+ID   Abnormal thyroid hormone metabolism.
+AC   DI-00015
+AR   ATHYHM.
+DE   A disorder associated with a reduction in type II iodothyronine
+DE   deiodinase activity.
+DR   MIM; 609698; phenotype.
+DR   MedGen; C1864761.
+DR   MeSH; D013959.
+//
+ID   Abruzzo-Erickson syndrome.
+AC   DI-03763
+AR   ABERS.
+DE   A disease characterized by cleft palate, coloboma, hypospadias,
+DE   deafness, short stature, and radial synostosis.
+SY   X-linked Charge-like syndrome.
+DR   MIM; 302905; phenotype.
+DR   MedGen; C1844862.
+DR   MeSH; D006314.
+DR   MeSH; D017880.
+DR   MeSH; D019767.
+KW   KW-0209:Deafness.
+KW   KW-0242:Dwarfism.
+//
+ID   Acatalasemia.
+AC   DI-00016
+AR   ACATLAS.
+DE   A metabolic disorder characterized by a total or near total loss of
+DE   catalase activity in red cells. It is often associated with ulcerating
+DE   oral lesions. Acatalasemia is inherited as an autosomal recessive
+DE   trait.
+SY   Acatalasia.
+SY   Catalase deficiency.
+SY   Takahara's disease.
+SY   Takahara disease.
+DR   MIM; 614097; phenotype.
+DR   MedGen; C0268419.
+DR   MeSH; D020642.
+//
+ID   Aceruloplasminemia.
+AC   DI-00017
+AR   ACERULOP.
+DE   An autosomal recessive disorder of iron metabolism characterized by
+DE   iron accumulation in the brain as well as visceral organs. Clinical
+DE   features consist of the triad of retinal degeneration, diabetes
+DE   mellitus and neurological disturbances.
+DR   MIM; 604290; phenotype.
+DR   MedGen; C0878682.
+DR   MedGen; C1858582.
+DR   MedGen; C1858583.
+DR   MeSH; D019189.
+//
+ID   Acetyl-CoA carboxylase 1 deficiency.
+AC   DI-01164
+AR   ACACAD.
+DE   An inborn error of de novo fatty acid synthesis associated with severe
+DE   brain damage, persistent myopathy and poor growth.
+SY   ACACA deficiency.
+SY   ACAC deficiency.
+SY   ACC1 deficiency.
+SY   ACC deficiency.
+DR   MIM; 613933; phenotype.
+DR   MedGen; C0268603.
+DR   MeSH; D008052.
+//
+ID   Achalasia-addisonianism-alacrima syndrome.
+AC   DI-00018
+AR   AAAS.
+DE   An autosomal recessive disorder characterized by adreno-corticotropic
+DE   hormone (ACTH)-resistant adrenal failure, achalasia of the esophageal
+DE   cardia and alacrima. The syndrome is associated with variable and
+DE   progressive neurological impairment involving the central, peripheral,
+DE   and autonomic nervous system. Other features such as palmoplantar
+DE   hyperkeratosis, short stature, facial dysmorphy and osteoporosis may
+DE   also be present.
+SY   ACTH-resistant adrenal insufficiency with achalasia and alacrima.
+SY   Addisonian-achalasia syndrome.
+SY   Alacrima-achalasia-addisonianism.
+SY   Alacrima-achalasia-adrenal insufficiency neurologic disorder.
+SY   Allgrove's syndrome.
+SY   Allgrove syndrome.
+SY   Glucocorticoid deficiency and achalasia.
+SY   Hypoadrenalism with achalasia.
+SY   Triple-A syndrome.
+DR   MIM; 231550; phenotype.
+DR   MedGen; C0271742.
+DR   MedGen; C1856419.
+DR   MedGen; C2931084.
+DR   MeSH; D000309.
+//
+ID   Acheiropody.
+AC   DI-01165
+AR   ACHP.
+DE   Very rare condition characterized by bilateral congenital amputations
+DE   of the hands and feet. The specific malformative phenotype consists of
+DE   a complete amputation of the distal epiphysis of the humerus,
+DE   amputation of the tibial diaphysis and aplasia of the radius, ulna,
+DE   fibula and of all the bones of the hands and feet.
+SY   Acheiropodia.
+SY   Acheiropody Brazilian type.
+DR   MIM; 200500; phenotype.
+DR   MedGen; C0265559.
+DR   MeSH; D005532.
+DR   MeSH; D006228.
+//
+ID   Achondrogenesis 1A.
+AC   DI-02719
+AR   ACG1A.
+DE   A form of achondrogenesis type 1, a lethal form of chondrodysplasia
+DE   characterized by deficient ossification in the lumbar vertebrae and
+DE   absent ossification in the sacral, pubic and ischial bones and
+DE   clinically by stillbirth or early death. In addition to severe
+DE   micromelia, there is a disproportionately large cranium due to marked
+DE   edema of soft tissues.
+SY   ACG-IA.
+SY   Achondrogenesis Houston-Harris type.
+SY   Achondrogenesis type IA.
+DR   MIM; 200600; phenotype.
+DR   MedGen; C0265273.
+DR   MeSH; D010009.
+KW   KW-0242:Dwarfism.
+//
+ID   Achondrogenesis 1B.
+AC   DI-00019
+AR   ACG1B.
+DE   A form of achondrogenesis type 1, a lethal form of chondrodysplasia
+DE   characterized by deficient ossification in the lumbar vertebrae and
+DE   absent ossification in the sacral, pubic and ischial bones and
+DE   clinically by stillbirth or early death. In addition to severe
+DE   micromelia, there is a disproportionately large cranium due to marked
+DE   edema of soft tissues. ACG1B is an autosomal recessive disease.
+SY   ACG-IB.
+SY   Achondrogenesis Fraccaro type.
+SY   Achondrogenesis type IB.
+SY   Fraccaro achondrogenesis.
+DR   MIM; 600972; phenotype.
+DR   MedGen; C0265274.
+DR   MeSH; D010009.
+KW   KW-0242:Dwarfism.
+//
+ID   Achondrogenesis 2.
+AC   DI-00020
+AR   ACG2.
+DE   An autosomal dominant disease characterized by the absence of
+DE   ossification in the vertebral column, sacrum and pubic bones.
+SY   ACG-II.
+SY   Achondrogenesis-hypochondrogenesis type II.
+SY   Achondrogenesis Langer-Saldino type.
+SY   Achondrogenesis type II.
+DR   MIM; 200610; phenotype.
+DR   MedGen; C0220685.
+DR   MedGen; C0542428.
+DR   MeSH; D010009.
+KW   KW-0242:Dwarfism.
+//
+ID   Achondroplasia.
+AC   DI-00021
+AR   ACH.
+DE   A frequent form of short-limb dwarfism. It is characterized by a long,
+DE   narrow trunk, short extremities, particularly in the proximal
+DE   (rhizomelic) segments, a large head with frontal bossing, hypoplasia
+DE   of the midface and a trident configuration of the hands. ACH is an
+DE   autosomal dominant disease.
+DR   MIM; 100800; phenotype.
+DR   MedGen; C0001080.
+DR   MeSH; D000130.
+KW   KW-0242:Dwarfism.
+//
+ID   Achondroplasia, severe, with developmental delay and acanthosis nigricans.
+AC   DI-04490
+AR   SADDAN.
+DE   A severe form of achondroplasia associated with developmental delay
+DE   and acanthosis nigricans. Patients manifest short-limb dwarfism, with
+DE   a long, narrow trunk, short extremities, particularly in the proximal
+DE   (rhizomelic) segments, a large head with frontal bossing, hypoplasia
+DE   of the midface and a trident configuration of the hands. Acanthosis
+DE   nigricans is a skin condition characterized by brown-pigmented,
+DE   velvety verrucosities in body folds and creases.
+SY   SADDAN dysplasia.
+DR   MIM; 616482; phenotype.
+DR   MedGen; CN231689.
+DR   MeSH; D000130.
+KW   KW-0242:Dwarfism.
+//
+ID   Achromatopsia 2.
+AC   DI-00022
+AR   ACHM2.
+DE   An autosomal recessive, ocular stationary disorder due to the absence
+DE   of functioning cone photoreceptors in the retina. It is characterized
+DE   by total colorblindness, low visual acuity, photophobia and nystagmus.
+SY   Complete achromatopsia.
+SY   RMCH2.
+SY   Rod monochromacy 2.
+SY   Rod monochromatism 2.
+SY   Total colorblindness.
+DR   MIM; 216900; phenotype.
+DR   MedGen; C1857618.
+DR   MeSH; D003117.
+//
+ID   Achromatopsia 3.
+AC   DI-00023
+AR   ACHM3.
+DE   An autosomal recessive, ocular stationary disorder due to the absence
+DE   of functioning cone photoreceptors in the retina. It is characterized
+DE   by total colorblindness, low visual acuity, photophobia and nystagmus.
+DE   Achromatopsia type 3 patients manifest severe myopia.
+SY   Achromatopsia with myopia.
+SY   Pingelapese blindness.
+SY   Total colorblindness with myopia.
+DR   MIM; 262300; phenotype.
+DR   MedGen; C1849792.
+DR   MeSH; D003117.
+//
+ID   Achromatopsia 4.
+AC   DI-01166
+AR   ACHM4.
+DE   An ocular stationary disorder due to the absence of functioning cone
+DE   photoreceptors in the retina. It is characterized by total
+DE   colorblindness, low visual acuity, photophobia and nystagmus.
+DR   MIM; 613856; phenotype.
+DR   MedGen; C1841721.
+DR   MeSH; D003117.
+//
+ID   Achromatopsia 5.
+AC   DI-05080
+AR   ACHM5.
+DE   A form of achromatopsia, an ocular stationary disorder due to the
+DE   absence of functioning cone photoreceptors in the retina. It is
+DE   characterized by total colorblindness, low visual acuity, photophobia
+DE   and nystagmus. ACHM5 inheritance is autosomal recessive.
+DR   MIM; 613093; phenotype.
+DR   MedGen; C2751309.
+DR   MeSH; D003117.
+//
+ID   Achromatopsia 7.
+AC   DI-04499
+AR   ACHM7.
+DE   A form of achromatopsia, an ocular stationary disorder due to the
+DE   absence of functioning cone photoreceptors in the retina. It is
+DE   characterized by total colorblindness, low visual acuity, photophobia
+DE   and nystagmus.
+DR   MIM; 616517; phenotype.
+DR   MedGen; C4225297.
+DR   MeSH; D003117.
+//
+ID   Acid-labile subunit deficiency.
+AC   DI-04198
+AR   ACLSD.
+DE   A disorder characterized by severely reduced serum IGF-I and IGFBP-3
+DE   concentrations and mild growth retardation. Pubertal delay in boys and
+DE   insulin insensitivity are common findings.
+DR   MIM; 615961; phenotype.
+DR   MedGen; CN069120.
+DR   MeSH; D006130.
+//
+ID   Acne inversa, familial, 1.
+AC   DI-02995
+AR   ACNINV1.
+DE   A chronic relapsing inflammatory disease of the hair follicles
+DE   characterized by recurrent draining sinuses, painful skin abscesses,
+DE   and disfiguring scars. Manifestations typically appear after puberty.
+SY   Acne inversa familial.
+SY   Hidradenitis suppurativa familial.
+DR   MIM; 142690; phenotype.
+DR   MedGen; C1840560.
+DR   MeSH; D017497.
+//
+ID   Acne inversa, familial, 2, with or without Dowling-Degos disease.
+AC   DI-02996
+AR   ACNINV2.
+DE   An autosomal dominant form of acne inversa, a chronic relapsing
+DE   inflammatory disease of the hair follicles characterized by recurrent
+DE   draining sinuses, painful skin abscesses, and disfiguring scars.
+DE   Manifestations typically appear after puberty. Some ACNINV2 patients
+DE   also exhibit reticulate hyperpigmentation consistent with Dowling-
+DE   Degos disease.
+SY   Acne inversa familial.
+SY   Hidradenitis suppurativa familial.
+DR   MIM; 613736; phenotype.
+DR   MedGen; C3151037.
+DR   MeSH; D017497.
+//
+ID   Acne inversa, familial, 3.
+AC   DI-02997
+AR   ACNINV3.
+DE   A chronic relapsing inflammatory disease of the hair follicles
+DE   characterized by recurrent draining sinuses, painful skin abscesses,
+DE   and disfiguring scars. Manifestations typically appear after puberty.
+SY   Acne inversa familial.
+SY   Hidradenitis suppurativa familial.
+DR   MIM; 613737; phenotype.
+DR   MedGen; C3151038.
+DR   MeSH; D017497.
+//
+ID   Acro-dermato-ungual-lacrimal-tooth syndrome.
+AC   DI-00028
+AR   ADULT syndrome.
+DE   A form of ectodermal dysplasia. Ectodermal dysplasia defines a
+DE   heterogeneous group of disorders due to abnormal development of two or
+DE   more ectodermal structures. ADULT syndrome involves ectrodactyly,
+DE   syndactyly, finger- and toenail dysplasia, hypoplastic breasts and
+DE   nipples, intensive freckling, lacrimal duct atresia, frontal alopecia,
+DE   primary hypodontia and loss of permanent teeth. ADULT syndrome differs
+DE   significantly from EEC3 syndrome by the absence of facial clefting.
+DE   Inheritance is autosomal dominant.
+DR   MIM; 103285; phenotype.
+DR   MedGen; C1863204.
+DR   MeSH; D004476.
+KW   KW-0038:Ectodermal dysplasia.
+//
+ID   Acrocallosal syndrome.
+AC   DI-00025
+AR   ACLS.
+DE   An autosomal recessive syndrome characterized by hypogenesis or
+DE   agenesis of the corpus callosum. Clinical features include postaxial
+DE   polydactyly, hallux duplication, macrocephaly, craniofacial
+DE   abnormalities, severe developmental delay and mental retardation.
+SY   Hallux duplication postaxial polydactyly and absence of corpus callosum.
+SY   Schinzel acrocallosal syndrome.
+DR   MIM; 200990; phenotype.
+DR   MedGen; C0796147.
+DR   MedGen; C2931760.
+DR   MeSH; D055673.
+KW   KW-1186:Ciliopathy.
+//
+ID   Acrocapitofemoral dysplasia.
+AC   DI-00026
+AR   ACFD.
+DE   An autosomal recessive disorder characterized by short stature of
+DE   variable severity with postnatal onset. The most constant radiographic
+DE   abnormalities are observed in the tubular bones of the hands and in
+DE   the proximal part of the femur. Cone-shaped epiphyses or a similar
+DE   epiphyseal configuration with premature epimetaphyseal fusion result
+DE   in shortening of the skeletal components involved. Cone-shaped
+DE   epiphyses are also present to a variable extent at the shoulders,
+DE   knees and ankles.
+DR   MIM; 607778; phenotype.
+DR   MedGen; C1843096.
+DR   MeSH; D001848.
+DR   MeSH; D017880.
+//
+ID   Acrodermatitis enteropathica, zinc-deficiency type.
+AC   DI-00027
+AR   AEZ.
+DE   A rare autosomal recessive disease caused by the inability to absorb
+DE   sufficient zinc. The clinical features are growth retardation, immune-
+DE   system dysfunction, alopecia, severe dermatitis, diarrhea and
+DE   occasionally mental disorders.
+DR   MIM; 201100; phenotype.
+DR   MedGen; C0221036.
+DR   MeSH; D000169.
+//
+ID   Acrodysostosis 1, with or without hormone resistance.
+AC   DI-03459
+AR   ACRDYS1.
+DE   A form of skeletal dysplasia characterized by short stature, severe
+DE   brachydactyly, facial dysostosis, and nasal hypoplasia. Affected
+DE   individuals often have advanced bone age and obesity. Laboratory
+DE   studies show resistance to multiple hormones, including parathyroid,
+DE   thyrotropin, calcitonin, growth hormone-releasing hormone, and
+DE   gonadotropin. However, not all patients show endocrine abnormalities.
+SY   ADOHR.
+SY   Arkless-Graham syndrome.
+SY   Maroteaux-Malamut syndrome.
+DR   MIM; 101800; phenotype.
+DR   MedGen; C0220659.
+DR   MedGen; C3276228.
+DR   MeSH; D004413.
+//
+ID   Acrodysostosis 2, with or without hormone resistance.
+AC   DI-03460
+AR   ACRDYS2.
+DE   A pleiotropic disorder characterized by skeletal, endocrine, and
+DE   neurological abnormalities. Skeletal features include brachycephaly,
+DE   midface hypoplasia with a small upturned nose, brachydactyly, and
+DE   lumbar spinal stenosis. Endocrine abnormalities include hypothyroidism
+DE   and hypogonadism in males and irregular menses in females.
+DE   Developmental disability is a common finding but is variable in
+DE   severity and can be associated with significant behavioral problems.
+DR   MIM; 614613; phenotype.
+DR   MedGen; C3553250.
+DR   MedGen; CN124736.
+DR   MeSH; D004413.
+//
+ID   Acrofacial dysostosis 1, Nager type.
+AC   DI-03474
+AR   AFD1.
+DE   A form of acrofacial dysostosis, a group of disorders which are
+DE   characterized by malformation of the craniofacial skeleton and the
+DE   limbs. The major facial features of AFD1 include downslanted palpebral
+DE   fissures, midface retrusion, and micrognathia, the latter of which
+DE   often requires the placement of a tracheostomy in early childhood.
+DE   Limb defects typically involve the anterior (radial) elements of the
+DE   upper limbs and manifest as small or absent thumbs, triphalangeal
+DE   thumbs, radial hyoplasia or aplasia, and radioulnar synostosis.
+DE   Phocomelia of the upper limbs and, occasionally, lower-limb defects
+DE   have also been reported.
+SY   AFD Nager type.
+SY   Mandibulofacial dysostosis Treacher Collins type with limb anomalies.
+SY   Nager acrofacial dysostosis.
+SY   Nager syndrome.
+DR   MIM; 154400; phenotype.
+DR   MedGen; C0265245.
+DR   MeSH; D008342.
+//
+ID   Acrofacial dysostosis, Cincinnati type.
+AC   DI-04483
+AR   AFDCIN.
+DE   A form of acrofacial dysostosis, a group of disorders which are
+DE   characterized by malformation of the craniofacial skeleton and, in
+DE   some patients, the limbs.
+DR   MIM; 616462; phenotype.
+DR   MedGen; CN231445.
+DR   MeSH; D008342.
+//
+ID   Acrofacial dysostosis, Weyers type.
+AC   DI-00029
+AR   WAD.
+DE   An autosomal dominant condition characterized by dysplastic nails,
+DE   postaxial polydactyly, dental anomalies, short limbs, short stature
+DE   and normal intelligence. The phenotype is milder than Ellis-van
+DE   Creveld syndrome.
+SY   Acrodental dysostosis of Weyers.
+SY   Curry-Hall syndrome.
+SY   Weyers acrofacial dysostosis.
+DR   MIM; 193530; phenotype.
+DR   MedGen; C0457013.
+DR   MeSH; D004413.
+//
+ID   Acrokeratosis verruciformis.
+AC   DI-00030
+AR   AKV.
+DE   A localized disorder of keratinization, which is inherited as an
+DE   autosomal dominant trait. Its onset is early in life with multiple
+DE   flat-topped, flesh-colored papules on the hands and feet, punctate
+DE   keratoses on the palms and soles, with varying degrees of nail
+DE   involvement. The histopathology shows a distinctive pattern of
+DE   epidermal features with hyperkeratosis, hypergranulosis and acanthosis
+DE   together with papillomatosis. These changes are frequently associated
+DE   with circumscribed elevations of the epidermis that are said to
+DE   resemble church spires. There are no features of dyskeratosis or
+DE   acantholysis, the typical findings in lesions of Darier disease.
+SY   Hopf disease.
+DR   MIM; 101900; phenotype.
+DR   MedGen; C0265971.
+DR   MeSH; D007642.
+//
+ID   Acromelic frontonasal dysostosis.
+AC   DI-04203
+AR   AFND.
+DE   A rare variant form of frontonasal dysplasia, an array of
+DE   abnormalities affecting the eyes, forehead and nose and linked to
+DE   midfacial dysraphia. The clinical picture is highly variable. Major
+DE   findings include true ocular hypertelorism, broadening of the nasal
+DE   root, median facial cleft affecting the nose and/or upper lip and
+DE   palate, unilateral or bilateral clefting of the alae nasi, lack of
+DE   formation of the nasal tip, anterior cranium bifidum occultum, a V-
+DE   shaped or widow's peak frontal hairline. AFND is characterized by the
+DE   association of frontonasal malformations with various combinations of
+DE   polydactyly, tibial hypoplasia, epibulbar dermoid, encephalocoele,
+DE   corpus callosum agenesis and Dandy-Walker malformation.
+DR   MIM; 603671; phenotype.
+DR   MedGen; C1863616.
+DR   MeSH; D000013.
+//
+ID   Acromesomelic chondrodysplasia, Grebe type.
+AC   DI-00031
+AR   AMDG.
+DE   An autosomal recessive acromesomelic chondrodysplasia. Acromesomelic
+DE   chondrodysplasias are rare hereditary skeletal disorders characterized
+DE   by short stature, very short limbs and hand/foot malformations. The
+DE   severity of limb abnormalities increases from proximal to distal with
+DE   profoundly affected hands and feet showing brachydactyly and/or
+DE   rudimentary fingers (knob-like fingers). AMDG is characterized by
+DE   normal axial skeletons and missing or fused skeletal elements within
+DE   the hands and feet.
+DR   MIM; 200700; phenotype.
+DR   MedGen; C0265260.
+DR   MeSH; D004392.
+KW   KW-0242:Dwarfism.
+//
+ID   Acromesomelic chondrodysplasia, Hunter-Thompson type.
+AC   DI-00032
+AR   AMDH.
+DE   An autosomal recessive form of dwarfism. Patients have limb
+DE   abnormalities, with the middle and distal segments being most affected
+DE   and the lower limbs more affected than the upper. AMDH is
+DE   characterized by normal axial skeletons and missing or fused skeletal
+DE   elements within the hands and feet.
+DR   MIM; 201250; phenotype.
+DR   MedGen; CN028907.
+DR   MeSH; D004392.
+KW   KW-0242:Dwarfism.
+//
+ID   Acromesomelic dysplasia, Demirhan type.
+AC   DI-00033
+AR   AMDD.
+DE   A form of chondrodysplasia. Acromesomelic chondrodysplasias are rare
+DE   hereditary skeletal disorders characterized by short stature, very
+DE   short limbs and hand/foot malformations. The severity of limb
+DE   abnormalities increases from proximal to distal with profoundly
+DE   affected hands and feet showing brachydactyly and/or rudimentary
+DE   fingers (knob-like fingers). AMDD inheritance is autosomal recessive.
+SY   Acromesomelic chondrodysplasia, with genital anomalies.
+SY   Chondrodysplasia, acromesomelic, with or without genital anomalies.
+DR   MIM; 609441; phenotype.
+DR   MedGen; C1836182.
+DR   MeSH; D004392.
+DR   MeSH; D010009.
+KW   KW-0242:Dwarfism.
+//
+ID   Acromesomelic dysplasia, Maroteaux type.
+AC   DI-00034
+AR   AMDM.
+DE   An autosomal recessive acromesomelic chondrodysplasia. Acromesomelic
+DE   chondrodysplasias are rare hereditary skeletal disorders characterized
+DE   by short stature, very short limbs and hand/foot malformations. The
+DE   severity of limb abnormalities increases from proximal to distal with
+DE   profoundly affected hands and feet showing brachydactyly and/or
+DE   rudimentary fingers (knob-like fingers). AMDM is characterized by
+DE   axial skeletal involvement with wedging of vertebral bodies. In AMDM
+DE   all skeletal elements are present but show abnormal rates of linear
+DE   growth.
+SY   St. Helena dysplasia.
+DR   MIM; 602875; phenotype.
+DR   MedGen; C0265278.
+DR   MedGen; C1864356.
+DR   MeSH; D004392.
+KW   KW-0242:Dwarfism.
+//
+ID   Acromicric dysplasia.
+AC   DI-03225
+AR   ACMICD.
+DE   An autosomal dominant disorder characterized by severe short stature,
+DE   short hands and feet, joint limitations, and skin thickening.
+DE   Radiologic features include delayed bone age, cone-shaped epiphyses,
+DE   shortened long tubular bones, and ovoid vertebral bodies. Affected
+DE   individuals have distinct facial features, including round face, well-
+DE   defined eyebrows, long eyelashes, bulbous nose with anteverted
+DE   nostrils, long and prominent philtrum, and thick lips with a small
+DE   mouth. Other characteristic features include hoarse voice and
+DE   pseudomuscular build, and there are distinct skeletal features as
+DE   well, including an internal notch of the femoral head, internal notch
+DE   of the second metacarpal, and external notch of the fifth metacarpal.
+DR   MIM; 102370; phenotype.
+DR   MedGen; CN074238.
+DR   MeSH; D001848.
+KW   KW-0242:Dwarfism.
+//
+ID   ACTH deficiency, isolated.
+AC   DI-00035
+AR   IAD.
+DE   An autosomal recessive disorder that is characterized by adrenal
+DE   insufficiency symptoms, such as weight loss, lack of appetite
+DE   (anorexia), weakness, nausea, vomiting and low blood pressure
+DE   (hypotension). The pituitary hormone ACTH is decreased or absent, and
+DE   other cortisol and other steroid hormone levels in the blood are
+DE   abnormally low.
+SY   Adrenocorticotropic hormone deficiency.
+DR   MIM; 201400; phenotype.
+DR   MedGen; C0271583.
+DR   MedGen; C0342388.
+DR   MeSH; D007018.
+//
+ID   ACTH-independent macronodular adrenal hyperplasia 1.
+AC   DI-01167
+AR   AIMAH1.
+DE   A rare adrenal defect characterized by multiple, bilateral, non-
+DE   pigmented, benign, adrenocortical nodules. It results in excessive
+DE   production of cortisol leading to ACTH-independent Cushing syndrome.
+DE   Clinical manifestations of Cushing syndrome include facial and truncal
+DE   obesity, abdominal striae, muscular weakness, osteoporosis, arterial
+DE   hypertension, diabetes.
+SY   ACTH-independent Cushing syndrome.
+SY   ACTH-independent macronodular adrenocortical hyperplasia.
+SY   Adrenal Cushing syndrome due to AIMAH.
+SY   Adrenocorticotropic hormone-independent macronodular adrenal hyperplasia.
+SY   Corticotropin-independent macronodular adrenal hyperplasia.
+DR   MIM; 219080; phenotype.
+DR   MedGen; C1857451.
+DR   MeSH; D003480.
+KW   KW-1062:Cushing syndrome.
+//
+ID   ACTH-independent macronodular adrenal hyperplasia 2.
+AC   DI-04195
+AR   AIMAH2.
+DE   A form of macronodular adrenal hyperplasia characterized by multiple,
+DE   bilateral, non-pigmented, benign, adrenocortical nodules. It results
+DE   in excessive production of cortisol leading to ACTH-independent
+DE   Cushing syndrome. Clinical manifestations of Cushing syndrome include
+DE   facial and truncal obesity, abdominal striae, muscular weakness,
+DE   osteoporosis, arterial hypertension, diabetes.
+SY   Primary macronodular adrenal hyperplasia.
+DR   MIM; 615954; phenotype.
+DR   MedGen; CN207837.
+DR   MeSH; D003480.
+KW   KW-1062:Cushing syndrome.
+//
+ID   Activated PI3K-delta syndrome.
+AC   DI-03995
+AR   APDS.
+DE   A disorder characterized by recurrent respiratory infections,
+DE   progressive airway damage, lymphopenia, increased circulating
+DE   transitional B cells, increased immunoglobulin M, reduced
+DE   immunoglobulin G2 levels in serum, and impaired vaccine responses.
+SY   Activated PI3K-delta immunodeficiency syndrome.
+SY   IMD14.
+SY   Immunodeficiency 14.
+SY   p110-delta-activating mutation causing senescent T cells, lymphadenopathy, and immunodeficiency.
+SY   PASLI.
+DR   MIM; 615513; phenotype.
+DR   MedGen; C3714976.
+DR   MedGen; CN185290.
+DR   MeSH; D007153.
+//
+ID   Acute hepatic porphyria.
+AC   DI-00036
+AR   AHEPP.
+DE   A form of porphyria. Porphyrias are inherited defects in the
+DE   biosynthesis of heme, resulting in the accumulation and increased
+DE   excretion of porphyrins or porphyrin precursors. They are classified
+DE   as erythropoietic or hepatic, depending on whether the enzyme
+DE   deficiency occurs in red blood cells or in the liver. AHP is
+DE   characterized by attacks of gastrointestinal disturbances, abdominal
+DE   colic, paralyses and peripheral neuropathy. Most attacks are
+DE   precipitated by drugs, alcohol, caloric deprivation, infections, or
+DE   endocrine factors.
+SY   ALAD deficiency.
+SY   Delta-aminolevulinate dehydratase deficiency.
+SY   Doss porphyria.
+SY   Porphobilinogen synthase deficiency.
+SY   Porphyria ALAD.
+DR   MIM; 612740; phenotype.
+DR   MedGen; C0268328.
+DR   MedGen; C2748608.
+DR   MeSH; D017094.
+//
+ID   Acute intermittent porphyria.
+AC   DI-00037
+AR   AIP.
+DE   A form of porphyria. Porphyrias are inherited defects in the
+DE   biosynthesis of heme, resulting in the accumulation and increased
+DE   excretion of porphyrins or porphyrin precursors. They are classified
+DE   as erythropoietic or hepatic, depending on whether the enzyme
+DE   deficiency occurs in red blood cells or in the liver. AIP is an
+DE   autosomal dominant form of hepatic porphyria characterized by attacks
+DE   of gastrointestinal disturbances, abdominal colic, with neurological
+DE   dysfunctions, hypertension, tachycardia and peripheral neuropathy.
+DE   Most attacks are precipitated by drugs, alcohol, caloric deprivation,
+DE   infections, or endocrine factors.
+SY   PBGD deficiency.
+SY   Porphobilinogen deaminase deficiency.
+SY   Porphyria, Swedish type.
+SY   UPS deficiency.
+SY   Uroporphyrinogen synthase deficiency.
+DR   MIM; 176000; phenotype.
+DR   MedGen; C0162565.
+DR   MedGen; C0268322.
+DR   MedGen; C0311292.
+DR   MedGen; C1867969.
+DR   MedGen; C2936779.
+DR   MeSH; D017118.
+//
+ID   Acyl-CoA dehydrogenase family, member 9, deficiency.
+AC   DI-01173
+AR   ACAD9 deficiency.
+DE   An autosomal recessive metabolic disorder associated with
+DE   mitochondrial complex I deficiency, resulting in multisystemic and
+DE   variable manifestations. Clinical features include infantile onset of
+DE   acute metabolic acidosis, Reye-like episodes (brain edema and vomiting
+DE   that may rapidly progress to seizures, coma and death), exercise
+DE   intolerance, hypertrophic cardiomyopathy, liver failure, muscle
+DE   weakness, and neurologic dysfunction.
+SY   Mitochondrial complex I deficiency due to ACAD9 deficiency.
+DR   MIM; 611126; phenotype.
+DR   MedGen; C1970173.
+DR   MeSH; D008661.
+DR   MeSH; D028361.
+KW   KW-1274:Primary mitochondrial disease.
+//
+ID   Acyl-CoA dehydrogenase medium-chain deficiency.
+AC   DI-01956
+AR   ACADMD.
+DE   An inborn error of mitochondrial fatty acid beta-oxidation which
+DE   causes fasting hypoglycemia, hepatic dysfunction and encephalopathy,
+DE   often resulting in death in infancy.
+SY   ACADM deficiency.
+SY   Carnitine deficiency secondary to medium-chain acyl-Coa dehydrogenase deficiency.
+SY   MCAD deficiency.
+SY   MCADH deficiency.
+DR   MIM; 201450; phenotype.
+DR   MedGen; C0220710.
+DR   MeSH; D008052.
+//
+ID   Acyl-CoA dehydrogenase short-chain deficiency.
+AC   DI-02301
+AR   ACADSD.
+DE   An inborn error of mitochondrial fatty acid beta-oxidation resulting
+DE   in acute acidosis and muscle weakness in infants, and a form of lipid-
+DE   storage myopathy in adults.
+SY   ACADS deficiency.
+SY   Lipid-storage myopathy secondary to short-chain acyl-CoA dehydrogenase deficiency.
+SY   SCAD deficiency.
+SY   SCADH deficiency.
+DR   MIM; 201470; phenotype.
+DR   MedGen; C0342783.
+DR   MeSH; D008052.
+//
+ID   Acyl-CoA dehydrogenase very long-chain deficiency.
+AC   DI-02411
+AR   ACADVLD.
+DE   An inborn error of mitochondrial fatty acid beta-oxidation which leads
+DE   to impaired long-chain fatty acid beta-oxidation. It is clinically
+DE   heterogeneous, with three major phenotypes: a severe childhood form
+DE   characterized by early onset, high mortality and high incidence of
+DE   cardiomyopathy; a milder childhood form with later onset,
+DE   characterized by hypoketotic hypoglycemia, low mortality and rare
+DE   cardiomyopathy; an adult form, with isolated skeletal muscle
+DE   involvement, rhabdomyolysis and myoglobinuria, usually triggered by
+DE   exercise or fasting.
+SY   ACADL deficiency.
+SY   Acyl-CoA dehydrogenase long-chain deficiency.
+SY   LCAD deficiency.
+SY   VLCAD deficiency.
+DR   MIM; 201475; phenotype.
+DR   MedGen; C0342784.
+DR   MeSH; D008052.
+//
+ID   Adams-Oliver syndrome 1.
+AC   DI-03194
+AR   AOS1.
+DE   A disorder characterized by the congenital absence of skin (aplasia
+DE   cutis congenita) in combination with transverse limb defects. Aplasia
+DE   cutis congenita can be located anywhere on the body, but in the vast
+DE   majority of the cases, it is present on the posterior parietal region
+DE   where it is often associated with an underlying defect of the parietal
+DE   bones. Limb abnormalities are typically limb truncation defects
+DE   affecting the distal phalanges or entire digits (true ectrodactyly).
+DE   Only rarely, metatarsals/metacarpals or more proximal limb structures
+DE   are also affected. Apart from transverse limb defects, syndactyly,
+DE   most commonly of second and third toes, can also be observed. The
+DE   clinical features are highly variable and can also include
+DE   cardiovascular malformations, brain abnormalities and vascular defects
+DE   such as cutis marmorata and dilated scalp veins.
+SY   Absence defect of limbs scalp and skull.
+SY   Aplasia cutis congenita with terminal transverse limb defects.
+SY   Congenital scalp defects with distal limb reduction anomalies.
+DR   MIM; 100300; phenotype.
+DR   MedGen; C0265268.
+DR   MedGen; C1970140.
+DR   MedGen; CN028867.
+DR   MeSH; D004476.
+DR   MeSH; D017880.
+//
+ID   Adams-Oliver syndrome 2.
+AC   DI-03223
+AR   AOS2.
+DE   A disorder characterized by the congenital absence of skin (aplasia
+DE   cutis congenita) in combination with transverse limb defects. Aplasia
+DE   cutis congenita can be located anywhere on the body, but in the vast
+DE   majority of the cases, it is present on the posterior parietal region
+DE   where it is often associated with an underlying defect of the parietal
+DE   bones. Limb abnormalities are typically limb truncation defects
+DE   affecting the distal phalanges or entire digits (true ectrodactyly).
+DE   Only rarely, metatarsals/metacarpals or more proximal limb structures
+DE   are also affected. Apart from transverse limb defects, syndactyly,
+DE   most commonly of second and third toes, can also be observed. The
+DE   clinical features are highly variable and can also include
+DE   cardiovascular malformations, brain abnormalities and vascular defects
+DE   such as cutis marmorata and dilated scalp veins.
+DR   MIM; 614219; phenotype.
+DR   MedGen; C3280182.
+DR   MeSH; D004476.
+DR   MeSH; D017880.
+//
+ID   Adams-Oliver syndrome 3.
+AC   DI-03522
+AR   AOS3.
+DE   An autosomal dominant form of Adams-Oliver syndrome, a disorder
+DE   characterized by the congenital absence of skin (aplasia cutis
+DE   congenita) in combination with transverse limb defects. Aplasia cutis
+DE   congenita can be located anywhere on the body, but in the vast
+DE   majority of the cases, it is present on the posterior parietal region
+DE   where it is often associated with an underlying defect of the parietal
+DE   bones. Limb abnormalities are typically limb truncation defects
+DE   affecting the distal phalanges or entire digits (true ectrodactyly).
+DE   Only rarely, metatarsals/metacarpals or more proximal limb structures
+DE   are also affected. Apart from transverse limb defects, syndactyly,
+DE   most commonly of second and third toes, can also be observed. The
+DE   clinical features are highly variable and can also include
+DE   cardiovascular malformations, brain abnormalities and vascular defects
+DE   such as cutis marmorata and dilated scalp veins. AOS3 patients
+DE   manifest characteristic vertex scalp defects and terminal limb
+DE   defects, but without congenital heart defects, other associated
+DE   defects, or immune defects.
+DR   MIM; 614814; phenotype.
+DR   MedGen; C3553748.
+DR   MedGen; CN143713.
+DR   MeSH; D004476.
+DR   MeSH; D017880.
+//
+ID   Adams-Oliver syndrome 4.
+AC   DI-03817
+AR   AOS4.
+DE   A form of Adams-Oliver syndrome, a disorder characterized by the
+DE   congenital absence of skin (aplasia cutis congenita) in combination
+DE   with transverse limb defects. Aplasia cutis congenita can be located
+DE   anywhere on the body, but in the vast majority of the cases, it is
+DE   present on the posterior parietal region where it is often associated
+DE   with an underlying defect of the parietal bones. Limb abnormalities
+DE   are typically limb truncation defects affecting the distal phalanges
+DE   or entire digits (true ectrodactyly). Only rarely,
+DE   metatarsals/metacarpals or more proximal limb structures are also
+DE   affected. Apart from transverse limb defects, syndactyly, most
+DE   commonly of second and third toes, can also be observed. The clinical
+DE   features are highly variable and can also include cardiovascular
+DE   malformations, brain abnormalities and vascular defects such as cutis
+DE   marmorata and dilated scalp veins.
+DR   MIM; 615297; phenotype.
+DR   MedGen; C3809092.
+DR   MedGen; CN177721.
+DR   MeSH; D004476.
+DR   MeSH; D017880.
+//
