@@ -1,18 +1,12 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-
-import javax.xml.bind.Marshaller;
-
-import org.springframework.http.MediaType;
-
 import com.sun.xml.bind.marshaller.DataWriter;
-
+import org.springframework.http.MediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.*;
 
 /**
  *
@@ -57,6 +51,18 @@ public abstract class AbstractXmlMessageConverter<T, X> extends AbstractEntityHt
 	@Override
 	protected void after(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
 		outputStream.write(getFooter().getBytes());
+	}
+
+	protected Marshaller createMarshaller(String context) {
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(context);
+			Marshaller contextMarshaller = jaxbContext.createMarshaller();
+			contextMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			contextMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+			return contextMarshaller;
+		} catch (Exception e) {
+			throw new RuntimeException("JAXB initialisation failed", e);
+		}
 	}
 
 	private String getXmlString(T uniProtEntry) {

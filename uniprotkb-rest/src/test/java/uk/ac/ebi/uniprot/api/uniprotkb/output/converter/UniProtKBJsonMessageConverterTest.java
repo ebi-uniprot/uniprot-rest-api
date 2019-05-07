@@ -5,23 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import org.junit.Before;
 import org.junit.Test;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetItem;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.api.uniprotkb.output.converter.UniProtKBJsonMessageConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -31,12 +28,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
  * @author Edd
  */
 public class UniProtKBJsonMessageConverterTest {
-    private UniProtKBJsonMessageConverter converter;
+    private UniProtKBJsonMessageConverterTester converter;
     private ByteArrayOutputStream outputStream;
 
     @Before
     public void setUp() {
-        converter = new UniProtKBJsonMessageConverter();
+        converter = new UniProtKBJsonMessageConverterTester();
         outputStream = new ByteArrayOutputStream();
     }
 
@@ -124,6 +121,21 @@ public class UniProtKBJsonMessageConverterTest {
     }
 
     // TODO: 08/11/18 test entity writing after flow has changed
+
+    // class used to allow access methods before and after to test it properly...
+    private static class UniProtKBJsonMessageConverterTester extends UniProtKBJsonMessageConverter{
+
+        @Override
+        protected void before(MessageConverterContext context, OutputStream outputStream) throws IOException {
+            super.before(context,outputStream);
+        }
+
+        @Override
+        protected void after(MessageConverterContext context, OutputStream outputStream) throws IOException {
+            super.after(context,outputStream);
+        }
+
+    }
 
     @Data
     private static class ResponseType {
