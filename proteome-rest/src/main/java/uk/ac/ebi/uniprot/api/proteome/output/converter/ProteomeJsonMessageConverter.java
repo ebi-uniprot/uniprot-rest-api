@@ -18,12 +18,12 @@ import java.util.Map;
 public class ProteomeJsonMessageConverter extends AbstractJsonMessageConverter<ProteomeEntry> {
 
 	public ProteomeJsonMessageConverter() {
-		super(ProteomeJsonConfig.getInstance().getDefaultFullObjectMapper());
+		super(ProteomeJsonConfig.getInstance().getFullObjectMapper());
 	}
 
 	@Override
-	protected ProteomeEntry filterEntryContent(ProteomeEntry entry) {
-		return entry; //TODO: Filters are not being applied for proteome entry in JSON FORMAT.....
+	protected ProteomeEntry filterEntryContent(ProteomeEntry entity) {
+		return entity; //TODO: Filters are not being applied for proteome entry in JSON FORMAT.....
 	}
 
 	@Override

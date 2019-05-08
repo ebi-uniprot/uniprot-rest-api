@@ -16,12 +16,12 @@ public class UniProtKBJsonMessageConverter extends AbstractJsonMessageConverter<
     }
 
     @Override
-    protected UniProtEntry filterEntryContent(UniProtEntry uniProtEntry) {
+    protected UniProtEntry filterEntryContent(UniProtEntry entity) {
         Map<String, List<String>> filters = getThreadLocalFilterMap();
         if (filters != null && !filters.isEmpty()) {
-            uniProtEntry = EntryFilters.filterEntry(uniProtEntry, filters);
+        	entity = EntryFilters.filterEntry(entity, filters);
         }
-        return uniProtEntry;
+        return entity;
     }
 
     @Override

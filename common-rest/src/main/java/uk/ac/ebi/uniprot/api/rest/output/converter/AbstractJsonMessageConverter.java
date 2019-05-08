@@ -28,7 +28,7 @@ public abstract  class AbstractJsonMessageConverter<T> extends AbstractEntityHtt
     }
 
     @Override
-    protected void before(MessageConverterContext context, OutputStream outputStream) throws IOException {
+    protected void before(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
         tlFilters.set(getFilterFieldMap(context.getFields()));
 
         JsonGenerator generator = objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
@@ -59,7 +59,7 @@ public abstract  class AbstractJsonMessageConverter<T> extends AbstractEntityHtt
     }
 
     @Override
-    protected void after(MessageConverterContext context, OutputStream outputStream) throws IOException {
+    protected void after(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
 
         if(!context.isEntityOnly()) {
@@ -74,7 +74,7 @@ public abstract  class AbstractJsonMessageConverter<T> extends AbstractEntityHtt
         return tlFilters.get();
     }
 
-    protected abstract T filterEntryContent(T uniProtEntry);
+    protected abstract T filterEntryContent(T entity);
 
     protected abstract Map<String, List<String>> getFilterFieldMap(String fields);
 
