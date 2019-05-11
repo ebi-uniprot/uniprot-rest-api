@@ -1,5 +1,8 @@
 package uk.ac.ebi.uniprot.api.disease.validator;
 
+import lombok.Getter;
+
+@Getter
 public enum DiseaseFields {
     ACCESSION("accession", true, true),
     NAME("name", true, false, false),
@@ -21,22 +24,6 @@ public enum DiseaseFields {
         this.indexed = indexed;
         this.stored = stored;
         this.visible = visible;
-    }
-
-    public String getSolrFieldName(){
-        return this.solrFieldName;
-    }
-
-    public boolean isIndexed(){
-        return this.indexed;
-    }
-
-    public boolean isStored(){
-        return this.stored;
-    }
-
-    public boolean isVisible(){
-        return this.visible;
     }
 
     @Override
