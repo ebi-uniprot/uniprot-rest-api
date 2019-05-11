@@ -19,8 +19,6 @@ public class DataStoreTestConfig {
     public DataStoreManager dataStoreManager() throws IOException {
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
         DataStoreManager dm = new DataStoreManager(sdsm);
-        //ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.disease);
-        //dm.addSolrClient(DataStoreManager.StoreType.DISEASE, solrClient);
         return dm;
     }
 

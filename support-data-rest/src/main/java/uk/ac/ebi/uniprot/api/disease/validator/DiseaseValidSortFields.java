@@ -1,5 +1,8 @@
 package uk.ac.ebi.uniprot.api.disease.validator;
 
+import lombok.Getter;
+
+@Getter
 public enum DiseaseValidSortFields {
     ACCESSION("accession");
 
@@ -7,10 +10,6 @@ public enum DiseaseValidSortFields {
 
     DiseaseValidSortFields(String solrFieldName) {
         this.solrFieldName = solrFieldName;
-    }
-
-    public String getSolrFieldName() {
-        return solrFieldName;
     }
 
     @Override
