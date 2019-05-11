@@ -47,7 +47,7 @@ class DatabasesTest {
 		List<DatabaseGroup> groups = instance.getDatabases();
 		assertEquals(20, groups.size());
 		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
-		assertEquals(158, nDb);
+		assertEquals(155, nDb);
 		instance.getDatabases().forEach(System.out::println);
 	}
 	@Test
