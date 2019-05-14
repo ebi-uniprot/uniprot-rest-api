@@ -1,12 +1,11 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.output.converter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.xml.jaxb.uniprot.Entry;
 import uk.ac.ebi.uniprot.xml.uniprot.UniProtEntryConverter;
+
+import javax.xml.bind.Marshaller;
 
 public class UniProtKBXmlMessageConverter extends AbstractXmlMessageConverter<UniProtEntry, Entry> {
 	private final UniProtEntryConverter converter;
@@ -16,18 +15,6 @@ public class UniProtKBXmlMessageConverter extends AbstractXmlMessageConverter<Un
 	public UniProtKBXmlMessageConverter() {
 		converter = new UniProtEntryConverter();
 		marshaller = createMarshaller(XML_CONTEXT);
-	}
-
-	private Marshaller createMarshaller(String context) {
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(context);
-			Marshaller contextMarshaller = jaxbContext.createMarshaller();
-			contextMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			contextMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-			return contextMarshaller;
-		} catch (Exception e) {
-			throw new RuntimeException("JAXB initialisation failed", e);
-		}
 	}
 
 	@Override

@@ -24,18 +24,18 @@ import uk.ac.ebi.uniprot.cv.disease.Disease;
 import uk.ac.ebi.uniprot.cv.keyword.Keyword;
 import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordImpl;
 import uk.ac.ebi.uniprot.domain.builder.DiseaseBuilder;
+import uk.ac.ebi.uniprot.repository.DataStoreTestConfig;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes=SupportDataApplication.class)
+@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(DiseaseController.class)
 class DiseaseControllerTest {
     @Autowired
@@ -80,7 +80,7 @@ class DiseaseControllerTest {
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages[0]",
                         equalTo("Invalid accession format. Expected DI-xxxxx")));
     }
@@ -97,7 +97,7 @@ class DiseaseControllerTest {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*",contains("Resource not found")));
     }
 

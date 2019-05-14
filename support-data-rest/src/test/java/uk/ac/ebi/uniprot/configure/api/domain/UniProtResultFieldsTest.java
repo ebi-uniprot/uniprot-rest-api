@@ -126,8 +126,8 @@ class UniProtResultFieldsTest {
 	void testDatabaseFieldSize() {
 		List<FieldGroup> groups = instance.getDatabaseFields();
 		assertEquals(19, groups.size());
-		verifyGroupSize(groups, "SEQ", 5);
-		verifyGroupSize(groups, "3DS", 5);
+		verifyGroupSize(groups, "SEQ", 4);
+		verifyGroupSize(groups, "3DS", 4);
 		verifyGroupSize(groups, "PPI", 8);
 		verifyGroupSize(groups, "CHEMISTRY", 5);
 		verifyGroupSize(groups, "PFAM", 12);
@@ -138,7 +138,7 @@ class UniProtResultFieldsTest {
 		verifyGroupSize(groups, "PAM", 1);
 		verifyGroupSize(groups, "GMA", 14);
 		verifyGroupSize(groups, "ORG", 37);
-		verifyGroupSize(groups, "PLG", 10);
+		verifyGroupSize(groups, "PLG", 9);
 		verifyGroupSize(groups, "EAP", 7);
 		verifyGroupSize(groups, "OTHER", 7);
 		verifyGroupSize(groups, "GEP", 5);

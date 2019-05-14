@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
+import uk.ac.ebi.uniprot.repository.DataStoreTestConfig;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author lgonzales
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes=SupportDataApplication.class)
+@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(UtilControllerIT.class)
 class UtilControllerIT {
 
