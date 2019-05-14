@@ -1,6 +1,11 @@
 package uk.ac.ebi.uniprot.api.rest.request;
 
 import org.springframework.data.solr.core.query.SimpleQuery;
+import uk.ac.ebi.uniprot.common.Utils;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -10,11 +15,46 @@ import org.springframework.data.solr.core.query.SimpleQuery;
 */
 
 public interface SearchRequest {
+
 	String getQuery();
-	String getReturnFields();
+
+	String getFields();
+
 	String getSort();
+
 	String getCursor();
-	int getPageSize();
-	SimpleQuery toQuery();
+
+	String getFacets();
+
+	int getSize();
+
+	default boolean hasFields() {
+		return Utils.notEmpty(getFields());
+	}
+
+	default boolean hasSort() {
+		return Utils.notEmpty(getSort());
+	}
+
+	default boolean hasCursor() {
+		return Utils.notEmpty(getCursor());
+	}
+
+	default boolean hasFacets() {
+		return Utils.notEmpty(getFacets());
+	}
+
+	default SimpleQuery getSimpleQuery(){
+		return new SimpleQuery(getQuery());
+	}
+
+	default List<String> getFacetList(){
+		if(hasFacets()) {
+			return Arrays.asList(getFacets().split(("\\s*,\\s*")));
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
 }
 

@@ -51,40 +51,63 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Test dependencies-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer</artifactId>
+            <version>${uniprot-search.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+            <version>${uniprot-search.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+            <version>${uniprot-search.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.junit.platform</groupId>
@@ -96,7 +119,7 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.junit.platform</groupId>
@@ -126,6 +149,32 @@
                         </goals>
                         <configuration>
                             <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>uk.ac.ebi.uniprot</groupId>
+                                    <artifactId>uniprot-index-config</artifactId>
+                                    <version>${uniprot-search.version}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
