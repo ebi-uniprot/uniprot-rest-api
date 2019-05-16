@@ -24,7 +24,7 @@ import uk.ac.ebi.uniprot.search.document.taxonomy.TaxonomyDocument;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,6 +41,7 @@ class TaxonomyControllerIT {
     private static final String SEARCH_QUERY_RESOURCE = "/taxonomy/search";
 
     private static final String QUERY_PARAM = "query";
+    private static final String FACETS_PARAM = "facets";
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,7 +52,7 @@ class TaxonomyControllerIT {
     @Test
     void validGetTaxonById() throws Exception {
         // given
-        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L));
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L,false));
 
         // when
         ResultActions response = mockMvc.perform(
@@ -72,7 +73,7 @@ class TaxonomyControllerIT {
     @Test
     void validSearchByTaxonId() throws Exception {
         // given
-        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L));
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L,true));
 
         // when
         ResultActions response = mockMvc.perform(
@@ -84,19 +85,39 @@ class TaxonomyControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.taxonId",is(10)))
-                .andExpect(jsonPath("$.scientificName",is("scientific10")));
+                .andExpect(jsonPath("$.results.*.taxonId",contains(10)))
+                .andExpect(jsonPath("$.results.*.scientificName",contains("scientific10")));
 
         storeManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
     }
 
+
     @Test
-    void search() {
+    void validSearchByTaxonIdReturningFacets() throws Exception {
+        // given
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L,true));
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(11L,false));
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(12L,true));
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(13L,false));
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_QUERY_RESOURCE)
+                        .param(QUERY_PARAM,"scientific:*")
+                        .param(FACETS_PARAM,"annotated,reviewed,complete,reference")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.results.*.taxonId",hasItem(hasItems(10,11,12,13,14))))
+                .andExpect(jsonPath("$.results.*.scientificName",hasItem("scientific10")));
+
+        storeManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
     }
 
-
-
-    private TaxonomyDocument createDocument(long id){
+    private TaxonomyDocument createDocument(long id,boolean facets){
         TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
         TaxonomyEntry taxonomyEntry = entryBuilder.taxonId(id).scientificName("scientific"+id).build();
 
@@ -111,6 +132,10 @@ class TaxonomyControllerIT {
                 .lineage(Collections.singletonList(id -1))
                 .strain(Collections.singletonList("strain"+id))
                 .host(Collections.singletonList(id -2))
+                .reviewed(facets)
+                .reference(facets)
+                .complete(facets)
+                .annotated(facets)
                 .taxonomyObj(getTaxonomyBinary(entryBuilder.build()))
                 .build();
     }

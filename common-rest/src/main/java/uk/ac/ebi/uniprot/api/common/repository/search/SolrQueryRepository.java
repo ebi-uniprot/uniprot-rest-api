@@ -10,7 +10,7 @@ import org.springframework.data.solr.core.DefaultQueryParser;
 import org.springframework.data.solr.core.SolrCallback;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
-
+import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
@@ -72,6 +72,16 @@ public abstract class SolrQueryRepository<T> {
         } catch (Throwable e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
+            logSolrQuery(query);
+        }
+    }
+
+    public Cursor<T> getAll(SimpleQuery query) {
+        try {
+            return solrTemplate.queryForCursor(collection.toString(),query,tClass);
+        }catch (Throwable e){
+            throw new RuntimeException("Error executing solr query",e);
+        }finally {
             logSolrQuery(query);
         }
     }

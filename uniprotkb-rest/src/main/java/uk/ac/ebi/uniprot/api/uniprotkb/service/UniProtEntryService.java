@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
@@ -119,14 +118,11 @@ public class UniProtEntryService {
     }
 
     public void stream(SearchRequestDTO request, MessageConverterContext<UniProtEntry> context, ResponseBodyEmitter emitter) {
-        MediaType contentType = context.getContentType();
-        boolean defaultFieldsRequested = FieldsParser
-                .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        streamEntities(request, defaultFieldsRequested, contentType, context);
+        streamEntities(request, context);
 
         downloadTaskExecutor.execute(() -> {
             try {
-                emitter.send(context, contentType);
+                emitter.send(context, context.getContentType());
             } catch (IOException e) {
                 emitter.completeWithError(e);
             }
@@ -158,11 +154,11 @@ public class UniProtEntryService {
         return builder.build();
     }
 
-    private void streamEntities(SearchRequestDTO request, boolean defaultFieldsOnly, MediaType contentType, MessageConverterContext<UniProtEntry> context) {
-        StreamRequest.StreamRequestBuilder requestBuilder =  StreamRequest.builder();
+    private void streamEntities(SearchRequestDTO request, MessageConverterContext<UniProtEntry> context) {
+        StreamRequest.StreamRequestBuilder streamBuilder =  StreamRequest.builder();
 
         if (needFilterIsoform(request)) {
-            requestBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
+            streamBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
         }
 
         boolean hasScore = false;
@@ -170,20 +166,23 @@ public class UniProtEntryService {
         if(defaultSearchHandler.hasDefaultSearch(requestedQuery)){
             requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
             hasScore = true;
-            requestBuilder.defaultQueryOperator(Query.Operator.OR.toString());
+            streamBuilder.defaultQueryOperator(Query.Operator.OR.toString());
         }
-        requestBuilder.query(requestedQuery);
-        requestBuilder.sort(getUniProtSort(request.getSort(),hasScore));
+        streamBuilder.query(requestedQuery);
+        streamBuilder.sort(getUniProtSort(request.getSort(),hasScore));
 
+        MediaType contentType = context.getContentType();
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(storeStreamer.idsStream(requestBuilder.build()));
+            context.setEntityIds(storeStreamer.idsStream(streamBuilder.build()));
         }
 
+        boolean defaultFieldsOnly = FieldsParser
+                .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
                 .equals(TSV_MEDIA_TYPE) || contentType.equals(XLS_MEDIA_TYPE))) {
-            context.setEntities(storeStreamer.defaultFieldStream(requestBuilder.build()));
+            context.setEntities(storeStreamer.defaultFieldStream(streamBuilder.build()));
         } else {
-            context.setEntities(storeStreamer.idsToStoreStream(requestBuilder.build()));
+            context.setEntities(storeStreamer.idsToStoreStream(streamBuilder.build()));
         }
     }
 
