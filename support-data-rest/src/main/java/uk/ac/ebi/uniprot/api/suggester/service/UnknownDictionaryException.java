@@ -7,7 +7,7 @@ package uk.ac.ebi.uniprot.api.suggester.service;
  *
  * @author Edd
  */
-public class UnknownDictionaryException extends RuntimeException {
+class UnknownDictionaryException extends RuntimeException {
     UnknownDictionaryException(String message) {
         super(message);
     }
