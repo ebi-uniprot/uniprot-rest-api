@@ -54,7 +54,7 @@ public class SuggesterService {
                     .suggestions(convertDocs(content))
                     .build();
         } catch (Exception e) {
-            throw new SuggestionRetrievalException("Problem encounted when retrieving suggestions.", e);
+            throw new SuggestionRetrievalException("Problem encountered when retrieving suggestions.", e);
         }
     }
 
@@ -66,7 +66,7 @@ public class SuggesterService {
         }
     }
 
-    private List<Suggestion> convertDocs(List<SuggestDocument> content) {
+    List<Suggestion> convertDocs(List<SuggestDocument> content) {
         return content.stream()
                 .map(doc -> {
                     String value = doc.value;

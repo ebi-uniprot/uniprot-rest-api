@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.api.suggester;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@EqualsAndHashCode
 public class Suggestion {
     private String value;
     private String id;
