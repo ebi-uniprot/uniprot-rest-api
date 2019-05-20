@@ -20,7 +20,6 @@ import uk.ac.ebi.uniprot.parser.tsv.proteome.ProteomeEntryMap;
 
 public class ProteomeXslMessageConverter extends AbstractXslMessegerConverter<ProteomeEntry> {
 	private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
-
 	@Override
 	protected void initBefore(MessageConverterContext<ProteomeEntry> context) {
 		tlFields.set(ProteomeFieldsParser.parse(context.getFields()));
