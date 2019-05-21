@@ -11,6 +11,7 @@ import uk.ac.ebi.uniprot.search.field.QueryBuilder;
 import uk.ac.ebi.uniprot.search.field.SuggestField;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,7 +71,7 @@ public class SuggesterService {
         return content.stream()
                 .map(doc -> {
                     String value = doc.value;
-                    if (!doc.altValues.isEmpty()) {
+                    if (Objects.nonNull(doc.altValues) && !doc.altValues.isEmpty()) {
                         StringJoiner joiner = new StringJoiner("/", " (", ")");
                         doc.altValues.forEach(joiner::add);
                         value += joiner.toString();
@@ -85,6 +86,6 @@ public class SuggesterService {
 
     private String createQueryString(SuggestDictionary dict, String query) {
         return "\"" + query + "\"" +
-                " +" + QueryBuilder.query(SuggestField.Search.dict.name(), dict.name().toLowerCase());
+                " +" + QueryBuilder.query(SuggestField.Search.dict.name(), dict.name());
     }
 }
