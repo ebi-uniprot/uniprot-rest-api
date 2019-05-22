@@ -31,7 +31,7 @@ public class SuggesterService {
                 .map(Enum::name)
                 .map(String::toLowerCase)
                 .collect(Collectors.joining(", ", "[", "]"));
-        errorFormat = "Unknown dictionary: {}. Expected one of " + dicts + ".";
+        errorFormat = "Unknown dictionary: '%s'. Expected one of " + dicts + ".";
     }
 
     private final SolrTemplate solrTemplate;
