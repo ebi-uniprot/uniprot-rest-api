@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.uniprot.api.suggester.Suggestions;
 import uk.ac.ebi.uniprot.api.suggester.service.SuggesterService;
+import uk.ac.ebi.uniprot.api.suggester.service.SuggestionRetrievalException;
 import uk.ac.ebi.uniprot.api.suggester.service.UnknownDictionaryException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -51,7 +52,7 @@ public class SuggesterController {
                         .build(), httpStatus);
     }
 
-    @ExceptionHandler(UnknownDictionaryException.class)
+    @ExceptionHandler({UnknownDictionaryException.class})
     public ResponseEntity<Error> handleMissingParams(UnknownDictionaryException ex) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(
@@ -60,6 +61,17 @@ public class SuggesterController {
                         .code(httpStatus.value())
                         .build(), httpStatus);
     }
+
+    @ExceptionHandler({SuggestionRetrievalException.class})
+    public ResponseEntity<Error> handleMissingParams(SuggestionRetrievalException ex) {
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        return new ResponseEntity<>(
+                Error.builder()
+                        .message(ex.getMessage())
+                        .code(httpStatus.value())
+                        .build(), httpStatus);
+    }
+
 
     @Data
     @Builder

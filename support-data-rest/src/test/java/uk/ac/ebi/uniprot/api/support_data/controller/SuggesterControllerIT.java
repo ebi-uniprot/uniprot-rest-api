@@ -145,6 +145,7 @@ public class SuggesterControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.code", is(HttpStatus.BAD_REQUEST.value())))
                 .andExpect(jsonPath("$.message", containsString(requiredParam)));
     }
 
@@ -161,6 +162,7 @@ public class SuggesterControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.code", is(HttpStatus.BAD_REQUEST.value())))
                 .andExpect(jsonPath("$.message", containsString(requiredParam)));
     }
 
@@ -177,6 +179,7 @@ public class SuggesterControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.code", is(HttpStatus.BAD_REQUEST.value())))
                 .andExpect(jsonPath("$.message", containsString("Unknown dictionary")));
     }
 

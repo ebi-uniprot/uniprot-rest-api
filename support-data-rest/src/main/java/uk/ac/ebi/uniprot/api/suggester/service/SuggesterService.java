@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.suggester.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import uk.ac.ebi.uniprot.api.suggester.Suggestion;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
  *
  * @author Edd
  */
+@Slf4j
 public class SuggesterService {
     private static final String SUGGEST_SEARCH_HANDLER = "/search";
     private static String errorFormat;
@@ -55,7 +57,8 @@ public class SuggesterService {
                     .suggestions(convertDocs(content))
                     .build();
         } catch (Exception e) {
-            throw new SuggestionRetrievalException("Problem encountered when retrieving suggestions.", e);
+            log.error("Problem when retrieving suggestions", e);
+            throw new SuggestionRetrievalException("An internal server error occurred when retrieving suggestions.", e);
         }
     }
 
