@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
@@ -78,9 +79,10 @@ public abstract class BasicSearchController<T> {
     }
 
     protected ResponseEntity<ResponseBodyEmitter> download(Stream<T> result, String fields, MediaType contentType,
-                                                           HttpServletRequest request){
+                                                           HttpServletRequest request,String encoding){
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
+        context.setFileType(FileType.bestFileTypeMatch(encoding));
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(result.map(this::getEntityId));
         } else {

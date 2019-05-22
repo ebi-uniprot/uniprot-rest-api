@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +24,7 @@ import uk.ac.ebi.uniprot.search.document.taxonomy.TaxonomyDocument;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -31,6 +33,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * @author lgonzales
+ */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes= {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -39,9 +44,11 @@ class TaxonomyControllerIT {
 
     private static final String ID_QUERY_RESOURCE = "/taxonomy/";
     private static final String SEARCH_QUERY_RESOURCE = "/taxonomy/search";
+    private static final String DOWNLOAD_QUERY_RESOURCE = "/taxonomy/download";
 
     private static final String QUERY_PARAM = "query";
     private static final String FACETS_PARAM = "facets";
+    private static final String FIELDS_PARAM = "fields";
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,8 +56,49 @@ class TaxonomyControllerIT {
     @Autowired
     private DataStoreManager storeManager;
 
+
     @Test
-    void validGetTaxonById() throws Exception {
+    void wrongIdFromIdEndpointReturnNotFound() throws Exception {
+        // given
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L,false));
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ID_QUERY_RESOURCE + "20")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",contains("Resource not found")));
+    }
+
+    @Test
+    void invalidParametersFromIdEndpointReturnBadRequest() throws Exception {
+        // given
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L,false));
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(ID_QUERY_RESOURCE + "invalid")
+                        .param(FIELDS_PARAM,"invalid1, invalid2")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*",
+                        containsInAnyOrder("The taxonomy id value should be a number",
+                                "Invalid fields parameter value 'invalid1'",
+                                "Invalid fields parameter value 'invalid2'")));
+    }
+
+
+
+    @Test
+    void canGetValidEntryFromIdEndpoint() throws Exception {
         // given
         storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(10L,false));
 
@@ -62,6 +110,7 @@ class TaxonomyControllerIT {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.taxonId",is(10)))
                 .andExpect(jsonPath("$.scientificName",is("scientific10")));
@@ -84,6 +133,7 @@ class TaxonomyControllerIT {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.results.*.taxonId",contains(10)))
                 .andExpect(jsonPath("$.results.*.scientificName",contains("scientific10")));
@@ -110,9 +160,32 @@ class TaxonomyControllerIT {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.results.*.taxonId",hasItem(hasItems(10,11,12,13,14))))
+                .andExpect(jsonPath("$.results.*.taxonId",contains(10,11,12,13)))
                 .andExpect(jsonPath("$.results.*.scientificName",hasItem("scientific10")));
+
+        storeManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
+    }
+
+    @Test
+    void validDownloadEntries() throws Exception {
+        // given
+        IntStream.rangeClosed(1, 101)
+                .forEach(i -> storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,createDocument(i,false)));
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(DOWNLOAD_QUERY_RESOURCE)
+                        .param(QUERY_PARAM,"scientific:*")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.results.size()",is(101)));
 
         storeManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
     }
@@ -136,7 +209,7 @@ class TaxonomyControllerIT {
                 .reference(facets)
                 .complete(facets)
                 .annotated(facets)
-                .taxonomyObj(getTaxonomyBinary(entryBuilder.build()))
+                .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
                 .build();
     }
 

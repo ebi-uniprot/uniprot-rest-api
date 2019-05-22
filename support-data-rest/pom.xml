@@ -74,10 +74,18 @@
 
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>common-rest</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
-            <scope>test</scope>
             <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

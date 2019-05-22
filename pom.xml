@@ -51,9 +51,9 @@
     </properties>
 
     <modules>
+        <module>common-rest</module>
         <module>support-data-rest</module>
         <module>uniprotkb-rest</module>
-        <module>common-rest</module>
          <module>proteome-rest</module>
   </modules>
 
