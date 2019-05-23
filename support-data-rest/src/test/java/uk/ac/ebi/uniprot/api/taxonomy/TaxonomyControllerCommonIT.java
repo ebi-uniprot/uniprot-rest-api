@@ -39,6 +39,21 @@ class TaxonomyControllerCommonIT extends AbstractBasicControllerIT {
     private DataStoreManager storeManager;
 
     @Override
+    public MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    @Override
+    public String getIdRequestPath() {
+        return "/taxonomy/";
+    }
+
+    @Override
+    public String getSearchRequestPath() {
+        return "/taxonomy/search";
+    }
+
+    @Override
     public void saveEntry(SAVE_CONTEXT context) {
         switch (context){
             case ID_SUCCESS:
@@ -84,18 +99,4 @@ class TaxonomyControllerCommonIT extends AbstractBasicControllerIT {
         }
     }
 
-    @Override
-    public MockMvc getMockMvc() {
-        return mockMvc;
-    }
-
-    @Override
-    public String getIdRequestPath() {
-        return "/taxonomy/";
-    }
-
-    @Override
-    public String getSearchRequestPath() {
-        return "/taxonomy/search";
-    }
 }

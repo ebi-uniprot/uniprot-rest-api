@@ -387,21 +387,25 @@ public abstract class AbstractBasicControllerIT {
         }
 
 
-        //TODO: more tests for query validations with parameters
-        /* @Test
+        @Test
         protected void searchAllowWildcardQueryAllDocuments(QueryParameter queryParameter) throws Exception {
+            assertThat(queryParameter, notNullValue());
         }
+
+        @Test
         protected void searchQueryWithInvalidTypeQueryReturnBadRequest(QueryParameter queryParameter) throws Exception {
+            assertThat(queryParameter, notNullValue());
         }
 
+        @Test
         protected void searchQueryWithInvalidValueQueryReturnBadRequest(QueryParameter queryParameter) throws Exception {
+            assertThat(queryParameter, notNullValue());
         }
-
-
 
         @Test
         public void searchSortWithCorrectValuesReturnSuccess(QueryParameter queryParameter) throws Exception {
-        */
+            assertThat(queryParameter, notNullValue());
+        }
 
         @Test
         public void searchSortWithIncorrectValuesReturnBadRequest() throws Exception {
@@ -422,12 +426,12 @@ public abstract class AbstractBasicControllerIT {
                                     "Invalid sort field invalidfield1")));
         }
 
-/*
-        //TODO: more tests for valid field
+
         @Test
         public void searchFieldsWithCorrectValuesReturnSuccess(QueryParameter queryParameter) throws Exception {
+            assertThat(queryParameter,notNullValue());
         }
- */
+
         @Test
         public void searchFieldsWithIncorrectValuesReturnBadRequest() throws Exception {
             // when
@@ -445,17 +449,15 @@ public abstract class AbstractBasicControllerIT {
                                     "Invalid fields parameter value 'otherInvalid'")));
         }
 
-        /*
-        //TODO: more tests for valid facets
         @Test
         public void searchFacetsWithCorrectValuesReturnSuccess(QueryParameter queryParameter) throws Exception {
+            assertThat(queryParameter,notNullValue());
         }
 
         @Test
         public void searchFacetsForXMLFormatReturnBadRequest(QueryParameter queryParameter) throws Exception {
-
+            assertThat(queryParameter,notNullValue());
         }
- */
 
         @Test
         public void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {

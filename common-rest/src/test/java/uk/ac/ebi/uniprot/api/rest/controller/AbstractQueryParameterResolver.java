@@ -37,6 +37,20 @@ public abstract class AbstractQueryParameterResolver implements ParameterResolve
             case "searchCanReturnBadRequestContentType":
                 result = getSearchBadRequestQueryParameter();
                 break;
+            case "searchFacetsForXMLFormatReturnBadRequest":
+                break;
+            case "searchSortWithCorrectValuesReturnSuccess":
+                break;
+            case "searchQueryWithInvalidValueQueryReturnBadRequest":
+                break;
+            case "searchQueryWithInvalidTypeQueryReturnBadRequest":
+                break;
+            case "searchFieldsWithCorrectValuesReturnSuccess":
+                break;
+            case "searchAllowWildcardQueryAllDocuments":
+                break;
+            case "searchFacetsWithCorrectValuesReturnSuccess":
+                break;
         }
         return result;
     }

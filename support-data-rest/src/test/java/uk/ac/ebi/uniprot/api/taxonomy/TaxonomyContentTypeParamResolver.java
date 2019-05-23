@@ -31,6 +31,12 @@ public class TaxonomyContentTypeParamResolver extends AbstractContentTypeParamRe
                 .resultMatcher(jsonPath("$.url",not(isEmptyOrNullString())))
                 .resultMatcher(jsonPath("$.messages.*",contains("The taxonomy id value should be a number")))
                 .build();
+
+        ContentTypeParam xml = ContentTypeParam.builder().contentType(MediaType.APPLICATION_XML)
+                //.resultMatcher(xpath("$.url",not(isEmptyOrNullString())))
+                //.resultMatcher(jsonPath("$.messages.*",contains("The taxonomy id value should be a number")))
+                .build();
+
         //TODO: Add other content types (xml, tsv.xls...)
         return Collections.singletonList(json);
     }
