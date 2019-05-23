@@ -36,18 +36,21 @@ public abstract class AbstractContentTypeParamResolver implements ParameterResol
                 result = getSuccessContentTypeRequestParamList();
                 break;
             case "searchCanReturnSuccessContentType":
+            case "configuredAllContentTypeForSearchSuccessEndpoint":
                 result = searchSuccessContentTypeRequestParamList();
                 break;
             case "getIdCanReturnBadRequestContentType":
                 result = getBadRequestContentTypeRequestParamList();
                 break;
             case "searchCanReturnBadRequestContentType":
+            case "configuredAllContentTypeForSearchBadRequestEndpoint":
                 result = searchBadRequestContentTypeRequestParamList();
                 break;
             case "getIdCanReturnNotFoundRequest":
                 result = getNotFoundContentTypeRequestParamList();
                 break;
             case "searchCanReturnNotFoundRequest":
+            case "configuredAllContentTypeForSearchNotFoundEndpoint":
                 result = searchNotFoundContentTypeRequestParamList();
                 break;
         }

@@ -39,8 +39,8 @@ class TaxonomyControllerCommonIT extends AbstractBasicControllerIT {
     private DataStoreManager storeManager;
 
     @Override
-    public void saveEntry(SAVE_TYPE entriesType) {
-        switch (entriesType){
+    public void saveEntry(SAVE_CONTEXT context) {
+        switch (context){
             case ID_SUCCESS:
             case ID_NOT_FOUND:
             case SEARCH_NOT_FOUND:
