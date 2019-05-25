@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
-import uk.ac.ebi.uniprot.repository.DataStoreTestConfig;
+import uk.ac.ebi.uniprot.repository.SolrTestConfig;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -43,7 +43,7 @@ import static uk.ac.ebi.uniprot.search.document.suggest.SuggestDictionary.TAXONO
  * @author Edd
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SuggesterControllerWithServerErrorsIT.OtherConfig.class, DataStoreTestConfig.class, SupportDataApplication.class})
+@SpringBootTest(classes = {SuggesterControllerWithServerErrorsIT.OtherConfig.class, SolrTestConfig.class, SupportDataApplication.class})
 @WebAppConfiguration
 @ActiveProfiles({"server-errors"})
 public class SuggesterControllerWithServerErrorsIT {
