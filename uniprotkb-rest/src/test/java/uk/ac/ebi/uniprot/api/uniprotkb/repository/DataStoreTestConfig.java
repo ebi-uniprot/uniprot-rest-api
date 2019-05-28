@@ -13,7 +13,6 @@ import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.GoRelationsRepoMocker;
-import uk.ac.ebi.uniprot.indexer.uniprot.mockers.KeywordRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.PathwayRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.search.SolrCollection;
@@ -68,7 +67,7 @@ public class DataStoreTestConfig {
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(),  KeywordRepoMocker.getKeywordRepo(),
+                GoRelationsRepoMocker.getGoRelationRepo(), 
                 PathwayRepoMocker.getPathwayRepo()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
