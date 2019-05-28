@@ -17,23 +17,24 @@ import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 /**
  *
  * @author jluo
- * @date: 24 Apr 2019
+ * @date: 17 May 2019
  *
 */
+
 @Component
 @Getter @Setter
-@PropertySource("classpath:proteome.facet.properties")
+@PropertySource("classpath:genecentric.facet.properties")
 @ConfigurationProperties(prefix = "facet")
-public class ProteomeFacetConfig extends GenericFacetConfig implements FacetConfigConverter {
+public class GeneCentricFacetConfig extends GenericFacetConfig implements FacetConfigConverter {
 
-	 private Map<String, FacetProperty> proteome = new HashMap<>();
+	 private Map<String, FacetProperty> genecentric = new HashMap<>();
 	
 	@Override
 	public Map<String, FacetProperty> getFacetPropertyMap() {
-		return proteome;
+		return genecentric;
 	}
 	 public Collection<String> getFacetNames() {
-	        return proteome.keySet();
+	        return genecentric.keySet();
 	    }
 }
 

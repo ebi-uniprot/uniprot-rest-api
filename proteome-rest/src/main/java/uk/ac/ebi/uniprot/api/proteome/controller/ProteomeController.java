@@ -12,8 +12,6 @@ import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_
 import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
 import static uk.ac.ebi.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +60,7 @@ public class ProteomeController {
 	 private final MessageConverterContextFactory<ProteomeEntry> converterContextFactory;
 	@Autowired
 	public ProteomeController(ApplicationEventPublisher eventPublisher, ProteomeQueryService queryService,
+			@Qualifier("PROTEOME")
 			MessageConverterContextFactory<ProteomeEntry> converterContextFactory
 			) {
 		this.eventPublisher = eventPublisher;
@@ -78,14 +78,8 @@ public class ProteomeController {
 			HttpServletResponse response) {
 		    MessageConverterContext<ProteomeEntry> context = converterContextFactory.get(PROTEOME, contentType);
 		    context.setFields(searchRequest.getFields());
-		QueryResult<ProteomeEntry> results = queryService.search(searchRequest);
+		QueryResult<?> results = queryService.search(searchRequest, context);
 		this.eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, results.getPageAndClean()));
-	    if (contentType.equals(LIST_MEDIA_TYPE)) {
-            List<String> accList = results.getContent().stream().map(doc -> doc.getId().getValue()).collect(Collectors.toList());
-            context.setEntityIds(accList.stream());
-        } else {
-        	 context.setEntities(results.getContent().stream());
-        }
         return ResponseEntity.ok()
                 .headers(createHttpSearchHeader(contentType))
                 .body(context);

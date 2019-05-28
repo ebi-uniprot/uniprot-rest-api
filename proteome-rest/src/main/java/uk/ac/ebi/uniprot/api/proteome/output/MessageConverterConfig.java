@@ -28,6 +28,8 @@ import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
+import uk.ac.ebi.uniprot.api.rest.output.converter.ListMessageConverter;
+import uk.ac.ebi.uniprot.domain.proteome.CanonicalProtein;
 import uk.ac.ebi.uniprot.domain.proteome.ProteomeEntry;
 
 /**
@@ -65,31 +67,53 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
+                converters.add(new ListMessageConverter());
+                converters.add( new ProteomeTsvMessageConverter());
+                converters.add( new ProteomeXslMessageConverter());
                 converters.add(0, new ProteomeXmlMessageConverter());
                 converters.add(1, new ProteomeJsonMessageConverter());
-                converters.add(1, new ProteomeTsvMessageConverter());
-                converters.add(1, new ProteomeXslMessageConverter());
+         //       converters.add(2, new GeneCentricJsonMessageConverter());
+        //        converters.add(3, new GeneCentricXmlMessageConverter());
+              
             }
         };
     }
-    @Bean
-    public MessageConverterContextFactory<ProteomeEntry> messageConverterContextFactory() {
+    @Bean (name="PROTEOME")
+    public MessageConverterContextFactory<ProteomeEntry> proteomeMessageConverterContextFactory() {
         MessageConverterContextFactory<ProteomeEntry> contextFactory = new MessageConverterContextFactory<>();
 
-        asList(context(LIST_MEDIA_TYPE),
-               context(APPLICATION_XML),
-               context(APPLICATION_JSON),
-               context(TSV_MEDIA_TYPE),
-               context(XLS_MEDIA_TYPE))
+        asList(proteomeContext(LIST_MEDIA_TYPE),
+        		proteomeContext(APPLICATION_XML),
+        		proteomeContext(APPLICATION_JSON),
+        		proteomeContext(TSV_MEDIA_TYPE),
+        		proteomeContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
-    private MessageConverterContext<ProteomeEntry> context(MediaType contentType) {
+    private MessageConverterContext<ProteomeEntry> proteomeContext(MediaType contentType) {
         return MessageConverterContext.<ProteomeEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.PROTEOME)
                 .contentType(contentType)
                 .build();
     }
+    @Bean (name="GENECENTRIC")
+    public MessageConverterContextFactory<CanonicalProtein> geneCentricMssageConverterContextFactory() {
+        MessageConverterContextFactory<CanonicalProtein> contextFactory = new MessageConverterContextFactory<>();
+        asList(geneCentricContent(LIST_MEDIA_TYPE),
+        		geneCentricContent(APPLICATION_XML),
+        		geneCentricContent(APPLICATION_JSON))
+                .forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    private MessageConverterContext<CanonicalProtein> geneCentricContent(MediaType contentType) {
+        return MessageConverterContext.<CanonicalProtein>builder()
+                .resource(MessageConverterContextFactory.Resource.GENECENTRIC)
+                .contentType(contentType)
+                .build();
+    }
+  
 }

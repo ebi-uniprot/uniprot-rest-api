@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
@@ -23,7 +24,8 @@ import uk.ac.ebi.uniprot.api.proteome.ProteomeRestApplication;
  *
 */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { ProteomeRestApplication.class})
+@SpringBootTest
+@Import(ProteomeFacetConfig.class)
 public class ProteomeFacetConfigTest {
 	@Autowired
 	ProteomeFacetConfig config;
