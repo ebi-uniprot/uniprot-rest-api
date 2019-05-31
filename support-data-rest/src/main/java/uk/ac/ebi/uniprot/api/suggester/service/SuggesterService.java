@@ -3,6 +3,8 @@ package uk.ac.ebi.uniprot.api.suggester.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
+import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
+import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.suggester.Suggestion;
 import uk.ac.ebi.uniprot.api.suggester.Suggestions;
 import uk.ac.ebi.uniprot.search.SolrCollection;
@@ -12,10 +14,11 @@ import uk.ac.ebi.uniprot.search.field.QueryBuilder;
 import uk.ac.ebi.uniprot.search.field.SuggestField;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static uk.ac.ebi.uniprot.common.Utils.notEmpty;
 
 /**
  * Created 18/07/18
@@ -58,7 +61,7 @@ public class SuggesterService {
                     .build();
         } catch (Exception e) {
             log.error("Problem when retrieving suggestions", e);
-            throw new SuggestionRetrievalException("An internal server error occurred when retrieving suggestions.", e);
+            throw new ServiceException("An internal server error occurred when retrieving suggestions.", e);
         }
     }
 
@@ -66,7 +69,7 @@ public class SuggesterService {
         try {
             return SuggestDictionary.valueOf(dictionaryStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new UnknownDictionaryException(String.format(errorFormat, dictionaryStr));
+            throw new InvalidRequestException(String.format(errorFormat, dictionaryStr));
         }
     }
 
@@ -74,7 +77,7 @@ public class SuggesterService {
         return content.stream()
                 .map(doc -> {
                     String value = doc.value;
-                    if (Objects.nonNull(doc.altValues) && !doc.altValues.isEmpty()) {
+                    if (notEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
                         StringJoiner joiner = new StringJoiner("/", " (", ")");
                         doc.altValues.forEach(joiner::add);
                         value += joiner.toString();
