@@ -42,23 +42,23 @@ public class ResponseExceptionHandler {
 
     private MessageSource messageSource;
 
-    public ResponseExceptionHandler(MessageSource messageSource){
+    public ResponseExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
     /**
      * Internal Server Error exception handler
      *
-     * @param ex throw exception
+     * @param ex      throw exception
      * @param request http request
      * @return 500 Internal server error response
      */
-    @ExceptionHandler({QueryRetrievalException.class, ServiceException.class,Throwable.class})
+    @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     protected ResponseEntity<ErrorInfo> handleInternalServerError(Throwable ex, HttpServletRequest request) {
-        logger.error("handleThrowableBadRequest: ",ex);
+        logger.error("handleThrowableBadRequest: ", ex);
         List<String> messages = new ArrayList<>();
-        messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE,null, Locale.getDefault()));
-        addDebugError(request,ex,messages);
+        messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
+        addDebugError(request, ex, messages);
 
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
 
@@ -70,7 +70,7 @@ public class ResponseExceptionHandler {
     /**
      * Bad Request exception handler that was catch during request
      *
-     * @param ex throw exception
+     * @param ex      throw exception
      * @param request http request
      * @return 400 Bad request error response with error message details
      */
@@ -79,7 +79,7 @@ public class ResponseExceptionHandler {
         List<String> messages = new ArrayList<>();
 
         for (FieldError error : ex.getFieldErrors()) {
-            if(error.getDefaultMessage() != null) {
+            if (error.getDefaultMessage() != null) {
                 messages.add(error.getDefaultMessage().replaceAll("\\{field\\}", error.getField()));
             }
         }
@@ -88,7 +88,7 @@ public class ResponseExceptionHandler {
             messages.add(error.getDefaultMessage());
         }
 
-        addDebugError(request,ex,messages);
+        addDebugError(request, ex, messages);
 
         return getBadRequestResponseEntity(request, messages);
     }
@@ -96,7 +96,7 @@ public class ResponseExceptionHandler {
     private MediaType getContentTypeFromRequest(HttpServletRequest request) {
         MediaType result = MediaType.APPLICATION_JSON;
         String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        if(Utils.notEmpty(acceptHeader)){
+        if (Utils.notEmpty(acceptHeader)) {
             result = MediaType.valueOf(acceptHeader);
         }
         return result;
@@ -105,21 +105,21 @@ public class ResponseExceptionHandler {
     /**
      * Bad Request exception handler that was catch during request
      *
-     * @param ex throw exception
+     * @param ex      throw exception
      * @param request http request
      * @return 400 Bad request error response with error message details
      */
-    @ExceptionHandler(value = { ConstraintViolationException.class })
+    @ExceptionHandler(value = {ConstraintViolationException.class})
     public ResponseEntity<ErrorInfo> constraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
 
         for (ConstraintViolation error : ex.getConstraintViolations()) {
-            if(error.getMessage() != null) {
+            if (error.getMessage() != null) {
                 messages.add(error.getMessage());
             }
         }
 
-        addDebugError(request,ex,messages);
+        addDebugError(request, ex, messages);
 
         return getBadRequestResponseEntity(request, messages);
     }
@@ -134,35 +134,35 @@ public class ResponseExceptionHandler {
     /**
      * Resource not found exception handler that was catch during request
      *
-     * @param ex throw exception
+     * @param ex      throw exception
      * @param request http request
      * @return 404 Not Found error response with error message details
      */
     @ExceptionHandler(value = {NoHandlerFoundException.class, ResourceNotFoundException.class})
     public ResponseEntity<ErrorInfo> noHandlerFoundException(Exception ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
-        messages.add(messageSource.getMessage(NOT_FOUND_MESSAGE,null, Locale.getDefault()));
+        messages.add(messageSource.getMessage(NOT_FOUND_MESSAGE, null, Locale.getDefault()));
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
-        addDebugError(request,ex,messages);
+        addDebugError(request, ex, messages);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
     }
 
     /**
-     *  If there is debugError in the request, this method also print exception causes to help in the debug error
+     * If there is debugError in the request, this method also print exception causes to help in the debug error
      *
-     * @param request Request Object.
+     * @param request   Request Object.
      * @param exception the exception that was captured.
-     * @param error List of existing message.
+     * @param error     List of existing message.
      */
     private static void addDebugError(HttpServletRequest request, Throwable exception, List<String> error) {
-        if(request.getParameter("debugError") != null &&
-           request.getParameter("debugError").equalsIgnoreCase("true")){
+        if (request.getParameter("debugError") != null &&
+                request.getParameter("debugError").equalsIgnoreCase("true")) {
 
             Throwable cause = exception.getCause();
-            while(cause != null) {
-                if(cause.getMessage() != null && !cause.getMessage().isEmpty()) {
+            while (cause != null) {
+                if (cause.getMessage() != null && !cause.getMessage().isEmpty()) {
                     error.add("Caused by: " + cause.getMessage());
                 }
                 cause = cause.getCause();
@@ -181,7 +181,7 @@ public class ResponseExceptionHandler {
         private final String url;
         private final List<String> messages;
 
-        private ErrorInfo(){
+        private ErrorInfo() {
             this("", Collections.emptyList());
         }
 
