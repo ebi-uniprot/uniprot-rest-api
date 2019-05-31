@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.api.suggester.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.solr.core.SolrTemplate;
+import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
 import uk.ac.ebi.uniprot.api.suggester.Suggestion;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.suggest.SuggestDictionary;
@@ -39,7 +40,7 @@ class SuggesterServiceTest {
 
     @Test
     void invalidDictionaryCausesException() {
-        assertThrows(UnknownDictionaryException.class, () -> service.getDictionary("WRONG"));
+        assertThrows(InvalidRequestException.class, () -> service.getDictionary("WRONG"));
     }
 
     @Test
