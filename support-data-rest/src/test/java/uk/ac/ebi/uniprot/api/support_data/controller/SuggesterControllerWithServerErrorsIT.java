@@ -23,18 +23,16 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 import uk.ac.ebi.uniprot.repository.SolrTestConfig;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.uniprot.search.document.suggest.SuggestDictionary.TAXONOMY;
 
 /**
@@ -80,9 +78,7 @@ public class SuggesterControllerWithServerErrorsIT {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.code", is(HttpStatus.INTERNAL_SERVER_ERROR.value())))
-                .andExpect(jsonPath("$.message", containsString("internal server error")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
     }
 
     @TestConfiguration
