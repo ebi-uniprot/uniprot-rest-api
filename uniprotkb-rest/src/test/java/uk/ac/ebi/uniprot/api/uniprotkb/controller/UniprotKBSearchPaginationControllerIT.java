@@ -97,7 +97,6 @@ public class UniprotKBSearchPaginationControllerIT {
 
     }
 
-
     @Test
     public void iterateOverAllPages() throws Exception {
         // given

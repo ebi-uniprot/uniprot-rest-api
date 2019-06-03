@@ -2,7 +2,6 @@ package uk.ac.ebi.uniprot.api.disease;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.uniprot.api.crossref.model.CrossRefAllFields;
 import uk.ac.ebi.uniprot.api.disease.validator.DiseaseFields;
 import uk.ac.ebi.uniprot.api.rest.search.AbstractSolrSortClause;
 
@@ -19,4 +18,15 @@ public class DiseaseSolrSortClause extends AbstractSolrSortClause {
 
         return defaultSort;
     }
+
+    @Override
+    protected String getSolrDocumentIdFieldName() {
+        return DiseaseFields.ACCESSION.getSolrFieldName();
+    }
+
+    @Override
+    protected String getSolrSortFieldName(String name) {
+        return name;
+    }
+
 }

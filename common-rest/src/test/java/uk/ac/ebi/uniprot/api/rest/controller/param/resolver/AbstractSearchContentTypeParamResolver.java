@@ -1,45 +1,37 @@
-package uk.ac.ebi.uniprot.api.rest.controller;
+package uk.ac.ebi.uniprot.api.rest.controller.param.resolver;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
 
 import java.lang.reflect.Method;
-/**
- *
- * @author lgonzales
- */
-public abstract class AbstractPathParameterResolver implements ParameterResolver {
+
+public abstract class AbstractSearchContentTypeParamResolver implements ParameterResolver {
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(PathParameter.class);
+        return parameterContext.getParameter().getType().equals(SearchContentTypeParam.class);
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        PathParameter result = null;
+        SearchContentTypeParam result = null;
         Method method = extensionContext.getTestMethod().orElseThrow(() -> new RuntimeException("AbstractContentTypeRequestParam: Unable to find tested method"));
         switch (method.getName()) {
-            case "getIdCanReturnSuccessContentType":
-            case "getIdCanFilterFieldsEntryReturnSuccess":
-                result = getSuccessPathParameter();
+            case "searchSuccessContentTypes":
+                result = searchSuccessContentTypesParam();
                 break;
-            case "getIdCanReturnBadRequestContentType":
-                result = getBadRequestPathParameter();
-                break;
-            case "getIdCanReturnNotFoundRequest":
-                result = getNotFoundPathParameter();
+            case "searchBadRequestContentTypes":
+                result = searchBadRequestContentTypesParam();
                 break;
         }
         return result;
     }
 
-    public abstract PathParameter getSuccessPathParameter();
+    protected abstract SearchContentTypeParam searchSuccessContentTypesParam();
 
-    public abstract PathParameter getBadRequestPathParameter();
-
-    public abstract PathParameter getNotFoundPathParameter();
+    protected abstract SearchContentTypeParam searchBadRequestContentTypesParam();
 
 }

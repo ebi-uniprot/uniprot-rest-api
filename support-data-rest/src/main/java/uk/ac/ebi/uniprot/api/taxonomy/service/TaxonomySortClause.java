@@ -13,4 +13,14 @@ public class TaxonomySortClause extends AbstractSolrSortClause {
                 .and(new Sort(Sort.Direction.ASC, TaxonomyField.Search.id.name()));
     }
 
+    @Override
+    protected String getSolrDocumentIdFieldName() {
+        return TaxonomyField.Search.id.getName();
+    }
+
+    @Override
+    protected String getSolrSortFieldName(String name) {
+        return TaxonomyField.Sort.valueOf(name).getSolrFieldName();
+    }
+
 }

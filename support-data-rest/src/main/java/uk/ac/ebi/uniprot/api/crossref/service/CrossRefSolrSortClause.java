@@ -18,4 +18,15 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
         return defaultSort;
     }
+
+    @Override
+    protected String getSolrDocumentIdFieldName() {
+        return CrossRefAllFields.ACCESSION.getSolrFieldName();
+    }
+
+    @Override
+    protected String getSolrSortFieldName(String name) {
+        return name;
+    }
+
 }

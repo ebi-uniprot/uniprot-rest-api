@@ -10,11 +10,14 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
+import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
+import uk.ac.ebi.uniprot.api.rest.output.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyJsonMessageConverter;
+import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
+import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
 import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
 
 import java.util.List;
@@ -56,7 +59,9 @@ public class MessageConverterConfig {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
-                converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
+                converters.add(new ListMessageConverter());
+                converters.add(new TaxonomyXlsMessageConverter());
+                converters.add(new TaxonomyTsvMessageConverter());
                 converters.add(0, new TaxonomyJsonMessageConverter());
             }
         };
@@ -65,11 +70,10 @@ public class MessageConverterConfig {
     public MessageConverterContextFactory<TaxonomyEntry> messageConverterContextFactory() {
         MessageConverterContextFactory<TaxonomyEntry> contextFactory = new MessageConverterContextFactory<>();
 
-        asList(//context(LIST_MEDIA_TYPE),
-               //context(APPLICATION_XML),
-               context(APPLICATION_JSON))
-               //context(TSV_MEDIA_TYPE),
-               //context(XLS_MEDIA_TYPE))
+        asList(context(UniProtMediaType.LIST_MEDIA_TYPE),
+               context(APPLICATION_JSON),
+               context(UniProtMediaType.TSV_MEDIA_TYPE),
+               context(UniProtMediaType.XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

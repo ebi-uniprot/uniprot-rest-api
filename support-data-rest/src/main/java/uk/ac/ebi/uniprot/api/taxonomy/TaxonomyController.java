@@ -24,7 +24,6 @@ import javax.validation.constraints.Pattern;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.*;
 import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.TAXONOMY;
 
@@ -43,7 +42,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
         this.taxonomyService = taxonomyService;
     }
 
-    @GetMapping(value = "/{taxonId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{taxonId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(@PathVariable("taxonId")
                                                                           @Pattern(regexp = TAXONOMY_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.taxonomy.invalid.id}")
                                                                           String taxonId,
@@ -59,8 +58,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
 
     @RequestMapping(value = "/search", method = RequestMethod.GET,
-            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-                    APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> search(@Valid
                                                                          TaxonomyRequestDTO searchRequest,
                                                                          @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
@@ -72,8 +70,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET,
-            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-                    APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(@Valid
                                                         TaxonomyRequestDTO searchRequest,
                                                         @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)

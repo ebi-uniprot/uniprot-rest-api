@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.rest.controller;
+package uk.ac.ebi.uniprot.api.rest.controller.param;
 
 import lombok.Builder;
 import lombok.Data;
@@ -6,17 +6,17 @@ import lombok.Singular;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
-import java.util.Map;
 /**
  *
  * @author lgonzales
  */
 @Data
 @Builder
-public class QueryParameter {
+public class GetIdParameter {
 
-    @Singular
-    private Map<String, List<String>> queryParams;
+    private String id;
+
+    private String fields;
 
     @Singular
     private List<ResultMatcher> resultMatchers;

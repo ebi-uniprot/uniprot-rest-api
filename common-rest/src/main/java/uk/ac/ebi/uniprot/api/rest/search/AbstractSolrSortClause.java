@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,14 +18,24 @@ import java.util.List;
 public abstract class AbstractSolrSortClause {
 
     public Sort getSort(String sortClause, boolean hasScore) {
+        Sort result;
         if (StringUtils.isEmpty(sortClause)) {
-            return createDefaultSort(hasScore);
+            result = createDefaultSort(hasScore);
         } else {
-            return createSort(sortClause);
+            result = createSort(sortClause);
         }
+        String documentIdFieldName = getSolrDocumentIdFieldName();
+        if(result.getOrderFor(documentIdFieldName) == null){
+            result = result.and(new Sort(Sort.Direction.ASC,documentIdFieldName));
+        }
+        return result;
     }
 
     protected abstract Sort createDefaultSort(boolean hasScore);
+
+    protected abstract String getSolrDocumentIdFieldName();
+
+    protected abstract String getSolrSortFieldName(String name);
 
 
     private Sort createSort(String sortClause) {
@@ -48,7 +59,8 @@ public abstract class AbstractSolrSortClause {
             if (fieldSortPairArr.length != 2) {
                 throw new IllegalArgumentException("You must pass field and sort value in pair.");
             }
-            fieldSortPairs.add(new ImmutablePair<>(fieldSortPairArr[0], Sort.Direction.fromString(fieldSortPairArr[1])));
+            String solrFieldName = getSolrSortFieldName(fieldSortPairArr[0]);
+            fieldSortPairs.add(new ImmutablePair<>(solrFieldName, Sort.Direction.fromString(fieldSortPairArr[1])));
         }
 
         return fieldSortPairs;
