@@ -148,7 +148,8 @@ class ResponseExceptionHandlerTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
-        InvalidRequestException error = new InvalidRequestException(null, null);
+        String message = "message describing error";
+        InvalidRequestException error = new InvalidRequestException(message, null);
 
         ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
                 .handleInvalidRequestExceptionBadRequest(error, request);
@@ -169,6 +170,7 @@ class ResponseExceptionHandlerTest {
 
         assertNotNull(errorMessage.getMessages());
         assertEquals(1, errorMessage.getMessages().size());
+        assertThat(errorMessage.getMessages().get(0), containsString(message));
     }
 
     @Test

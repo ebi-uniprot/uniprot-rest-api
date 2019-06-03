@@ -168,7 +168,9 @@ public class ResponseExceptionHandler {
      */
     @ExceptionHandler({InvalidRequestException.class})
     protected ResponseEntity<ErrorInfo> handleInvalidRequestExceptionBadRequest(InvalidRequestException ex, HttpServletRequest request) {
-        List<String> messages = singletonList(messageSource.getMessage(INVALID_REQUEST, null, Locale.getDefault()));
+        List<String> messages = singletonList(messageSource.getMessage(INVALID_REQUEST,
+                                                                       new Object[]{ex.getMessage()},
+                                                                       Locale.getDefault()));
 
         addDebugError(request, ex, messages);
 
