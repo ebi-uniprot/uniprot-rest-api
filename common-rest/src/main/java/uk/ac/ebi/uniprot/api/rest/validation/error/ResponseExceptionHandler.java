@@ -42,6 +42,8 @@ public class ResponseExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ResponseExceptionHandler.class);
     private static final String NOT_FOUND_MESSAGE = "search.not.found";
     private static final String INTERNAL_ERROR_MESSAGE = "search.internal.error";
+    private static final String REQUIRED_REQUEST_PARAM = "request.parameter.required";
+    private static final String INVALID_REQUEST = "request.invalid";
 
     private MessageSource messageSource;
 
@@ -146,7 +148,11 @@ public class ResponseExceptionHandler {
     @ExceptionHandler({MissingServletRequestParameterException.class})
     protected ResponseEntity<ErrorInfo> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
                                                                              HttpServletRequest request) {
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), singletonList("Missing required parameter: " + ex.getParameterName()));
+        List<String> messages = singletonList(messageSource.getMessage(REQUIRED_REQUEST_PARAM, new Object[]{
+                ex.getParameterName()}, Locale.getDefault()));
+        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
+
+        addDebugError(request, ex, messages);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(getContentTypeFromRequest(request))
@@ -162,7 +168,7 @@ public class ResponseExceptionHandler {
      */
     @ExceptionHandler({InvalidRequestException.class})
     protected ResponseEntity<ErrorInfo> handleInvalidRequestExceptionBadRequest(InvalidRequestException ex, HttpServletRequest request) {
-        List<String> messages = singletonList(ex.getMessage());
+        List<String> messages = singletonList(messageSource.getMessage(INVALID_REQUEST, null, Locale.getDefault()));
 
         addDebugError(request, ex, messages);
 

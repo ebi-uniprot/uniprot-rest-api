@@ -21,6 +21,8 @@ import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -115,7 +117,8 @@ class ResponseExceptionHandlerTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
-        MissingServletRequestParameterException error = new MissingServletRequestParameterException("param", "paramType");
+        String param = "param";
+        MissingServletRequestParameterException error = new MissingServletRequestParameterException(param, "paramType");
 
         ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
                 .handleMissingServletRequestParameter(error, request);
@@ -136,7 +139,7 @@ class ResponseExceptionHandlerTest {
 
         assertNotNull(errorMessage.getMessages());
         assertEquals(1, errorMessage.getMessages().size());
-        // TODO: 01/06/19 refactor error message to use messagesource.
+        assertThat(errorMessage.getMessages().get(0), containsString(param));
     }
 
     @Test
@@ -145,7 +148,7 @@ class ResponseExceptionHandlerTest {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
-        InvalidRequestException error = new InvalidRequestException("param", null);
+        InvalidRequestException error = new InvalidRequestException(null, null);
 
         ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
                 .handleInvalidRequestExceptionBadRequest(error, request);
@@ -166,7 +169,6 @@ class ResponseExceptionHandlerTest {
 
         assertNotNull(errorMessage.getMessages());
         assertEquals(1, errorMessage.getMessages().size());
-        // TODO: 01/06/19 refactor error message to use messagesource.
     }
 
     @Test
