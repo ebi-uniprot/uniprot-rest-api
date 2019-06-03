@@ -19,15 +19,17 @@ import java.lang.annotation.Target;
  * @author lgonzales
  */
 @Constraint(validatedBy = ValidSolrQuerySyntax.QuerySyntaxValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD,ElementType.PARAMETER })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrQuerySyntax {
 
     String message() default "{search.invalid.syntax.query}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
-    class QuerySyntaxValidator implements ConstraintValidator<ValidSolrQuerySyntax,String>{
+    class QuerySyntaxValidator implements ConstraintValidator<ValidSolrQuerySyntax, String> {
 
         @Override
         public void initialize(ValidSolrQuerySyntax constraintAnnotation) {
@@ -36,7 +38,7 @@ public @interface ValidSolrQuerySyntax {
         @Override
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if(Utils.notEmpty(queryString)) {
+            if (Utils.notEmpty(queryString)) {
                 try {
                     StandardQueryParser standardQueryParser = new StandardQueryParser();
                     standardQueryParser.setAllowLeadingWildcard(true);
