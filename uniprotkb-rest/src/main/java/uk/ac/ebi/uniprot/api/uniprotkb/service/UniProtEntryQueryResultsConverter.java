@@ -108,7 +108,7 @@ class UniProtEntryQueryResultsConverter {
                 char[] fakeSeqArrayWithCorrectLength = new char[doc.seqLength];
                 Arrays.fill(fakeSeqArrayWithCorrectLength, 'X');
                 SequenceBuilder seq = new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
-                seq.molWeight(doc.seqMass);
+//                seq.molWeight(doc.seqMass); // TODO: 03/06/19 Fix this!! 
                 UniProtEntryBuilder.ActiveEntryBuilder entryBuilder = new UniProtEntryBuilder().from(uniProtEntry);
                 entryBuilder.sequence(seq.build());
                 uniProtEntry = entryBuilder.build();
