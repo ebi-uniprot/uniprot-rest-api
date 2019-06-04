@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 import uk.ac.ebi.uniprot.common.Utils;
 
@@ -24,14 +23,14 @@ import java.util.Collection;
 
 /**
  * This Include Facets Constraint Validator class is responsible to verify if the parameter value is true or false,
- *
+ * <p>
  * WHEN THE VALUE IS TRUE, it must also verify if the accept content type is "application/json"
  * because facets are only supported by json format requests.
  *
  * @author lgonzales
  */
 @Constraint(validatedBy = ValidFacets.ValidIncludeFacetsValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidFacets {
 
@@ -44,7 +43,7 @@ public @interface ValidFacets {
     Class<? extends Payload>[] payload() default {};
 
 
-    public class ValidIncludeFacetsValidator implements ConstraintValidator<ValidFacets, String> {
+    class ValidIncludeFacetsValidator implements ConstraintValidator<ValidFacets, String> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(ValidIncludeFacetsValidator.class);
 
@@ -63,7 +62,7 @@ public @interface ValidFacets {
                 GenericFacetConfig facetConfig = applicationContext.getBean(constraintAnnotation.facetConfig());
                 facetNames = facetConfig.getFacetNames();
             } catch (Exception e) {
-                LOGGER.error("Unable to instanciate facet connfig", e);
+                LOGGER.error("Unable to instantiate facet config", e);
                 facetNames = new ArrayList<>();
             }
         }
@@ -71,24 +70,24 @@ public @interface ValidFacets {
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if(Utils.notEmpty(value)){
+            if (Utils.notEmpty(value)) {
                 //first validate if the accept is for application/json
                 ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
                 String accept = getRequest().getHeader("Accept");
-                if(accept == null || !accept.equalsIgnoreCase("application/json")){
-                    buildUnsuportedContentTypeErrorMessage(accept,contextImpl);
+                if (accept == null || !accept.equalsIgnoreCase("application/json")) {
+                    buildUnsuportedContentTypeErrorMessage(accept, contextImpl);
                     isValid = false;
-                }else {
+                } else {
                     // verify if facet name is valid.
                     String[] facetList = value.split("\\s*,\\s*");
                     for (String facet : facetList) {
-                        if(!getFacetNames().contains(facet)){
-                            buildInvalidFacetNameMessage(facet,getFacetNames(),contextImpl);
+                        if (!getFacetNames().contains(facet)) {
+                            buildInvalidFacetNameMessage(facet, getFacetNames(), contextImpl);
                             isValid = false;
                         }
                     }
                 }
-                if(!isValid && contextImpl != null){
+                if (!isValid && contextImpl != null) {
                     contextImpl.disableDefaultConstraintViolation();
                 }
             }
@@ -99,19 +98,20 @@ public @interface ValidFacets {
             return request;
         }
 
-        Collection<String> getFacetNames(){
+        Collection<String> getFacetNames() {
             return facetNames;
         }
 
         void buildUnsuportedContentTypeErrorMessage(String contentType, ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = "{search.invalid.includeFacet.content.type}";
-            contextImpl.addMessageParameter("contentType",contentType);
+            contextImpl.addMessageParameter("0", contentType);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
-        void buildInvalidFacetNameMessage(String facetName,Collection<String> validNames, ConstraintValidatorContextImpl contextImpl) {
+
+        void buildInvalidFacetNameMessage(String facetName, Collection<String> validNames, ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = "{search.invalid.facet.name}";
-            contextImpl.addMessageParameter("facetName",facetName);
-            contextImpl.addMessageParameter("validNames", "["+String.join(", ",validNames)+"]");
+            contextImpl.addMessageParameter("0", facetName);
+            contextImpl.addMessageParameter("1", "[" + String.join(", ", validNames) + "]");
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
     }

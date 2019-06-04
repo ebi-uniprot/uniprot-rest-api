@@ -6,16 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.ac.ebi.uniprot.api.suggester.Suggestions;
 import uk.ac.ebi.uniprot.api.suggester.service.SuggesterService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.ac.ebi.uniprot.api.suggester.service.SuggestionValidator.getSuggestionDictionary;
 
 /**
  * Controller for the suggestion service.
- *
+ * <p>
  * Created 18/07/18
  *
  * @author Edd
@@ -33,8 +31,8 @@ public class SuggesterController {
     public ResponseEntity<Suggestions> suggester(
             @RequestParam(value = "dict", required = true) String dict,
             @RequestParam(value = "query", required = true) String query) {
-        return new ResponseEntity<>(
-                suggesterService.getSuggestions(getSuggestionDictionary(dict), query),
-                HttpStatus.OK);
+
+        return new ResponseEntity<>(suggesterService.findSuggestions(dict, query),
+                                    HttpStatus.OK);
     }
 }

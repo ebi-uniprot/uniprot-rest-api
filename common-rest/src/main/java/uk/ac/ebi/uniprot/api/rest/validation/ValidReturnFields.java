@@ -3,7 +3,6 @@ package uk.ac.ebi.uniprot.api.rest.validation;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
-
 import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.search.field.validator.ReturnFieldsValidator;
 
@@ -21,13 +20,13 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * This Return Fields Constraint Validator class is responsible to verify
  * if the inputted return fields parameter have valid field names.
- *
+ * <p>
  * It return one message for each invalid field name.
  *
  * @author lgonzales
  */
 @Constraint(validatedBy = ValidReturnFields.ReturnFieldsValidatorImpl.class)
-@Target( { ElementType.METHOD, ElementType.FIELD,ElementType.PARAMETER })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidReturnFields {
 
@@ -40,7 +39,7 @@ public @interface ValidReturnFields {
     Class<? extends Payload>[] payload() default {};
 
 
-    public class ReturnFieldsValidatorImpl implements ConstraintValidator<ValidReturnFields, String> {
+    class ReturnFieldsValidatorImpl implements ConstraintValidator<ValidReturnFields, String> {
 
         private static final Logger LOGGER = getLogger(ReturnFieldsValidatorImpl.class);
         private ReturnFieldsValidator fieldValidator;
@@ -50,23 +49,23 @@ public @interface ValidReturnFields {
             try {
                 fieldValidator = constraintAnnotation.fieldValidatorClazz().newInstance();
             } catch (Exception e) {
-                LOGGER.error("Error initializing ReturnFieldsValidator",e);
+                LOGGER.error("Error initializing ReturnFieldsValidator", e);
             }
         }
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if(Utils.notEmpty(value)){
+            if (Utils.notEmpty(value)) {
                 ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
                 String[] fieldList = value.split("\\s*,\\s*");
                 for (String field : fieldList) {
-                    if(!fieldValidator.hasValidReturnField(field)){
-                        buildErrorMessage(field,contextImpl);
+                    if (!fieldValidator.hasValidReturnField(field)) {
+                        buildErrorMessage(field, contextImpl);
                         isValid = false;
                     }
                 }
-                if(!isValid){
+                if (!isValid) {
                     disableDefaultErrorMessage(contextImpl);
                 }
             }
@@ -77,9 +76,9 @@ public @interface ValidReturnFields {
             contextImpl.disableDefaultConstraintViolation();
         }
 
-        public void buildErrorMessage(String field,ConstraintValidatorContextImpl contextImpl) {
+        public void buildErrorMessage(String field, ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = "{search.invalid.return.field}";
-            contextImpl.addMessageParameter("fieldName",field);
+            contextImpl.addMessageParameter("0", field);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
     }

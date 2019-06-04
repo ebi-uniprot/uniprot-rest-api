@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * @author lgonzales
  */
 @Constraint(validatedBy = ValidSolrSortFields.SortFieldValidatorImpl.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrSortFields {
 
@@ -34,11 +34,11 @@ public @interface ValidSolrSortFields {
 
     Class<? extends Payload>[] payload() default {};
 
-    class SortFieldValidatorImpl implements ConstraintValidator <ValidSolrSortFields,String> {
+    class SortFieldValidatorImpl implements ConstraintValidator<ValidSolrSortFields, String> {
 
         private static final String SORT_FORMAT = "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
         private static final String SORT_ORDER = "^asc|desc$";
-        private List<String> valueList ;
+        private List<String> valueList;
 
 
         @Override
@@ -48,7 +48,7 @@ public @interface ValidSolrSortFields {
 
             Enum[] enumValArr = enumClass.getEnumConstants();
 
-            for(Enum enumVal : enumValArr) {
+            for (Enum enumVal : enumValArr) {
                 valueList.add(enumVal.name().toLowerCase());
             }
 
@@ -58,35 +58,35 @@ public @interface ValidSolrSortFields {
         public boolean isValid(String value, ConstraintValidatorContext context) {
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
             boolean result = true;
-            if(value != null) {
+            if (value != null) {
                 value = value.toLowerCase();
-                if(value.matches(SORT_FORMAT)){
+                if (value.matches(SORT_FORMAT)) {
                     Pattern pattern = Pattern.compile(SORT_FORMAT);
                     Matcher matcher = pattern.matcher(value);
-                    if(matcher.matches()){
+                    if (matcher.matches()) {
                         int index = 0;
                         List<String> groups = getMatchGroupList(matcher);
-                        while (groups.size() > index){
+                        while (groups.size() > index) {
                             String sortField = groups.get(++index);
-                            if(!valueList.contains(sortField)){
+                            if (!valueList.contains(sortField)) {
                                 addInvalidSortFieldErrorMessage(contextImpl, sortField);
                                 result = false;
                             }
 
                             String sortOrder = groups.get(++index);
-                            if(!sortOrder.matches(SORT_ORDER)){
+                            if (!sortOrder.matches(SORT_ORDER)) {
                                 addInvalidSortOrderErrorMessage(contextImpl, sortOrder);
                                 result = false;
                             }
                             index++; //the comma is another group
                         }
-                        if(!result && contextImpl != null){
+                        if (!result && contextImpl != null) {
                             contextImpl.disableDefaultConstraintViolation();
                         }
                     }
-                }else{
-                    addInvalidSortFormatErrorMessage(contextImpl,value);
-                    result =  false;
+                } else {
+                    addInvalidSortFormatErrorMessage(contextImpl, value);
+                    result = false;
                 }
             }
             return result;
@@ -94,26 +94,26 @@ public @interface ValidSolrSortFields {
 
         public void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
             String errorMessage = "{search.invalid.sort.format}";
-            contextImpl.addMessageParameter("value",value);
+            contextImpl.addMessageParameter("0", value);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         public void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
             String errorMessage = "{search.invalid.sort.order}";
-            contextImpl.addMessageParameter("sortOrder",sortOrder);
+            contextImpl.addMessageParameter("0", sortOrder);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         public void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
             String errorMessage = "{search.invalid.sort.field}";
-            contextImpl.addMessageParameter("sortField",sortField);
+            contextImpl.addMessageParameter("0", sortField);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         private List<String> getMatchGroupList(Matcher matcher) {
             List<String> groups = new ArrayList<>();
-            for (int i=0;i <= matcher.groupCount() ;i++){
-                if(matcher.group(i) != null) {
+            for (int i = 0; i <= matcher.groupCount(); i++) {
+                if (matcher.group(i) != null) {
                     groups.add(matcher.group(i));
                 }
             }

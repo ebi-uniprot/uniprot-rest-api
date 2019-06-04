@@ -1,8 +1,9 @@
 package uk.ac.ebi.uniprot.api.suggester.service;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.solr.core.SolrTemplate;
+import uk.ac.ebi.uniprot.search.SolrCollection;
 
 /**
  * Provides beans used to give access to suggestions retrieved from a Solr instance.
@@ -14,12 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SuggesterServiceConfig {
     @Bean
-    public SolrConfigProperties solrConfigProperties() {
-        return new SolrConfigProperties();
-    }
-
-    @Bean
-    public SuggesterService suggesterService(SolrClient solrClient, SolrConfigProperties solrConfigProperties) {
-        return new SuggesterService(solrClient, solrConfigProperties.getCollectionName());
+    public SuggesterService suggesterService(SolrTemplate solrTemplate) {
+        return new SuggesterService(solrTemplate, SolrCollection.suggest);
     }
 }
