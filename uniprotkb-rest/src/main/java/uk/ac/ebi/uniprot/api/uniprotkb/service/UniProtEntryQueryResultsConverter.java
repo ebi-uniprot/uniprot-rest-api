@@ -5,7 +5,6 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
@@ -108,7 +107,7 @@ class UniProtEntryQueryResultsConverter {
                 char[] fakeSeqArrayWithCorrectLength = new char[doc.seqLength];
                 Arrays.fill(fakeSeqArrayWithCorrectLength, 'X');
                 SequenceBuilder seq = new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
-                seq.molWeight(doc.seqMass);
+                //seq.molWeight(doc.seqMass); //TODO: TRM-22339 assigned to Jie
                 UniProtEntryBuilder.ActiveEntryBuilder entryBuilder = new UniProtEntryBuilder().from(uniProtEntry);
                 entryBuilder.sequence(seq.build());
                 uniProtEntry = entryBuilder.build();
