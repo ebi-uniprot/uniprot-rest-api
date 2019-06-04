@@ -111,7 +111,7 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",contains("query is a required parameter")));
+                .andExpect(jsonPath("$.messages.*",contains("'query' is a required parameter")));
     }
 
     @Test
@@ -359,8 +359,8 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",containsInAnyOrder("Invalid sort field invalidfield"
-                        ,"Invalid sort field order invalidsort. Expected asc or desc")));
+                .andExpect(jsonPath("$.messages.*",containsInAnyOrder("Invalid sort field 'invalidfield'"
+                        ,"Invalid sort field order 'invalidsort'. Expected asc or desc")));
     }
 
     @Test
@@ -380,10 +380,10 @@ public class UniprotKBSearchControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("Invalid sort field order invalidsort1. Expected asc or desc",
-                                "Invalid sort field invalidfield",
-                                "Invalid sort field invalidfield1",
-                                "Invalid sort field order invalidsort. Expected asc or desc")));
+                        containsInAnyOrder("Invalid sort field order 'invalidsort1'. Expected asc or desc",
+                                "Invalid sort field 'invalidfield'",
+                                "Invalid sort field 'invalidfield1'",
+                                "Invalid sort field order 'invalidsort'. Expected asc or desc")));
     }
 
     @Test
@@ -688,7 +688,7 @@ public class UniprotKBSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_XML_VALUE))
-                .andExpect(content().string(containsString("facets are only supported by application/json format")));
+                .andExpect(content().string(containsString("facets are supported only for 'application/json'")));
     }
 
     @Test
