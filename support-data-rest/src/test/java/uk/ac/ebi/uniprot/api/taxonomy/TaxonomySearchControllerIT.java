@@ -19,6 +19,7 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchConten
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
+import uk.ac.ebi.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
 import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
 import uk.ac.ebi.uniprot.domain.taxonomy.builder.TaxonomyEntryBuilder;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
@@ -28,6 +29,7 @@ import uk.ac.ebi.uniprot.search.field.SearchField;
 import uk.ac.ebi.uniprot.search.field.TaxonomyField;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired
     private DataStoreManager storeManager;
+
+    @Autowired
+    private TaxonomyFacetConfig facetConfig;
 
     @Override
     protected void cleanEntries() {
@@ -98,7 +103,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllFacetFields() {
-        return Arrays.asList("reviewed","annotated","reference","complete");
+        return new ArrayList<>(facetConfig.getFacetNames());
     }
 
     @Override

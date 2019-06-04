@@ -100,7 +100,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", contains("query is a required parameter")));
+                .andExpect(jsonPath("$.messages.*", contains("'query' is a required parameter")));
     }
 
     @Test
@@ -568,7 +568,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", contains("size must be greater than of 0")));
+                .andExpect(jsonPath("$.messages.*", contains("'size' must be greater than 0")));
     }
 
     @Test
