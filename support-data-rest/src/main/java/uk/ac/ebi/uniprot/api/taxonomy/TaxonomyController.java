@@ -53,7 +53,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                                                                           MediaType contentType) {
 
         TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.valueOf(taxonId));
-        return getEntityResponse(taxonomyEntry, fields, contentType);
+        return super.getEntityResponse(taxonomyEntry, fields, contentType);
     }
 
 
@@ -66,7 +66,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                                                                          HttpServletRequest request,
                                                                          HttpServletResponse response) {
         QueryResult<TaxonomyEntry> results = taxonomyService.search(searchRequest);
-        return getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET,

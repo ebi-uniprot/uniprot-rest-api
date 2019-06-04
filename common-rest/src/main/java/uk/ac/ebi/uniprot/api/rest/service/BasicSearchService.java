@@ -27,6 +27,8 @@ import java.util.stream.StreamSupport;
 /**
  * @param <T>
  * @param <R>
+ *
+ * @author lgonzales
  */
 public class BasicSearchService<T, R extends Document> {
 

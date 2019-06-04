@@ -77,6 +77,19 @@ public class TaxonomySearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
+    protected String getFieldValueForValidatedField(SearchField searchField) {
+        String value = "";
+        switch (searchField.getName()) {
+            case "id":
+            case "tax_id":
+            case "host":
+                value = "10";
+                break;
+        }
+        return value;
+    }
+
+    @Override
     protected List<String> getAllSortFields() {
         return Arrays.stream(TaxonomyField.Sort.values())
                 .map(TaxonomyField.Sort::name)
@@ -127,10 +140,13 @@ public class TaxonomySearchControllerIT extends AbstractSearchControllerIT {
                 .mnemonic("mnemonic"+taxId)
                 .rank("rank")
                 .strain(Collections.singletonList("strain"))
+                .host(Collections.singletonList(10L))
                 .complete(facet)
                 .reference(facet)
                 .reviewed(facet)
                 .annotated(facet)
+                .linked(facet)
+                .active(facet)
                 .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
                 .build();
 

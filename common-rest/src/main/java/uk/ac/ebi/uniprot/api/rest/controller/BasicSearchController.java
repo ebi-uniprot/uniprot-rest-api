@@ -22,7 +22,10 @@ import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE
 import static uk.ac.ebi.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static uk.ac.ebi.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
-
+/**
+ * @param <T>
+ * @author lgonzales
+ */
 public abstract class BasicSearchController<T> {
 
     private final ApplicationEventPublisher eventPublisher;
@@ -34,7 +37,7 @@ public abstract class BasicSearchController<T> {
     protected BasicSearchController(ApplicationEventPublisher eventPublisher,
                                     MessageConverterContextFactory<T> converterContextFactory,
                                     ThreadPoolTaskExecutor downloadTaskExecutor,
-                                    MessageConverterContextFactory.Resource resource){
+                                    MessageConverterContextFactory.Resource resource) {
         this.eventPublisher = eventPublisher;
         this.converterContextFactory = converterContextFactory;
         this.downloadTaskExecutor = downloadTaskExecutor;
@@ -42,7 +45,7 @@ public abstract class BasicSearchController<T> {
     }
 
 
-    protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(T entity, String fields, MediaType contentType){
+    protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(T entity, String fields, MediaType contentType) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setEntityOnly(true);
@@ -58,9 +61,9 @@ public abstract class BasicSearchController<T> {
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(QueryResult<T> result, String fields,
-                                                                        MediaType contentType,
-                                                                        HttpServletRequest request,
-                                                                        HttpServletResponse response){
+                                                                           MediaType contentType,
+                                                                           HttpServletRequest request,
+                                                                           HttpServletResponse response) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFacets(result.getFacets());
@@ -79,7 +82,7 @@ public abstract class BasicSearchController<T> {
     }
 
     protected ResponseEntity<ResponseBodyEmitter> download(Stream<T> result, String fields, MediaType contentType,
-                                                           HttpServletRequest request,String encoding){
+                                                           HttpServletRequest request, String encoding) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFileType(FileType.bestFileTypeMatch(encoding));

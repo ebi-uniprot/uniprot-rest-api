@@ -5,7 +5,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -15,13 +14,15 @@ import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.PathwayRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.InactiveEntryConverter;
+import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.UniProtEntryConverter;
 import uk.ac.ebi.uniprot.search.SolrCollection;
+import uk.ac.ebi.uniprot.search.document.suggest.SuggestDocument;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
-import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.InactiveEntryConverter;
-import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.UniProtEntryConverter;
 import static org.mockito.Mockito.mock;
 
 
@@ -67,8 +68,8 @@ public class DataStoreTestConfig {
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(), 
-                PathwayRepoMocker.getPathwayRepo()));
+                GoRelationsRepoMocker.getGoRelationRepo(),
+                PathwayRepoMocker.getPathwayRepo(), new HashMap<String, SuggestDocument>()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);

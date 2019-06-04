@@ -31,11 +31,7 @@ public abstract class AbstractGetByIdControllerIT {
 
     @Test
     protected void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
-        assertThat(idParameter,notNullValue());
-        assertThat(idParameter.getId(),notNullValue());
-        assertThat(idParameter.getId(),not(isEmptyOrNullString()));
-        assertThat(idParameter.getResultMatchers(),notNullValue());
-        assertThat(idParameter.getResultMatchers(),not(emptyIterable()));
+        checkParameterInput(idParameter);
         // given
         saveEntry();
 
@@ -58,11 +54,7 @@ public abstract class AbstractGetByIdControllerIT {
 
     @Test
     protected void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
-        assertThat(idParameter,notNullValue());
-        assertThat(idParameter.getId(),notNullValue());
-        assertThat(idParameter.getId(),not(isEmptyOrNullString()));
-        assertThat(idParameter.getResultMatchers(),notNullValue());
-        assertThat(idParameter.getResultMatchers(),not(emptyIterable()));
+        checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
@@ -82,11 +74,7 @@ public abstract class AbstractGetByIdControllerIT {
 
     @Test
     protected void nonExistentIdReturnFoundRequest(GetIdParameter idParameter) throws Exception {
-        assertThat(idParameter,notNullValue());
-        assertThat(idParameter.getId(),notNullValue());
-        assertThat(idParameter.getId(),not(isEmptyOrNullString()));
-        assertThat(idParameter.getResultMatchers(),notNullValue());
-        assertThat(idParameter.getResultMatchers(),not(emptyIterable()));
+        checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
@@ -108,10 +96,8 @@ public abstract class AbstractGetByIdControllerIT {
         assertThat(idParameter,notNullValue());
         if (Utils.notEmpty(idParameter.getFields())) {
 
-            assertThat(idParameter.getId(),notNullValue());
-            assertThat(idParameter.getId(),not(isEmptyOrNullString()));
-            assertThat(idParameter.getResultMatchers(),notNullValue());
-            assertThat(idParameter.getResultMatchers(),not(emptyIterable()));
+            checkParameterInput(idParameter);
+
             //when
             saveEntry();
 
@@ -137,6 +123,9 @@ public abstract class AbstractGetByIdControllerIT {
     @Test
     protected void withInvalidFilterFieldsReturnBadRequest(GetIdParameter idParameter) throws Exception {
         if (Utils.notEmpty(idParameter.getFields())) {
+
+            checkParameterInput(idParameter);
+
             //when
             MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
                     .header(ACCEPT, MediaType.APPLICATION_JSON)
@@ -162,9 +151,7 @@ public abstract class AbstractGetByIdControllerIT {
         // given
         saveEntry();
 
-        assertThat(contentTypeParam, notNullValue());
-        assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
-        assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
+        checkIdContentTypeParameterInput(contentTypeParam);
 
         for(ContentTypeParam contentType: contentTypeParam.getContentTypeParams()) {
             // when
@@ -186,9 +173,7 @@ public abstract class AbstractGetByIdControllerIT {
 
     @Test
     protected void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
-        assertThat(contentTypeParam, notNullValue());
-        assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
-        assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
+        checkIdContentTypeParameterInput(contentTypeParam);
 
         // when
         for(ContentTypeParam contentType: contentTypeParam.getContentTypeParams()) {
@@ -214,5 +199,19 @@ public abstract class AbstractGetByIdControllerIT {
     protected abstract MockMvc getMockMvc();
 
     protected abstract String getIdRequestPath();
+
+    private void checkParameterInput(GetIdParameter idParameter) {
+        assertThat(idParameter, notNullValue());
+        assertThat(idParameter.getId(), notNullValue());
+        assertThat(idParameter.getId(), not(isEmptyOrNullString()));
+        assertThat(idParameter.getResultMatchers(), notNullValue());
+        assertThat(idParameter.getResultMatchers(), not(emptyIterable()));
+    }
+
+    private void checkIdContentTypeParameterInput(GetIdContentTypeParam contentTypeParam) {
+        assertThat(contentTypeParam, notNullValue());
+        assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
+        assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
+    }
 
 }
