@@ -1,56 +1,97 @@
 package uk.ac.ebi.uniprot.api.suggester.service;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.ebi.uniprot.api.suggester.SuggestionDictionary;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
+import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
+import uk.ac.ebi.uniprot.api.suggester.Suggestion;
 import uk.ac.ebi.uniprot.api.suggester.Suggestions;
+import uk.ac.ebi.uniprot.search.SolrCollection;
+import uk.ac.ebi.uniprot.search.document.suggest.SuggestDictionary;
+import uk.ac.ebi.uniprot.search.document.suggest.SuggestDocument;
+import uk.ac.ebi.uniprot.search.field.QueryBuilder;
+import uk.ac.ebi.uniprot.search.field.SuggestField;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static uk.ac.ebi.uniprot.common.Utils.notEmpty;
 
 /**
  * Created 18/07/18
  *
  * @author Edd
  */
+@Slf4j
 public class SuggesterService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SuggesterService.class);
-    private static final String SUGGEST_HANDLER = "/suggest";
-    private static final String SUGGEST_DICTIONARY = "suggest.dictionary";
-    private static final String SUGGEST_Q = "suggest.q";
-    private final SolrClient solrClient;
-    private final String collection;
+    private static final String SUGGEST_SEARCH_HANDLER = "/search";
+    private static String errorFormat;
 
-    public SuggesterService(SolrClient solrClient, String collection) {
-        this.solrClient = solrClient;
+    static {
+        String dicts = Stream
+                .of(SuggestDictionary.values())
+                .map(Enum::name)
+                .map(String::toLowerCase)
+                .collect(Collectors.joining(", ", "[", "]"));
+        errorFormat = "Unknown dictionary: '%s'. Expected one of " + dicts + ".";
+    }
+
+    private final SolrTemplate solrTemplate;
+    private final SolrCollection collection;
+
+    public SuggesterService(SolrTemplate solrTemplate, SolrCollection collection) {
+        this.solrTemplate = solrTemplate;
         this.collection = collection;
     }
 
-    public Suggestions getSuggestions(SuggestionDictionary dictionary, String query) {
-        SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setRequestHandler(SUGGEST_HANDLER);
-        solrQuery.add(SUGGEST_DICTIONARY, dictionary.getId());
-        solrQuery.add(SUGGEST_Q, query);
+    public Suggestions findSuggestions(String dictionaryStr, String queryStr) {
+        SimpleQuery query = new SimpleQuery(createQueryString(getDictionary(dictionaryStr), queryStr));
+        query.setRequestHandler(SUGGEST_SEARCH_HANDLER);
 
         try {
-            return Suggestions.createSuggestions(
-                    dictionary,
-                    query,
-                    solrClient.query(collection, solrQuery)
-                            .getSuggesterResponse()
-                            .getSuggestedTerms()
-                            .get(dictionary.getId())
-                            .stream()
-                            .distinct()
-                            .collect(Collectors.toList()));
-        } catch (SolrServerException | IOException e) {
-            String message = "Could not get suggestions for: [" + dictionary.getId() + ", " + query + "]";
-            LOGGER.error(message, e);
-            throw new SuggestionRetrievalException(message);
+            List<SuggestDocument> content = solrTemplate.query(collection.name(), query, SuggestDocument.class)
+                    .getContent();
+            return Suggestions.builder()
+                    .dictionary(dictionaryStr)
+                    .query(queryStr)
+                    .suggestions(convertDocs(content))
+                    .build();
+        } catch (Exception e) {
+            log.error("Problem when retrieving suggestions", e);
+            throw new ServiceException("An internal server error occurred when retrieving suggestions.", e);
         }
+    }
+
+    SuggestDictionary getDictionary(String dictionaryStr) {
+        try {
+            return SuggestDictionary.valueOf(dictionaryStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException(String.format(errorFormat, dictionaryStr));
+        }
+    }
+
+    List<Suggestion> convertDocs(List<SuggestDocument> content) {
+        return content.stream()
+                .map(doc -> {
+                    String value = doc.value;
+                    if (notEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
+                        StringJoiner joiner = new StringJoiner("/", " (", ")");
+                        doc.altValues.forEach(joiner::add);
+                        value += joiner.toString();
+                    }
+                    return Suggestion.builder()
+                            .id(doc.id)
+                            .value(value)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private String createQueryString(SuggestDictionary dict, String query) {
+        return "\"" + query + "\"" +
+                " +" + QueryBuilder.query(SuggestField.Search.dict.name(), dict.name());
     }
 }

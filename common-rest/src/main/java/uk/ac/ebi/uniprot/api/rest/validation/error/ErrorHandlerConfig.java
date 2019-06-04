@@ -18,8 +18,8 @@ import javax.validation.Validator;
 public class ErrorHandlerConfig {
 
     @Bean
-    public Validator validatorFactory (MessageSource messageSource) {
-        LocalValidatorFactoryBean validator =  new LocalValidatorFactoryBean();
+    public Validator validatorFactory(MessageSource messageSource) {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.setValidationMessageSource(messageSource);
         return validator;
     }
@@ -27,7 +27,7 @@ public class ErrorHandlerConfig {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource bean = new ReloadableResourceBundleMessageSource();
-        bean.addBasenames("classpath:org.hibernate.validator.ValidationMessages","classpath:message");
+        bean.addBasenames("classpath:org.hibernate.validator.ValidationMessages", "classpath:message");
         bean.setDefaultEncoding("UTF-8");
         return bean;
     }

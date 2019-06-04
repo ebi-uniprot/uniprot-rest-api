@@ -5,6 +5,7 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
