@@ -61,10 +61,11 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @RequestMapping(value = "/search", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
                         APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(@Valid SearchRequestDTO searchRequest,
-                                                                              @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
-                                                                              @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
-                                                                              HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(
+            @Valid SearchRequestDTO searchRequest,
+            @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
+            HttpServletRequest request, HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
         QueryResult<UniProtEntry> result = entryService.search(searchRequest);
         return super.getSearchResponse(result, searchRequest.getFields(), contentType, request, response);
@@ -73,18 +74,13 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
                         APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(@PathVariable("accession")
-                                                 @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX,
-                                                        flags = {Pattern.Flag.CASE_INSENSITIVE},
-                                                        message ="{search.invalid.accession.value}")
-                                                 String accession,
-                                                                                @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
-                                                 @RequestParam(value = "fields", required = false)
-                                                 String fields,
-                                                                                @RequestHeader(value = "Accept",
-                                                         defaultValue = APPLICATION_JSON_VALUE)
-                                                 MediaType contentType
-                                                 ) {
+    public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(
+            @PathVariable("accession")
+            @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE},
+                    message = "{search.invalid.accession.value}") String accession,
+            @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
 
         UniProtEntry entry = entryService.getByAccession(accession, fields);
         return super.getEntityResponse(entry, fields, contentType);
