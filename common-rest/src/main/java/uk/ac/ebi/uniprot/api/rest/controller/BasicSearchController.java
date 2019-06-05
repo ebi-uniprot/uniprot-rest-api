@@ -92,6 +92,10 @@ public abstract class BasicSearchController<T> {
             context.setEntities(result);
         }
 
+        return getResponseBodyEmitterResponseEntity(request, context);
+    }
+
+    protected ResponseEntity<ResponseBodyEmitter> getResponseBodyEmitterResponseEntity(HttpServletRequest request, MessageConverterContext<T> context) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         downloadTaskExecutor.execute(() -> {
             try {

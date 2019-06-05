@@ -5,15 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtEntryService;
@@ -30,8 +30,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.*;
 import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static uk.ac.ebi.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static uk.ac.ebi.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 /**
@@ -43,10 +41,9 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
 @Api(tags = {"uniprotkb"})
 @Validated
 @RequestMapping(UNIPROTKB_RESOURCE)
-public class UniprotKBController {
+public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
-    private final ApplicationEventPublisher eventPublisher;
 
     private final UniProtEntryService entryService;
     private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
@@ -54,8 +51,9 @@ public class UniprotKBController {
     @Autowired
     public UniprotKBController(ApplicationEventPublisher eventPublisher,
                                UniProtEntryService entryService,
-                               MessageConverterContextFactory<UniProtEntry> converterContextFactory) {
-        this.eventPublisher = eventPublisher;
+                               MessageConverterContextFactory<UniProtEntry> converterContextFactory,
+                               ThreadPoolTaskExecutor downloadTaskExecutor) {
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROT);
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
     }
@@ -63,45 +61,33 @@ public class UniprotKBController {
     @RequestMapping(value = "/search", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
                         APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext> searchCursor(@Valid SearchRequestDTO searchRequest,
-                                                                @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
-                                                                @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
-                                                                HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(@Valid SearchRequestDTO searchRequest,
+                                                                              @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+                                                                              @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
+                                                                              HttpServletRequest request, HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
-
-        MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
-        context.setFields(searchRequest.getFields());
-        QueryResult<?> result = entryService.search(searchRequest, context);
-
-        eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-        return ResponseEntity.ok()
-                .headers(createHttpSearchHeader(contentType))
-                .body(context);
+        QueryResult<UniProtEntry> result = entryService.search(searchRequest);
+        return super.getSearchResponse(result, searchRequest.getFields(), contentType, request, response);
     }
          
     @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET,
             produces = {TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
                         APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE, GFF_MEDIA_TYPE_VALUE})
-    public ResponseEntity<Object> getByAccession(@PathVariable("accession")
+    public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(@PathVariable("accession")
                                                  @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX,
                                                         flags = {Pattern.Flag.CASE_INSENSITIVE},
                                                         message ="{search.invalid.accession.value}")
                                                  String accession,
-                                                 @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
+                                                                                @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
                                                  @RequestParam(value = "fields", required = false)
                                                  String fields,
-                                                 @RequestHeader(value = "Accept",
+                                                                                @RequestHeader(value = "Accept",
                                                          defaultValue = APPLICATION_JSON_VALUE)
                                                  MediaType contentType
                                                  ) {
-        MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
-        context.setFields(fields);
-        context.setEntityOnly(true);
-        entryService.getByAccession(accession, fields, context);
 
-        return ResponseEntity.ok()
-                .headers(createHttpSearchHeader(contentType))
-                .body(context);
+        UniProtEntry entry = entryService.getByAccession(accession, fields);
+        return super.getEntityResponse(entry, fields, contentType);
     }
 
     /*
@@ -118,17 +104,22 @@ public class UniprotKBController {
             @RequestHeader(value = "Accept", defaultValue = FF_MEDIA_TYPE_VALUE) MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 
         MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
         context.setFields(searchRequest.getFields());
+        if (contentType.equals(LIST_MEDIA_TYPE)) {
+            context.setEntityIds(entryService.streamIds(searchRequest));
+        } else {
+            context.setEntities(entryService.stream(searchRequest, contentType));
+        }
 
-        entryService.stream(searchRequest, context, emitter);
+        return super.getResponseBodyEmitterResponseEntity(request, context);
+    }
 
-        return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(context, request))
-                .body(emitter);
+    @Override
+    protected String getEntityId(UniProtEntry entity) {
+        return entity.getPrimaryAccession().getValue();
     }
 
     private void setPreviewInfo(SearchRequestDTO searchRequest, boolean preview) {
