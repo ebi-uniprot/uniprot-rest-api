@@ -18,8 +18,6 @@ import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
-import uk.ac.ebi.uniprot.common.Utils;
-import uk.ac.ebi.uniprot.domain.uniprot.InactiveReasonType;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.search.DefaultSearchHandler;
 import uk.ac.ebi.uniprot.search.SolrQueryUtil;
@@ -67,23 +65,14 @@ public class UniProtEntryService {
 
     public UniProtEntry getByAccession(String accession, String fields) {
         try {
-            UniProtEntry result = null;
             Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
             SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
             Optional<UniProtDocument> optionalDoc = repository.getEntry(simpleQuery);
             Optional<UniProtEntry> optionalUniProtEntry = optionalDoc
                     .map(doc -> resultsConverter.convertDoc(doc, filters))
                     .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
-            if(optionalUniProtEntry.isPresent()){
-                result = optionalUniProtEntry.get();
-                if (isInactiveAndMergedEntry(result)) {
-                    String mergedAccession = result.getInactiveReason().getMergeDemergeTo().get(0);
-                    result = getByAccession(mergedAccession, fields);
-                }
-            }else{
-                throw new ResourceNotFoundException("{search.not.found}");
-            }
-            return result;
+
+            return optionalUniProtEntry.orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -183,12 +172,5 @@ public class UniProtEntryService {
         }else{
             return false;
         }
-    }
-
-    private boolean isInactiveAndMergedEntry(UniProtEntry uniProtEntry) {
-        return !uniProtEntry.isActive() &&
-                uniProtEntry.getInactiveReason() != null &&
-                uniProtEntry.getInactiveReason().getInactiveReasonType().equals(InactiveReasonType.MERGED) &&
-                Utils.notEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
     }
 }

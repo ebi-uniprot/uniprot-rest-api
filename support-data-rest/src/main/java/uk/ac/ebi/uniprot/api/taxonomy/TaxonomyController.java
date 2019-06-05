@@ -16,11 +16,13 @@ import uk.ac.ebi.uniprot.api.taxonomy.request.TaxonomyRequestDTO;
 import uk.ac.ebi.uniprot.api.taxonomy.request.TaxonomyReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.taxonomy.service.TaxonomyService;
 import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
+import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyInactiveReasonType;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -86,4 +88,20 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     protected String getEntityId(TaxonomyEntry entity) {
         return String.valueOf(entity.getTaxonId());
     }
+
+    @Override
+    protected Optional<String> getEntityRedirectId(TaxonomyEntry entity) {
+        if (isInactiveAndMergedEntity(entity)) {
+            return Optional.of(String.valueOf(entity.getInactiveReason().getMergedTo()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private boolean isInactiveAndMergedEntity(TaxonomyEntry entity) {
+        return !entity.isActive() && entity.hasInactiveReason() &&
+                TaxonomyInactiveReasonType.MERGED.equals(entity.getInactiveReason().getInactiveReasonType());
+    }
+
+
 }

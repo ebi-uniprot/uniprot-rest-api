@@ -1,10 +1,13 @@
 package uk.ac.ebi.uniprot.api.rest.controller;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,13 +53,22 @@ public abstract class BasicSearchController<T> {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setEntityOnly(true);
-
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(Stream.of(getEntityId(entity)));
         } else {
             context.setEntities(Stream.of(entity));
         }
-        return ResponseEntity.ok()
+
+        Optional<String> redirectId = getEntityRedirectId(entity);
+        ResponseEntity.BodyBuilder responseBuilder = null;
+        if (redirectId.isPresent()) {
+            String locationURL = getLocationURLForId(redirectId.get());
+            responseBuilder = ResponseEntity.status(HttpStatus.SEE_OTHER)
+                    .header(HttpHeaders.LOCATION, locationURL);
+        } else {
+            responseBuilder = ResponseEntity.ok();
+        }
+        return responseBuilder
                 .headers(createHttpSearchHeader(contentType))
                 .body(context);
     }
@@ -112,5 +125,19 @@ public abstract class BasicSearchController<T> {
     }
 
     protected abstract String getEntityId(T entity);
+
+    protected abstract Optional<String> getEntityRedirectId(T entity);
+
+
+    private String getLocationURLForId(String redirectId) {
+        String path = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .build()
+                .getPath();
+        if (path != null) {
+            path = path.substring(0, path.lastIndexOf("/") + 1) + redirectId;
+        }
+        return path;
+    }
 
 }

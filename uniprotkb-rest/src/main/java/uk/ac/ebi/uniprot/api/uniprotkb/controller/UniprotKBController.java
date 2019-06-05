@@ -18,6 +18,8 @@ import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtEntryService;
 import uk.ac.ebi.uniprot.api.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
+import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.domain.uniprot.InactiveReasonType;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
 
@@ -25,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
@@ -116,6 +119,22 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @Override
     protected String getEntityId(UniProtEntry entity) {
         return entity.getPrimaryAccession().getValue();
+    }
+
+    @Override
+    protected Optional<String> getEntityRedirectId(UniProtEntry entity) {
+        if (isInactiveAndMergedEntry(entity)) {
+            return Optional.of(String.valueOf(entity.getInactiveReason().getMergeDemergeTo().get(0)));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private boolean isInactiveAndMergedEntry(UniProtEntry uniProtEntry) {
+        return !uniProtEntry.isActive() &&
+                uniProtEntry.getInactiveReason() != null &&
+                uniProtEntry.getInactiveReason().getInactiveReasonType().equals(InactiveReasonType.MERGED) &&
+                Utils.notEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
     }
 
     private void setPreviewInfo(SearchRequestDTO searchRequest, boolean preview) {

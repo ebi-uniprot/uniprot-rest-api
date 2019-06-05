@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import uk.ac.ebi.uniprot.api.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
@@ -260,9 +259,13 @@ public class UniprotKBByAccessionControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is("P21802")));
+                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/accession/P21802"))
+                .andExpect(jsonPath("$.primaryAccession", is("B4DFC2")))
+                .andExpect(jsonPath("$.entryType", is("Inactive")))
+                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))
+                .andExpect(jsonPath("$.inactiveReason.mergeDemergeTo", contains("P21802")));
     }
 
     @Test
