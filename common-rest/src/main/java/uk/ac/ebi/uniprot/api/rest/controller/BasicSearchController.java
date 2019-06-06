@@ -37,7 +37,6 @@ public abstract class BasicSearchController<T> {
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
 
-
     protected BasicSearchController(ApplicationEventPublisher eventPublisher,
                                     MessageConverterContextFactory<T> converterContextFactory,
                                     ThreadPoolTaskExecutor downloadTaskExecutor,
@@ -47,7 +46,6 @@ public abstract class BasicSearchController<T> {
         this.downloadTaskExecutor = downloadTaskExecutor;
         this.resource = resource;
     }
-
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(T entity, String fields, MediaType contentType) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
@@ -59,15 +57,11 @@ public abstract class BasicSearchController<T> {
             context.setEntities(Stream.of(entity));
         }
 
-        Optional<String> redirectId = getEntityRedirectId(entity);
-        ResponseEntity.BodyBuilder responseBuilder = null;
-        if (redirectId.isPresent()) {
-            String locationURL = getLocationURLForId(redirectId.get());
-            responseBuilder = ResponseEntity.status(HttpStatus.SEE_OTHER)
-                    .header(HttpHeaders.LOCATION, locationURL);
-        } else {
-            responseBuilder = ResponseEntity.ok();
-        }
+        ResponseEntity.BodyBuilder responseBuilder = getEntityRedirectId(entity)
+                .map(id -> ResponseEntity.status(HttpStatus.SEE_OTHER)
+                        .header(HttpHeaders.LOCATION, getLocationURLForId(id)))
+                .orElse(ResponseEntity.ok());
+
         return responseBuilder
                 .headers(createHttpSearchHeader(contentType))
                 .body(context);
@@ -108,7 +102,8 @@ public abstract class BasicSearchController<T> {
         return getResponseBodyEmitterResponseEntity(request, context);
     }
 
-    protected ResponseEntity<ResponseBodyEmitter> getResponseBodyEmitterResponseEntity(HttpServletRequest request, MessageConverterContext<T> context) {
+    protected ResponseEntity<ResponseBodyEmitter> getResponseBodyEmitterResponseEntity(HttpServletRequest request,
+                                                                                       MessageConverterContext<T> context) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
         downloadTaskExecutor.execute(() -> {
             try {
@@ -128,14 +123,13 @@ public abstract class BasicSearchController<T> {
 
     protected abstract Optional<String> getEntityRedirectId(T entity);
 
-
     private String getLocationURLForId(String redirectId) {
         String path = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .build()
                 .getPath();
         if (path != null) {
-            path = path.substring(0, path.lastIndexOf("/") + 1) + redirectId;
+            path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
         return path;
     }
