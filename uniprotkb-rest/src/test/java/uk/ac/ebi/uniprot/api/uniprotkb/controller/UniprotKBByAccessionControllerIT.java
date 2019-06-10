@@ -1,18 +1,25 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
+import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
+import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdContentTypeParam;
+import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdParameter;
+import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
+import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
+import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
@@ -35,89 +42,48 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
  *
  * @author lgonzales
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
-@WebAppConfiguration
-public class UniprotKBByAccessionControllerIT {
+@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@ActiveProfiles(profiles = "offline")
+@AutoConfigureWebClient
+@WebMvcTest(UniprotKBController.class)
+@ExtendWith(value = {SpringExtension.class, UniprotKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
+        UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class})
+public class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
+
+    private static final String ACCESSION_ID = "Q8DIA7";
 
     @Autowired
     private DataStoreManager storeManager;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
 
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.
-                webAppContextSetup(webApplicationContext)
-                .build();
+    @Override
+    protected void saveEntry() {
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+    }
+
+    @Override
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    @Override
+    protected String getIdRequestPath() {
+        return ACCESSION_RESOURCE;
     }
 
     @Test
-    public void wrongAccessionFromAccessionEndpointReturnNotFound() throws Exception {
+    void invalidMultipleFieldsParametersFromAccessionEndpointReturnBadRequest() throws Exception {
         // given
-        String acc = saveEntry();
+        saveEntry();
 
         // when
         ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + "P05067")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",contains("Resource not found")));
-    }
-
-    @Test
-    public void invalidAccessionParametersFromAccessionEndpointReturnBadRequest() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + "invalid")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",
-                        contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")));
-    }
-
-    @Test
-    public void invalidSimpleFieldsParametersFromAccessionEndpointReturnBadRequest() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + acc)
-                        .param("fields", "invalid")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")));
-    }
-
-    @Test
-    public void invalidMultipleFieldsParametersFromAccessionEndpointReturnBadRequest() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + acc)
+                get(ACCESSION_RESOURCE + ACCESSION_ID)
                         .param("fields", "invalid, organism, invalid2")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -131,66 +97,7 @@ public class UniprotKBByAccessionControllerIT {
     }
 
     @Test
-    public void invalidAccessionAndFieldsParametersFromAccessionEndpointReturnBadRequest() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + "invalid")
-                        .param("fields", "invalid")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("Invalid fields parameter value 'invalid'",
-                                "The 'accession' value has invalid format. It should be a valid UniProtKB accession")));
-    }
-
-    @Test
-    public void canSearchAccessionFromAccessionEndpoint() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + acc)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is(acc)));
-    }
-
-    @Test
-    public void canFilterEntryFromAccessionEndpoint() throws Exception {
-        // given
-        String acc = saveEntry();
-
-        // when
-        ResultActions response = mockMvc.perform(
-                get(ACCESSION_RESOURCE + acc)
-                        .param("fields", "gene_primary")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is(acc)))
-                .andExpect(jsonPath("$.genes").exists())
-                // ensure other parts of the entry were not returned (using one example)
-                .andExpect(jsonPath("$.organism").doesNotExist());
-    }
-
-    @Test
-    public void canSearchIsoFormEntryFromAccessionEndpoint() throws Exception {
+    void canSearchIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -217,7 +124,7 @@ public class UniprotKBByAccessionControllerIT {
     }
 
     @Test
-    public void canSearchCanonicalIsoFormEntryFromAccessionEndpoint() throws Exception {
+    void canSearchCanonicalIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -244,7 +151,7 @@ public class UniprotKBByAccessionControllerIT {
     }
 
     @Test
-    public void withMergedInactiveEntryReturnTheActiveOne() throws Exception {
+    void withMergedInactiveEntryReturnTheActiveOne() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -269,7 +176,7 @@ public class UniprotKBByAccessionControllerIT {
     }
 
     @Test
-    public void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
+    void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -294,7 +201,7 @@ public class UniprotKBByAccessionControllerIT {
     }
 
     @Test
-    public void searchForDeletedInactiveEntriesReturnItself() throws Exception {
+    void searchForDeletedInactiveEntriesReturnItself() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -317,11 +224,146 @@ public class UniprotKBByAccessionControllerIT {
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DELETED")));
     }
 
-    private String saveEntry() {
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-        return acc;
+    static class UniprotKBGetIdParameterResolver extends AbstractGetIdParameterResolver {
+
+        @Override
+        public GetIdParameter validIdParameter() {
+            return GetIdParameter.builder().id(ACCESSION_ID)
+                    .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter invalidIdParameter() {
+            return GetIdParameter.builder()
+                    .id("invalid")
+                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.messages.*",
+                            contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter nonExistentIdParameter() {
+            return GetIdParameter.builder().id(ACCESSION_ID)
+                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter withFilterFieldsParameter() {
+            return GetIdParameter.builder()
+                    .id(ACCESSION_ID)
+                    .fields("gene_primary")
+                    .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
+                    .resultMatcher(jsonPath("$.genes").exists())
+                    // ensure other parts of the entry were not returned (using one example)
+                    .resultMatcher(jsonPath("$.organism").doesNotExist())
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter withInvalidFilterParameter() {
+            return GetIdParameter.builder()
+                    .id(ACCESSION_ID)
+                    .fields("invalid")
+                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")))
+                    .build();
+        }
+    }
+
+    static class UniprotKBGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+        @Override
+        public GetIdContentTypeParam idSuccessContentTypesParam() {
+            return GetIdContentTypeParam.builder()
+                    .id(ACCESSION_ID)
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
+                            .resultMatcher(jsonPath("$.entryType", is("Swiss-Prot")))
+                            .resultMatcher(jsonPath("$.uniProtId", is("PURL_THEEB")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(MediaType.APPLICATION_XML)
+                            .resultMatcher(content().string(containsString("<accession>Q8DIA7</accession>")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                            .resultMatcher(content().string(containsString("ID   PURL_THEEB              Reviewed;         761 AA.\n" +
+                                    "AC   Q8DIA7;\n" +
+                                    "DT   07-JUN-2005, integrated into UniProtKB/Swiss-Prot.\n" +
+                                    "DT   01-MAR-2003, sequence version 1.\n" +
+                                    "DT   05-DEC-2018, entry version 101.")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                            .resultMatcher(content().string(containsString(">sp|Q8DIA7|" +
+                                    "PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL " +
+                                    "OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                            .resultMatcher(content().string(containsString("##gff-version 3\n" +
+                                    "##sequence-region Q8DIA7 1 761\n" +
+                                    "Q8DIA7\tUniProtKB\tChain\t1\t761\t.\t.\t.\tID=PRO_0000100496;Note=Phosphoribosylformylglycinamidine synthase subunit PurL")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                            .resultMatcher(content().string(containsString(ACCESSION_ID)))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                            .resultMatcher(content().string(containsString("Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
+                            .resultMatcher(content().string(containsString("Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL, FGAM synthase")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                            .build())
+                    .build();
+        }
+
+        @Override
+        public GetIdContentTypeParam idBadRequestContentTypesParam() {
+            return GetIdContentTypeParam.builder()
+                    .id("INVALID")
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                            .resultMatcher(jsonPath("$.messages.*", contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(MediaType.APPLICATION_XML)
+                            .resultMatcher(content().string(containsString("<messages>The 'accession' value has invalid format. It should be a valid UniProtKB accession</messages>")))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .build();
+        }
     }
 
 }

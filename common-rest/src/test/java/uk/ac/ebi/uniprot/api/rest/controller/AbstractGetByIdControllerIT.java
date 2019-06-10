@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.api.rest.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdParameter;
@@ -28,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Slf4j
 public abstract class AbstractGetByIdControllerIT {
+
+    @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @Test
     protected void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
@@ -212,6 +217,7 @@ public abstract class AbstractGetByIdControllerIT {
         assertThat(contentTypeParam, notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
+        ControllerITUtils.verifyContentTypes(getIdRequestPath(), requestMappingHandlerMapping, contentTypeParam.getContentTypeParams());
     }
 
 }

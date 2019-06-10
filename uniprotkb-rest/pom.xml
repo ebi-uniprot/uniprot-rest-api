@@ -174,20 +174,27 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-    		   <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
     	</dependency>
-    	   <dependency>
+        <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>uniprot-indexer-integration-test</artifactId>
-             <version>${uniprot-search.version}</version>
+            <artifactId>common-rest</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-    	   <dependency>
-    		   <groupId>uk.ac.ebi.uniprot</groupId>
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+            <version>${uniprot-search.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>uniprot-indexer</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
@@ -201,19 +208,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-               <scope>test</scope>
+            <scope>test</scope>
         </dependency>
         
         <dependency>
