@@ -21,7 +21,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.GoEvidences;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.api.rest.controller.AbstractSearchControllerIT;
-import uk.ac.ebi.uniprot.api.rest.controller.SaveContext;
+import uk.ac.ebi.uniprot.api.rest.controller.SaveScenario;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
@@ -76,6 +76,9 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
 public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
+
+    private static final String ACCESSION_SP_CANONICAL = "P21802";
+    private static final String ACCESSION_SP = "Q8DIA7";
 
     @Autowired
     private DataStoreManager storeManager;
@@ -380,35 +383,35 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
     @Override
     protected String getFieldValueForValidatedField(SearchField searchField) {
         UniProtField.Search search = UniProtField.Search.valueOf(searchField.getName());
-        log.debug("FIELD_NAME: ", search.getName());
         String value = "";
         if (searchField.getName().startsWith("ftlen_")) {
             value = "[* TO *]";
-        }
-        switch (search) {
-            case accession:
-            case accession_id:
-                value = "P21802";
-                break;
-            case organism_id:
-            case host_id:
-            case taxonomy_id:
-                value = "9606";
-                break;
-            case modified:
-            case created:
-            case sequence_modified:
-            case lit_pubdate:
-            case length:
-            case mass:
-                value = "[* TO *]";
-                break;
-            case proteome:
-                value = "UP000000000";
-                break;
-            case annotation_score:
-                value = "5";
-                break;
+        } else {
+            switch (search) {
+                case accession:
+                case accession_id:
+                    value = "P21802";
+                    break;
+                case organism_id:
+                case host_id:
+                case taxonomy_id:
+                    value = "9606";
+                    break;
+                case modified:
+                case created:
+                case sequence_modified:
+                case lit_pubdate:
+                case length:
+                case mass:
+                    value = "[* TO *]";
+                    break;
+                case proteome:
+                    value = "UP000000000";
+                    break;
+                case annotation_score:
+                    value = "5";
+                    break;
+            }
         }
         return value;
     }
@@ -433,7 +436,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected void saveEntry(SaveContext saveContext) {
+    protected void saveEntry(SaveScenario saveContext) {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); //P21802
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -443,7 +446,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM); //P21802-2
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        if (SaveContext.SEARCH_ALL_FIELDS.equals(saveContext) || SaveContext.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)) {
+        if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext) || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)) {
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
             doc.active = true;
@@ -599,7 +602,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("organism:*"))
-                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802", "Q8DIA7")))
+                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
                     .resultMatcher(jsonPath("$.results.*.organism.taxonId", containsInAnyOrder(9606, 197221)))
                     .build();
         }
@@ -638,7 +641,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("gene desc"))
-                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("Q8DIA7", "P21802")))
+                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP, ACCESSION_SP_CANONICAL)))
                     .resultMatcher(jsonPath("$.results.*.genes[0].geneName.value", contains("purL", "FGFR2")))
                     .build();
         }
@@ -648,7 +651,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("gene_primary,protein_name"))
-                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802", "Q8DIA7")))
+                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
                     .resultMatcher(jsonPath("$.results.*.proteinDescription").exists())
                     .resultMatcher(jsonPath("$.results.*.genes").exists())
                     .resultMatcher(jsonPath("$.results.*.comments").doesNotExist())
@@ -664,7 +667,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("reviewed,fragment"))
-                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802", "Q8DIA7")))
+                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets.*.name", contains("reviewed", "fragment")))
@@ -677,10 +680,10 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("accession:P21802 OR accession:Q8DIA7")
+                    .query("accession:" + ACCESSION_SP_CANONICAL + " OR accession:" + ACCESSION_SP)
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802", "Q8DIA7")))
+                            .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(MediaType.APPLICATION_XML)
@@ -708,8 +711,8 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("P21802")))
-                            .resultMatcher(content().string(containsString("Q8DIA7")))
+                            .resultMatcher(content().string(containsString(ACCESSION_SP_CANONICAL)))
+                            .resultMatcher(content().string(containsString(ACCESSION_SP)))
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.TSV_MEDIA_TYPE)

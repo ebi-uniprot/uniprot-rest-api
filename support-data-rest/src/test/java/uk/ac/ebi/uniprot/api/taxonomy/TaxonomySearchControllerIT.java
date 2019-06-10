@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.ac.ebi.uniprot.api.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.api.rest.controller.AbstractSearchControllerIT;
-import uk.ac.ebi.uniprot.api.rest.controller.SaveContext;
+import uk.ac.ebi.uniprot.api.rest.controller.SaveScenario;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
@@ -119,7 +119,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected void saveEntry(SaveContext saveContext) {
+    protected void saveEntry(SaveScenario saveContext) {
         saveEntry(10,true);
         saveEntry(20,false);
     }
