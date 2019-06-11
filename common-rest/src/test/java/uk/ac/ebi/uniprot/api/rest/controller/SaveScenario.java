@@ -1,6 +1,8 @@
 package uk.ac.ebi.uniprot.api.rest.controller;
 
-public enum SaveContext {
+public enum SaveScenario {
+    SEARCH_ALL_FIELDS,
+    SEARCH_ALL_RETURN_FIELDS,
     SEARCH_SUCCESS,
     SEARCH_NOT_FOUND,
     ALLOW_QUERY_ALL,

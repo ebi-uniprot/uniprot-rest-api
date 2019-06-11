@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.api.rest.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
@@ -31,6 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 public abstract class AbstractSearchControllerIT {
 
+    @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
     @BeforeEach
     protected void cleanData() {
         cleanEntries();
@@ -40,7 +45,7 @@ public abstract class AbstractSearchControllerIT {
     protected void searchCanReturnSuccess(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         // given
-        saveEntry(SaveContext.SEARCH_SUCCESS);
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
@@ -66,7 +71,7 @@ public abstract class AbstractSearchControllerIT {
     protected void searchCanReturnNotFound(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
 
-        saveEntry(SaveContext.SEARCH_NOT_FOUND);
+        saveEntry(SaveScenario.SEARCH_NOT_FOUND);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
@@ -106,7 +111,7 @@ public abstract class AbstractSearchControllerIT {
     @Test
     protected void searchAllowQueryAllDocumentsReturnSuccess() throws Exception {
         // given
-        saveEntry(SaveContext.ALLOW_QUERY_ALL);
+        saveEntry(SaveScenario.ALLOW_QUERY_ALL);
 
         // when
         ResultActions response = getMockMvc().perform(
@@ -171,7 +176,7 @@ public abstract class AbstractSearchControllerIT {
     @Test
     protected void searchCanSearchWithAllSearchFields() throws Exception {
         // given
-        saveEntry(SaveContext.SEARCH_SUCCESS);
+        saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
 
         List<SearchField> searchFields = getAllSearchFields();
         assertThat(searchFields, notNullValue());
@@ -199,7 +204,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(queryParameter.getQueryParams().keySet(), hasItem("query"));
 
         // given
-        saveEntry(SaveContext.ALLOW_WILDCARD_QUERY);
+        saveEntry(SaveScenario.ALLOW_WILDCARD_QUERY);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
@@ -277,7 +282,7 @@ public abstract class AbstractSearchControllerIT {
 
 
         // given
-        saveEntry(SaveContext.SORT_SUCCESS);
+        saveEntry(SaveScenario.SORT_SUCCESS);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
@@ -314,15 +319,15 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("Invalid sort field order invalidsort1. Expected asc or desc",
-                                "Invalid sort field invalidfield",
-                                "Invalid sort field invalidfield1")));
+                        containsInAnyOrder("Invalid sort field order 'invalidsort1'. Expected asc or desc",
+                                "Invalid sort field 'invalidfield1'",
+                                "Invalid sort field 'invalidfield'")));
     }
 
     @Test
     protected void searchCanSearchWithAllAvailableSortFields() throws Exception {
         // given
-        saveEntry(SaveContext.SORT_SUCCESS);
+        saveEntry(SaveScenario.SORT_SUCCESS);
 
         List<String> sortFields = getAllSortFields();
         assertThat(sortFields, notNullValue());
@@ -351,7 +356,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("fields", "query"));
 
         // given
-        saveEntry(SaveContext.FIELDS_SUCCESS);
+        saveEntry(SaveScenario.FIELDS_SUCCESS);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
@@ -394,7 +399,7 @@ public abstract class AbstractSearchControllerIT {
     protected void searchCanSearchWithAllAvailableReturnedFields() throws Exception {
 
         // given
-        saveEntry(SaveContext.FIELDS_SUCCESS);
+        saveEntry(SaveScenario.SEARCH_ALL_RETURN_FIELDS);
 
         List<String> returnFields = getAllReturnedFields();
         assertThat(returnFields, notNullValue());
@@ -423,7 +428,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("facets", "query"));
 
         // given
-        saveEntry(SaveContext.FACETS_SUCCESS);
+        saveEntry(SaveScenario.FACETS_SUCCESS);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
@@ -467,7 +472,7 @@ public abstract class AbstractSearchControllerIT {
     protected void searchCanSearchWithAllAvailableFacetsFields() throws Exception {
 
         // given
-        saveEntry(SaveContext.FACETS_SUCCESS);
+        saveEntry(SaveScenario.FACETS_SUCCESS);
 
         List<String> facetFields = getAllFacetFields();
         assertThat(facetFields, notNullValue());
@@ -497,7 +502,7 @@ public abstract class AbstractSearchControllerIT {
         checkSearchContentTypeParameterInput(contentTypeParam);
 
         // given
-        saveEntry(SaveContext.SEARCH_SUCCESS);
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
 
         assertThat(contentTypeParam, notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
@@ -551,6 +556,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(contentTypeParam.getQuery(), not(isEmptyOrNullString()));
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(emptyIterable()));
+        ControllerITUtils.verifyContentTypes(getSearchRequestPath(), requestMappingHandlerMapping, contentTypeParam.getContentTypeParams());
     }
 
     //----------------------------------------- TEST PAGINATION -----------------------------------------------
@@ -677,18 +683,20 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract List<String> getAllReturnedFields();
 
-    protected abstract void saveEntry(SaveContext saveContext);
+    protected abstract void saveEntry(SaveScenario saveContext);
 
     protected abstract void saveEntries(int numberOfEntries);
 
     private String getFieldValueForField(SearchField searchField) {
-        if (searchField.hasValidValue("*")) {
-            return "*";
-        } else if (searchField.hasValidValue("true")) {
-            return "true";
-        } else {
-            return getFieldValueForValidatedField(searchField);
+        String value = getFieldValueForValidatedField(searchField);
+        if (value.isEmpty()) {
+            if (searchField.hasValidValue("*")) {
+                value = "*";
+            } else if (searchField.hasValidValue("true")) {
+                value = "true";
+            }
         }
+        return value;
     }
 
 
