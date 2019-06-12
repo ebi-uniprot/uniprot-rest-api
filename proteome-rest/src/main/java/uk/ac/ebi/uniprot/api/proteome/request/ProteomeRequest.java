@@ -9,6 +9,7 @@ import javax.validation.constraints.Positive;
 
 import lombok.Data;
 import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
+import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
@@ -24,7 +25,7 @@ import uk.ac.ebi.uniprot.search.field.ProteomeField;
  *
 */
 @Data
-public class ProteomeRequest {
+public class ProteomeRequest implements SearchRequest{
 	  private static final int DEFAULT_RESULTS_SIZE = 25;
 
 	    @NotNull(message = "{search.required}")
@@ -44,19 +45,7 @@ public class ProteomeRequest {
 	    private String facets;
 
 	    @Positive(message = "{search.positive}")
-	    private Integer size = DEFAULT_RESULTS_SIZE;
-
-	    public List<String> getFacetList(){
-	        if(hasFacets()) {
-	            return Arrays.asList(facets.split(("\\s*,\\s*")));
-	        } else {
-	            return Collections.emptyList();
-	        }
-	    }
-
-	    public boolean hasFacets() {
-	        return Utils.notEmpty(facets);
-	    }
+	    private int size = DEFAULT_RESULTS_SIZE;
 
 }
 

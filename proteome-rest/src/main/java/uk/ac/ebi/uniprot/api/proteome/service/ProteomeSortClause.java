@@ -27,7 +27,7 @@ public class ProteomeSortClause extends AbstractSolrSortClause {
 
 	@Override
 	protected String getSolrDocumentIdFieldName() {
-		return ProteomeField.Sort.upid.getSolrFieldName();
+		return ProteomeField.Search.upid.name();
 	}
 
 	@Override
