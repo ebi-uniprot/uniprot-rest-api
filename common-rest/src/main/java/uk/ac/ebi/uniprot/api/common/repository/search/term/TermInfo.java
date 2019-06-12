@@ -7,7 +7,8 @@ import lombok.Getter;
  * A class representing meta-data about a term that has one or more hits an index. The {@code url} attribute
  * is used to link to a resource that displays more information about this term.
  *
- * Note that often the term {@code name}s will map 1-to-1 to fields in the search index; but it need not be 1-to-1.
+ * Note that often the term {@code name}s will map 1-to-1 to fields in the search index; but it need not map
+ * to a specific field at all / may map to multiple fields.
  *
  * Created 12/06/19
  *
