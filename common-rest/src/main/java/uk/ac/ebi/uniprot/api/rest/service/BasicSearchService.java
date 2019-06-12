@@ -27,11 +27,9 @@ import java.util.stream.StreamSupport;
 /**
  * @param <T>
  * @param <R>
- *
  * @author lgonzales
  */
 public class BasicSearchService<T, R extends Document> {
-
     private final SolrQueryRepository<R> repository;
     private final Function<R, T> entryConverter;
 
@@ -61,7 +59,7 @@ public class BasicSearchService<T, R extends Document> {
         }
     }
 
-    public QueryResult<T> search(SimpleQuery query, String cursor, int pageSize) {
+    public QueryResult<T> search(Query query, String cursor, int pageSize) {
         QueryResult<R> results = repository.searchPage(query, cursor, pageSize);
         List<T> converted = results.getContent().stream()
                 .map(entryConverter)
@@ -70,7 +68,7 @@ public class BasicSearchService<T, R extends Document> {
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
-    public Stream<T> download(SimpleQuery query) {
+    public Stream<T> download(Query query) {
         Cursor<R> results = repository.getAll(query);
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(results, Spliterator.ORDERED), false)
                 .map(entryConverter)
@@ -83,8 +81,8 @@ public class BasicSearchService<T, R extends Document> {
         return builder.build();
     }
 
-    public SolrQueryBuilder createSolrQueryBuilder(SearchRequest request, GenericFacetConfig facetConfig,
-                                                   AbstractSolrSortClause solrSortClause, DefaultSearchHandler defaultSearchHandler) {
+    private SolrQueryBuilder createSolrQueryBuilder(SearchRequest request, GenericFacetConfig facetConfig,
+                                                    AbstractSolrSortClause solrSortClause, DefaultSearchHandler defaultSearchHandler) {
         SolrQueryBuilder builder = new SolrQueryBuilder();
         String requestedQuery = request.getQuery();
 
@@ -105,5 +103,4 @@ public class BasicSearchService<T, R extends Document> {
 
         return builder;
     }
-
 }
