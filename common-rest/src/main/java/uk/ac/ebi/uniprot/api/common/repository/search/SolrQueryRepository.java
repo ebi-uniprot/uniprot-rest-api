@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.solr.core.DefaultQueryParser;
 import org.springframework.data.solr.core.SolrCallback;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
@@ -28,7 +28,6 @@ import java.util.Optional;
  * @author lgonzales
  */
 public abstract class SolrQueryRepository<T> {
-
     private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrQueryRepository.class);
 
@@ -44,7 +43,7 @@ public abstract class SolrQueryRepository<T> {
         this.facetConverter = facetConverter;
     }
 
-    public QueryResult<T> searchPage(SimpleQuery query, String cursor, Integer pageSize) {
+    public QueryResult<T> searchPage(Query query, String cursor, Integer pageSize) {
         if (pageSize == null || pageSize <= 0) {
             pageSize = DEFAULT_PAGE_SIZE;
         }
@@ -66,7 +65,7 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    public Optional<T> getEntry(SimpleQuery query) {
+    public Optional<T> getEntry(Query query) {
         try {
             return solrTemplate.queryForObject(collection.toString(), query, tClass);
         } catch (Throwable e) {
@@ -76,18 +75,18 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    public Cursor<T> getAll(SimpleQuery query) {
+    public Cursor<T> getAll(Query query) {
         try {
-            return solrTemplate.queryForCursor(collection.toString(),query,tClass);
-        }catch (Throwable e){
-            throw new RuntimeException("Error executing solr query",e);
-        }finally {
+            return solrTemplate.queryForCursor(collection.toString(), query, tClass);
+        } catch (Throwable e) {
+            throw new RuntimeException("Error executing solr query", e);
+        } finally {
             logSolrQuery(query);
         }
     }
 
-
-    private SolrCallback<QueryResponse> getSolrCursorCallback(SimpleQuery query, String cursor, Integer pageSize) {
+    // TODO: 12/06/19 should this class accept our own solrquery class instance, and then in this class it is free to create it as a simplequery or solrquery?
+    private SolrCallback<QueryResponse> getSolrCursorCallback(Query query, String cursor, Integer pageSize) {
         return solrClient -> {
             DefaultQueryParser queryParser = new DefaultQueryParser();
             SolrQuery solrQuery = queryParser.doConstructSolrQuery(query);
@@ -103,7 +102,7 @@ public abstract class SolrQueryRepository<T> {
         };
     }
 
-    private void logSolrQuery(SimpleQuery query) {
+    private void logSolrQuery(Query query) {
         if (query != null) {
             DefaultQueryParser queryParser = new DefaultQueryParser();
             LOGGER.debug("solrQuery: {}", queryParser.getQueryString(query));
