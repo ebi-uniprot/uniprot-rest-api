@@ -101,21 +101,21 @@ public class UniProtEntryService {
     private SimpleQuery createQuery(SearchRequestDTO request) {
         SolrQueryBuilder builder = new SolrQueryBuilder();
 
-        if (needFilterIsoform(request)) {
+        if (needsToFilterIsoform(request)) {
             builder.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
         }
 
         boolean hasScore = false;
         String requestedQuery = request.getQuery();
-        if(defaultSearchHandler.hasDefaultSearch(requestedQuery)){
+        if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
             requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
             hasScore = true;
             builder.defaultOperator(Query.Operator.OR);
         }
         builder.query(requestedQuery);
-        builder.addSort(getUniProtSort(request.getSort(),hasScore));
+        builder.addSort(getUniProtSort(request.getSort(), hasScore));
 
-        if(request.hasFacets()) {
+        if (request.hasFacets()) {
             builder.facets(request.getFacetList());
             builder.facetConfig(uniprotFacetConfig);
         }
@@ -123,26 +123,26 @@ public class UniProtEntryService {
     }
 
     private StreamRequest getStreamRequest(SearchRequestDTO request) {
-        StreamRequest.StreamRequestBuilder streamBuilder =  StreamRequest.builder();
+        StreamRequest.StreamRequestBuilder streamBuilder = StreamRequest.builder();
 
-        if (needFilterIsoform(request)) {
+        if (needsToFilterIsoform(request)) {
             streamBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
         }
 
         boolean hasScore = false;
         String requestedQuery = request.getQuery();
-        if(defaultSearchHandler.hasDefaultSearch(requestedQuery)){
+        if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
             requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
             hasScore = true;
             streamBuilder.defaultQueryOperator(Query.Operator.OR.toString());
         }
         streamBuilder.query(requestedQuery);
-        streamBuilder.sort(getUniProtSort(request.getSort(),hasScore));
+        streamBuilder.sort(getUniProtSort(request.getSort(), hasScore));
 
         return streamBuilder.build();
     }
 
-    private Sort getUniProtSort(String sortStr,boolean hasScore) {
+    private Sort getUniProtSort(String sortStr, boolean hasScore) {
         if (Strings.isNullOrEmpty(sortStr)) {
             return UniProtSortUtil.createDefaultSort(hasScore);
         } else {
@@ -152,7 +152,7 @@ public class UniProtEntryService {
 
     /**
      * This method verify if we need to add isoform filter query to remove isoform entries
-     *
+     * <p>
      * if does not have id fields (we can not filter isoforms when querying for IDS)
      * AND
      * has includeIsoform params in the request URL
@@ -161,15 +161,15 @@ public class UniProtEntryService {
      *
      * @return true if we need to add isoform filter query
      */
-    private boolean needFilterIsoform(SearchRequestDTO request){
+    private boolean needsToFilterIsoform(SearchRequestDTO request) {
         boolean hasIdFieldTerms = SolrQueryUtil.hasFieldTerms(request.getQuery(),
-                UniProtField.Search.accession_id.name(),
-                UniProtField.Search.mnemonic.name(),
-                UniProtField.Search.is_isoform.name());
+                                                              UniProtField.Search.accession_id.name(),
+                                                              UniProtField.Search.mnemonic.name(),
+                                                              UniProtField.Search.is_isoform.name());
 
-        if(!hasIdFieldTerms){
+        if (!hasIdFieldTerms) {
             return !request.isIncludeIsoform();
-        }else{
+        } else {
             return false;
         }
     }
