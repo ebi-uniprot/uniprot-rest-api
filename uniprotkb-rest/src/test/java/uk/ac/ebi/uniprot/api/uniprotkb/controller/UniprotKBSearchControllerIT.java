@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -555,7 +554,6 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
         return evidenceGroup.getGroupName().equalsIgnoreCase("Manual assertions");
     }
 
-    @NotNull
     private Stream<String> getEvidenceCodes(EvidenceGroup evidenceGroup) {
         return evidenceGroup.getItems().stream().map(EvidenceItem::getCode);
     }
