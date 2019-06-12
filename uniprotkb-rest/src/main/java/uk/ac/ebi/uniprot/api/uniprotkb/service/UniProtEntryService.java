@@ -105,6 +105,11 @@ public class UniProtEntryService {
             builder.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
         }
 
+//        if (request.isIncludeTermInfo() && shouldIncludeTermInfo()) { // TODO: 12/06/19 implement exact contents of terms request
+//            builder.addParam("terms", "true")
+//                    .addParam("distrib", "true");
+//        }
+
         boolean hasScore = false;
         String requestedQuery = request.getQuery();
         if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
