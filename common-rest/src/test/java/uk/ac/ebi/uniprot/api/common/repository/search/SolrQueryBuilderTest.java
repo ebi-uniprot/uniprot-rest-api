@@ -33,7 +33,6 @@ class SolrQueryBuilderTest {
         SolrQuery solrQuery = queryParser.doConstructSolrQuery(termsQuery);
         solrQuery.setParam("terms", "true");
 
-
         System.out.println(solrQuery);
     }
 }

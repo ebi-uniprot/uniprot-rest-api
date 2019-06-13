@@ -6,8 +6,11 @@ package uk.ac.ebi.uniprot.api.common.repository.search;
  * @author lgonzales
  */
 public class QueryRetrievalException extends RuntimeException {
+    public QueryRetrievalException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    public QueryRetrievalException(String message,Throwable cause) {
-        super(message,cause);
+    public QueryRetrievalException(String message) {
+        super(message);
     }
 }

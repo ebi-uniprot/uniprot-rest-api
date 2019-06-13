@@ -1,8 +1,8 @@
 package uk.ac.ebi.uniprot.api.taxonomy.service;
 
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
 import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
 import uk.ac.ebi.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
 import uk.ac.ebi.uniprot.api.taxonomy.repository.TaxonomyRepository;
@@ -35,12 +35,12 @@ public class TaxonomyService {
     }
 
     public QueryResult<TaxonomyEntry> search(TaxonomyRequestDTO request) {
-        SimpleQuery query = basicService.createSolrQuery(request, facetConfig, taxonomySortClause, defaultSearchHandler);
-        return basicService.search(query, request.getCursor(), request.getSize());
+        SolrRequest solrQuery = basicService.createSolrRequest(request, facetConfig, taxonomySortClause, defaultSearchHandler);
+        return basicService.search(solrQuery, request.getCursor(), request.getSize());
     }
 
     public Stream<TaxonomyEntry> download(TaxonomyRequestDTO request) {
-        SimpleQuery query = basicService.createSolrQuery(request, facetConfig, taxonomySortClause, defaultSearchHandler);
+        SolrRequest query = basicService.createSolrRequest(request, facetConfig, taxonomySortClause, defaultSearchHandler);
         return basicService.download(query);
     }
 

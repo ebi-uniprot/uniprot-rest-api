@@ -6,14 +6,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.solr.core.DefaultQueryParser;
 import org.springframework.data.solr.core.SolrCallback;
 import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
+import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
 import java.util.List;
@@ -43,13 +42,14 @@ public abstract class SolrQueryRepository<T> {
         this.facetConverter = facetConverter;
     }
 
-    public QueryResult<T> searchPage(Query query, String cursor, Integer pageSize) {
+    public QueryResult<T> searchPage(SolrRequest request, String cursor, Integer pageSize) {
         if (pageSize == null || pageSize <= 0) {
             pageSize = DEFAULT_PAGE_SIZE;
         }
         try {
             CursorPage page = CursorPage.of(cursor, pageSize);
-            QueryResponse solrResponse = solrTemplate.execute(getSolrCursorCallback(query, page.getCursor(), pageSize));
+            QueryResponse solrResponse = solrTemplate
+                    .execute(getSolrCursorCallback(request, page.getCursor(), pageSize));
 
             List<T> resultList = solrTemplate.convertQueryResponseToBeans(solrResponse, tClass);
             page.setNextCursor(solrResponse.getNextCursorMark());
@@ -61,13 +61,13 @@ public abstract class SolrQueryRepository<T> {
         } catch (Throwable e) {
             throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
         } finally {
-            logSolrQuery(query);
+            logSolrQuery(request);
         }
     }
 
-    public Optional<T> getEntry(Query query) {
+    public Optional<T> getEntry(SolrRequest query) {
         try {
-            return solrTemplate.queryForObject(collection.toString(), query, tClass);
+            return solrTemplate.queryForObject(collection.toString(), query.toQuery(), tClass);
         } catch (Throwable e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
@@ -75,9 +75,9 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    public Cursor<T> getAll(Query query) {
+    public Cursor<T> getAll(SolrRequest query) {
         try {
-            return solrTemplate.queryForCursor(collection.toString(), query, tClass);
+            return solrTemplate.queryForCursor(collection.toString(), query.toQuery(), tClass);
         } catch (Throwable e) {
             throw new RuntimeException("Error executing solr query", e);
         } finally {
@@ -85,12 +85,9 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    // TODO: 12/06/19 should this class accept our own solrquery class instance, and then in this class it is free to create it as a simplequery or solrquery?
-    private SolrCallback<QueryResponse> getSolrCursorCallback(Query query, String cursor, Integer pageSize) {
+    private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest query, String cursor, Integer pageSize) {
         return solrClient -> {
-            DefaultQueryParser queryParser = new DefaultQueryParser();
-            SolrQuery solrQuery = queryParser.doConstructSolrQuery(query);
-
+            SolrQuery solrQuery = query.toSolrQuery();
             if (cursor != null && !cursor.isEmpty()) {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
             } else {
@@ -102,10 +99,10 @@ public abstract class SolrQueryRepository<T> {
         };
     }
 
-    private void logSolrQuery(Query query) {
+    private void logSolrQuery(SolrRequest query) {
         if (query != null) {
-            DefaultQueryParser queryParser = new DefaultQueryParser();
-            LOGGER.debug("solrQuery: {}", queryParser.getQueryString(query));
+            String queryString = query.toSolrQuery().toQueryString();
+            LOGGER.debug("SolrQuery: {}", queryString);
         }
     }
 }

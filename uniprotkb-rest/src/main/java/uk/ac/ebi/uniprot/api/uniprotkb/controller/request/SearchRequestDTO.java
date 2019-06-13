@@ -52,8 +52,15 @@ public class SearchRequestDTO {
     @Positive(message = "{search.positive}")
     private Integer size = DEFAULT_RESULTS_SIZE;
 
+    @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{search.invalid.includeIsoform}")
+    private String includeTermInfo;
+
     public boolean isIncludeIsoform(){
         return Boolean.valueOf(includeIsoform);
+    }
+
+    public boolean isIncludeTermInfo() {
+        return Boolean.valueOf(includeTermInfo);
     }
 
     public List<String> getFacetList(){
