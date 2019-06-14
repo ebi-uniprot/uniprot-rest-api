@@ -19,5 +19,5 @@ import lombok.Getter;
 public class TermInfo {
     private String name;
     private String url;
-    private int hits;
+    private long hits;
 }

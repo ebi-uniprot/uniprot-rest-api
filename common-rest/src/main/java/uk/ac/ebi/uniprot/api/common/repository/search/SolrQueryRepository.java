@@ -12,6 +12,8 @@ import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
+import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfo;
+import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfoConverter;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
 import java.util.List;
@@ -31,6 +33,7 @@ import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverte
 public abstract class SolrQueryRepository<T> {
     private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrQueryRepository.class);
+    private final TermInfoConverter termInfoConverter;
 
     private SolrTemplate solrTemplate;
     private SolrCollection collection;
@@ -42,6 +45,7 @@ public abstract class SolrQueryRepository<T> {
         this.collection = collection;
         this.tClass = tClass;
         this.facetConverter = facetConverter;
+        this.termInfoConverter = new TermInfoConverter();
     }
 
     public QueryResult<T> searchPage(SolrRequest request, String cursor, Integer pageSize) {
@@ -58,8 +62,9 @@ public abstract class SolrQueryRepository<T> {
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
             List<Facet> facets = facetConverter.convert(solrResponse);
+            List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
 
-            return QueryResult.of(resultList, page, facets);
+            return QueryResult.of(resultList, page, facets, termInfos);
         } catch (Throwable e) {
             throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
         } finally {

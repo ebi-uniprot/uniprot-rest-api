@@ -24,6 +24,7 @@ public class SolrRequest {
     private Query.Operator defaultQueryOperator;
     private Sort sort;
     private GenericFacetConfig facetConfig;
+    private String termQuery;
 
     @Singular
     private List<String> termFields = new ArrayList<>();

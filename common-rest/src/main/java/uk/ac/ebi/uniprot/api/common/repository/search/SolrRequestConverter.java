@@ -6,6 +6,7 @@ import org.springframework.data.solr.core.query.FacetOptions;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFacetQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
+import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static uk.ac.ebi.uniprot.common.Utils.nonNull;
  *
  * @author Edd
  */
+// TODO: 14/06/19 test this class
 class SolrRequestConverter {
     private static final String QUERY_OPERATOR = "q.op";
     private static final Pattern SINGLE_TERM_PATTERN = Pattern.compile("^\\w+$");
@@ -38,7 +40,7 @@ class SolrRequestConverter {
             setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
         }
         if (!request.getTermFields().isEmpty()) {
-            setTermFields(solrQuery, request.getTermFields());
+            setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
         return solrQuery;
@@ -74,17 +76,20 @@ class SolrRequestConverter {
     }
 
     static class SolrQueryConverter {
-        static void setTermFields(SolrQuery solrQuery, List<String> termFields) {
-            String query = solrQuery.getQuery();
-            if (isSingleTerm(query)) {
-                solrQuery.setParam(TERMS_LIST, query);
+        static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
+            if (isSingleTerm(termQuery)) {
+                solrQuery.setParam(TERMS_LIST, termQuery);
             } else {
-                throw new QueryRetrievalException("Term information will only be returned for single value searches that do not specify a field.");
+                throw new InvalidRequestException("Term information will only be returned for single value searches that do not specify a field.");
             }
 
             solrQuery.setParam(TERMS, "true");
-            solrQuery.setParam(DISTRIB, "true");
-            termFields.forEach(termField -> solrQuery.setParam(TERMS_FIELDS, termField));
+            // TODO: 14/06/19 refactor class so that this can be overridden in tests
+            solrQuery.setParam(DISTRIB, "false");
+
+            String[] termsFieldsArr = new String[termFields.size()];
+            termsFieldsArr = termFields.toArray(termsFieldsArr);
+            solrQuery.setParam(TERMS_FIELDS, termsFieldsArr);
         }
 
         static boolean isSingleTerm(String query) {

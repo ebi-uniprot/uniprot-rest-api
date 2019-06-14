@@ -101,17 +101,18 @@ public class UniProtEntryService {
 
     private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
+        String requestedQuery = request.getQuery();
 
         if (needsToFilterIsoform(request)) {
             requestBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
         }
 
         if (request.isIncludeTermInfo()) {
+            requestBuilder.termQuery(requestedQuery);
             uniProtTermsConfig.getFields().forEach(requestBuilder::termField);
         }
 
         boolean hasScore = false;
-        String requestedQuery = request.getQuery();
         if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
             requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
             hasScore = true;
