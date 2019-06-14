@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents the request object for download stream request
+ * Represents a request object containing the details to create a query to send to Solr.
  *
- * @author lgonzales
+ * @author Edd
  */
 @Data
 @Builder(builderClassName = "SolrRequestBuilder")
