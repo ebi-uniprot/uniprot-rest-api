@@ -17,6 +17,9 @@ import uk.ac.ebi.uniprot.search.SolrCollection;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter.toQuery;
+import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter.toSolrQuery;
+
 /**
  * Solr Basic Repository class to enable the execution of dynamically build queries in a solr collections.
  * <p>
@@ -64,29 +67,29 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    public Optional<T> getEntry(SolrRequest query) {
+    public Optional<T> getEntry(SolrRequest request) {
         try {
-            return solrTemplate.queryForObject(collection.toString(), query.toQuery(), tClass);
+            return solrTemplate.queryForObject(collection.toString(), toQuery(request), tClass);
         } catch (Throwable e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
-            logSolrQuery(query);
+            logSolrQuery(request);
         }
     }
 
-    public Cursor<T> getAll(SolrRequest query) {
+    public Cursor<T> getAll(SolrRequest request) {
         try {
-            return solrTemplate.queryForCursor(collection.toString(), query.toQuery(), tClass);
+            return solrTemplate.queryForCursor(collection.toString(), toQuery(request), tClass);
         } catch (Throwable e) {
             throw new RuntimeException("Error executing solr query", e);
         } finally {
-            logSolrQuery(query);
+            logSolrQuery(request);
         }
     }
 
-    private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest query, String cursor, Integer pageSize) {
+    private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest request, String cursor, Integer pageSize) {
         return solrClient -> {
-            SolrQuery solrQuery = query.toSolrQuery();
+            SolrQuery solrQuery = toSolrQuery(request);
             if (cursor != null && !cursor.isEmpty()) {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
             } else {
@@ -98,9 +101,9 @@ public abstract class SolrQueryRepository<T> {
         };
     }
 
-    private void logSolrQuery(SolrRequest query) {
-        if (query != null) {
-            String queryString = query.toSolrQuery().toQueryString();
+    private void logSolrQuery(SolrRequest request) {
+        if (request != null) {
+            String queryString = toSolrQuery(request).toQueryString();
             LOGGER.debug("SolrQuery: {}", queryString);
         }
     }
