@@ -354,6 +354,58 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
                 .andExpect(jsonPath("$.results.*.inactiveReason.inactiveReasonType", contains("DELETED")));
     }
 
+    @Test
+    void defaultSearchWithMatchedFields() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=Fibroblast&fields=accession,gene_primary&showMatchedFields=true")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        // TODO: 14/06/19 add assertions for contents of expected terms info
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()",is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")));
+    }
+
+    @Test
+    void badDefaultSearchWithMatchedFields() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=gene:Fibroblast&fields=accession,gene_primary&showMatchedFields=true")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        // TODO: 14/06/19 add assertions for contents of expected terms info
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()",is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")));
+    }
+
     @Override
     protected void cleanEntries() {
         storeManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
