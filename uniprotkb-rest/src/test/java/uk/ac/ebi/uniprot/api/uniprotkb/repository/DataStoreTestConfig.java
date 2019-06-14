@@ -2,9 +2,12 @@ package uk.ac.ebi.uniprot.api.uniprotkb.repository;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.cv.chebi.ChebiRepo;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
@@ -66,6 +69,23 @@ public class DataStoreTestConfig {
         return storeClient;
     }
 
+    @Bean
+    @Profile("offline")
+    public SolrRequestConverter requestConverter() {
+        return new SolrRequestConverter() {
+            @Override
+            public SolrQuery toSolrQuery(SolrRequest request) {
+                SolrQuery solrQuery = super.toSolrQuery(request);
+
+                // required for tests, because EmbeddedSolrServer is not sharded
+                solrQuery.setParam("distrib", "false");
+                solrQuery.setParam("terms.mincount", "1");
+
+                return solrQuery;
+            }
+        };
+    }
+
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
                 GoRelationsRepoMocker.getGoRelationRepo(),
@@ -75,6 +95,4 @@ public class DataStoreTestConfig {
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, uniProtSolrClient);
     }
-
-
 }
