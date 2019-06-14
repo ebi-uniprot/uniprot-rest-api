@@ -6,7 +6,6 @@ import org.springframework.data.solr.core.query.FacetOptions;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFacetQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.stereotype.Component;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 
@@ -23,7 +22,6 @@ import static uk.ac.ebi.uniprot.common.Utils.nonNull;
  * @author Edd
  */
 // TODO: 14/06/19 test this class
-@Component
 public class SolrRequestConverter {
     private static final String QUERY_OPERATOR = "q.op";
     private static final Pattern SINGLE_TERM_PATTERN = Pattern.compile("^\\w+$");
@@ -86,8 +84,7 @@ public class SolrRequestConverter {
             }
 
             solrQuery.setParam(TERMS, "true");
-            // TODO: 14/06/19 refactor class so that this can be overridden in tests
-            solrQuery.setParam(DISTRIB, "false");
+            solrQuery.setParam(DISTRIB, "true");
 
             String[] termsFieldsArr = new String[termFields.size()];
             termsFieldsArr = termFields.toArray(termsFieldsArr);
