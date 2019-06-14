@@ -54,7 +54,7 @@ class UniProtEntryQueryResultsConverter {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-        return QueryResult.of(upEntries, results.getPage(), results.getFacets(), results.getTermInfos());
+        return QueryResult.of(upEntries, results.getPage(), results.getFacets(), results.getMatchedTerms());
     }
 
     Optional<UniProtEntry> convertDoc(UniProtDocument doc, Map<String, List<String>> filters) {

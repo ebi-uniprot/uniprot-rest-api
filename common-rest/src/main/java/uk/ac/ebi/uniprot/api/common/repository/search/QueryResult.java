@@ -14,16 +14,16 @@ import java.util.Collection;
  */
 @Getter
 public class QueryResult<T> {
-    private final Collection<TermInfo> termInfos;
+    private final Collection<TermInfo> matchedTerms;
     private Page page;
     private final Collection<T> content;
     private final Collection<Facet> facets;
 
-    private QueryResult(Collection<T> content, Page page, Collection<Facet> facets, Collection<TermInfo> termInfos) {
+    private QueryResult(Collection<T> content, Page page, Collection<Facet> facets, Collection<TermInfo> matchedTerms) {
         this.content = content;
         this.page = page;
         this.facets = facets;
-        this.termInfos = termInfos;
+        this.matchedTerms = matchedTerms;
     }
 
     public static <T> QueryResult<T> of(Collection<T> content, Page page) {
