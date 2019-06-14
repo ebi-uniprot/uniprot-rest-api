@@ -111,8 +111,7 @@ public abstract class SolrQueryRepository<T> {
 
     private void logSolrQuery(SolrRequest request) {
         if (request != null) {
-            String queryString = requestConverter.toSolrQuery(request).toQueryString();
-            LOGGER.debug("SolrQuery: {}", queryString);
+            LOGGER.debug("SolrRequest: {}", request);
         }
     }
 }

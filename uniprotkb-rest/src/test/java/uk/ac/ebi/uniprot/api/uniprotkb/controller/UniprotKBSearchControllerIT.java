@@ -398,12 +398,9 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        // TODO: 14/06/19 add assertions for contents of expected terms info
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()",is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")));
+                .andExpect(content().string(containsString("Term information will only be returned for single value searches that do not specify a field")));
     }
 
     @Override

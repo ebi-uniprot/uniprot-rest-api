@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.api.common.repository.search;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import lombok.ToString;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Query;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author Edd
  */
 @Data
+@ToString
 @Builder(builderClassName = "SolrRequestBuilder")
 public class SolrRequest {
     private static final Query.Operator DEFAULT_OPERATOR = Query.Operator.AND;
