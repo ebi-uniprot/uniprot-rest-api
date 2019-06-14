@@ -268,7 +268,7 @@ class SolrQueryRepositoryIT {
 
     public static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
         GeneralSolrQueryRepository(SolrTemplate template) {
-            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter());
+            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter(), new SolrRequestConverter());
         }
     }
 }

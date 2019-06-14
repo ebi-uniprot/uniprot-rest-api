@@ -107,7 +107,7 @@ public class UniProtEntryService {
             requestBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
         }
 
-        if (request.isIncludeTermInfo()) {
+        if (request.isShowMatchedFields()) {
             requestBuilder.termQuery(requestedQuery);
             uniProtTermsConfig.getFields().forEach(requestBuilder::termField);
         }

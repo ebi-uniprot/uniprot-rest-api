@@ -52,15 +52,15 @@ public class SearchRequestDTO {
     @Positive(message = "{search.positive}")
     private Integer size = DEFAULT_RESULTS_SIZE;
 
-    @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{search.invalid.includeIsoform}")
-    private String includeTermInfo;
+    @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{search.invalid.matchedFields}")
+    private String showMatchedFields;
 
     public boolean isIncludeIsoform(){
         return Boolean.valueOf(includeIsoform);
     }
 
-    public boolean isIncludeTermInfo() {
-        return Boolean.valueOf(includeTermInfo);
+    public boolean isShowMatchedFields() {
+        return Boolean.valueOf(showMatchedFields);
     }
 
     public List<String> getFacetList(){

@@ -19,9 +19,6 @@ import uk.ac.ebi.uniprot.search.SolrCollection;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter.toQuery;
-import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter.toSolrQuery;
-
 /**
  * Solr Basic Repository class to enable the execution of dynamically build queries in a solr collections.
  * <p>
@@ -34,17 +31,19 @@ public abstract class SolrQueryRepository<T> {
     private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrQueryRepository.class);
     private final TermInfoConverter termInfoConverter;
+    private final SolrRequestConverter requestConverter;
 
     private SolrTemplate solrTemplate;
     private SolrCollection collection;
     private Class<T> tClass;
     private FacetConfigConverter facetConverter;
 
-    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass, FacetConfigConverter facetConverter) {
+    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass, FacetConfigConverter facetConverter, SolrRequestConverter requestConverter) {
         this.solrTemplate = solrTemplate;
         this.collection = collection;
         this.tClass = tClass;
         this.facetConverter = facetConverter;
+        this.requestConverter = requestConverter;
         this.termInfoConverter = new TermInfoConverter();
     }
 
@@ -74,7 +73,7 @@ public abstract class SolrQueryRepository<T> {
 
     public Optional<T> getEntry(SolrRequest request) {
         try {
-            return solrTemplate.queryForObject(collection.toString(), toQuery(request), tClass);
+            return solrTemplate.queryForObject(collection.toString(), requestConverter.toQuery(request), tClass);
         } catch (Throwable e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
@@ -84,7 +83,7 @@ public abstract class SolrQueryRepository<T> {
 
     public Cursor<T> getAll(SolrRequest request) {
         try {
-            return solrTemplate.queryForCursor(collection.toString(), toQuery(request), tClass);
+            return solrTemplate.queryForCursor(collection.toString(), requestConverter.toQuery(request), tClass);
         } catch (Throwable e) {
             throw new RuntimeException("Error executing solr query", e);
         } finally {
@@ -94,7 +93,7 @@ public abstract class SolrQueryRepository<T> {
 
     private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest request, String cursor, Integer pageSize) {
         return solrClient -> {
-            SolrQuery solrQuery = toSolrQuery(request);
+            SolrQuery solrQuery = requestConverter.toSolrQuery(request);
             if (cursor != null && !cursor.isEmpty()) {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
             } else {
@@ -108,7 +107,7 @@ public abstract class SolrQueryRepository<T> {
 
     private void logSolrQuery(SolrRequest request) {
         if (request != null) {
-            String queryString = toSolrQuery(request).toQueryString();
+            String queryString = requestConverter.toSolrQuery(request).toQueryString();
             LOGGER.debug("SolrQuery: {}", queryString);
         }
     }

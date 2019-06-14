@@ -4,6 +4,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
 
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
@@ -14,9 +15,7 @@ import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
  */
 @Repository
 public class UniprotQueryRepository  extends SolrQueryRepository<UniProtDocument> {
-
-    public UniprotQueryRepository(SolrTemplate solrTemplate, UniprotFacetConfig facetConverter) {
-        super(solrTemplate, SolrCollection.uniprot, UniProtDocument.class,facetConverter);
+    public UniprotQueryRepository(SolrTemplate solrTemplate, UniprotFacetConfig facetConverter, SolrRequestConverter requestConverter) {
+        super(solrTemplate, SolrCollection.uniprot, UniProtDocument.class,facetConverter, requestConverter);
     }
-
 }
