@@ -99,7 +99,7 @@ public class ResponseExceptionHandler {
      * @return 500 Internal server error response
      */
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
-    protected ResponseEntity<ErrorInfo> handleInternalServerError(Throwable ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> handleInternalServerError(Throwable ex, HttpServletRequest request) {
         logger.error("handleThrowableBadRequest: ", ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
@@ -120,7 +120,7 @@ public class ResponseExceptionHandler {
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler({BindException.class})
-    protected ResponseEntity<ErrorInfo> handleBindExceptionBadRequest(BindException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> handleBindExceptionBadRequest(BindException ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
 
         for (FieldError error : ex.getFieldErrors()) {
@@ -146,7 +146,7 @@ public class ResponseExceptionHandler {
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler({MissingServletRequestParameterException.class})
-    protected ResponseEntity<ErrorInfo> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+    public ResponseEntity<ErrorInfo> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
                                                                              HttpServletRequest request) {
         List<String> messages = singletonList(messageSource.getMessage(REQUIRED_REQUEST_PARAM, new Object[]{
                 ex.getParameterName()}, Locale.getDefault()));
@@ -167,7 +167,7 @@ public class ResponseExceptionHandler {
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler({InvalidRequestException.class})
-    protected ResponseEntity<ErrorInfo> handleInvalidRequestExceptionBadRequest(InvalidRequestException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> handleInvalidRequestExceptionBadRequest(InvalidRequestException ex, HttpServletRequest request) {
         List<String> messages = singletonList(messageSource.getMessage(INVALID_REQUEST,
                                                                        new Object[]{ex.getMessage()},
                                                                        Locale.getDefault()));
