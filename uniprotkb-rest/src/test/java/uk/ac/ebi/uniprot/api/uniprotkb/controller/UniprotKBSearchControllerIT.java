@@ -122,7 +122,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=abcd&fields=accession,gene_primary&includeTermInfo=true")
+                get(SEARCH_RESOURCE + "?query=accession:B4DFC2&fields=accession,gene_primary")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
