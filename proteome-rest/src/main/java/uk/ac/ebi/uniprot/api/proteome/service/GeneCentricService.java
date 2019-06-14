@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import uk.ac.ebi.uniprot.api.proteome.request.GeneCentricRequest;

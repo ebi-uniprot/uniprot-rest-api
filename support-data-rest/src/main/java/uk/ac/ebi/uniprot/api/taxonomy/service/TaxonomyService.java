@@ -2,7 +2,7 @@ package uk.ac.ebi.uniprot.api.taxonomy.service;
 
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
 import uk.ac.ebi.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
 import uk.ac.ebi.uniprot.api.taxonomy.repository.TaxonomyRepository;

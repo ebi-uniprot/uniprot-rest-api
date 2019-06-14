@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.io.stream.expr.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 
 import java.io.IOException;
 import java.util.Objects;

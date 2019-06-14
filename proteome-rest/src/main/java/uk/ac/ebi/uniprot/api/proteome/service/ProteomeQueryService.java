@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import uk.ac.ebi.uniprot.api.proteome.request.ProteomeRequest;
@@ -40,13 +40,12 @@ public class ProteomeQueryService {
         this.solrSortClause = solrSortClause;
     }
 
-
     public QueryResult<?> search(ProteomeRequest request, MessageConverterContext<ProteomeEntry> context) {
         MediaType contentType = context.getContentType();
         SolrRequest solrRequest = createQuery(request);
 
-        QueryResult<ProteomeDocument> results = repository.searchPage(solrRequest, request.getCursor(),
-                                                                      request.getSize());
+        QueryResult<ProteomeDocument> results = repository
+                .searchPage(solrRequest, request.getCursor(), request.getSize());
         if (request.hasFacets()) {
             context.setFacets(results.getFacets());
         }

@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.common.repository.store;
+package uk.ac.ebi.uniprot.api.common.repository.search;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,6 @@ import org.springframework.data.solr.core.query.FacetOptions;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFacetQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
-import uk.ac.ebi.uniprot.api.common.repository.search.QueryRetrievalException;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 
 import java.util.ArrayList;

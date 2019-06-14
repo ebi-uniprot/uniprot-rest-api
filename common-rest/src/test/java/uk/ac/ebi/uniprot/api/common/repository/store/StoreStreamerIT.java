@@ -11,6 +11,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;

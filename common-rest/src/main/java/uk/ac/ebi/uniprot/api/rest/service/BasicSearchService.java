@@ -7,7 +7,7 @@ import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
-import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
 import uk.ac.ebi.uniprot.api.rest.search.AbstractSolrSortClause;
 import uk.ac.ebi.uniprot.search.DefaultSearchHandler;

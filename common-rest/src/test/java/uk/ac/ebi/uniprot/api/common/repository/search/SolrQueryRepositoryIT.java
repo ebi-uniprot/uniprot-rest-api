@@ -9,24 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.search.QueryRetrievalException;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryBuilder;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
-import uk.ac.ebi.uniprot.indexer.DataStoreManager.StoreType;
 import uk.ac.ebi.uniprot.indexer.uniprot.mockers.UniProtDocMocker;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -232,7 +224,7 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SimpleQuery query = queryWithFacets(accQuery,Collections.singletonList("reviewed"));
+        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("reviewed"));
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
 
         // then
@@ -249,31 +241,29 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SimpleQuery query = queryWithFacets(accQuery, Arrays.asList("reviewed","d3structure"));
+        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "d3structure"));
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(2)));
     }
 
-    private SimpleQuery queryWithFacets(String query,List<String> facets) {
-        SimpleQuery simpleQuery = new SolrQueryBuilder()
+    private SolrRequest queryWithFacets(String query, List<String> facets) {
+        return SolrRequest.builder()
                 .query(query)
-                .defaultOperator(Query.Operator.AND)
-                .addFilterQuery(new SimpleQuery("active:true"))
+                .defaultQueryOperator(Query.Operator.AND)
+                .filterQuery("active:true")
                 .facetConfig(new FakeFacetConfigConverter())
                 .facets(facets)
+                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .build();
-        simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession_id"));
-        return simpleQuery;
     }
 
-    private SimpleQuery queryWithoutFacets(String query) {
-        SimpleQuery simpleQuery = new SolrQueryBuilder()
+    private SolrRequest queryWithoutFacets(String query) {
+        return SolrRequest.builder()
                 .query(query)
+                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .build();
-        simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession_id"));
-        return simpleQuery;
     }
 
     public static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
@@ -281,5 +271,4 @@ class SolrQueryRepositoryIT {
             super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter());
         }
     }
-
 }

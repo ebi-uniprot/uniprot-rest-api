@@ -12,7 +12,6 @@ import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
-import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
 import java.util.List;

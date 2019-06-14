@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.store.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.common.repository.store.StoreStreamer;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
