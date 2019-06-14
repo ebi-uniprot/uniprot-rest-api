@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.solr.core.SolrCallback;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.result.Cursor;
+import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
@@ -53,6 +54,7 @@ public abstract class SolrQueryRepository<T> {
         }
         try {
             CursorPage page = CursorPage.of(cursor, pageSize);
+            requestConverter.toSolrQuery(request);
             QueryResponse solrResponse = solrTemplate
                     .execute(getSolrCursorCallback(request, page.getCursor(), pageSize));
 
@@ -64,6 +66,8 @@ public abstract class SolrQueryRepository<T> {
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
 
             return QueryResult.of(resultList, page, facets, termInfos);
+        } catch (InvalidRequestException e) {
+            throw e;
         } catch (Throwable e) {
             throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
         } finally {
