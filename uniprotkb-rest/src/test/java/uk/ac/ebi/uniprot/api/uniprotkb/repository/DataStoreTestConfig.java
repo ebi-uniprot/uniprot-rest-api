@@ -69,7 +69,7 @@ public class DataStoreTestConfig {
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
                 GoRelationsRepoMocker.getGoRelationRepo(),
-                PathwayRepoMocker.getPathwayRepo(), new HashMap<String, SuggestDocument>()));
+                PathwayRepoMocker.getPathwayRepo(), null, new HashMap<String, SuggestDocument>()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);

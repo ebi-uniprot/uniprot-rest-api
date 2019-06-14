@@ -1,17 +1,5 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,13 +8,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import uk.ac.ebi.uniprot.api.uniprotkb.view.ViewBy;
-import uk.ac.ebi.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService;
-import uk.ac.ebi.uniprot.cv.keyword.KeywordDetail;
+import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
 import uk.ac.ebi.uniprot.cv.keyword.KeywordService;
-import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordDetailImpl;
+import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordEntryImpl;
 import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordImpl;
+
+import java.io.IOException;
+import java.util.*;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 class UniProtViewByKeywordServiceTest {
@@ -63,29 +57,28 @@ class UniProtViewByKeywordServiceTest {
 		
 	}
 	void mockKeywordService() {
-		KeywordDetailImpl keyword = new KeywordDetailImpl();
+		KeywordEntryImpl keyword = new KeywordEntryImpl();
 		keyword.setKeyword(new KeywordImpl( "Catecholamine metabolism","KW-9999"));
-		List<KeywordDetail> parents =Arrays.asList(keyword);
-		KeywordDetailImpl kw1 = new KeywordDetailImpl();
+		Set<KeywordEntry> parents = Collections.singleton(keyword);
+		KeywordEntryImpl kw1 = new KeywordEntryImpl();
 		kw1.setKeyword(new KeywordImpl( "Catecholamine metabolism", "KW-0128"));
 		kw1.setParents(parents);
-		KeywordDetailImpl kw2 = new KeywordDetailImpl();
+		KeywordEntryImpl kw2 = new KeywordEntryImpl();
 		kw2.setKeyword(new KeywordImpl( "Cell adhesion", "KW-0130"));
 		kw2.setParents(parents);
-		
-		KeywordDetailImpl kw3 = new KeywordDetailImpl();
+
+		KeywordEntryImpl kw3 = new KeywordEntryImpl();
 		kw3.setKeyword(new KeywordImpl( "Cell cycle", "KW-0131"));
 		kw3.setParents(parents);
-		List<KeywordDetail> kws =new ArrayList<>();
+		List<KeywordEntry> kws = new ArrayList<>();
 		kws.add(kw1);
 		kws.add(kw2);
 		kws.add(kw3);
-		List<KeywordDetail> kws3 =new ArrayList<>();
-		kws3.add(kw3);
-		KeywordDetailImpl kw31 = new KeywordDetailImpl();
+		Set<KeywordEntry> kws3 = Collections.singleton(kw3);
+		KeywordEntryImpl kw31 = new KeywordEntryImpl();
 		kw31.setKeyword(new KeywordImpl( "Cell division", "KW-0132"));
 		kw3.setParents(kws3);
-		KeywordDetailImpl kw32 = new KeywordDetailImpl();
+		KeywordEntryImpl kw32 = new KeywordEntryImpl();
 		kw32.setKeyword(new KeywordImpl( "Growth arrest", "KW-0338"));
 		kw3.setParents(kws3);
 	
