@@ -15,18 +15,16 @@ import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
-import uk.ac.ebi.uniprot.indexer.proteome.ProteomeEntryConverter;
-import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
 /**
  *
  * @author jluo
- * @date: 30 Apr 2019
+ * @date: 14 Jun 2019
  *
 */
 @TestConfiguration
-public class ProteomeDataStoreTestConfig {
+public class GeneCentriDataStoreTestConfig {
 	@Bean(destroyMethod = "close")
     public DataStoreManager dataStoreManager() throws IOException,URISyntaxException{
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
@@ -35,25 +33,18 @@ public class ProteomeDataStoreTestConfig {
     }
 
     @Bean
-    @Profile("proteome_offline")
+    @Profile("genecentric_offline")
     public HttpClient httpClient() {
         return mock(HttpClient.class);
     }
-    @Bean("proteome")
-    @Profile("proteome_offline")
-    public SolrClient proteomeSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
-        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.proteome);
-        addStoreInfoProteome(dataStoreManager, solrClient, DataStoreManager.StoreType.PROTEOME );
+
+    @Bean("genecentric")
+    @Profile("genecentric_offline")
+    public SolrClient genecentricSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
+        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.genecentric);
+        addStoreInfoProteome(dataStoreManager, solrClient,  DataStoreManager.StoreType.GENECENTRIC );
         return solrClient;
     }
-    
-//    @Bean("genecentric")
-//    @Profile("offline")
-//    public SolrClient genecentricSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
-//        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.genecentric);
-//        addStoreInfoProteome(dataStoreManager, solrClient,  DataStoreManager.StoreType.GENECENTRIC );
-//        return solrClient;
-//    }
 
     private void addStoreInfoProteome(DataStoreManager dsm, ClosableEmbeddedSolrClient solrClient, DataStoreManager.StoreType store ) throws URISyntaxException {
         dsm.addSolrClient(store, solrClient);

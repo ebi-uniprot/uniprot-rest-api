@@ -39,7 +39,7 @@ public class GeneCentricQueryFieldsValidator implements SolrQueryFieldValidator 
 
 	@Override
 	public String getInvalidFieldTypeErrorMessage(String fieldName, SearchFieldType searchFieldType) {
-		  return "{search.uniprot.invalid.query.field.type}";
+		  return "{search.proteome.invalid.query.field.type}";
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class GeneCentricQueryFieldsValidator implements SolrQueryFieldValidator 
 
 	@Override
 	public String getInvalidFieldValueErrorMessage(String fieldName, String value) {
-		  return "{search.crossref.invalid.query.field.value}";
+		  return "{search.proteome.invalid.query.field.value}";
 	}
 
 }

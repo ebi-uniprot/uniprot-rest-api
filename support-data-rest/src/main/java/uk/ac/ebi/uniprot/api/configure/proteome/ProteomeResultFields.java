@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldGroupImpl;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.JsonConfig;
 
 /**
@@ -29,6 +30,7 @@ public enum ProteomeResultFields {
 	private static final String FILENAME = "proteome/proteome_result_field.json";
 	private List<FieldGroup> resultFields = new ArrayList<>();
 	private Map<String, Field> fieldMap = new HashMap<>();
+	
 
 	ProteomeResultFields() {
 		init();
@@ -41,15 +43,17 @@ public enum ProteomeResultFields {
 					new TypeReference<List<FieldGroupImpl>>() {
 					});
 			this.resultFields.addAll(fields);
-			this.fieldMap = this.resultFields.stream().flatMap(val -> val.getFields().stream())
-					.collect(Collectors.toMap(Field::getName, Function.identity()));
+			
+			this.fieldMap.put("upid", new FieldImpl("Proteome ID", "upid"));		
+			this.resultFields.stream().flatMap(val -> val.getFields().stream())
+					.forEach(field -> this.fieldMap.put(field.getName(), field));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 	}
 
-	public List<FieldGroup> getResultFields() {
+	public List<FieldGroup> getResultFieldGroups() {
 		return resultFields;
 	}
 
@@ -57,6 +61,9 @@ public enum ProteomeResultFields {
 		return Optional.ofNullable( this.fieldMap.get(name));
 	}
 
+	public Map<String, Field> getAllFields(){
+		return fieldMap;
+	}
 	@Override
 	public String toString() {
 		return resultFields.stream().map(val -> val.toString()).collect(Collectors.joining(",\n"));
