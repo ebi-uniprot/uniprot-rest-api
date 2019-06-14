@@ -34,8 +34,12 @@ class SolrRequestConverter {
         setFilterQueries(solrQuery, request.getFilterQueries());
         setSort(solrQuery, request.getSort());
         setQueryOperator(solrQuery, request.getDefaultQueryOperator());
-        setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
-        setTermFields(solrQuery, request.getTermFields());
+        if (!request.getFacets().isEmpty()) {
+            setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
+        }
+        if (!request.getTermFields().isEmpty()) {
+            setTermFields(solrQuery, request.getTermFields());
+        }
 
         return solrQuery;
     }
