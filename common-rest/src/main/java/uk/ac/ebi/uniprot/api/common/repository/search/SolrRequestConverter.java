@@ -78,7 +78,7 @@ public class SolrRequestConverter {
     static class SolrQueryConverter {
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
-                solrQuery.setParam(TERMS_LIST, termQuery);
+                solrQuery.setParam(TERMS_LIST, termQuery.toLowerCase());
             } else {
                 throw new InvalidRequestException("Term information will only be returned for single value searches that do not specify a field.");
             }

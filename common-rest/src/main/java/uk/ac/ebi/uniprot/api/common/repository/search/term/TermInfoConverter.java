@@ -43,7 +43,7 @@ public class TermInfoConverter implements Converter<QueryResponse, List<TermInfo
             // TODO: 14/06/19 need to add url, and get correct url.
 
             if (!entry.getValue().isEmpty()) {
-                builder.hits(entry.getValue().get(0).getTotalTermFreq());
+                builder.hits(entry.getValue().get(0).getFrequency());
                 return builder.build();
             } else {
                 return null;
