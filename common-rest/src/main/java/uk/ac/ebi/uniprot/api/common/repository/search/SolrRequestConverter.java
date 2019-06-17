@@ -15,21 +15,19 @@ import java.util.regex.Pattern;
 import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
 import static uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
 import static uk.ac.ebi.uniprot.common.Utils.nonNull;
+import static uk.ac.ebi.uniprot.common.Utils.nullOrEmpty;
 
 /**
  * Created 14/06/19
  *
  * @author Edd
  */
-// TODO: 14/06/19 test this class
 public class SolrRequestConverter {
-    private static final String QUERY_OPERATOR = "q.op";
-    private static final Pattern SINGLE_TERM_PATTERN = Pattern.compile("^\\w+$");
-    private static final String TERMS_LIST = "terms.list";
-    private static final String TERMS = "terms";
-    private static final String DISTRIB = "distrib";
-    private static final String TERMS_FIELDS = "terms.fl";
-
+    /**
+     * Creates a {@link SolrQuery} from a {@link SolrRequest}.
+     * @param request the request that specifies the query
+     * @return the solr query
+     */
     public SolrQuery toSolrQuery(SolrRequest request) {
         SolrQuery solrQuery = new SolrQuery(request.getQuery());
 
@@ -40,12 +38,22 @@ public class SolrRequestConverter {
             setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
         }
         if (!request.getTermFields().isEmpty()) {
+            if (nullOrEmpty(request.getTermQuery())) {
+                throw new InvalidRequestException("Please specify required field, term query.");
+            }
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
         return solrQuery;
     }
 
+    /**
+     * Creates a Spring {@link Query} from a {@link SolrRequest}. Note that this does not
+     * handle term queries, which are not supported by Spring's standard Query API.
+     *
+     * @param request the request that specifies the query
+     * @return the query
+     */
     public Query toQuery(SolrRequest request) {
         SimpleQuery simpleQuery = new SimpleQuery(request.getQuery());
 
@@ -76,6 +84,14 @@ public class SolrRequestConverter {
     }
 
     static class SolrQueryConverter {
+        private static final String QUERY_OPERATOR = "q.op";
+        private static final Pattern SINGLE_TERM_PATTERN = Pattern.compile("^\\w+$");
+        private static final String TERMS_LIST = "terms.list";
+        private static final String TERMS = "terms";
+        private static final String DISTRIB = "distrib";
+        private static final String TERMS_FIELDS = "terms.fl";
+        private static final String MINCOUNT = "terms.mincount";
+
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
                 solrQuery.setParam(TERMS_LIST, termQuery.toLowerCase());
@@ -85,6 +101,7 @@ public class SolrRequestConverter {
 
             solrQuery.setParam(TERMS, "true");
             solrQuery.setParam(DISTRIB, "true");
+            solrQuery.setParam(MINCOUNT, "1");
 
             String[] termsFieldsArr = new String[termFields.size()];
             termsFieldsArr = termFields.toArray(termsFieldsArr);
