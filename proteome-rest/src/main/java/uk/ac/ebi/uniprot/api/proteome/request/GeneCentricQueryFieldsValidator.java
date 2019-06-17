@@ -65,7 +65,7 @@ public class GeneCentricQueryFieldsValidator implements SolrQueryFieldValidator 
 
 	@Override
 	public String getInvalidFieldValueErrorMessage(String fieldName, String value) {
-		  return "{search.proteome.invalid.query.field.value}";
+		 return "{search.genecentric.invalid.query.field.value."+fieldName+"}";
 	}
 
 }

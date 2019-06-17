@@ -37,7 +37,6 @@ public class GeneCentriDataStoreTestConfig {
     public HttpClient httpClient() {
         return mock(HttpClient.class);
     }
-
     @Bean("genecentric")
     @Profile("genecentric_offline")
     public SolrClient genecentricSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {

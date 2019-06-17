@@ -45,7 +45,7 @@ public class GeneCentricService {
 	}
 
 	public CanonicalProtein getByAccession(String accession) {
-		return basicService.getEntity(Search.accession.name(), accession);
+		return basicService.getEntity(Search.accession_id.name(), accession.toUpperCase());
 	}
 
 	public Stream<CanonicalProtein> download(GeneCentricRequest request) {

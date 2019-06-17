@@ -265,7 +265,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 	        protected SearchParameter searchCanReturnSuccessParameter() {
 	            return SearchParameter.builder()
 	                    .queryParam("query", Collections.singletonList("upid:UP000005231"))
-	                    .resultMatcher(jsonPath("$.results.*..id.value",contains("UP000005231")))
+	                    .resultMatcher(jsonPath("$.results.*.id.value",contains("UP000005231")))
 	                    .build();
 	        }
 

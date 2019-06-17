@@ -2,7 +2,6 @@ package uk.ac.ebi.uniprot.api.proteome.controller;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
@@ -26,6 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import uk.ac.ebi.uniprot.api.proteome.ProteomeRestApplication;
+import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricFacetConfig;
+import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import uk.ac.ebi.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -66,12 +67,15 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
 	    @Autowired
 	    private DataStoreManager storeManager;
+	    
+
 		@Override
 		protected void saveEntry() {
 			CanonicalProtein entry = create();
 			 GeneCentricDocumentBuilder builder = GeneCentricDocument.builder();
 			 builder.accession(ACCESSION)
-			 .accessions(Arrays.asList(ACCESSION, "P21912", "P31912"));
+			 .accessions(Arrays.asList(ACCESSION, "P21912", "P31912"))
+			 .upid("UP000005641");
 			 builder.geneCentricStored(getBinary(entry));
 			  storeManager.saveDocs(DataStoreManager.StoreType.GENECENTRIC, builder.build());
 
@@ -143,7 +147,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 		        public GetIdParameter invalidIdParameter() {
 		            return GetIdParameter.builder().id("INVALID")
 		                    .resultMatcher(jsonPath("$.url",not(isEmptyOrNullString())))
-		                    .resultMatcher(jsonPath("$.messages.*",contains("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+		                    .resultMatcher(jsonPath("$.messages.*",contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
 		                    .build();
 		        }
 
@@ -157,8 +161,8 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
 		        @Override
 		        public GetIdParameter withFilterFieldsParameter() {
-		            return GetIdParameter.builder().id(ACCESSION).fields("accession")
-		                    .resultMatcher(jsonPath("$.*.accession.value",is(ACCESSION)))
+		            return GetIdParameter.builder().id(ACCESSION).fields("accession_id")
+		                    .resultMatcher(jsonPath("$.*.accession.value",contains(ACCESSION)))
 //		                    .resultMatcher(jsonPath("$.scientificName",is("scientific")))
 //		                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
 //		                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
@@ -183,7 +187,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 		                    .id(ACCESSION)
 		                    .contentTypeParam(ContentTypeParam.builder()
 		                            .contentType(MediaType.APPLICATION_JSON)
-		                            .resultMatcher(jsonPath("$.id.value",contains(ACCESSION)))
+		                            .resultMatcher(jsonPath("$.*.accession.value",contains(ACCESSION)))
 //		                            .resultMatcher(jsonPath("$.scientificName",is("scientific")))
 //		                            .resultMatcher(jsonPath("$.commonName",is("common")))
 //		                            .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
@@ -191,7 +195,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 		                            .build())
 		                    .contentTypeParam(ContentTypeParam.builder()
 	                        .contentType(MediaType.APPLICATION_XML)
-	                        .resultMatcher(content().string(containsString("accession="+ACCESSION)))
+	                        .resultMatcher(content().string(containsString("accession=\""+ACCESSION+ "\"")))
 //	                        .resultMatcher(jsonPath("$.scientificName",is("scientific")))
 //	                        .resultMatcher(jsonPath("$.commonName",is("common")))
 //	                        .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
@@ -201,15 +205,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 		                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
 		                            .resultMatcher(content().string(containsString(ACCESSION)))
 		                            .build())
-		                    .contentTypeParam(ContentTypeParam.builder()
-		                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-		                            .resultMatcher(content().string(containsString("Proteome ID\tOrganism\tOrganism ID\tProtein count")))
-		                            .resultMatcher(content().string(containsString("UP000005640\tHomo sapiens\t9606\t0")))
-		                            .build())
-		                    .contentTypeParam(ContentTypeParam.builder()
-		                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-		                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-		                            .build())
+		
 		                    .build();
 		        }
 
@@ -220,22 +216,14 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 		                    .contentTypeParam(ContentTypeParam.builder()
 		                            .contentType(MediaType.APPLICATION_JSON)
 		                            .resultMatcher(jsonPath("$.url",not(isEmptyOrNullString())))
-		                      //      .resultMatcher(jsonPath("$.messages.*",contains("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+		                            .resultMatcher(jsonPath("$.messages.*",contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
 		                            .build())
 		                    .contentTypeParam(ContentTypeParam.builder()
 		                            .contentType(MediaType.APPLICATION_XML)
-		                            .resultMatcher(content().string(containsString("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+		                            .resultMatcher(content().string(containsString("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
 		                            .build())
 		                    .contentTypeParam(ContentTypeParam.builder()
 		                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-		                            .resultMatcher(content().string(isEmptyString()))
-		                            .build())
-		                    .contentTypeParam(ContentTypeParam.builder()
-		                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-		                            .resultMatcher(content().string(isEmptyString()))
-		                            .build())
-		                    .contentTypeParam(ContentTypeParam.builder()
-		                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
 		                            .resultMatcher(content().string(isEmptyString()))
 		                            .build())
 		                    .build();
