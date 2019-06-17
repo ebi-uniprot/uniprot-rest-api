@@ -33,7 +33,6 @@ import java.util.Collection;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidFacets {
-
     Class<? extends GenericFacetConfig> facetConfig();
 
     String message() default "{search.invalid.includeFacet}";
@@ -42,9 +41,7 @@ public @interface ValidFacets {
 
     Class<? extends Payload>[] payload() default {};
 
-
     class ValidIncludeFacetsValidator implements ConstraintValidator<ValidFacets, String> {
-
         private static final Logger LOGGER = LoggerFactory.getLogger(ValidIncludeFacetsValidator.class);
 
         @Autowired
@@ -71,22 +68,16 @@ public @interface ValidFacets {
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
             if (Utils.notEmpty(value)) {
-                //first validate if the accept is for application/json
+                // verify if facet name is valid.
                 ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-                String accept = getRequest().getHeader("Accept");
-                if (accept == null || !accept.equalsIgnoreCase("application/json")) {
-                    buildUnsuportedContentTypeErrorMessage(accept, contextImpl);
-                    isValid = false;
-                } else {
-                    // verify if facet name is valid.
-                    String[] facetList = value.split("\\s*,\\s*");
-                    for (String facet : facetList) {
-                        if (!getFacetNames().contains(facet)) {
-                            buildInvalidFacetNameMessage(facet, getFacetNames(), contextImpl);
-                            isValid = false;
-                        }
+                String[] facetList = value.split("\\s*,\\s*");
+                for (String facet : facetList) {
+                    if (!getFacetNames().contains(facet)) {
+                        buildInvalidFacetNameMessage(facet, getFacetNames(), contextImpl);
+                        isValid = false;
                     }
                 }
+
                 if (!isValid && contextImpl != null) {
                     contextImpl.disableDefaultConstraintViolation();
                 }
@@ -100,12 +91,6 @@ public @interface ValidFacets {
 
         Collection<String> getFacetNames() {
             return facetNames;
-        }
-
-        void buildUnsuportedContentTypeErrorMessage(String contentType, ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = "{search.invalid.includeFacet.content.type}";
-            contextImpl.addMessageParameter("0", contentType);
-            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         void buildInvalidFacetNameMessage(String facetName, Collection<String> validNames, ConstraintValidatorContextImpl contextImpl) {

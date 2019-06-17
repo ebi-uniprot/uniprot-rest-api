@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author lgonzales
  */
 class ValidFacetsValidatorTest {
-
     @Test
     void isValidNullValueReturnTrue() {
         FakeValidIncludeFacetsValidator validator = new FakeValidIncludeFacetsValidator();
@@ -49,19 +48,6 @@ class ValidFacetsValidatorTest {
         validator.mockedFacetNames.add("validName2");
         boolean result = validator.isValid("validName, validName1 , validName2",null);
         assertTrue(result);
-    }
-
-    @Test
-    void isValidWithIncorrectContentTypeReturnFalse() {
-        HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString())).thenReturn("application/xml");
-
-        FakeValidIncludeFacetsValidator validator = new FakeValidIncludeFacetsValidator();
-        validator.mockedRequest = mockedServletWebRequest;
-        boolean result = validator.isValid("validName",null);
-        assertFalse(result);
-        assertEquals(1, validator.errorFields.size());
-        assertEquals("application/xml", validator.errorFields.get(0));
     }
 
     @Test
@@ -101,18 +87,8 @@ class ValidFacetsValidatorTest {
         Collection<String> mockedFacetNames = new ArrayList<>();
 
         @Override
-        void buildUnsuportedContentTypeErrorMessage(String contentType,ConstraintValidatorContextImpl contextImpl) {
-            errorFields.add(contentType);
-        }
-
-        @Override
         void buildInvalidFacetNameMessage(String facetName, Collection<String> validNames, ConstraintValidatorContextImpl contextImpl) {
             errorFields.add(facetName);
-        }
-
-        @Override
-        HttpServletRequest getRequest() {
-            return this.mockedRequest;
         }
 
         @Override
@@ -120,6 +96,4 @@ class ValidFacetsValidatorTest {
             return mockedFacetNames;
         }
     }
-
-
 }

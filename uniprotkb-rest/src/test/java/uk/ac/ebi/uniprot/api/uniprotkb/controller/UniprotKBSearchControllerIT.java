@@ -283,7 +283,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
-                .andExpect(content().string(containsString("facets are supported only for 'application/json'")));
+                .andExpect(content().string(containsString("Invalid content type received, 'application/xml'. Expected one of [application/json]")));
     }
 
     @Test
@@ -356,20 +356,6 @@ public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
 
     @Test
     void defaultSearchWithMatchedFields() throws Exception {
-        /*
-        * SolrQuery params = new SolrQuery("content:fibroblast");
-params.setParam("terms", "true");
-//params.setParam("terms.list", "fibroblast");
-params.setParam("terms.list", "familial");
-//params.setParam("terms.ttf", "true");
-params.setParam("terms.mincount", "1");
-params.setParam("terms.fl", "cc_disease");
-
-//params.setRequestHandler("/terms");
-storeManager.solrClientMap.get(DataStoreManager.StoreType.UNIPROT).query(params);
-//storeManager.solrClientMap.get(DataStoreManager.StoreType.UNIPROT).request(new QueryRequest(params));
-        * */
-
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -410,6 +396,25 @@ storeManager.solrClientMap.get(DataStoreManager.StoreType.UNIPROT).query(params)
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content()
                                    .string(containsString("Term information will only be returned for single value searches that do not specify a field")));
+    }
+
+    @Test
+    void cannotReturnMatchedFieldsForXML() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
+                        .header(ACCEPT, APPLICATION_XML_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("Invalid content type received, 'application/xml'. Expected one of [application/json]")));
     }
 
     @Override
