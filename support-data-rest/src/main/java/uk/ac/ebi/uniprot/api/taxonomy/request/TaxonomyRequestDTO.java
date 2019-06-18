@@ -12,8 +12,6 @@ import javax.validation.constraints.Positive;
 @Data
 public class TaxonomyRequestDTO implements SearchRequest {
 
-    private static final int DEFAULT_RESULTS_SIZE = 25;
-
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(fieldValidatorClazz = TaxonomySolrQueryFieldValidator.class)

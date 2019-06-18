@@ -1,9 +1,10 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
 import org.springframework.http.MediaType;
-
+import org.springframework.lang.Nullable;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
+import java.lang.reflect.Type;
 import java.util.stream.Stream;
 
 /**
@@ -16,8 +17,13 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractEntityIdHttpMessageConverter<C> extends AbstractUUWHttpMessageConverter<C, String> {
 
-    AbstractEntityIdHttpMessageConverter(MediaType mediaType) {
-        super(mediaType);
+    AbstractEntityIdHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
+        super(mediaType, messageConverterEntryClass);
+    }
+
+    @Override
+    public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
+        return this.canWrite(mediaType) && MessageConverterContext.class.isAssignableFrom(clazz);
     }
 
     @Override

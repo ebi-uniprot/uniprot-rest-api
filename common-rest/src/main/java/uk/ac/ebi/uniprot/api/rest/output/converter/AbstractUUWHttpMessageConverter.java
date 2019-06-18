@@ -4,14 +4,17 @@ import org.slf4j.Logger;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-
+import org.springframework.lang.Nullable;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -36,19 +39,26 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttpMessageConverter<MessageConverterContext<C>> {
+public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractGenericHttpMessageConverter<MessageConverterContext<C>> {
     private static final Logger LOGGER = getLogger(AbstractUUWHttpMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
     private static final int LOG_INTERVAL = 10000;
     private String entitySeparator;
+    private final Class<C> messageConverterEntryClass;
 
-    AbstractUUWHttpMessageConverter(MediaType mediaType) {
+    AbstractUUWHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
         super(mediaType);
+        this.messageConverterEntryClass = messageConverterEntryClass;
     }
 
-    @Override
-    protected boolean supports(Class<?> aClass) {
-        return MessageConverterContext.class.isAssignableFrom(aClass);
+    public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
+        boolean result = false;
+        if (this.canWrite(mediaType) && MessageConverterContext.class.isAssignableFrom(clazz) && type != null) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            String typeClassName = parameterizedType.getActualTypeArguments()[0].getTypeName();
+            result = typeClassName.equals(messageConverterEntryClass.getName());
+        }
+        return result;
     }
 
     @Override
@@ -57,7 +67,12 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractHttp
     }
 
     @Override
-    protected void writeInternal(MessageConverterContext<C> context, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+    public MessageConverterContext<C> read(Type type, Class<?> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+        return null;
+    }
+
+    @Override
+    protected void writeInternal(MessageConverterContext<C> context, Type type, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
         Instant start = Instant.now();

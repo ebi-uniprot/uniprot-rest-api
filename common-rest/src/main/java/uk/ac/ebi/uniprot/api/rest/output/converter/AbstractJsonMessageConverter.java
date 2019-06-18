@@ -3,11 +3,14 @@ package uk.ac.ebi.uniprot.api.rest.output.converter;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import org.springframework.http.MediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,14 +19,15 @@ import java.util.Map;
  *
  * @author lgonzales
  */
-public abstract  class AbstractJsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
+public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
+    private static final String COMMA = "\\s*,\\s*";
     private final ObjectMapper objectMapper;
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
 
-    public AbstractJsonMessageConverter(ObjectMapper objectMapper) {
-        super(MediaType.APPLICATION_JSON);
+    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass) {
+        super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
     }
 
@@ -76,7 +80,17 @@ public abstract  class AbstractJsonMessageConverter<T> extends AbstractEntityHtt
 
     protected abstract T filterEntryContent(T entity);
 
-    protected abstract Map<String, List<String>> getFilterFieldMap(String fields);
+    protected Map<String, List<String>> getFilterFieldMap(String fields) {
+        if (Strings.isNullOrEmpty(fields)) {
+            return Collections.emptyMap();
+        } else {
+            Map<String, List<String>> filters = new HashMap<>();
+            for (String field : fields.split(COMMA)) {
+                filters.put(field, Collections.emptyList());
+            }
+            return filters;
+        }
+    }
 
     private void writeFacet(JsonGenerator generator, Object facet) {
         try {

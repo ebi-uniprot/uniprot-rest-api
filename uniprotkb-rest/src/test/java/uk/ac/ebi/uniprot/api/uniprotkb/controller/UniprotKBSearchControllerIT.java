@@ -19,7 +19,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.EvidenceItem;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.GoEvidences;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
-import uk.ac.ebi.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import uk.ac.ebi.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import uk.ac.ebi.uniprot.api.rest.controller.SaveScenario;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -72,7 +72,7 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
 @ExtendWith(value = {SpringExtension.class, UniprotKBSearchControllerIT.UniprotKbSearchParameterResolver.class,
         UniprotKBSearchControllerIT.UniprotKbSearchContentTypeParamResolver.class})
 @Slf4j
-public class UniprotKBSearchControllerIT extends AbstractSearchControllerIT {
+public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 

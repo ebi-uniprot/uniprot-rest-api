@@ -10,7 +10,7 @@ import java.io.OutputStream;
 
 public class UniProtKBFlatFileMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     public UniProtKBFlatFileMessageConverter() {
-        super(UniProtMediaType.FF_MEDIA_TYPE);
+        super(UniProtMediaType.FF_MEDIA_TYPE, UniProtEntry.class);
     }
 
     @Override

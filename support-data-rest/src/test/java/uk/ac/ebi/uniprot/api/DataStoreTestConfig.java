@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.api;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.core.CoreContainer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -10,6 +11,7 @@ import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -32,13 +34,15 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public SolrClient taxonomySolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
-        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.taxonomy);
-        addStoreInfo(dataStoreManager, solrClient);
-        return solrClient;
-    }
+    public SolrClient solrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
+        CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
+        container.load();
+        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.taxonomy);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.TAXONOMY, solrClient);
 
-    private void addStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient taxonomySolrClient) throws URISyntaxException {
-        dsm.addSolrClient(DataStoreManager.StoreType.TAXONOMY, taxonomySolrClient);
+        solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.keyword);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.KEYWORD, solrClient);
+
+        return solrClient;
     }
 }

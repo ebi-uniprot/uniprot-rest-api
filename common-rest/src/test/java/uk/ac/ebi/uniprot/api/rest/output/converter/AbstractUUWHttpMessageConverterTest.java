@@ -4,15 +4,15 @@ import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
-
 import uk.ac.ebi.uniprot.api.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +38,7 @@ public class AbstractUUWHttpMessageConverterTest {
             .codePoints()
             .mapToObj(c -> String.valueOf((char) c))
             .collect(Collectors.joining(ENTITY_SEPARATOR));
+    private List<Character> listType;
 
     @Test
     public void overridenMethodsCalledInCorrectOrder_beforeThenWriteThenAfterThenCleanUp() throws IOException {
@@ -47,17 +48,19 @@ public class AbstractUUWHttpMessageConverterTest {
         assertThat(converter.hasCleanedUp(), is(false));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(os));
+        converter.writeInternal(context, null, httpOutputMessage(os));
 
         assertThat(os.toString(), is(BEFORE + ORIGINAL + AFTER));
         assertThat(converter.hasCleanedUp(), is(true));
     }
 
     @Test
-    public void supportsMessageConvertersOnly() {
+    public void canWriteMessageConvertersOnly() throws Exception {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
-        assertThat(converter.supports(MessageConverterContext.class), is(true));
-        assertThat(converter.supports(String.class), is(false));
+
+        ParameterizedType type = (ParameterizedType) this.getClass().getDeclaredField("listType").getGenericType();
+        assertThat(converter.canWrite(type, MessageConverterContext.class, ANY_MEDIA_TYPE), is(true));
+        assertThat(converter.canWrite(type, String.class, ANY_MEDIA_TYPE), is(false));
     }
 
     @Test
@@ -66,7 +69,7 @@ public class AbstractUUWHttpMessageConverterTest {
         converter.setEntitySeparator(ENTITY_SEPARATOR);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(os));
+        converter.writeInternal(context, null, httpOutputMessage(os));
 
         assertThat(os.toString(), is(SEPARATED_ORIGINAL));
     }
@@ -83,7 +86,7 @@ public class AbstractUUWHttpMessageConverterTest {
         assertThat(converter.isCharacterStreamIsClosed(), is(false));
         ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(mockOS));
+        converter.writeInternal(context, null, httpOutputMessage(mockOS));
 
         verify(mockOS).close();
         assertThat(converter.hasCleanedUp(), is(true));
@@ -102,7 +105,7 @@ public class AbstractUUWHttpMessageConverterTest {
         assertThat(converter.isCharacterStreamIsClosed(), is(false));
         ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(mockOS));
+        converter.writeInternal(context, null, httpOutputMessage(mockOS));
 
         verify(mockOS).close();
         assertThat(converter.hasCleanedUp(), is(true));
@@ -121,7 +124,7 @@ public class AbstractUUWHttpMessageConverterTest {
         assertThat(converter.isCharacterStreamIsClosed(), is(false));
         ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(mockOS));
+        converter.writeInternal(context, null, httpOutputMessage(mockOS));
 
         verify(mockOS).close();
         assertThat(converter.hasCleanedUp(), is(true));
@@ -135,7 +138,7 @@ public class AbstractUUWHttpMessageConverterTest {
         assertThat(converter.getCounter(), is(0));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(os));
+        converter.writeInternal(context, null, httpOutputMessage(os));
 
         assertThat(converter.getCounter(), is(ORIGINAL.length()));
     }
@@ -145,7 +148,7 @@ public class AbstractUUWHttpMessageConverterTest {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.GZIP);
-        converter.writeInternal(context, httpOutputMessage(os));
+        converter.writeInternal(context, null, httpOutputMessage(os));
 
         assertThat(os.toString(), is(zippedString(ORIGINAL)));
     }
@@ -155,7 +158,7 @@ public class AbstractUUWHttpMessageConverterTest {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, httpOutputMessage(os));
+        converter.writeInternal(context, null, httpOutputMessage(os));
 
         assertThat(os.toString(), is(ORIGINAL));
     }
@@ -206,7 +209,7 @@ public class AbstractUUWHttpMessageConverterTest {
         private Stream<Character> characterStream = charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
 
         FakeMessageConverter(MediaType mediaType) {
-            super(mediaType);
+            super(mediaType, Character.class);
         }
 
         int getCounter() {

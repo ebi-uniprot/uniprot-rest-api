@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
 import org.springframework.http.MediaType;
-
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 import java.util.stream.Stream;
@@ -16,8 +15,8 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractEntityHttpMessageConverter<C> extends AbstractUUWHttpMessageConverter<C, C> {
 
-    public AbstractEntityHttpMessageConverter(MediaType mediaType) {
-        super(mediaType);
+    public AbstractEntityHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
+        super(mediaType, messageConverterEntryClass);
     }
 
     @Override

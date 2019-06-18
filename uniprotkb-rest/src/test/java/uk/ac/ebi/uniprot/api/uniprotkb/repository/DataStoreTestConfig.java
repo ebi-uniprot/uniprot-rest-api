@@ -2,10 +2,12 @@ package uk.ac.ebi.uniprot.api.uniprotkb.repository;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.core.CoreContainer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
+import uk.ac.ebi.uniprot.cv.chebi.ChebiRepo;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
@@ -17,8 +19,8 @@ import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.InactiveEntryConverter;
 import uk.ac.ebi.uniprot.indexer.uniprotkb.processor.UniProtEntryConverter;
 import uk.ac.ebi.uniprot.search.SolrCollection;
-import uk.ac.ebi.uniprot.search.document.suggest.SuggestDocument;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -52,7 +54,9 @@ public class DataStoreTestConfig {
     @Bean
     @Profile("offline")
     public SolrClient uniProtSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
-        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.uniprot);
+        CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
+        container.load();
+        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.uniprot);
         addUniProtStoreInfo(dataStoreManager, solrClient);
         return solrClient;
     }

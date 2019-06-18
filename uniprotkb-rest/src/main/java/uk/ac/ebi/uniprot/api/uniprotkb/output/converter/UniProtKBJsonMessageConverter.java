@@ -12,7 +12,7 @@ import java.util.Map;
 public class UniProtKBJsonMessageConverter extends AbstractJsonMessageConverter<UniProtEntry> {
 
     public UniProtKBJsonMessageConverter() {
-        super(UniprotJsonConfig.getInstance().getSimpleObjectMapper());
+        super(UniprotJsonConfig.getInstance().getSimpleObjectMapper(), UniProtEntry.class);
     }
 
     @Override

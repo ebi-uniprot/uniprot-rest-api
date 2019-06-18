@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.taxonomy;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +39,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     private static final String TAXONOMY_ID_REGEX = "^[0-9]+$";
 
     public TaxonomyController(ApplicationEventPublisher eventPublisher, TaxonomyService taxonomyService,
-                              MessageConverterContextFactory<TaxonomyEntry> converterContextFactory,
+                              @Qualifier("taxonomyMessageConverterContextFactory") MessageConverterContextFactory<TaxonomyEntry> taxonomyMessageConverterContextFactory,
                               ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, TAXONOMY);
+        super(eventPublisher, taxonomyMessageConverterContextFactory, downloadTaskExecutor, TAXONOMY);
         this.taxonomyService = taxonomyService;
     }
 

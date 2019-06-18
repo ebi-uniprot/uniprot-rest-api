@@ -10,7 +10,7 @@ import java.io.OutputStream;
 
 public class UniProtKBFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     public UniProtKBFastaMessageConverter() {
-        super(UniProtMediaType.FASTA_MEDIA_TYPE);
+        super(UniProtMediaType.FASTA_MEDIA_TYPE, UniProtEntry.class);
     }
 
     @Override

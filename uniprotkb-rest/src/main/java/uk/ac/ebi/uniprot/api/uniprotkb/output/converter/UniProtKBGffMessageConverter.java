@@ -11,7 +11,7 @@ import java.io.OutputStream;
 public class UniProtKBGffMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
 
     public UniProtKBGffMessageConverter() {
-        super(UniProtMediaType.GFF_MEDIA_TYPE);
+        super(UniProtMediaType.GFF_MEDIA_TYPE, UniProtEntry.class);
     }
 
     @Override
