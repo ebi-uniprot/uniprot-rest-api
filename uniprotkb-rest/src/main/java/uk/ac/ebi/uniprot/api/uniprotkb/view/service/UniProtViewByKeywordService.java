@@ -1,23 +1,21 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.view.service;
 
+import com.google.common.base.Strings;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import uk.ac.ebi.uniprot.api.uniprotkb.view.ViewBy;
+import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
+import uk.ac.ebi.uniprot.cv.keyword.KeywordService;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-
-import com.google.common.base.Strings;
-
-import uk.ac.ebi.uniprot.api.uniprotkb.view.ViewBy;
-import uk.ac.ebi.uniprot.cv.keyword.KeywordDetail;
-import uk.ac.ebi.uniprot.cv.keyword.KeywordService;
 
 public class UniProtViewByKeywordService  implements  UniProtViewByService {
 	private final SolrClient solrClient;
@@ -35,11 +33,11 @@ public class UniProtViewByKeywordService  implements  UniProtViewByService {
 
 	@Override
 	public List<ViewBy> get(String queryStr, String parent) {
-		List<KeywordDetail> keywords = getKeywordsFromParent(parent);
+        List<KeywordEntry> keywords = getKeywordsFromParent(parent);
 		if(keywords.isEmpty())
 			return Collections.emptyList();
-		Map<String, KeywordDetail> keywordAccMap = 
-				keywords.stream().collect(Collectors.toMap(KeywordDetail::getAccession, Function.identity()));
+        Map<String, KeywordEntry> keywordAccMap =
+                keywords.stream().collect(Collectors.toMap(KeywordEntry::getAccession, Function.identity()));
 		String facetIterms=
 		keywords.stream().map(val ->val.getAccession())
 		.collect(Collectors.joining(","));
@@ -66,14 +64,15 @@ public class UniProtViewByKeywordService  implements  UniProtViewByService {
 			throw new UniProtViewByServiceException(e);
 		}
 	}
-	private ViewBy convert(FacetField.Count count, Map<String, KeywordDetail> keywordAccMap) {
+
+    private ViewBy convert(FacetField.Count count, Map<String, KeywordEntry> keywordAccMap) {
 		if(count.getCount() ==0)
 			return null;
 		ViewBy viewBy = new ViewBy();
 		
 		viewBy.setId(count.getName());
 		viewBy.setCount(count.getCount());
-		KeywordDetail keyword = keywordAccMap.get(count.getName());
+        KeywordEntry keyword = keywordAccMap.get(count.getName());
 		viewBy.setLink(URL_PREFIX + count.getName());
 		if(keyword != null) {
 			viewBy.setLabel(keyword.getKeyword().getId());
@@ -82,12 +81,12 @@ public class UniProtViewByKeywordService  implements  UniProtViewByService {
 		}
 		return viewBy;
 	}
-	
-	private List <KeywordDetail> getKeywordsFromParent(String parent){
+
+    private List<KeywordEntry> getKeywordsFromParent(String parent) {
 		if(Strings.isNullOrEmpty(parent)) {
 			return keywordService.getAllCategories();
 		}
-		KeywordDetail keyword = keywordService.getByAccession(parent);
+        KeywordEntry keyword = keywordService.getByAccession(parent);
 		if(keyword ==null)
 			return keywordService.getAllCategories();
 		return keyword.getChildren();

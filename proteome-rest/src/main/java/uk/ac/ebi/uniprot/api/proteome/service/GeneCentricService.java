@@ -1,101 +1,55 @@
 package uk.ac.ebi.uniprot.api.proteome.service;
 
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
-import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
+
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import uk.ac.ebi.uniprot.api.proteome.request.GeneCentricRequest;
-import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
 import uk.ac.ebi.uniprot.domain.proteome.CanonicalProtein;
+import uk.ac.ebi.uniprot.search.DefaultSearchHandler;
 import uk.ac.ebi.uniprot.search.document.proteome.GeneCentricDocument;
-import uk.ac.ebi.uniprot.search.field.GeneCentricField;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import uk.ac.ebi.uniprot.search.field.GeneCentricField.Search;
 
 /**
+ *
  * @author jluo
  * @date: 30 Apr 2019
+ *
  */
 @Service
 public class GeneCentricService {
-    private GeneCentricQueryRepository repository;
-    private final GeneCentricEntryConverter converter;
-    private final GeneCentricSortClause solrSortClause;
-    private GeneCentricFacetConfig facetConfig;
+	private final GeneCentricSortClause solrSortClause;
+	private GeneCentricFacetConfig facetConfig;
+	private final BasicSearchService<CanonicalProtein, GeneCentricDocument> basicService;
+	private final DefaultSearchHandler defaultSearchHandler;
 
-    @Autowired
-    public GeneCentricService(GeneCentricQueryRepository repository,
-                              GeneCentricFacetConfig facetConfig,
-                              GeneCentricSortClause solrSortClause) {
-        this.repository = repository;
-        this.converter = new GeneCentricEntryConverter();
-        this.facetConfig = facetConfig;
-        this.solrSortClause = solrSortClause;
-    }
+	@Autowired
+	public GeneCentricService(GeneCentricQueryRepository repository, GeneCentricFacetConfig facetConfig,
+			GeneCentricSortClause solrSortClause) {
+		basicService = new BasicSearchService<>(repository, new GeneCentricEntryConverter());
+		this.facetConfig = facetConfig;
+		this.solrSortClause = solrSortClause;
+		this.defaultSearchHandler = new DefaultSearchHandler(Search.accession, Search.accession_id,
+				Search.getBoostFields());
+	}
 
-    public QueryResult<?> search(GeneCentricRequest request, MessageConverterContext<CanonicalProtein> context) {
-        MediaType contentType = context.getContentType();
-        SolrRequest solrRequest = createQuery(request);
+	public QueryResult<CanonicalProtein> search(GeneCentricRequest request) {
+		SimpleQuery query = basicService.createSolrQuery(request, facetConfig, solrSortClause, defaultSearchHandler);
+		return basicService.search(query, request.getCursor(), request.getSize());
+	}
 
-        QueryResult<GeneCentricDocument> results = repository
-                .searchPage(solrRequest, request.getCursor(), request.getSize());
-        if (request.hasFacets()) {
-            context.setFacets(results.getFacets());
-        }
+	public CanonicalProtein getByAccession(String accession) {
+		return basicService.getEntity(Search.accession_id.name(), accession.toUpperCase());
+	}
 
-        if (contentType.equals(LIST_MEDIA_TYPE)) {
-            List<String> accList = results.getContent().stream().map(GeneCentricDocument::getDocumentId)
-                    .collect(Collectors.toList());
-            context.setEntityIds(results.getContent().stream().map(GeneCentricDocument::getDocumentId));
-            return QueryResult.of(accList, results.getPage(), results.getFacets());
-        } else {
-            List<CanonicalProtein> converted = results.getContent().stream().map(converter).filter(Utils::nonNull)
-                    .collect(Collectors.toList());
-
-            QueryResult<CanonicalProtein> queryResult = QueryResult
-                    .of(converted, results.getPage(), results.getFacets());
-            context.setEntities(converted.stream());
-            return queryResult;
-        }
-    }
-
-    public CanonicalProtein getByAccession(String accession) {
-        SolrRequest solrRequest = SolrRequest.builder()
-                .query(GeneCentricField.Search.accession.name() + ":" + accession)
-                .build();
-        try {
-            return repository
-                    .getEntry(solrRequest)
-                    .map(converter)
-                    .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
-
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            String message = "Could not fetch entry";
-            throw new ServiceException(message, e);
-        }
-    }
-
-    private SolrRequest createQuery(GeneCentricRequest request) {
-        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
-        String requestedQuery = request.getQuery();
-        builder.query(requestedQuery);
-        builder.addSort(solrSortClause.getSort(request.getSort(), false));
-
-        if (request.hasFacets()) {
-            builder.facets(request.getFacetList());
-            builder.facetConfig(facetConfig);
-        }
-        return builder.build();
-    }
+	public Stream<CanonicalProtein> download(GeneCentricRequest request) {
+		SimpleQuery query = basicService.createSolrQuery(request, facetConfig, solrSortClause, defaultSearchHandler);
+		return basicService.download(query);
+	}
 }

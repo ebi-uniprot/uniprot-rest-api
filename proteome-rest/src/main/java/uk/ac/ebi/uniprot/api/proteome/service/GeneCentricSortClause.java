@@ -35,5 +35,13 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
 			return newFieldSortPairs;
 		}
 	}
+	@Override
+	protected String getSolrDocumentIdFieldName() {
+		return GeneCentricField.Search.accession_id.name();
+	}
+	@Override
+	protected String getSolrSortFieldName(String name) {
+		return name;
+	}
 }
 
