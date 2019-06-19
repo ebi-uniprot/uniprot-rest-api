@@ -65,9 +65,10 @@ public abstract class SolrQueryRepository<T> {
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
 
             return QueryResult.of(resultList, page, facets, termInfos);
-        } catch (InvalidRequestException e) {
-            throw e;
         } catch (Throwable e) {
+            if (e.getCause() instanceof InvalidRequestException) {
+                throw (InvalidRequestException)e.getCause();
+            }
             throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
         } finally {
             logSolrQuery(request);
