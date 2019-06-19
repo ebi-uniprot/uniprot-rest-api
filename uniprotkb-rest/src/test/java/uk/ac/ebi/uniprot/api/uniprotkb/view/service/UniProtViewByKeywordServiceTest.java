@@ -77,10 +77,15 @@ class UniProtViewByKeywordServiceTest {
 		Set<KeywordEntry> kws3 = Collections.singleton(kw3);
 		KeywordEntryImpl kw31 = new KeywordEntryImpl();
 		kw31.setKeyword(new KeywordImpl( "Cell division", "KW-0132"));
-		kw3.setParents(kws3);
+		kw31.setParents(kws3);
 		KeywordEntryImpl kw32 = new KeywordEntryImpl();
 		kw32.setKeyword(new KeywordImpl( "Growth arrest", "KW-0338"));
-		kw3.setParents(kws3);
+		List<KeywordEntry> kws33 = new ArrayList<>();
+		kws33.add(kw31);
+		kws33.add(kw32);
+		kw31.setParents(kws3);
+		kw3.setChildren(kws33);
+		keyword.setChildren(kws);
 	
 		
 		when(keywordService.getByAccession(any())).thenReturn(keyword);
