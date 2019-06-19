@@ -54,7 +54,6 @@ public abstract class SolrQueryRepository<T> {
         }
         try {
             CursorPage page = CursorPage.of(cursor, pageSize);
-            requestConverter.toSolrQuery(request);
             QueryResponse solrResponse = solrTemplate
                     .execute(getSolrCursorCallback(request, page.getCursor(), pageSize));
 

@@ -18,6 +18,5 @@ import lombok.Getter;
 @Getter
 public class TermInfo {
     private String name;
-    private String url;  // TODO: 15/06/19 needed?
     private long hits;
 }
