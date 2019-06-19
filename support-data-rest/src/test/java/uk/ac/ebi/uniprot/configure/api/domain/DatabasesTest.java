@@ -2,7 +2,6 @@ package uk.ac.ebi.uniprot.configure.api.domain;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.DatabaseGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Tuple;
@@ -47,7 +46,7 @@ class DatabasesTest {
 		List<DatabaseGroup> groups = instance.getDatabases();
 		assertEquals(20, groups.size());
 		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
-		assertEquals(155, nDb);
+        assertEquals(156, nDb);
 		instance.getDatabases().forEach(System.out::println);
 	}
 	@Test

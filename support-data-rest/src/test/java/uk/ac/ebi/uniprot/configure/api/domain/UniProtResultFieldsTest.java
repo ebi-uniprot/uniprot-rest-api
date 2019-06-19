@@ -3,7 +3,6 @@ package uk.ac.ebi.uniprot.configure.api.domain;
 import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldGroupImpl;
@@ -134,7 +133,7 @@ class UniProtResultFieldsTest {
 		verifyGroupSize(groups, "PTM", 7);
 		verifyGroupSize(groups, "PMD", 3);
 		verifyGroupSize(groups, "2DG", 7);
-		verifyGroupSize(groups, "PROTEOMIC", 9);
+		verifyGroupSize(groups, "PROTEOMIC", 10);
 		verifyGroupSize(groups, "PAM", 1);
 		verifyGroupSize(groups, "GMA", 14);
 		verifyGroupSize(groups, "ORG", 37);
