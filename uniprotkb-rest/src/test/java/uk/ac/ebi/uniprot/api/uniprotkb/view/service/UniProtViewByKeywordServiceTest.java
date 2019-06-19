@@ -3,6 +3,7 @@ package uk.ac.ebi.uniprot.api.uniprotkb.view.service;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -39,7 +40,7 @@ class UniProtViewByKeywordServiceTest {
 		service = new UniProtViewByKeywordService( solrClient, "uniprot", keywordService);
 	 }
 
-	//@Test
+    @Test
 	void test()  throws IOException, SolrServerException {
 		Map<String, Long> counts = new HashMap<>();
 		counts.put("KW-0128", 5l);
