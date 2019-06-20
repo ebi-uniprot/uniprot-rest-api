@@ -4,6 +4,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
 
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.proteome.GeneCentricDocument;
 
@@ -16,8 +17,8 @@ import uk.ac.ebi.uniprot.search.document.proteome.GeneCentricDocument;
 @Repository
 public class GeneCentricQueryRepository  extends SolrQueryRepository<GeneCentricDocument> {
 
-	  public GeneCentricQueryRepository(SolrTemplate solrTemplate, GeneCentricFacetConfig facetConverter) {
-	        super(solrTemplate, SolrCollection.genecentric, GeneCentricDocument.class,facetConverter);
+	  public GeneCentricQueryRepository(SolrTemplate solrTemplate, GeneCentricFacetConfig facetConverter,  SolrRequestConverter requestConverter) {
+	        super(solrTemplate, SolrCollection.genecentric, GeneCentricDocument.class,facetConverter, requestConverter);
 	    }
 }
 

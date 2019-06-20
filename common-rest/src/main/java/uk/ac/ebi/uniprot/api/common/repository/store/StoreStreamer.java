@@ -5,6 +5,7 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.slf4j.Logger;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class StoreStreamer<T> {
     private Function<String, T> defaultsConverter;
     private TupleStreamTemplate tupleStreamTemplate;
 
-    public Stream<T> idsToStoreStream(StreamRequest request) {
+    public Stream<T> idsToStoreStream(SolrRequest request) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(request, id);
             tupleStream.open();
@@ -57,7 +58,7 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<String> idsStream(StreamRequest request) {
+    public Stream<String> idsStream(SolrRequest request) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(request, id);
             tupleStream.open();
@@ -69,7 +70,7 @@ public class StoreStreamer<T> {
         }
     }
 
-    public Stream<T> defaultFieldStream(StreamRequest request) {
+    public Stream<T> defaultFieldStream(SolrRequest request) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(request, defaultsField);
             tupleStream.open();

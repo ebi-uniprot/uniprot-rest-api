@@ -2,13 +2,12 @@ package uk.ac.ebi.uniprot.api.disease;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.query.Criteria;
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryBuilder;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.cv.disease.Disease;
 import uk.ac.ebi.uniprot.json.parser.disease.DiseaseJsonConfig;
 import uk.ac.ebi.uniprot.search.document.disease.DiseaseDocument;
@@ -32,14 +31,13 @@ public class DiseaseService {
 
     public Disease findByAccession(final String accession) {
         try {
-            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION_STR).is(accession.toUpperCase()));
-            Optional<DiseaseDocument> optionalDoc = this.diseaseRepository.getEntry(simpleQuery);
+            Optional<DiseaseDocument> optionalDoc = this.diseaseRepository.getEntry(SolrRequest
+                                                                                            .builder().query(ACCESSION_STR + accession.toUpperCase()).build());
 
             if (optionalDoc.isPresent()) {
                 DiseaseDocument disDoc = optionalDoc.get();
                 ByteBuffer diseaseBB = disDoc.getDiseaseObj();
-                Disease disease = this.diseaseObjectMapper.readValue(diseaseBB.array(), Disease.class);
-                return disease;
+                return this.diseaseObjectMapper.readValue(diseaseBB.array(), Disease.class);
             } else {
                 throw new ResourceNotFoundException("{search.not.found}");
             }
@@ -52,18 +50,18 @@ public class DiseaseService {
     }
 
     public QueryResult<Disease> search(DiseaseSearchRequest request) {
-        SimpleQuery simpleQuery = createQuery(request);
-        QueryResult<DiseaseDocument> results = this.diseaseRepository.searchPage(simpleQuery, request.getCursor(), request.getSize());
+        SolrRequest solrRequest = createQuery(request);
+        QueryResult<DiseaseDocument> results = this.diseaseRepository.searchPage(solrRequest, request.getCursor(), request.getSize());
         List<Disease> converted = results.getContent().stream()
                 .map(toDiseaseConverter)
-                .filter(val -> val != null)
+                .filter(Utils::nonNull)
                 .collect(Collectors.toList());
 
         return QueryResult.of(converted, results.getPage());
     }
 
-    private SimpleQuery createQuery(DiseaseSearchRequest request) {
-        SolrQueryBuilder builder = new SolrQueryBuilder();
+    private SolrRequest createQuery(DiseaseSearchRequest request) {
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
         String requestedQuery = request.getQuery();
 
         builder.query(requestedQuery);

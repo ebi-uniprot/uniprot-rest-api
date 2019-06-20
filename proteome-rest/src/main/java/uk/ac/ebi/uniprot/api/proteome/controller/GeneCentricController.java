@@ -26,16 +26,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import io.swagger.annotations.Api;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.proteome.request.GeneCentricRequest;
+import uk.ac.ebi.uniprot.api.proteome.request.GeneCentricReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.proteome.service.GeneCentricService;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.domain.proteome.CanonicalProtein;
 import uk.ac.ebi.uniprot.search.field.GeneCentricField;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
@@ -89,13 +92,15 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
 	public  ResponseEntity<MessageConverterContext<CanonicalProtein>> getByAccession(
 			@PathVariable("accession") @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {
 					Pattern.Flag.CASE_INSENSITIVE }, message = "{search.invalid.accession.value}") String accession,
+			@ValidReturnFields(fieldValidatorClazz = GeneCentricReturnFieldsValidator.class) 
+			@RequestParam(value = "fields", required = false) String fields,
 			@RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
 		CanonicalProtein entry = service.getByAccession(accession);
-		return super.getEntityResponse(entry, "", contentType);
+		return super.getEntityResponse(entry, fields, contentType);
 	}
 	
     @RequestMapping(value = "/download", method = RequestMethod.GET,
-            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = { LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(@Valid
     		GeneCentricRequest searchRequest,
                                                         @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)

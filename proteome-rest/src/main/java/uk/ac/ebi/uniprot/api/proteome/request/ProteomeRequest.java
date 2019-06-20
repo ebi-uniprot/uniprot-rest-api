@@ -1,11 +1,9 @@
 package uk.ac.ebi.uniprot.api.proteome.request;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+
+import com.google.common.base.Strings;
 
 import lombok.Data;
 import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
@@ -15,7 +13,6 @@ import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
-import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.search.field.ProteomeField;
 
 /**
@@ -46,6 +43,17 @@ public class ProteomeRequest implements SearchRequest{
 
 	    @Positive(message = "{search.positive}")
 	    private int size = DEFAULT_RESULTS_SIZE;
-
+	    
+	    private static final String DEFAULT_FIELDS="upid,organism,organism_id,protein_count";
+	    @Override
+	    public String getFields() {
+	    	if(Strings.isNullOrEmpty(fields)) {
+	    		fields =DEFAULT_FIELDS;
+	    	}else if(!fields.contains(ProteomeField.Return.upid.name())) {
+	    		String temp = "upid,"+fields;
+	    		this.fields= temp;
+	    	}
+	    	return fields;
+	    }
 }
 

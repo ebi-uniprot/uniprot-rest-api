@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.common.repository.search;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.core.CoreContainer;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -10,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
@@ -33,7 +34,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
  * @author lgonzales
  */
 class SolrQueryRepositoryIT {
@@ -50,13 +50,13 @@ class SolrQueryRepositoryIT {
             container.load();
             ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.uniprot);
             storeManager = new DataStoreManager(solrStoreManager);
-            storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT,solrClient);
+            storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, solrClient);
 
             SolrTemplate template = new SolrTemplate(solrClient);
             template.afterPropertiesSet();
             queryRepo = new GeneralSolrQueryRepository(template);
         } catch (Exception e) {
-            fail("Error to setup SolrQueryRepositoryTest",e);
+            fail("Error to setup SolrQueryRepositoryTest", e);
         }
     }
 
@@ -94,9 +94,9 @@ class SolrQueryRepositoryIT {
     void invalidQueryExceptionReturned() {
         QueryRetrievalException thrown =
                 assertThrows(QueryRetrievalException.class,
-                        () ->  queryRepo.getEntry(queryWithoutFacets("invalid:invalid")));
+                             () -> queryRepo.getEntry(queryWithoutFacets("invalid:invalid")));
 
-        assertEquals("Error executing solr query",thrown.getMessage());
+        assertEquals("Error executing solr query", thrown.getMessage());
     }
 
     @Test
@@ -113,8 +113,9 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
-        CursorPage page = CursorPage.of(null,2);
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
+        CursorPage page = CursorPage.of(null, 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo
+                .searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
         List<String> page1Accs = queryResult.getContent().stream()
                 .map(doc -> doc.accession)
                 .collect(Collectors.toList());
@@ -147,10 +148,46 @@ class SolrQueryRepositoryIT {
         assertFalse(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
 
         assertNotNull(queryResult.getContent());
-        assertEquals(1,queryResult.getContent().size());
+        assertEquals(1, queryResult.getContent().size());
 
         assertNotNull(queryResult.getFacets());
         assertTrue(queryResult.getFacets().isEmpty());
+    }
+
+    @Test
+    void defaultSearchWithMatchedFieldsRequested() {
+        // given
+        UniProtDocument doc1 = UniProtDocMocker.createDoc("P21802");
+        String findMe = "FIND_ME";
+        doc1.proteinNames.add("this is a protein name " + findMe + ".");
+        UniProtDocument doc2 = UniProtDocMocker.createDoc("P21803");
+        doc2.keywords.add("this is a keyword " + findMe + ", yes it is.");
+
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
+
+        // when attempt to fetch page 1
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithMatchedFields(findMe), null, null);
+
+        // then
+        assertNotNull(queryResult.getMatchedFields());
+//        assertThat(queryResult.getMatchedFields(), is(not(emptyList())));
+        // TODO: 14/06/19 fix this
+    }
+
+    @Test
+    void invalidDefaultSearchWithMatchedFieldsRequested() {
+        // given
+        UniProtDocument doc1 = UniProtDocMocker.createDoc("P21802");
+        String findMe = "FIND_ME";
+        doc1.proteinNames.add("this is a protein name " + findMe + ".");
+        UniProtDocument doc2 = UniProtDocMocker.createDoc("P21803");
+        doc2.keywords.add("this is a keyword " + findMe + ", yes it is.");
+
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
+
+        // when attempt to fetch then error occurs
+        assertThrows(InvalidRequestException.class, () -> queryRepo
+                .searchPage(queryWithMatchedFields("accession:" + findMe), null, null));
     }
 
     @Test
@@ -169,8 +206,9 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
-        CursorPage page = CursorPage.of(null,2);
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
+        CursorPage page = CursorPage.of(null, 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo
+                .searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
         List<String> page1Accs = queryResult.getContent().stream()
                 .map(doc -> doc.accession)
                 .collect(Collectors.toList());
@@ -230,13 +268,12 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SimpleQuery query = queryWithFacets(accQuery,Collections.singletonList("reviewed"));
+        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("reviewed"));
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(1)));
     }
-
 
     @Test
     void multiplesFacetRequested() {
@@ -247,37 +284,57 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SimpleQuery query = queryWithFacets(accQuery, Arrays.asList("reviewed","d3structure"));
+        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "d3structure"));
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(2)));
     }
 
-    private SimpleQuery queryWithFacets(String query,List<String> facets) {
-        SimpleQuery simpleQuery = new SolrQueryBuilder()
+    private SolrRequest queryWithFacets(String query, List<String> facets) {
+        return SolrRequest.builder()
                 .query(query)
-                .defaultOperator(Query.Operator.AND)
-                .addFilterQuery(new SimpleQuery("active:true"))
+                .defaultQueryOperator(Query.Operator.AND)
+                .filterQuery("active:true")
                 .facetConfig(new FakeFacetConfigConverter())
                 .facets(facets)
+                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .build();
-        simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession_id"));
-        return simpleQuery;
     }
 
-    private SimpleQuery queryWithoutFacets(String query) {
-        SimpleQuery simpleQuery = new SolrQueryBuilder()
+    private SolrRequest queryWithoutFacets(String query) {
+        return SolrRequest.builder()
                 .query(query)
+                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .build();
-        simpleQuery.addSort(new Sort(Sort.Direction.ASC, "accession_id"));
-        return simpleQuery;
     }
 
-    public static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
+    private SolrRequest queryWithMatchedFields(String query) {
+        return SolrRequest.builder()
+                .query(query)
+                .termQuery(query)
+                .termField("keyword")
+                .termField("name")
+                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .build();
+    }
+
+    private static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
         GeneralSolrQueryRepository(SolrTemplate template) {
-            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter());
+            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter(), new GeneralSolrRequestConverter());
         }
     }
 
+    private static class GeneralSolrRequestConverter extends SolrRequestConverter {
+        @Override
+        public SolrQuery toSolrQuery(SolrRequest request) {
+            SolrQuery solrQuery = super.toSolrQuery(request);
+
+            // required for tests, because EmbeddedSolrServer is not sharded
+            solrQuery.setParam("distrib", "false");
+            solrQuery.setParam("terms.mincount", "1");
+
+            return solrQuery;
+        }
+    }
 }

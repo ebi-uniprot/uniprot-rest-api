@@ -70,7 +70,7 @@ import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNI
 @AutoConfigureWebClient
 @WebMvcTest(UniprotKBController.class)
 @ExtendWith(value = {SpringExtension.class, UniprotKBSearchControllerIT.UniprotKbSearchParameterResolver.class,
-        UniprotKBSearchControllerIT.UniprotKbSearchContentTypeParamResolver.class})
+                     UniprotKBSearchControllerIT.UniprotKbSearchContentTypeParamResolver.class})
 @Slf4j
 public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
@@ -103,8 +103,8 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",contains("Invalid includeIsoform parameter value. Expected true or false")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*", contains("Invalid includeIsoform parameter value. Expected true or false")));
     }
 
     @Test
@@ -128,9 +128,9 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()",is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
     }
 
     @Test
@@ -154,11 +154,11 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()",is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-2")));
     }
 
     @Test
@@ -182,10 +182,10 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-2")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-2")));
     }
 
     @Test
@@ -209,9 +209,9 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession",containsInAnyOrder("P21802","P21802-2")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802", "P21802-2")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")));
     }
 
     @Test
@@ -235,9 +235,9 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession",containsInAnyOrder("P21802","P21802-2")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802", "P21802-2")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")));
     }
 
     @Test
@@ -261,10 +261,10 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",not("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession",contains("P21802-2")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802-2")));
     }
 
     @Test
@@ -276,14 +276,14 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
 
         // when
         ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE + "?query=accession:"+acc+"&facets=reviewed")
+                get(SEARCH_RESOURCE + "?query=accession:" + acc + "&facets=reviewed")
                         .header(ACCEPT, APPLICATION_XML_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_XML_VALUE))
-                .andExpect(content().string(containsString("facets are supported only for 'application/json'")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("Invalid content type received, 'application/xml'. Expected one of [application/json]")));
     }
 
     @Test
@@ -293,7 +293,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> mergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,mergedList);
+        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
 
         // when
         ResultActions response = mockMvc.perform(
@@ -303,8 +303,8 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802","Q14301")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802", "Q14301")));
     }
 
     @Test
@@ -314,7 +314,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> demergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,demergedList);
+        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
 
         // when
         ResultActions response = mockMvc.perform(
@@ -324,11 +324,11 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q00007")))
                 .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
                 .andExpect(jsonPath("$.results.*.inactiveReason.inactiveReasonType", contains("DEMERGED")))
-                .andExpect(jsonPath("$.results.*.inactiveReason.mergeDemergeTo", contains(contains("P63150","P63151"))));
+                .andExpect(jsonPath("$.results.*.inactiveReason.mergeDemergeTo", contains(contains("P63150", "P63151"))));
     }
 
     @Test
@@ -338,7 +338,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> deletedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,deletedList);
+        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
 
         // when
         ResultActions response = mockMvc.perform(
@@ -348,10 +348,73 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")))
                 .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
                 .andExpect(jsonPath("$.results.*.inactiveReason.inactiveReasonType", contains("DELETED")));
+    }
+
+    @Test
+    void defaultSearchWithMatchedFields() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.matchedFields.size()", is(1)))
+                .andExpect(jsonPath("$.matchedFields.*.name", contains("cc_disease")))
+                .andExpect(jsonPath("$.matchedFields.*.hits", contains(1)));
+    }
+
+    @Test
+    void badDefaultSearchWithMatchedFields() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=gene:Fibroblast&fields=accession,gene_primary&showMatchedFields=true")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(content()
+                                   .string(containsString("Term information will only be returned for single value searches that do not specify a field")));
+    }
+
+    @Test
+    void cannotReturnMatchedFieldsForXML() throws Exception {
+        // given
+        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(SEARCH_RESOURCE + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
+                        .header(ACCEPT, APPLICATION_XML_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+                .andExpect(content().string(containsString("Invalid content type received, 'application/xml'. Expected one of [application/json]")));
     }
 
     @Override
@@ -445,7 +508,8 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM); //P21802-2
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext) || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)) {
+        if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext) || SaveScenario.SEARCH_ALL_RETURN_FIELDS
+                .equals(saveContext)) {
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
             doc.active = true;
@@ -539,10 +603,10 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
                     .uniProtId(new UniProtIdBuilder("ID_P00001").build())
                     .active()
                     .addDatabaseCrossReference(new UniProtDBCrossReferenceBuilder()
-                            .databaseType(new UniProtXDbType("Proteomes"))
-                            .id("UP000000000")
-                            .addProperty(new DBXRefTypeAttribute("a", "a", "a"), "value")
-                            .build())
+                                                       .databaseType(new UniProtXDbType("Proteomes"))
+                                                       .id("UP000000000")
+                                                       .addProperty(new DBXRefTypeAttribute("a", "a", "a"), "value")
+                                                       .build())
                     .build();
 
             storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
@@ -618,8 +682,8 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("accession:INVALID OR accession_id:INVALID " +
-                            "OR reviewed:INVALID OR organism_id:invalid OR host_id:invalid OR taxonomy_id:invalid " +
-                            "OR is_isoform:invalid OR d3structure:invalid OR active:invalid OR proteome:INVALID"))
+                                                                           "OR reviewed:INVALID OR organism_id:invalid OR host_id:invalid OR taxonomy_id:invalid " +
+                                                                           "OR is_isoform:invalid OR d3structure:invalid OR active:invalid OR proteome:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
                             "The 'accession' filter value 'INVALID' has invalid format. It should be a valid UniProtKB accession",
@@ -680,48 +744,56 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
             return SearchContentTypeParam.builder()
                     .query("accession:" + ACCESSION_SP_CANONICAL + " OR accession:" + ACCESSION_SP)
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
-                            .build())
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .resultMatcher(jsonPath("$.results.*.primaryAccession", contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("<accession>P21802</accession>")))
-                            .resultMatcher(content().string(containsString("<accession>Q8DIA7</accession>")))
-                            .build())
+                                              .contentType(MediaType.APPLICATION_XML)
+                                              .resultMatcher(content()
+                                                                     .string(containsString("<accession>P21802</accession>")))
+                                              .resultMatcher(content()
+                                                                     .string(containsString("<accession>Q8DIA7</accession>")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FF_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("AC   P21802;")))
-                            .resultMatcher(content().string(containsString("AC   Q8DIA7;")))
-                            .build())
+                                              .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                                              .resultMatcher(content().string(containsString("AC   P21802;")))
+                                              .resultMatcher(content().string(containsString("AC   Q8DIA7;")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(">sp|Q8DIA7|" +
-                                    "PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL " +
-                                    "OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1")))
-                            .resultMatcher(content().string(containsString(">sp|P21802|FGFR2_HUMAN Fibroblast" +
-                                    " growth factor receptor 2 OS=Homo sapiens OX=9606 GN=FGFR2 PE=1 SV=1")))
-                            .build())
+                                              .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                              .resultMatcher(content().string(containsString(">sp|Q8DIA7|" +
+                                                                                                     "PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL " +
+                                                                                                     "OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1")))
+                                              .resultMatcher(content()
+                                                                     .string(containsString(">sp|P21802|FGFR2_HUMAN Fibroblast" +
+                                                                                                    " growth factor receptor 2 OS=Homo sapiens OX=9606 GN=FGFR2 PE=1 SV=1")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("##gff-version 3")))
-                            .resultMatcher(content().string(containsString("##sequence-region Q8DIA7 1 761")))
-                            .resultMatcher(content().string(containsString("##sequence-region P21802 1 821")))
-                            .build())
+                                              .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                                              .resultMatcher(content().string(containsString("##gff-version 3")))
+                                              .resultMatcher(content()
+                                                                     .string(containsString("##sequence-region Q8DIA7 1 761")))
+                                              .resultMatcher(content()
+                                                                     .string(containsString("##sequence-region P21802 1 821")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(ACCESSION_SP_CANONICAL)))
-                            .resultMatcher(content().string(containsString(ACCESSION_SP)))
-                            .build())
+                                              .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                              .resultMatcher(content().string(containsString(ACCESSION_SP_CANONICAL)))
+                                              .resultMatcher(content().string(containsString(ACCESSION_SP)))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
-                            .resultMatcher(content().string(containsString("Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL, FGAM synthase")))
-                            .resultMatcher(content().string(containsString("P21802\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2")))
-                            .build())
+                                              .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                              .resultMatcher(content()
+                                                                     .string(containsString("Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
+                                              .resultMatcher(content()
+                                                                     .string(containsString("Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL, FGAM synthase")))
+                                              .resultMatcher(content()
+                                                                     .string(containsString("P21802\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                                              .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                              .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                              .build())
                     .build();
         }
 
@@ -730,38 +802,39 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
             return SearchContentTypeParam.builder()
                     .query("accession:invalid")
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
-                            .build())
+                                              .contentType(MediaType.APPLICATION_JSON)
+                                              .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                              .resultMatcher(jsonPath("$.messages.*", contains("The 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("<messages>The 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession</messages>")))
-                            .build())
+                                              .contentType(MediaType.APPLICATION_XML)
+                                              .resultMatcher(content()
+                                                                     .string(containsString("<messages>The 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession</messages>")))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                                              .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                              .resultMatcher(content().string(isEmptyString()))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                                              .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                                              .resultMatcher(content().string(isEmptyString()))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FF_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                                              .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                                              .resultMatcher(content().string(isEmptyString()))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                                              .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                              .resultMatcher(content().string(isEmptyString()))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                                              .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                              .resultMatcher(content().string(isEmptyString()))
+                                              .build())
                     .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                                              .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                              .resultMatcher(content().string(isEmptyString()))
+                                              .build())
                     .build();
         }
     }

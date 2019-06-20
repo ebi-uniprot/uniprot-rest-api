@@ -2,19 +2,16 @@ package uk.ac.ebi.uniprot.api.rest.output.context;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
-import uk.ac.ebi.uniprot.api.rest.output.context.FileType;
-import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
-import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfo;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext.DEFAULT_FILE_TYPE;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created 08/11/18
@@ -29,6 +26,7 @@ class MessageConverterContextTest {
         Stream<String> entityStream = Stream.of("a", "b");
         Stream<String> entityIdStream = Stream.of("a.id", "b.id");
         List<Facet> facets = emptyList();
+        List<TermInfo> matchedFields = emptyList();
         MessageConverterContextFactory.Resource resource = MessageConverterContextFactory.Resource.UNIPROT;
         String fields = "field1,field2";
         
@@ -38,6 +36,7 @@ class MessageConverterContextTest {
                 .entities(entityStream)
                 .entityIds(entityIdStream)
                 .facets(facets)
+                .matchedFields(matchedFields)
                 .fields(fields)
                 .resource(resource)
                 .build();
@@ -47,6 +46,7 @@ class MessageConverterContextTest {
         assertThat(context.getEntities(), is(entityStream));
         assertThat(context.getEntityIds(), is(entityIdStream));
         assertThat(context.getFacets(), is(facets));
+        assertThat(context.getMatchedFields(), is(matchedFields));
         assertThat(context.getFields(), is(fields));
         assertThat(context.getResource(), is(resource));
     }
@@ -58,6 +58,7 @@ class MessageConverterContextTest {
         Stream<String> entityStream = Stream.of("a", "b");
         Stream<String> entityIdStream = Stream.of("a.id", "b.id");
         List<Facet> facets = emptyList();
+        List<TermInfo> matchedFIelds = emptyList();
         MessageConverterContextFactory.Resource resource = MessageConverterContextFactory.Resource.UNIPROT;
         String fields = "field1,field2";
 
@@ -67,6 +68,7 @@ class MessageConverterContextTest {
                 .entities(entityStream)
                 .entityIds(entityIdStream)
                 .facets(facets)
+                .matchedFields(matchedFIelds)
                 .fields(fields)
                 .resource(resource)
                 .build();
@@ -78,6 +80,7 @@ class MessageConverterContextTest {
         assertThat(contextCopy.getEntities(), is(entityStream));
         assertThat(contextCopy.getEntityIds(), is(entityIdStream));
         assertThat(contextCopy.getFacets(), is(facets));
+        assertThat(contextCopy.getMatchedFields(), is(matchedFIelds));
         assertThat(contextCopy.getFields(), is(fields));
         assertThat(contextCopy.getResource(), is(resource));
     }

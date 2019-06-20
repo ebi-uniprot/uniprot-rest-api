@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 import uk.ac.ebi.uniprot.repository.SolrTestConfig;
 
@@ -88,6 +90,23 @@ public class SuggesterControllerWithServerErrorsIT {
         @Primary
         public SolrClient uniProtSolrClient() {
             return mock(SolrClient.class);
+        }
+
+        @Bean
+        @Primary
+        public SolrRequestConverter requestConverter() {
+            return new SolrRequestConverter() {
+                @Override
+                public SolrQuery toSolrQuery(SolrRequest request) {
+                    SolrQuery solrQuery = super.toSolrQuery(request);
+
+                    // required for tests, because EmbeddedSolrServer is not sharded
+                    solrQuery.setParam("distrib", "false");
+                    solrQuery.setParam("terms.mincount", "1");
+
+                    return solrQuery;
+                }
+            };
         }
     }
 }

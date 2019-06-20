@@ -18,7 +18,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 public class ProteomeResultFieldsTest {
 	@Test
 	void test () {
-	List<FieldGroup>  result =ProteomeResultFields.INSTANCE.getResultFields();
+	List<FieldGroup>  result =ProteomeResultFields.INSTANCE.getResultFieldGroups();
 	assertEquals(2, result.size());
 	}
 }

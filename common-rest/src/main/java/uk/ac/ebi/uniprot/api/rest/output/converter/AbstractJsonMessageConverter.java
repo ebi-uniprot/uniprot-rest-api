@@ -16,7 +16,6 @@ import java.util.Map;
 
 /**
  * @param <T> instance of the object that is being written.
- *
  * @author lgonzales
  */
 public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
@@ -37,17 +36,27 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
 
         JsonGenerator generator = objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
 
-        if(!context.isEntityOnly()) {
+        if (!context.isEntityOnly()) {
             generator.writeStartObject();
 
             if (context.getFacets() != null) {
                 generator.writeFieldName("facets");
                 generator.writeStartArray();
-                for(Object facet: context.getFacets()){
-                    writeFacet(generator,facet);
+                for (Object facet : context.getFacets()) {
+                    writeFacet(generator, facet);
                 }
                 generator.writeEndArray();
             }
+
+            if (context.getMatchedFields() != null) {
+                generator.writeFieldName("matchedFields");
+                generator.writeStartArray();
+                for (Object matchedField : context.getMatchedFields()) {
+                    writeFacet(generator, matchedField);
+                }
+                generator.writeEndArray();
+            }
+
 
             generator.writeFieldName("results");
             generator.writeStartArray();
@@ -66,7 +75,7 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
     protected void after(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
 
-        if(!context.isEntityOnly()) {
+        if (!context.isEntityOnly()) {
             generator.writeEndArray();
             generator.writeEndObject();
         }
@@ -74,7 +83,7 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
         generator.close();
     }
 
-    protected Map<String, List<String>> getThreadLocalFilterMap(){
+    protected Map<String, List<String>> getThreadLocalFilterMap() {
         return tlFilters.get();
     }
 

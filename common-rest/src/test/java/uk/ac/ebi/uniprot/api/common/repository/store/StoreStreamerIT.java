@@ -11,9 +11,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 
-import uk.ac.ebi.uniprot.api.common.repository.store.StoreStreamer;
-import uk.ac.ebi.uniprot.api.common.repository.store.StreamRequest;
-import uk.ac.ebi.uniprot.api.common.repository.store.TupleStreamTemplate;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;
@@ -44,7 +42,7 @@ public class StoreStreamerIT {
     private static final Sort FAKE_SORT = new Sort(Sort.Direction.ASC, "any field");
     private FakeVoldemortClient fakeVoldemortClient;
     private StoreStreamer<String> storeStreamer;
-    private StreamRequest streamRequest;
+    private SolrRequest solrRequest;
     private static final Logger LOGGER = getLogger(StoreStreamerIT.class);
     public static String transformString(String id) {
         return id + "-transformed";
@@ -53,7 +51,7 @@ public class StoreStreamerIT {
     @Before
     public void setUp() {
         fakeVoldemortClient = new FakeVoldemortClient();
-        streamRequest = StreamRequest.builder()
+        solrRequest = SolrRequest.builder()
                 .query(FAKE_QUERY)
                 .sort(FAKE_SORT)
                 .filterQuery(FAKE_FILTER_QUERY)
@@ -69,7 +67,7 @@ public class StoreStreamerIT {
     @Test
     public void canTransformSourceStreamWithUnaryBatchSize() {
         createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(streamRequest);
+        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),
@@ -82,7 +80,7 @@ public class StoreStreamerIT {
     @Test
     public void canTransformSourceStreamWithIntermediateBatchSize() {
         createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(streamRequest);
+        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),
@@ -95,7 +93,7 @@ public class StoreStreamerIT {
     @Test
     public void canTransformSourceStreamWithBiggerBatchSize() {
         createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(streamRequest);
+        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),
@@ -108,7 +106,7 @@ public class StoreStreamerIT {
     @Test
     public void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
         createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(streamRequest);
+        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(results, contains(
                 transformString("a"),

@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.io.stream.expr.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -37,7 +38,7 @@ public class TupleStreamTemplate {
     private StreamContext streamContext;
     private HttpClient httpClient;
 
-    public TupleStream create(StreamRequest request, String key) {
+    public TupleStream create(SolrRequest request, String key) {
         initTupleStreamFactory(zookeeperHost, collection);
         initStreamContext(zookeeperHost, httpClient);
         TupleStreamBuilder streamBuilder = TupleStreamBuilder.builder()
@@ -69,16 +70,17 @@ public class TupleStreamTemplate {
         private String key;
         private StreamContext streamContext;
 
-        private TupleStream createFor(StreamRequest request) {
+        private TupleStream createFor(SolrRequest request) {
             try {
                 StreamExpression requestExpression = new StreamExpression("search");
                 requestExpression.addParameter(new StreamExpressionValue(streamFactory.getDefaultCollection()));
                 requestExpression.addParameter(new StreamExpressionNamedParameter("q", request.getQuery()));
-                if(request.hasDefaultQueryOperator()) {
-                    requestExpression.addParameter(new StreamExpressionNamedParameter("q.op", request.getDefaultQueryOperator()));
-                }
-                if (request.hasFilterQuery()) {
-                    requestExpression.addParameter(new StreamExpressionNamedParameter("fq", request.getFilterQuery()));
+                requestExpression.addParameter(new StreamExpressionNamedParameter(
+                        "q.op",
+                        request.getDefaultQueryOperator().asQueryStringRepresentation()));
+                if (!request.getFilterQueries().isEmpty()) {
+                    String filterQuery = request.getFilterQueries().stream().collect(Collectors.joining(" ", "(", ")"));
+                    requestExpression.addParameter(new StreamExpressionNamedParameter("fq", filterQuery));
                 }
                 requestExpression.addParameter(new StreamExpressionNamedParameter("fl", fieldsToReturn(key, order)));
                 requestExpression.addParameter(new StreamExpressionNamedParameter("sort", sortToString(order)));

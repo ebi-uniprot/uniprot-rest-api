@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.core.SolrTemplate;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 
 import java.util.Optional;
 
@@ -60,6 +61,12 @@ public class RepositoryConfig {
         } else {
             throw new BeanCreationException("make sure your application.properties has eight solr zookeeperhost or httphost properties");
         }
+    }
+
+    @Bean
+    @Profile("live")
+    public SolrRequestConverter requestConverter() {
+        return new SolrRequestConverter();
     }
 
     @Bean
