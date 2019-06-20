@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.rest.service;
 
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
@@ -27,6 +28,7 @@ import java.util.stream.StreamSupport;
  * @param <R>
  * @author lgonzales
  */
+@PropertySource( "classpath:common-message.properties")
 public class BasicSearchService<T, R extends Document> {
     private final SolrQueryRepository<R> repository;
     private final Function<R, T> entryConverter;
