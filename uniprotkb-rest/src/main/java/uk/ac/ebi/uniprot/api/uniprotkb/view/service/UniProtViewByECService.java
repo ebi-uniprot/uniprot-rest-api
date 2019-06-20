@@ -14,6 +14,7 @@ import uk.ac.ebi.uniprot.cv.ec.ECRepo;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 //@Service
@@ -93,11 +94,10 @@ public class UniProtViewByECService implements UniProtViewByService {
         } else {
             viewBy.setExpand(false);
         }
-        EC ec = ecRepo.getEC(fullEc);
+        Optional<EC> ecOpt = ecRepo.getEC(fullEc);
         viewBy.setId(fullEc);
-        if (ec != null) {
-            viewBy.setLabel(ec.label());
-        }
+        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.label()));
+
         viewBy.setLink(URL_PREFIX + fullEc);
         viewBy.setCount(count.getCount());
         return viewBy;

@@ -10,6 +10,7 @@ import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.cv.chebi.ChebiRepo;
+import uk.ac.ebi.uniprot.cv.ec.ECRepo;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
@@ -64,8 +65,8 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
         UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
-                                                                               .getInstance("avro-uniprot"));
-       dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
+                                                                        .getInstance("avro-uniprot"));
+        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
         return storeClient;
     }
 
@@ -87,9 +88,13 @@ public class DataStoreTestConfig {
     }
 
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
-        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(),
-                PathwayRepoMocker.getPathwayRepo(), mock(ChebiRepo.class), new HashMap<>()));
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT,
+                            new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+                                                      GoRelationsRepoMocker.getGoRelationRepo(),
+                                                      PathwayRepoMocker.getPathwayRepo(),
+                                                      mock(ChebiRepo.class),
+                                                      mock(ECRepo.class),
+                                                      new HashMap<>()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);
