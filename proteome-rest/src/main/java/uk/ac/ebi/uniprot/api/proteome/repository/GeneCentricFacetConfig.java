@@ -23,7 +23,7 @@ import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 
 @Component
 @Getter @Setter
-@PropertySource({"classpath:genecentric.facet.properties", "classpath:common-message.properties"})
+@PropertySource({"classpath:genecentric.facet.properties"})
 @ConfigurationProperties(prefix = "facet")
 public class GeneCentricFacetConfig extends GenericFacetConfig implements FacetConfigConverter {
 

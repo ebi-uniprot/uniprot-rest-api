@@ -28,6 +28,8 @@ import java.util.stream.StreamSupport;
  * @param <R>
  * @author lgonzales
  */
+
+
 @PropertySource( "classpath:common-message.properties")
 public class BasicSearchService<T, R extends Document> {
     private final SolrQueryRepository<R> repository;
