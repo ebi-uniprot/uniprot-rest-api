@@ -16,7 +16,7 @@ public class TaxonomyRequestDTO implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = TaxonomySolrQueryFieldValidator.class)
+    @ValidSolrQueryFields(fieldValidatorClazz = TaxonomyField.Search.class, messagePrefix = "search.taxonomy")
     private String query;
 
     @ValidSolrSortFields(sortFieldEnumClazz = TaxonomyField.Sort.class)
@@ -24,7 +24,7 @@ public class TaxonomyRequestDTO implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = TaxonomyReturnFieldsValidator.class)
+    @ValidReturnFields(fieldValidatorClazz = TaxonomyField.ResultFields.class)
     private String fields;
 
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)

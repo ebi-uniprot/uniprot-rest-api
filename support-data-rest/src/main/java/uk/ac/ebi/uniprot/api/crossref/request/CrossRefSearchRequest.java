@@ -2,13 +2,14 @@ package uk.ac.ebi.uniprot.api.crossref.request;
 
 import lombok.Data;
 import uk.ac.ebi.uniprot.api.crossref.config.CrossRefFacetConfig;
+import uk.ac.ebi.uniprot.api.crossref.model.CrossRefAllFields;
 import uk.ac.ebi.uniprot.api.crossref.model.CrossRefValidSortFields;
-import uk.ac.ebi.uniprot.api.crossref.validator.CrossRefSolrQueryFieldValidator;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
 import uk.ac.ebi.uniprot.common.Utils;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class CrossRefSearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = CrossRefSolrQueryFieldValidator.class)
+    @ValidSolrQueryFields(fieldValidatorClazz = CrossRefAllFields.class, messagePrefix = "search.crossref")
     private String query;
 
     @ValidSolrSortFields(sortFieldEnumClazz = CrossRefValidSortFields.class)

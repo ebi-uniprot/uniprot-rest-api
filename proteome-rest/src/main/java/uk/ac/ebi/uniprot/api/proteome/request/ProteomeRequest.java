@@ -1,19 +1,15 @@
 package uk.ac.ebi.uniprot.api.proteome.request;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
 import com.google.common.base.Strings;
-
 import lombok.Data;
+import uk.ac.ebi.uniprot.api.configure.proteome.ProteomeResultFields;
 import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
+import uk.ac.ebi.uniprot.api.rest.validation.*;
 import uk.ac.ebi.uniprot.search.field.ProteomeField;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  *
@@ -27,15 +23,15 @@ public class ProteomeRequest implements SearchRequest{
 
 	    @NotNull(message = "{search.required}")
 	    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-	    @ValidSolrQueryFields(fieldValidatorClazz = ProteomeSolrQueryFieldValidator.class)
+		@ValidSolrQueryFields(fieldValidatorClazz = ProteomeField.Search.class, messagePrefix = "search.proteome")
 	    private String query;
 
 	    @ValidSolrSortFields(sortFieldEnumClazz = ProteomeField.Sort.class)
 	    private String sort;
 
 	    private String cursor;
-	    
-	    @ValidReturnFields(fieldValidatorClazz = ProteomeReturnFieldsValidator.class)
+
+	@ValidReturnFields(fieldValidatorClazz = ProteomeResultFields.class)
 	    private String fields;
 
 	    @ValidFacets(facetConfig = ProteomeFacetConfig.class)

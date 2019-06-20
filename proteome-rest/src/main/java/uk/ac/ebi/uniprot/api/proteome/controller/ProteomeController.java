@@ -1,20 +1,6 @@
 package uk.ac.ebi.uniprot.api.proteome.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,18 +8,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
-import io.swagger.annotations.Api;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.configure.proteome.ProteomeResultFields;
 import uk.ac.ebi.uniprot.api.proteome.request.ProteomeRequest;
-import uk.ac.ebi.uniprot.api.proteome.request.ProteomeReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.proteome.service.ProteomeQueryService;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
@@ -41,6 +20,18 @@ import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.domain.proteome.ProteomeEntry;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.*;
+import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
 
 /**
  *
@@ -77,11 +68,11 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
 	@RequestMapping(value = "/{upid}", method = RequestMethod.GET, produces = { TSV_MEDIA_TYPE_VALUE,
 			LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE })
 	public ResponseEntity<MessageConverterContext<ProteomeEntry>> getByUpId(
-			@PathVariable("upid") @Pattern(regexp = FieldValueValidator.PROTEOME_ID_REX, flags = {
+            @PathVariable("upid") @Pattern(regexp = FieldValueValidator.PROTEOME_ID_REX, flags = {
 					Pattern.Flag.CASE_INSENSITIVE }, message = "{search.invalid.upid.value}") String upid,
-			@ValidReturnFields(fieldValidatorClazz = ProteomeReturnFieldsValidator.class) 
+            @ValidReturnFields(fieldValidatorClazz = ProteomeResultFields.class)
 			@RequestParam(value = "fields", required = false) String fields,
-			@RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
 		ProteomeEntry entry = queryService.getByUPId(upid);
 		return super.getEntityResponse(entry, fields, contentType);
 	}

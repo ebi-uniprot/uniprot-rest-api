@@ -1,63 +1,52 @@
 package uk.ac.ebi.uniprot.api.crossref.model;
 
-public enum CrossRefAllFields {
-    ACCESSION("accession", true, true),
-    ABBREV("abbrev", true, true),
-    NAME("nameOnly", true, true),
-    DOIID("doi_id", true, true),
-    PUBMEDID("pubmed_id", true, true),
-    LINKTYPE("link_type", true, true),
-    CATEGORY("category_str", true, false),
-    SERVER("server", false, true),
-    DBURL("db_url", false, true),
-    CATEGORY_FACET("category_facet", true, true, false),
-    CONTENT("content", true, false, false);
+import uk.ac.ebi.uniprot.search.field.SearchField;
+import uk.ac.ebi.uniprot.search.field.SearchFieldType;
 
-    private String solrFieldName;
-    private boolean indexed;
-    private boolean stored;
-    private boolean visible = true;
+import java.util.function.Predicate;
 
-    CrossRefAllFields(String solrFieldName, boolean indexed, boolean stored) {
-        this.solrFieldName = solrFieldName;
-        this.indexed = indexed;
-        this.stored = stored;
+public enum CrossRefAllFields implements SearchField {
+    accession(SearchFieldType.TERM),
+    abbrev(SearchFieldType.TERM),
+    name_only(SearchFieldType.TERM),
+    doi_id(SearchFieldType.TERM),
+    pubmed_id(SearchFieldType.TERM),
+    link_type(SearchFieldType.TERM),
+    category_str(SearchFieldType.TERM),
+    category_facet(SearchFieldType.TERM),
+    content(SearchFieldType.TERM);
+
+    private final Predicate<String> fieldValueValidator;
+    private final SearchFieldType searchFieldType;
+    private final Float boostValue;
+
+    CrossRefAllFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator, Float boostValue) {
+        this.searchFieldType = searchFieldType;
+        this.fieldValueValidator = fieldValueValidator;
+        this.boostValue = boostValue;
     }
 
-    CrossRefAllFields(String solrFieldName, boolean indexed, boolean stored, boolean visible) {
-        this.solrFieldName = solrFieldName;
-        this.indexed = indexed;
-        this.stored = stored;
-        this.visible = visible;
-    }
-
-    public String getSolrFieldName(){
-        return this.solrFieldName;
-    }
-
-    public boolean isIndexed(){
-        return this.indexed;
-    }
-
-    public boolean isStored(){
-        return this.stored;
-    }
-
-    public boolean isVisible(){
-        return this.visible;
+    CrossRefAllFields(SearchFieldType searchFieldType) {
+        this(searchFieldType, null, null);
     }
 
     @Override
-    public String toString() {
-        return this.solrFieldName;
+    public Float getBoostValue() {
+        return this.boostValue;
     }
 
-    public static boolean isVisible(String solrFieldName) {
-        for(CrossRefAllFields field : CrossRefAllFields.values()){
-            if(field.getSolrFieldName().equals(solrFieldName)){
-                return field.isVisible();
-            }
-        }
-        return false;
+    @Override
+    public String getName() {
+        return this.name();
+    }
+
+    @Override
+    public SearchFieldType getSearchFieldType() {
+        return this.searchFieldType;
+    }
+
+    @Override
+    public Predicate<String> getFieldValueValidator() {
+        return this.fieldValueValidator;
     }
 }

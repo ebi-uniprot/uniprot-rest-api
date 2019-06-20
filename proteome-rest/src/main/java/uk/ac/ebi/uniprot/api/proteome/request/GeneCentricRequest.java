@@ -1,20 +1,14 @@
 package uk.ac.ebi.uniprot.api.proteome.request;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
 import com.google.common.base.Strings;
-
 import lombok.Data;
 import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
+import uk.ac.ebi.uniprot.api.rest.validation.*;
 import uk.ac.ebi.uniprot.search.field.GeneCentricField;
-import uk.ac.ebi.uniprot.search.field.ProteomeField;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  *
@@ -28,15 +22,15 @@ public class GeneCentricRequest  implements SearchRequest{
 
 	    @NotNull(message = "{search.required}")
 	    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-	    @ValidSolrQueryFields(fieldValidatorClazz = GeneCentricQueryFieldsValidator.class)
+        @ValidSolrQueryFields(fieldValidatorClazz = GeneCentricField.Search.class, messagePrefix = "search.genecentric")
 	    private String query;
 
 	    @ValidSolrSortFields(sortFieldEnumClazz = GeneCentricField.Sort.class)
 	    private String sort;
 
 	    private String cursor;
-	    
-	    @ValidReturnFields(fieldValidatorClazz = GeneCentricReturnFieldsValidator.class)
+
+    @ValidReturnFields(fieldValidatorClazz = GeneCentricField.ResultFields.class)
 	    private String fields;
 
 	    @ValidFacets(facetConfig = GeneCentricFacetConfig.class)

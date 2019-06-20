@@ -1,42 +1,48 @@
 package uk.ac.ebi.uniprot.api.disease.validator;
 
 import lombok.Getter;
+import uk.ac.ebi.uniprot.search.field.SearchField;
+import uk.ac.ebi.uniprot.search.field.SearchFieldType;
+
+import java.util.function.Predicate;
 
 @Getter
-public enum DiseaseFields {
-    ACCESSION("accession", true, true),
-    NAME("name", true, false, false),
-    CONTENT("content", true, false, false);
+public enum DiseaseFields implements SearchField {
+    accession(SearchFieldType.TERM),
+    name(SearchFieldType.TERM),
+    content(SearchFieldType.TERM);
 
-    private String solrFieldName;
-    private boolean indexed;
-    private boolean stored;
-    private boolean visible = true;
+    private final Predicate<String> fieldValueValidator;
+    private final SearchFieldType searchFieldType;
+    private final Float boostValue;
 
-    DiseaseFields(String solrFieldName, boolean indexed, boolean stored) {
-        this.solrFieldName = solrFieldName;
-        this.indexed = indexed;
-        this.stored = stored;
+    DiseaseFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator, Float boostValue) {
+        this.searchFieldType = searchFieldType;
+        this.fieldValueValidator = fieldValueValidator;
+        this.boostValue = boostValue;
     }
 
-    DiseaseFields(String solrFieldName, boolean indexed, boolean stored, boolean visible) {
-        this.solrFieldName = solrFieldName;
-        this.indexed = indexed;
-        this.stored = stored;
-        this.visible = visible;
+    DiseaseFields(SearchFieldType searchFieldType) {
+        this(searchFieldType, null, null);
     }
 
     @Override
-    public String toString() {
-        return this.solrFieldName;
+    public Float getBoostValue() {
+        return this.boostValue;
     }
 
-    public static boolean isVisible(String solrFieldName) {
-        for(DiseaseFields field : DiseaseFields.values()){
-            if(field.getSolrFieldName().equals(solrFieldName)){
-                return field.isVisible();
-            }
-        }
-        return false;
+    @Override
+    public String getName() {
+        return this.name();
+    }
+
+    @Override
+    public SearchFieldType getSearchFieldType() {
+        return this.searchFieldType;
+    }
+
+    @Override
+    public Predicate<String> getFieldValueValidator() {
+        return this.fieldValueValidator;
     }
 }

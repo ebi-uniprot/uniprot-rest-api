@@ -2,16 +2,16 @@ package uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
+import uk.ac.ebi.uniprot.search.field.ReturnField;
 
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public enum UniProtResultFields {
+public enum UniProtResultFields implements ReturnField {
 	INSTANCE;
 	private static final String FILENAME = "uniprot/result_field.json";
 	private List<FieldGroup> resultFields = new ArrayList<>();
@@ -60,4 +60,9 @@ public enum UniProtResultFields {
 		return resultFields.stream().map(val -> val.toString()).collect(Collectors.joining(",\n"));
 	}
 
+
+	@Override
+	public boolean hasReturnField(String fieldName) {
+		return INSTANCE.getField(fieldName).isPresent();
+	}
 }

@@ -13,10 +13,10 @@ import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.taxonomy.request.TaxonomyRequestDTO;
-import uk.ac.ebi.uniprot.api.taxonomy.request.TaxonomyReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.taxonomy.service.TaxonomyService;
 import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
 import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyInactiveReasonType;
+import uk.ac.ebi.uniprot.search.field.TaxonomyField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +48,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(@PathVariable("taxonId")
                                                                           @Pattern(regexp = TAXONOMY_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.taxonomy.invalid.id}")
                                                                           String taxonId,
-                                                                          @ValidReturnFields(fieldValidatorClazz = TaxonomyReturnFieldsValidator.class)
+                                                                          @ValidReturnFields(fieldValidatorClazz = TaxonomyField.ResultFields.class)
                                                                           @RequestParam(value = "fields", required = false)
                                                                           String fields,
                                                                           @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)

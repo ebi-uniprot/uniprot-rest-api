@@ -1,20 +1,6 @@
 package uk.ac.ebi.uniprot.api.proteome.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,18 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
-
-import io.swagger.annotations.Api;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.proteome.request.GeneCentricRequest;
-import uk.ac.ebi.uniprot.api.proteome.request.GeneCentricReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.proteome.service.GeneCentricService;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
@@ -42,6 +20,19 @@ import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.domain.proteome.CanonicalProtein;
 import uk.ac.ebi.uniprot.search.field.GeneCentricField;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
 
 /**
  *
@@ -90,11 +81,11 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
 
 	@RequestMapping(value = "/{accession}", produces = { APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE,LIST_MEDIA_TYPE_VALUE })
 	public  ResponseEntity<MessageConverterContext<CanonicalProtein>> getByAccession(
-			@PathVariable("accession") @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {
+            @PathVariable("accession") @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {
 					Pattern.Flag.CASE_INSENSITIVE }, message = "{search.invalid.accession.value}") String accession,
-			@ValidReturnFields(fieldValidatorClazz = GeneCentricReturnFieldsValidator.class) 
+            @ValidReturnFields(fieldValidatorClazz = GeneCentricField.ResultFields.class)
 			@RequestParam(value = "fields", required = false) String fields,
-			@RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
 		CanonicalProtein entry = service.getByAccession(accession);
 		return super.getEntityResponse(entry, fields, contentType);
 	}
