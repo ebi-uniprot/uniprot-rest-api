@@ -74,6 +74,7 @@ public abstract class BasicSearchController<T> {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFacets(result.getFacets());
+        context.setMatchedFields(result.getMatchedFields());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             List<String> accList = result.getContent().stream()
                     .map(this::getEntityId)

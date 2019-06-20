@@ -2,11 +2,15 @@ package uk.ac.ebi.uniprot.api.uniprotkb.repository;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.cv.chebi.ChebiRepo;
+import uk.ac.ebi.uniprot.cv.ec.ECRepo;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
@@ -61,20 +65,39 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
         UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
-                                                                               .getInstance("avro-uniprot"));
-       dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
+                                                                        .getInstance("avro-uniprot"));
+        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
         return storeClient;
     }
 
+    @Bean
+    @Profile("offline")
+    public SolrRequestConverter requestConverter() {
+        return new SolrRequestConverter() {
+            @Override
+            public SolrQuery toSolrQuery(SolrRequest request) {
+                SolrQuery solrQuery = super.toSolrQuery(request);
+
+                // required for tests, because EmbeddedSolrServer is not sharded
+                solrQuery.setParam("distrib", "false");
+                solrQuery.setParam("terms.mincount", "1");
+
+                return solrQuery;
+            }
+        };
+    }
+
     private void addUniProtStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient uniProtSolrClient) throws URISyntaxException {
-        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(),
-                PathwayRepoMocker.getPathwayRepo(), mock(ChebiRepo.class), new HashMap<>()));
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT,
+                            new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+                                                      GoRelationsRepoMocker.getGoRelationRepo(),
+                                                      PathwayRepoMocker.getPathwayRepo(),
+                                                      mock(ChebiRepo.class),
+                                                      mock(ECRepo.class),
+                                                      new HashMap<>()));
         dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
 
         dsm.addSolrClient(DataStoreManager.StoreType.UNIPROT, uniProtSolrClient);
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, uniProtSolrClient);
     }
-
-
 }

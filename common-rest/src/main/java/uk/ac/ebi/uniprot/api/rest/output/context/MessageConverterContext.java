@@ -2,9 +2,9 @@ package uk.ac.ebi.uniprot.api.rest.output.context;
 
 import lombok.Builder;
 import lombok.Data;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
-
 import org.springframework.http.MediaType;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
+import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfo;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -26,6 +26,7 @@ public class MessageConverterContext<T> {
     private MessageConverterContextFactory.Resource resource;
     private String fields;
     private Collection<Facet> facets;
+    private Collection<TermInfo> matchedFields;
     private boolean entityOnly;
 
     MessageConverterContext<T> asCopy() {
@@ -37,6 +38,7 @@ public class MessageConverterContext<T> {
                 .fields(this.fields)
                 .entityIds(this.entityIds)
                 .facets(this.facets)
+                .matchedFields(this.matchedFields)
                 .entityOnly(this.entityOnly)
                 .build();
     }

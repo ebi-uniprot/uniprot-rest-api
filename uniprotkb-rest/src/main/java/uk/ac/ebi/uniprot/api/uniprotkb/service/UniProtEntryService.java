@@ -2,19 +2,17 @@ package uk.ac.ebi.uniprot.api.uniprotkb.service;
 
 import com.google.common.base.Strings;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryBuilder;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.common.repository.store.StoreStreamer;
-import uk.ac.ebi.uniprot.api.common.repository.store.StreamRequest;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
+import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
@@ -39,15 +37,18 @@ public class UniProtEntryService {
     private final StoreStreamer<UniProtEntry> storeStreamer;
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final DefaultSearchHandler defaultSearchHandler;
+    private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
     private UniprotFacetConfig uniprotFacetConfig;
 
     public UniProtEntryService(UniprotQueryRepository repository,
                                UniprotFacetConfig uniprotFacetConfig,
+                               UniProtTermsConfig uniProtTermsConfig,
                                UniProtStoreClient entryStore,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
                                DefaultSearchHandler defaultSearchHandler) {
         this.repository = repository;
+        this.uniProtTermsConfig = uniProtTermsConfig;
         this.defaultSearchHandler = defaultSearchHandler;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.storeStreamer = uniProtEntryStoreStreamer;
@@ -55,10 +56,10 @@ public class UniProtEntryService {
     }
 
     public QueryResult<UniProtEntry> search(SearchRequestDTO request) {
-        SimpleQuery simpleQuery = createQuery(request);
+        SolrRequest solrRequest = createSolrRequest(request, true);
 
         QueryResult<UniProtDocument> results = repository
-                .searchPage(simpleQuery, request.getCursor(), request.getSize());
+                .searchPage(solrRequest, request.getCursor(), request.getSize());
 
         return resultsConverter.convertQueryResult(results, FieldsParser.parseForFilters(request.getFields()));
     }
@@ -66,8 +67,8 @@ public class UniProtEntryService {
     public UniProtEntry getByAccession(String accession, String fields) {
         try {
             Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
-            SimpleQuery simpleQuery = new SimpleQuery(Criteria.where(ACCESSION).is(accession.toUpperCase()));
-            Optional<UniProtDocument> optionalDoc = repository.getEntry(simpleQuery);
+            SolrRequest solrRequest = SolrRequest.builder().query(ACCESSION + ":" + accession.toUpperCase()).build();
+            Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
             Optional<UniProtEntry> optionalUniProtEntry = optionalDoc
                     .map(doc -> resultsConverter.convertDoc(doc, filters))
                     .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
@@ -82,67 +83,53 @@ public class UniProtEntryService {
     }
 
     public Stream<UniProtEntry> stream(SearchRequestDTO request, MediaType contentType) {
-        StreamRequest streamRequest = getStreamRequest(request);
+        SolrRequest solrRequest = createSolrRequest(request, false);
         boolean defaultFieldsOnly = FieldsParser
                 .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
         if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
                 .equals(TSV_MEDIA_TYPE) || contentType.equals(XLS_MEDIA_TYPE))) {
-            return storeStreamer.defaultFieldStream(streamRequest);
+            return storeStreamer.defaultFieldStream(solrRequest);
         } else {
-            return storeStreamer.idsToStoreStream(streamRequest);
+            return storeStreamer.idsToStoreStream(solrRequest);
         }
     }
 
     public Stream<String> streamIds(SearchRequestDTO request) {
-        StreamRequest streamRequest = getStreamRequest(request);
-        return storeStreamer.idsStream(streamRequest);
+        SolrRequest solrRequest = createSolrRequest(request, false);
+        return storeStreamer.idsStream(solrRequest);
     }
 
-    private SimpleQuery createQuery(SearchRequestDTO request) {
-        SolrQueryBuilder builder = new SolrQueryBuilder();
+    private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
+        SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
+        String requestedQuery = request.getQuery();
 
-        if (needFilterIsoform(request)) {
-            builder.addFilterQuery(new SimpleQuery(UniProtField.Search.is_isoform.name() + ":" + false));
+        if (needsToFilterIsoform(request)) {
+            requestBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
+        }
+
+        if (request.isShowMatchedFields()) {
+            requestBuilder.termQuery(requestedQuery);
+            uniProtTermsConfig.getFields().forEach(requestBuilder::termField);
         }
 
         boolean hasScore = false;
-        String requestedQuery = request.getQuery();
-        if(defaultSearchHandler.hasDefaultSearch(requestedQuery)){
+        if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
             requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
             hasScore = true;
-            builder.defaultOperator(Query.Operator.OR);
+            requestBuilder.defaultQueryOperator(Query.Operator.OR);
         }
-        builder.query(requestedQuery);
-        builder.addSort(getUniProtSort(request.getSort(),hasScore));
+        requestBuilder.query(requestedQuery);
+        requestBuilder.sort(getUniProtSort(request.getSort(), hasScore));
 
-        if(request.hasFacets()) {
-            builder.facets(request.getFacetList());
-            builder.facetConfig(uniprotFacetConfig);
+        if (includeFacets && request.hasFacets()) {
+            requestBuilder.facets(request.getFacetList());
+            requestBuilder.facetConfig(uniprotFacetConfig);
         }
-        return builder.build();
+
+        return requestBuilder.build();
     }
 
-    private StreamRequest getStreamRequest(SearchRequestDTO request) {
-        StreamRequest.StreamRequestBuilder streamBuilder =  StreamRequest.builder();
-
-        if (needFilterIsoform(request)) {
-            streamBuilder.filterQuery(UniProtField.Search.is_isoform.name() + ":" + false);
-        }
-
-        boolean hasScore = false;
-        String requestedQuery = request.getQuery();
-        if(defaultSearchHandler.hasDefaultSearch(requestedQuery)){
-            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
-            hasScore = true;
-            streamBuilder.defaultQueryOperator(Query.Operator.OR.toString());
-        }
-        streamBuilder.query(requestedQuery);
-        streamBuilder.sort(getUniProtSort(request.getSort(),hasScore));
-
-        return streamBuilder.build();
-    }
-
-    private Sort getUniProtSort(String sortStr,boolean hasScore) {
+    private Sort getUniProtSort(String sortStr, boolean hasScore) {
         if (Strings.isNullOrEmpty(sortStr)) {
             return UniProtSortUtil.createDefaultSort(hasScore);
         } else {
@@ -152,7 +139,7 @@ public class UniProtEntryService {
 
     /**
      * This method verify if we need to add isoform filter query to remove isoform entries
-     *
+     * <p>
      * if does not have id fields (we can not filter isoforms when querying for IDS)
      * AND
      * has includeIsoform params in the request URL
@@ -161,15 +148,15 @@ public class UniProtEntryService {
      *
      * @return true if we need to add isoform filter query
      */
-    private boolean needFilterIsoform(SearchRequestDTO request){
+    private boolean needsToFilterIsoform(SearchRequestDTO request) {
         boolean hasIdFieldTerms = SolrQueryUtil.hasFieldTerms(request.getQuery(),
-                UniProtField.Search.accession_id.name(),
-                UniProtField.Search.mnemonic.name(),
-                UniProtField.Search.is_isoform.name());
+                                                              UniProtField.Search.accession_id.name(),
+                                                              UniProtField.Search.mnemonic.name(),
+                                                              UniProtField.Search.is_isoform.name());
 
-        if(!hasIdFieldTerms){
+        if (!hasIdFieldTerms) {
             return !request.isIncludeIsoform();
-        }else{
+        } else {
             return false;
         }
     }
