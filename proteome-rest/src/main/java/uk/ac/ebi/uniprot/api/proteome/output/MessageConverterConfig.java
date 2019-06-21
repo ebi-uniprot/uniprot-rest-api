@@ -74,10 +74,10 @@ public class MessageConverterConfig {
                 converters.add( new ProteomeTsvMessageConverter());
                 converters.add( new ProteomeXslMessageConverter());
                 converters.add(0, new ProteomeJsonMessageConverter());
-                converters.add( new ProteomeXmlMessageConverter());
+                converters.add(1, new ProteomeXmlMessageConverter());
                 
                 converters.add(0, new GeneCentricJsonMessageConverter());
-                converters.add( new GeneCentricXmlMessageConverter());
+                converters.add(1, new GeneCentricXmlMessageConverter());
             }
         };
     }
