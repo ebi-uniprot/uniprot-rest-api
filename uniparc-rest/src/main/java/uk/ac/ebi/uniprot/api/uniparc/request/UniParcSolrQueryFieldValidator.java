@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.api.uniparc.request;
 
-import uk.ac.ebi.uniprot.search.field.ProteomeField;
+import java.util.function.Predicate;
+
 import uk.ac.ebi.uniprot.search.field.SearchFieldType;
 import uk.ac.ebi.uniprot.search.field.UniParcField;
 import uk.ac.ebi.uniprot.search.field.validator.SolrQueryFieldValidator;
@@ -43,20 +44,28 @@ public class UniParcSolrQueryFieldValidator implements SolrQueryFieldValidator {
 
 	@Override
 	public SearchFieldType getExpectedSearchFieldType(String fieldName) {
-		// TODO Auto-generated method stub
-		return null;
+		 return UniParcField.Search.valueOf(fieldName).getSearchFieldType();
 	}
 
 	@Override
 	public boolean hasValidFieldValue(String fieldName, String value) {
-		// TODO Auto-generated method stub
-		return false;
+		UniParcField.Search search = UniParcField.Search.valueOf(fieldName);
+        Predicate<String> fieldValueValidator = search.getFieldValueValidator();
+        if(fieldValueValidator != null) {
+            try {
+                return fieldValueValidator.test(value);
+            }catch (Exception e){
+          
+                return false;
+            }
+        } else {
+            return true;
+        }
 	}
 
 	@Override
 	public String getInvalidFieldValueErrorMessage(String fieldName, String value) {
-		// TODO Auto-generated method stub
-		return null;
+		 return "{search.uniparc.invalid.query.field.value."+fieldName+"}";
 	}
 
 }

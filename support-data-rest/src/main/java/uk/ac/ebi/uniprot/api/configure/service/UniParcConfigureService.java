@@ -4,19 +4,21 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import uk.ac.ebi.uniprot.api.configure.proteome.ProteomeResultFields;
+import uk.ac.ebi.uniprot.api.configure.uniparc.UniParcResultFields;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 
 /**
  *
  * @author jluo
- * @date: 30 Apr 2019
+ * @date: 20 Jun 2019
  *
 */
+
 @Service
-public class ProteomeConfigureService {
+public class UniParcConfigureService {
 	public List<FieldGroup> getResultFields() {
-		return ProteomeResultFields.INSTANCE.getResultFieldGroups();
+		return UniParcResultFields.INSTANCE.getResultFieldGroups();
 	}
 }
+
 
