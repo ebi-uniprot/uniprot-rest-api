@@ -15,6 +15,7 @@ import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfo;
 import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfoConverter;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public abstract class SolrQueryRepository<T> {
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
             List<Facet> facets = new ArrayList<>();
-            if (facetConverter != null) {
+            if (Utils.nonNull(facetConverter)) {
                 facets = facetConverter.convert(solrResponse);
             }
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);

@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.api.keyword.output.converter;
 
 import uk.ac.ebi.uniprot.api.keyword.output.KeywordEntryFilter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractJsonMessageConverter;
+import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
 import uk.ac.ebi.uniprot.json.parser.keyword.KeywordJsonConfig;
 
@@ -21,7 +22,7 @@ public class KeywordJsonMessageConverter extends AbstractJsonMessageConverter<Ke
     @Override
     protected KeywordEntry filterEntryContent(KeywordEntry entity) {
         Map<String, List<String>> filters = getThreadLocalFilterMap();
-        if (filters != null && !filters.isEmpty()) {
+        if (Utils.notEmpty(filters)) {
             entity = KeywordEntryFilter.filterEntry(entity, new ArrayList<>(filters.keySet()));
         }
         return entity;

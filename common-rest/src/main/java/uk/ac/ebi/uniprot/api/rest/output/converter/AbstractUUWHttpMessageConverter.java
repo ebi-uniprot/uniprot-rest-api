@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.lang.Nullable;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.common.Utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +54,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T> extends AbstractGene
 
     public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
         boolean result = false;
-        if (this.canWrite(mediaType) && MessageConverterContext.class.isAssignableFrom(clazz) && type != null) {
+        if (this.canWrite(mediaType) && MessageConverterContext.class.isAssignableFrom(clazz) && Utils.nonNull(type)) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             String typeClassName = parameterizedType.getActualTypeArguments()[0].getTypeName();
             result = typeClassName.equals(messageConverterEntryClass.getName());
