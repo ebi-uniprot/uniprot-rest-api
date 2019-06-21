@@ -1,12 +1,12 @@
 package uk.ac.ebi.uniprot.api.proteome.output.converter;
 
-import javax.xml.bind.Marshaller;
-
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import uk.ac.ebi.uniprot.domain.proteome.CanonicalProtein;
 import uk.ac.ebi.uniprot.domain.proteome.ProteomeEntry;
 import uk.ac.ebi.uniprot.xml.proteome.CanonicalProteinConverter;
 import uk.ac.ebi.uniprot.xml.proteome.ProteomeConverter;
+
+import javax.xml.bind.Marshaller;
 
 /**
  *
@@ -23,6 +23,7 @@ public class ProteomeXmlMessageConverter extends AbstractXmlMessageConverter<Obj
 	private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/proteome.xsd\">\n";
 
 	public ProteomeXmlMessageConverter() {
+		super(Object.class);
 		proteomeConverter = new ProteomeConverter();
 		converter = new CanonicalProteinConverter();
 		marshaller = createMarshaller(XML_CONTEXT);

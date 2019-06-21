@@ -1,8 +1,8 @@
 package uk.ac.ebi.uniprot.api.keyword.service;
 
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.keyword.KeywordRepository;
 import uk.ac.ebi.uniprot.api.keyword.request.KeywordRequestDTO;
 import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
@@ -30,12 +30,12 @@ public class KeywordService {
     }
 
     public QueryResult<KeywordEntry> search(KeywordRequestDTO request) {
-        SimpleQuery query = basicService.createSolrQuery(request, null, keywordSortClause, defaultSearchHandler);
-        return basicService.search(query, request.getCursor(), request.getSize());
+        SolrRequest solrRequest = basicService.createSolrRequest(request, null, keywordSortClause, defaultSearchHandler);
+        return basicService.search(solrRequest, request.getCursor(), request.getSize());
     }
 
     public Stream<KeywordEntry> download(KeywordRequestDTO request) {
-        SimpleQuery query = basicService.createSolrQuery(request, null, keywordSortClause, defaultSearchHandler);
-        return basicService.download(query);
+        SolrRequest solrRequest = basicService.createSolrRequest(request, null, keywordSortClause, defaultSearchHandler);
+        return basicService.download(solrRequest);
     }
 }
