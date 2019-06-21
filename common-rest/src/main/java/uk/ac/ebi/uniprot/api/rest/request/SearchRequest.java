@@ -16,6 +16,8 @@ import java.util.List;
 
 public interface SearchRequest {
 
+    static final int DEFAULT_RESULTS_SIZE = 25;
+
 	String getQuery();
 
 	String getFields();

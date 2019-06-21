@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.api.common.repository.search;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.core.CoreContainer;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -21,6 +22,8 @@ import uk.ac.ebi.uniprot.indexer.uniprot.mockers.UniProtDocMocker;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +46,9 @@ class SolrQueryRepositoryIT {
     static void setUp() {
         try {
             SolrDataStoreManager solrStoreManager = new SolrDataStoreManager();
-            ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.uniprot);
+            CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
+            container.load();
+            ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.uniprot);
             storeManager = new DataStoreManager(solrStoreManager);
             storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, solrClient);
 
@@ -166,7 +171,7 @@ class SolrQueryRepositoryIT {
         // then
         assertNotNull(queryResult.getMatchedFields());
 //        assertThat(queryResult.getMatchedFields(), is(not(emptyList())));
-        // TODO: 14/06/19 fix this 
+        // TODO: 14/06/19 fix this
     }
 
     @Test

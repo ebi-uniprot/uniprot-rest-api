@@ -421,81 +421,6 @@ public abstract class AbstractSearchControllerIT {
         }
     }
 
-    //----------------------------------------- TEST FACETS -----------------------------------------------
-    @Test
-    protected void searchFacetsWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
-        checkSearchParameterInput(queryParameter);
-        assertThat(queryParameter.getQueryParams().keySet(), hasItems("facets", "query"));
-
-        // given
-        saveEntry(SaveScenario.FACETS_SUCCESS);
-
-        // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
-
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
-
-        ResultActions response = getMockMvc().perform(requestBuilder);
-
-        // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
-
-        for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
-            resultActions.andExpect(resultMatcher);
-        }
-    }
-
-    @Test
-    protected void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {
-
-        // when
-        ResultActions response = getMockMvc().perform(
-                get(getSearchRequestPath())
-                        .param("query", "*:*")
-                        .param("facets", "invalid, invalid2")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", containsInAnyOrder(
-                        startsWith("Invalid facet name 'invalid'. Expected value can be "),
-                        startsWith("Invalid facet name 'invalid2'. Expected value can be "))));
-    }
-
-    @Test
-    protected void searchCanSearchWithAllAvailableFacetsFields() throws Exception {
-
-        // given
-        saveEntry(SaveScenario.FACETS_SUCCESS);
-
-        List<String> facetFields = getAllFacetFields();
-        assertThat(facetFields, notNullValue());
-        assertThat(facetFields, not(emptyIterable()));
-
-        for (String facetField : facetFields) {
-            // when
-            ResultActions response = getMockMvc().perform(
-                    get(getSearchRequestPath())
-                            .param("query", "*:*")
-                            .param("facets", facetField)
-                            .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-            // then
-            response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.size()", greaterThan(0)))
-                    .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
-                    .andExpect(jsonPath("$.facets.*.name", contains(facetField)));
-        }
-    }
-
     //----------------------------------------- TEST CONTENT TYPES -----------------------------------------------
     @Test
     protected void searchSuccessContentTypes(SearchContentTypeParam contentTypeParam) throws Exception {
@@ -700,7 +625,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
 
-    private void checkSearchParameterInput(SearchParameter queryParameter) {
+    void checkSearchParameterInput(SearchParameter queryParameter) {
         assertThat(queryParameter, notNullValue());
         assertThat(queryParameter.getQueryParams(), notNullValue());
         assertThat(queryParameter.getQueryParams().keySet(), not(emptyIterable()));

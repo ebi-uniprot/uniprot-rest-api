@@ -13,6 +13,7 @@ public class UniProtKBXmlMessageConverter extends AbstractXmlMessageConverter<Un
 	private static final String XML_CONTEXT = "uk.ac.ebi.uniprot.xml.jaxb.uniprot";
 
 	public UniProtKBXmlMessageConverter() {
+        super(UniProtEntry.class);
 		converter = new UniProtEntryConverter();
 		marshaller = createMarshaller(XML_CONTEXT);
 	}

@@ -15,6 +15,10 @@ public class TaxonomyTsvMessageConverter extends AbstractTsvMessagerConverter<Ta
 
     private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
 
+    public TaxonomyTsvMessageConverter() {
+        super(TaxonomyEntry.class);
+    }
+
     @Override
     protected List<String> entry2TsvStrings(TaxonomyEntry entity) {
         Map<String, String> mappedField = new TaxonomyEntryMap(entity).attributeValues();

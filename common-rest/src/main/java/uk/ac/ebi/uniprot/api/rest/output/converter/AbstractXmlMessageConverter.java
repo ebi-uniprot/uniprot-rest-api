@@ -17,8 +17,8 @@ import java.io.*;
 
 public abstract class AbstractXmlMessageConverter<T, X> extends AbstractEntityHttpMessageConverter<T> {
 
-	public AbstractXmlMessageConverter() {
-		super(MediaType.APPLICATION_XML);
+    public AbstractXmlMessageConverter(Class<T> messageConverterEntryClass) {
+        super(MediaType.APPLICATION_XML, messageConverterEntryClass);
 	}
 
 	private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniprot.xsd\">\n";

@@ -20,6 +20,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import lombok.Getter;
 import lombok.Setter;
 import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
+import uk.ac.ebi.uniprot.api.proteome.output.converter.GeneCentricJsonMessageConverter;
+import uk.ac.ebi.uniprot.api.proteome.output.converter.GeneCentricXmlMessageConverter;
 import uk.ac.ebi.uniprot.api.proteome.output.converter.ProteomeJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.proteome.output.converter.ProteomeTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.proteome.output.converter.ProteomeXmlMessageConverter;
@@ -68,13 +70,14 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
+                
                 converters.add( new ProteomeTsvMessageConverter());
                 converters.add( new ProteomeXslMessageConverter());
-                converters.add(0, new ProteomeXmlMessageConverter());
-                converters.add(1, new ProteomeJsonMessageConverter());
-         //       converters.add(2, new GeneCentricJsonMessageConverter());
-        //        converters.add(3, new GeneCentricXmlMessageConverter());
-              
+                converters.add(0, new ProteomeJsonMessageConverter());
+                converters.add(1, new ProteomeXmlMessageConverter());
+                
+                converters.add(0, new GeneCentricJsonMessageConverter());
+                converters.add(1, new GeneCentricXmlMessageConverter());
             }
         };
     }

@@ -5,9 +5,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.common.Utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,12 +20,13 @@ import java.util.Map;
  */
 public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
+    private static final String COMMA = "\\s*,\\s*";
     private final ObjectMapper objectMapper;
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
 
-    public AbstractJsonMessageConverter(ObjectMapper objectMapper) {
-        super(MediaType.APPLICATION_JSON);
+    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass) {
+        super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
     }
 
@@ -85,7 +89,17 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
 
     protected abstract T filterEntryContent(T entity);
 
-    protected abstract Map<String, List<String>> getFilterFieldMap(String fields);
+    protected Map<String, List<String>> getFilterFieldMap(String fields) {
+        if (Utils.notEmpty(fields)) {
+            Map<String, List<String>> filters = new HashMap<>();
+            for (String field : fields.split(COMMA)) {
+                filters.put(field, Collections.emptyList());
+            }
+            return filters;
+        } else {
+            return Collections.emptyMap();
+        }
+    }
 
     private void writeFacet(JsonGenerator generator, Object facet) {
         try {

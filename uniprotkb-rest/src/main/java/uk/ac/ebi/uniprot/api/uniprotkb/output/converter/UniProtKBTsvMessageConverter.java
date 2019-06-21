@@ -1,10 +1,5 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.output.converter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
@@ -14,12 +9,20 @@ import uk.ac.ebi.uniprot.api.uniprotkb.service.filters.EntryFilters;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.parser.tsv.uniprot.EntryMap;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 public class UniProtKBTsvMessageConverter extends AbstractTsvMessagerConverter<UniProtEntry> {
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
 
-    
-    @Override
+	public UniProtKBTsvMessageConverter() {
+		super(UniProtEntry.class);
+	}
+
+	@Override
 	protected void initBefore(MessageConverterContext<UniProtEntry> context) {
     	   tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
            tlFields.set(FieldsParser.parse(context.getFields()));

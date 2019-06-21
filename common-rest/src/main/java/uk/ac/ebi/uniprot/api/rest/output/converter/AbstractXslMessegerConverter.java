@@ -1,20 +1,19 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.slf4j.Logger;
+import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
+import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.slf4j.Logger;
-
-import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
-import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
+import static org.slf4j.LoggerFactory.getLogger;
 
 
 /**
@@ -30,8 +29,8 @@ public abstract class AbstractXslMessegerConverter<T> extends AbstractEntityHttp
     private ThreadLocal<SXSSFSheet> tlSheet = new ThreadLocal<>();
     private ThreadLocal<AtomicInteger> tlCounter = new ThreadLocal<>();
 
-    public AbstractXslMessegerConverter() {
-        super(UniProtMediaType.XLS_MEDIA_TYPE);
+    public AbstractXslMessegerConverter(Class<T> messageConverterEntryClass) {
+        super(UniProtMediaType.XLS_MEDIA_TYPE, messageConverterEntryClass);
     }
     
 	abstract protected List<String> entry2TsvStrings(T entity);

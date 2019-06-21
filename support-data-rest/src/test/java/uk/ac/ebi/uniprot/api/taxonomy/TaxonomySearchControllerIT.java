@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.ac.ebi.uniprot.api.DataStoreTestConfig;
-import uk.ac.ebi.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import uk.ac.ebi.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import uk.ac.ebi.uniprot.api.rest.controller.SaveScenario;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TaxonomyController.class)
 @ExtendWith(value = {SpringExtension.class, TaxonomySearchControllerIT.TaxonomySearchContentTypeParamResolver.class,
         TaxonomySearchControllerIT.TaxonomySearchParameterResolver.class})
-public class TaxonomySearchControllerIT extends AbstractSearchControllerIT {
+public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired
     private MockMvc mockMvc;

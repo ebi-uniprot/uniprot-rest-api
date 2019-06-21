@@ -1,12 +1,12 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
+import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
+import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
-import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 /**
  *
@@ -17,8 +17,8 @@ import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 public abstract class AbstractTsvMessagerConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
-	public AbstractTsvMessagerConverter() {
-		super(UniProtMediaType.TSV_MEDIA_TYPE);
+    public AbstractTsvMessagerConverter(Class<T> messageConverterEntryClass) {
+        super(UniProtMediaType.TSV_MEDIA_TYPE, messageConverterEntryClass);
 	}
 
 	abstract protected List<String> entry2TsvStrings(T entity);

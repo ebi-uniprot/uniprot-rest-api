@@ -2,15 +2,16 @@ package uk.ac.ebi.uniprot.api.proteome.controller;
 
 import static org.mockito.Mockito.mock;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.core.CoreContainer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
@@ -18,8 +19,6 @@ import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.indexer.SolrDataStoreManager;
-import uk.ac.ebi.uniprot.indexer.proteome.ProteomeEntryConverter;
-import uk.ac.ebi.uniprot.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import uk.ac.ebi.uniprot.search.SolrCollection;
 
 /**
@@ -45,7 +44,10 @@ public class ProteomeDataStoreTestConfig {
     @Bean("proteome")
     @Profile("proteome_offline")
     public SolrClient proteomeSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
-        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(SolrCollection.proteome);
+    	 CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
+         container.load();
+     	
+        ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.proteome);
         addStoreInfoProteome(dataStoreManager, solrClient, DataStoreManager.StoreType.PROTEOME );
         return solrClient;
     }

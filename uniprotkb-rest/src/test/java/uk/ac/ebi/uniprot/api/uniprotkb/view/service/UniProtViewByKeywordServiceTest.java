@@ -39,7 +39,8 @@ class UniProtViewByKeywordServiceTest {
 		mockKeywordService();
 		service = new UniProtViewByKeywordService( solrClient, "uniprot", keywordService);
 	 }
-	@Test
+
+    @Test
 	void test()  throws IOException, SolrServerException {
 		Map<String, Long> counts = new HashMap<>();
 		counts.put("KW-0128", 5l);
