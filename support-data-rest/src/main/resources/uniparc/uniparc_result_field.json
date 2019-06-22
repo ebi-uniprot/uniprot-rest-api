@@ -52,7 +52,7 @@
 			},
 			{
 				"label": "UniProtKB",
-				"name": "accessions"
+				"name": "accession"
 			}
 		]
 	},

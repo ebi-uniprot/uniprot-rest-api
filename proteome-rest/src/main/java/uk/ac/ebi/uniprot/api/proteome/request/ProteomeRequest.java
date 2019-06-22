@@ -44,7 +44,7 @@ public class ProteomeRequest implements SearchRequest{
 	    @Positive(message = "{search.positive}")
 	    private int size = DEFAULT_RESULTS_SIZE;
 	    
-	    private static final String DEFAULT_FIELDS="upid,organism,organism_id,protein_count";
+	    public static final String DEFAULT_FIELDS="upid,organism,organism_id,protein_count";
 	    @Override
 	    public String getFields() {
 	    	if(Strings.isNullOrEmpty(fields)) {

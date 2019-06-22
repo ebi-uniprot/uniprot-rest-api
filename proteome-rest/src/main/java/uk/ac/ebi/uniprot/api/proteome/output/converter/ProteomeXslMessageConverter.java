@@ -2,8 +2,10 @@ package uk.ac.ebi.uniprot.api.proteome.output.converter;
 
 import uk.ac.ebi.uniprot.api.configure.proteome.ProteomeResultFields;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
+import uk.ac.ebi.uniprot.api.proteome.request.ProteomeRequest;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
+import uk.ac.ebi.uniprot.api.rest.output.converter.OutputFieldsParser;
 import uk.ac.ebi.uniprot.domain.proteome.ProteomeEntry;
 import uk.ac.ebi.uniprot.parser.tsv.proteome.ProteomeEntryMap;
 
@@ -27,7 +29,7 @@ public class ProteomeXslMessageConverter extends AbstractXslMessegerConverter<Pr
 
 	@Override
 	protected void initBefore(MessageConverterContext<ProteomeEntry> context) {
-		tlFields.set(ProteomeFieldsParser.parse(context.getFields()));
+		tlFields.set(OutputFieldsParser.parse(context.getFields(), ProteomeRequest.DEFAULT_FIELDS));
 
 	}
 

@@ -44,7 +44,7 @@ public enum UniParcResultFields {
 					});
 			this.resultFields.addAll(fields);
 			
-			this.fieldMap.put("upi", new FieldImpl("UPI", "upi"));		
+			this.fieldMap.put("upi", new FieldImpl("Entry", "upi"));		
 			this.resultFields.stream().flatMap(val -> val.getFields().stream())
 					.forEach(field -> this.fieldMap.put(field.getName(), field));
 		} catch (Exception e) {
