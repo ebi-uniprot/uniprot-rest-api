@@ -122,8 +122,17 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 	            case "upid":
 	            	value =UPID;
 	            	break;
-	            case "organism_id":
+	            case "taxonomy_id":
 	            	value ="9606";
+	            	break;
+	            case "taxonomy_name":
+	            	value ="human";
+	            	break;
+	            case "length":
+	            	value ="30";
+	            	break;
+	            case "active":
+	            	value ="true";
 	            	break;
 	        }
 	        return value;

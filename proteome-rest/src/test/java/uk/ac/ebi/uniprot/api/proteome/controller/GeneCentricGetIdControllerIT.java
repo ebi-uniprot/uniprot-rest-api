@@ -25,8 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import uk.ac.ebi.uniprot.api.proteome.ProteomeRestApplication;
-import uk.ac.ebi.uniprot.api.proteome.repository.GeneCentricFacetConfig;
-import uk.ac.ebi.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import uk.ac.ebi.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import uk.ac.ebi.uniprot.api.rest.controller.param.ContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdContentTypeParam;

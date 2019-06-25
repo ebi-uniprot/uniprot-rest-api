@@ -44,7 +44,6 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
-import uk.ac.ebi.uniprot.api.taxonomy.TaxonomyController;
 import uk.ac.ebi.uniprot.domain.DBCrossReference;
 import uk.ac.ebi.uniprot.domain.builder.DBCrossReferenceBuilder;
 import uk.ac.ebi.uniprot.domain.citation.Citation;
@@ -73,7 +72,7 @@ import uk.ac.ebi.uniprot.search.field.SearchField;
 */
 @ContextConfiguration(classes= {ProteomeDataStoreTestConfig.class, ProteomeRestApplication.class})
 @ActiveProfiles(profiles = "proteome_offline")
-@WebMvcTest(TaxonomyController.class)
+@WebMvcTest(ProteomeController.class)
 @ExtendWith(value = {SpringExtension.class, ProteomeSearchControllerIT.ProteomeSearchContentTypeParamResolver.class,
 		ProteomeSearchControllerIT.ProteomeSearchParameterResolver.class})
 public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
