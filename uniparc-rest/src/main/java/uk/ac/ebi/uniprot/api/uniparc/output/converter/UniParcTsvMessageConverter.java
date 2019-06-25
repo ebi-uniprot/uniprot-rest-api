@@ -4,15 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import uk.ac.ebi.uniprot.api.configure.proteome.ProteomeResultFields;
+import uk.ac.ebi.uniprot.api.configure.uniparc.UniParcResultFields;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractTsvMessagerConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.OutputFieldsParser;
 import uk.ac.ebi.uniprot.api.uniparc.request.UniParcRequest;
-import uk.ac.ebi.uniprot.domain.proteome.ProteomeEntry;
 import uk.ac.ebi.uniprot.domain.uniparc.UniParcEntry;
-import uk.ac.ebi.uniprot.parser.tsv.proteome.ProteomeEntryMap;
 import uk.ac.ebi.uniprot.parser.tsv.uniparc.UniParcEntryMap;
 
 /**
@@ -48,7 +46,7 @@ public class UniParcTsvMessageConverter extends AbstractTsvMessagerConverter<Uni
 	}
 
 	private String getFieldDisplayName(String field) {
-		Optional<Field> opField = ProteomeResultFields.INSTANCE.getField(field);
+		Optional<Field> opField = UniParcResultFields.INSTANCE.getField(field);
 		if (opField.isPresent())
 			return opField.get().getLabel();
 		else

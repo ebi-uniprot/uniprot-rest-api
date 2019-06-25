@@ -1,6 +1,7 @@
 package uk.ac.ebi.uniprot.api.uniparc.service;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 
 import uk.ac.ebi.uniprot.api.rest.search.AbstractSolrSortClause;
 import uk.ac.ebi.uniprot.search.field.UniParcField;
@@ -11,7 +12,7 @@ import uk.ac.ebi.uniprot.search.field.UniParcField;
  * @date: 21 Jun 2019
  *
 */
-
+@Component
 public class UniParcSortClause extends AbstractSolrSortClause {
 
 	@Override

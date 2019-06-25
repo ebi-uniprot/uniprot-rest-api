@@ -46,7 +46,7 @@ public class UniParcRequest implements SearchRequest {
 	    @Positive(message = "{search.positive}")
 	    private int size = DEFAULT_RESULTS_SIZE;
 
-	    public static final String DEFAULT_FIELDS="upd,organism,accession,first_seen,last_seen,length";
+	    public static final String DEFAULT_FIELDS="upi,organism,accession,first_seen,last_seen,length";
 	    @Override
 	    public String getFields() {
 	    	if(Strings.isNullOrEmpty(fields)) {
