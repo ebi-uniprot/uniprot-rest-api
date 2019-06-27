@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.crossref.model;
 
+import uk.ac.ebi.uniprot.search.field.BoostValue;
 import uk.ac.ebi.uniprot.search.field.SearchField;
 import uk.ac.ebi.uniprot.search.field.SearchFieldType;
 
@@ -18,9 +19,9 @@ public enum CrossRefAllFields implements SearchField {
 
     private final Predicate<String> fieldValueValidator;
     private final SearchFieldType searchFieldType;
-    private final Float boostValue;
+    private final BoostValue boostValue;
 
-    CrossRefAllFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator, Float boostValue) {
+    CrossRefAllFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator, BoostValue boostValue) {
         this.searchFieldType = searchFieldType;
         this.fieldValueValidator = fieldValueValidator;
         this.boostValue = boostValue;
@@ -31,7 +32,7 @@ public enum CrossRefAllFields implements SearchField {
     }
 
     @Override
-    public Float getBoostValue() {
+    public BoostValue getBoostValue() {
         return this.boostValue;
     }
 

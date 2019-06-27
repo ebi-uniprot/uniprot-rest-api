@@ -5,6 +5,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
+import uk.ac.ebi.uniprot.search.field.BoostValue;
 import uk.ac.ebi.uniprot.search.field.SearchField;
 import uk.ac.ebi.uniprot.search.field.SearchFieldType;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
@@ -268,7 +269,7 @@ class QueryFieldValidatorTest {
         }
 
         @Override
-        public Float getBoostValue() {
+        public BoostValue getBoostValue() {
             return null;
         }
 
