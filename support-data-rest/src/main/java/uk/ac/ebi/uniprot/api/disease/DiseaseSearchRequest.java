@@ -1,7 +1,7 @@
 package uk.ac.ebi.uniprot.api.disease;
 
 import lombok.Data;
-import uk.ac.ebi.uniprot.api.disease.validator.DiseaseSolrQueryFieldValidator;
+import uk.ac.ebi.uniprot.api.disease.validator.DiseaseFields;
 import uk.ac.ebi.uniprot.api.disease.validator.DiseaseValidSortFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -16,7 +16,7 @@ public class DiseaseSearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = DiseaseSolrQueryFieldValidator.class)
+    @ValidSolrQueryFields(fieldValidatorClazz = DiseaseFields.class, messagePrefix = "search.disease")
     private String query;
 
     @ValidSolrSortFields(sortFieldEnumClazz = DiseaseValidSortFields.class)

@@ -1,17 +1,19 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.controller.request;
 
 import lombok.Data;
-import org.springframework.http.MediaType;
+
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.api.rest.validation.*;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
-import uk.ac.ebi.uniprot.api.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
-import uk.ac.ebi.uniprot.api.uniprotkb.validation.validator.impl.UniprotSolrQueryFieldValidator;
 import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.search.field.UniProtField;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+
+import org.springframework.http.MediaType;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,10 +35,10 @@ public class SearchRequestDTO {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = UniprotSolrQueryFieldValidator.class)
+    @ValidSolrQueryFields(fieldValidatorClazz = UniProtField.Search.class, messagePrefix = "search.uniprot")
     private String query;
 
-    @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
+    @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
     private String fields;
 
     @ValidSolrSortFields(sortFieldEnumClazz = UniProtField.Sort.class)

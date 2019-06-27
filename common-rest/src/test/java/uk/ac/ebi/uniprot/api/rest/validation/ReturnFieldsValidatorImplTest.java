@@ -4,8 +4,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-
-import uk.ac.ebi.uniprot.search.field.validator.ReturnFieldsValidator;
+import uk.ac.ebi.uniprot.search.field.ReturnField;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +74,7 @@ class ReturnFieldsValidatorImplTest {
 
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
         validator.initialize(validReturnFields);
-        boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession,ft:non_ter",null);
+        boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession", null);
         assertTrue(result);
     }
 
@@ -99,7 +98,7 @@ class ReturnFieldsValidatorImplTest {
     private ValidReturnFields getMockedValidReturnFields() {
         ValidReturnFields validReturnFields = Mockito.mock(ValidReturnFields.class);
 
-        Class<? extends ReturnFieldsValidator> returnFieldValidator = FakeReturnFieldsValidator.class;
+        Class<? extends Enum<? extends ReturnField>> returnFieldValidator = FakeReturnFieldsValidator.class;
         OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validReturnFields.fieldValidatorClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
         return validReturnFields;
@@ -128,20 +127,19 @@ class ReturnFieldsValidatorImplTest {
     }
 
     /**
-     *  this class is responsible to fake ReturnFieldsValidator to help with tests.
+     *  this class is responsible to fake ReturnField to help with tests.
      *
      */
-    private static class FakeReturnFieldsValidator implements ReturnFieldsValidator{
+    private enum FakeReturnFieldsValidator implements ReturnField {
+        gene_primary, gene_names, kinetics, reviewed, accession;
 
         FakeReturnFieldsValidator(){
-            super();
-        }
 
-        List<String> fakeValidField = Arrays.asList("gene_primary","gene_names","kinetics","reviewed","accession","ft:non_ter");
+        }
 
         @Override
-        public boolean hasValidReturnField(String fieldName) {
-            return fakeValidField.contains(fieldName);
-        }
-    }
+        public boolean hasReturnField(String fieldName) {
+            return Arrays.stream(FakeReturnFieldsValidator.values())
+                    .anyMatch(returnItem -> returnItem.name().equalsIgnoreCase(fieldName));
+        }}
 }

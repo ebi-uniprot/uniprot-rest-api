@@ -1,22 +1,17 @@
 package uk.ac.ebi.uniprot.api.configure.proteome;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldGroupImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.JsonConfig;
+import uk.ac.ebi.uniprot.search.field.ReturnField;
+
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -25,7 +20,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.JsonConfig;
  *
  */
 
-public enum ProteomeResultFields {
+public enum ProteomeResultFields implements ReturnField {
 	INSTANCE;
 	private static final String FILENAME = "proteome/proteome_result_field.json";
 	private List<FieldGroup> resultFields = new ArrayList<>();
@@ -69,4 +64,7 @@ public enum ProteomeResultFields {
 		return resultFields.stream().map(val -> val.toString()).collect(Collectors.joining(",\n"));
 	}
 
-}
+	@Override
+	public boolean hasReturnField(String fieldName) {
+		return INSTANCE.getField(fieldName).isPresent();
+	}}

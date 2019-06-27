@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.FileType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
@@ -17,7 +18,6 @@ import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.UniProtEntryService;
-import uk.ac.ebi.uniprot.api.uniprotkb.validation.validator.impl.UniprotReturnFieldsValidator;
 import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.domain.uniprot.InactiveReasonType;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
@@ -81,7 +81,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             @PathVariable("accession")
             @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE},
                     message = "{search.invalid.accession.value}") String accession,
-            @ValidReturnFields(fieldValidatorClazz = UniprotReturnFieldsValidator.class)
+            @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
             @RequestParam(value = "fields", required = false) String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
 

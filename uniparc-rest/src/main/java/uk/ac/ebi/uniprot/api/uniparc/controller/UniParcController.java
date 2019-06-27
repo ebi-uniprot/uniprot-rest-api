@@ -32,12 +32,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 
 import io.swagger.annotations.Api;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
+import uk.ac.ebi.uniprot.api.configure.uniparc.UniParcResultFields;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.api.uniparc.request.UniParcRequest;
-import uk.ac.ebi.uniprot.api.uniparc.request.UniParcReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.uniparc.service.UniParcQueryService;
 import uk.ac.ebi.uniprot.domain.uniparc.UniParcEntry;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
@@ -80,7 +80,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 	public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpId(
 			@PathVariable("upi") @Pattern(regexp = FieldValueValidator.UNIPARC_UPI_REX, flags = {
 					Pattern.Flag.CASE_INSENSITIVE }, message = "{search.invalid.upi.value}") String upi,
-		@ValidReturnFields(fieldValidatorClazz = UniParcReturnFieldsValidator.class) 
+	         @ValidReturnFields(fieldValidatorClazz = UniParcResultFields.class)
 			@RequestParam(value = "fields", required = false) String fields,
 			@RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType) {
 		UniParcEntry entry = queryService.getById(upi);

@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.keyword.request.KeywordRequestDTO;
-import uk.ac.ebi.uniprot.api.keyword.request.KeywordReturnFieldsValidator;
 import uk.ac.ebi.uniprot.api.keyword.service.KeywordService;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
+import uk.ac.ebi.uniprot.search.field.KeywordField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +48,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(@PathVariable("keywordId")
                                                                          @Pattern(regexp = KEYWORD_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.keyword.invalid.id}")
                                                                                  String keywordId,
-                                                                         @ValidReturnFields(fieldValidatorClazz = KeywordReturnFieldsValidator.class)
+                                                                                 @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
                                                                          @RequestParam(value = "fields", required = false)
                                                                                  String fields,
                                                                          @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)

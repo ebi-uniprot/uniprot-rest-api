@@ -1,10 +1,10 @@
 package uk.ac.ebi.uniprot.api.rest.validation;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.slf4j.Logger;
 import uk.ac.ebi.uniprot.common.Utils;
-import uk.ac.ebi.uniprot.search.field.validator.ReturnFieldsValidator;
+import uk.ac.ebi.uniprot.search.field.ReturnField;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -14,8 +14,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import static org.slf4j.LoggerFactory.getLogger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This Return Fields Constraint Validator class is responsible to verify
@@ -30,7 +30,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidReturnFields {
 
-    Class<? extends ReturnFieldsValidator> fieldValidatorClazz();
+    Class<? extends Enum<? extends ReturnField>> fieldValidatorClazz();
 
     String message() default "{search.invalid.return.field}";
 
@@ -39,17 +39,24 @@ public @interface ValidReturnFields {
     Class<? extends Payload>[] payload() default {};
 
 
+    @Slf4j
     class ReturnFieldsValidatorImpl implements ConstraintValidator<ValidReturnFields, String> {
 
-        private static final Logger LOGGER = getLogger(ReturnFieldsValidatorImpl.class);
-        private ReturnFieldsValidator fieldValidator;
+        private List<ReturnField> returnFieldList;
 
         @Override
         public void initialize(ValidReturnFields constraintAnnotation) {
             try {
-                fieldValidator = constraintAnnotation.fieldValidatorClazz().newInstance();
+                returnFieldList = new ArrayList<>();
+                Class<? extends Enum<? extends ReturnField>> enumClass = constraintAnnotation.fieldValidatorClazz();
+
+                Enum[] enumValArr = enumClass.getEnumConstants();
+
+                for (Enum enumVal : enumValArr) {
+                    returnFieldList.add((ReturnField) enumVal);
+                }
             } catch (Exception e) {
-                LOGGER.error("Error initializing ReturnFieldsValidator", e);
+                log.error("Error initializing ReturnFieldsValidator", e);
             }
         }
 
@@ -60,7 +67,7 @@ public @interface ValidReturnFields {
                 ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
                 String[] fieldList = value.split("\\s*,\\s*");
                 for (String field : fieldList) {
-                    if (!fieldValidator.hasValidReturnField(field)) {
+                    if (!hasValidReturnField(field)) {
                         buildErrorMessage(field, contextImpl);
                         isValid = false;
                     }
@@ -80,6 +87,11 @@ public @interface ValidReturnFields {
             String errorMessage = "{search.invalid.return.field}";
             contextImpl.addMessageParameter("0", field);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        private boolean hasValidReturnField(String fieldName) {
+            return returnFieldList.stream()
+                    .anyMatch(returnField -> returnField.hasReturnField(fieldName));
         }
     }
 }

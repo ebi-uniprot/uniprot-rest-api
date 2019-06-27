@@ -5,9 +5,8 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-
+import uk.ac.ebi.uniprot.search.field.SearchField;
 import uk.ac.ebi.uniprot.search.field.SearchFieldType;
-import uk.ac.ebi.uniprot.search.field.validator.SolrQueryFieldValidator;
 import uk.ac.ebi.uniprot.search.field.validator.FieldValueValidator;
 
 import javax.validation.ConstraintValidatorContext;
@@ -188,7 +187,7 @@ class QueryFieldValidatorTest {
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
         ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
 
-        Class<? extends SolrQueryFieldValidator> returnFieldValidator = FakeSolrQueryFieldValidator.class;
+        Class<? extends SearchField> returnFieldValidator = FakeSearchFields.class;
         OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validReturnFields.fieldValidatorClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
         return validReturnFields;
@@ -236,89 +235,53 @@ class QueryFieldValidatorTest {
     }
 
     /**
-     * this class is responsible to fake UniprotSolrQueryFieldValidator to help tests
+     * this enum is responsible to fake SearchField to help tests
      */
-    static class FakeSolrQueryFieldValidator implements SolrQueryFieldValidator{
 
-        enum FakeSearchFields {
-            active(SearchFieldType.TERM,FieldValueValidator::isBooleanValue),
-            accession(SearchFieldType.TERM, FieldValueValidator::isAccessionValid),
-            organism_id(SearchFieldType.TERM, null),
-            organism_name(SearchFieldType.TERM, null),
-            taxonomy_id(SearchFieldType.TERM, FieldValueValidator::isNumberValue),
-            gene(SearchFieldType.TERM,null),
-            cc_bpcp_kinetics(SearchFieldType.TERM,null),
-            ccev_bpcp_kinetics(SearchFieldType.TERM,null),
-            proteome(SearchFieldType.TERM,FieldValueValidator::isProteomeIdValue);
 
-            private final Predicate<String> fieldValueValidator;
-            private final SearchFieldType searchFieldType;
+    enum FakeSearchFields implements SearchField {
+        active(SearchFieldType.TERM, FieldValueValidator::isBooleanValue),
+        accession(SearchFieldType.TERM, FieldValueValidator::isAccessionValid),
+        organism_id(SearchFieldType.TERM, null),
+        organism_name(SearchFieldType.TERM, null),
+        taxonomy_id(SearchFieldType.TERM, FieldValueValidator::isNumberValue),
+        gene(SearchFieldType.TERM, null),
+        cc_bpcp_kinetics(SearchFieldType.TERM, null),
+        ccev_bpcp_kinetics(SearchFieldType.TERM, null),
+        proteome(SearchFieldType.TERM, FieldValueValidator::isProteomeIdValue);
 
-            FakeSearchFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator){
-                this.searchFieldType = searchFieldType;
-                this.fieldValueValidator  = fieldValueValidator;
-            }
+        private final Predicate<String> fieldValueValidator;
+        private final SearchFieldType searchFieldType;
 
-            public Predicate<String> getFieldValueValidator(){
-                return this.fieldValueValidator;
-            }
-
-            public SearchFieldType getSearchFieldType(){
-                return this.searchFieldType;
-            }
+        FakeSearchFields() {
+            this.searchFieldType = null;
+            this.fieldValueValidator = null;
         }
 
-            @Override
-        public boolean hasField(String fieldName) {
-            boolean result = true;
-            try{
-                FakeSearchFields.valueOf(fieldName);
-            } catch (Exception e){
-                result = false;
-            }
-            return result;
+        FakeSearchFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator) {
+            this.searchFieldType = searchFieldType;
+            this.fieldValueValidator = fieldValueValidator;
+        }
+
+        public Predicate<String> getFieldValueValidator() {
+            return this.fieldValueValidator;
         }
 
         @Override
-        public String getInvalidFieldErrorMessage(String fieldName) {
-            return "{invalid.field}";
+        public Float getBoostValue() {
+            return null;
         }
 
         @Override
-        public boolean hasValidFieldType(String fieldName, SearchFieldType searchFieldType) {
-            FakeSearchFields search = FakeSearchFields.valueOf(fieldName);
-            return search.getSearchFieldType().equals(searchFieldType);
+        public String getName() {
+            return this.name();
         }
 
         @Override
-        public String getInvalidFieldTypeErrorMessage(String fieldName, SearchFieldType searchFieldType) {
-            return "{invalid.type}";
-        }
-
-        @Override
-        public SearchFieldType getExpectedSearchFieldType(String fieldName) {
-            return FakeSearchFields.valueOf(fieldName).getSearchFieldType();
-        }
-
-        @Override
-        public boolean hasValidFieldValue(String fieldName, String value) {
-            FakeSearchFields search = FakeSearchFields.valueOf(fieldName);
-            Predicate<String> fieldValueValidator = search.getFieldValueValidator();
-            if(fieldValueValidator != null) {
-                try {
-                    return fieldValueValidator.test(value);
-                }catch (Exception e){
-                    return false;
-                }
-            } else {
-                return true;
-            }
-        }
-
-        @Override
-        public String getInvalidFieldValueErrorMessage(String fieldName, String value) {
-            return "{invalid.value}";
+        public SearchFieldType getSearchFieldType() {
+            return this.searchFieldType;
         }
     }
+
 
 }

@@ -17,6 +17,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldGroupImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.JsonConfig;
+import uk.ac.ebi.uniprot.search.field.ReturnField;
 
 /**
  *
@@ -25,7 +26,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.JsonConfig;
  *
 */
 
-public enum UniParcResultFields {
+public enum UniParcResultFields implements ReturnField {
 	INSTANCE;
 	private static final String FILENAME = "uniparc/uniparc_result_field.json";
 	private List<FieldGroup> resultFields = new ArrayList<>();
@@ -67,6 +68,11 @@ public enum UniParcResultFields {
 	@Override
 	public String toString() {
 		return resultFields.stream().map(val -> val.toString()).collect(Collectors.joining(",\n"));
+	}
+
+	@Override
+	public boolean hasReturnField(String fieldName) {
+		return INSTANCE.getField(fieldName).isPresent();
 	}
 }
 

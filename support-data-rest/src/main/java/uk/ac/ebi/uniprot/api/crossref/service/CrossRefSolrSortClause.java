@@ -10,7 +10,7 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
-        Sort defaultSort = new Sort(Sort.Direction.ASC, CrossRefAllFields.ACCESSION.getSolrFieldName());
+        Sort defaultSort = new Sort(Sort.Direction.ASC, CrossRefAllFields.accession.getName());
 
         if (hasScore) {
             defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
@@ -21,7 +21,7 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return CrossRefAllFields.ACCESSION.getSolrFieldName();
+        return CrossRefAllFields.accession.getName();
     }
 
     @Override

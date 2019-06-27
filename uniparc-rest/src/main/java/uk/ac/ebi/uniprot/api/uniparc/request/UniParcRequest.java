@@ -6,6 +6,7 @@ import javax.validation.constraints.Positive;
 import com.google.common.base.Strings;
 
 import lombok.Data;
+import uk.ac.ebi.uniprot.api.configure.uniparc.UniParcResultFields;
 import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
 import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
@@ -27,7 +28,7 @@ public class UniParcRequest implements SearchRequest {
 
 	    @NotNull(message = "{search.required}")
 	    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-	    @ValidSolrQueryFields(fieldValidatorClazz = UniParcSolrQueryFieldValidator.class)
+     @ValidSolrQueryFields(fieldValidatorClazz = UniParcField.Search.class, messagePrefix = "search.uniparc")
 	    private String query;
 
 	    @ValidSolrSortFields(sortFieldEnumClazz = UniParcField.Sort.class)
@@ -35,7 +36,7 @@ public class UniParcRequest implements SearchRequest {
 
 	    private String cursor;
 	    
-	    @ValidReturnFields(fieldValidatorClazz = UniParcReturnFieldsValidator.class)
+	    @ValidReturnFields(fieldValidatorClazz = UniParcResultFields.class)
 	    private String fields;
 
 	    @ValidFacets(facetConfig = UniParcFacetConfig.class)
