@@ -33,6 +33,7 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdParameter;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
+import uk.ac.ebi.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import uk.ac.ebi.uniprot.domain.DBCrossReference;
 import uk.ac.ebi.uniprot.domain.builder.DBCrossReferenceBuilder;
 import uk.ac.ebi.uniprot.domain.citation.Citation;
@@ -57,7 +58,7 @@ import uk.ac.ebi.uniprot.search.document.proteome.ProteomeDocument;
  * @date: 12 Jun 2019
  *
 */
-@ContextConfiguration(classes= {ProteomeDataStoreTestConfig.class, ProteomeRestApplication.class})
+@ContextConfiguration(classes= {ProteomeDataStoreTestConfig.class, ProteomeRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "proteome_offline")
 @WebMvcTest(ProteomeController.class)
 @ExtendWith(value = {SpringExtension.class, ProteomeGetIdControllerIT.ProteomeGetIdParameterResolver.class,

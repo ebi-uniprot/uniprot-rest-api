@@ -42,6 +42,7 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
+import uk.ac.ebi.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import uk.ac.ebi.uniprot.domain.proteome.CanonicalProtein;
 import uk.ac.ebi.uniprot.domain.proteome.Protein;
 import uk.ac.ebi.uniprot.domain.proteome.builder.CanonicalProteinBuilder;
@@ -60,7 +61,7 @@ import uk.ac.ebi.uniprot.search.field.SearchField;
  * @date: 17 Jun 2019
  *
  */
-@ContextConfiguration(classes = { GeneCentriDataStoreTestConfig.class, ProteomeRestApplication.class })
+@ContextConfiguration(classes = { GeneCentriDataStoreTestConfig.class, ProteomeRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "genecentric_offline")
 @WebMvcTest(GeneCentricController.class)
 @ExtendWith(value = { SpringExtension.class, GeneCentricSearchControllerIT.GeneCentricSearchParameterResolver.class,

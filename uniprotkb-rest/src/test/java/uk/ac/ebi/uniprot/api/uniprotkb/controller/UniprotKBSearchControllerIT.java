@@ -27,6 +27,7 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
+import uk.ac.ebi.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.UniProtKBREST;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
@@ -65,7 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static uk.ac.ebi.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniprotKBController.class)
