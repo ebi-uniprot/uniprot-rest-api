@@ -27,7 +27,7 @@ public class ErrorHandlerConfig {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource bean = new ReloadableResourceBundleMessageSource();
-        bean.addBasenames("classpath:org.hibernate.validator.ValidationMessages", "classpath:message");
+        bean.addBasenames("classpath:org.hibernate.validator.ValidationMessages", "classpath:message", "classpath:common-message.properties");
         bean.setDefaultEncoding("UTF-8");
         return bean;
     }
