@@ -167,6 +167,33 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.uniprot</groupId>
+            <artifactId>uniprot-indexer-integration-test</artifactId>
+            <version>${uniprot-search.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- REST API documentation, see:
+        https://github.com/BerkleyTechnologyServices/restdocs-spec and
+        https://github.com/BerkleyTechnologyServices/restdocs-spec-example/blob/master/pom.xml -->
+        <dependency>
+            <groupId>org.springframework.restdocs</groupId>
+            <artifactId>spring-restdocs-mockmvc</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.epages</groupId>
+            <artifactId>restdocs-api-spec</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.epages</groupId>
+            <artifactId>restdocs-api-spec-mockmvc</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -212,6 +239,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.berkleytechnologyservices.restdocs-spec</groupId>
+                <artifactId>restdocs-spec-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

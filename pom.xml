@@ -24,6 +24,9 @@
         <java.version>1.8</java.version>
         <jacoco.version>0.7.8</jacoco.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+        <restdocs-spec.version>0.15</restdocs-spec.version>
+        <asciidoctor.version>1.5.8</asciidoctor.version>
+        <restdocs-api-spec.version>0.9.4</restdocs-api-spec.version>
 
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
         <http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
@@ -118,6 +121,20 @@
                         <artifactId>woodstox-core-asl</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.epages</groupId>
+                <artifactId>restdocs-api-spec</artifactId>
+                <version>${restdocs-api-spec.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.epages</groupId>
+                <artifactId>restdocs-api-spec-mockmvc</artifactId>
+                <version>${restdocs-api-spec.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -307,6 +324,21 @@
                     <version>${maven-jar-plugin.version}</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>com.github.berkleytechnologyservices.restdocs-spec</groupId>
+                    <artifactId>restdocs-spec-maven-plugin</artifactId>
+                    <version>${restdocs-spec.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <specification>OPENAPI_V3</specification>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -349,6 +381,10 @@
             </snapshots>
         </repository>
         <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+        <repository>
             <id>uniprot-artifactory-release</id>
             <name>UniProt Artifactory for Releases</name>
             <releases>
@@ -386,6 +422,10 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com</url>
         </pluginRepository>
         <pluginRepository>
             <id>uniprot-artifactory-snapshots</id>
