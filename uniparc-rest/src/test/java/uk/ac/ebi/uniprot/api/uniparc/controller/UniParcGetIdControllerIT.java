@@ -33,6 +33,7 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.GetIdParameter;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
+import uk.ac.ebi.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import uk.ac.ebi.uniprot.api.uniparc.UniParcRestApplication;
 import uk.ac.ebi.uniprot.domain.Location;
 import uk.ac.ebi.uniprot.domain.Property;
@@ -62,7 +63,7 @@ import uk.ac.ebi.uniprot.search.document.uniparc.UniParcDocument.UniParcDocument
  * @date: 25 Jun 2019
  *
 */
-@ContextConfiguration(classes= {UniParcDataStoreTestConfig.class, UniParcRestApplication.class})
+@ContextConfiguration(classes= {UniParcDataStoreTestConfig.class, UniParcRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcController.class)
 @ExtendWith(value = {SpringExtension.class, UniParcGetIdControllerIT.UniParcGetIdParameterResolver.class,

@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-import uk.ac.ebi.uniprot.api.common.config.CommonConfig;
 import uk.ac.ebi.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import uk.ac.ebi.uniprot.api.rest.respository.RepositoryConfig;
+import uk.ac.ebi.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 
 /**
  *
@@ -18,7 +18,7 @@ import uk.ac.ebi.uniprot.api.rest.respository.RepositoryConfig;
 
 
 @SpringBootApplication
-@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, CommonConfig.class})
+@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
 @ComponentScan(basePackages = {"uk.ac.ebi.uniprot.api.proteome","uk.ac.ebi.uniprot.api.rest"})
 public class ProteomeRestApplication {
 	public static void main(String[] args) {
