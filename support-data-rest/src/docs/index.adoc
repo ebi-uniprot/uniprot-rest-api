@@ -1,0 +1,34 @@
+= Keyword API
+Version {project-version}
+:toc: left
+:toclevels: 3
+
+Provides services to access UniProt keyword information.
+
+[[resources]]
+== Resources
+
+[[resources-keyword-get-by-id]]
+=== Get by ID
+A `GET` request is used to retrieve a keyword object.
+
+==== Successful request
+
+operation::get-keyword-by-id[snippets='curl-request,path-parameters,response-fields,http-response']
+
+==== Unsuccessful request
+
+operation::get-keyword-by-id-not-found[snippets='curl-request,path-parameters,response-fields,http-response']
+
+---
+
+[[resources-keyword-search]]
+=== Search
+
+A `GET` request is used to search over the keyword domain.
+
+---
+
+[[resources-keyword-download]]
+=== Download
+A `GET` request is used to download the data associated with a search.
