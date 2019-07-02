@@ -122,6 +122,8 @@ class UniProtResultFieldsTest {
 				.forEach(System.out::println);
 	}
 
+	@Test
+	@Disabled
 	void testDatabaseFieldSize() {
 		List<FieldGroup> groups = instance.getDatabaseFields();
 		assertEquals(19, groups.size());
@@ -146,6 +148,7 @@ class UniProtResultFieldsTest {
 		verifyGroupSize(groups, "PRM", 0);
 	}
 
+	@Test
 	void testDatabaseField() {
 		List<FieldGroup> groups = instance.getDatabaseFields();
 		assertEquals(19, groups.size());

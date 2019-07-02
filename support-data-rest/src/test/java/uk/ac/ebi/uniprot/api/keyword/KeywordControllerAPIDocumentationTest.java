@@ -134,6 +134,7 @@ class KeywordControllerAPIDocumentationTest {
                 .andDo(document(identifier,
                                 resourceDetails()
                                         .description("Find keywords that match a search query"),
+                                // check this https://github.com/ePages-de/restdocs-api-spec/blob/master/samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/ProductRestIntegrationTest.java
                                 requestParameters(
                                         parameterWithName("query").description("the query")
                                         .attributes(key("constraints").value("some constraint"))
