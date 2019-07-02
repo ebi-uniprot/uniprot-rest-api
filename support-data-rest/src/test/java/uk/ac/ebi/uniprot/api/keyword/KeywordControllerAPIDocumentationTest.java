@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.keyword;
 
+import com.epages.restdocs.apispec.ConstrainedFields;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.ac.ebi.uniprot.api.DataStoreTestConfig;
+import uk.ac.ebi.uniprot.api.keyword.request.KeywordRequestDTO;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
 import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordEntryImpl;
@@ -33,10 +35,9 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resour
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -119,8 +120,10 @@ class KeywordControllerAPIDocumentationTest {
     }
 
     @Test
-    void getAKeywordsBySearch() throws Exception {
+    void getKeywordsBySearch() throws Exception {
         String identifier = "get-keyword-by-search";
+
+        ConstrainedFields fields = new ConstrainedFields(KeywordRequestDTO.class);
 
         saveEntry();
         this.mockMvc.perform(get("/keyword/search")
@@ -130,17 +133,14 @@ class KeywordControllerAPIDocumentationTest {
                 .andExpect(status().isOk())
                 .andDo(document(identifier,
                                 resourceDetails()
-                                        .description("Get a keyword entry by ID, which does not exist"),
-                                pathParameters(
-                                        parameterWithName("keywordId").description("the keyword id")
+                                        .description("Find keywords that match a search query"),
+                                requestParameters(
+                                        parameterWithName("query").description("the query")
+                                        .attributes(key("constraints").value("some constraint"))
                                 ),
                                 responseFields(
-                                        fieldWithPath("keyword.id").description("the keyword identifier"),
-                                        fieldWithPath("keyword.accession").description("the keyword accession"),
-                                        fieldWithPath("definition")
-                                                .description("the keyword definition"),
-                                        fieldWithPath("category.id").description("the keyword category identifier"),
-                                        fieldWithPath("category.accession").description("the keyword category accession")
+                                        subsectionWithPath("results").description("A list of `keyword` objects matching the search query."),
+                                        subsectionWithPath("facets").description("A list of facets matching the search query.")
                                 )));
     }
 
