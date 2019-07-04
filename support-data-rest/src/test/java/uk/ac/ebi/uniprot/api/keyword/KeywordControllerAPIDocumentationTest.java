@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.api.keyword;
 
-import com.epages.restdocs.apispec.ConstrainedFields;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
+import org.springframework.restdocs.constraints.ResourceBundleConstraintDescriptionResolver;
+import org.springframework.restdocs.constraints.ValidatorConstraintResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -29,6 +31,7 @@ import uk.ac.ebi.uniprot.json.parser.keyword.KeywordJsonConfig;
 import uk.ac.ebi.uniprot.search.document.keyword.KeywordDocument;
 
 import java.nio.ByteBuffer;
+import java.util.ResourceBundle;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resourceDetails;
@@ -37,6 +40,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.attributes;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -123,7 +127,9 @@ class KeywordControllerAPIDocumentationTest {
     void getKeywordsBySearch() throws Exception {
         String identifier = "get-keyword-by-search";
 
-        ConstrainedFields fields = new ConstrainedFields(KeywordRequestDTO.class);
+        ConstraintDescriptions keywordConstraints = new ConstraintDescriptions(KeywordRequestDTO.class, new ValidatorConstraintResolver(),
+                new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("constraint-descriptor")));
+
 
         saveEntry();
         this.mockMvc.perform(get("/keyword/search")
@@ -135,9 +141,9 @@ class KeywordControllerAPIDocumentationTest {
                                 resourceDetails()
                                         .description("Find keywords that match a search query"),
                                 // check this https://github.com/ePages-de/restdocs-api-spec/blob/master/samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/ProductRestIntegrationTest.java
-                                requestParameters(
+                        requestParameters(attributes(key("title").value("There we go!!!")),
                                         parameterWithName("query").description("the query")
-                                        .attributes(key("constraints").value("some constraint"))
+                                                .attributes(key("constraints").value(keywordConstraints.descriptionsForProperty("query")))
                                 ),
                                 responseFields(
                                         subsectionWithPath("results").description("A list of `keyword` objects matching the search query."),

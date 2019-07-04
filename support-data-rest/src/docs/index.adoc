@@ -27,7 +27,7 @@ operation::get-keyword-by-id-not-found[snippets='curl-request,path-parameters,re
 
 A `GET` request is used to search over the keyword domain.
 
-operation::get-keyword-by-search[snippets='curl-request,path-parameters,response-fields,http-response']
+operation::get-keyword-by-search[snippets='curl-request,request-parameters,response-fields,http-response']
 
 ---
 
