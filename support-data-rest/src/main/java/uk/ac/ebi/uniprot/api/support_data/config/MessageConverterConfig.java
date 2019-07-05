@@ -10,6 +10,8 @@ import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordXlsMessageConverter;
+import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureJsonMessageConverter;
+import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureXlsMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ListMessageConverter;
 import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyJsonMessageConverter;
@@ -46,6 +48,10 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ListMessageConverter());
+
+                converters.add(new LiteratureXlsMessageConverter());
+                converters.add(new LiteratureXlsMessageConverter());
+                converters.add(0, new LiteratureJsonMessageConverter());
 
                 converters.add(new TaxonomyXlsMessageConverter());
                 converters.add(new TaxonomyTsvMessageConverter());

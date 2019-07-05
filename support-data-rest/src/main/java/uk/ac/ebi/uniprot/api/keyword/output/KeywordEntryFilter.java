@@ -1,6 +1,5 @@
 package uk.ac.ebi.uniprot.api.keyword.output;
 
-import com.google.common.base.Strings;
 import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
 import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordEntryImpl;
@@ -19,7 +18,7 @@ public class KeywordEntryFilter {
     private static final String COMMA = "\\s*,\\s*";
 
     public static List<String> parse(String fields) {
-        if (Strings.isNullOrEmpty(fields)) {
+        if (Utils.notEmpty(fields)) {
             fields = DEFAULT_FIELDS;
         }
         return Arrays.asList(fields.split(COMMA));
