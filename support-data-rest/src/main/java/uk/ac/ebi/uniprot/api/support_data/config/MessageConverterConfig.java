@@ -11,6 +11,7 @@ import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordJsonMessageConverte
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordXlsMessageConverter;
 import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureJsonMessageConverter;
+import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureXlsMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ListMessageConverter;
@@ -50,7 +51,7 @@ public class MessageConverterConfig {
                 converters.add(new ListMessageConverter());
 
                 converters.add(new LiteratureXlsMessageConverter());
-                converters.add(new LiteratureXlsMessageConverter());
+                converters.add(new LiteratureTsvMessageConverter());
                 converters.add(0, new LiteratureJsonMessageConverter());
 
                 converters.add(new TaxonomyXlsMessageConverter());

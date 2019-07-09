@@ -46,6 +46,9 @@ public class DataStoreTestConfig {
         solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.keyword);
         dataStoreManager.addSolrClient(DataStoreManager.StoreType.KEYWORD, solrClient);
 
+        solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.literature);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.LITERATURE, solrClient);
+
         return solrClient;
     }
 
@@ -64,9 +67,5 @@ public class DataStoreTestConfig {
                 return solrQuery;
             }
         };
-    }
-
-    private void addStoreInfo(DataStoreManager dsm, ClosableEmbeddedSolrClient taxonomySolrClient) throws URISyntaxException {
-        dsm.addSolrClient(DataStoreManager.StoreType.TAXONOMY, taxonomySolrClient);
     }
 }

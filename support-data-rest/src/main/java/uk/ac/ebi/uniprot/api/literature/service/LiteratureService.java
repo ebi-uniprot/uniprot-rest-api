@@ -3,7 +3,8 @@ package uk.ac.ebi.uniprot.api.literature.service;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
-import uk.ac.ebi.uniprot.api.literature.LiteratureRepository;
+import uk.ac.ebi.uniprot.api.literature.repository.LiteratureFacetConfig;
+import uk.ac.ebi.uniprot.api.literature.repository.LiteratureRepository;
 import uk.ac.ebi.uniprot.api.literature.request.LiteratureRequestDTO;
 import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
 import uk.ac.ebi.uniprot.domain.literature.LiteratureEntry;
@@ -22,11 +23,13 @@ public class LiteratureService {
     private final BasicSearchService<LiteratureEntry, LiteratureDocument> basicService;
     private final DefaultSearchHandler defaultSearchHandler;
     private final LiteratureSortClause literatureSortClause;
+    private final LiteratureFacetConfig facetConfig;
 
-    public LiteratureService(LiteratureRepository repository) {
+    public LiteratureService(LiteratureRepository repository, LiteratureFacetConfig facetConfig) {
         this.basicService = new BasicSearchService<>(repository, new LiteratureEntryConverter());
         this.defaultSearchHandler = new DefaultSearchHandler(LiteratureField.Search.content, LiteratureField.Search.id, LiteratureField.Search.getBoostFields());
         this.literatureSortClause = new LiteratureSortClause();
+        this.facetConfig = facetConfig;
     }
 
     public LiteratureEntry findById(final String literatureId) {
@@ -34,12 +37,12 @@ public class LiteratureService {
     }
 
     public QueryResult<LiteratureEntry> search(LiteratureRequestDTO request) {
-        SolrRequest solrRequest = basicService.createSolrRequest(request, null, literatureSortClause, defaultSearchHandler);
+        SolrRequest solrRequest = basicService.createSolrRequest(request, facetConfig, literatureSortClause, defaultSearchHandler);
         return basicService.search(solrRequest, request.getCursor(), request.getSize());
     }
 
     public Stream<LiteratureEntry> download(LiteratureRequestDTO request) {
-        SolrRequest solrRequest = basicService.createSolrRequest(request, null, literatureSortClause, defaultSearchHandler);
+        SolrRequest solrRequest = basicService.createSolrRequest(request, facetConfig, literatureSortClause, defaultSearchHandler);
         return basicService.download(solrRequest);
     }
 }

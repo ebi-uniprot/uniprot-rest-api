@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
@@ -32,6 +33,9 @@ import static uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextF
  * @author lgonzales
  * @since 2019-07-04
  */
+@RestController
+@RequestMapping("/literature")
+@Validated
 public class LiteratureController extends BasicSearchController<LiteratureEntry> {
 
     private final LiteratureService literatureService;
@@ -86,7 +90,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
 
     @Override
     protected String getEntityId(LiteratureEntry entity) {
-        return entity.getPubmedId();
+        return String.valueOf(entity.getPubmedId());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.literature;
+package uk.ac.ebi.uniprot.api.literature.repository;
 
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,8 +14,8 @@ import uk.ac.ebi.uniprot.search.document.literature.LiteratureDocument;
 @Repository
 public class LiteratureRepository extends SolrQueryRepository<LiteratureDocument> {
 
-    protected LiteratureRepository(SolrTemplate solrTemplate, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.literature, LiteratureDocument.class, null, requestConverter);
+    protected LiteratureRepository(SolrTemplate solrTemplate, LiteratureFacetConfig facetConverter, SolrRequestConverter requestConverter) {
+        super(solrTemplate, SolrCollection.literature, LiteratureDocument.class, facetConverter, requestConverter);
     }
 
 }

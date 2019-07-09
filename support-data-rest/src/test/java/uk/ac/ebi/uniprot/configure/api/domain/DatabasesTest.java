@@ -6,6 +6,9 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.DatabaseGroup;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Tuple;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.Databases;
+import uk.ac.ebi.uniprot.cv.xdb.DatabaseCategory;
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypeDetail;
+import uk.ac.ebi.uniprot.cv.xdb.UniProtXDbTypes;
 
 import java.util.List;
 import java.util.Map;
@@ -42,12 +45,19 @@ class DatabasesTest {
 	}
 
 	@Test
-	void testSize() {
+	void testHasCorrectKnownCrossReferencesSize() {
+		List<UniProtXDbTypeDetail> allKnownCrossReferences = UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
+				.filter(dbd -> !dbd.getCategory().equals(DatabaseCategory.UNKNOWN))
+				.collect(Collectors.toList());
+
 		List<DatabaseGroup> groups = instance.getDatabases();
 		assertEquals(20, groups.size());
-		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
-        assertEquals(156, nDb);
-		instance.getDatabases().forEach(System.out::println);
+
+		List<Tuple> databaseGroupItems = groups.stream()
+				.flatMap(g -> g.getItems().stream())
+				.filter(t -> !t.getValue().equals("any"))
+				.collect(Collectors.toList());
+		assertEquals(allKnownCrossReferences.size(), databaseGroupItems.size());
 	}
 	@Test
 	void testGroup() {

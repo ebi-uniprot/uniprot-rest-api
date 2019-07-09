@@ -1,11 +1,9 @@
 package uk.ac.ebi.uniprot.api.literature.request;
 
 import lombok.Data;
+import uk.ac.ebi.uniprot.api.literature.repository.LiteratureFacetConfig;
 import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
+import uk.ac.ebi.uniprot.api.rest.validation.*;
 import uk.ac.ebi.uniprot.search.field.LiteratureField;
 
 import javax.validation.constraints.NotNull;
@@ -29,15 +27,12 @@ public class LiteratureRequestDTO implements SearchRequest {
 
     private String cursor;
 
-
     @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
     private String fields;
 
     @Positive(message = "{search.positive}")
     private int size = DEFAULT_RESULTS_SIZE;
 
-    @Override
-    public String getFacets() {
-        return "";
-    }
+    @ValidFacets(facetConfig = LiteratureFacetConfig.class)
+    private String facets;
 }
