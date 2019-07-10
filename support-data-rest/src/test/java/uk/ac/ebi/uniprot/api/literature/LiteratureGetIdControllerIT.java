@@ -21,7 +21,9 @@ import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
 import uk.ac.ebi.uniprot.domain.citation.impl.AuthorImpl;
 import uk.ac.ebi.uniprot.domain.citation.impl.PublicationDateImpl;
 import uk.ac.ebi.uniprot.domain.literature.LiteratureEntry;
+import uk.ac.ebi.uniprot.domain.literature.LiteratureMappedReference;
 import uk.ac.ebi.uniprot.domain.literature.builder.LiteratureEntryBuilder;
+import uk.ac.ebi.uniprot.domain.literature.builder.LiteratureMappedReferenceBuilder;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.json.parser.literature.LiteratureJsonConfig;
 import uk.ac.ebi.uniprot.search.document.literature.LiteratureDocument;
@@ -53,12 +55,15 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
+        LiteratureMappedReference mappedReference = new LiteratureMappedReferenceBuilder().source("source").build();
+
         LiteratureEntry literatureEntry = new LiteratureEntryBuilder()
                 .pubmedId(PUBMED_ID)
                 .title("The Title")
                 .addAuthor(new AuthorImpl("The Author"))
                 .literatureAbstract("literature abstract")
                 .publicationDate(new PublicationDateImpl("2019"))
+                .addLiteratureMappedReference(mappedReference)
                 .firstPage("10")
                 .build();
 
@@ -96,6 +101,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.pubmedId", is(100)))
                     .resultMatcher(jsonPath("$.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.title", is("The Title")))
+                    .resultMatcher(jsonPath("$.literatureMappedReferences").doesNotExist())
                     .build();
         }
 
@@ -117,10 +123,11 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withFilterFieldsParameter() {
-            return GetIdParameter.builder().id(String.valueOf(PUBMED_ID)).fields("id,title")
+            return GetIdParameter.builder().id(String.valueOf(PUBMED_ID)).fields("id,title,mapped_references")
                     .resultMatcher(jsonPath("$.pubmedId", is(100)))
                     .resultMatcher(jsonPath("$.title", is("The Title")))
                     .resultMatcher(jsonPath("$.authors").doesNotExist())
+                    .resultMatcher(jsonPath("$.literatureMappedReferences").exists())
                     .build();
         }
 

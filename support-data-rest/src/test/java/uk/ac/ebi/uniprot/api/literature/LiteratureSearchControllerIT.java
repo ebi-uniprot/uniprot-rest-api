@@ -24,7 +24,9 @@ import uk.ac.ebi.uniprot.domain.citation.Author;
 import uk.ac.ebi.uniprot.domain.citation.impl.AuthorImpl;
 import uk.ac.ebi.uniprot.domain.citation.impl.PublicationDateImpl;
 import uk.ac.ebi.uniprot.domain.literature.LiteratureEntry;
+import uk.ac.ebi.uniprot.domain.literature.LiteratureMappedReference;
 import uk.ac.ebi.uniprot.domain.literature.builder.LiteratureEntryBuilder;
+import uk.ac.ebi.uniprot.domain.literature.builder.LiteratureMappedReferenceBuilder;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.json.parser.literature.LiteratureJsonConfig;
 import uk.ac.ebi.uniprot.search.document.literature.LiteratureDocument;
@@ -130,6 +132,8 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
     }
 
     private void saveEntry(long pubMedId, boolean facet) {
+        LiteratureMappedReference mappedReference = new LiteratureMappedReferenceBuilder().source("source").build();
+
         LiteratureEntry entry = new LiteratureEntryBuilder()
                 .pubmedId(pubMedId)
                 .doiId("doi " + pubMedId)
@@ -137,6 +141,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                 .addAuthor(new AuthorImpl("author " + pubMedId))
                 .journal("journal " + pubMedId)
                 .publicationDate(new PublicationDateImpl("2019"))
+                .addLiteratureMappedReference(mappedReference)
                 .build();
 
         LiteratureDocument document = LiteratureDocument.builder()
@@ -172,6 +177,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10)))
                     .resultMatcher(jsonPath("$.results.*.title", contains("title 10")))
                     .resultMatcher(jsonPath("$.results.*.publicationDate", contains("2019")))
+                    .resultMatcher(jsonPath("$.results.*.literatureMappedReferences").doesNotExist())
                     .build();
         }
 
@@ -228,9 +234,10 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,title"))
+                    .queryParam("fields", Collections.singletonList("id,title,mapped_references"))
                     .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10, 20)))
                     .resultMatcher(jsonPath("$.results.*.title", contains("title 10", "title 20")))
+                    .resultMatcher(jsonPath("$.results.*.literatureMappedReferences").exists())
                     .resultMatcher(jsonPath("$.results.*.authors").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.journal").doesNotExist())
                     .build();

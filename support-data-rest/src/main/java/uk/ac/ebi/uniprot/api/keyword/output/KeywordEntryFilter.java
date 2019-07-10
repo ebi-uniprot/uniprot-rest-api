@@ -18,7 +18,7 @@ public class KeywordEntryFilter {
     private static final String COMMA = "\\s*,\\s*";
 
     public static List<String> parse(String fields) {
-        if (Utils.notEmpty(fields)) {
+        if (Utils.nullOrEmpty(fields)) {
             fields = DEFAULT_FIELDS;
         }
         return Arrays.asList(fields.split(COMMA));
