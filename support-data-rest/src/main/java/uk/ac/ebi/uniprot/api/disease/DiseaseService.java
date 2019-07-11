@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class DiseaseService {
-    private static final String ACCESSION_STR = "accession";
+    private static final String ACCESSION_STR = "accession:";
     @Autowired
     private DiseaseRepository diseaseRepository;
     @Autowired

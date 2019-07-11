@@ -13,6 +13,6 @@ import java.util.HashMap;
 @Repository
 public class DiseaseRepository extends SolrQueryRepository<DiseaseDocument> {
     public DiseaseRepository(SolrTemplate solrTemplate, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.disease, DiseaseDocument.class, HashMap::new, requestConverter);
+        super(solrTemplate, SolrCollection.disease, DiseaseDocument.class, null, requestConverter);
     }
 }
