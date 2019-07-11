@@ -13,7 +13,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.SearchItem;
 import java.util.List;
 
 @RestController
-@RequestMapping("/uniprotkb")
+@RequestMapping("/configure/uniprotkb")
 public class UniProtConfigureController {
 
 	private UniProtConfigureService service;

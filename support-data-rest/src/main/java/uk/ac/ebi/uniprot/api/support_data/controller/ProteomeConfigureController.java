@@ -1,13 +1,12 @@
 package uk.ac.ebi.uniprot.api.support_data.controller;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.ac.ebi.uniprot.api.configure.service.ProteomeConfigureService;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
+
+import java.util.List;
 
 /**
  *
@@ -16,7 +15,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
  *
 */
 @RestController
-@RequestMapping("/proteome")
+@RequestMapping("/configure/proteome")
 public class ProteomeConfigureController {
 	private ProteomeConfigureService service;
 
