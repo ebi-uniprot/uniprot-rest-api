@@ -40,7 +40,7 @@ class CrossRefControllerTest {
 
         ResultActions response = this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/xref/accession/" + accession)
+                        .get("/xref/" + accession)
                         .param("accessionId", accession)
         );
 

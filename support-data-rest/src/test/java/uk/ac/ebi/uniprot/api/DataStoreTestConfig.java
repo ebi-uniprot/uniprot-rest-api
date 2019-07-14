@@ -49,6 +49,9 @@ public class DataStoreTestConfig {
         solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.literature);
         dataStoreManager.addSolrClient(DataStoreManager.StoreType.LITERATURE, solrClient);
 
+        ClosableEmbeddedSolrClient diseaseSolrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.disease);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.DISEASE, diseaseSolrClient);
+
         return solrClient;
     }
 

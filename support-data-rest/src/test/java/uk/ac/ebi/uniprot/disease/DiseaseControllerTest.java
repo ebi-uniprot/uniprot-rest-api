@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -50,7 +52,8 @@ class DiseaseControllerTest {
 
         ResultActions response = this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/disease/accession/" + accession)
+                        .get("/disease/" + accession)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
                         .param("accessionId", accession)
         );
 
@@ -59,11 +62,11 @@ class DiseaseControllerTest {
                 .andExpect(jsonPath("$.accession", equalTo(disease.getAccession())))
                 .andExpect(jsonPath("$.acronym", equalTo(disease.getAcronym())))
                 .andExpect(jsonPath("$.definition", equalTo(disease.getDefinition())))
-                .andExpect(jsonPath("$.alternativeNames.size()", equalTo(disease.getAlternativeNames().size())))
+                .andExpect(jsonPath("$.alternative_names.size()", equalTo(disease.getAlternativeNames().size())))
                 .andExpect(jsonPath("$.keywords.size()", equalTo(disease.getKeywords().size())))
-                .andExpect(jsonPath("$.crossReferences.size()", equalTo(disease.getCrossReferences().size())))
-                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(disease.getReviewedProteinCount().toString()))))
-                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(disease.getUnreviewedProteinCount().toString()))));
+                .andExpect(jsonPath("$.cross_references.size()", equalTo(disease.getCrossReferences().size())))
+                .andExpect(jsonPath("$.reviewed_protein_count", equalTo(Integer.valueOf(disease.getReviewedProteinCount().toString()))))
+                .andExpect(jsonPath("$.unreviewed_protein_count", equalTo(Integer.valueOf(disease.getUnreviewedProteinCount().toString()))));
     }
 
     @Test
@@ -73,7 +76,8 @@ class DiseaseControllerTest {
 
         // when
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.
-                get("/disease/accession/" + accession)
+                get("/disease/" + accession)
+                .header(ACCEPT, MediaType.APPLICATION_JSON)
                 .param("accessionId", accession));
 
         // then
@@ -90,7 +94,8 @@ class DiseaseControllerTest {
         Mockito.when(this.diseaseService.findByAccession(accession)).thenThrow(new ResourceNotFoundException("{search.not.found}"));
         // when
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.
-                get("/disease/accession/" + accession)
+                get("/disease/" + accession)
+                .header(ACCEPT, MediaType.APPLICATION_JSON)
                 .param("accessionId", accession));
 
         // then
@@ -110,7 +115,6 @@ class DiseaseControllerTest {
         CrossReference xr1 = new CrossReference("DT1", "ID1", Arrays.asList("p1", "p2"));
         CrossReference xr2 = new CrossReference("DT2", "ID2", Arrays.asList("p3", "p4"));
         List<CrossReference> xrefs = Arrays.asList(xr1, xr2);
-        List<CrossReference> crossReferences = xrefs;
         List<Keyword> keywords = Arrays.asList(new KeywordImpl("keyword1", "kw-1"),
                 new KeywordImpl("keyword2", "kw-2"));
 

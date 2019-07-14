@@ -52,12 +52,13 @@ class DatabasesTest {
 
 		List<DatabaseGroup> groups = instance.getDatabases();
 		assertEquals(20, groups.size());
-
 		List<Tuple> databaseGroupItems = groups.stream()
 				.flatMap(g -> g.getItems().stream())
 				.filter(t -> !t.getValue().equals("any"))
 				.collect(Collectors.toList());
 		assertEquals(allKnownCrossReferences.size(), databaseGroupItems.size());
+		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
+        assertEquals(159, nDb);
 	}
 	@Test
 	void testGroup() {
