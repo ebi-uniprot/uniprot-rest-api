@@ -6,13 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.search.field.ReturnField;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @param <T> instance of the object that is being written.
@@ -24,10 +22,18 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
     private final ObjectMapper objectMapper;
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
+    private List<ReturnField> allFields;
+    private JsonResponseFieldProjector fieldProjector;
 
-    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass) {
+    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass) { // TODO Remove this constructor once all converter use the other constructor
         super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
+    }
+
+    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass, List<ReturnField> allFields) {
+        this(objectMapper, messageConverterEntryClass);
+        this.allFields = allFields;
+        this.fieldProjector = new JsonResponseFieldProjector();
     }
 
     @Override
@@ -87,7 +93,20 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
         return tlFilters.get();
     }
 
+    protected ThreadLocal<JsonGenerator> getThreadLocalJsonGenerator(){
+        return this.tlJsonGenerator;
+    }
+
     protected abstract T filterEntryContent(T entity);
+
+    // returns only the required fields asked by the client or all fields in T.ResultFields enum
+    protected Map<String, Object> projectEntryFields(T entity){
+
+        Map<String, List<String>> filters = getThreadLocalFilterMap();
+        List<String> returnFields = Utils.notEmpty(filters) ? new ArrayList<>(filters.keySet()) : new ArrayList<>();
+
+        return this.fieldProjector.project(entity, returnFields, this.allFields);
+    }
 
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
         if (Utils.notEmpty(fields)) {

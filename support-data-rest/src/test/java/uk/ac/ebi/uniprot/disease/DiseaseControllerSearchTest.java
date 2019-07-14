@@ -40,7 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -84,14 +87,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].id", Matchers.containsString(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].id", Matchers.containsString(searchString)));
 
     }
 
@@ -105,19 +108,20 @@ public class DiseaseControllerSearchTest {
         // when
         ResultActions response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/disease/search/")
+                        .param("query", searchString)
                         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+                        );
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].acronym", Matchers.equalTo(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].acronym", Matchers.equalTo(searchString)));
 
     }
 
@@ -136,14 +140,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].definition", Matchers.containsString(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].definition", Matchers.containsString(searchString)));
 
     }
 
@@ -163,14 +167,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].alternativeNames[2]", Matchers.equalTo(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].alternative_names[2]", Matchers.equalTo(searchString)));
 
     }
 
@@ -189,14 +193,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].keywords[1].id", Matchers.equalTo(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].keywords[1].id", Matchers.equalTo(searchString)));
 
     }
 
@@ -215,14 +219,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].accession", Matchers.equalTo(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].accession", Matchers.equalTo(searchString)));
 
     }
     // search by cross reference
@@ -240,8 +244,8 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(0, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(0, results.length());
     }
 
 
@@ -260,14 +264,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].id", Matchers.containsString(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].id", Matchers.containsString(searchString)));
 
     }
 
@@ -285,14 +289,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].acronym", Matchers.equalTo(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].acronym", Matchers.equalTo(searchString)));
 
     }
 
@@ -310,14 +314,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].definition", Matchers.containsString(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].definition", Matchers.containsString(searchString)));
 
     }
 
@@ -335,14 +339,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].alternativeNames[0]", Matchers.containsString(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].alternative_names[0]", Matchers.containsString(searchString)));
 
     }
 
@@ -360,14 +364,14 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(1, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content[0].keywords[1].id", Matchers.containsString(searchString)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].keywords[1].id", Matchers.containsString(searchString)));
 
     }
 
@@ -386,8 +390,8 @@ public class DiseaseControllerSearchTest {
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
-        JSONArray content = result.getJSONArray("content");
-        Assertions.assertEquals(0, content.length());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(0, results.length());
     }
 
     // search by accession
@@ -406,7 +410,7 @@ public class DiseaseControllerSearchTest {
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.messages[0]", Matchers.equalTo("{search.disease.invalid.query.field}")));
+                .andExpect(jsonPath("$.messages[0]", Matchers.equalTo("'acronym' is not a valid search field")));
     }
 
     @Test
@@ -423,8 +427,8 @@ public class DiseaseControllerSearchTest {
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.content.*.accession", Matchers.contains(accession)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.accession", Matchers.contains(accession)));
     }
 
     private List<DiseaseDocument> convertToDocs(List<Disease> diseases) {

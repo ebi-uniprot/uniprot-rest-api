@@ -3,47 +3,72 @@ package uk.ac.ebi.uniprot.api.disease;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
-import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
+import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
+import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
+import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import uk.ac.ebi.uniprot.api.rest.validation.ValidReturnFields;
 import uk.ac.ebi.uniprot.cv.disease.Disease;
+import uk.ac.ebi.uniprot.search.field.DiseaseField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.*;
 
 @RestController
 @RequestMapping("/disease")
 @Validated
-public class DiseaseController {
+public class DiseaseController extends BasicSearchController<Disease> {
     @Autowired
     private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
 
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    protected DiseaseController(ApplicationEventPublisher eventPublisher,
+                                MessageConverterContextFactory<Disease> diseaseMessageConverterContextFactory) {
 
-    @GetMapping(value = "/{accessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Disease getByAccession(@PathVariable("accessionId") @Pattern(regexp = ACCESSION_REGEX,
-            flags = {Pattern.Flag.CASE_INSENSITIVE},
-            message ="Invalid accession format. Expected DI-xxxxx") String accession){
-        Disease disease = this.diseaseService.findByAccession(accession);
-        return disease;
+        super(eventPublisher, diseaseMessageConverterContextFactory, null, MessageConverterContextFactory.Resource.DISEASE);
+
     }
 
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public QueryResult<Disease> searchCursor(@Valid DiseaseSearchRequest searchRequest,
-                                                      HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping(value = "/{accessionId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    public ResponseEntity<MessageConverterContext<Disease>> getByAccession(
+            @PathVariable("accessionId")
+            @Pattern(regexp = ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="Invalid accession format. Expected DI-xxxxx")
+                    String accession,
+            @ValidReturnFields(fieldValidatorClazz = DiseaseField.ResultFields.class)
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType){
 
-        QueryResult<Disease> result = this.diseaseService.search(searchRequest);
+        Disease disease = this.diseaseService.findByAccession(accession);
+        return super.getEntityResponse(disease, fields, contentType);
 
-        this.eventPublisher.publishEvent(new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
+    }
 
-        return result;
+    @GetMapping(value = "/search", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    public ResponseEntity<MessageConverterContext<Disease>> searchCursor(@Valid DiseaseSearchRequest searchRequest,
+                                             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
+                                             HttpServletRequest request,
+                                             HttpServletResponse response) {
+
+        QueryResult<Disease> results = this.diseaseService.search(searchRequest);
+        return super.getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
+    }
+
+    @Override
+    protected String getEntityId(Disease entity) {
+        return entity.getId();
+    }
+
+    @Override
+    protected Optional<String> getEntityRedirectId(Disease entity) {
+        return Optional.empty();
     }
 }
