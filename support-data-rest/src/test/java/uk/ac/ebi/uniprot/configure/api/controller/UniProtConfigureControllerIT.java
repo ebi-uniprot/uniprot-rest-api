@@ -31,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes={SolrTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(UniProtConfigureController.class)
-@Disabled
 class UniProtConfigureControllerIT {
 
     private static final String BASIC_RESOURCE = "/uniprotkb";
