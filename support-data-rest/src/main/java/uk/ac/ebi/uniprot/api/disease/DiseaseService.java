@@ -20,8 +20,8 @@ public class DiseaseService {
 
     @Autowired
     public void setDefaultSearchHandler() {
-        //this.defaultSearchHandler = new DefaultSearchHandler(DiseaseField.Search.content,
-          //      DiseaseField.Search.name, DiseaseField.Search.getBoostFields());
+        this.defaultSearchHandler = new DefaultSearchHandler(DiseaseField.Search.content,
+                DiseaseField.Search.accession, DiseaseField.Search.getBoostFields());
     }
 
     @Autowired
@@ -36,7 +36,7 @@ public class DiseaseService {
 
     public QueryResult<Disease> search(DiseaseSearchRequest request) {
 
-        SolrRequest solrRequest = this.basicService.createSolrRequest(request, null, this.solrSortClause, null);
+        SolrRequest solrRequest = this.basicService.createSolrRequest(request, null, this.solrSortClause, this.defaultSearchHandler);
 
         return this.basicService.search(solrRequest, request.getCursor(), request.getSize());
     }
