@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.disease.response.converter;
 
+import uk.ac.ebi.uniprot.api.configure.util.SupportingDataUtils;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
 import uk.ac.ebi.uniprot.common.Utils;
@@ -11,8 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseTsvMessageConverter.COMMA;
 
 public class DiseaseXlsMessageConverter extends AbstractXslMessegerConverter<Disease> {
 
@@ -30,7 +29,7 @@ public class DiseaseXlsMessageConverter extends AbstractXslMessegerConverter<Dis
 
     @Override
     protected List<String> getHeader() {
-        List<String> fields = tlFields.get();
+        List<String> fields = this.tlFields.get();
         return fields.stream().map(this::getFieldDisplayName).collect(Collectors.toList());
     }
 
@@ -41,14 +40,14 @@ public class DiseaseXlsMessageConverter extends AbstractXslMessegerConverter<Dis
     @Override
     protected void initBefore(MessageConverterContext<Disease> context) {
         if(Utils.nullOrEmpty(context.getFields())){
-            tlFields.set(Arrays.asList(DiseaseField.ResultFields.getDefaultFields().split(COMMA)));
+            this.tlFields.set(Arrays.asList(DiseaseField.ResultFields.getDefaultFields().split(SupportingDataUtils.COMMA)));
         } else {
-            tlFields.set(Arrays.asList(context.getFields().split(COMMA)));
+            this.tlFields.set(Arrays.asList(context.getFields().split(SupportingDataUtils.COMMA)));
         }
     }
 
     public List<String> getData(Map<String, String> mappedField) {
-        List<String> fields = tlFields.get();
+        List<String> fields = this.tlFields.get();
 
         return fields.stream()
                 .map(field -> mappedField.getOrDefault(field,""))

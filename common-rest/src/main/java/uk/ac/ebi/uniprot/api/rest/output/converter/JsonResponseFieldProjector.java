@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.ac.ebi.uniprot.common.Utils;
 import uk.ac.ebi.uniprot.search.field.ReturnField;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
  *
  * Returns a map of root level fields with their values for the json writer
  */
+@Slf4j
 public class JsonResponseFieldProjector {
 
     // Get a map containing the object's projected fields
@@ -61,7 +63,7 @@ public class JsonResponseFieldProjector {
             sourceField.setAccessible(true);
             return sourceField.get(source);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            // incorrect fieldName provided
+            log.warn("{} not found", fieldName);// incorrect fieldName provided
             return null;
         }
     }
