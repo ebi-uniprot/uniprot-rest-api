@@ -55,13 +55,13 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @GetMapping(value = "/{literatureId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<LiteratureEntry>> getById(@PathVariable("literatureId")
+    public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(@PathVariable("literatureId")
                                                                             @Pattern(regexp = LITERATURE_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.literature.invalid.id}")
                                                                                     String literatureId,
-                                                                            @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
+                                                                                      @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
                                                                             @RequestParam(value = "fields", required = false)
                                                                                     String fields,
-                                                                            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                                                                                      @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                                                                                     MediaType contentType) {
         String updatedFields = updateFieldsWithoutMappedReferences(fields, contentType);
         LiteratureEntry literatureEntry = this.literatureService.findById(literatureId);

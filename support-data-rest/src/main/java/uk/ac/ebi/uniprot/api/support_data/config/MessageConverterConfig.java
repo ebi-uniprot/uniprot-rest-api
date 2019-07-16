@@ -52,15 +52,17 @@ public class MessageConverterConfig {
 
                 converters.add(new LiteratureXlsMessageConverter());
                 converters.add(new LiteratureTsvMessageConverter());
-                converters.add(0, new LiteratureJsonMessageConverter());
 
                 converters.add(new TaxonomyXlsMessageConverter());
                 converters.add(new TaxonomyTsvMessageConverter());
-                converters.add(0, new TaxonomyJsonMessageConverter());
 
                 converters.add(new KeywordXlsMessageConverter());
                 converters.add(new KeywordTsvMessageConverter());
+
+                // add Json message converter first in the list because it is the most used
+                converters.add(0, new LiteratureJsonMessageConverter());
                 converters.add(0, new KeywordJsonMessageConverter());
+                converters.add(0, new TaxonomyJsonMessageConverter());
             }
         };
     }
