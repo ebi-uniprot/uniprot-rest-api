@@ -96,9 +96,10 @@ class KeywordControllerAPIDocumentationTest {
                                         fieldWithPath("keyword.id").description("the keyword identifier"),
                                         fieldWithPath("keyword.accession").description("the keyword accession"),
                                         fieldWithPath("definition")
-                                            .description("the keyword definition"),
+                                                .description("the keyword definition"),
                                         fieldWithPath("category.id").description("the keyword category identifier"),
-                                        fieldWithPath("category.accession").description("the keyword category accession")
+                                        fieldWithPath("category.accession")
+                                                .description("the keyword category accession")
                                 )));
     }
 
@@ -128,12 +129,13 @@ class KeywordControllerAPIDocumentationTest {
         String identifier = "get-keyword-by-search";
 
         ConstraintDescriptions keywordConstraints = new ConstraintDescriptions(KeywordRequestDTO.class, new ValidatorConstraintResolver(),
-                new ResourceBundleConstraintDescriptionResolver(ResourceBundle.getBundle("constraint-descriptor")));
+                                                                               new ResourceBundleConstraintDescriptionResolver(ResourceBundle
+                                                                                                                                       .getBundle("constraint-descriptor")));
 
 
         saveEntry();
         this.mockMvc.perform(get("/keyword/search")
-                .param("query", "keyword_id:KW-0001")
+                                     .param("query", "keyword_id:KW-0001")
                                      .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -141,13 +143,23 @@ class KeywordControllerAPIDocumentationTest {
                                 resourceDetails()
                                         .description("Find keywords that match a search query"),
                                 // check this https://github.com/ePages-de/restdocs-api-spec/blob/master/samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/ProductRestIntegrationTest.java
-                        requestParameters(attributes(key("title").value("There we go!!!")),
-                                        parameterWithName("query").description("the query")
-                                                .attributes(key("constraints").value(keywordConstraints.descriptionsForProperty("query")))
-                                ),
+                                requestParameters(
+                                        attributes(key("title").value("There we go!!!")),
+                                        parameterWithName("query")
+                                                .description("the query")
+                                                .attributes(
+                                                        key("constraints").value(keywordConstraints
+                                                                                         .descriptionsForProperty("query"))),
+                                        parameterWithName("sort")
+                                                .description("Fields to sort on")
+                                                .attributes(
+                                                        key("constraints").value(keywordConstraints
+                                                                                         .descriptionsForProperty("sort")))),
                                 responseFields(
-                                        subsectionWithPath("results").description("A list of `keyword` objects matching the search query."),
-                                        subsectionWithPath("facets").description("A list of facets matching the search query.")
+                                        subsectionWithPath("results")
+                                                .description("A list of `keyword` objects matching the search query."),
+                                        subsectionWithPath("facets")
+                                                .description("A list of facets matching the search query.")
                                 )));
     }
 

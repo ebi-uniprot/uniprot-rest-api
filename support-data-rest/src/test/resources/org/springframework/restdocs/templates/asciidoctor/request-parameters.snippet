@@ -1,12 +1,14 @@
-    .+{{title}}+
+.+{{title}}+
+|===
 
-        |===
-        |Name|Description|Constraints
+|Name|Description|Constraints
+{{#parameters}}
+|{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
+|{{#tableCellContent}}`+{{description}}+`{{/tableCellContent}}
+a|
+{{#constraints}}
+* {{.}}
+{{/constraints}}
+{{/parameters}}
 
-    {{#parameters}}
-        |{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
-        |{{#tableCellContent}}`+{{description}}+`{{/tableCellContent}}
-        |{{#tableCellContent}}{{constraints}}{{/tableCellContent}}
-
-    {{/parameters}}
-        |===
+|===
