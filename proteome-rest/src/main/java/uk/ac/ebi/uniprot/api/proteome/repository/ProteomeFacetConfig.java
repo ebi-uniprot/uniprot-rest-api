@@ -22,7 +22,7 @@ import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 */
 @Component
 @Getter @Setter
-@PropertySource({"classpath:proteome.facet.properties", "classpath:common-message.properties"})
+@PropertySource({"classpath:proteome.facet.properties"})
 @ConfigurationProperties(prefix = "facet")
 public class ProteomeFacetConfig extends GenericFacetConfig implements FacetConfigConverter {
 

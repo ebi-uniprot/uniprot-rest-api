@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import uk.ac.ebi.uniprot.cv.disease.Disease;
-import uk.ac.ebi.uniprot.search.document.disease.DiseaseDocument;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +28,7 @@ public class DiseaseController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @GetMapping(value = "/accession/{accessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{accessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Disease getByAccession(@PathVariable("accessionId") @Pattern(regexp = ACCESSION_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message ="Invalid accession format. Expected DI-xxxxx") String accession){

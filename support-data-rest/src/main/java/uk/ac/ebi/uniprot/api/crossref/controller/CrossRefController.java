@@ -24,7 +24,7 @@ public class CrossRefController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @GetMapping(value = "/accession/{accessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{accessionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CrossRefDocument getByAccession(@PathVariable("accessionId") String accession){
         CrossRefDocument crossRef = crossRefService.findByAccession(accession);
         return crossRef;

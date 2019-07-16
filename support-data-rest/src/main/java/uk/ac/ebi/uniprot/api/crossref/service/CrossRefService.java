@@ -13,7 +13,7 @@ import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 
 @Service
 public class CrossRefService {
-    private static final String ACCESSION_STR = "accession";
+    private static final String ACCESSION_STR = "accession:";
     @Autowired
     private CrossRefRepository crossRefRepository;
     @Autowired
