@@ -86,7 +86,83 @@ class LiteratureMappedProteinsControllerIT {
     }
 
     @Test
-    void getMappedProteinsBadRequest() throws Exception {
+    void getMappedProteinsSortedReturnSuccess() throws Exception {
+        // given
+        saveEntry(10, "P12309", "P12310", "P12311");
+        saveEntry(11, "P12310", "P12311", "P12312");
+        saveEntry(12, "P12311", "P12312", "P12313");
+        saveEntry(13, "P12312", "P12313", "P12314");
+        saveEntry(14, "P12313", "P12314", "P12315");
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(MAPPED_PROTEIN_PATH + "P12312")
+                        .param("sort", "title desc")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.results.*.pubmedId", contains(13, 12, 11)))
+                .andExpect(jsonPath("$.results.*.title", contains("title 13", "title 12", "title 11")))
+                .andExpect(jsonPath("$.results.*.publicationDate", contains("2019", "2019", "2019")))
+                .andExpect(jsonPath("$.results.*.literatureMappedReferences.size()", contains(1, 1, 1)))
+                .andExpect(jsonPath("$.results.*.literatureMappedReferences.*.uniprotAccession", contains("P12312", "P12312", "P12312")));
+    }
+
+    @Test
+    void getMappedProteinsWithReturnFieldReturnSuccess() throws Exception {
+        // given
+        saveEntry(10, "P12309", "P12310", "P12311");
+        saveEntry(11, "P12310", "P12311", "P12312");
+        saveEntry(12, "P12311", "P12312", "P12313");
+        saveEntry(13, "P12312", "P12313", "P12314");
+        saveEntry(14, "P12313", "P12314", "P12315");
+
+        // when
+        ResultActions response = mockMvc.perform(
+                get(MAPPED_PROTEIN_PATH + "P12312")
+                        .param("fields", "title, id, mapped_references")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.results.*.pubmedId", contains(11, 12, 13)))
+                .andExpect(jsonPath("$.results.*.title", contains("title 11", "title 12", "title 13")))
+                .andExpect(jsonPath("$.results.*.publicationDate").doesNotExist())
+                .andExpect(jsonPath("$.results.*.literatureMappedReferences.size()", contains(1, 1, 1)))
+                .andExpect(jsonPath("$.results.*.literatureMappedReferences.*.uniprotAccession", contains("P12312", "P12312", "P12312")));
+    }
+
+    @Test
+    void getMappedProteinsInvalidRequestParamsBadRequest() throws Exception {
+        // when
+        ResultActions response = mockMvc.perform(
+                get(MAPPED_PROTEIN_PATH + "P12345")
+                        .param("fields", "invalid")
+                        .param("sort", "invalid invalid")
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url", not(isEmptyOrNullString())))
+                .andExpect(jsonPath("$.messages.*", containsInAnyOrder(
+                        //"The accession parameter has invalid format. It should be a valid UniProtKB accession",
+                        "Invalid sort field 'invalid'",
+                        "Invalid sort field order 'invalid'. Expected asc or desc",
+                        "Invalid fields parameter value 'invalid'")));
+
+    }
+
+    @Test
+    void getMappedProteinsInvalidPathParamsBadRequest() throws Exception {
         // when
         ResultActions response = mockMvc.perform(
                 get(MAPPED_PROTEIN_PATH + "INVALID")
@@ -97,7 +173,8 @@ class LiteratureMappedProteinsControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.url", not(isEmptyOrNullString())))
-                .andExpect(jsonPath("$.messages.*", contains("The accession parameter has invalid format. It should be a valid UniProtKB accession")));
+                .andExpect(jsonPath("$.messages.*", contains(
+                        "The accession parameter has invalid format. It should be a valid UniProtKB accession")));
 
     }
 
