@@ -2,54 +2,50 @@ package uk.ac.ebi.uniprot.api.crossref.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
-import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.crossref.config.CrossRefFacetConfig;
 import uk.ac.ebi.uniprot.api.crossref.repository.CrossRefRepository;
+import uk.ac.ebi.uniprot.api.crossref.request.CrossRefEntryConverter;
 import uk.ac.ebi.uniprot.api.crossref.request.CrossRefSearchRequest;
+import uk.ac.ebi.uniprot.api.disease.DiseaseSolrSortClause;
+import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
+import uk.ac.ebi.uniprot.domain.crossref.CrossRefEntry;
+import uk.ac.ebi.uniprot.search.DefaultSearchHandler;
 import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
+import uk.ac.ebi.uniprot.search.field.CrossRefField;
 
 @Service
 public class CrossRefService {
-    private static final String ACCESSION_STR = "accession:";
+    private BasicSearchService<CrossRefEntry, CrossRefDocument> basicService;
+    private DefaultSearchHandler defaultSearchHandler;
+
     @Autowired
-    private CrossRefRepository crossRefRepository;
+    private DiseaseSolrSortClause solrSortClause;
     @Autowired
     private CrossRefFacetConfig crossRefFacetConfig;
+
     @Autowired
-    private CrossRefSolrSortClause solrSortClause;
-
-    public CrossRefDocument findByAccession(final String accession) {
-        try {
-            return crossRefRepository
-                    .getEntry(SolrRequest.builder().query(ACCESSION_STR + accession.toUpperCase()).build())
-                    .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            String message = "Could not get accession for: [" + accession + "]";
-            throw new ServiceException(message, e);
-        }
+    public void setDefaultSearchHandler() {
+        this.defaultSearchHandler = new DefaultSearchHandler(CrossRefField.Search.content,
+                CrossRefField.Search.accession, CrossRefField.Search.getBoostFields());
     }
 
-    public QueryResult<CrossRefDocument> search(CrossRefSearchRequest request) {
-        SolrRequest simpleQuery = createQuery(request);
-        return crossRefRepository.searchPage(simpleQuery, request.getCursor(), request.getSize());
+    @Autowired
+    public void setBasicService(CrossRefRepository crossRefRepository, CrossRefEntryConverter toCrossRefEntryConverter) {
+        this.basicService = new BasicSearchService<>(crossRefRepository, toCrossRefEntryConverter);
     }
 
-    private SolrRequest createQuery(CrossRefSearchRequest request) {
-        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
-        String requestedQuery = request.getQuery();
 
-        builder.query(requestedQuery);
-        builder.addSort(this.solrSortClause.getSort(request.getSort(), false));
+    public CrossRefEntry findByAccession(final String accession) {
+        return this.basicService.getEntity(CrossRefField.Search.accession.name(), accession);
+    }
 
-        if(request.hasFacets()) {
-            builder.facets(request.getFacetList());
-            builder.facetConfig(this.crossRefFacetConfig);
-        }
-        return builder.build();
+    public QueryResult<CrossRefEntry> search(CrossRefSearchRequest request) {
+
+        SolrRequest solrRequest = this.basicService.createSolrRequest(request, this.crossRefFacetConfig,
+                this.solrSortClause, this.defaultSearchHandler);
+
+        return this.basicService.search(solrRequest, request.getCursor(), request.getSize());
     }
 }
