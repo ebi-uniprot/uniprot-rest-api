@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
+import uk.ac.ebi.uniprot.api.crossref.output.converter.CrossRefJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseXlsMessageConverter;
@@ -70,6 +71,8 @@ public class MessageConverterConfig {
                 converters.add(new DiseaseXlsMessageConverter());
                 converters.add(new DiseaseTsvMessageConverter());
                 converters.add(0, new DiseaseJsonMessageConverter());
+
+                converters.add(0, new CrossRefJsonMessageConverter());
             }
         };
     }
