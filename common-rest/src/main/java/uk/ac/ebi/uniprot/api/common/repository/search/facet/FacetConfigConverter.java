@@ -1,13 +1,15 @@
 package uk.ac.ebi.uniprot.api.common.repository.search.facet;
 
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.IntervalFacet;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.util.CollectionUtils;
+import uk.ac.ebi.uniprot.common.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This interface is responsible to convert QueryResponse facets to a List<Facet> response model.
@@ -16,7 +18,6 @@ import java.util.Map;
  *
  * @author lgonzales
  */
-// TODO: 08/11/18 test
 public interface FacetConfigConverter extends Converter<QueryResponse, List<Facet>> {
 
     /**
@@ -29,11 +30,11 @@ public interface FacetConfigConverter extends Converter<QueryResponse, List<Face
     @Override
     default List<Facet> convert(QueryResponse queryResponse) {
         List<Facet> facetResult = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(queryResponse.getFacetFields())) {
+        if (Utils.notEmpty(queryResponse.getFacetFields())) {
             for (FacetField facetField : queryResponse.getFacetFields()) {
                 // Iterating over all Query response Facets
                 List<FacetItem> values = new ArrayList<>();
-                if (!CollectionUtils.isEmpty(facetField.getValues())) {
+                if (Utils.notEmpty(facetField.getValues())) {
                     for (FacetField.Count count : facetField.getValues()) {
                         // Iterating over all query response facet items
                         if (count != null) {
@@ -53,6 +54,33 @@ public interface FacetConfigConverter extends Converter<QueryResponse, List<Face
                                         .allowMultipleSelection(allowMultipleSelection(facetField.getName()))
                                         .values(values)
                                         .build());
+            }
+        }
+        if (Utils.notEmpty(queryResponse.getIntervalFacets())) {
+            for (IntervalFacet intervalFacet : queryResponse.getIntervalFacets()) {
+                // Iterating over all Query response Interval Facets
+                List<FacetItem> values = new ArrayList<>();
+                if (Utils.notEmpty(intervalFacet.getIntervals())) {
+                    for (IntervalFacet.Count count : intervalFacet.getIntervals()) {
+                        // Iterating over all query response interval facet items
+                        if (count != null) {
+                            String queryTerm = count.getKey().replace(",", " TO ");
+                            //Adding add Facet Item to facet item list
+                            values.add(FacetItem.builder()
+                                    .value(queryTerm)
+                                    .label(getIntervalFacetItemLabel(intervalFacet.getField(), count.getKey()))
+                                    .count((long) count.getCount())
+                                    .build());
+                        }
+                    }
+                }
+                //Adding an Interval facet to facet result list
+                facetResult.add(Facet.builder()
+                        .name(intervalFacet.getField())
+                        .label(getFacetLabel(intervalFacet.getField()))
+                        .allowMultipleSelection(allowMultipleSelection(intervalFacet.getField()))
+                        .values(values)
+                        .build());
             }
         }
         return facetResult;
@@ -88,6 +116,30 @@ public interface FacetConfigConverter extends Converter<QueryResponse, List<Face
         }
         return result;
     }
+
+
+    /**
+     * This method returns Facet item label for a facetName that is Interval Facet
+     *
+     * @param facetName        facet name returned in Solr query response
+     * @param facetIntervalKey facet item key return in Solr query response
+     * @return facet item label from facet.properties
+     */
+    default String getIntervalFacetItemLabel(String facetName, String facetIntervalKey) {
+        String result = null;
+        FacetProperty facetProperty = getFacetPropertyMap().getOrDefault(facetName, null);
+        if (facetProperty != null && facetProperty.getInterval() != null) {
+            Optional<String> intervalPropertyKeyValue = facetProperty.getInterval().entrySet().stream()
+                    .filter(item -> item.getValue().equalsIgnoreCase(facetIntervalKey))
+                    .map(Map.Entry::getKey)
+                    .findAny();
+            if (intervalPropertyKeyValue.isPresent()) {
+                result = getFacetItemLabel(facetName, intervalPropertyKeyValue.get());
+            }
+        }
+        return result;
+    }
+
 
     /**
      * this method returns allowMultipleSelection property for a facet name
