@@ -5,10 +5,14 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.rest.service.BasicSearchService;
+import uk.ac.ebi.uniprot.api.taxonomy.request.TaxonomyRequestDTO;
 import uk.ac.ebi.uniprot.cv.disease.Disease;
+import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
 import uk.ac.ebi.uniprot.search.DefaultSearchHandler;
 import uk.ac.ebi.uniprot.search.document.disease.DiseaseDocument;
 import uk.ac.ebi.uniprot.search.field.DiseaseField;
+
+import java.util.stream.Stream;
 
 @Service
 public class DiseaseService {
@@ -39,5 +43,12 @@ public class DiseaseService {
         SolrRequest solrRequest = this.basicService.createSolrRequest(request, null, this.solrSortClause, this.defaultSearchHandler);
 
         return this.basicService.search(solrRequest, request.getCursor(), request.getSize());
+    }
+
+    public Stream<Disease> download(DiseaseSearchRequest request) {
+
+        SolrRequest query = this.basicService.createSolrRequest(request, null, this.solrSortClause, this.defaultSearchHandler);
+
+        return this.basicService.download(query);
     }
 }

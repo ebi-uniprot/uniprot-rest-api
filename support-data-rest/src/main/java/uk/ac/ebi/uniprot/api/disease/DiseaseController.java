@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.rest.controller.BasicSearchController;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType.*;
@@ -32,16 +35,18 @@ public class DiseaseController extends BasicSearchController<Disease> {
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
 
     protected DiseaseController(ApplicationEventPublisher eventPublisher,
-                                MessageConverterContextFactory<Disease> diseaseMessageConverterContextFactory) {
+                                MessageConverterContextFactory<Disease> diseaseMessageConverterContextFactory,
+                                ThreadPoolTaskExecutor downloadTaskExecutor) {
 
-        super(eventPublisher, diseaseMessageConverterContextFactory, null, MessageConverterContextFactory.Resource.DISEASE);
+        super(eventPublisher, diseaseMessageConverterContextFactory, downloadTaskExecutor, MessageConverterContextFactory.Resource.DISEASE);
 
     }
 
-    @GetMapping(value = "/{accessionId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @GetMapping(value = "/{accessionId}",
+            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, OBO_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<Disease>> getByAccession(
             @PathVariable("accessionId")
-            @Pattern(regexp = ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="Invalid accession format. Expected DI-xxxxx")
+            @Pattern(regexp = ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message ="{search.disease.invalid.id}")
                     String accession,
             @ValidReturnFields(fieldValidatorClazz = DiseaseField.ResultFields.class)
             @RequestParam(value = "fields", required = false) String fields,
@@ -52,7 +57,8 @@ public class DiseaseController extends BasicSearchController<Disease> {
 
     }
 
-    @GetMapping(value = "/search", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @GetMapping(value = "/search",
+            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, OBO_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<Disease>> searchCursor(@Valid DiseaseSearchRequest searchRequest,
                                              @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
                                              HttpServletRequest request,
@@ -60,6 +66,21 @@ public class DiseaseController extends BasicSearchController<Disease> {
 
         QueryResult<Disease> results = this.diseaseService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
+    }
+
+    @RequestMapping(value = "/download", method = RequestMethod.GET,
+            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, OBO_MEDIA_TYPE_VALUE})
+    public ResponseEntity<ResponseBodyEmitter> download(@Valid
+                                                                    DiseaseSearchRequest searchRequest,
+                                                        @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                                                                MediaType contentType,
+                                                        @RequestHeader(value = "Accept-Encoding", required = false)
+                                                                String encoding,
+                                                        HttpServletRequest request) {
+
+        Stream<Disease> result = this.diseaseService.download(searchRequest);
+
+        return super.download(result, searchRequest.getFields(), contentType, request,encoding);
     }
 
     @Override

@@ -85,7 +85,7 @@ class DiseaseControllerTest {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages[0]",
-                        equalTo("Invalid accession format. Expected DI-xxxxx")));
+                        equalTo("The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")));
     }
 
     @Test

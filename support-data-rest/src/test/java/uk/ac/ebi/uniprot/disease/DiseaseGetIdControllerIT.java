@@ -141,7 +141,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder().id("INVALID")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid accession format. Expected DI-xxxxx")))
+                    .resultMatcher(jsonPath("$.messages.*", contains("The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")))
                     .build();
         }
 
@@ -202,6 +202,10 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                             .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                             .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                             .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                            .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                            .build())
                     .build();
         }
 
@@ -212,7 +216,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(MediaType.APPLICATION_JSON)
                             .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("Invalid accession format. Expected DI-xxxxx")))
+                            .resultMatcher(jsonPath("$.messages.*", contains("The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")))
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
@@ -224,6 +228,10 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                             .resultMatcher(content().string(isEmptyString()))
                             .build())
                     .build();
