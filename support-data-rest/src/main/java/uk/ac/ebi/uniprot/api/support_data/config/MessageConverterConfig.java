@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
 import uk.ac.ebi.uniprot.api.crossref.output.converter.CrossRefJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseJsonMessageConverter;
+import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseXlsMessageConverter;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordJsonMessageConverter;
@@ -71,6 +72,7 @@ public class MessageConverterConfig {
                 converters.add(new DiseaseXlsMessageConverter());
                 converters.add(new DiseaseTsvMessageConverter());
                 converters.add(0, new DiseaseJsonMessageConverter());
+                converters.add(1, new DiseaseOBOMessageConverter());
 
                 converters.add(0, new CrossRefJsonMessageConverter());
             }

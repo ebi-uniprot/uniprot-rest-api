@@ -309,6 +309,10 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                             .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                             .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                             .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                            .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                            .build())
                     .build();
         }
 
@@ -331,6 +335,10 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                             .resultMatcher(content().string(isEmptyString()))
                             .build())
                     .build();
