@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * This class contains generic facet configuration
@@ -13,7 +14,7 @@ import java.util.Collections;
  */
 @Getter
 @Setter
-public class GenericFacetConfig {
+public abstract class GenericFacetConfig {
     private int mincount;
 
     private int limit;
@@ -21,4 +22,6 @@ public class GenericFacetConfig {
     public Collection<String> getFacetNames() {
         return Collections.emptySet();
     }
+
+    public abstract Map<String, FacetProperty> getFacetPropertyMap();
 }

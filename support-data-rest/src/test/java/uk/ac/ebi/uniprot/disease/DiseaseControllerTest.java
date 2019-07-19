@@ -50,7 +50,7 @@ class DiseaseControllerTest {
 
         ResultActions response = this.mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/disease/accession/" + accession)
+                        .get("/disease/" + accession)
                         .param("accessionId", accession)
         );
 
@@ -73,7 +73,7 @@ class DiseaseControllerTest {
 
         // when
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.
-                get("/disease/accession/" + accession)
+                get("/disease/" + accession)
                 .param("accessionId", accession));
 
         // then
@@ -90,7 +90,7 @@ class DiseaseControllerTest {
         Mockito.when(this.diseaseService.findByAccession(accession)).thenThrow(new ResourceNotFoundException("{search.not.found}"));
         // when
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.
-                get("/disease/accession/" + accession)
+                get("/disease/" + accession)
                 .param("accessionId", accession));
 
         // then

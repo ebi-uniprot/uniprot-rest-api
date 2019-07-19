@@ -1,14 +1,11 @@
 package uk.ac.ebi.uniprot.api.common.repository.search;
 
 import org.apache.solr.client.solrj.SolrQuery;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.*;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
 
 import java.util.stream.Collectors;
 
@@ -36,9 +33,9 @@ class SolrRequestConverterTest {
         void canCreateSolrQueryWithFacetsAndTermFields() {
             // given
             String queryString = "query";
-            String facet1 = "facet 1";
-            String facet2 = "facet 2";
-            GenericFacetConfig facetConfig = new GenericFacetConfig();
+            String facet1 = "fragment";
+            String facet2 = "length";
+            FakeFacetConfigConverter facetConfig = new FakeFacetConfigConverter();
             int facetLimit = 100;
             int facetMinCount = 10;
             facetConfig.setLimit(facetLimit);
@@ -70,7 +67,9 @@ class SolrRequestConverterTest {
 
             // then
             assertThat(solrQuery.getQuery(), is(queryString));
-            assertThat(solrQuery.getFacetFields(), arrayContainingInAnyOrder(facet1, facet2));
+            assertThat(solrQuery.getFacetFields(), arrayContainingInAnyOrder(facet1));
+            assertThat(solrQuery.getParams("facet.interval"), arrayContainingInAnyOrder(facet2));
+            assertThat(solrQuery.getParams("f.length.facet.interval.set"), arrayContainingInAnyOrder("[1,200]", "[201,400]", "[401,600]", "[601,800]", "[801,*]"));
             assertThat(solrQuery.getFacetLimit(), is(facetLimit));
             assertThat(solrQuery.getFacetMinCount(), is(facetMinCount));
             assertThat(solrQuery.getTermsFields(), arrayContainingInAnyOrder(termField1, termField2));
@@ -104,13 +103,13 @@ class SolrRequestConverterTest {
         void canCreateFacetQuery() {
             // given
             String queryString = "my query";
-            GenericFacetConfig facetConfig = new GenericFacetConfig();
+            FakeFacetConfigConverter facetConfig = new FakeFacetConfigConverter();
             int facetLimit = 100;
             int facetMinCount = 10;
             facetConfig.setLimit(facetLimit);
             facetConfig.setMincount(facetMinCount);
-            String facet1 = "facet 1";
-            String facet2 = "facet 2";
+            String facet1 = "fragment";
+            String facet2 = "reviewed";
             String filterQuery1 = "filter query 1";
             String filterQuery2 = "filter query 2";
             Sort sorts = new Sort(Sort.Direction.ASC, "sortField1").and(new Sort(Sort.Direction.DESC, "sortField2"));
@@ -144,5 +143,28 @@ class SolrRequestConverterTest {
             assertThat(facetQuery.getSort(), is(sorts));
             assertThat(facetQuery.getDefaultOperator(), is(defaultQueryOperator));
         }
+    }
+
+    @Test
+    void notSupportedIntervalQueryQuery() {
+        String queryString = "my query";
+        FakeFacetConfigConverter facetConfig = new FakeFacetConfigConverter();
+        int facetLimit = 100;
+        int facetMinCount = 10;
+        facetConfig.setLimit(facetLimit);
+        facetConfig.setMincount(facetMinCount);
+        String facet1 = "length";
+        String facet2 = "reviewed";
+        SolrRequest request = SolrRequest.builder()
+                .query(queryString)
+                .facet(facet1)
+                .facet(facet2)
+                .facetConfig(facetConfig)
+                .build();
+
+        // when
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> {
+            converter.toQuery(request);
+        });
     }
 }

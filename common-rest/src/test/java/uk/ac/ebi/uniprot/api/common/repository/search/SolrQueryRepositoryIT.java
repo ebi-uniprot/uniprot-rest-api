@@ -23,7 +23,6 @@ import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -284,7 +283,7 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "d3structure"));
+        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "fragment"));
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
 
         // then

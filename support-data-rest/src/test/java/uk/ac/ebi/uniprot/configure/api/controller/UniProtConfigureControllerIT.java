@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UniProtConfigureController.class)
 class UniProtConfigureControllerIT {
 
-    private static final String BASIC_RESOURCE = "/uniprotkb";
+    private static final String BASIC_RESOURCE = "/configure/uniprotkb";
 
     @Autowired
     private MockMvc mockMvc;
