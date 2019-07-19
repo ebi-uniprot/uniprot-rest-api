@@ -1,7 +1,6 @@
 package uk.ac.ebi.uniprot.configure.api.controller;
 
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UniProtConfigureController.class)
 class UniProtConfigureControllerIT {
 
-    private static final String BASIC_RESOURCE = "/uniprotkb";
+    private static final String BASIC_RESOURCE = "/configure/uniprotkb";
 
     @Autowired
     private MockMvc mockMvc;
