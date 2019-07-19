@@ -2,15 +2,15 @@ package uk.ac.ebi.uniprot.api.crossref.service;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.uniprot.api.crossref.model.CrossRefAllFields;
 import uk.ac.ebi.uniprot.api.rest.search.AbstractSolrSortClause;
+import uk.ac.ebi.uniprot.search.field.CrossRefField;
 
 @Service
 public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
-        Sort defaultSort = new Sort(Sort.Direction.ASC, CrossRefAllFields.accession.getName());
+        Sort defaultSort = new Sort(Sort.Direction.ASC, CrossRefField.Search.accession.getName());
 
         if (hasScore) {
             defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
@@ -21,7 +21,7 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return CrossRefAllFields.accession.getName();
+        return CrossRefField.Search.accession.getName();
     }
 
     @Override

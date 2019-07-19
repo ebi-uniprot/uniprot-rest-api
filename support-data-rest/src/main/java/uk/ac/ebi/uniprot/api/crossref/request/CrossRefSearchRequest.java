@@ -2,30 +2,21 @@ package uk.ac.ebi.uniprot.api.crossref.request;
 
 import lombok.Data;
 import uk.ac.ebi.uniprot.api.crossref.config.CrossRefFacetConfig;
-import uk.ac.ebi.uniprot.api.crossref.model.CrossRefAllFields;
-import uk.ac.ebi.uniprot.api.crossref.model.CrossRefValidSortFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidFacets;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQueryFields;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import uk.ac.ebi.uniprot.api.rest.validation.ValidSolrSortFields;
-import uk.ac.ebi.uniprot.common.Utils;
+import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
+import uk.ac.ebi.uniprot.api.rest.validation.*;
+import uk.ac.ebi.uniprot.search.field.CrossRefField;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Data
-public class CrossRefSearchRequest {
-    private static final int DEFAULT_RESULTS_SIZE = 25;
-
+public class CrossRefSearchRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = CrossRefAllFields.class, messagePrefix = "search.crossref")
+    @ValidSolrQueryFields(fieldValidatorClazz = CrossRefField.Search.class, messagePrefix = "search.crossref")
     private String query;
 
-    @ValidSolrSortFields(sortFieldEnumClazz = CrossRefValidSortFields.class)
+    @ValidSolrSortFields(sortFieldEnumClazz = CrossRefField.Sort.class)
     private String sort;
 
     private String cursor;
@@ -33,19 +24,10 @@ public class CrossRefSearchRequest {
     @ValidFacets(facetConfig = CrossRefFacetConfig.class)
     private String facets;
 
+    @ValidReturnFields(fieldValidatorClazz = CrossRefField.ResultFields.class)
+    private String fields;
+
     @Positive(message = "{search.positive}")
-    private Integer size = DEFAULT_RESULTS_SIZE;
-
-    public List<String> getFacetList(){
-        if(hasFacets()) {
-            return Arrays.asList(facets.split(("\\s*,\\s*")));
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    public boolean hasFacets() {
-        return Utils.notEmpty(facets);
-    }
+    private int size = DEFAULT_RESULTS_SIZE;
 
 }

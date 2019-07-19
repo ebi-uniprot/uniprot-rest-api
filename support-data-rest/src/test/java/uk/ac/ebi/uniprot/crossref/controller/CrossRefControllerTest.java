@@ -15,8 +15,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import uk.ac.ebi.uniprot.api.crossref.controller.CrossRefController;
 import uk.ac.ebi.uniprot.api.crossref.service.CrossRefService;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
+import uk.ac.ebi.uniprot.domain.crossref.CrossRefEntry;
+import uk.ac.ebi.uniprot.domain.crossref.CrossRefEntryBuilder;
 import uk.ac.ebi.uniprot.repository.SolrTestConfig;
-import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
 
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ class CrossRefControllerTest {
     @Test
     void testGetCrossRefByAccession() throws Exception {
         String accession = "DB-1234";
-        CrossRefDocument crossRef = createDBXRef();
+        CrossRefEntry crossRef = createDBXRef();
         Mockito.when(this.crossRefService.findByAccession(accession)).thenReturn(crossRef);
 
         ResultActions response = this.mockMvc.perform(
@@ -48,17 +49,17 @@ class CrossRefControllerTest {
                 .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
                 .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))
-                .andExpect(jsonPath("$.pubMedId", equalTo(crossRef.getPubMedId())))
-                .andExpect(jsonPath("$.doiId", equalTo(crossRef.getDoiId())))
-                .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
+                .andExpect(jsonPath("$.pub_med_id", equalTo(crossRef.getPubMedId())))
+                .andExpect(jsonPath("$.doi_id", equalTo(crossRef.getDoiId())))
+                .andExpect(jsonPath("$.link_type", equalTo(crossRef.getLinkType())))
                 .andExpect(jsonPath("$.server", equalTo(crossRef.getServer())))
-                .andExpect(jsonPath("$.dbUrl", equalTo(crossRef.getDbUrl())))
+                .andExpect(jsonPath("$.db_url", equalTo(crossRef.getDbUrl())))
                 .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
-                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
-                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
+                .andExpect(jsonPath("$.reviewed_protein_count", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
+                .andExpect(jsonPath("$.unreviewed_protein_count", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
     }
 
-    private CrossRefDocument createDBXRef(){
+    private CrossRefEntry createDBXRef(){
         String random = UUID.randomUUID().toString();
         String ac = random + "-AC-";
         String ab = random + "-AB-";
@@ -70,7 +71,7 @@ class CrossRefControllerTest {
         String du = random + "-DU-";
         String ct = random + "-CT-";
 
-        CrossRefDocument.CrossRefDocumentBuilder builder = CrossRefDocument.builder();
+        CrossRefEntryBuilder builder = new CrossRefEntryBuilder();
         builder.abbrev(ab).accession(ac).category(ct).dbUrl(du);
         builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
         builder.reviewedProteinCount(2L).unreviewedProteinCount(3L);
