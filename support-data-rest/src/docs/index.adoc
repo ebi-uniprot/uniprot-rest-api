@@ -1,47 +1,89 @@
 = Keyword API
 Version {project-version}
 :toc: left
-:toclevels: 3
+:toclevels: 6
+:icons: font
 
-Provides services to access UniProt keyword information.
+Provides services for accessing UniProt _keyword_ information.
 
 [[resources]]
 == Resources
 
+// ----------------------------------------------------------------------------
+////
+Each resource is documented with standard sections:
+
+=== Resource Description
+==== Request
+==== Response
+==== Example: successful request
+==== Example: unsuccessful request
+
+////
+// ----------------------------------------------------------------------------
+
+
+// ======================================== GET BY ID ========================================
 [[resources-keyword-get-by-id]]
-=== Get by ID
-A `GET` request is used to retrieve a keyword object.
+=== Get keyword by ID
+A `GET` request is used to retrieve a specific keyword object.
 
-==== Successful request
+include::{snippets}/get-keyword-by-id/resource.adoc[]
 
-operation::get-keyword-by-id[snippets='curl-request,path-parameters,response-fields,http-response']
+==== Request
 
-==== Unsuccessful request
+operation::get-keyword-by-id[snippets='path-parameters']
 
-operation::get-keyword-by-id-not-found[snippets='curl-request,path-parameters,response-fields,http-response']
+[[resources-keyword-headers]]
+===== Headers
+
+operation::get-keyword-by-id[snippets='supported-content-types']
+
+==== Response
+
+operation::get-keyword-by-id[snippets='response-fields']
+
+==== Example: successful request
+
+operation::get-keyword-by-id[snippets='curl-request,r-request,http-response']
+
+==== Example: unsuccessful request
+
+operation::get-keyword-by-id-not-found[snippets='curl-request,r-request,http-response']
 
 ---
 
+// ======================================== GET BY SEARCH ========================================
 [[resources-keyword-search]]
-=== Search
+=== Keyword search
 
 A `GET` request is used to search over the keyword domain.
 
+include::{snippets}/get-keyword-by-search/resource.adoc[]
+
+==== Request
+
 [[search-request-parameters]]
-==== Request Parameters
-include::{snippets}/get-keyword-by-search/request-parameters.adoc[]
+operation::get-keyword-by-search[snippets='request-parameters']
 
 [[search-content-types]]
-==== Headers
-operation::search-meta-info[snippets='valid-content-types']
+===== Headers
+operation::get-keyword-by-search[snippets='supported-content-types']
 
+==== Response
+operation::get-keyword-by-search[snippets='response-fields']
 
+==== Example: successful request
 
-operation::get-keyword-by-search[snippets='r-request,curl-request,response-fields,http-response']
+operation::get-keyword-by-search[snippets='curl-request,r-request,http-response']
 
+==== Example: unsuccessful request
 
+operation::get-keyword-by-search-unsuccessful[snippets='curl-request,r-request,http-response']
 ---
 
-[[resources-keyword-download]]
-=== Download
-A `GET` request is used to download the data associated with a search.
+
+// ======================================== GET BY DOWNLOAD ========================================
+// TODO
+
+---

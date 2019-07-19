@@ -13,9 +13,9 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.constraints.ResourceBundleConstraintDescriptionResolver;
 import org.springframework.restdocs.constraints.ValidatorConstraintResolver;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentationConfigurer;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -46,7 +46,8 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.ebi.uniprot.api.keyword.RRequestSnippet.rRequest;
-import static uk.ac.ebi.uniprot.api.keyword.ValidContentTypes.validContentTypes;
+import static uk.ac.ebi.uniprot.api.keyword.ResourceSnippet.resource;
+import static uk.ac.ebi.uniprot.api.keyword.SupportedContentTypesSnippet.supportedContentTypes;
 
 /**
  * E.g., check this https://github.com/ePages-de/restdocs-api-spec/blob/master/samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/ProductRestIntegrationTest.java
@@ -61,7 +62,6 @@ import static uk.ac.ebi.uniprot.api.keyword.ValidContentTypes.validContentTypes;
 @ExtendWith(value = {RestDocumentationExtension.class, SpringExtension.class,
                      KeywordGetIdControllerIT.KeywordGetIdParameterResolver.class,
                      KeywordGetIdControllerIT.KeywordGetIdContentTypeParamResolver.class})
-@TestPropertySource(properties = "spring.jackson.serialization.indent_output=true")
 class KeywordControllerAPIDocumentationTest {
     private static final String KW_ACC = "KW-0001";
 
@@ -76,14 +76,18 @@ class KeywordControllerAPIDocumentationTest {
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider restDocumentation) {
+        MockMvcRestDocumentationConfigurer docConfigurer = documentationConfiguration(restDocumentation);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(documentationConfiguration(restDocumentation))
-                .apply(documentationConfiguration(restDocumentation).operationPreprocessors()
-                               .withRequestDefaults(prettyPrint())
-                               .withResponseDefaults(prettyPrint()))
-                .apply(documentationConfiguration(restDocumentation).snippets().withAdditionalDefaults(
+                .apply(docConfigurer)
+                .apply(docConfigurer.snippets().withAdditionalDefaults(
                         rRequest(),
-                        validContentTypes(requestMappingHandlerMapping)))
+                        supportedContentTypes(requestMappingHandlerMapping),
+                        resource(requestMappingHandlerMapping)))
+                .apply(docConfigurer
+                               .operationPreprocessors()
+                               .withRequestDefaults(prettyPrint())
+                               .withResponseDefaults(prettyPrint())
+                )
                 .build();
     }
 
@@ -117,7 +121,7 @@ class KeywordControllerAPIDocumentationTest {
     void getKeywordByIdNotFound() throws Exception {
         String identifier = "get-keyword-by-id-not-found";
 
-        this.mockMvc.perform(get("/keyword/{keywordId}", "KW-0002")
+        this.mockMvc.perform(get("/keyword/{keywordId}", "KW-0000")
                                      .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -138,11 +142,10 @@ class KeywordControllerAPIDocumentationTest {
     void getKeywordsBySearch() throws Exception {
         String identifier = "get-keyword-by-search";
 
-        ConstraintDescriptions keywordConstraints = new ConstraintDescriptions(KeywordRequestDTO.class, new ValidatorConstraintResolver(),
-                                                                               new ResourceBundleConstraintDescriptionResolver(ResourceBundle
-                                                                                                                                       .getBundle("constraint-descriptor")));
-
-
+        ConstraintDescriptions keywordConstraints =
+                new ConstraintDescriptions(KeywordRequestDTO.class, new ValidatorConstraintResolver(),
+                                           new ResourceBundleConstraintDescriptionResolver(ResourceBundle
+                                                                                                   .getBundle("constraint-descriptor")));
         saveEntry();
         this.mockMvc.perform(get("/keyword/search")
                                      .param("query", "keyword_id:KW-0001")
@@ -176,47 +179,18 @@ class KeywordControllerAPIDocumentationTest {
     }
 
     @Test
-    void searchInfo() throws Exception {
-        String identifier = "search-meta-info";
-
-        ConstraintDescriptions keywordConstraints = new ConstraintDescriptions(KeywordRequestDTO.class, new ValidatorConstraintResolver(),
-                                                                               new ResourceBundleConstraintDescriptionResolver(ResourceBundle
-                                                                                                                                       .getBundle("constraint-descriptor")));
-
+    void getKeywordsBySearchUnsuccessful() throws Exception {
+        String identifier = "get-keyword-by-search-unsuccessful";
 
         saveEntry();
         this.mockMvc.perform(get("/keyword/search")
-                                     .param("query", "keyword_id:KW-0001")
                                      .param("sort", "name desc")
                                      .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andDo(document(identifier,
                                 resourceDetails()
-                                        .description("Find keywords that match a search query"),
-//                                requestHeaders(
-//                                        headerWithName("Accept")
-//                                                .description("some description for the content type here")),
-                                requestParameters(
-                                        attributes(key("title").value("There we go!!!")),
-
-                                        parameterWithName("sort")
-                                                .description("Fields to sort on")
-                                                .attributes(
-                                                        key("constraints").value(keywordConstraints
-                                                                                         .descriptionsForProperty("sort")))
-                                        , parameterWithName("query")
-                                                .description("the query")
-                                                .attributes(
-                                                        key("constraints").value(keywordConstraints
-                                                                                         .descriptionsForProperty("query")))
-                                ),
-                                responseFields(
-                                        subsectionWithPath("results")
-                                                .description("A list of `keyword` objects matching the search query."),
-                                        subsectionWithPath("facets")
-                                                .description("A list of facets matching the search query.")
-                                )));
+                                        .description("Request to find keywords is unsuccessful")));
     }
 
     private void saveEntry() {
@@ -224,12 +198,11 @@ class KeywordControllerAPIDocumentationTest {
         keywordEntry.setDefinition("Protein which contains at least one 2Fe-2S iron-sulfur cluster: 2 iron atoms " +
                                            "complexed to 2 inorganic sulfides and 4 sulfur atoms of cysteines from " +
                                            "the protein");
-        String accession = "KW-0001";
-        keywordEntry.setKeyword(new KeywordImpl("2Fe-2S", accession));
+        keywordEntry.setKeyword(new KeywordImpl("2Fe-2S", KW_ACC));
         keywordEntry.setCategory(new KeywordImpl("Ligand", "KW-9993"));
 
         KeywordDocument document = KeywordDocument.builder()
-                .id(accession)
+                .id(KW_ACC)
                 .keywordObj(getKeywordBinary(keywordEntry))
                 .build();
 
