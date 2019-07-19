@@ -1,0 +1,15 @@
+[source,bash]
+----
+library(httr)
+library(jsonlite)
+library(xml2)
+
+contentType <- "{{contentType}}"
+requestURL <- {{url}}
+r <- GET(requestURL, accept(contentType))
+
+stop_for_status(r)
+
+json <- toJSON(content(r))
+head(fromJSON(json))
+----

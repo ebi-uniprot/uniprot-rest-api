@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import uk.ac.ebi.uniprot.api.DataStoreTestConfig;
 import uk.ac.ebi.uniprot.api.keyword.request.KeywordRequestDTO;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
@@ -44,8 +45,11 @@ import static org.springframework.restdocs.snippet.Attributes.attributes;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.uniprot.api.keyword.RRequestSnippet.rRequest;
+import static uk.ac.ebi.uniprot.api.keyword.ValidContentTypes.validContentTypes;
 
 /**
+ * E.g., check this https://github.com/ePages-de/restdocs-api-spec/blob/master/samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/ProductRestIntegrationTest.java
  * Created 28/06/19
  *
  * @author Edd
@@ -65,6 +69,9 @@ class KeywordControllerAPIDocumentationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+    @Autowired
     private DataStoreManager storeManager;
 
     @BeforeEach
@@ -74,6 +81,9 @@ class KeywordControllerAPIDocumentationTest {
                 .apply(documentationConfiguration(restDocumentation).operationPreprocessors()
                                .withRequestDefaults(prettyPrint())
                                .withResponseDefaults(prettyPrint()))
+                .apply(documentationConfiguration(restDocumentation).snippets().withAdditionalDefaults(
+                        rRequest(),
+                        validContentTypes(requestMappingHandlerMapping)))
                 .build();
     }
 
@@ -107,7 +117,7 @@ class KeywordControllerAPIDocumentationTest {
     void getKeywordByIdNotFound() throws Exception {
         String identifier = "get-keyword-by-id-not-found";
 
-        this.mockMvc.perform(get("/keyword/{keywordId}", "KW-0001")
+        this.mockMvc.perform(get("/keyword/{keywordId}", "KW-0002")
                                      .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -136,25 +146,71 @@ class KeywordControllerAPIDocumentationTest {
         saveEntry();
         this.mockMvc.perform(get("/keyword/search")
                                      .param("query", "keyword_id:KW-0001")
+                                     .param("sort", "name desc")
                                      .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document(identifier,
                                 resourceDetails()
                                         .description("Find keywords that match a search query"),
-                                // check this https://github.com/ePages-de/restdocs-api-spec/blob/master/samples/restdocs-api-spec-sample/src/test/java/com/epages/restdocs/apispec/sample/ProductRestIntegrationTest.java
                                 requestParameters(
                                         attributes(key("title").value("There we go!!!")),
                                         parameterWithName("query")
                                                 .description("the query")
                                                 .attributes(
                                                         key("constraints").value(keywordConstraints
-                                                                                         .descriptionsForProperty("query"))),
+                                                                                         .descriptionsForProperty("query")))
+                                        ,
                                         parameterWithName("sort")
                                                 .description("Fields to sort on")
                                                 .attributes(
                                                         key("constraints").value(keywordConstraints
-                                                                                         .descriptionsForProperty("sort")))),
+                                                                                         .descriptionsForProperty("sort")))
+                                ),
+                                responseFields(
+                                        subsectionWithPath("results")
+                                                .description("A list of `keyword` objects matching the search query."),
+                                        subsectionWithPath("facets")
+                                                .description("A list of facets matching the search query.")
+                                )));
+    }
+
+    @Test
+    void searchInfo() throws Exception {
+        String identifier = "search-meta-info";
+
+        ConstraintDescriptions keywordConstraints = new ConstraintDescriptions(KeywordRequestDTO.class, new ValidatorConstraintResolver(),
+                                                                               new ResourceBundleConstraintDescriptionResolver(ResourceBundle
+                                                                                                                                       .getBundle("constraint-descriptor")));
+
+
+        saveEntry();
+        this.mockMvc.perform(get("/keyword/search")
+                                     .param("query", "keyword_id:KW-0001")
+                                     .param("sort", "name desc")
+                                     .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document(identifier,
+                                resourceDetails()
+                                        .description("Find keywords that match a search query"),
+//                                requestHeaders(
+//                                        headerWithName("Accept")
+//                                                .description("some description for the content type here")),
+                                requestParameters(
+                                        attributes(key("title").value("There we go!!!")),
+
+                                        parameterWithName("sort")
+                                                .description("Fields to sort on")
+                                                .attributes(
+                                                        key("constraints").value(keywordConstraints
+                                                                                         .descriptionsForProperty("sort")))
+                                        , parameterWithName("query")
+                                                .description("the query")
+                                                .attributes(
+                                                        key("constraints").value(keywordConstraints
+                                                                                         .descriptionsForProperty("query")))
+                                ),
                                 responseFields(
                                         subsectionWithPath("results")
                                                 .description("A list of `keyword` objects matching the search query."),
@@ -187,5 +243,4 @@ class KeywordControllerAPIDocumentationTest {
             throw new RuntimeException("Unable to parse KeywordEntry to binary json: ", e);
         }
     }
-
 }
