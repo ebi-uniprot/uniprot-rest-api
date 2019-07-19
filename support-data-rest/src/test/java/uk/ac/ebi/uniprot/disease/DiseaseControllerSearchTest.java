@@ -174,7 +174,7 @@ public class DiseaseControllerSearchTest {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].alternative_names[2]", Matchers.equalTo(searchString)));
+                .andExpect(jsonPath("$.results[0].alternativeNames[2]", Matchers.equalTo(searchString)));
 
     }
 
@@ -346,7 +346,7 @@ public class DiseaseControllerSearchTest {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].alternative_names[0]", Matchers.containsString(searchString)));
+                .andExpect(jsonPath("$.results[0].alternativeNames[0]", Matchers.containsString(searchString)));
 
     }
 

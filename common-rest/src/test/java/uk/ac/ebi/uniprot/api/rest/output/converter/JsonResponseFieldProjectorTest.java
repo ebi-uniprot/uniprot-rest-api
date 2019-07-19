@@ -58,16 +58,16 @@ public class JsonResponseFieldProjectorTest {
         Assertions.assertNotNull(returnMap.get("acronym"));
         Assertions.assertTrue(returnMap.containsKey("definition"));
         Assertions.assertNotNull(returnMap.get("definition"));
-        Assertions.assertTrue(returnMap.containsKey("alternative_names"));
-        Assertions.assertNotNull(returnMap.get("alternative_names"));
-        Assertions.assertTrue(returnMap.containsKey("cross_references"));
-        Assertions.assertNotNull(returnMap.get("cross_references"));
+        Assertions.assertTrue(returnMap.containsKey("alternativeNames"));
+        Assertions.assertNotNull(returnMap.get("alternativeNames"));
+        Assertions.assertTrue(returnMap.containsKey("crossReferences"));
+        Assertions.assertNotNull(returnMap.get("crossReferences"));
         Assertions.assertTrue(returnMap.containsKey("keywords"));
         Assertions.assertNotNull(returnMap.get("keywords"));
-        Assertions.assertTrue(returnMap.containsKey("reviewed_protein_count"));
-        Assertions.assertNotNull(returnMap.get("reviewed_protein_count"));
-        Assertions.assertTrue(returnMap.containsKey("unreviewed_protein_count"));
-        Assertions.assertNotNull(returnMap.get("unreviewed_protein_count"));
+        Assertions.assertTrue(returnMap.containsKey("reviewedProteinCount"));
+        Assertions.assertNotNull(returnMap.get("reviewedProteinCount"));
+        Assertions.assertTrue(returnMap.containsKey("unreviewedProteinCount"));
+        Assertions.assertNotNull(returnMap.get("unreviewedProteinCount"));
     }
 
     @Test
@@ -80,8 +80,8 @@ public class JsonResponseFieldProjectorTest {
 
         Assertions.assertTrue(returnMap.containsKey("id"));
         Assertions.assertNotNull(returnMap.get("id"));
-        Assertions.assertTrue(returnMap.containsKey("alternative_names"));
-        Assertions.assertNotNull(returnMap.get("alternative_names"));
+        Assertions.assertTrue(returnMap.containsKey("alternativeNames"));
+        Assertions.assertNotNull(returnMap.get("alternativeNames"));
         Assertions.assertTrue(returnMap.containsKey("keywords"));
         Assertions.assertNotNull(returnMap.get("keywords"));
 
@@ -98,8 +98,8 @@ public class JsonResponseFieldProjectorTest {
 
         Assertions.assertTrue(returnMap.containsKey("id"));
         Assertions.assertNotNull(returnMap.get("id"));
-        Assertions.assertTrue(returnMap.containsKey("unreviewed_protein_count"));
-        Assertions.assertNotNull(returnMap.get("unreviewed_protein_count"));
+        Assertions.assertTrue(returnMap.containsKey("unreviewedProteinCount"));
+        Assertions.assertNotNull(returnMap.get("unreviewedProteinCount"));
         Assertions.assertFalse(returnMap.containsKey("invalid_field_name"));
     }
 

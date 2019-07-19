@@ -21,12 +21,16 @@ public class JsonResponseFieldProjector {
     // Get a map containing the object's projected fields
     public Map<String, Object> project(Object object, List<String> returnFields, List<ReturnField> allFields) {
 
+        List<String> camelCaseFieldNames;
         if(!Utils.notEmpty(returnFields)){ // if the return fields is empty return all fields from allFields
-            returnFields = allFields.stream().map(f -> f.toString()).collect(Collectors.toList());
+            camelCaseFieldNames = allFields.stream().map(f -> f.getJavaFieldName()).collect(Collectors.toList());
+        } else {
+            camelCaseFieldNames = allFields.stream().filter(f -> returnFields.contains(f.toString())).map(f -> f.getJavaFieldName()).collect(Collectors.toList());
+
         }
 
         // create the Map instance to be returned with root fields populated
-        Map<String, Object> projectedMap = buildMapWithFields(object, returnFields, allFields);
+        Map<String, Object> projectedMap = buildMapWithFields(object, camelCaseFieldNames, allFields);
 
         return projectedMap;
 

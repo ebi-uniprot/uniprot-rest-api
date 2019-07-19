@@ -125,15 +125,15 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
                     .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
                     .resultMatcher(jsonPath("$.definition", containsString("characterized by intellectual disability")))
-                    .resultMatcher(jsonPath("$.unreviewed_protein_count", is(0)))
-                    .resultMatcher(jsonPath("$.reviewed_protein_count", is(1)))
+                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
+                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.keywords.length()", is(1)))
                     .resultMatcher(jsonPath("$.keywords[0].id", is("Mental retardation")))
                     .resultMatcher(jsonPath("$.keywords[0].accession", is("KW-0991")))
-                    .resultMatcher(jsonPath("$.alternative_names.length()", is(2)))
-                    .resultMatcher(jsonPath("$.alternative_names", containsInAnyOrder(  "Zhu-Tokita-Takenouchi-Kim syndrome",
+                    .resultMatcher(jsonPath("$.alternativeNames.length()", is(2)))
+                    .resultMatcher(jsonPath("$.alternativeNames", containsInAnyOrder(  "Zhu-Tokita-Takenouchi-Kim syndrome",
                             "ZTTK multiple congenital anomalies-mental retardation syndrome")))
-                    .resultMatcher(jsonPath("$.cross_references.length()", is(4)))
+                    .resultMatcher(jsonPath("$.crossReferences.length()", is(4)))
                     .build();
         }
 
@@ -158,9 +158,9 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder().id(ACCESSION).fields("id,accession,reviewed_protein_count")
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
-                    .resultMatcher(jsonPath("$.reviewed_protein_count", is(1)))
-                    .resultMatcher(jsonPath("$.alternative_names").doesNotExist())
-                    .resultMatcher(jsonPath("$.unreviewed_protein_count").doesNotExist())
+                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
+                    .resultMatcher(jsonPath("$.alternativeNames").doesNotExist())
+                    .resultMatcher(jsonPath("$.unreviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.acronym").doesNotExist())
                     .build();
         }
@@ -185,8 +185,8 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                             .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                             .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
                             .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
-                            .resultMatcher(jsonPath("$.unreviewed_protein_count", is(0)))
-                            .resultMatcher(jsonPath("$.reviewed_protein_count", is(1)))
+                            .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
+                            .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
                             .resultMatcher(jsonPath("$.definition", containsString("characterized by intellectual disability")))
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()

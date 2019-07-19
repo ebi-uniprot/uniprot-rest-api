@@ -49,14 +49,14 @@ class CrossRefControllerTest {
                 .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
                 .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))
-                .andExpect(jsonPath("$.pub_med_id", equalTo(crossRef.getPubMedId())))
-                .andExpect(jsonPath("$.doi_id", equalTo(crossRef.getDoiId())))
-                .andExpect(jsonPath("$.link_type", equalTo(crossRef.getLinkType())))
+                .andExpect(jsonPath("$.pubMedId", equalTo(crossRef.getPubMedId())))
+                .andExpect(jsonPath("$.doiId", equalTo(crossRef.getDoiId())))
+                .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
                 .andExpect(jsonPath("$.server", equalTo(crossRef.getServer())))
-                .andExpect(jsonPath("$.db_url", equalTo(crossRef.getDbUrl())))
+                .andExpect(jsonPath("$.dbUrl", equalTo(crossRef.getDbUrl())))
                 .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
-                .andExpect(jsonPath("$.reviewed_protein_count", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
-                .andExpect(jsonPath("$.unreviewed_protein_count", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
+                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
+                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
     }
 
     private CrossRefEntry createDBXRef(){

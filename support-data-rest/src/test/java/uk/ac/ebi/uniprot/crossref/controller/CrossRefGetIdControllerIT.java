@@ -91,17 +91,17 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder().id(ACCESSION)
-                    .resultMatcher(jsonPath("$.link_type", is("Explicit")))
+                    .resultMatcher(jsonPath("$.linkType", is("Explicit")))
                     .resultMatcher(jsonPath("$.server", is("http://tigrfams.jcvi.org/cgi-bin/index.cgi")))
-                    .resultMatcher(jsonPath("$.unreviewed_protein_count", is(5)))
+                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name", is("TIGRFAMs; a protein family database")))
-                    .resultMatcher(jsonPath("$.db_url", is("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
-                    .resultMatcher(jsonPath("$.pub_med_id", is("17151080")))
+                    .resultMatcher(jsonPath("$.dbUrl", is("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
+                    .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
-                    .resultMatcher(jsonPath("$.reviewed_protein_count", is(10)))
+                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(10)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
-                    .resultMatcher(jsonPath("$.doi_id", is("10.1093/nar/gkl1043")))
+                    .resultMatcher(jsonPath("$.doiId", is("10.1093/nar/gkl1043")))
                     .build();
         }
 
@@ -126,9 +126,9 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder().id(ACCESSION).fields("accession,category,unreviewed_protein_count")
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
-                    .resultMatcher(jsonPath("$.unreviewed_protein_count", is(5)))
+                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name").doesNotExist())
-                    .resultMatcher(jsonPath("$.reviewed_protein_count").doesNotExist())
+                    .resultMatcher(jsonPath("$.reviewedProteinCount").doesNotExist())
                     .build();
         }
 
@@ -149,17 +149,17 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .id(ACCESSION)
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.link_type", is("Explicit")))
+                            .resultMatcher(jsonPath("$.linkType", is("Explicit")))
                             .resultMatcher(jsonPath("$.server", is("http://tigrfams.jcvi.org/cgi-bin/index.cgi")))
-                            .resultMatcher(jsonPath("$.unreviewed_protein_count", is(5)))
+                            .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
                             .resultMatcher(jsonPath("$.name", is("TIGRFAMs; a protein family database")))
-                            .resultMatcher(jsonPath("$.db_url", is("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
-                            .resultMatcher(jsonPath("$.pub_med_id", is("17151080")))
+                            .resultMatcher(jsonPath("$.dbUrl", is("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
+                            .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
                             .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                             .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
-                            .resultMatcher(jsonPath("$.reviewed_protein_count", is(10)))
+                            .resultMatcher(jsonPath("$.reviewedProteinCount", is(10)))
                             .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
-                            .resultMatcher(jsonPath("$.doi_id", is("10.1093/nar/gkl1043")))
+                            .resultMatcher(jsonPath("$.doiId", is("10.1093/nar/gkl1043")))
                             .build())
                     .build();
         }

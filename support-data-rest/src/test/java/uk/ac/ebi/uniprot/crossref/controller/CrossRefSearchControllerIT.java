@@ -244,7 +244,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("accession,name"))
                     .resultMatcher(jsonPath("$.results.*.accession", containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
-                    .resultMatcher(jsonPath("$.results.*.reviewed_protein_count").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
                     .build();
         }

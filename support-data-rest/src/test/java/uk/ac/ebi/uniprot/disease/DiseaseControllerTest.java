@@ -62,11 +62,11 @@ class DiseaseControllerTest {
                 .andExpect(jsonPath("$.accession", equalTo(disease.getAccession())))
                 .andExpect(jsonPath("$.acronym", equalTo(disease.getAcronym())))
                 .andExpect(jsonPath("$.definition", equalTo(disease.getDefinition())))
-                .andExpect(jsonPath("$.alternative_names.size()", equalTo(disease.getAlternativeNames().size())))
+                .andExpect(jsonPath("$.alternativeNames.size()", equalTo(disease.getAlternativeNames().size())))
                 .andExpect(jsonPath("$.keywords.size()", equalTo(disease.getKeywords().size())))
-                .andExpect(jsonPath("$.cross_references.size()", equalTo(disease.getCrossReferences().size())))
-                .andExpect(jsonPath("$.reviewed_protein_count", equalTo(Integer.valueOf(disease.getReviewedProteinCount().toString()))))
-                .andExpect(jsonPath("$.unreviewed_protein_count", equalTo(Integer.valueOf(disease.getUnreviewedProteinCount().toString()))));
+                .andExpect(jsonPath("$.crossReferences.size()", equalTo(disease.getCrossReferences().size())))
+                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(disease.getReviewedProteinCount().toString()))))
+                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(disease.getUnreviewedProteinCount().toString()))));
     }
 
     @Test
