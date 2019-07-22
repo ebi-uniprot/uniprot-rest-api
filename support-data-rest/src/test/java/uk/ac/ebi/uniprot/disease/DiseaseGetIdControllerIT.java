@@ -178,6 +178,20 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {
+
+            String fmtStr = "format-version: 1.2";
+            String defaultNSStr = "default-namespace: uniprot:diseases";
+            String termStr = "[Term]\n" +
+                    "id: DI-04860\n" +
+                    "name: ZTTK syndrome\n" +
+                    "def: \"An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.\" []\n" +
+                    "synonym: \"Zhu-Tokita-Takenouchi-Kim syndrome\" [UniProt]\n" +
+                    "synonym: \"ZTTK multiple congenital anomalies-mental retardation syndrome\" [UniProt]\n" +
+                    "xref: MedGen:CN238690\n" +
+                    "xref: MeSH:D000015\n" +
+                    "xref: MeSH:D008607\n" +
+                    "xref: MIM:617140 \"phenotype\"";
+
             return GetIdContentTypeParam.builder()
                     .id(ACCESSION)
                     .contentTypeParam(ContentTypeParam.builder()
@@ -205,6 +219,9 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                             .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                            .resultMatcher(content().string(containsString(fmtStr)))
+                            .resultMatcher(content().string(containsString(defaultNSStr)))
+                            .resultMatcher(content().string(containsString(termStr)))
                             .build())
                     .build();
         }

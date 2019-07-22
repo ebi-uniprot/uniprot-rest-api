@@ -11,6 +11,8 @@ import uk.ac.ebi.uniprot.cv.disease.Disease;
 import java.util.*;
 
 public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Disease> {
+    private static final String DISEASE_NAMESPACE = "uniprot:diseases";
+
     public DiseaseOBOMessageConverter() {
         super(Disease.class);
     }
@@ -40,12 +42,8 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
     }
 
     @Override
-    public Frame getHeaderFrame() {
-        Frame headerFrame = new Frame(Frame.FrameType.HEADER);
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_FORMAT_VERSION, "1.2"));
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_DATE, OBOFormatConstants.headerDateFormat().format(new Date())));
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_DEFAULT_NAMESPACE, "uniprot:diseases"));
-        return headerFrame;
+    public String getHeaderNamespace() {
+        return DISEASE_NAMESPACE;
     }
 
 

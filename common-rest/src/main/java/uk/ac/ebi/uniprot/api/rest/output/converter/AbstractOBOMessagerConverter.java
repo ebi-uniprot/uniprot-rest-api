@@ -1,11 +1,14 @@
 package uk.ac.ebi.uniprot.api.rest.output.converter;
 
+import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 
 import java.io.*;
+import java.util.Date;
 
 
 public abstract class AbstractOBOMessagerConverter<T> extends AbstractEntityHttpMessageConverter<T> {
@@ -18,8 +21,15 @@ public abstract class AbstractOBOMessagerConverter<T> extends AbstractEntityHttp
     }
 
     abstract protected Frame getTermFrame(T entity);
+    abstract protected String getHeaderNamespace();
 
-    abstract protected Frame getHeaderFrame();
+    public Frame getHeaderFrame(){
+        Frame headerFrame = new Frame(Frame.FrameType.HEADER);
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_FORMAT_VERSION, "1.2"));
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_DATE, OBOFormatConstants.headerDateFormat().format(new Date())));
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_DEFAULT_NAMESPACE, getHeaderNamespace()));
+        return headerFrame;
+    }
 
     @Override
     protected void before(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
