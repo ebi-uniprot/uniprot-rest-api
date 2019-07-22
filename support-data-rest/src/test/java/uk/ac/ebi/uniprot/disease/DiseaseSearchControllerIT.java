@@ -288,6 +288,17 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
+            String fmtStr = "format-version: 1.2";
+            String defaultNSStr = "default-namespace: uniprot:diseases";
+            String termStr = "name: ZTTK syndrome20\n" +
+                    "def: \"An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.\" []\n" +
+                    "synonym: \"Zhu-Tokita-Takenouchi-Kim syndrome\" [UniProt]\n" +
+                    "synonym: \"ZTTK multiple congenital anomalies-mental retardation syndrome\" [UniProt]\n" +
+                    "xref: MedGen20:CN23869020\n" +
+                    "xref: MeSH20:D00001520\n" +
+                    "xref: MeSH20:D00860720\n" +
+                    "xref: MIM20:61714020 \"phenotype20\"";
+
             return SearchContentTypeParam.builder()
                     .query("accession:" + SEARCH_ACCESSION1 + " OR accession:" + SEARCH_ACCESSION2)
                     .contentTypeParam(ContentTypeParam.builder()
@@ -312,6 +323,9 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                             .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                            .resultMatcher(content().string(containsString(fmtStr)))
+                            .resultMatcher(content().string(containsString(defaultNSStr)))
+                            .resultMatcher(content().string(containsString(termStr)))
                             .build())
                     .build();
         }
