@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.restdocs.cli.CliDocumentation.multiLineFormat;
-import static uk.ac.ebi.uniprot.api.keyword.SnippetHelper.pathMatches;
 
 /**
  * Created 18/07/19
@@ -39,16 +38,7 @@ public class ResourceSnippet extends TemplatedSnippet {
     @Override
     protected Map<String, Object> createModel(Operation operation) {
         Map<String, Object> model = new HashMap<>();
-        model.put("resource", this.supportedContentTypes(operation.getRequest().getUri().getPath()));
+        model.put("resource", operation.getAttributes().get("org.springframework.restdocs.urlTemplate"));
         return model;
-    }
-
-    private String supportedContentTypes(String requestPath) {
-        return requestMappingHandler.getHandlerMethods().keySet().stream()
-                .map(requestMappingInfo -> requestMappingInfo.getPatternsCondition().getPatterns().stream())
-                .flatMap(l -> l)
-                .filter(path -> pathMatches(path, requestPath))
-                .findFirst()
-                .orElse("");
     }
 }
