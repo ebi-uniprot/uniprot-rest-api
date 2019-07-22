@@ -82,7 +82,7 @@ class KeywordControllerAPIDocumentationTest {
                 .apply(docConfigurer.snippets().withAdditionalDefaults(
                         rRequest(),
                         supportedContentTypes(requestMappingHandlerMapping),
-                        resource(requestMappingHandlerMapping)))
+                        resource()))
                 .apply(docConfigurer
                                .operationPreprocessors()
                                .withRequestDefaults(prettyPrint())

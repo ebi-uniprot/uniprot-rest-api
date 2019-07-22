@@ -3,11 +3,13 @@ package uk.ac.ebi.uniprot.api.keyword;
 import java.util.regex.Pattern;
 
 /**
+ * Helper methods used when generating snippets.
+ * <p>
  * Created 19/07/19
  *
  * @author Edd
  */
-public class SnippetHelper {
+class SnippetHelper {
     private static final Pattern PATH_VARIABLE_PATTERN = Pattern.compile("\\{.*\\}");
 
     static boolean pathMatches(String pathFormat, String path) {

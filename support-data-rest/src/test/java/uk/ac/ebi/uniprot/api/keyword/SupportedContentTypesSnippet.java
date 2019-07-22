@@ -17,6 +17,11 @@ import static org.springframework.restdocs.cli.CliDocumentation.multiLineFormat;
 import static uk.ac.ebi.uniprot.api.keyword.SnippetHelper.pathMatches;
 
 /**
+ * Used in combination with {@code org/springframework/restdocs/templates/asciidoctor/supported-content-types.snippet} to produce
+ * concrete {@code supported-content-types.snippet}s, which document the content types supported by a REST end-point.
+ * To modify formatting, change {@code supported-content-types.snippet}.
+ * <p>
+ *
  * Created 18/07/19
  *
  * @author Edd

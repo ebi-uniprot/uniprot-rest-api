@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 import static org.springframework.restdocs.cli.CliDocumentation.multiLineFormat;
 
 /**
+ * Used in combination with {@code org/springframework/restdocs/templates/asciidoctor/r-request.snippet} to produce
+ * concrete {@code r-request.snippet}s, which document an example REST call using the R language for a REST Doc test case.
+ * To modify formatting, change {@code r-request.snippet}.
+ * <p>
  * Created 18/07/19
  *
  * @author Edd
