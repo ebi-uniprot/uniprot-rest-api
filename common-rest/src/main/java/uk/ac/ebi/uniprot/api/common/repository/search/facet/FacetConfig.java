@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -14,14 +13,12 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public abstract class GenericFacetConfig {
+public abstract class FacetConfig {
     private int mincount;
 
     private int limit;
 
-    public Collection<String> getFacetNames() {
-        return Collections.emptySet();
-    }
+    public abstract Collection<String> getFacetNames();
 
     public abstract Map<String, FacetProperty> getFacetPropertyMap();
 }

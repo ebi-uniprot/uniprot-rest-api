@@ -13,7 +13,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
@@ -295,7 +295,7 @@ class SolrQueryRepositoryIT {
                 .query(query)
                 .defaultQueryOperator(Query.Operator.AND)
                 .filterQuery("active:true")
-                .facetConfig(new FakeFacetConfigConverter())
+                .facetConfig(new FakeFacetConfig())
                 .facets(facets)
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .build();
@@ -320,7 +320,7 @@ class SolrQueryRepositoryIT {
 
     private static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
         GeneralSolrQueryRepository(SolrTemplate template) {
-            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter(), new GeneralSolrRequestConverter());
+            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfig(), new GeneralSolrRequestConverter());
         }
     }
 

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
 import uk.ac.ebi.uniprot.common.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ import java.util.Collection;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidFacets {
-    Class<? extends GenericFacetConfig> facetConfig();
+    Class<? extends FacetConfig> facetConfig();
 
     String message() default "{search.invalid.includeFacet}";
 
@@ -56,7 +56,7 @@ public @interface ValidFacets {
         public void initialize(ValidFacets constraintAnnotation) {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             try {
-                GenericFacetConfig facetConfig = applicationContext.getBean(constraintAnnotation.facetConfig());
+                FacetConfig facetConfig = applicationContext.getBean(constraintAnnotation.facetConfig());
                 facetNames = facetConfig.getFacetNames();
             } catch (Exception e) {
                 LOGGER.error("Unable to instantiate facet config", e);

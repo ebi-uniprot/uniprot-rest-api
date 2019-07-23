@@ -11,7 +11,8 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.result.Cursor;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetResponseConverter;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfo;
 import uk.ac.ebi.uniprot.api.common.repository.search.term.TermInfoConverter;
@@ -39,13 +40,13 @@ public abstract class SolrQueryRepository<T> {
     private SolrTemplate solrTemplate;
     private SolrCollection collection;
     private Class<T> tClass;
-    private FacetConfigConverter facetConverter;
+    private FacetResponseConverter facetConverter;
 
-    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass, FacetConfigConverter facetConverter, SolrRequestConverter requestConverter) {
+    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass, FacetConfig facetConfig, SolrRequestConverter requestConverter) {
         this.solrTemplate = solrTemplate;
         this.collection = collection;
         this.tClass = tClass;
-        this.facetConverter = facetConverter;
+        this.facetConverter = new FacetResponseConverter(facetConfig);
         this.requestConverter = requestConverter;
         this.termInfoConverter = new TermInfoConverter();
     }

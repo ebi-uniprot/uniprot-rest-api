@@ -7,8 +7,8 @@ import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFacetQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 import uk.ac.ebi.uniprot.common.Utils;
 
 import java.util.List;
@@ -121,7 +121,7 @@ public class SolrRequestConverter {
             return SINGLE_TERM_PATTERN.matcher(query).matches();
         }
 
-        static void setFacets(SolrQuery solrQuery, List<String> facets, GenericFacetConfig facetConfig) {
+        static void setFacets(SolrQuery solrQuery, List<String> facets, FacetConfig facetConfig) {
             solrQuery.setFacet(true);
 
             for (String facetName : facets) {

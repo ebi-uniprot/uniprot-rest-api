@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
  *
  * @author lgonzales
  */
-class FacetConfigConverterTest {
+class FacetResponseConverterTest {
 
     private QueryResponse queryResponse = mock(QueryResponse.class);
 
@@ -27,8 +27,8 @@ class FacetConfigConverterTest {
     void convertFacetForNullResponse() {
         when(queryResponse.getFacetFields()).thenReturn(null);
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
         assertEquals(0,facets.size());
     }
@@ -40,8 +40,8 @@ class FacetConfigConverterTest {
 
         when(queryResponse.getFacetFields()).thenReturn(fieldList);
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
         assertEquals(2,facets.size());
 
@@ -65,8 +65,8 @@ class FacetConfigConverterTest {
 
         when(queryResponse.getFacetFields()).thenReturn(fieldList);
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
 
         Facet popularOrganism = facets.get(0);
@@ -89,8 +89,8 @@ class FacetConfigConverterTest {
         IntervalFacet intervalFacet = getLengthIntervalFacet();
         when(queryResponse.getIntervalFacets()).thenReturn(Collections.singletonList(intervalFacet));
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
 
         Facet lengthFacet = facets.get(0);

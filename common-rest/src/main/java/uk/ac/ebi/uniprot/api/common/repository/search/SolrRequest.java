@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Singular;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Query;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class SolrRequest {
     private String query;
     private Query.Operator defaultQueryOperator;
     private Sort sort;
-    private GenericFacetConfig facetConfig;
+    private FacetConfig facetConfig;
     private String termQuery;
 
     @Singular

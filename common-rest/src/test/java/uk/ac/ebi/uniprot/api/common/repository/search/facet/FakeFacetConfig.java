@@ -1,5 +1,6 @@
 package uk.ac.ebi.uniprot.api.common.repository.search.facet;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +8,12 @@ import java.util.Map;
  *
  * @author lgonzales
  */
-public class FakeFacetConfigConverter extends GenericFacetConfig implements FacetConfigConverter{
+public class FakeFacetConfig extends FacetConfig {
+
+    @Override
+    public Collection<String> getFacetNames() {
+        return null;
+    }
 
     @Override
     public Map<String, FacetProperty> getFacetPropertyMap() {

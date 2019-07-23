@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.*;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ class SolrRequestConverterTest {
             String queryString = "query";
             String facet1 = "fragment";
             String facet2 = "length";
-            FakeFacetConfigConverter facetConfig = new FakeFacetConfigConverter();
+            FakeFacetConfig facetConfig = new FakeFacetConfig();
             int facetLimit = 100;
             int facetMinCount = 10;
             facetConfig.setLimit(facetLimit);
@@ -103,7 +103,7 @@ class SolrRequestConverterTest {
         void canCreateFacetQuery() {
             // given
             String queryString = "my query";
-            FakeFacetConfigConverter facetConfig = new FakeFacetConfigConverter();
+            FakeFacetConfig facetConfig = new FakeFacetConfig();
             int facetLimit = 100;
             int facetMinCount = 10;
             facetConfig.setLimit(facetLimit);
@@ -148,7 +148,7 @@ class SolrRequestConverterTest {
     @Test
     void notSupportedIntervalQueryQuery() {
         String queryString = "my query";
-        FakeFacetConfigConverter facetConfig = new FakeFacetConfigConverter();
+        FakeFacetConfig facetConfig = new FakeFacetConfig();
         int facetLimit = 100;
         int facetMinCount = 10;
         facetConfig.setLimit(facetLimit);
