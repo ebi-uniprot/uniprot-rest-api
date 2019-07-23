@@ -14,8 +14,8 @@ import uk.ac.ebi.uniprot.search.document.literature.LiteratureDocument;
 @Repository
 public class LiteratureRepository extends SolrQueryRepository<LiteratureDocument> {
 
-    protected LiteratureRepository(SolrTemplate solrTemplate, LiteratureFacetConfig facetConverter, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.literature, LiteratureDocument.class, facetConverter, requestConverter);
+    protected LiteratureRepository(SolrTemplate solrTemplate, LiteratureFacetConfig facetConfig, SolrRequestConverter requestConverter) {
+        super(solrTemplate, SolrCollection.literature, LiteratureDocument.class, facetConfig, requestConverter);
     }
 
 }

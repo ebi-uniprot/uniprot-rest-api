@@ -1,18 +1,16 @@
 package uk.ac.ebi.uniprot.api.proteome.repository;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-
-import lombok.Getter;
-import lombok.Setter;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
 import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -24,7 +22,7 @@ import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 @Getter @Setter
 @PropertySource({"classpath:proteome.facet.properties"})
 @ConfigurationProperties(prefix = "facet")
-public class ProteomeFacetConfig extends GenericFacetConfig implements FacetConfigConverter {
+public class ProteomeFacetConfig extends FacetConfig {
 
 	 private Map<String, FacetProperty> proteome = new HashMap<>();
 	
@@ -32,8 +30,10 @@ public class ProteomeFacetConfig extends GenericFacetConfig implements FacetConf
 	public Map<String, FacetProperty> getFacetPropertyMap() {
 		return proteome;
 	}
-	 public Collection<String> getFacetNames() {
-	        return proteome.keySet();
-	    }
+
+    @Override
+    public Collection<String> getFacetNames() {
+        return proteome.keySet();
+    }
 }
 

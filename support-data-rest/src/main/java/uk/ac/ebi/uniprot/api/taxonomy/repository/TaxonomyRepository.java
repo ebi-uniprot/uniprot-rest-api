@@ -13,7 +13,7 @@ import uk.ac.ebi.uniprot.search.document.taxonomy.TaxonomyDocument;
  */
 @Repository
 public class TaxonomyRepository extends SolrQueryRepository<TaxonomyDocument> {
-    protected TaxonomyRepository(SolrTemplate solrTemplate, TaxonomyFacetConfig facetConverter, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.taxonomy, TaxonomyDocument.class, facetConverter, requestConverter);
+    protected TaxonomyRepository(SolrTemplate solrTemplate, TaxonomyFacetConfig facetConfig, SolrRequestConverter requestConverter) {
+        super(solrTemplate, SolrCollection.taxonomy, TaxonomyDocument.class, facetConfig, requestConverter);
     }
 }

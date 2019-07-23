@@ -7,7 +7,9 @@ import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.SimpleFacetQuery;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
+import uk.ac.ebi.uniprot.common.Utils;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -50,6 +52,7 @@ public class SolrRequestConverter {
     /**
      * Creates a Spring {@link Query} from a {@link SolrRequest}. Note that this does not
      * handle term queries, which are not supported by Spring's standard Query API.
+     * And it also does not support Interval Facets.
      *
      * @param request the request that specifies the query
      * @return the query
@@ -73,6 +76,12 @@ public class SolrRequestConverter {
         static SimpleFacetQuery getSimpleFacetQuery(SimpleQuery simpleQuery, SolrRequest request) {
             SimpleFacetQuery simpleFacetQuery = new SimpleFacetQuery(simpleQuery.getCriteria());
 
+            for (String facetName : request.getFacets()) {
+                FacetProperty facetProperty = request.getFacetConfig().getFacetPropertyMap().get(facetName);
+                if (Utils.notEmpty(facetProperty.getInterval())) {
+                    throw new UnsupportedOperationException("Interval facets are not supported by Spring Data Solr");
+                }
+            }
             FacetOptions facetOptions = new FacetOptions();
             facetOptions.addFacetOnFlieldnames(request.getFacets());
             facetOptions.setFacetMinCount(request.getFacetConfig().getMincount());
@@ -112,13 +121,18 @@ public class SolrRequestConverter {
             return SINGLE_TERM_PATTERN.matcher(query).matches();
         }
 
-        static void setFacets(SolrQuery solrQuery, List<String> facets, GenericFacetConfig facetConfig) {
+        static void setFacets(SolrQuery solrQuery, List<String> facets, FacetConfig facetConfig) {
             solrQuery.setFacet(true);
 
-            String[] facetArr = new String[facets.size()];
-            facetArr = facets.toArray(facetArr);
-            solrQuery.addFacetField(facetArr);
-
+            for (String facetName : facets) {
+                FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facetName);
+                if (Utils.notEmpty(facetProperty.getInterval())) {
+                    String[] facetIntervals = facetProperty.getInterval().values().toArray(new String[0]);
+                    solrQuery.addIntervalFacets(facetName, facetIntervals);
+                } else {
+                    solrQuery.addFacetField(facetName);
+                }
+            }
             solrQuery.setFacetLimit(facetConfig.getLimit());
             solrQuery.setFacetMinCount(facetConfig.getMincount());
         }

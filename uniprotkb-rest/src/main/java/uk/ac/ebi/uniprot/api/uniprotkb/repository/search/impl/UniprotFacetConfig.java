@@ -2,13 +2,11 @@ package uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,7 +23,7 @@ import java.util.Map;
 @Getter @Setter
 @PropertySource("classpath:facet.properties")
 @ConfigurationProperties(prefix = "facet")
-public class UniprotFacetConfig extends GenericFacetConfig implements FacetConfigConverter {
+public class UniprotFacetConfig extends FacetConfig {
 
     private Map<String, FacetProperty> uniprot = new HashMap<>();
 

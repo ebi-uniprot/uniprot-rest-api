@@ -1,14 +1,14 @@
 package uk.ac.ebi.uniprot.api.common.repository.search.facet;
 
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.IntervalFacet;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.junit.jupiter.api.Test;
 
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.Facet;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetItem;
-
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
  *
  * @author lgonzales
  */
-class FacetConfigConverterTest {
+class FacetResponseConverterTest {
 
     private QueryResponse queryResponse = mock(QueryResponse.class);
 
@@ -27,8 +27,8 @@ class FacetConfigConverterTest {
     void convertFacetForNullResponse() {
         when(queryResponse.getFacetFields()).thenReturn(null);
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
         assertEquals(0,facets.size());
     }
@@ -40,8 +40,8 @@ class FacetConfigConverterTest {
 
         when(queryResponse.getFacetFields()).thenReturn(fieldList);
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
         assertEquals(2,facets.size());
 
@@ -65,8 +65,8 @@ class FacetConfigConverterTest {
 
         when(queryResponse.getFacetFields()).thenReturn(fieldList);
 
-        FakeFacetConfigConverter fakeFacetConfigConverter = new FakeFacetConfigConverter();
-        List<Facet> facets = fakeFacetConfigConverter.convert(queryResponse);
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
 
         Facet popularOrganism = facets.get(0);
@@ -84,6 +84,28 @@ class FacetConfigConverterTest {
 
     }
 
+    @Test
+    void convertIntervalFacet() throws Exception {
+        IntervalFacet intervalFacet = getLengthIntervalFacet();
+        when(queryResponse.getIntervalFacets()).thenReturn(Collections.singletonList(intervalFacet));
+
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
+        assertNotNull(facets);
+
+        Facet lengthFacet = facets.get(0);
+        assertEquals("Sequence Length", lengthFacet.getLabel());
+        assertEquals("length", lengthFacet.getName());
+        assertFalse(lengthFacet.isAllowMultipleSelection());
+        assertNotNull(lengthFacet.getValues());
+        assertEquals(3, lengthFacet.getValues().size());
+
+        FacetItem itemValue = lengthFacet.getValues().get(0);
+        assertNotNull(itemValue);
+        assertEquals("1 - 200", itemValue.getLabel());
+        assertEquals("[1 TO 200]", itemValue.getValue());
+        assertEquals(new Long(10L), itemValue.getCount());
+    }
 
     private List<FacetField> getFacetFields(String ... name) {
         List<FacetField> fieldList = new ArrayList<>(1);
@@ -109,6 +131,19 @@ class FacetConfigConverterTest {
         return fieldList;
     }
 
+    private IntervalFacet getLengthIntervalFacet() throws Exception {
+        List<IntervalFacet.Count> counts = new ArrayList<>();
+        Constructor countConstructor = Class.forName("org.apache.solr.client.solrj.response.IntervalFacet$Count")
+                .getDeclaredConstructor(String.class, Integer.TYPE);
+        countConstructor.setAccessible(true);
+        counts.add((IntervalFacet.Count) countConstructor.newInstance("[1,200]", 10));
+        counts.add((IntervalFacet.Count) countConstructor.newInstance("[201,400]", 15));
+        counts.add((IntervalFacet.Count) countConstructor.newInstance("[801,*]", 20));
 
+        Constructor constructor = Class.forName("org.apache.solr.client.solrj.response.IntervalFacet")
+                .getDeclaredConstructor(String.class, List.class);
+        constructor.setAccessible(true);
+        return (IntervalFacet) constructor.newInstance("length", counts);
+    }
 
 }

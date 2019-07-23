@@ -7,8 +7,8 @@ import uk.ac.ebi.uniprot.api.common.exception.ResourceNotFoundException;
 import uk.ac.ebi.uniprot.api.common.exception.ServiceException;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrQueryRepository;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfig;
 import uk.ac.ebi.uniprot.api.rest.request.SearchRequest;
 import uk.ac.ebi.uniprot.api.rest.search.AbstractSolrSortClause;
 import uk.ac.ebi.uniprot.search.DefaultSearchHandler;
@@ -78,13 +78,13 @@ public class BasicSearchService<T, R extends Document> {
                 .filter(Objects::nonNull);
     }
 
-    public SolrRequest createSolrRequest(SearchRequest request, GenericFacetConfig facetConfig,
+    public SolrRequest createSolrRequest(SearchRequest request, FacetConfig facetConfig,
                                          AbstractSolrSortClause solrSortClause, DefaultSearchHandler defaultSearchHandler) {
         SolrRequest.SolrRequestBuilder builder = createSolrRequestBuilder(request, facetConfig, solrSortClause, defaultSearchHandler);
         return builder.build();
     }
 
-    private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(SearchRequest request, GenericFacetConfig facetConfig,
+    private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(SearchRequest request, FacetConfig facetConfig,
                                                                     AbstractSolrSortClause solrSortClause, DefaultSearchHandler defaultSearchHandler) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
         String requestedQuery = request.getQuery();

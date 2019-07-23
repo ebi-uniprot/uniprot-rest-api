@@ -21,5 +21,7 @@ public class FacetProperty {
     @NotNull
     private Boolean allowmultipleselection;
 
+    private Map<String, String> interval;
+
     private Map<String, String> value;
 }

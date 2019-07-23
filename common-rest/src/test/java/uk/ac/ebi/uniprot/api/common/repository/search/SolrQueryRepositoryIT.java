@@ -13,7 +13,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.uniprot.api.common.exception.InvalidRequestException;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfigConverter;
+import uk.ac.ebi.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import uk.ac.ebi.uniprot.api.common.repository.search.page.impl.CursorPage;
 import uk.ac.ebi.uniprot.indexer.ClosableEmbeddedSolrClient;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
@@ -23,7 +23,6 @@ import uk.ac.ebi.uniprot.search.SolrCollection;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -284,7 +283,7 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "d3structure"));
+        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "fragment"));
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
 
         // then
@@ -296,7 +295,7 @@ class SolrQueryRepositoryIT {
                 .query(query)
                 .defaultQueryOperator(Query.Operator.AND)
                 .filterQuery("active:true")
-                .facetConfig(new FakeFacetConfigConverter())
+                .facetConfig(new FakeFacetConfig())
                 .facets(facets)
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .build();
@@ -321,7 +320,7 @@ class SolrQueryRepositoryIT {
 
     private static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
         GeneralSolrQueryRepository(SolrTemplate template) {
-            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfigConverter(), new GeneralSolrRequestConverter());
+            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfig(), new GeneralSolrRequestConverter());
         }
     }
 

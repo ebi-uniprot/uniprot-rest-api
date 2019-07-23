@@ -1,17 +1,19 @@
 package uk.ac.ebi.uniprot.api.common.repository.search.facet;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetConfigConverter;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.FacetProperty;
-import uk.ac.ebi.uniprot.api.common.repository.search.facet.GenericFacetConfig;
 
 /**
  *
  * @author lgonzales
  */
-public class FakeFacetConfigConverter extends GenericFacetConfig implements FacetConfigConverter{
+public class FakeFacetConfig extends FacetConfig {
+
+    @Override
+    public Collection<String> getFacetNames() {
+        return null;
+    }
 
     @Override
     public Map<String, FacetProperty> getFacetPropertyMap() {
@@ -41,6 +43,30 @@ public class FakeFacetConfigConverter extends GenericFacetConfig implements Face
         organism.setAllowmultipleselection(true);
         result.put("popular_organism",organism);
 
+
+        // Interval facet
+        FacetProperty length = new FacetProperty();
+        length.setLabel("Sequence Length");
+        length.setAllowmultipleselection(false);
+        Map<String, String> lengthIntervals = new HashMap<>();
+        lengthIntervals.put("1", "[1,200]");
+        lengthIntervals.put("2", "[201,400]");
+        lengthIntervals.put("3", "[401,600]");
+        lengthIntervals.put("4", "[601,800]");
+        lengthIntervals.put("5", "[801,*]");
+
+        length.setInterval(lengthIntervals);
+
+        Map<String, String> lengthLabels = new HashMap<>();
+        lengthLabels.put("1", "1 - 200");
+        lengthLabels.put("2", "201 - 400");
+        lengthLabels.put("3", "401 - 600");
+        lengthLabels.put("4", "601 - 800");
+        lengthLabels.put("5", ">= 801");
+
+        length.setValue(lengthLabels);
+
+        result.put("length", length);
         return result;
-}
+    }
 }
