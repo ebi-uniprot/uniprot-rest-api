@@ -1,7 +1,5 @@
 package uk.ac.ebi.uniprot.crossref.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,29 +18,14 @@ import uk.ac.ebi.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import uk.ac.ebi.uniprot.api.rest.controller.param.SearchParameter;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import uk.ac.ebi.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
-import uk.ac.ebi.uniprot.api.rest.output.UniProtMediaType;
 import uk.ac.ebi.uniprot.api.support_data.SupportDataApplication;
-import uk.ac.ebi.uniprot.api.taxonomy.TaxonomyController;
-import uk.ac.ebi.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
-import uk.ac.ebi.uniprot.cv.disease.CrossReference;
-import uk.ac.ebi.uniprot.cv.disease.Disease;
-import uk.ac.ebi.uniprot.cv.keyword.Keyword;
-import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordImpl;
-import uk.ac.ebi.uniprot.domain.builder.DiseaseBuilder;
 import uk.ac.ebi.uniprot.domain.crossref.CrossRefEntry;
 import uk.ac.ebi.uniprot.domain.crossref.CrossRefEntryBuilder;
-import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
-import uk.ac.ebi.uniprot.domain.taxonomy.builder.TaxonomyEntryBuilder;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
-import uk.ac.ebi.uniprot.json.parser.taxonomy.TaxonomyJsonConfig;
 import uk.ac.ebi.uniprot.search.document.dbxref.CrossRefDocument;
-import uk.ac.ebi.uniprot.search.document.disease.DiseaseDocument;
-import uk.ac.ebi.uniprot.search.document.taxonomy.TaxonomyDocument;
 import uk.ac.ebi.uniprot.search.field.CrossRefField;
 import uk.ac.ebi.uniprot.search.field.SearchField;
-import uk.ac.ebi.uniprot.search.field.TaxonomyField;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,10 +33,8 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
