@@ -81,6 +81,9 @@ public class SolrRequestConverter {
                 if (Utils.notEmpty(facetProperty.getInterval())) {
                     throw new UnsupportedOperationException("Interval facets are not supported by Spring Data Solr");
                 }
+                if (facetProperty.getLimit() != 0) {
+                    throw new UnsupportedOperationException("Define a limit for a specific facet is not supported by Spring Data Solr");
+                }
             }
             FacetOptions facetOptions = new FacetOptions();
             facetOptions.addFacetOnFlieldnames(request.getFacets());
@@ -131,6 +134,9 @@ public class SolrRequestConverter {
                     solrQuery.addIntervalFacets(facetName, facetIntervals);
                 } else {
                     solrQuery.addFacetField(facetName);
+                }
+                if (facetProperty.getLimit() != 0) {
+                    solrQuery.add(String.format("f.%s.facet.limit", facetName), String.valueOf(facetProperty.getLimit()));
                 }
             }
             solrQuery.setFacetLimit(facetConfig.getLimit());

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * This class represent facet configuration from facet.properties.
  * <p>
- * Please, check the description at facet.properties
+ * Please, check the header description at facet.properties
  *
  * @author lgonzales
  */
@@ -20,6 +20,8 @@ public class FacetProperty {
 
     @NotNull
     private Boolean allowmultipleselection;
+
+    private int limit;
 
     private Map<String, String> interval;
 
