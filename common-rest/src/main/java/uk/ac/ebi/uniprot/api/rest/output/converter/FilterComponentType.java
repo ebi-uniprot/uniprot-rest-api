@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.uniprotkb.service.filters;
+package uk.ac.ebi.uniprot.api.rest.output.converter;
 
 import java.util.Arrays;
 import java.util.List;

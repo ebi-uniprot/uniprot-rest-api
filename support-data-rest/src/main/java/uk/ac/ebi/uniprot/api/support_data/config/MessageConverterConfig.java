@@ -7,23 +7,31 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.ac.ebi.uniprot.api.common.concurrency.TaskExecutorProperties;
-import uk.ac.ebi.uniprot.api.crossref.output.converter.CrossRefJsonMessageConverter;
-import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.disease.response.converter.DiseaseXlsMessageConverter;
-import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.keyword.output.converter.KeywordXlsMessageConverter;
-import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.literature.output.converter.LiteratureXlsMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ErrorMessageConverter;
+import uk.ac.ebi.uniprot.api.rest.output.converter.JsonMessageConverter;
 import uk.ac.ebi.uniprot.api.rest.output.converter.ListMessageConverter;
-import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyJsonMessageConverter;
 import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
 import uk.ac.ebi.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
+import uk.ac.ebi.uniprot.cv.disease.Disease;
+import uk.ac.ebi.uniprot.cv.keyword.KeywordEntry;
+import uk.ac.ebi.uniprot.domain.crossref.CrossRefEntry;
+import uk.ac.ebi.uniprot.domain.literature.LiteratureEntry;
+import uk.ac.ebi.uniprot.domain.taxonomy.TaxonomyEntry;
+import uk.ac.ebi.uniprot.json.parser.crossref.CrossRefJsonConfig;
+import uk.ac.ebi.uniprot.json.parser.disease.DiseaseJsonConfig;
+import uk.ac.ebi.uniprot.json.parser.keyword.KeywordJsonConfig;
+import uk.ac.ebi.uniprot.json.parser.literature.LiteratureJsonConfig;
+import uk.ac.ebi.uniprot.json.parser.taxonomy.TaxonomyJsonConfig;
+import uk.ac.ebi.uniprot.search.field.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -65,16 +73,38 @@ public class MessageConverterConfig {
                 converters.add(new KeywordTsvMessageConverter());
 
                 // add Json message converter first in the list because it is the most used
-                converters.add(0, new LiteratureJsonMessageConverter());
-                converters.add(0, new KeywordJsonMessageConverter());
-                converters.add(0, new TaxonomyJsonMessageConverter());
+                JsonMessageConverter<LiteratureEntry> litJsonConverter =
+                        new JsonMessageConverter<>(LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
+                                LiteratureEntry.class, Arrays.asList(LiteratureField.ResultFields.values()));
+
+                converters.add(0, litJsonConverter);
+
+                JsonMessageConverter<KeywordEntry> keywordJsonConverter =
+                        new JsonMessageConverter<>(KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
+                                KeywordEntry.class, Arrays.asList(KeywordField.ResultFields.values()));
+
+                converters.add(0, keywordJsonConverter);
+
+                JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
+                        new JsonMessageConverter<>(TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
+                                TaxonomyEntry.class, Arrays.asList(TaxonomyField.ResultFields.values()));
+
+                converters.add(0, taxonomyJsonConverter);
 
                 converters.add(new DiseaseXlsMessageConverter());
                 converters.add(new DiseaseTsvMessageConverter());
-                converters.add(0, new DiseaseJsonMessageConverter());
+
+                JsonMessageConverter<Disease> diseaseJsonConverter =
+                        new JsonMessageConverter(DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
+                                Disease.class, Arrays.asList(DiseaseField.ResultFields.values()));
+                converters.add(0, diseaseJsonConverter);
                 converters.add(1, new DiseaseOBOMessageConverter());
 
-                converters.add(0, new CrossRefJsonMessageConverter());
+                JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
+                        new JsonMessageConverter<>(CrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
+                                CrossRefEntry.class, Arrays.asList(CrossRefField.ResultFields.values()));
+
+                converters.add(0, xrefJsonConverter);
             }
         };
     }

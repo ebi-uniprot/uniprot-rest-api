@@ -16,7 +16,7 @@ import java.util.*;
  * @param <T> instance of the object that is being written.
  * @author lgonzales
  */
-public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
+public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
     private static final String COMMA = "\\s*,\\s*";
     private final ObjectMapper objectMapper;
@@ -25,13 +25,9 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
     private List<ReturnField> allFields;
     private JsonResponseFieldProjector fieldProjector;
 
-    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass) { // TODO Remove this constructor once all converter use the other constructor
+    public JsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass, List<ReturnField> allFields) {
         super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
-    }
-
-    public AbstractJsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass, List<ReturnField> allFields) {
-        this(objectMapper, messageConverterEntryClass);
         this.allFields = allFields;
         this.fieldProjector = new JsonResponseFieldProjector();
     }
@@ -74,7 +70,7 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
     @Override
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
-        generator.writeObject(filterEntryContent(entity));
+        generator.writeObject(projectEntryFields(entity));
     }
 
     @Override
@@ -93,19 +89,12 @@ public abstract class AbstractJsonMessageConverter<T> extends AbstractEntityHttp
         return tlFilters.get();
     }
 
-    protected ThreadLocal<JsonGenerator> getThreadLocalJsonGenerator(){
-        return this.tlJsonGenerator;
-    }
-
-    protected abstract T filterEntryContent(T entity);
-
     // returns only the required fields asked by the client or all fields in T.ResultFields enum
-    protected Map<String, Object> projectEntryFields(T entity){
+    protected Map<String, Object> projectEntryFields(T entity) {
 
-        Map<String, List<String>> filters = getThreadLocalFilterMap();
-        List<String> returnFields = Utils.notEmpty(filters) ? new ArrayList<>(filters.keySet()) : new ArrayList<>();
+        Map<String, List<String>> filterFieldMap = getThreadLocalFilterMap();
 
-        return this.fieldProjector.project(entity, returnFields, this.allFields);
+        return this.fieldProjector.project(entity, filterFieldMap, this.allFields);
     }
 
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
