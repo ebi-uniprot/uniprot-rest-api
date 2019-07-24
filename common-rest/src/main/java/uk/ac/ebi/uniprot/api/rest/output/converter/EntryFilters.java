@@ -1,4 +1,4 @@
-package uk.ac.ebi.uniprot.api.uniprotkb.service.filters;
+package uk.ac.ebi.uniprot.api.rest.output.converter;
 
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
@@ -47,7 +47,7 @@ public class EntryFilters {
 	}
 	
 	
-	private static Predicate<UniProtDBCrossReference> createDbReferenceFilter(List<String> values) {
+	public static Predicate<UniProtDBCrossReference> createDbReferenceFilter(List<String> values) {
 		return v -> createXrefPredicate(v, values);
 	}
 
@@ -58,7 +58,7 @@ public class EntryFilters {
 		return values.contains(v.getDatabaseType().getName().toLowerCase());
 	}
 
-	private static Predicate<Feature> createFeatureFilter(List<String> values) {
+	public static Predicate<Feature> createFeatureFilter(List<String> values) {
 		return (Feature v) -> createFeaturePredicate(v, values);
 	}
 
@@ -69,7 +69,7 @@ public class EntryFilters {
 		return values.contains(v.getType().name().toLowerCase());
 	}
 
-	private static Predicate<Comment> createCommentFilter(List<String> values) {
+	public static Predicate<Comment> createCommentFilter(List<String> values) {
 		return (Comment v) -> createCommentPredicate(v, values);
 	}
 

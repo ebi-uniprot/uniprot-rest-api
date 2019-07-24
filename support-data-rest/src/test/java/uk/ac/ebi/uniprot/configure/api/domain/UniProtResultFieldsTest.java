@@ -9,6 +9,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldGroupImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.FieldImpl;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +27,7 @@ class UniProtResultFieldsTest {
 
 	@Test
 	void fieldUniqueness() {
+		List<UniProtResultFields> allFields = Arrays.asList(UniProtResultFields.values());
 		Map<String, List<Field>> result = instance.getResultFields()
 				.stream().flatMap(val -> val.getFields().stream()).collect(Collectors.groupingBy(Field::getName));
 		

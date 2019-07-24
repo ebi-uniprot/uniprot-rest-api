@@ -5,7 +5,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
-import uk.ac.ebi.uniprot.api.uniprotkb.service.filters.EntryFilters;
+import uk.ac.ebi.uniprot.api.rest.output.converter.EntryFilters;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.parser.tsv.uniprot.EntryMap;
 
