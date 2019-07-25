@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
-import uk.ac.ebi.uniprot.api.rest.output.converter.FilterComponentType;
 import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.*;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.EntryInactiveReasonBuilder;
@@ -18,6 +17,7 @@ import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtIdBuilder;
 import uk.ac.ebi.uniprot.json.parser.uniprot.UniprotJsonConfig;
 import uk.ac.ebi.uniprot.search.document.uniprot.UniProtDocument;
+import uk.ac.ebi.uniprot.search.field.UniProtField;
 
 import java.io.IOException;
 import java.util.*;
@@ -103,8 +103,8 @@ class UniProtEntryQueryResultsConverter {
             if (Objects.isNull(uniProtEntry)) {
                 return Optional.empty();
             }
-            if (filters.containsKey(FilterComponentType.MASS.name().toLowerCase())
-                    || filters.containsKey(FilterComponentType.LENGTH.name().toLowerCase())) {
+            if (filters.containsKey(UniProtField.ResultFields.mass.name())
+                    || filters.containsKey(UniProtField.ResultFields.length.name())) {
                 char[] fakeSeqArrayWithCorrectLength = new char[doc.seqLength];
                 Arrays.fill(fakeSeqArrayWithCorrectLength, 'X');
                 SequenceBuilder seq = new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
