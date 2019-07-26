@@ -21,12 +21,12 @@ public class UniProtStoreConfig {
 
     @Bean
     @Profile("live")
-    public UniProtStoreClient uniProtStoreClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
+    public UniProtKBStoreClient uniProtStoreClient(UniProtStoreConfigProperties uniProtStoreConfigProperties) {
         VoldemortClient<UniProtEntry> client =
                 new VoldemortRemoteUniprotEntryStore(uniProtStoreConfigProperties
                                                              .getNumberOfConnections(),
                                                      uniProtStoreConfigProperties.getStoreName(),
                                                      uniProtStoreConfigProperties.getHost());
-        return new UniProtStoreClient(client);
+        return new UniProtKBStoreClient(client);
     }
 }

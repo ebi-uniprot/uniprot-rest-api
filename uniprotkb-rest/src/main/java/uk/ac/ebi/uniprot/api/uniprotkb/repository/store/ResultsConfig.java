@@ -41,7 +41,7 @@ public class ResultsConfig {
     }
 
     @Bean
-    public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtStoreClient uniProtClient, TupleStreamTemplate tupleStreamTemplate) {
+    public StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer(UniProtKBStoreClient uniProtClient, TupleStreamTemplate tupleStreamTemplate) {
         return StoreStreamer.<UniProtEntry>builder()
                 .id(resultsConfigProperties().getUniprot().getValueId())
                 .defaultsField(resultsConfigProperties().getUniprot().getDefaultsField())

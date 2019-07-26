@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
+import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import uk.ac.ebi.uniprot.api.uniprotkb.service.filters.FilterComponentType;
 import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.*;
@@ -38,13 +38,13 @@ import java.util.stream.Collectors;
 class UniProtEntryQueryResultsConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(UniProtEntryQueryResultsConverter.class);
 
-    private final UniProtStoreClient entryStore;
+    private final UniProtKBStoreClient entryStore;
     private final RetryPolicy retryPolicy = new RetryPolicy()
             .retryOn(IOException.class)
             .withDelay(500,TimeUnit.MILLISECONDS)
             .withMaxRetries(5);
 
-    UniProtEntryQueryResultsConverter(UniProtStoreClient entryStore) {
+    UniProtEntryQueryResultsConverter(UniProtKBStoreClient entryStore) {
         this.entryStore = entryStore;
     }
 

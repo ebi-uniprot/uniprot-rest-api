@@ -1,6 +1,6 @@
 package uk.ac.ebi.uniprot.api.uniprotkb.repository.store;
 
-import uk.ac.ebi.uniprot.api.common.repository.store.UUWStoreClient;
+import uk.ac.ebi.uniprot.api.common.repository.store.UniProtStoreClient;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 
@@ -9,8 +9,8 @@ import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
  *
  * @author Edd
  */
-public class UniProtStoreClient extends UUWStoreClient<UniProtEntry> {
-    public UniProtStoreClient(VoldemortClient<UniProtEntry> client) {
+public class UniProtKBStoreClient extends UniProtStoreClient<UniProtEntry> {
+    public UniProtKBStoreClient(VoldemortClient<UniProtEntry> client) {
         super(client);
     }
 }

@@ -15,7 +15,7 @@ import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
+import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.search.DefaultSearchHandler;
 import uk.ac.ebi.uniprot.search.SolrQueryUtil;
@@ -44,7 +44,7 @@ public class UniProtEntryService {
     public UniProtEntryService(UniprotQueryRepository repository,
                                UniprotFacetConfig uniprotFacetConfig,
                                UniProtTermsConfig uniProtTermsConfig,
-                               UniProtStoreClient entryStore,
+                               UniProtKBStoreClient entryStore,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
                                DefaultSearchHandler defaultSearchHandler) {
         this.repository = repository;

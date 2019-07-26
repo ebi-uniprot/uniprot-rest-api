@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.OngoingStubbing;
 import org.slf4j.Logger;
@@ -40,17 +41,21 @@ public class StoreStreamerIT {
     private static final String FAKE_QUERY = "any query";
     private static final String FAKE_FILTER_QUERY = "any filter query";
     private static final Sort FAKE_SORT = new Sort(Sort.Direction.ASC, "any field");
-    private FakeVoldemortClient fakeVoldemortClient;
+    private FakeUniProtStoreClient fakeUniProtStoreClient;
     private StoreStreamer<String> storeStreamer;
     private SolrRequest solrRequest;
     private static final Logger LOGGER = getLogger(StoreStreamerIT.class);
+
+    @Mock
+    private VoldemortClient<String> fakeClient;
+
     public static String transformString(String id) {
         return id + "-transformed";
     }
 
     @Before
     public void setUp() {
-        fakeVoldemortClient = new FakeVoldemortClient();
+        fakeUniProtStoreClient = new FakeUniProtStoreClient(fakeClient);
         solrRequest = SolrRequest.builder()
                 .query(FAKE_QUERY)
                 .sort(FAKE_SORT)
@@ -120,7 +125,7 @@ public class StoreStreamerIT {
         TupleStreamTemplate mockTupleStreamTemplate = mock(TupleStreamTemplate.class);
         when(mockTupleStreamTemplate.create(ArgumentMatchers.any(),ArgumentMatchers.any())).thenReturn(tupleStream);
         this.storeStreamer = StoreStreamer.<String>builder()
-                .storeClient(fakeVoldemortClient)
+                .storeClient(fakeUniProtStoreClient)
                 .streamerBatchSize(streamerBatchSize)
                 .id(ID)
                 .tupleStreamTemplate(mockTupleStreamTemplate)
@@ -159,7 +164,11 @@ public class StoreStreamerIT {
         return new Tuple(eofMap);
     }
 
-    private static class FakeVoldemortClient implements VoldemortClient<String> {
+    private static class FakeUniProtStoreClient extends UniProtStoreClient<String> {
+        FakeUniProtStoreClient(VoldemortClient<String> client) {
+            super(client);
+        }
+
         @Override
         public String getStoreName() {
             return null;

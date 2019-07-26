@@ -6,7 +6,6 @@ import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.slf4j.Logger;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
-import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Builder
 public class StoreStreamer<T> {
     private static final Logger LOGGER = getLogger(StoreStreamer.class);
-    private VoldemortClient<T> storeClient;
+    private UniProtStoreClient<T> storeClient;
     private int streamerBatchSize;
     private String id;
     private String defaultsField;
@@ -104,10 +103,10 @@ public class StoreStreamer<T> {
     }
 
     private static class BatchStoreIterable<T> extends BatchIterable<T> {
-        private VoldemortClient<T> storeClient;
+        private UniProtStoreClient<T> storeClient;
         private RetryPolicy retryPolicy;
 
-        BatchStoreIterable(Iterable<String> sourceIterable, VoldemortClient<T> storeClient, int batchSize) {
+        BatchStoreIterable(Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
             this.retryPolicy = new RetryPolicy()

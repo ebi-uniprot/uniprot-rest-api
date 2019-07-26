@@ -7,41 +7,37 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Generic class for saving and retrieving entities of type {@code S} to/from a {@link VoldemortClient} containing
- * serialized forms of the entity, of type {@code A}.
+ * Generic class for saving and retrieving entities of type {@code S} to/from a data-store containing
+ * serialized forms of the entity, of type {@code A}. Currently, the underlying data-store is accessed via a
+ * {@link VoldemortClient}, but could be replaced in future to any other store.
  *
  * Created 21/09/18
  *
  * @author Edd
  */
-public abstract class UUWStoreClient<S> implements VoldemortClient<S> {
+public abstract class UniProtStoreClient<S> {
     private final VoldemortClient<S> client;
 
-    public UUWStoreClient(VoldemortClient<S> client) {
+    public UniProtStoreClient(VoldemortClient<S> client) {
         this.client = client;
     }
 
-    @Override
     public String getStoreName() {
         return client.getStoreName();
     }
 
-    @Override
     public Optional<S> getEntry(String s) {
         return client.getEntry(s);
     }
 
-    @Override
     public List<S> getEntries(Iterable<String> iterable) {
         return client.getEntries(iterable);
     }
 
-    @Override
     public Map<String, S> getEntryMap(Iterable<String> iterable) {
         return client.getEntryMap(iterable);
     }
 
-    @Override
     public void saveEntry(S s) {
         client.saveEntry(s);
     }

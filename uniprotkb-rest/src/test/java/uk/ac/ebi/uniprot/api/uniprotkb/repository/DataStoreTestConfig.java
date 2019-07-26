@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequest;
 import uk.ac.ebi.uniprot.api.common.repository.search.SolrRequestConverter;
-import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtStoreClient;
+import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import uk.ac.ebi.uniprot.cv.chebi.ChebiRepo;
 import uk.ac.ebi.uniprot.cv.ec.ECRepo;
 import uk.ac.ebi.uniprot.datastore.voldemort.VoldemortClient;
@@ -67,10 +67,10 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public UniProtStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
-        UniProtStoreClient storeClient = new UniProtStoreClient(VoldemortInMemoryUniprotEntryStore
+    public UniProtKBStoreClient primaryUniProtStoreClient(DataStoreManager dsm) {
+        UniProtKBStoreClient storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
                                                                         .getInstance("avro-uniprot"));
-        dsm.addVoldemort(DataStoreManager.StoreType.UNIPROT, storeClient);
+        dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
         return storeClient;
     }
 
