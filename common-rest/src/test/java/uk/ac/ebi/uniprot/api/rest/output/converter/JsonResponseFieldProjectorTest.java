@@ -8,11 +8,19 @@ import uk.ac.ebi.uniprot.cv.disease.Disease;
 import uk.ac.ebi.uniprot.cv.keyword.Keyword;
 import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordImpl;
 import uk.ac.ebi.uniprot.domain.builder.DiseaseBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.ProteinExistence;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntryType;
+import uk.ac.ebi.uniprot.domain.uniprot.UniProtId;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtEntryBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.builder.UniProtIdBuilder;
+import uk.ac.ebi.uniprot.domain.uniprot.comment.Comment;
+import uk.ac.ebi.uniprot.json.parser.uniprot.*;
+import uk.ac.ebi.uniprot.json.parser.uniprot.comment.*;
 import uk.ac.ebi.uniprot.search.field.DiseaseField;
+import uk.ac.ebi.uniprot.search.field.UniProtField;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,7 +81,9 @@ public class JsonResponseFieldProjectorTest {
     @Test
     void testProjectFewValidFields(){
         List<String> returnFields = Stream.of("id", "alternative_names", "keywords").collect(Collectors.toList());
-        Map<String, Object> returnMap = this.fieldProjector.project(this.disease, returnFields,
+        Map<String, List<String>> filterFieldMap = returnFields.stream().collect(Collectors.toMap(f -> f, f -> Collections.emptyList()));
+
+        Map<String, Object> returnMap = this.fieldProjector.project(this.disease, filterFieldMap,
                 Arrays.asList(DiseaseField.ResultFields.values()));
 
         Assertions.assertEquals(returnFields.size(), returnMap.size());
@@ -91,7 +101,9 @@ public class JsonResponseFieldProjectorTest {
     @Test
     void testProjectFewValidOneInvalidFields(){ // it should ignore invalid fields and return only valid fields
         List<String> returnFields = Stream.of("id", "invalid_field_name", "unreviewed_protein_count").collect(Collectors.toList());
-        Map<String, Object> returnMap = this.fieldProjector.project(this.disease, returnFields,
+        Map<String, List<String>> filterFieldMap = returnFields.stream().collect(Collectors.toMap(f -> f, f -> Collections.emptyList()));
+
+        Map<String, Object> returnMap = this.fieldProjector.project(this.disease, filterFieldMap,
                 Arrays.asList(DiseaseField.ResultFields.values()));
 
         Assertions.assertEquals(returnFields.size() - 1, returnMap.size());
@@ -101,6 +113,71 @@ public class JsonResponseFieldProjectorTest {
         Assertions.assertTrue(returnMap.containsKey("unreviewedProteinCount"));
         Assertions.assertNotNull(returnMap.get("unreviewedProteinCount"));
         Assertions.assertFalse(returnMap.containsKey("invalid_field_name"));
+    }
+
+    @Test
+    void testProjectAllUniProtKBFields(){
+        List<Comment> comments = new ArrayList<>();
+        comments.add(AlternativeProductsCommentTest.getAlternativeProductsComment());
+        comments.add(BPCPCommentTest.getBpcpComment());
+        comments.add(CatalyticActivityCommentTest.getCatalyticActivityComment());
+        comments.add(CofactorCommentTest.getCofactorComment());
+        comments.add(DiseaseCommentTest.getDiseaseComment());
+        comments.add(FreeTextCommentTest.getFreeTextComment());
+        comments.add(InteractionCommentTest.getInteractionComment());
+        comments.add(MassSpectrometryCommentTest.getMassSpectrometryComment());
+        comments.add(RnaEditingCommentTest.getRnaEditingComment());
+        comments.add(SequenceCautionCommentTest.getSequenceCautionComment());
+        comments.add(SubcellularLocationCommentTest.getSubcellularLocationComment());
+        comments.add(WebResourceCommentTest.getWebResourceComment());
+
+        UniProtId uniProtId = new UniProtIdBuilder("uniprot id").build();
+        UniProtEntryBuilder builder = new UniProtEntryBuilder();
+        UniProtEntry entry = builder.primaryAccession(UniProtAccessionTest.getUniProtAccession())
+                .uniProtId(uniProtId)
+                .active()
+                .entryType(UniProtEntryType.SWISSPROT)
+                .addSecondaryAccession(UniProtAccessionTest.getUniProtAccession())
+                .entryAudit(EntryAuditTest.getEntryAudit())
+                .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
+                .proteinDescription(ProteinDescriptionTest.getProteinDescription())
+                .genes(Collections.singletonList(GeneTest.createCompleteGene()))
+                .annotationScore(2)
+                .organism(OrganimsTest.getOrganism())
+                .organismHosts(Collections.singletonList(OrganimHostTest.getOrganismHost()))
+                .comments(comments)
+                .features(Collections.singletonList(FeatureTest.getFeature()))
+                .internalSection(InternalSectionTest.getInternalSection())
+                .keywords(Collections.singletonList(KeywordTest.getKeyword()))
+                .geneLocations(Collections.singletonList(GeneLocationTest.getGeneLocation()))
+                .references(UniProtReferenceTest.getUniProtReferences())
+                .databaseCrossReferences(Collections.singletonList(UniProtDBCrossReferenceTest.getUniProtDBCrossReference()))
+                .sequence(SequenceTest.getSequence())
+                .build();
+
+        Map<String, List<String>> filterFieldMap = new HashMap<>();
+        filterFieldMap.put("gene", Collections.EMPTY_LIST);
+        filterFieldMap.put("organism", Collections.EMPTY_LIST);
+        filterFieldMap.put("feature", Collections.EMPTY_LIST);
+        filterFieldMap.put("xref", Collections.EMPTY_LIST);
+        filterFieldMap.put("keyword", Collections.EMPTY_LIST);
+        List<String> cTypes = new ArrayList<>();
+        cTypes.add("disease");
+        cTypes.add("webresource");
+        filterFieldMap.put("comment", cTypes);
+        Map<String, Object> result = this.fieldProjector.project(entry, filterFieldMap, Arrays.asList(UniProtField.ResultFields.values()));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(12, result.size(), "total number of expected fields does not match");
+        Assertions.assertNotNull(result.get("genes"));
+        Assertions.assertNotNull(result.get("organism"));
+        Assertions.assertNotNull(result.get("features"));
+        Assertions.assertNotNull(result.get("databaseCrossReferences"));
+        Assertions.assertNotNull(result.get("keywords"));
+        Assertions.assertNotNull(result.get("comments"));
+        Assertions.assertEquals(cTypes.size(), ((List<?>) result.get("comments")).size());
+        Assertions.assertEquals(entry.getEntryType(), result.get("entryType"));
+        Assertions.assertEquals(entry.getPrimaryAccession(), result.get("primaryAccession"));
     }
 
 }

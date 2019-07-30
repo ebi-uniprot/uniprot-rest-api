@@ -1,12 +1,14 @@
 package uk.ac.ebi.uniprot.api.uniparc.output.converter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractJsonMessageConverter;
+import uk.ac.ebi.uniprot.api.rest.output.converter.JsonMessageConverter;
 import uk.ac.ebi.uniprot.domain.uniparc.UniParcEntry;
 import uk.ac.ebi.uniprot.json.parser.uniparc.UniParcJsonConfig;
+import uk.ac.ebi.uniprot.search.field.UniParcField;
 
 /**
  *
@@ -15,19 +17,15 @@ import uk.ac.ebi.uniprot.json.parser.uniparc.UniParcJsonConfig;
  *
 */
 
-public class UniParcJsonMessageConverter extends AbstractJsonMessageConverter<UniParcEntry> {
+public class UniParcJsonMessageConverter extends JsonMessageConverter<UniParcEntry> {
 
 	public UniParcJsonMessageConverter() {
-		super(UniParcJsonConfig.getInstance().getFullObjectMapper(), UniParcEntry.class);
+		super(UniParcJsonConfig.getInstance().getFullObjectMapper(), UniParcEntry.class, Arrays.asList(UniParcField.ResultFields.values()));
 	}
 
 	@Override
-	protected UniParcEntry filterEntryContent(UniParcEntry entity) {
-		return entity;
-	}
-	@Override
 	protected Map<String, List<String>> getFilterFieldMap(String fields) {
-		return new HashMap<>(); 
+		return new HashMap<>();
 	}
 }
 
