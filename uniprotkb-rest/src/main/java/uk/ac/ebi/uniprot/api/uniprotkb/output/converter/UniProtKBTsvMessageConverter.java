@@ -5,7 +5,7 @@ import uk.ac.ebi.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import uk.ac.ebi.uniprot.api.rest.output.context.MessageConverterContext;
 import uk.ac.ebi.uniprot.api.rest.output.converter.AbstractTsvMessagerConverter;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
-import uk.ac.ebi.uniprot.api.rest.output.converter.EntryFilters;
+import uk.ac.ebi.uniprot.api.rest.output.converter.UniProtEntryFilters;
 import uk.ac.ebi.uniprot.domain.uniprot.UniProtEntry;
 import uk.ac.ebi.uniprot.parser.tsv.uniprot.EntryMap;
 
@@ -41,7 +41,7 @@ public class UniProtKBTsvMessageConverter extends AbstractTsvMessagerConverter<U
 		
 		List<String> fields =tlFields.get();
 		  if ((filterParams != null) && !filterParams.isEmpty())
-	            EntryFilters.filterEntry(entity, filterParams);
+	            UniProtEntryFilters.filterEntry(entity, filterParams);
 	        EntryMap dlEntry = new EntryMap(entity, fields);
 	        return dlEntry.getData();
 		
