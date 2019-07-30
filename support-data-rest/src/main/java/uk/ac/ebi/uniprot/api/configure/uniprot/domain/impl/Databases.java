@@ -39,7 +39,7 @@ public enum Databases {
 				List<Tuple> databaseTypes = types.stream().map(this::convertTuple).collect(Collectors.toList());
 				databases.add(new DatabaseGroupImpl(category.getName(), databaseTypes));
 				List<Field> fields = types.stream().map(this::convertField).collect(Collectors.toList());
-				databaseFields.add(new FieldGroupImpl(trimCategory(category.getName()), fields));
+				databaseFields.add(new FieldGroupImpl(trimCategory(category.getDisplayName()), true, fields));
 			}
 		}
 		this.fieldMap =this.databaseFields

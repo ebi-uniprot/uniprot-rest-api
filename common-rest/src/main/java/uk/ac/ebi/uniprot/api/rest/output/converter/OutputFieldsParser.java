@@ -3,8 +3,6 @@ package uk.ac.ebi.uniprot.api.rest.output.converter;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.base.Strings;
-
 /**
  *
  * @author jluo
@@ -15,7 +13,7 @@ import com.google.common.base.Strings;
 public class OutputFieldsParser {
 	private static final String COMMA = "\\s*,\\s*";
 	public static List<String> parse(String fields, String defaultFields) {
-		if (Strings.isNullOrEmpty(fields)) {
+		if((fields ==null) || (fields.isEmpty())) {
 			fields = defaultFields;
 		}
 		return Arrays.asList( fields.split(COMMA));

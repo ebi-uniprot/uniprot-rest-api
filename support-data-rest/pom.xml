@@ -167,13 +167,6 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
-            <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${uniprot-search.version}</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -197,7 +190,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
+                <version>${maven-dependency-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
                 <executions>
                     <execution>
                         <id>unpack-dependencies</id>
