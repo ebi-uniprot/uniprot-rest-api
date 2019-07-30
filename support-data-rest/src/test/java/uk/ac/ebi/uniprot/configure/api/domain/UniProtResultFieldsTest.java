@@ -27,7 +27,6 @@ class UniProtResultFieldsTest {
 
 	@Test
 	void fieldUniqueness() {
-		List<UniProtResultFields> allFields = Arrays.asList(UniProtResultFields.values());
 		Map<String, List<Field>> result = instance.getResultFields()
 				.stream().flatMap(val -> val.getFields().stream()).collect(Collectors.groupingBy(Field::getName));
 		

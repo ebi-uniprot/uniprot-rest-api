@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class JsonResponseFieldProjector {
-    private static final String ALL = "all";
 
     // Get a map containing the object's projected fields
     public Map<String, Object> project(Object entry, Map<String, List<String>> filterFieldMap, List<ReturnField> allFields) {
@@ -37,7 +36,7 @@ public class JsonResponseFieldProjector {
         } else {
             camelCaseFieldNameValuesMap = allFields
                     .stream()
-                    .filter(f -> (filterFieldMap.containsKey(f.toString()) || f.isMandatoryJsonField()) && f.getJavaFieldName() != null)
+                    .filter(f -> isResponseField(f, filterFieldMap))
                     .collect(
                             Collectors.toMap(
                                             ReturnField::getJavaFieldName,
@@ -53,6 +52,17 @@ public class JsonResponseFieldProjector {
 
         return projectedMap;
 
+    }
+
+    // whether this field will be returned in json response or not.
+    private boolean isResponseField(ReturnField rf, Map<String, List<String>> filterFieldMap) {
+
+        if((filterFieldMap.containsKey(rf.toString()) || rf.isMandatoryJsonField())
+                && rf.getJavaFieldName() != null){
+            return true;
+        }
+
+        return false;
     }
 
     // Get a map with provided field names and values
@@ -110,18 +120,18 @@ public class JsonResponseFieldProjector {
                 && fieldValue instanceof List<?> && Utils.notEmpty((List<?>) fieldValue)) {
             // comment
             if (((List<?>) fieldValue).get(0) instanceof Comment) { // check one to decide the type of list items
-                Predicate<Comment> filter = EntryFilters.createCommentFilter(neededFieldValues);
+                Predicate<Comment> filter = UniProtEntryFilters.createCommentFilter(neededFieldValues);
                 List<Comment> comments = (List<Comment>) fieldValue;
                 comments.removeIf(comment -> !filter.test(comment));
                 return comments;
             } else if (((List<?>) fieldValue).get(0) instanceof Feature) { // feature
-                Predicate<Feature> filter = EntryFilters.createFeatureFilter(neededFieldValues);
+                Predicate<Feature> filter = UniProtEntryFilters.createFeatureFilter(neededFieldValues);
                 List<Feature> features = (List<Feature>) fieldValue;
                 features.removeIf(feature -> !filter.test(feature));
                 return features;
 
             } else if (((List<?>) fieldValue).get(0) instanceof UniProtDBCrossReference) { // cross ref
-                Predicate<UniProtDBCrossReference> filter = EntryFilters.createDbReferenceFilter(neededFieldValues);
+                Predicate<UniProtDBCrossReference> filter = UniProtEntryFilters.createDbReferenceFilter(neededFieldValues);
                 List<UniProtDBCrossReference> crossReferences = (List<UniProtDBCrossReference>) fieldValue;
                 crossReferences.removeIf(xref -> !filter.test(xref));
                 return crossReferences;
