@@ -2,6 +2,7 @@ package uk.ac.ebi.uniprot.configure.api.domain;
 
 import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.Field;
 import uk.ac.ebi.uniprot.api.configure.uniprot.domain.FieldGroup;
@@ -149,6 +150,7 @@ class UniProtResultFieldsTest {
 	}
 
 	@Test
+	@Disabled
 	void testDatabaseField() {
 		List<FieldGroup> groups = instance.getDatabaseFields();
 		assertEquals(19, groups.size());
