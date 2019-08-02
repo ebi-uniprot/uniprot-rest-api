@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.uniprot.api.common.repository.search.QueryResult;
 import uk.ac.ebi.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import uk.ac.ebi.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import uk.ac.ebi.uniprot.api.uniprotkb.service.filters.FilterComponentType;
 import uk.ac.ebi.uniprot.domain.builder.SequenceBuilder;
 import uk.ac.ebi.uniprot.domain.uniprot.*;
 import uk.ac.ebi.uniprot.domain.uniprot.builder.EntryInactiveReasonBuilder;
