@@ -30,6 +30,7 @@ import uk.ac.ebi.uniprot.cv.keyword.impl.KeywordImpl;
 import uk.ac.ebi.uniprot.indexer.DataStoreManager;
 import uk.ac.ebi.uniprot.json.parser.keyword.KeywordJsonConfig;
 import uk.ac.ebi.uniprot.search.document.keyword.KeywordDocument;
+import uk.ac.ebi.uniprot.search.field.KeywordField;
 
 import java.nio.ByteBuffer;
 import java.util.ResourceBundle;
@@ -88,6 +89,7 @@ class KeywordControllerAPIDocumentationTest {
                                .withRequestDefaults(prettyPrint())
                                .withResponseDefaults(prettyPrint())
                 )
+                .apply(docConfigurer.snippets().withAdditionalDefaults(QueryFieldsSnippet.info(KeywordField.Search.values())))
                 .build();
     }
 
@@ -147,7 +149,8 @@ class KeywordControllerAPIDocumentationTest {
                                            new ResourceBundleConstraintDescriptionResolver(ResourceBundle
                                                                                                    .getBundle("constraint-descriptor")));
         saveEntry();
-        this.mockMvc.perform(get("/keyword/search")
+        this.mockMvc
+                .perform(get("/keyword/search")
                                      .param("query", "keyword_id:KW-0001")
                                      .param("sort", "name desc")
                                      .accept(MediaType.APPLICATION_JSON))

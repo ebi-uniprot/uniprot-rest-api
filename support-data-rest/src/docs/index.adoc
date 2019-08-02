@@ -64,7 +64,7 @@ include::{snippets}/get-keyword-by-search/resource.adoc[]
 ==== Request
 
 [[search-request-parameters]]
-operation::get-keyword-by-search[snippets='request-parameters']
+operation::get-keyword-by-search[snippets='request-parameters,allowed-fields-in-search-query']
 
 [[search-content-types]]
 ===== Headers
