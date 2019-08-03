@@ -61,10 +61,11 @@ A `GET` request is used to search over the keyword domain.
 
 include::{snippets}/get-keyword-by-search/resource.adoc[]
 
-==== Request
-
 [[search-request-parameters]]
-operation::get-keyword-by-search[snippets='request-parameters,allowed-fields-in-search-query']
+==== Request
+operation::get-keyword-by-search[snippets='request-parameters']
+===== Allowed fields in search `query`
+include::{snippets}/get-keyword-by-search/allowed-fields-in-search-query.adoc[]
 
 [[search-content-types]]
 ===== Headers

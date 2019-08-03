@@ -1,72 +1,71 @@
 package uk.ac.ebi.uniprot.api.keyword;
 
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.restdocs.operation.Operation;
-import org.springframework.restdocs.operation.OperationRequest;
-import org.springframework.restdocs.operation.Parameters;
 import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.restdocs.snippet.TemplatedSnippet;
-import org.springframework.util.StringUtils;
-import uk.ac.ebi.uniprot.search.field.KeywordField;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-/**
- * Used in combination with {@code org/springframework/restdocs/templates/asciidoctor/r-request.snippet} to produce
- * concrete {@code r-request.snippet}s, which document an example REST call using the R language for a REST Doc test case.
- * To modify formatting, change {@code r-request.snippet}.
- * <p>
- * Created 18/07/19
- *
- * @author Edd
- */
 public class QueryFieldsSnippet extends TemplatedSnippet {
-    private KeywordField.Search[] values;
+    private final String filePath;
 
-    public QueryFieldsSnippet(KeywordField.Search[] values) {
-        super("allowed-fields-in-search-query", null);
-        this.values = values;
+    public QueryFieldsSnippet(String filePath) {
+
+        super("allowed-fields-in-search-query",null);
+
+        this.filePath = filePath;
     }
 
 
-    public static Snippet info(KeywordField.Search[] values) {
-        return new QueryFieldsSnippet(values);
+    public static Snippet getQueryFieldSnippet(String filePath) {
+        return new QueryFieldsSnippet(filePath);
     }
-
 
     @Override
     protected Map<String, Object> createModel(Operation operation) {
-        Map<String, Object> model = new HashMap<>();
-       // model.put("url", this.getUrl(operation));
-        model.put("fields", getFields());
-        return model;
-    }
-
-    private List<KeywordField.Search> getFields() {
-        List<KeywordField.Search> f = new ArrayList<>();
-        for (KeywordField.Search s : values) {
-            f.add(s);
+        try {
+            String queryFieldDetail = readFile(this.filePath);
+            JSONObject jsonObject = new JSONObject(queryFieldDetail);
+            Map<String, Object> model = getModelFromJson(jsonObject);
+            return model;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return f;
     }
 
-    private String getUrl(Operation operation) {
-        OperationRequest request = operation.getRequest();
-        Parameters uniqueParameters = request.getParameters().getUniqueParameters(operation.getRequest().getUri());
-        return !uniqueParameters.isEmpty() && this.includeParametersInUri(request) ? String
-                .format("'%s%s%s'", request.getUri(), StringUtils
-                        .hasText(request.getUri().getRawQuery()) ? "&" : "?", uniqueParameters.toQueryString()) : String
-                .format("'%s'", request.getUri());
+    public String readFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        return FileUtils.readFileToString(file, StandardCharsets.UTF_8);
     }
 
-    private boolean includeParametersInUri(OperationRequest request) {
-        return request.getMethod() == HttpMethod.GET || request
-                .getContent().length > 0 && !MediaType.APPLICATION_FORM_URLENCODED
-                .isCompatibleWith(request.getHeaders().getContentType());
-    }
+    private Map<String, Object> getModelFromJson(JSONObject json) throws JSONException {
 
+        Map<String, Object> out = new HashMap<>();
+
+        for (String key : json.keySet()) {
+            if (json.get(key) instanceof JSONArray) {
+                // Copy an array
+                JSONArray arrayIn = json.getJSONArray(key);
+                List<Object> arrayOut = new ArrayList<>();
+                for (int i = 0; i < arrayIn.length(); i++) {
+                    JSONObject item = (JSONObject) arrayIn.get(i);
+                    Map<String, Object> items = getModelFromJson(item);
+                    arrayOut.add(items);
+                }
+                out.put(key, arrayOut);
+            } else {
+                // Copy a primitive string
+                out.put(key, json.getString(key));
+            }
+        }
+
+        return out;
+    }
 }

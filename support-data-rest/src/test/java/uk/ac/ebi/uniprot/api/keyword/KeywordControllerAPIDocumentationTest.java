@@ -65,6 +65,7 @@ import static uk.ac.ebi.uniprot.api.keyword.SupportedContentTypesSnippet.support
                      KeywordGetIdControllerIT.KeywordGetIdContentTypeParamResolver.class})
 class KeywordControllerAPIDocumentationTest {
     private static final String KW_ACC = "KW-0001";
+    private static final String QUERY_FIELD_DETAIL_FILE = "src/test/resources/keyword_query_fields.json";
 
     @Autowired
     private MockMvc mockMvc;
@@ -89,7 +90,7 @@ class KeywordControllerAPIDocumentationTest {
                                .withRequestDefaults(prettyPrint())
                                .withResponseDefaults(prettyPrint())
                 )
-                .apply(docConfigurer.snippets().withAdditionalDefaults(QueryFieldsSnippet.info(KeywordField.Search.values())))
+                .apply(docConfigurer.snippets().withAdditionalDefaults(QueryFieldsSnippet.getQueryFieldSnippet(QUERY_FIELD_DETAIL_FILE)))
                 .build();
     }
 
