@@ -10,7 +10,7 @@ import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
 public class UniProtKBXmlMessageConverter extends AbstractXmlMessageConverter<UniProtEntry, Entry> {
 	private final UniProtEntryConverter converter;
 	private final Marshaller marshaller;
-	private static final String XML_CONTEXT = "uk.ac.ebi.uniprot.xml.jaxb.uniprot";
+	private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniprot";
 
 	public UniProtKBXmlMessageConverter() {
         super(UniProtEntry.class);
