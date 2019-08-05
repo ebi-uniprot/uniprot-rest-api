@@ -14,8 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
-import org.uniprot.api.common.repository.store.UniProtStoreClient;
-
+import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 
 import java.io.IOException;
