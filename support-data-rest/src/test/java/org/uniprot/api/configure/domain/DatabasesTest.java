@@ -58,7 +58,7 @@ class DatabasesTest {
 				.collect(Collectors.toList());
 		assertEquals(allKnownCrossReferences.size(), databaseGroupItems.size());
 		int nDb = groups.stream().mapToInt(val -> val.getItems().size()).sum();
-        assertEquals(159, nDb);
+		assertTrue(nDb>159);
 	}
 	@Test
 	void testGroup() {
