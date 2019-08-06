@@ -48,6 +48,7 @@ public class SolrTestConfig implements DisposableBean {
         return new SolrTemplate(uniProtSolrClient);
     }
 
+
     @Bean
     @Profile("offline")
     public SolrRequestConverter requestConverter() {

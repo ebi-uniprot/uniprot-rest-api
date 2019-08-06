@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>uk.ac.ebi.uniprot</groupId>
+        <groupId>org.uniprot</groupId>
         <artifactId>uniprot-rest-api</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
@@ -87,21 +87,21 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
              <version>${common-rest.version}</version>
             <type>test-jar</type>
@@ -109,7 +109,7 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <type>test-jar</type>
@@ -202,7 +202,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>uk.ac.ebi.uniprot</groupId>
+                                    <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
                                     <version>${uniprot-search.version}</version>
                                     <type>tar.gz</type>
