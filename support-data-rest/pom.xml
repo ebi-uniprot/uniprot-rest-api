@@ -13,13 +13,14 @@
     </parent>
 
     <artifactId>support-data-rest</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <description>UniProt Rest API for support data</description>
 
     <properties>
         <controlled-vocab-version>0.1-SNAPSHOT</controlled-vocab-version>
         <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
         <core.version>0.1-SNAPSHOT</core.version>
+        <common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
     </properties>
 
     <dependencies>
@@ -43,7 +44,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${common-rest.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -102,7 +103,7 @@
         <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+             <version>${common-rest.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

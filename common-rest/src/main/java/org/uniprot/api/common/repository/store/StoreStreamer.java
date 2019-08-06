@@ -9,6 +9,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -105,15 +106,17 @@ public class StoreStreamer<T> {
 
     private static class BatchStoreIterable<T> extends BatchIterable<T> {
         private UniProtStoreClient<T> storeClient;
-        private RetryPolicy retryPolicy;
+        private RetryPolicy<Object> retryPolicy;
 
         BatchStoreIterable(Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
-            this.retryPolicy = new RetryPolicy()
-                    .retryOn(IOException.class)
-                    .withDelay(500, TimeUnit.MILLISECONDS)
-                    .withMaxRetries(5);
+            retryPolicy = new RetryPolicy<>()
+                    .handle(IOException.class)          
+                    .withDelay(Duration.ofMillis(500))
+             //      .withDelay(500,TimeUnit.MILLISECONDS)
+                   .withMaxRetries(5);
+       
         }
 
         @Override

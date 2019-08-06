@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -32,6 +32,7 @@ import org.uniprot.store.search.field.UniProtField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
 /**
@@ -49,9 +50,10 @@ class UniProtEntryQueryResultsConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(UniProtEntryQueryResultsConverter.class);
 
     private final UniProtKBStoreClient entryStore;
-    private final RetryPolicy retryPolicy = new RetryPolicy()
-            .retryOn(IOException.class)
-            .withDelay(500,TimeUnit.MILLISECONDS)
+    private final RetryPolicy<Object> retryPolicy = new RetryPolicy<>()
+             .handle(IOException.class)          
+             .withDelay(Duration.ofMillis(100))
+      //      .withDelay(500,TimeUnit.MILLISECONDS)
             .withMaxRetries(5);
 
     UniProtEntryQueryResultsConverter(UniProtKBStoreClient entryStore) {
@@ -125,7 +127,8 @@ class UniProtEntryQueryResultsConverter {
             }
             return Optional.of(uniProtEntry);
         } else {
-            return  entryStore.getEntry(doc.accession);                     
+            return Failsafe.with(retryPolicy).get(() ->entryStore.getEntry(doc.accession));
+            		            
                           
         }
     }

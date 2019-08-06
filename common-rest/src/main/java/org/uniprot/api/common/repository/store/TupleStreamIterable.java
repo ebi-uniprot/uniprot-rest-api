@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,7 @@ class TupleStreamIterable implements Iterable<String> {
     private static final int DELAY = 500;
     private final TupleStream tupleStream;
     private final String id;
-    private final RetryPolicy retryPolicy;
+    private final RetryPolicy<Object> retryPolicy;
     private Tuple current = new Tuple();
     private Tuple next = current;
     private boolean atEnd = false;
@@ -35,10 +36,12 @@ class TupleStreamIterable implements Iterable<String> {
     TupleStreamIterable(TupleStream tupleStream, String id) {
         this.tupleStream = tupleStream;
         this.id = id;
-            this.retryPolicy = new RetryPolicy()
-                .retryOn(IOException.class)
-                .withDelay(DELAY, TimeUnit.MILLISECONDS)
-                .withMaxRetries(MAX_RETRIES);
+        retryPolicy = new RetryPolicy<>()
+                .handle(IOException.class)          
+                .withDelay(Duration.ofMillis(DELAY))
+         //      .withDelay(500,TimeUnit.MILLISECONDS)
+               .withMaxRetries(5);
+        
     }
 
     @Override

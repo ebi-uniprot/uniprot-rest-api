@@ -9,13 +9,15 @@
 	</parent>
 	<groupId>uk.ac.ebi.uniprot</groupId>
 	<artifactId>proteome-rest</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>proteome-rest</name>
 	<description>Proteome Rest API</description>
 
 	<properties>
 		<core.version>0.1-SNAPSHOT</core.version>
 		<uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
+		<common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
+		<support-data.version>0.0.2-SNAPSHOT</support-data.version>
 	</properties>
 
 	<dependencies>
@@ -37,12 +39,12 @@
 		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${common-rest.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>
 			<artifactId>support-data-rest</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${support-data.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -58,7 +60,7 @@
 		  <dependency>
             <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${common-rest.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
