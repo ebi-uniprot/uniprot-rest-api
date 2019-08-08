@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.crossref.controller.CrossRefController;
 import org.uniprot.api.crossref.service.CrossRefService;
 import org.uniprot.api.repository.SolrTestConfig;
@@ -25,7 +26,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={SolrTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(CrossRefController.class)
 class CrossRefControllerTest {
     @Autowired

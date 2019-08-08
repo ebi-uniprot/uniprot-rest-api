@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author lgonzales
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={SolrTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(UtilControllerIT.class)
 class UtilControllerIT {
 

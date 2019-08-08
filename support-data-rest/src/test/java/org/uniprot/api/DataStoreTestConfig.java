@@ -35,6 +35,7 @@ public class DataStoreTestConfig {
         return mock(HttpClient.class);
     }
 
+  
     @Bean
     @Profile("offline")
     public SolrClient solrClient(DataStoreManager dataStoreManager) throws URISyntaxException {

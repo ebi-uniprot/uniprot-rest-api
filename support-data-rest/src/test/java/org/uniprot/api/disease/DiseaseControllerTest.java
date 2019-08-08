@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.DiseaseService;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={SolrTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(DiseaseController.class)
 class DiseaseControllerTest {
     @Autowired

@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.store.search.SolrCollection;
@@ -45,7 +46,7 @@ import static org.uniprot.store.search.field.SuggestField.Importance.medium;
  * @author Edd
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SolrTestConfig.class, SupportDataApplication.class})
+@SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebAppConfiguration
 public class SuggesterControllerIT {
     private static final String SEARCH_RESOURCE = "/suggester";

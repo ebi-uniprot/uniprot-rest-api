@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.repository.SolrTestConfig;
@@ -43,7 +44,7 @@ import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONO
  * @author Edd
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {SuggesterControllerWithServerErrorsIT.OtherConfig.class, SolrTestConfig.class, SupportDataApplication.class})
+@SpringBootTest(classes = {SuggesterControllerWithServerErrorsIT.OtherConfig.class, DataStoreTestConfig.class, SupportDataApplication.class})
 @WebAppConfiguration
 @ActiveProfiles({"server-errors"})
 public class SuggesterControllerWithServerErrorsIT {
