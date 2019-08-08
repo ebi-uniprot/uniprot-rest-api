@@ -1,8 +1,12 @@
 package org.uniprot.api.uniprotkb.output.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -50,7 +54,6 @@ public class UniProtKBJsonMessageConverterTest {
                 .build();
         converter.before(context, outputStream);
         converter.after(context, outputStream);
-
         ObjectMapper om = new ObjectMapper();
         ResponseType response = om.readValue(outputStream.toString(), ResponseType.class);
 
@@ -95,7 +98,7 @@ public class UniProtKBJsonMessageConverterTest {
                 .build();
         converter.before(context, outputStream);
         converter.after(context, outputStream);
-
+        System.out.println(outputStream.toString());
         // then
         ObjectMapper om = new ObjectMapper();
         ResponseType response = om.readValue(outputStream.toString(), ResponseType.class);
@@ -146,6 +149,8 @@ public class UniProtKBJsonMessageConverterTest {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class ReponseFacet {
         private String label;
 
@@ -158,6 +163,8 @@ public class UniProtKBJsonMessageConverterTest {
 
     @Data
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class ResponseFacetItem {
         private String label;
 
