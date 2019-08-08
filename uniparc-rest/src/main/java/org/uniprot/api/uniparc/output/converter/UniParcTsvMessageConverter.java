@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.uniprot.api.configure.uniparc.UniParcResultFields;
-import org.uniprot.api.configure.uniprot.domain.Field;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractTsvMessagerConverter;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.uniparc.request.UniParcRequest;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryMap;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.search.domain.Field;
+import org.uniprot.store.search.field.UniParcResultFields;
 
 /**
  *

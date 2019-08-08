@@ -5,11 +5,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.api.configure.uniprot.domain.*;
-import org.uniprot.api.configure.uniprot.domain.impl.*;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.core.cv.xdb.UniProtXDbTypes;
+import org.uniprot.store.search.domain.DatabaseGroup;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.FieldGroup;
+import org.uniprot.store.search.domain.SearchItem;
+import org.uniprot.store.search.domain.Tuple;
+import org.uniprot.store.search.domain.impl.AnnotationEvidences;
+import org.uniprot.store.search.domain.impl.DatabaseGroupImpl;
+import org.uniprot.store.search.domain.impl.GoEvidences;
+import org.uniprot.store.search.domain.impl.TupleImpl;
+import org.uniprot.store.search.domain.impl.UniProtResultFields;
+import org.uniprot.store.search.domain.impl.UniProtSearchItems;
 
 @Service
 public class UniProtConfigureService {

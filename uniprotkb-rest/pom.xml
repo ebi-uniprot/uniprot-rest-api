@@ -39,11 +39,11 @@
 			<artifactId>common-rest</artifactId>
 			<version>${common-rest.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.uniprot</groupId>
-			<artifactId>support-data-rest</artifactId>
-			<version>${support-data.version}</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.uniprot</groupId> -->
+<!-- 			<artifactId>support-data-rest</artifactId> -->
+<!-- 			<version>${support-data.version}</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>core-domain</artifactId>

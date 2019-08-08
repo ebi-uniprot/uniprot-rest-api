@@ -29,7 +29,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.api.configure.proteome.ProteomeResultFields;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.controller.ProteomeController;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
@@ -60,6 +59,7 @@ import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 import org.uniprot.store.search.field.ProteomeField;
+import org.uniprot.store.search.field.ProteomeResultFields;
 import org.uniprot.store.search.field.SearchField;
 
 import com.beust.jcommander.internal.Lists;

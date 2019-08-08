@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.configure.service.UniProtConfigureService;
-import org.uniprot.api.configure.uniprot.domain.DatabaseGroup;
-import org.uniprot.api.configure.uniprot.domain.EvidenceGroup;
-import org.uniprot.api.configure.uniprot.domain.FieldGroup;
-import org.uniprot.api.configure.uniprot.domain.SearchItem;
+import org.uniprot.store.search.domain.DatabaseGroup;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.FieldGroup;
+import org.uniprot.store.search.domain.SearchItem;
 
 import java.util.List;
 

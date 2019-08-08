@@ -7,10 +7,10 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
 import org.springframework.http.MediaType;
-import org.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.UniProtField;
 
 import java.util.Arrays;

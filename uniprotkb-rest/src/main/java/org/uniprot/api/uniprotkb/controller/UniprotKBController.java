@@ -10,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -21,6 +20,7 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.InactiveReasonType;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
 import javax.servlet.http.HttpServletRequest;

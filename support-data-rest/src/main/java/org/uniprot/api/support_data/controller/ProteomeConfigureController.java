@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.configure.service.ProteomeConfigureService;
-import org.uniprot.api.configure.uniprot.domain.FieldGroup;
+import org.uniprot.store.search.domain.FieldGroup;
 
 import java.util.List;
 

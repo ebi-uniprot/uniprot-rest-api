@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 
 import java.util.*;
 
-import org.uniprot.api.configure.uniprot.domain.impl.FieldMaps;
+import org.uniprot.store.search.domain.impl.FieldMaps;
 
 public class FieldsParser {
 	private static final String COLON = ":";

@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.configure.service.UniProtConfigureService;
-import org.uniprot.api.configure.uniprot.domain.SearchItem;
+import org.uniprot.store.search.domain.SearchItem;
 
 class UniProtConfigureServiceTest {
 	private static UniProtConfigureService service;

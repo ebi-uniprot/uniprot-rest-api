@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.uniprot.api.configure.uniprot.domain.Field;
-import org.uniprot.api.configure.uniprot.domain.impl.UniProtResultFields;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
 import org.uniprot.api.rest.output.converter.UniProtEntryFilters;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import org.uniprot.core.parser.tsv.uniprot.EntryMap;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.store.search.domain.Field;
+import org.uniprot.store.search.domain.impl.UniProtResultFields;
 
 public class UniProtKBXslMessageConverter extends AbstractXslMessegerConverter<UniProtEntry> {
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();

@@ -6,11 +6,11 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import org.uniprot.api.configure.proteome.ProteomeResultFields;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.search.field.ProteomeField;
+import org.uniprot.store.search.field.ProteomeResultFields;
 
 /**
  *

@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.configure.uniparc.UniParcResultFields;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -38,6 +37,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.request.UniParcRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.search.field.UniParcResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
 import io.swagger.annotations.Api;

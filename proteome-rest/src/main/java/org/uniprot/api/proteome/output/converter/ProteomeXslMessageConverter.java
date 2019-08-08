@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.uniprot.api.configure.proteome.ProteomeResultFields;
-import org.uniprot.api.configure.uniprot.domain.Field;
 import org.uniprot.api.proteome.request.ProteomeRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.core.parser.tsv.proteome.ProteomeEntryMap;
 import org.uniprot.core.proteome.ProteomeEntry;
+import org.uniprot.store.search.domain.Field;
+import org.uniprot.store.search.field.ProteomeResultFields;
 
 /**
  *

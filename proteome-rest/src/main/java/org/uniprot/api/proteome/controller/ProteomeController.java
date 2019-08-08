@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.configure.proteome.ProteomeResultFields;
 import org.uniprot.api.proteome.request.ProteomeRequest;
 import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -19,6 +18,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.ProteomeEntry;
+import org.uniprot.store.search.field.ProteomeResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
 import javax.servlet.http.HttpServletRequest;

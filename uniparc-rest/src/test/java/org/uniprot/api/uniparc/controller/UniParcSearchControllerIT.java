@@ -28,7 +28,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.api.configure.uniparc.UniParcResultFields;
 import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -64,6 +63,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniParcField;
+import org.uniprot.store.search.field.UniParcResultFields;
 
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
