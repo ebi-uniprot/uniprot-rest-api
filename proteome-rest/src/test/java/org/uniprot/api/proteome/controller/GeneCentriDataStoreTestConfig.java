@@ -29,6 +29,7 @@ import org.uniprot.store.search.SolrCollection;
 @TestConfiguration
 public class GeneCentriDataStoreTestConfig {
 	@Bean(destroyMethod = "close")
+	   @Profile("genecentric_offline")
     public DataStoreManager dataStoreManager() throws IOException,URISyntaxException{
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
         DataStoreManager dataStoreManager=  new DataStoreManager(sdsm);

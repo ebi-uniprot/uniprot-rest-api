@@ -29,6 +29,7 @@ import org.uniprot.store.search.SolrCollection;
 @TestConfiguration
 public class ProteomeDataStoreTestConfig {
 	@Bean(destroyMethod = "close")
+	  @Profile("proteome_offline")
     public DataStoreManager dataStoreManager() throws IOException,URISyntaxException{
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
         DataStoreManager dataStoreManager=  new DataStoreManager(sdsm);
