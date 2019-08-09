@@ -34,11 +34,11 @@ public class ViewByServiceConfig {
 
     @Bean
     public UniPathwayService pathwayService() {
-        String filepath = "unipathway.txt";
-        InputStream inputStream = ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
-        if (inputStream != null) {
-            filepath = ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
-        }
+       String filepath = "unipathway.txt";
+//        InputStream inputStream = ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
+//        if (inputStream != null) {
+//            filepath = ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
+//        }
         return new UniPathwayServiceImpl(filepath);
     }
 
