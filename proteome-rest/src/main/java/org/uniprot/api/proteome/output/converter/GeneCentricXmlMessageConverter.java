@@ -18,8 +18,9 @@ public class GeneCentricXmlMessageConverter  extends AbstractXmlMessageConverter
 	private final CanonicalProteinConverter converter;
 	private final Marshaller marshaller;
 	private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
-	private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/proteome.xsd\">\n";
+	private static final String HEADER = "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
 
+	private static final String FOOTER = "\n</proteomes>";
 	public GeneCentricXmlMessageConverter() {
 		super(CanonicalProtein.class);
 		converter = new CanonicalProteinConverter();
@@ -40,4 +41,9 @@ public class GeneCentricXmlMessageConverter  extends AbstractXmlMessageConverter
 	protected Marshaller getMarshaller() {
 		return marshaller;
 	}
+	@Override
+	protected String getFooter() {
+		return FOOTER;
+	}
+
 }

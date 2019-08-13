@@ -7,6 +7,8 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 
+
+
 /**
  *
  * @author jluo
@@ -18,17 +20,26 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
 	private final UniParcEntryConverter converter;
 	private final Marshaller marshaller;
 	private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniparc";
-	private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/uniparc.xsd\">\n";
+	private static final String HEADER_PREFIX = "<uniparc xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/uniparc.xsd\""
+			;
 
-	public UniParcXmlMessageConverter() {
+	private static final String FOOTER = "\n</uniparc>";
+	
+	private String header;
+	public UniParcXmlMessageConverter(String version) {
 		super(UniParcEntry.class);
 		converter = new UniParcEntryConverter();
 		marshaller = createMarshaller(XML_CONTEXT);
+		header = HEADER_PREFIX;
+		if((version !=null) &&( !version.isEmpty())) {
+			header +=" version=\"" + version+ "\"";
+		}
+		header+=">\n";
 	}
 
 	@Override
 	protected String getHeader() {
-		return HEADER;
+		return header;
 	}
 
 	@Override
@@ -41,6 +52,11 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
 	@Override
 	protected Marshaller getMarshaller() {
 		return marshaller;
+	}
+
+	@Override
+	protected String getFooter() {
+		return FOOTER;
 	}
 
 }

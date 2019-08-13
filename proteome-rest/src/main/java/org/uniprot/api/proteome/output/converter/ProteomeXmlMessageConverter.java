@@ -18,8 +18,9 @@ public class ProteomeXmlMessageConverter extends AbstractXmlMessageConverter<Pro
 	private final ProteomeConverter converter;
 	private final Marshaller marshaller;
 	private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
-	private static final String HEADER = "<uniprot xmlns=\"http://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniprot http://www.uniprot.org/support/docs/proteome.xsd\">\n";
+	private static final String HEADER = "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
 
+	private static final String FOOTER = "\n</proteomes>";
 	public ProteomeXmlMessageConverter() {
 		super(ProteomeEntry.class);
 		converter = new ProteomeConverter();
@@ -41,6 +42,11 @@ public class ProteomeXmlMessageConverter extends AbstractXmlMessageConverter<Pro
 	@Override
 	protected Marshaller getMarshaller() {
 		return marshaller;
+	}
+
+	@Override
+	protected String getFooter() {
+		return FOOTER;
 	}
 
 }

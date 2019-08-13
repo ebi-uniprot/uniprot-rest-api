@@ -73,7 +73,7 @@ public class MessageConverterConfig {
                 converters.add( new UniParcXslMessageConverter());
     
                 converters.add(0, new UniParcJsonMessageConverter());
-                converters.add(1, new UniParcXmlMessageConverter());
+                converters.add(1, new UniParcXmlMessageConverter(""));
                 
               
             }

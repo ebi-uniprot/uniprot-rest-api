@@ -11,6 +11,11 @@ public class UniProtKBXmlMessageConverter extends AbstractXmlMessageConverter<Un
 	private final UniProtEntryConverter converter;
 	private final Marshaller marshaller;
 	private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniprot";
+	
+	private static final String HEADER = "<uniprot xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/uniprot.xsd\">\n";
+	private static final String FOOTER = "<copyright>\n"
+			+ "Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms Distributed under the Creative Commons Attribution (CC BY 4.0) License\n"
+			+ "</copyright>\n" + "</uniprot>";
 
 	public UniProtKBXmlMessageConverter() {
         super(UniProtEntry.class);
@@ -26,5 +31,13 @@ public class UniProtKBXmlMessageConverter extends AbstractXmlMessageConverter<Un
 	@Override
 	protected Marshaller getMarshaller() {
 		return marshaller;
+	}
+	@Override
+	protected String getFooter() {
+		return FOOTER;
+	}
+	@Override
+	protected String getHeader() {
+		return HEADER;
 	}
 }
