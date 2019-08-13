@@ -3,23 +3,28 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>uk.ac.ebi.uniprot</groupId>
+		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<groupId>uk.ac.ebi.uniprot</groupId>
 	<artifactId>proteome-rest</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>proteome-rest</name>
 	<description>Proteome Rest API</description>
 
 	<properties>
 		<core.version>0.1-SNAPSHOT</core.version>
 		<uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
+		<common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
+			<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
 	</properties>
 
 	<dependencies>
-
+   	<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${dropwizard.metrics.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -35,15 +40,15 @@
 			<version>${core.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
+			<groupId>org.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${common-rest.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
-			<artifactId>support-data-rest</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.uniprot</groupId> -->
+<!-- 			<artifactId>support-data-rest</artifactId> -->
+<!-- 			<version>${support-data.version}</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -56,14 +61,14 @@
 			<scope>test</scope>
 		</dependency>
 		  <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${common-rest.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
+			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-indexer-integration-test</artifactId>
 			<version>${uniprot-search.version}</version>
 			<scope>test</scope>
@@ -140,7 +145,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>${maven-dependency-plugin.version}</version>
+				<version>${maven-dependency-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
 				<executions>
 					<execution>
 						<id>unpack-dependencies</id>
@@ -151,7 +156,7 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>uk.ac.ebi.uniprot</groupId>
+									<groupId>org.uniprot</groupId>
 									<artifactId>uniprot-index-config</artifactId>
 									<version>${uniprot-search.version}</version>
 									<type>tar.gz</type>

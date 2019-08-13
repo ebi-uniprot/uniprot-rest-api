@@ -5,23 +5,32 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>uk.ac.ebi.uniprot</groupId>
+        <groupId>org.uniprot</groupId>
         <artifactId>uniprot-rest-api</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
     <artifactId>support-data-rest</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <description>UniProt Rest API for support data</description>
 
     <properties>
         <controlled-vocab-version>0.1-SNAPSHOT</controlled-vocab-version>
         <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
         <core.version>0.1-SNAPSHOT</core.version>
+        <common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
+        		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
     </properties>
 
     <dependencies>
+    	<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${dropwizard.metrics.version}</version>
+		</dependency>
+
+    
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>controlled-vocabulary</artifactId>
@@ -42,7 +51,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${common-rest.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -97,29 +106,29 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+             <version>${common-rest.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <type>test-jar</type>
@@ -239,7 +248,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>uk.ac.ebi.uniprot</groupId>
+                                    <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
                                     <version>${uniprot-search.version}</version>
                                     <type>tar.gz</type>

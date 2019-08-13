@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>uk.ac.ebi.uniprot</groupId>
+        <groupId>org.uniprot</groupId>
         <artifactId>uniprot-rest-api</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
@@ -16,6 +16,7 @@
 
     <properties>
         <!-- Plugin versions -->
+        
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <!-- Dependency versions -->
         <slf4j.version>1.7.25</slf4j.version>
@@ -43,12 +44,12 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>support-data-rest</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -174,27 +175,27 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
             <version>${uniprot-search.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>uk.ac.ebi.uniprot</groupId>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer</artifactId>
             <version>${uniprot-search.version}</version>
             <scope>test</scope>
@@ -279,7 +280,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>uk.ac.ebi.uniprot</groupId>
+                                    <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
                                     <version>${uniprot-search.version}</version>
                                     <type>tar.gz</type>
