@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>uniprot-rest-api</artifactId>
         <groupId>org.uniprot</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>common-rest</artifactId>
     <version>0.0.2-SNAPSHOT</version>
@@ -15,19 +15,18 @@
     <properties>
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <solrj.version>7.5.0</solrj.version>
-        <data-service.version>web-2019.3-SNAPSHOT</data-service.version>
         <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
-          <poi.version>4.0.0</poi.version>
-           <jaxb.version>2.3.0</jaxb.version>
+        <poi.version>4.0.0</poi.version>
+        <jaxb.version>2.3.0</jaxb.version>
     </properties>
 
     <dependencies>
-    	<dependency>
-    		   <groupId>org.uniprot</groupId>
+        <dependency>
+            <groupId>org.uniprot</groupId>
             <artifactId>uniprot-search</artifactId>
             <version>${uniprot-search.version}</version>
-    	</dependency>
-    	  <dependency>
+        </dependency>
+        <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-datastore</artifactId>
             <version>${uniprot-search.version}</version>
@@ -37,9 +36,9 @@
                     <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.hibernate</groupId>
-                   <artifactId>hibernate-validator</artifactId>
-                   </exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -69,46 +68,18 @@
             </exclusions>
         </dependency>
 
-      
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        
         <!-- Solr -->
-          <dependency>
+        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-solr</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-                        <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                	<groupId>org.apache.logging.log4j</groupId>
-                  <artifactId>log4j-core</artifactId>
-                </exclusion>
-                   <exclusion>
-                	<groupId>org.apache.logging.log4j</groupId>
-                  <artifactId>log4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-      
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
@@ -127,8 +98,8 @@
                     <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
                 <exclusion>
-                	<groupId>org.apache.logging.log4j</groupId>
-                  <artifactId>log4j-1.2-api</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-1.2-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -145,8 +116,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
-          <!-- Excel writer -->
+
+        <!-- Excel writer -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -157,9 +128,9 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
         </dependency>
-        
-<!--  xml marshaller -->
-          <dependency>
+
+        <!--  xml marshaller -->
+        <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb.version}</version>
@@ -183,16 +154,16 @@
             <version>2.21.0</version>
             <scope>test</scope>
         </dependency>
-   		 <dependency>
+        <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-             <version>${uniprot-search.version}</version>
+            <version>${uniprot-search.version}</version>
             <scope>test</scope>
         </dependency>
-    	   <dependency>
+        <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-             <version>${uniprot-search.version}</version>
+            <version>${uniprot-search.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -204,9 +175,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-      <build>
+    <build>
         <plugins>
-<!--             allows executable jar with embedded jetty to be created through, "mvn package" command -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
