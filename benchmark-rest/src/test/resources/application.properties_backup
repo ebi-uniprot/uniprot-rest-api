@@ -5,6 +5,8 @@
 ## Naming conventions used in property names
 ## a.s. => advanced-search
 
+a.s.host=http://localhost:1234
+
 # ===========================================
 # AccessionRetrievalSimulation
 # ===========================================

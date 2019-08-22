@@ -17,11 +17,12 @@ class DownloadSwissProtSimulation extends Simulation {
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
+  val host = conf.getString("a.s.host")
   val downloadFeeder = separatedValues(conf.getString("a.s.download.swissprot.query.list"), '#').random
 
   def getRequestWithFormat(): ChainBuilder = {
     val httpReqInfo: String = "download swissprot, format=${download_sp_format}"
-    val filterGeneralRequestStr: String = "${download_sp_url}"
+    val filterGeneralRequestStr: String = host + "${download_sp_url}"
 
     val request =
       feed(downloadFeeder)

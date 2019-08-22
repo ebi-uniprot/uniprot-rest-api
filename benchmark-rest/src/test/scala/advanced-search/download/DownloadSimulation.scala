@@ -16,11 +16,12 @@ class DownloadSimulation extends Simulation {
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
+  val host = conf.getString("a.s.host")
   val downloadFeeder = separatedValues(conf.getString("a.s.download.query.list"), '#').random
 
   def getRequestWithFormat(): ChainBuilder = {
     val httpReqInfo: String = "download, format=${download_format}, encoding=${download_encoding}"
-    val queryRequestStr: String = "${download_url}"
+    val queryRequestStr: String = host + "${download_url}"
 
     val request =
       feed(downloadFeeder)

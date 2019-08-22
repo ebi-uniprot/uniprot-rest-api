@@ -7,7 +7,7 @@ import com.typesafe.config._
 
 /**
   * Simulates simple retrieval of accessions from the REST service. The most basic ID retrieval, which serves
-  * as a basis on which other test performances can be compared.
+  * as a basis to which other test performances can be compared.
   */
 class AccessionRetrievalSimulation extends Simulation {
 
@@ -17,11 +17,12 @@ class AccessionRetrievalSimulation extends Simulation {
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
 
+  val host = conf.getString("a.s.host")
   val feeder = separatedValues(conf.getString("a.s.accession.retrieval.list"), '#').random
 
   def getRequest(): ChainBuilder = {
     val httpReqInfo: String = "accession retrieval, format=${accession_format}";
-    val requestStr: String = "${accession_url}";
+    val requestStr: String = host + "${accession_url}";
 
     val request =
       feed(feeder)
@@ -47,6 +48,5 @@ class AccessionRetrievalSimulation extends Simulation {
     instance.inject(atOnceUsers(conf.getInt("a.s.accession.retrieval.users")))
   )
     .protocols(httpConf)
-    //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
     .maxDuration(conf.getInt("a.s.accession.retrieval.maxDuration") minutes)
 }
