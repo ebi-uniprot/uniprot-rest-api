@@ -20,7 +20,7 @@ import org.uniprot.store.search.field.UniParcField;
 public class UniParcJsonMessageConverter extends JsonMessageConverter<UniParcEntry> {
 
 	public UniParcJsonMessageConverter() {
-		super(UniParcJsonConfig.getInstance().getFullObjectMapper(), UniParcEntry.class, Arrays.asList(UniParcField.ResultFields.values()));
+		super(UniParcJsonConfig.getInstance().getSimpleObjectMapper(), UniParcEntry.class, Arrays.asList(UniParcField.ResultFields.values()));
 	}
 
 	@Override

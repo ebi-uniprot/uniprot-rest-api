@@ -339,7 +339,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 	                    .resultMatcher(jsonPath("$.url",not(isEmptyOrNullString())))
 	                    .resultMatcher(jsonPath("$.messages.*",containsInAnyOrder(
 	                    		"The 'upi' value has invalid format. It should be a valid UniParc UPI",
-	                            "The sequence length filter value should be a number",
+	                    		 "'length' filter type 'term' is invalid. Expected 'range' filter type",	 
 	                            "The taxonomy id filter value should be a number",
 	                            "The 'upid' value has invalid format. It should be a valid Proteome UPID"
 	                      )))

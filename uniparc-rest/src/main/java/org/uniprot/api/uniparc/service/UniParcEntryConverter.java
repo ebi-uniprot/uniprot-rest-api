@@ -33,7 +33,7 @@ public class UniParcEntryConverter implements Function<UniParcDocument, UniParcE
 			UniParcEntry entry= objectMapper.readValue(t.getEntryStored().array(), UniParcEntry.class);
 				return entry;
 		} catch (Exception e) {
-			LOGGER.info("Error converting solr avro_binary default UniProtEntry", e);
+			LOGGER.info("Error converting solr avro_binary default UniParcEntry", e);
 		}
 		return null;
 	}
