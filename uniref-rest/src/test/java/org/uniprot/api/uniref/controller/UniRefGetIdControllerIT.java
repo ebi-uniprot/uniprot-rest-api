@@ -167,7 +167,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 	        @Override
 	        public GetIdParameter validIdParameter() {
 	            return GetIdParameter.builder().id(ID)
-	                    .resultMatcher(jsonPath("$.uniref.id",is(ID)))
+	                    .resultMatcher(jsonPath("$.id",is(ID)))
 //	                    .resultMatcher(jsonPath("$.scientificName",is("scientific")))
 //	                    .resultMatcher(jsonPath("$.commonName",is("common")))
 //	                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
@@ -193,8 +193,8 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
 	        @Override
 	        public GetIdParameter withFilterFieldsParameter() {
-	            return GetIdParameter.builder().id(ID).fields("id,name")
-	                    .resultMatcher(jsonPath("$.uniref.id",is(ID)))
+	            return GetIdParameter.builder().id(ID).fields("id,name,count")
+	                    .resultMatcher(jsonPath("$.id",is(ID)))
 //	                    .resultMatcher(jsonPath("$.scientificName",is("scientific")))
 //	                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
 //	                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
@@ -219,8 +219,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 	                    .id(ID)
 	                    .contentTypeParam(ContentTypeParam.builder()
 	                            .contentType(MediaType.APPLICATION_JSON)
-	                    //        .resultMatcher(jsonPath("$.uniref.id",contains(ID)))
-	                            .resultMatcher(jsonPath("$.uniref.id",is(ID)))
+	                            .resultMatcher(jsonPath("$.id",is(ID)))
 //	                            .resultMatcher(jsonPath("$.scientificName",is("scientific")))
 //	                            .resultMatcher(jsonPath("$.commonName",is("common")))
 //	                            .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))

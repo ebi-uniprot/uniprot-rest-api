@@ -291,7 +291,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	        protected SearchParameter searchCanReturnSuccessParameter() {
 	            return SearchParameter.builder()
 	                    .queryParam("query", Collections.singletonList("id:UniRef50_P03911"))
-	                    .resultMatcher(jsonPath("$.results.*.uniref.id",contains("UniRef50_P03911")))
+	                    .resultMatcher(jsonPath("$.results.*.id",contains("UniRef50_P03911")))
 	                    .build();
 	        }
 
@@ -307,7 +307,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	        protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
 	            return SearchParameter.builder()
 	                    .queryParam("query", Collections.singletonList("id:*"))
-	                    .resultMatcher(jsonPath("$.results.*.uniref.id",contains("UniRef50_P03911", "UniRef50_P03920")))
+	                    .resultMatcher(jsonPath("$.results.*.id",contains("UniRef50_P03911", "UniRef50_P03920")))
 	                    .build();
 	        }
 
@@ -342,7 +342,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	            return SearchParameter.builder()
 	                    .queryParam("query", Collections.singletonList("*:*"))
 	                    .queryParam("sort", Collections.singletonList("id desc"))
-	                    .resultMatcher(jsonPath("$.results.*.uniref.id",contains("UniRef50_P03920", "UniRef50_P03911")))
+	                    .resultMatcher(jsonPath("$.results.*.id",contains("UniRef50_P03920", "UniRef50_P03911")))
 	                    .build();
 	        }
 
@@ -351,7 +351,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	            return SearchParameter.builder()
 	                    .queryParam("query", Collections.singletonList("*:*"))
 	                    .queryParam("fields", Collections.singletonList("name"))
-	                    .resultMatcher(jsonPath("$.results.*.uniref.id",contains( "UniRef50_P03911", "UniRef50_P03920")))
+	                    .resultMatcher(jsonPath("$.results.*.id",contains( "UniRef50_P03911", "UniRef50_P03920")))
 	                  
 	                
 	                    .build();
@@ -362,7 +362,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	            return SearchParameter.builder()
 	                    .queryParam("query", Collections.singletonList("*:*"))
 	                //    .queryParam("facets", Collections.singletonList("reference"))
-	                    .resultMatcher(jsonPath("$.results.*.uniref.id",contains("UniRef50_P03911", "UniRef50_P03920")))
+	                    .resultMatcher(jsonPath("$.results.*.id",contains("UniRef50_P03911", "UniRef50_P03920")))
 	                    .build();
 	        }
 	    }
@@ -376,7 +376,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	                    .query("taxonomy_id:9606")
 	                    .contentTypeParam(ContentTypeParam.builder()
 	                            .contentType(MediaType.APPLICATION_JSON)
-	                            .resultMatcher(jsonPath("$.results.*.uniref.id",contains("UniRef50_P03911", "UniRef50_P03920")))
+	                            .resultMatcher(jsonPath("$.results.*.id",contains("UniRef50_P03911", "UniRef50_P03920")))
 	                            .build())
 	                    .contentTypeParam(ContentTypeParam.builder()
 	                            .contentType(MediaType.APPLICATION_XML)

@@ -1,11 +1,11 @@
 package org.uniprot.api.uniref.output.converter;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
+import org.uniprot.api.uniref.request.UniRefFieldsParser;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.field.UniRefField;
@@ -24,15 +24,9 @@ public class UniRefJsonMessageConverter extends JsonMessageConverter<UniRefEntry
 	}
 
 	@Override
-	protected Map<String, List<String>> getFilterFieldMap(String fields) {
-		
-		return new HashMap<>();
+	protected Map<String, List<String>> getFilterFieldMap(String fields) {		
+		return UniRefFieldsParser.parseForFilters(fields);
 	}
-	@Override
-	protected Map<String, Object> projectEntryFields(UniRefEntry entity) {
-		 Map<String, Object> map = new HashMap<>();
-		 map.put("uniref", entity);
-		 return map;
-	}
+
 }
 
