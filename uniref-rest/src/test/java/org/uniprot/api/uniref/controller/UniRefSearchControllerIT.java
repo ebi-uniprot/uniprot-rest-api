@@ -271,19 +271,6 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 					.build();
 			return member;
 		}
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
-	 
 	
 	  static class UniRefSearchParameterResolver extends AbstractSearchParameterResolver {
 

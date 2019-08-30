@@ -10,7 +10,7 @@ import lombok.Data;
  * @date: 20 Aug 2019
  *
 */
-@ConfigurationProperties(prefix = "voldemort.uniprot")
+@ConfigurationProperties(prefix = "voldemort.uniref")
 @Data
 public class UniRefStoreConfigProperties {
     private String host;

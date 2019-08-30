@@ -46,9 +46,6 @@ public class UniRefXslMessageConverter extends AbstractXslMessegerConverter<UniR
 
 	private String getFieldDisplayName(String field) {
 		Optional<Field> opField = UniParcResultFields.INSTANCE.getField(field);
-		if (opField.isPresent())
-			return opField.get().getLabel();
-		else
-			return field;
+		return opField.map(Field::getLabel).orElse(field);	
 	}
 }

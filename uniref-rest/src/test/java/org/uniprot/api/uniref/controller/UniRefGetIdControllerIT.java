@@ -168,10 +168,6 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 	        public GetIdParameter validIdParameter() {
 	            return GetIdParameter.builder().id(ID)
 	                    .resultMatcher(jsonPath("$.id",is(ID)))
-//	                    .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//	                    .resultMatcher(jsonPath("$.commonName",is("common")))
-//	                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-//	                    .resultMatcher(jsonPath("$.links",contains("link")))
 	                    .build();
 	        }
 
@@ -220,18 +216,10 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 	                    .contentTypeParam(ContentTypeParam.builder()
 	                            .contentType(MediaType.APPLICATION_JSON)
 	                            .resultMatcher(jsonPath("$.id",is(ID)))
-//	                            .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//	                            .resultMatcher(jsonPath("$.commonName",is("common")))
-//	                            .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-//	                            .resultMatcher(jsonPath("$.links",contains("link")))
 	                            .build())
 	                    .contentTypeParam(ContentTypeParam.builder()
                       .contentType(MediaType.APPLICATION_XML)
                       .resultMatcher(content().string(containsString(ID)))
-//                      .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//                      .resultMatcher(jsonPath("$.commonName",is("common")))
-//                      .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-//                      .resultMatcher(jsonPath("$.links",contains("link")))
                       .build())
 	                    .contentTypeParam(ContentTypeParam.builder()
 	                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)

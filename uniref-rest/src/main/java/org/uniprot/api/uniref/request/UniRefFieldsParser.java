@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Strings;
+import org.uniprot.core.util.Utils;
 
 /**
  *
@@ -17,7 +17,7 @@ import com.google.common.base.Strings;
 public class UniRefFieldsParser {
 	private static final String COMMA = "\\s*,\\s*";
 	public static Map<String, List<String>> parseForFilters(String fields) {
-		if (Strings.isNullOrEmpty(fields)) {
+		if (Utils.nullOrEmpty(fields)) {
 			return Collections.emptyMap();
 		}
 		Map<String, List<String>> filters = new HashMap<>();

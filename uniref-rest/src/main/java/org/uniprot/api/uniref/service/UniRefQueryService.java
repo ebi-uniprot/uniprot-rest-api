@@ -36,9 +36,9 @@ public class UniRefQueryService {
 	private final DefaultSearchHandler defaultSearchHandler;
 
 	private final StoreStreamer<UniRefEntry> storeStreamer;
-	
+
 	private final UniRefQueryRepository repository;
-	
+
 	private final UniRefQueryResultConverter resultsConverter;
 
 	@Autowired
@@ -50,35 +50,34 @@ public class UniRefQueryService {
 		this.defaultSearchHandler = new DefaultSearchHandler(Search.content, Search.upi, Search.getBoostFields());
 		this.storeStreamer = storeStreamer;
 		this.repository = repository;
-		 this.resultsConverter = new UniRefQueryResultConverter(entryStore);
+		this.resultsConverter = new UniRefQueryResultConverter(entryStore);
 	}
 
 	public QueryResult<UniRefEntry> search(UniRefRequest request) {
-		SolrRequest query = basicService.createSolrRequest(request, facetConfig, solrSortClause, defaultSearchHandler);	
+		SolrRequest query = basicService.createSolrRequest(request, facetConfig, solrSortClause, defaultSearchHandler);
 
-        QueryResult<UniRefDocument> results = repository
-                .searchPage(query, request.getCursor(), request.getSize());
+		QueryResult<UniRefDocument> results = repository.searchPage(query, request.getCursor(), request.getSize());
 
-        return resultsConverter.convertQueryResult(results,  Collections.emptyMap());
+		return resultsConverter.convertQueryResult(results, Collections.emptyMap());
 	}
 
 	public UniRefEntry getById(String id) {
-		   try {
+		try {
 
-	            SolrRequest solrRequest = SolrRequest.builder().query(UniRefField.Search.id.name() + ":" + id).build();
-	            Optional<UniRefDocument> optionalDoc = repository.getEntry(solrRequest);
-	            Optional<UniRefEntry> optionalRefEntry = optionalDoc
-	                    .map(doc -> resultsConverter.convertDoc(doc, Collections.emptyMap()))
-	                    .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+			SolrRequest solrRequest = SolrRequest.builder().query(UniRefField.Search.id.name() + ":" + id).build();
+			Optional<UniRefDocument> optionalDoc = repository.getEntry(solrRequest);
+			Optional<UniRefEntry> optionalRefEntry = optionalDoc
+					.map(doc -> resultsConverter.convertDoc(doc, Collections.emptyMap()))
+					.orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
 
-	            return optionalRefEntry.orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
-	        } catch (ResourceNotFoundException e) {
-	            throw e;
-	        } catch (Exception e) {
-	            String message = "Could not get uniref id for: [" + id + "]";
-	            throw new ServiceException(message, e);
-	        }
-	
+			return optionalRefEntry.orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+		} catch (ResourceNotFoundException e) {
+			throw e;
+		} catch (Exception e) {
+			String message = "Could not get uniref id for: [" + id + "]";
+			throw new ServiceException(message, e);
+		}
+
 	}
 
 	public Stream<UniRefEntry> stream(UniRefRequest request) {
@@ -86,9 +85,11 @@ public class UniRefQueryService {
 		return storeStreamer.idsToStoreStream(query);
 
 	}
-    public Stream<String> streamIds(UniRefRequest request) {
-        SolrRequest solrRequest = basicService.createSolrRequest(request, facetConfig, solrSortClause, defaultSearchHandler);
-        return storeStreamer.idsStream(solrRequest);
-    }
+
+	public Stream<String> streamIds(UniRefRequest request) {
+		SolrRequest solrRequest = basicService.createSolrRequest(request, facetConfig, solrSortClause,
+				defaultSearchHandler);
+		return storeStreamer.idsStream(solrRequest);
+	}
 
 }

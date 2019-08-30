@@ -15,6 +15,5 @@ import lombok.Data;
 public class UniRefStreamConfigProperties {
 	private int batchSize;
 	private String valueId;
-	private String defaultsField;  //not used
 }
 
