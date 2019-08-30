@@ -53,7 +53,7 @@ public abstract class AbstractSolrSortClause {
         List<Pair<String, Sort.Direction>> fieldSortPairs = new ArrayList<>();
 
         String[] tokenizedSortClause = sortClause.split("\\s*,\\s*");//e.g. field1 asc, field2 desc, field3 asc
-
+        boolean hasIdField= false;
         for (String singleSortPairStr : tokenizedSortClause) {
             String[] fieldSortPairArr = singleSortPairStr.split("\\s+");
             if (fieldSortPairArr.length != 2) {
@@ -61,8 +61,13 @@ public abstract class AbstractSolrSortClause {
             }
             String solrFieldName = getSolrSortFieldName(fieldSortPairArr[0]);
             fieldSortPairs.add(new ImmutablePair<>(solrFieldName, Sort.Direction.fromString(fieldSortPairArr[1])));
+            if(solrFieldName.equals(getSolrDocumentIdFieldName())) {
+            	hasIdField =true;
+            }
         }
-
+        if(!hasIdField && !fieldSortPairs.isEmpty()) {
+        	fieldSortPairs.add(new ImmutablePair<>(getSolrDocumentIdFieldName(), Sort.Direction.ASC));
+        }
         return fieldSortPairs;
     }
 
