@@ -17,15 +17,20 @@ import org.uniprot.api.literature.output.converter.LiteratureXlsMessageConverter
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.subcell.output.converter.SubcellularLocationOBOMessageConverter;
+import org.uniprot.api.subcell.output.converter.SubcellularLocationTsvMessageConverter;
+import org.uniprot.api.subcell.output.converter.SubcellularLocationXlsMessageConverter;
 import org.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
 import org.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.core.cv.keyword.KeywordEntry;
+import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.json.parser.crossref.CrossRefJsonConfig;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
+import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -72,38 +77,44 @@ public class MessageConverterConfig {
                 converters.add(new KeywordXlsMessageConverter());
                 converters.add(new KeywordTsvMessageConverter());
 
+                converters.add(new SubcellularLocationXlsMessageConverter());
+                converters.add(new SubcellularLocationTsvMessageConverter());
+                converters.add(new SubcellularLocationOBOMessageConverter());
+
+
+                converters.add(new DiseaseXlsMessageConverter());
+                converters.add(new DiseaseTsvMessageConverter());
+                converters.add(new DiseaseOBOMessageConverter());
+
                 // add Json message converter first in the list because it is the most used
                 JsonMessageConverter<LiteratureEntry> litJsonConverter =
                         new JsonMessageConverter<>(LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
                                 LiteratureEntry.class, Arrays.asList(LiteratureField.ResultFields.values()));
-
                 converters.add(0, litJsonConverter);
 
                 JsonMessageConverter<KeywordEntry> keywordJsonConverter =
                         new JsonMessageConverter<>(KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
                                 KeywordEntry.class, Arrays.asList(KeywordField.ResultFields.values()));
-
                 converters.add(0, keywordJsonConverter);
 
                 JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
                         new JsonMessageConverter<>(TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
                                 TaxonomyEntry.class, Arrays.asList(TaxonomyField.ResultFields.values()));
-
                 converters.add(0, taxonomyJsonConverter);
 
-                converters.add(new DiseaseXlsMessageConverter());
-                converters.add(new DiseaseTsvMessageConverter());
+                JsonMessageConverter<SubcellularLocationEntry> subcellJsonConverter =
+                        new JsonMessageConverter<>(SubcellularLocationJsonConfig.getInstance().getSimpleObjectMapper(),
+                                SubcellularLocationEntry.class, Arrays.asList(SubcellularLocationField.ResultFields.values()));
+                converters.add(0, subcellJsonConverter);
 
                 JsonMessageConverter<Disease> diseaseJsonConverter =
                         new JsonMessageConverter(DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
                                 Disease.class, Arrays.asList(DiseaseField.ResultFields.values()));
                 converters.add(0, diseaseJsonConverter);
-                converters.add(1, new DiseaseOBOMessageConverter());
 
                 JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
                         new JsonMessageConverter<>(CrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
                                 CrossRefEntry.class, Arrays.asList(CrossRefField.ResultFields.values()));
-
                 converters.add(0, xrefJsonConverter);
             }
         };

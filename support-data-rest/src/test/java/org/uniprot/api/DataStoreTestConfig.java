@@ -56,6 +56,9 @@ public class DataStoreTestConfig {
         ClosableEmbeddedSolrClient xrefSolrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.crossref);
         dataStoreManager.addSolrClient(DataStoreManager.StoreType.CROSSREF, xrefSolrClient);
 
+        ClosableEmbeddedSolrClient subcellularLocation = new ClosableEmbeddedSolrClient(container, SolrCollection.subcellularlocation);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, subcellularLocation);
+
         return solrClient;
     }
 
