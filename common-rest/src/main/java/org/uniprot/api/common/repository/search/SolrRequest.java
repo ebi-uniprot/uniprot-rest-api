@@ -32,6 +32,10 @@ public class SolrRequest {
     private List<String> filterQueries = new ArrayList<>();
     @Singular
     private List<String> facets = new ArrayList<>();
+    @Singular
+    private List<String> boostQueries = new ArrayList<>();
+    @Singular
+    private List<String> boostByFunctions = new ArrayList<>();
 
     // setting default field values in a builder following instructions here:
     // https://www.baeldung.com/lombok-builder-default-value
