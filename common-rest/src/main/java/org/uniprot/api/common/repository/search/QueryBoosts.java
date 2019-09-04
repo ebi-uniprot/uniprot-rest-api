@@ -3,6 +3,7 @@ package org.uniprot.api.common.repository.search;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -13,13 +14,14 @@ import java.util.List;
  */
 @Builder
 @Getter
+@ToString
 public class QueryBoosts {
     @Singular
-    private List<String> defaultBoosts;
+    private List<String> defaultSearchBoosts;
     @Singular
-    private List<String> fieldBoosts;
+    private List<String> defaultSearchBoostFunctions;
     @Singular
-    private List<String> valueBoosts;
+    private List<String> advancedSearchBoosts;
     @Singular
-    private List<String> boostFunctions;
+    private List<String> advancedSearchBoostFunctions;
 }
