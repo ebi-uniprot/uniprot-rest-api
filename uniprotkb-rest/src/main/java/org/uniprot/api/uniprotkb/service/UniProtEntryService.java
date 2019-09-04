@@ -16,12 +16,10 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.UniProtField;
 
 import java.util.List;
@@ -46,7 +44,7 @@ public class UniProtEntryService {
     public UniProtEntryService(UniprotQueryRepository repository,
                                UniprotFacetConfig uniprotFacetConfig,
                                UniProtTermsConfig uniProtTermsConfig,
-                               BoostsConfig boostsConfig,
+//                               BoostsConfig boostsConfig,
                                // TODO: 04/09/19 implement its usage
                                UniProtKBStoreClient entryStore,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
@@ -122,7 +120,7 @@ public class UniProtEntryService {
             hasScore = true;
             requestBuilder.defaultQueryOperator(Query.Operator.OR);
         }
-        setBoosts(requestBuilder, );
+//        setBoosts(requestBuilder, );
         requestBuilder.query(requestedQuery);
         requestBuilder.sort(getUniProtSort(request.getSort(), hasScore));
 

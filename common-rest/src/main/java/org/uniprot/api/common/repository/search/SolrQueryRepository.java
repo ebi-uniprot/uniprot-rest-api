@@ -83,6 +83,7 @@ public abstract class SolrQueryRepository<T> {
 
     public Optional<T> getEntry(SolrRequest request) {
         try {
+            // TODO: 04/09/19 can we just create a Solr query and not a SimpleQuery?
             return solrTemplate.queryForObject(collection.toString(), requestConverter.toQuery(request), tClass);
         } catch (Throwable e) {
             throw new QueryRetrievalException("Error executing solr query", e);
