@@ -5,8 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.*;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
 import java.util.stream.Collectors;
@@ -71,7 +69,8 @@ class SolrRequestConverterTest {
             assertThat(solrQuery.getQuery(), is(queryString));
             assertThat(solrQuery.getFacetFields(), arrayContainingInAnyOrder(facet1));
             assertThat(solrQuery.getParams("facet.interval"), arrayContainingInAnyOrder(facet2));
-            assertThat(solrQuery.getParams("f.length.facet.interval.set"), arrayContainingInAnyOrder("[1,200]", "[201,400]", "[401,600]", "[601,800]", "[801,*]"));
+            assertThat(solrQuery
+                               .getParams("f.length.facet.interval.set"), arrayContainingInAnyOrder("[1,200]", "[201,400]", "[401,600]", "[601,800]", "[801,*]"));
             assertThat(solrQuery.getFacetLimit(), is(facetLimit));
             assertThat(solrQuery.getFacetMinCount(), is(facetMinCount));
             assertThat(solrQuery.getTermsFields(), arrayContainingInAnyOrder(termField1, termField2));
@@ -95,6 +94,25 @@ class SolrRequestConverterTest {
             SolrRequest request = SolrRequest.builder().query("too long").termQuery("too long").termField("field 1")
                     .build();
             assertThrows(InvalidRequestException.class, () -> converter.toSolrQuery(request));
+        }
+
+        @Test
+        void queryBoostsAreSetCorrectly() {
+            // given
+            SolrRequest request = SolrRequest.builder().query("term1:value term2").queryBoosts(
+                    QueryBoosts.builder()
+                            .advancedSearchBoost("field1:{query}^3")
+                            .advancedSearchBoost("field2:value^2")
+                            .build()
+            ).build();
+
+            System.out.println("hello {query} world".replaceAll("\\{query\\}", "thing"));
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request);
+
+            // then
+            System.out.println(solrQuery);
         }
     }
 
@@ -139,7 +157,7 @@ class SolrRequestConverterTest {
                                .collect(Collectors.toList()), containsInAnyOrder(facet1, facet2));
             assertThat(facetQuery.getFilterQueries().stream()
                                .map(SolrDataQuery::getCriteria)
-                               .map(c -> ((SimpleStringCriteria)c).getQueryString())
+                               .map(c -> ((SimpleStringCriteria) c).getQueryString())
                                .collect(Collectors.toList()),
                        containsInAnyOrder(filterQuery1, filterQuery2));
             assertThat(facetQuery.getSort(), is(sorts));

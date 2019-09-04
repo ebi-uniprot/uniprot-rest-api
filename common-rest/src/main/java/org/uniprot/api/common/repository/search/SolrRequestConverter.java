@@ -12,6 +12,7 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.core.util.Utils;
 
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
@@ -27,6 +28,7 @@ import static org.uniprot.core.util.Utils.nullOrEmpty;
 public class SolrRequestConverter {
     /**
      * Creates a {@link SolrQuery} from a {@link SolrRequest}.
+     *
      * @param request the request that specifies the query
      * @return the solr query
      */
@@ -45,6 +47,9 @@ public class SolrRequestConverter {
             }
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
+
+        // TODO: 04/09/19 process query boosts
+        setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
 
         return solrQuery;
     }
@@ -103,6 +108,9 @@ public class SolrRequestConverter {
         private static final String DISTRIB = "distrib";
         private static final String TERMS_FIELDS = "terms.fl";
         private static final String MINCOUNT = "terms.mincount";
+        private static final Pattern FIELD_QUERY_PATTERN = Pattern.compile("\\w+:\\w+");
+        private static final String BOOST_QUERY = "bq";
+        private static final String BOOST_FUNCTIONS = "boost";
 
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
@@ -136,7 +144,8 @@ public class SolrRequestConverter {
                     solrQuery.addFacetField(facetName);
                 }
                 if (facetProperty.getLimit() != 0) {
-                    solrQuery.add(String.format("f.%s.facet.limit", facetName), String.valueOf(facetProperty.getLimit()));
+                    solrQuery.add(String.format("f.%s.facet.limit", facetName), String
+                            .valueOf(facetProperty.getLimit()));
                 }
             }
             solrQuery.setFacetLimit(facetConfig.getLimit());
@@ -157,7 +166,30 @@ public class SolrRequestConverter {
             if (nonNull(sort)) {
                 for (Sort.Order order : sort) {
                     solrQuery
-                            .addSort(order.getProperty(), order.isAscending() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+                            .addSort(order.getProperty(), order
+                                    .isAscending() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+                }
+            }
+        }
+
+        static void setQueryBoosts(SolrQuery solrQuery, String query, QueryBoosts boosts) {
+            Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
+            if (fieldQueryMatcher.find()) {
+                // a query involving field queries
+                boosts.getAdvancedSearchBoosts()
+                        .stream()
+                        // TODO: 04/09/19 only substitute if default value. therefore, this should be in else branch.
+                        .map(boost -> boost.replaceAll("\\{query\\}", "(" + query + ")"))
+                        .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+                if (!nullOrEmpty(boosts.getAdvancedSearchBoostFunctions())) {
+                    solrQuery.add(BOOST_FUNCTIONS, boosts.getAdvancedSearchBoostFunctions());
+                }
+            } else {
+                // a default query
+                boosts.getDefaultSearchBoosts()
+                        .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+                if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
+                    solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
             }
         }

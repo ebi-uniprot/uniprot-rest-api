@@ -71,13 +71,13 @@ public class QueryBoostsFileReader {
                 builder.defaultSearchBoost(line);
                 break;
             case DEFAULT_SEARCH_FUNCTIONS:
-                builder.defaultSearchBoostFunction(line);
+                builder.defaultSearchBoostFunctions(line);
                 break;
             case ADVANCED_SEARCH:
                 builder.advancedSearchBoost(line);
                 break;
             case ADVANCED_SEARCH_FUNCTIONS:
-                builder.advancedSearchBoostFunction(line);
+                builder.advancedSearchBoostFunctions(line);
                 break;
         }
     }

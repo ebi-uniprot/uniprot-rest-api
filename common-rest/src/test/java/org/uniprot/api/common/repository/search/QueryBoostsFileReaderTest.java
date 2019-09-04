@@ -39,7 +39,7 @@ class QueryBoostsFileReaderTest {
 
     @Test
     void defaultBoostFunctionsLoadedCorrectly() {
-        assertThat(reader.getQueryBoosts().getDefaultSearchBoostFunctions(), contains("default3"));
+        assertThat(reader.getQueryBoosts().getDefaultSearchBoostFunctions(), is("default3"));
     }
 
     @Test
@@ -49,6 +49,6 @@ class QueryBoostsFileReaderTest {
 
     @Test
     void advancedBoostFunctionsLoadedCorrectly() {
-        assertThat(reader.getQueryBoosts().getAdvancedSearchBoostFunctions(), contains("advanced1"));
+        assertThat(reader.getQueryBoosts().getAdvancedSearchBoostFunctions(), is("advanced1,advanced2"));
     }
 }

@@ -18,10 +18,8 @@ import java.util.List;
 public class QueryBoosts {
     @Singular
     private List<String> defaultSearchBoosts;
-    @Singular
-    private List<String> defaultSearchBoostFunctions;
+    private String defaultSearchBoostFunctions;
     @Singular
     private List<String> advancedSearchBoosts;
-    @Singular
-    private List<String> advancedSearchBoostFunctions;
+    private String advancedSearchBoostFunctions;
 }
