@@ -97,22 +97,59 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void queryBoostsAreSetCorrectly() {
+        void queryBoostsWithPlaceholderIsReplacedCorrectly() {
             // given
-            SolrRequest request = SolrRequest.builder().query("term1:value term2").queryBoosts(
+            SolrRequest request = SolrRequest.builder().query("value1 value2").queryBoosts(
                     QueryBoosts.builder()
-                            .advancedSearchBoost("field1:{query}^3")
-                            .advancedSearchBoost("field2:value^2")
+                            .defaultSearchBoost("field1:{query}^3")
+                            .defaultSearchBoost("field2:value3^2")
                             .build()
             ).build();
-
-            System.out.println("hello {query} world".replaceAll("\\{query\\}", "thing"));
 
             // when
             SolrQuery solrQuery = converter.toSolrQuery(request);
 
             // then
-            System.out.println(solrQuery);
+            assertThat(solrQuery.getParams("bq"), is(arrayContainingInAnyOrder("field1:(value1 value2)^3", "field2:value3^2")));
+            assertThat(solrQuery.get("boost"), is(nullValue()));
+        }
+
+        @Test
+        void defaultQueryBoostsAndFunctionsCreatedCorrectly() {
+            // given
+            SolrRequest request = SolrRequest.builder().query("value1 value2").queryBoosts(
+                    QueryBoosts.builder()
+                            .defaultSearchBoost("field1:value3^3")
+                            .defaultSearchBoost("field2:value4^2")
+                            .defaultSearchBoostFunctions("f1,f2")
+                            .build()
+            ).build();
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request);
+
+            // then
+            assertThat(solrQuery.getParams("bq"), is(arrayContainingInAnyOrder("field1:value3^3", "field2:value4^2")));
+            assertThat(solrQuery.get("boost"), is("f1,f2"));
+        }
+
+        @Test
+        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly() {
+            // given
+            SolrRequest request = SolrRequest.builder().query("field1:value1 value2").queryBoosts(
+                    QueryBoosts.builder()
+                            .advancedSearchBoost("field1:value3^3")
+                            .advancedSearchBoost("field2:value4^2")
+                            .advancedSearchBoostFunctions("f1,f2")
+                            .build()
+            ).build();
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request);
+
+            // then
+            assertThat(solrQuery.getParams("bq"), is(arrayContainingInAnyOrder("field1:value3^3", "field2:value4^2")));
+            assertThat(solrQuery.get("boost"), is("f1,f2"));
         }
     }
 

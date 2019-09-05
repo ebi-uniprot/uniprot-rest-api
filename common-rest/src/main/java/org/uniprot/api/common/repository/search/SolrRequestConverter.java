@@ -17,8 +17,7 @@ import java.util.regex.Pattern;
 
 import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
 import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.nonNull;
-import static org.uniprot.core.util.Utils.nullOrEmpty;
+import static org.uniprot.core.util.Utils.*;
 
 /**
  * Created 14/06/19
@@ -49,7 +48,9 @@ public class SolrRequestConverter {
         }
 
         // TODO: 04/09/19 process query boosts
-        setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
+        if (nonNull(request.getQueryBoosts())) {
+            setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
+        }
 
         return solrQuery;
     }
@@ -108,7 +109,7 @@ public class SolrRequestConverter {
         private static final String DISTRIB = "distrib";
         private static final String TERMS_FIELDS = "terms.fl";
         private static final String MINCOUNT = "terms.mincount";
-        private static final Pattern FIELD_QUERY_PATTERN = Pattern.compile("\\w+:\\w+");
+        private static final Pattern FIELD_QUERY_PATTERN = Pattern.compile("\\w+:");
         private static final String BOOST_QUERY = "bq";
         private static final String BOOST_FUNCTIONS = "boost";
 
@@ -176,18 +177,20 @@ public class SolrRequestConverter {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries
-                boosts.getAdvancedSearchBoosts()
-                        .stream()
-                        // TODO: 04/09/19 only substitute if default value. therefore, this should be in else branch.
-                        .map(boost -> boost.replaceAll("\\{query\\}", "(" + query + ")"))
-                        .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+                if (notEmpty(boosts.getAdvancedSearchBoosts())) {
+                    boosts.getAdvancedSearchBoosts()
+                            .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+                }
                 if (!nullOrEmpty(boosts.getAdvancedSearchBoostFunctions())) {
                     solrQuery.add(BOOST_FUNCTIONS, boosts.getAdvancedSearchBoostFunctions());
                 }
             } else {
                 // a default query
-                boosts.getDefaultSearchBoosts()
-                        .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+                if (notEmpty(boosts.getDefaultSearchBoosts())) {
+                    boosts.getDefaultSearchBoosts().stream()
+                            .map(boost -> boost.replaceAll("\\{query\\}", "(" + query + ")"))
+                            .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+                }
                 if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
                     solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
