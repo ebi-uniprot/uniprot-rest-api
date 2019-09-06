@@ -25,9 +25,8 @@ public class SolrRequest {
     private Sort sort;
     private FacetConfig facetConfig;
     private String termQuery;
-    // TODO: 04/09/19 put default field in solrconfig.xml
-    // TODO: 04/09/19 handle this
     private QueryBoosts queryBoosts;
+    private String defaultField;
 
     @Singular
     private List<String> termFields = new ArrayList<>();

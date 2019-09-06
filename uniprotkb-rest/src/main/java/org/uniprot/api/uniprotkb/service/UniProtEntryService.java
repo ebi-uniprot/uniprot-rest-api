@@ -1,17 +1,19 @@
 package org.uniprot.api.uniprotkb.service;
 
 import com.google.common.base.Strings;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Query;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import org.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -32,10 +34,12 @@ import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 
 @Service
+@Import(UniProtQueryBoostsConfig.class)
 public class UniProtEntryService {
     private static final String ACCESSION = "accession_id";
     private final StoreStreamer<UniProtEntry> storeStreamer;
     private final UniProtEntryQueryResultsConverter resultsConverter;
+    private final QueryBoosts queryBoosts;
     private final DefaultSearchHandler defaultSearchHandler;
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
@@ -44,13 +48,13 @@ public class UniProtEntryService {
     public UniProtEntryService(UniprotQueryRepository repository,
                                UniprotFacetConfig uniprotFacetConfig,
                                UniProtTermsConfig uniProtTermsConfig,
-//                               BoostsConfig boostsConfig,
-                               // TODO: 04/09/19 implement its usage
+                               QueryBoosts uniProtKBQueryBoosts,
                                UniProtKBStoreClient entryStore,
                                StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
                                DefaultSearchHandler defaultSearchHandler) {
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
+        this.queryBoosts = uniProtKBQueryBoosts;
         this.defaultSearchHandler = defaultSearchHandler;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.storeStreamer = uniProtEntryStoreStreamer;
@@ -103,6 +107,8 @@ public class UniProtEntryService {
 
     private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
+        requestBuilder.queryBoosts(queryBoosts);
+        
         String requestedQuery = request.getQuery();
 
         if (needsToFilterIsoform(request)) {
@@ -114,13 +120,13 @@ public class UniProtEntryService {
             uniProtTermsConfig.getFields().forEach(requestBuilder::termField);
         }
 
+
         boolean hasScore = false;
-        if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
-            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
-            hasScore = true;
-            requestBuilder.defaultQueryOperator(Query.Operator.OR);
-        }
-//        setBoosts(requestBuilder, );
+//        if (defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
+//            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
+//            hasScore = true;
+//            requestBuilder.defaultQueryOperator(Query.Operator.OR);
+//        }
         requestBuilder.query(requestedQuery);
         requestBuilder.sort(getUniProtSort(request.getSort(), hasScore));
 
@@ -134,7 +140,7 @@ public class UniProtEntryService {
 
     private Sort getUniProtSort(String sortStr, boolean hasScore) {
         if (Strings.isNullOrEmpty(sortStr)) {
-            return UniProtSortUtil.createDefaultSort(hasScore);
+            return UniProtSortUtil.createDefaultSort(true);
         } else {
             return UniProtSortUtil.createSort(sortStr);
         }

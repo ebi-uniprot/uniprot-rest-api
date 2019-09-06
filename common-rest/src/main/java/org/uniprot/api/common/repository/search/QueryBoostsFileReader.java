@@ -50,9 +50,9 @@ public class QueryBoostsFileReader {
                         boostType = BoostType.ADVANCED_SEARCH;
                     } else if (line.startsWith(BoostType.ADVANCED_SEARCH_FUNCTIONS.prefix)) {
                         boostType = BoostType.ADVANCED_SEARCH_FUNCTIONS;
-                    } else if (line.startsWith(COMMENT_PREFIX)) {
-                        // => commented out line, skip it
-                        log.debug("ignoring boost line: {}", line);
+                    } else if (line.startsWith(COMMENT_PREFIX) || line.isEmpty()) {
+                        // => commented out or empty line, skip it
+                        log.debug("ignoring boost line: <{}>", line);
                     } else {
                         addBoost(boostType, line);
                     }

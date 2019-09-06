@@ -1,5 +1,6 @@
 package org.uniprot.api.common.repository.search;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.FacetOptions;
@@ -24,6 +25,7 @@ import static org.uniprot.core.util.Utils.*;
  *
  * @author Edd
  */
+@Slf4j
 public class SolrRequestConverter {
     /**
      * Creates a {@link SolrQuery} from a {@link SolrRequest}.
@@ -33,6 +35,7 @@ public class SolrRequestConverter {
      */
     public SolrQuery toSolrQuery(SolrRequest request) {
         SolrQuery solrQuery = new SolrQuery(request.getQuery());
+        setDefaults(solrQuery, request.getDefaultField());
 
         setFilterQueries(solrQuery, request.getFilterQueries());
         setSort(solrQuery, request.getSort());
@@ -47,11 +50,12 @@ public class SolrRequestConverter {
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
-        // TODO: 04/09/19 process query boosts
         if (nonNull(request.getQueryBoosts())) {
             setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
         }
 
+        log.debug("Solr Query: " + solrQuery);
+        
         return solrQuery;
     }
 
@@ -112,6 +116,9 @@ public class SolrRequestConverter {
         private static final Pattern FIELD_QUERY_PATTERN = Pattern.compile("\\w+:");
         private static final String BOOST_QUERY = "bq";
         private static final String BOOST_FUNCTIONS = "boost";
+        private static final String EDISMAX = "edismax";
+        private static final String DEF_TYPE = "defType";
+        private static final String DEFAULT_FIELD = "df";
 
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
@@ -195,6 +202,11 @@ public class SolrRequestConverter {
                     solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
             }
+        }
+
+        static void setDefaults(SolrQuery solrQuery, String defaultField) {
+            solrQuery.setParam(DEFAULT_FIELD, defaultField);
+            solrQuery.setParam(DEF_TYPE, EDISMAX);
         }
     }
 }
