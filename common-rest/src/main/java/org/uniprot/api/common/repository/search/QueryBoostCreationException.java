@@ -1,9 +1,9 @@
 package org.uniprot.api.common.repository.search;
 
 /**
- * Represents a problem when retrieving information from Solr.
+ * Represents a problem when creating query boosts.
  *
- * @author lgonzales
+ * @author Edd
  */
 public class QueryBoostCreationException extends RuntimeException {
     public QueryBoostCreationException(String message, Throwable cause) {
