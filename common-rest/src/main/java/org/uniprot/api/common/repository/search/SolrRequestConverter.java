@@ -194,6 +194,7 @@ public class SolrRequestConverter {
             } else {
                 // a default query
                 if (notEmpty(boosts.getDefaultSearchBoosts())) {
+                    // replace all occurrences of "{query}" with X, given that q=X
                     boosts.getDefaultSearchBoosts().stream()
                             .map(boost -> boost.replaceAll("\\{query\\}", "(" + query + ")"))
                             .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
