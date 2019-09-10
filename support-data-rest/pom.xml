@@ -21,12 +21,12 @@
         <core.version>0.1-SNAPSHOT</core.version>
         <common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
         <dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-        <openapi-maven-plugin.version>1.0-SNAPSHOT</openapi-maven-plugin.version>
+        <openapi-maven-plugin.version>master</openapi-maven-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.uniprot</groupId>
+            <groupId>uk.ac.ebi.uniprot</groupId>
             <artifactId>openapi-maven-plugin</artifactId>
             <version>${openapi-maven-plugin.version}</version>
             <exclusions>
@@ -187,13 +187,13 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.uniprot</groupId>
+                        <groupId>uk.ac.ebi.uniprot</groupId>
                         <artifactId>openapi-maven-plugin</artifactId>
                         <version>${openapi-maven-plugin.version}</version>
                         <configuration>
                             <packageToScan>org.uniprot.api.keyword</packageToScan>
                             <openApiDirectory>generated/swagger</openApiDirectory>
-                            <openApiFileName>openapi-leo.yaml</openApiFileName>
+                            <openApiFileName>openapi.yaml</openApiFileName>
                         </configuration>
                         <executions>
                             <execution>
