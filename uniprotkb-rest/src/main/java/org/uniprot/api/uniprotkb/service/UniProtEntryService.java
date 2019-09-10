@@ -129,7 +129,7 @@ public class UniProtEntryService {
 
     private Sort getUniProtSort(String sortStr) {
         if (Strings.isNullOrEmpty(sortStr)) {
-            return UniProtSortUtil.createDefaultSort(true);
+            return UniProtSortUtil.createDefaultSort();
         } else {
             return UniProtSortUtil.createSort(sortStr);
         }

@@ -1,11 +1,10 @@
 package org.uniprot.api.uniprotkb.service;
 
 import com.google.common.base.Strings;
-
 import org.springframework.data.domain.Sort;
 import org.uniprot.store.search.field.UniProtField;
 
-public class UniProtSortUtil {
+class UniProtSortUtil {
 
     private static Sort addSort(Sort initialSort, Sort.Direction direction, UniProtField.Sort fields) {
         Sort newSort = new Sort(direction, fields.getSolrFieldName());
@@ -16,7 +15,7 @@ public class UniProtSortUtil {
         }
     }
 
-    public static Sort createSort(String sortFields) {
+    static Sort createSort(String sortFields) {
         if (Strings.isNullOrEmpty(sortFields)) {
             return null;
         }
@@ -43,13 +42,9 @@ public class UniProtSortUtil {
         return (sortedField.length == 2) && sortedField[1].equalsIgnoreCase(Sort.Direction.DESC.name());
     }
 
-    public static Sort createDefaultSort(boolean hasScore) {
-        Sort sort = new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName())
-                .and(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName()));
-        if(hasScore){
-            sort = new Sort(Sort.Direction.DESC, "score").and(sort);
-        }
-        return sort;
+    static Sort createDefaultSort() {
+        return new Sort(Sort.Direction.DESC, "score")
+                .and(new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName())
+                             .and(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName())));
     }
-
 }
