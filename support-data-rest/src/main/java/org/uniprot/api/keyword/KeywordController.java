@@ -1,5 +1,6 @@
 package org.uniprot.api.keyword;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -15,7 +16,6 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.core.SearchRequestMeta;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.search.field.KeywordField;
 
@@ -45,6 +45,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         this.keywordService = keywordService;
     }
 
+    @Tag(name = "Keyword")
     @GetMapping(value = "/{keywordId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(@PathVariable("keywordId")
                                                                          @Pattern(regexp = KEYWORD_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.keyword.invalid.id}")
@@ -59,11 +60,11 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         return super.getEntityResponse(keywordEntry, fields, contentType);
     }
 
-    @SearchRequestMeta(path = "src/main/resources/query.json")
+    @Tag(name = "Keyword")
     @GetMapping(value = "/search",
             produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(@Valid
-                                                                                KeywordRequestDTO searchRequest, @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                                                                            @ModelAttribute KeywordRequestDTO searchRequest, @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                                                                                 MediaType contentType,
                                                                         HttpServletRequest request,
                                                                         HttpServletResponse response) {
@@ -71,13 +72,14 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
     }
 
-    @SearchRequestMeta(path = "src/main/resources/query.json")
+    @Tag(name = "Keyword")
     @GetMapping(value = "/download",
             produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<ResponseBodyEmitter> download(@Valid
-                                                              KeywordRequestDTO searchRequest,
+                                                            @ModelAttribute
+                                                                    KeywordRequestDTO searchRequest,
                                                         @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                                                                MediaType contentType,
+                                                                    MediaType contentType,
                                                         @RequestHeader(value = "Accept-Encoding", required = false)
                                                                 String encoding,
                                                         HttpServletRequest request) {
