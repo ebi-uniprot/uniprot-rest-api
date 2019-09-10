@@ -6,16 +6,15 @@
     <parent>
         <artifactId>uniprot-rest-api</artifactId>
         <groupId>org.uniprot</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.11-SNAPSHOT</version>
     </parent>
 
     <artifactId>common-rest</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>${project.parent.version}</version>
 
     <properties>
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <solrj.version>7.5.0</solrj.version>
-        <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
         <poi.version>4.0.0</poi.version>
         <jaxb.version>2.3.0</jaxb.version>
     </properties>
@@ -24,12 +23,12 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-search</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-datastore</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -157,20 +156,20 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>json-parser</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -204,7 +203,7 @@
                                 <artifactItem>
                                     <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
-                                    <version>${uniprot-search.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory>

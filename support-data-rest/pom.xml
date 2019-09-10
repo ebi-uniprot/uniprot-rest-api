@@ -7,21 +7,17 @@
     <parent>
         <groupId>org.uniprot</groupId>
         <artifactId>uniprot-rest-api</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.11-SNAPSHOT</version>
         <relativePath>../</relativePath>
 
     </parent>
 
     <artifactId>support-data-rest</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>${project.parent.version}</version>
     <description>UniProt Rest API for support data</description>
 
     <properties>
-        <controlled-vocab-version>0.1-SNAPSHOT</controlled-vocab-version>
-        <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
-        <core.version>0.1-SNAPSHOT</core.version>
-        <common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
-        		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
+        <dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
     </properties>
 
     <dependencies>
@@ -35,7 +31,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>controlled-vocabulary</artifactId>
-            <version>${controlled-vocab-version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -52,12 +48,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common-rest</artifactId>
-            <version>${common-rest.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-parser</artifactId>
-            <version>${core.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <!-- Solr Data -->
@@ -97,21 +93,21 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-             <version>${common-rest.version}</version>
+             <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -119,7 +115,7 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -165,7 +161,7 @@
                                 <artifactItem>
                                     <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
-                                    <version>${uniprot-search.version}</version>
+                                    <version>${project.parent.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
