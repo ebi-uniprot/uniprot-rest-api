@@ -194,6 +194,7 @@
                             <packageToScan>org.uniprot.api.keyword</packageToScan>
                             <openApiDirectory>generated/swagger</openApiDirectory>
                             <openApiFileName>openapi.yaml</openApiFileName>
+                            <serverBaseUrl>http://localhost:8090//uniprot/api</serverBaseUrl>
                         </configuration>
                         <executions>
                             <execution>

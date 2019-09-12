@@ -1,6 +1,12 @@
 package org.uniprot.api.keyword;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -34,6 +40,9 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping("/keyword")
 @Validated
 public class KeywordController extends BasicSearchController<KeywordEntry> {
+    @Autowired
+    private HttpServletRequest request;
+
 
     private final KeywordService keywordService;
     private static final String KEYWORD_ID_REGEX = "^KW-[0-9]{4}";
@@ -47,44 +56,48 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
 
     @Tag(name = "Keyword")
     @GetMapping(value = "/{keywordId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @Operation(summary = "Get Keyword by keywordId", description = "Get Keyword by keywordId. If you want to search more than one you can use other api")
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(@PathVariable("keywordId")
                                                                          @Pattern(regexp = KEYWORD_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.keyword.invalid.id}")
                                                                                  String keywordId,
                                                                                  @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
                                                                          @RequestParam(value = "fields", required = false)
-                                                                                 String fields,
-                                                                         @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                                                                                 MediaType contentType) {
+                                                                                 String fields) {
 
         KeywordEntry keywordEntry = this.keywordService.findById(keywordId);
-        return super.getEntityResponse(keywordEntry, fields, contentType);
+
+        MediaType acceptHeader = getAcceptHeader(this.request);
+
+        return super.getEntityResponse(keywordEntry, fields, acceptHeader);
     }
 
     @Tag(name = "Keyword")
     @GetMapping(value = "/search",
             produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @Operation(summary = "Search Keywords by search criteria", description = "You can search more than one keywords based on the query. The query supports the solr format")
+    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = KeywordEntry.class))))
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(@Valid
-                                                                            @ModelAttribute KeywordRequestDTO searchRequest, @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                                                                                MediaType contentType,
+                                                                            @ModelAttribute KeywordRequestDTO searchRequest,
                                                                         HttpServletRequest request,
                                                                         HttpServletResponse response) {
         QueryResult<KeywordEntry> results = keywordService.search(searchRequest);
-        return super.getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
+        MediaType acceptHeader = getAcceptHeader(request);
+        return super.getSearchResponse(results, searchRequest.getFields(), acceptHeader, request, response);
     }
 
     @Tag(name = "Keyword")
-    @GetMapping(value = "/download",
-            produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @GetMapping(value = "/download", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @Operation(summary = "Download Keywords by search criteria", description = "You can download more than one keywords based on the query. The query supports the solr format")
+    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = KeywordEntry.class))))
     public ResponseEntity<ResponseBodyEmitter> download(@Valid
                                                             @ModelAttribute
                                                                     KeywordRequestDTO searchRequest,
-                                                        @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                                                                    MediaType contentType,
                                                         @RequestHeader(value = "Accept-Encoding", required = false)
                                                                 String encoding,
                                                         HttpServletRequest request) {
         Stream<KeywordEntry> result = keywordService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request, encoding);
+        MediaType acceptHeader = getAcceptHeader(request);
+        return super.download(result, searchRequest.getFields(), acceptHeader, request, encoding);
     }
 
     @Override
@@ -96,4 +109,5 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     protected Optional<String> getEntityRedirectId(KeywordEntry entity) {
         return Optional.empty();
     }
+
 }
