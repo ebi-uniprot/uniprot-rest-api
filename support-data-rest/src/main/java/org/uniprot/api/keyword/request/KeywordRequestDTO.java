@@ -3,12 +3,13 @@ package org.uniprot.api.keyword.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
-import org.uniprot.extension.ModelFieldMeta;
 import org.uniprot.store.search.field.KeywordField;
 
 import lombok.Data;
