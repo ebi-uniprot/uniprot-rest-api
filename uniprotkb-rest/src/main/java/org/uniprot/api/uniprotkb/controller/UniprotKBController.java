@@ -1,18 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -32,10 +25,21 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.InactiveReasonType;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.util.Utils;
+import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 /**
  * Controller for uniprot advanced search service.
@@ -43,9 +47,8 @@ import io.swagger.annotations.Api;
  * @author lgonzales
  */
 @RestController
-@Api(tags = {"uniprotkb"})
 @Validated
-@RequestMapping(UNIPROTKB_RESOURCE)
+@RequestMapping(value = UNIPROTKB_RESOURCE)
 public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
@@ -54,62 +57,71 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
 
     @Autowired
-    public UniprotKBController(
-            ApplicationEventPublisher eventPublisher,
-            UniProtEntryService entryService,
-            MessageConverterContextFactory<UniProtEntry> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
+    private HttpServletRequest request;
+
+    @Autowired
+    public UniprotKBController(ApplicationEventPublisher eventPublisher,
+                               UniProtEntryService entryService,
+                               MessageConverterContextFactory<UniProtEntry> converterContextFactory,
+                               ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROT);
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
     }
 
-    @RequestMapping(
-            value = "/search",
-            method = RequestMethod.GET,
-            produces = {
-                TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE
-            })
+
+    @Tag(name = "uniprotkb")
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @Operation(responses = {
+            @ApiResponse(content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UniProtEntry.class))),
+                    @Content(mediaType = APPLICATION_XML_VALUE, array = @ArraySchema(schema = @Schema(implementation = Entry.class, name = "Entries"))),
+                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+            }
+            )
+    })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(
-            @Valid SearchRequestDTO searchRequest,
-            @RequestParam(value = "preview", required = false, defaultValue = "false")
-                    boolean preview,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @Valid @ModelAttribute SearchRequestDTO searchRequest,
+            @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+            HttpServletRequest request, HttpServletResponse response) {
+
         setPreviewInfo(searchRequest, preview);
+        MediaType contentType = getAcceptHeader(this.request);
         QueryResult<UniProtEntry> result = entryService.search(searchRequest);
-        return super.getSearchResponse(
-                result, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(result, searchRequest.getFields(), contentType, request, response);
     }
 
-    @RequestMapping(
-            value = "/accession/{accession}",
-            method = RequestMethod.GET,
-            produces = {
-                TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE
-            })
+    @Tag(name = "uniprotkb")
+    @RequestMapping(value = "/accession/{accession}", method = RequestMethod.GET)
+    @Operation(responses = {
+            @ApiResponse(content = {
+                            @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = UniProtEntry.class)),
+                            @Content(mediaType = APPLICATION_XML_VALUE, schema = @Schema(implementation = Entry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            }
+                         )
+    })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(
             @PathVariable("accession")
-                    @Pattern(
-                            regexp = FieldValueValidator.ACCESSION_REGEX,
-                            flags = {Pattern.Flag.CASE_INSENSITIVE},
-                            message = "{search.invalid.accession.value}")
-                    String accession,
+            @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE},
+                    message = "{search.invalid.accession.value}") String accession,
             @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
-                    @RequestParam(value = "fields", required = false)
-                    String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            @RequestParam(value = "fields", required = false) String fields) {
 
         UniProtEntry entry = entryService.getByAccession(accession, fields);
+
+        MediaType contentType = getAcceptHeader(this.request);
+
         return super.getEntityResponse(entry, fields, contentType);
     }
 
@@ -119,24 +131,28 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
      *   - for GZIPPED results, add -H "Accept-Encoding:gzip"
      *   - omit '-OJ' option to curl, to just see it print to standard output
      */
-    @RequestMapping(
-            value = "/download",
-            method = RequestMethod.GET,
-            produces = {
-                TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE
-            })
+    @Tag(name = "uniprotkb")
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    @Operation(responses = {
+            @ApiResponse(content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UniProtEntry.class))),
+                    @Content(mediaType = APPLICATION_XML_VALUE, array = @ArraySchema(schema = @Schema(implementation = Entry.class, name = "Entries"))),
+                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+            }
+            )
+    })
     public ResponseEntity<ResponseBodyEmitter> download(
-            @Valid SearchRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = FF_MEDIA_TYPE_VALUE)
-                    MediaType contentType,
+            @Valid @ModelAttribute SearchRequestDTO searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        MessageConverterContext<UniProtEntry> context =
-                converterContextFactory.get(UNIPROT, contentType);
+        MediaType contentType = getAcceptHeader(this.request);
+        MessageConverterContext<UniProtEntry> context = converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
         context.setFields(searchRequest.getFields());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
@@ -156,21 +172,17 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @Override
     protected Optional<String> getEntityRedirectId(UniProtEntry entity) {
         if (isInactiveAndMergedEntry(entity)) {
-            return Optional.of(
-                    String.valueOf(entity.getInactiveReason().getMergeDemergeTo().get(0)));
+            return Optional.of(String.valueOf(entity.getInactiveReason().getMergeDemergeTo().get(0)));
         } else {
             return Optional.empty();
         }
     }
 
     private boolean isInactiveAndMergedEntry(UniProtEntry uniProtEntry) {
-        return !uniProtEntry.isActive()
-                && uniProtEntry.getInactiveReason() != null
-                && uniProtEntry
-                        .getInactiveReason()
-                        .getInactiveReasonType()
-                        .equals(InactiveReasonType.MERGED)
-                && Utils.notNullOrEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
+        return !uniProtEntry.isActive() &&
+                uniProtEntry.getInactiveReason() != null &&
+                uniProtEntry.getInactiveReason().getInactiveReasonType().equals(InactiveReasonType.MERGED) &&
+                Utils.notEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
     }
 
     private void setPreviewInfo(SearchRequestDTO searchRequest, boolean preview) {
