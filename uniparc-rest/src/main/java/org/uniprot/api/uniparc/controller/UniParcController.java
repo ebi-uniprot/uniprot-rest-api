@@ -40,14 +40,11 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.field.UniParcResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author jluo
  * @date: 21 Jun 2019
  */
 @RestController
-@Api(tags = {"uniparc"})
 @Validated
 @RequestMapping("/uniparc")
 public class UniParcController extends BasicSearchController<UniParcEntry> {
