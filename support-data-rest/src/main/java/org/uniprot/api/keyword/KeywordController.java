@@ -54,9 +54,17 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         this.keywordService = keywordService;
     }
 
-    @Tag(name = "Keyword")
+    @Tag(name = "keyword")
     @GetMapping(value = "/{keywordId}", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
-    @Operation(summary = "Get Keyword by keywordId", description = "Get Keyword by keywordId. If you want to search more than one you can use other api")
+    @Operation(summary = "Get Keyword by keywordId", responses = {
+            @ApiResponse(content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = KeywordEntry.class)),
+                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+            }
+            )
+    })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(@PathVariable("keywordId")
                                                                          @Pattern(regexp = KEYWORD_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.keyword.invalid.id}")
                                                                                  String keywordId,
@@ -71,11 +79,18 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         return super.getEntityResponse(keywordEntry, fields, acceptHeader);
     }
 
-    @Tag(name = "Keyword")
+    @Tag(name = "keyword")
     @GetMapping(value = "/search",
             produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
-    @Operation(summary = "Search Keywords by search criteria", description = "You can search more than one keywords based on the query. The query supports the solr format")
-    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = KeywordEntry.class))))
+    @Operation(summary = "Search Keywords by given search criteria", responses = {
+            @ApiResponse(content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = KeywordEntry.class))),
+                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+            }
+            )
+    })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(@Valid
                                                                             @ModelAttribute KeywordRequestDTO searchRequest,
                                                                         HttpServletRequest request,
@@ -85,10 +100,17 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), acceptHeader, request, response);
     }
 
-    @Tag(name = "Keyword")
+    @Tag(name = "keyword")
     @GetMapping(value = "/download", produces = {TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
-    @Operation(summary = "Download Keywords by search criteria", description = "You can download more than one keywords based on the query. The query supports the solr format")
-    @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = KeywordEntry.class))))
+    @Operation(summary = "Download Keywords by given search criteria", responses = {
+            @ApiResponse(content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = KeywordEntry.class))),
+                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+            }
+            )
+    })
     public ResponseEntity<ResponseBodyEmitter> download(@Valid
                                                             @ModelAttribute
                                                                     KeywordRequestDTO searchRequest,

@@ -75,7 +75,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @Operation(responses = {
             @ApiResponse(content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UniProtEntry.class))),
-                    @Content(mediaType = APPLICATION_XML_VALUE, array = @ArraySchema(schema = @Schema(implementation = Entry.class, name = "Entries"))),
+                    @Content(mediaType = APPLICATION_XML_VALUE, array = @ArraySchema(schema = @Schema(implementation = Entry.class, name = "entries"))),
                     @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                     @Content(mediaType = FF_MEDIA_TYPE_VALUE),
                     @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
@@ -136,7 +136,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @Operation(responses = {
             @ApiResponse(content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UniProtEntry.class))),
-                    @Content(mediaType = APPLICATION_XML_VALUE, array = @ArraySchema(schema = @Schema(implementation = Entry.class, name = "Entries"))),
+                    @Content(mediaType = APPLICATION_XML_VALUE, array = @ArraySchema(schema = @Schema(implementation = Entry.class, name = "entries"))),
                     @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                     @Content(mediaType = FF_MEDIA_TYPE_VALUE),
                     @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
