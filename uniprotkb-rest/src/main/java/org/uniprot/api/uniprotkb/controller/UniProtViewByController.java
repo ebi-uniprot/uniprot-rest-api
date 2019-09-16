@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,7 +54,9 @@ public class UniProtViewByController {
     @GetMapping(value = "/ec", produces = {APPLICATION_JSON_VALUE})
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getEC(
+            @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
             @RequestParam(value = "query", required = true) String query,
+            @Parameter(description = "Name of the parent")
             @RequestParam(value = "parent", required = false) String parent) {
         List<ViewBy> viewBys = viewByECService.get(query, parent);
         return new ResponseEntity<>(viewBys, HttpStatus.OK);
@@ -63,7 +66,9 @@ public class UniProtViewByController {
     @GetMapping(value = "/keyword", produces = {APPLICATION_JSON_VALUE})
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getKeyword(
+            @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
             @RequestParam(value = "query", required = true) String query,
+            @Parameter(description = "Name of the parent")
             @RequestParam(value = "parent", required = false) String parent) {
         return new ResponseEntity<>(viewByKeywordService.get(query, parent), HttpStatus.OK);
     }
@@ -72,7 +77,9 @@ public class UniProtViewByController {
     @GetMapping(value = "/pathway", produces = {APPLICATION_JSON_VALUE})
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getPathway(
+            @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
             @RequestParam(value = "query", required = true) String query,
+            @Parameter(description = "Name of the parent")
             @RequestParam(value = "parent", required = false) String parent) {
         return new ResponseEntity<>(viewByPathwayService.get(query, parent), HttpStatus.OK);
     }
@@ -81,7 +88,9 @@ public class UniProtViewByController {
     @GetMapping(value = "/go", produces = {APPLICATION_JSON_VALUE})
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getGo(
+            @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
             @RequestParam(value = "query", required = true) String query,
+            @Parameter(description = "Name of the parent")
             @RequestParam(value = "parent", required = false) String parent) {
         return new ResponseEntity<>(viewByGoService.get(query, parent), HttpStatus.OK);
     }
@@ -90,7 +99,9 @@ public class UniProtViewByController {
     @GetMapping(value = "/taxonomy", produces = {APPLICATION_JSON_VALUE})
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getTaxonomy(
+            @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
             @RequestParam(value = "query", required = true) String query,
+            @Parameter(description = "Name of the parent")
             @RequestParam(value = "parent", required = false) String parent) {
         return new ResponseEntity<>(viewByTaxonomyService.get(query, parent), HttpStatus.OK);
     }
