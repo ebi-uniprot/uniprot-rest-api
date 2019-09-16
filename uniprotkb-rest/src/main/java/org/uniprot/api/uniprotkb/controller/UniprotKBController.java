@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -87,7 +88,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(
             @Valid @ModelAttribute SearchRequestDTO searchRequest,
-            @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+            @Parameter(hidden = true) @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
             HttpServletRequest request, HttpServletResponse response) {
 
         setPreviewInfo(searchRequest, preview);
@@ -112,10 +113,12 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                          )
     })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(
+            @Parameter(description = "Unique identifier for the UniProt entry")
             @PathVariable("accession")
             @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE},
                     message = "{search.invalid.accession.value}") String accession,
             @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+            @Parameter(description = "Comma separated list of fields to be returned in response")
             @RequestParam(value = "fields", required = false) String fields) {
 
         UniProtEntry entry = entryService.getByAccession(accession, fields);

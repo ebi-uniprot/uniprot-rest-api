@@ -1,6 +1,7 @@
 package org.uniprot.api.keyword;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -65,9 +66,11 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             }
             )
     })
-    public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(@PathVariable("keywordId")
+    public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(@Parameter(description = "Keyword id to find")
+                                                                         @PathVariable("keywordId")
                                                                          @Pattern(regexp = KEYWORD_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.keyword.invalid.id}")
                                                                                  String keywordId,
+                                                                         @Parameter(description = "Comma separated list of fields to be returned in response")
                                                                                  @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
                                                                          @RequestParam(value = "fields", required = false)
                                                                                  String fields) {

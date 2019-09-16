@@ -34,30 +34,38 @@ public class SearchRequestDTO {
     @Parameter(hidden = true)
     private static final int DEFAULT_RESULTS_SIZE = 25;
 
+    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(fieldValidatorClazz = UniProtField.Search.class, messagePrefix = "search.uniprot")
     private String query;
 
+    @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
     private String fields;
 
+    @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(sortFieldEnumClazz = UniProtField.Sort.class)
     private String sort;
 
+    @Parameter(hidden = true)
     private String cursor;
 
+    @Parameter(description = "Flag to include Isoform or not")
     @Pattern(regexp = "true|false", flags = {
             Pattern.Flag.CASE_INSENSITIVE}, message = "{search.invalid.includeIsoform}")
     private String includeIsoform;
 
+    @Parameter(description = "Name of the facet saerch")
     @ValidFacets(facetConfig = UniprotFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
+    @Parameter(description = "Size of the result. Defaults to 25")
     @Positive(message = "{search.positive}")
     private Integer size = DEFAULT_RESULTS_SIZE;
 
+    @Parameter(hidden = true)
     @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.invalid.matchedFields}")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String showMatchedFields;
