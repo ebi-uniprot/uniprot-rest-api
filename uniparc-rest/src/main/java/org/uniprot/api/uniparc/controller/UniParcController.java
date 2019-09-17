@@ -55,7 +55,7 @@ import io.swagger.annotations.Api;
 public class UniParcController extends BasicSearchController<UniParcEntry> {
 
 	private final UniParcQueryService queryService;
-
+	private static final int PREVIEW_SIZE = 10;
 	@Autowired
 	public UniParcController(ApplicationEventPublisher eventPublisher, UniParcQueryService queryService,
 			 MessageConverterContextFactory<UniParcEntry> converterContextFactory,
@@ -71,6 +71,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 			@RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
 			@RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE) MediaType contentType,
 			HttpServletRequest request, HttpServletResponse response) {
+		setPreviewInfo(searchRequest, preview);
 		QueryResult<UniParcEntry> results = queryService.search(searchRequest);
 		return super.getSearchResponse(results, searchRequest.getFields(), contentType, request, response);
 	}
@@ -106,6 +107,10 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 	protected Optional<String> getEntityRedirectId(UniParcEntry entity) {
 		return Optional.empty();
 	}
-
+	 private void setPreviewInfo(UniParcRequest searchRequest, boolean preview) {
+	        if (preview) {
+	            searchRequest.setSize(PREVIEW_SIZE);
+	        }
+	    }
 }
 

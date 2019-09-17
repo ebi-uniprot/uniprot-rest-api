@@ -94,7 +94,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
         Map<String, List<String>> filterFieldMap = getThreadLocalFilterMap();
 
-        return this.fieldProjector.project(entity, filterFieldMap, this.allFields);
+        Map<String, Object> result = this.fieldProjector.project(entity, filterFieldMap, this.allFields);
+        return result;
     }
 
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
