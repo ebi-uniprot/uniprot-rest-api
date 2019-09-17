@@ -59,7 +59,7 @@ class FacetResponseConverterTest {
         assertNotNull(itemValue);
         assertEquals("Reviewed (Swiss-Prot)",itemValue.getLabel());
         assertEquals("true",itemValue.getValue());
-        assertEquals(new Long(10L),itemValue.getCount());
+        assertEquals(Long.valueOf(10L),itemValue.getCount());
     }
 
     @Test
@@ -83,7 +83,7 @@ class FacetResponseConverterTest {
         assertNotNull(itemValue);
         assertNull(itemValue.getLabel());
         assertEquals("Human",itemValue.getValue());
-        assertEquals(new Long(11L),itemValue.getCount());
+        assertEquals(Long.valueOf(11L),itemValue.getCount());
 
     }
 
@@ -107,7 +107,7 @@ class FacetResponseConverterTest {
         assertNotNull(itemValue);
         assertEquals("1 - 200", itemValue.getLabel());
         assertEquals("[1 TO 200]", itemValue.getValue());
-        assertEquals(new Long(10L), itemValue.getCount());
+        assertEquals(Long.valueOf(10L), itemValue.getCount());
     }
 
     private List<FacetField> getFacetFields(String ... name) {

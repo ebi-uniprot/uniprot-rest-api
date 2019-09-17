@@ -2,9 +2,9 @@ package org.uniprot.api.support_data.controller;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,7 +24,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,11 +43,11 @@ import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONO
  *
  * @author Edd
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {SuggesterControllerWithServerErrorsIT.OtherConfig.class, DataStoreTestConfig.class, SupportDataApplication.class})
 @WebAppConfiguration
 @ActiveProfiles({"server-errors"})
-public class SuggesterControllerWithServerErrorsIT {
+class SuggesterControllerWithServerErrorsIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
     @Autowired
@@ -58,15 +58,15 @@ public class SuggesterControllerWithServerErrorsIT {
 
     private MockMvc mockMvc;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
     }
 
     @Test
-    public void solrErrorCauses500() throws Exception {
+    void solrErrorCauses500() throws Exception {
         // given
         doThrow(IllegalStateException.class)
                 .when(uniProtSolrClient).query(anyString(), any(SolrQuery.class));

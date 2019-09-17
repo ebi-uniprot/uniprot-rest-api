@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -17,7 +17,6 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.uniprotkb.configuration.UniprotKBConfig;
-import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.output.MessageConverterConfig;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
@@ -25,7 +24,6 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.ResultsConfig;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
@@ -48,7 +46,7 @@ import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB
  *
  * @author Edd
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest({UniprotKBController.class})
 @Import({DataStoreTestConfig.class, RepositoryConfig.class, UniprotFacetConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
          UniProtStoreConfig.class, ResultsConfig.class,
@@ -70,7 +68,7 @@ public class UniProtKBDownloadIT {
     @MockBean
     private StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(tupleStreamTemplate.create(any(),any())).thenReturn(mock(TupleStream.class));
     }

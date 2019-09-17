@@ -2,14 +2,15 @@ package org.uniprot.api.support_data.controller;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,7 +18,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
@@ -45,10 +45,10 @@ import static org.uniprot.store.search.field.SuggestField.Importance.medium;
  *
  * @author Edd
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebAppConfiguration
-public class SuggesterControllerIT {
+class SuggesterControllerIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
     @Autowired
@@ -59,8 +59,8 @@ public class SuggesterControllerIT {
 
     private MockMvc mockMvc;
 
-    @Before
-    public void setUp() throws IOException, SolrServerException {
+    @BeforeEach
+    void setUp() throws IOException, SolrServerException {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
@@ -76,7 +76,7 @@ public class SuggesterControllerIT {
     }
 
     @Test
-    public void findsSpecificSuggestion() throws Exception {
+    void findsSpecificSuggestion() throws Exception {
         // given
         String id = "myId";
         saveSuggestionDoc(id, "myValue", emptyList());
@@ -96,7 +96,7 @@ public class SuggesterControllerIT {
     }
 
     @Test
-    public void findsBothSuggestions() throws Exception {
+    void findsBothSuggestions() throws Exception {
         // given
         String id1 = "myId1";
         String id2 = "myId2";
@@ -118,7 +118,7 @@ public class SuggesterControllerIT {
     }
 
     @Test
-    public void findsNoSuggestions() throws Exception {
+    void findsNoSuggestions() throws Exception {
         // when
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)
@@ -134,7 +134,7 @@ public class SuggesterControllerIT {
     }
 
     @Test
-    public void missingRequiredDictField() throws Exception {
+    void missingRequiredDictField() throws Exception {
         // when
         String requiredParam = "dict";
         ResultActions response = mockMvc.perform(
@@ -150,7 +150,7 @@ public class SuggesterControllerIT {
     }
 
     @Test
-    public void missingRequiredQueryField() throws Exception {
+    void missingRequiredQueryField() throws Exception {
         // when
         String requiredParam = "query";
         ResultActions response = mockMvc.perform(
@@ -166,7 +166,7 @@ public class SuggesterControllerIT {
     }
 
     @Test
-    public void unknownDictionaryCausesBadRequest() throws Exception {
+    void unknownDictionaryCausesBadRequest() throws Exception {
         // when
         ResultActions response = mockMvc.perform(
                 get(SEARCH_RESOURCE)

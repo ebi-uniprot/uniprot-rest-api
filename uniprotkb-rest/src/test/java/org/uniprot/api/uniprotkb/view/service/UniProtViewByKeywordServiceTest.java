@@ -4,12 +4,11 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordService;
 import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
@@ -18,12 +17,12 @@ import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class UniProtViewByKeywordServiceTest {
 	 @Mock
 	 private SolrClient solrClient;

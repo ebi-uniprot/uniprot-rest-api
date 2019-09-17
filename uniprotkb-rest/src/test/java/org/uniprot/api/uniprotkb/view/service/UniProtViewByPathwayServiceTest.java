@@ -1,6 +1,5 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -15,17 +14,15 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.uniprot.api.uniprotkb.view.TaxonomyNode;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByPathwayService;
 import org.uniprot.core.cv.pathway.UniPathway;
 import org.uniprot.core.cv.pathway.UniPathwayService;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class UniProtViewByPathwayServiceTest {
 	 @Mock
 	 private SolrClient solrClient;

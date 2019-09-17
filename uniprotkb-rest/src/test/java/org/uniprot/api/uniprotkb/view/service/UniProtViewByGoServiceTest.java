@@ -1,7 +1,7 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,17 +12,16 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.GoService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByGoService;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class UniProtViewByGoServiceTest {
 	 @Mock
 	 private SolrClient solrClient;

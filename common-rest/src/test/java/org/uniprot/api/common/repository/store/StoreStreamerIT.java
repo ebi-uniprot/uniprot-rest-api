@@ -2,18 +2,16 @@ package org.uniprot.api.common.repository.store;
 
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Sort;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.store.StoreStreamer;
-import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 
@@ -36,7 +34,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author Edd
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StoreStreamerIT {
     private static final String ID = "id";
     private static final String DEFAULTS = "defaults";
@@ -55,7 +53,7 @@ public class StoreStreamerIT {
         return id + "-transformed";
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fakeUniProtStoreClient = new FakeUniProtStoreClient(fakeClient);
         solrRequest = SolrRequest.builder()

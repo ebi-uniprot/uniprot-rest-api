@@ -14,16 +14,14 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -36,7 +34,7 @@ import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.field.UniProtField;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
 public class SearchByDateIT {
@@ -78,7 +76,7 @@ public class SearchByDateIT {
 
 	    private static MockMvc mockMvc;
 
-	    @Before
+	    @BeforeEach
 	    public  void setUp() throws IOException {
 	        mockMvc = MockMvcBuilders.
 	                webAppContextSetup(webApplicationContext)

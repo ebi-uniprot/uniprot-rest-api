@@ -4,12 +4,11 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByECService;
 import org.uniprot.core.cv.ec.EC;
 import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.ec.impl.ECImpl;
@@ -20,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class UniProtViewByECServiceTest {
     @Mock
     private SolrClient solrClient;
@@ -61,7 +60,7 @@ class UniProtViewByECServiceTest {
     void mockEcService() {
         EC ec1 = new ECImpl("1.1.1.-", "With NAD(+) or NADP(+) as acceptor");
         EC ec2 = new ECImpl("1.1.3.-", "With oxygen as acceptor");
-        when(ecRepo.getEC("1.1.1.-")).thenReturn(Optional.of(ec1));
-        when(ecRepo.getEC("1.1.3.-")).thenReturn(Optional.of(ec2));
+        doReturn(Optional.of(ec1)).when(ecRepo).getEC("1.1.1.-");
+        doReturn(Optional.of(ec2)).when(ecRepo).getEC("1.1.3.-");
     }
 }

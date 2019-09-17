@@ -61,17 +61,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-launcher</artifactId>
-                <version>${junit-platform.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-runner</artifactId>
-                <version>${junit-platform.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>net.jodah</groupId>
@@ -169,23 +158,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- Swagger dependencies -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -210,15 +182,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.version}</version>
-                    <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                    </configuration>
-                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

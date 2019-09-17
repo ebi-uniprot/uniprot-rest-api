@@ -7,12 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.uniprotkb.output.converter.UniProtKBJsonMessageConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class UniProtKBJsonMessageConverterTest {
     private UniProtKBJsonMessageConverterTester converter;
     private ByteArrayOutputStream outputStream;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         converter = new UniProtKBJsonMessageConverterTester();
         outputStream = new ByteArrayOutputStream();
