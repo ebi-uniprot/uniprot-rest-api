@@ -33,7 +33,7 @@ class UniProtViewByKeywordServiceTest {
 	 
 	 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		solrClient =Mockito.mock(SolrClient.class);
 		keywordService =Mockito.mock(KeywordService.class);
 		mockKeywordService();
@@ -43,17 +43,17 @@ class UniProtViewByKeywordServiceTest {
     @Test
 	void test()  throws IOException, SolrServerException {
 		Map<String, Long> counts = new HashMap<>();
-		counts.put("KW-0128", 5l);
-		counts.put("KW-0130", 45l);	
-		counts.put("KW-0131", 102l);	
+		counts.put("KW-0128", 5L);
+		counts.put("KW-0130", 45L);
+		counts.put("KW-0131", 102L);
 		MockServiceHelper.mockServiceQueryResponse( solrClient, "keyword_id", counts);
 		List<ViewBy> viewBys = service.get("", "KW-9999");
 		assertEquals(3, viewBys.size());
-		ViewBy viewBy1 = MockServiceHelper.createViewBy("KW-0128", "Catecholamine metabolism", 5l, UniProtViewByKeywordService.URL_PREFIX +"KW-0128" , false);
+		ViewBy viewBy1 = MockServiceHelper.createViewBy("KW-0128", "Catecholamine metabolism", 5L, UniProtViewByKeywordService.URL_PREFIX +"KW-0128" , false);
 		assertTrue(viewBys.contains(viewBy1));
-		ViewBy viewBy2 = MockServiceHelper.createViewBy("KW-0130", "Cell adhesion", 45l, UniProtViewByKeywordService.URL_PREFIX +"KW-0130" , false);
+		ViewBy viewBy2 = MockServiceHelper.createViewBy("KW-0130", "Cell adhesion", 45L, UniProtViewByKeywordService.URL_PREFIX +"KW-0130" , false);
 		assertTrue(viewBys.contains(viewBy2));
-		ViewBy viewBy3 = MockServiceHelper.createViewBy("KW-0131", "Cell cycle", 102l, UniProtViewByKeywordService.URL_PREFIX +"KW-0131" , true);
+		ViewBy viewBy3 = MockServiceHelper.createViewBy("KW-0131", "Cell cycle", 102L, UniProtViewByKeywordService.URL_PREFIX +"KW-0131" , true);
 		assertTrue(viewBys.contains(viewBy3));
 		
 	}

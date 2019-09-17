@@ -33,8 +33,8 @@ import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-public class SearchByMnemonicIT {
-    public static final String ACC_LINE = "AC   %s;";
+class SearchByMnemonicIT {
+    private static final String ACC_LINE = "AC   %s;";
     private static final String UNIPROT_FLAT_FILE_ENTRY_PATH = "/it/P0A377.43.dat";
     private static final String TARGET_ACCESSION = "Q197F5";
     private static final String TARGET_ID = "CYC_HUMAN";
@@ -51,7 +51,7 @@ public class SearchByMnemonicIT {
     private static MockMvc mockMvc;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
@@ -75,7 +75,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpoint() throws Exception {
+    void canReachSearchEndpoint() throws Exception {
 
         // when
         ResultActions response = mockMvc.perform(
@@ -91,7 +91,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpointMixCase() throws Exception {
+    void canReachSearchEndpointMixCase() throws Exception {
 
         // when
         ResultActions response = mockMvc.perform(
@@ -107,7 +107,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpointWithDefault() throws Exception {
+    void canReachSearchEndpointWithDefault() throws Exception {
     
        // when
        ResultActions response = mockMvc.perform(
@@ -123,7 +123,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpointPartNotAvailable() throws Exception {
+    void canReachSearchEndpointPartNotAvailable() throws Exception {
 
         // when
         ResultActions response = mockMvc.perform(

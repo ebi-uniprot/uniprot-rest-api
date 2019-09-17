@@ -27,14 +27,14 @@ import static org.mockito.Mockito.when;
  * @author Edd
  */
 @ExtendWith(MockitoExtension.class)
-public class TupleStreamIterableIT {
+class TupleStreamIterableIT {
     private final static String ID = "id";
 
     @Mock
     private TupleStream tupleStream;
 
     @Test
-    public void tupleStreamToStreamWithElements() throws IOException {
+    void tupleStreamToStreamWithElements() throws IOException {
         when(tupleStream.read())
                 .thenReturn(tuple("accession1"))  // when calling next()
                 .thenReturn(tuple("accession2"))  // when calling next() 2nd time
@@ -47,7 +47,7 @@ public class TupleStreamIterableIT {
     }
 
     @Test
-    public void tupleStreamWrappedAsStreamHasCorrectElements() throws IOException {
+    void tupleStreamWrappedAsStreamHasCorrectElements() throws IOException {
         when(tupleStream.read())
                 .thenReturn(tuple("accession1"))  // when calling next()
                 .thenReturn(tuple("accession2"))  // when calling next() 2nd time
@@ -63,7 +63,7 @@ public class TupleStreamIterableIT {
     }
 
     @Test
-    public void closingTupleStreamWrappedAsStreamWillCloseTupleStream() throws IOException {
+    void closingTupleStreamWrappedAsStreamWillCloseTupleStream() throws IOException {
         when(tupleStream.read())
                 .thenReturn(tuple("accession1"))  // when calling next()
                 .thenReturn(tuple("accession2"))  // when calling next() 2nd time
@@ -80,7 +80,7 @@ public class TupleStreamIterableIT {
     }
 
     @Test
-    public void closingTupleStreamWrappedAsStreamAfterOneReadWillCloseTupleStream() throws IOException {
+    void closingTupleStreamWrappedAsStreamAfterOneReadWillCloseTupleStream() throws IOException {
         when(tupleStream.read())
                 .thenReturn(tuple("accession1"))  // when calling next()
                 .thenReturn(tuple("accession2"))  // when calling next() 2nd time
@@ -98,14 +98,14 @@ public class TupleStreamIterableIT {
     }
 
     @Test
-    public void tupleStreamToIteratorWhenEmpty() throws IOException {
+    void tupleStreamToIteratorWhenEmpty() throws IOException {
         when(tupleStream.read()).thenReturn(endTuple());
         assertThat(new TupleStreamIterable(tupleStream, ID), Matchers.emptyIterable());
         Mockito.verify(tupleStream).close();
     }
 
     @Test
-    public void retryAfterExceptionWhenReadingFromTupleStream() throws IOException {
+    void retryAfterExceptionWhenReadingFromTupleStream() throws IOException {
         when(tupleStream.read())
                 .thenThrow(IOException.class)
                 .thenThrow(IOException.class)
@@ -122,7 +122,7 @@ public class TupleStreamIterableIT {
     }
 
     @Test
-    public void tooManyExceptionsWhenReadingCausesException() throws IOException {
+    void tooManyExceptionsWhenReadingCausesException() throws IOException {
         when(tupleStream.read())
                 .thenThrow(IOException.class)
                 .thenThrow(IOException.class)
@@ -134,15 +134,13 @@ public class TupleStreamIterableIT {
                 .thenReturn(endTuple());
 
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
-        assertThrows(IllegalStateException.class, () -> {
-            getContents(iterable);
-        });
+        assertThrows(IllegalStateException.class, () -> getContents(iterable));
 
         Mockito.verify(tupleStream).close();
     }
 
     @Test
-    public void canCallHasNextRepeatedlyWithoutAdvancingIterator() throws IOException {
+    void canCallHasNextRepeatedlyWithoutAdvancingIterator() throws IOException {
         when(tupleStream.read())
                 .thenReturn(tuple("accession1"))
                 .thenReturn(tuple("accession2"))

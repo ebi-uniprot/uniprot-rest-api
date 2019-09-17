@@ -49,13 +49,6 @@ import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.indexer.DataStoreManager;
 
-
-/**
- *
- * @author jluo
- * @date: 23 Aug 2019
- *
-*/
 @ContextConfiguration(classes= {DataStoreTestConfig.class, UniRefRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRefController.class)
@@ -97,13 +90,13 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 		UniRefType type = UniRefType.UniRef100;
 	
 		UniRefEntryId entryId = new UniRefEntryIdBuilder(ID).build();
-		
-		UniRefEntry entry = new UniRefEntryBuilder()
+
+		return new UniRefEntryBuilder()
 				.id(entryId)
 				.name(NAME)
 				.updated(LocalDate.now())
 				.entryType(type)
-				.commonTaxonId(9606l)
+				.commonTaxonId(9606L)
 				.commonTaxon("Homo sapiens")
 				.representativeMember(createReprestativeMember())
 				.addMember(createMember())
@@ -112,7 +105,6 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 				.addGoTerm(new GoTermBuilder().type(GoTermType.PROCESS).id("GO:0032459").build())
 				.memberCount(2)
 				.build();
-		return entry;
 	}
 	private UniRefMember createMember() {
 		String memberId = "P12345_HUMAN";
@@ -121,7 +113,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 		String upi = "UPI0000083A08";
 		
 		UniRefMemberIdType type =UniRefMemberIdType.UNIPROTKB;
-		UniRefMember member = new UniRefMemberBuilder()
+		return new UniRefMemberBuilder()
 				.memberIdType(type).memberId(memberId)
 				.organismName("Homo sapiens")
 				.organismTaxId(9606)
@@ -133,7 +125,6 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 				.uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
 				.uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
 				.build();
-		return member;
 	}
 	private RepresentativeMember createReprestativeMember() {
 		String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVEDDFSAGSADFAFWERDGDSDGFDSHSDJHETRHJREH";
@@ -144,8 +135,8 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 		String upi = "UPI0000083A08";
 		
 		UniRefMemberIdType type =UniRefMemberIdType.UNIPROTKB;
-		
-		RepresentativeMember member = new RepresentativeMemberBuilder()
+
+		return new RepresentativeMemberBuilder()
 				.memberIdType(type).memberId(memberId)
 				.organismName("Homo sapiens")
 				.organismTaxId(9606)
@@ -159,7 +150,6 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 				.isSeed(true)
 				.sequence(sequence)
 				.build();
-		return member;
 	}
 	
 	  static class UniRefGetIdParameterResolver extends AbstractGetIdParameterResolver {

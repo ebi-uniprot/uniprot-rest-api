@@ -35,7 +35,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author Edd
  */
 @ExtendWith(MockitoExtension.class)
-public class StoreStreamerIT {
+class StoreStreamerIT {
     private static final String ID = "id";
     private static final String DEFAULTS = "defaults";
     private static final String FAKE_QUERY = "any query";
@@ -49,12 +49,12 @@ public class StoreStreamerIT {
     @Mock
     private VoldemortClient<String> fakeClient;
 
-    public static String transformString(String id) {
+    static String transformString(String id) {
         return id + "-transformed";
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fakeUniProtStoreClient = new FakeUniProtStoreClient(fakeClient);
         solrRequest = SolrRequest.builder()
                 .query(FAKE_QUERY)
@@ -64,13 +64,13 @@ public class StoreStreamerIT {
     }
 
     @Test
-    public void canCreateSearchStoreStream() {
+    void canCreateSearchStoreStream() {
         createSearchStoreStream(1, tupleStream(singletonList("a")));
         assertThat(storeStreamer, is(notNullValue()));
     }
 
     @Test
-    public void canTransformSourceStreamWithUnaryBatchSize() {
+    void canTransformSourceStreamWithUnaryBatchSize() {
         createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
@@ -83,7 +83,7 @@ public class StoreStreamerIT {
     }
 
     @Test
-    public void canTransformSourceStreamWithIntermediateBatchSize() {
+    void canTransformSourceStreamWithIntermediateBatchSize() {
         createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
@@ -96,7 +96,7 @@ public class StoreStreamerIT {
     }
 
     @Test
-    public void canTransformSourceStreamWithBiggerBatchSize() {
+    void canTransformSourceStreamWithBiggerBatchSize() {
         createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
@@ -109,7 +109,7 @@ public class StoreStreamerIT {
     }
 
     @Test
-    public void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
+    void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
         createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());

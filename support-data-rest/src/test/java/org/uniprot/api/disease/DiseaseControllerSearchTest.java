@@ -31,6 +31,7 @@ import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.core.cv.impl.DiseaseFileReader;
+import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
@@ -50,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(DiseaseController.class)
-public class DiseaseControllerSearchTest {
+class DiseaseControllerSearchTest {
     // accession
     private ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
@@ -438,7 +439,7 @@ public class DiseaseControllerSearchTest {
         for (Disease disease : diseases) {
             List<String> kwIds = new ArrayList<>();
             if (disease.getKeywords() != null) {
-                kwIds = disease.getKeywords().stream().map(kw -> kw.getId()).collect(Collectors.toList());
+                kwIds = disease.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
             }
             // name is a combination of id, acronym, definition, synonyms, keywords
             List<String> name = new ArrayList<>();
@@ -449,8 +450,7 @@ public class DiseaseControllerSearchTest {
             name.add(StringUtils.join(disease.getAlternativeNames()));
 
             // content is name + accession
-            List<String> content = new ArrayList<>();
-            content.addAll(name);
+            List<String> content = new ArrayList<>(name);
             content.add(disease.getAccession());
 
             // create disease document

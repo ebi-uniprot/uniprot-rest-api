@@ -49,7 +49,7 @@ import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB
 @WebMvcTest(UniprotKBController.class)
 @ExtendWith(value = {SpringExtension.class, UniprotKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
         UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class})
-public class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
+class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
 

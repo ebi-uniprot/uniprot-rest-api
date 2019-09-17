@@ -74,7 +74,7 @@ import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB
 @ExtendWith(value = {SpringExtension.class, UniprotKBSearchControllerIT.UniprotKbSearchParameterResolver.class,
                      UniprotKBSearchControllerIT.UniprotKbSearchContentTypeParamResolver.class})
 @Slf4j
-public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
@@ -596,9 +596,7 @@ public class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControll
 
             goAssertionCodes.addAll(Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown"));// TODO: is it correct?
 
-            goAssertionCodes.forEach(code -> {
-                doc.goWithEvidenceMaps.put("go_" + code, Collections.singleton("Search All"));
-            });
+            goAssertionCodes.forEach(code -> doc.goWithEvidenceMaps.put("go_" + code, Collections.singleton("Search All")));
 
             entry = new UniProtEntryBuilder()
                     .primaryAccession(new UniProtAccessionBuilder("P00001").build())

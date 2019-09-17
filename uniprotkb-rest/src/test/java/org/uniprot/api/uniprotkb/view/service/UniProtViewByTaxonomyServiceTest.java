@@ -34,7 +34,7 @@ class UniProtViewByTaxonomyServiceTest {
 	 
 	 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		solrClient =Mockito.mock(SolrClient.class);
 		taxonService =Mockito.mock(TaxonomyService.class);
 
@@ -42,17 +42,17 @@ class UniProtViewByTaxonomyServiceTest {
 	 }
 	 
 	@Test
-	public void test()throws IOException, SolrServerException {
+	void test()throws IOException, SolrServerException {
 		mockTaxonService();
 		Map<String, Long> counts = new HashMap<>();
-		counts.put("1425170", 23l);
-		counts.put("9606", 50l);
+		counts.put("1425170", 23L);
+		counts.put("9606", 50L);
 		MockServiceHelper.mockServiceQueryResponse( solrClient, "taxonomoy_id", counts);
 		List<ViewBy> viewBys = service.get("", "");
 		assertEquals(2, viewBys.size());
-		ViewBy viewBy1 = MockServiceHelper.createViewBy("1425170", "Homo heidelbergensis", 23l, UniProtViewByTaxonomyService.URL_PREFIX +"1425170" , false);
+		ViewBy viewBy1 = MockServiceHelper.createViewBy("1425170", "Homo heidelbergensis", 23L, UniProtViewByTaxonomyService.URL_PREFIX +"1425170" , false);
 		assertTrue(viewBys.contains(viewBy1));
-		ViewBy viewBy2 = MockServiceHelper.createViewBy("9606", "Homo sapiens", 50l, UniProtViewByTaxonomyService.URL_PREFIX +"9606" , false);
+		ViewBy viewBy2 = MockServiceHelper.createViewBy("9606", "Homo sapiens", 50L, UniProtViewByTaxonomyService.URL_PREFIX +"9606" , false);
 		assertTrue(viewBys.contains(viewBy2));
 	}
 

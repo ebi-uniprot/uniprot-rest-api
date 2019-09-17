@@ -31,23 +31,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
  *
  * @author Edd
  */
-public class UniProtKBJsonMessageConverterTest {
+class UniProtKBJsonMessageConverterTest {
     private UniProtKBJsonMessageConverterTester converter;
     private ByteArrayOutputStream outputStream;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         converter = new UniProtKBJsonMessageConverterTester();
         outputStream = new ByteArrayOutputStream();
     }
 
     @Test
-    public void hasCorrectMediaType() {
+    void hasCorrectMediaType() {
         assertThat(converter.getSupportedMediaTypes(), is(singletonList(APPLICATION_JSON)));
     }
 
     @Test
-    public void beforeWritesCorrectlyWithoutFacets() throws IOException {
+    void beforeWritesCorrectlyWithoutFacets() throws IOException {
         // only interested in response being a valid JSON object (not actual entities written)
         MessageConverterContext<String> context = MessageConverterContext.<String>builder()
                 .build();
@@ -61,7 +61,7 @@ public class UniProtKBJsonMessageConverterTest {
     }
 
     @Test
-    public void beforeWritesCorrectlyWithFacets() throws IOException {
+    void beforeWritesCorrectlyWithFacets() throws IOException {
         // only interested in response being a valid JSON object (not actual entities written)
 
         // given

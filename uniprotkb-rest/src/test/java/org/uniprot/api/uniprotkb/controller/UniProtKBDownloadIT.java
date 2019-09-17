@@ -52,7 +52,7 @@ import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB
          UniProtStoreConfig.class, ResultsConfig.class,
          MessageConverterConfig.class, UniprotKBConfig.class})
 @AutoConfigureWebClient
-public class UniProtKBDownloadIT {
+class UniProtKBDownloadIT {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
 
@@ -69,12 +69,12 @@ public class UniProtKBDownloadIT {
     private StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(tupleStreamTemplate.create(any(),any())).thenReturn(mock(TupleStream.class));
     }
 
     @Test
-    public void canReachDownloadEndpoint() throws Exception {
+    void canReachDownloadEndpoint() throws Exception {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         String acc = entry.getPrimaryAccession().getValue();
         storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);

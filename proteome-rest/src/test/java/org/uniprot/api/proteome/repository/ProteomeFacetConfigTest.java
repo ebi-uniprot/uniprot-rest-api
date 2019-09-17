@@ -15,12 +15,6 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- *
- * @author jluo
- * @date: 2 May 2019
- *
-*/
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Import(ProteomeFacetConfig.class)

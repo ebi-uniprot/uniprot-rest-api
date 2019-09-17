@@ -44,16 +44,16 @@ class UniProtViewByECServiceTest {
     @Test
     void test() throws IOException, SolrServerException {
         Map<String, Long> counts = new HashMap<>();
-        counts.put("1.1.1.-", 346l);
-        counts.put("1.1.3.-", 1l);
+        counts.put("1.1.1.-", 346L);
+        counts.put("1.1.3.-", 1L);
         MockServiceHelper.mockServiceQueryResponse(solrClient, "ec", counts);
         List<ViewBy> viewBys = service.get("", "1.1");
         assertEquals(2, viewBys.size());
         ViewBy viewBy1 = MockServiceHelper
-                .createViewBy("1.1.1.-", "With NAD(+) or NADP(+) as acceptor", 346l, UniProtViewByECService.URL_PREFIX + "1.1.1.-", true);
+                .createViewBy("1.1.1.-", "With NAD(+) or NADP(+) as acceptor", 346L, UniProtViewByECService.URL_PREFIX + "1.1.1.-", true);
         assertTrue(viewBys.contains(viewBy1));
         ViewBy viewBy2 = MockServiceHelper
-                .createViewBy("1.1.3.-", "With oxygen as acceptor", 1l, UniProtViewByECService.URL_PREFIX + "1.1.3.-", true);
+                .createViewBy("1.1.3.-", "With oxygen as acceptor", 1L, UniProtViewByECService.URL_PREFIX + "1.1.3.-", true);
         assertTrue(viewBys.contains(viewBy2));
     }
 

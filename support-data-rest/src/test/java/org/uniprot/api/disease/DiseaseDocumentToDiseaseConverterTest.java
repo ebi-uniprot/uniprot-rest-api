@@ -23,10 +23,10 @@ import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes={DiseaseDocumentToDiseaseConverter.class})
-public class DiseaseDocumentToDiseaseConverterTest {
+class DiseaseDocumentToDiseaseConverterTest {
     @Autowired
     private DiseaseDocumentToDiseaseConverter toDiseaseConverter;
-    ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
+    private ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
     @Test
     void shouldConvertDiseaseDocToDisease() throws JsonProcessingException {

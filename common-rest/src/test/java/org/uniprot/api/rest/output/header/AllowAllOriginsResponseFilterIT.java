@@ -36,7 +36,7 @@ import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.ALLOW_AL
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {FakeRESTApp.class})
 @WebAppConfiguration
-public class AllowAllOriginsResponseFilterIT {
+class AllowAllOriginsResponseFilterIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
@@ -44,7 +44,7 @@ public class AllowAllOriginsResponseFilterIT {
     private OncePerRequestFilter originsFilter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .addFilter(originsFilter)
@@ -52,7 +52,7 @@ public class AllowAllOriginsResponseFilterIT {
     }
 
     @Test
-    public void requestWithoutAnOriginHasResponseWithAllOriginsHeader() throws Exception {
+    void requestWithoutAnOriginHasResponseWithAllOriginsHeader() throws Exception {
         MvcResult result = mockMvc.perform(
                 get(RESOURCE_1_URL))
                 .andDo(print())
@@ -63,7 +63,7 @@ public class AllowAllOriginsResponseFilterIT {
     }
 
     @Test
-    public void requestFromAnOriginHasResponseWithAllOriginsHeader() throws Exception {
+    void requestFromAnOriginHasResponseWithAllOriginsHeader() throws Exception {
         String origin = "http://www.ebi.ac.uk";
 
         MvcResult result = mockMvc.perform(
