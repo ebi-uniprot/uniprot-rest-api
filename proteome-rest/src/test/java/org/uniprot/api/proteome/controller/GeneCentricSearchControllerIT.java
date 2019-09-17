@@ -168,7 +168,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 	@Override
 	protected void saveEntries(int numberOfEntries) {
 		IntStream.rangeClosed(1, numberOfEntries)
-		.forEach(i-> saveEntry(i));
+		.forEach(this::saveEntry);
 
 	}
 
@@ -192,10 +192,10 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 		List<String> accessions = new ArrayList<>();
 		accessions.add(protein.getCanonicalProtein().getAccession().getValue());
 		protein.getRelatedProteins().stream().map(val -> val.getAccession().getValue())
-				.forEach(val -> accessions.add(val));
+				.forEach(accessions::add);
 		List<String> genes = new ArrayList<>();
 		genes.add(protein.getCanonicalProtein().getGeneName());
-		protein.getRelatedProteins().stream().map(val -> val.getGeneName()).forEach(val -> genes.add(val));
+		protein.getRelatedProteins().stream().map(Protein::getGeneName).forEach(genes::add);
 
 		builder.accession(protein.getCanonicalProtein().getAccession().getValue()).accessions(accessions)
 				.geneNames(genes).reviewed(protein.getCanonicalProtein().getEntryType() == UniProtEntryType.SWISSPROT)
@@ -216,10 +216,9 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 				.entryType(UniProtEntryType.TREMBL).geneName(getName("twogene", i))
 				.geneNameType(org.uniprot.core.proteome.GeneNameType.OLN).sequenceLength(434).build();
 		CanonicalProteinBuilder builder = CanonicalProteinBuilder.newInstance();
-		CanonicalProtein cProtein = builder.canonicalProtein(protein).addRelatedProtein(protein2)
-				.addRelatedProtein(protein3).build();
 
-		return cProtein;
+		return builder.canonicalProtein(protein).addRelatedProtein(protein2)
+				.addRelatedProtein(protein3).build();
 	}
 
 	private ByteBuffer getBinary(CanonicalProtein entry) {

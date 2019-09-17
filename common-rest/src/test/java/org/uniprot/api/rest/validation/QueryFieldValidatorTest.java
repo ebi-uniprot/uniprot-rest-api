@@ -208,7 +208,7 @@ class QueryFieldValidatorTest {
             Arrays.stream(ErrorType.values()).forEach(errorType -> errorFields.put(errorType, new ArrayList<>()));
         }
 
-        Map<ErrorType, List<String>> errorFields = new HashMap<>();
+        final Map<ErrorType, List<String>> errorFields = new HashMap<>();
 
         List<String> getErrorFields(ErrorType errorType) {
             return errorFields.get(errorType);

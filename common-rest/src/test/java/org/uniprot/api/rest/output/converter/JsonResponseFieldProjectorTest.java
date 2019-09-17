@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  */
 class JsonResponseFieldProjectorTest {
 
-    private JsonResponseFieldProjector fieldProjector = new JsonResponseFieldProjector();
+    private final JsonResponseFieldProjector fieldProjector = new JsonResponseFieldProjector();
     private Disease disease;
 
     @BeforeEach

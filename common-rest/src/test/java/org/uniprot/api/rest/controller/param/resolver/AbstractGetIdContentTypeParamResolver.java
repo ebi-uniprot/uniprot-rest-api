@@ -33,8 +33,8 @@ public abstract class AbstractGetIdContentTypeParamResolver implements Parameter
         return result;
     }
 
-    public abstract GetIdContentTypeParam idSuccessContentTypesParam();
+    protected abstract GetIdContentTypeParam idSuccessContentTypesParam();
 
-    public abstract GetIdContentTypeParam idBadRequestContentTypesParam();
+    protected abstract GetIdContentTypeParam idBadRequestContentTypesParam();
 
 }

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.ViewBy;
@@ -23,19 +22,14 @@ import org.uniprot.api.uniprotkb.view.ViewBy;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByGoServiceTest {
-	 @Mock
-	 private SolrClient solrClient;
-	 
-
-	 private GoService goService;
-	 private UniProtViewByGoService service;
+	 @Mock private SolrClient solrClient;
+	private UniProtViewByGoService service;
 	 
 	 
 	@BeforeEach
 	void setup() {
 		solrClient =Mockito.mock(SolrClient.class);
-		goService =new GoService(new RestTemplate());
-
+		GoService goService = new GoService(new RestTemplate());
 		service = new UniProtViewByGoService( solrClient, "uniprot", goService);
 	 }
 	

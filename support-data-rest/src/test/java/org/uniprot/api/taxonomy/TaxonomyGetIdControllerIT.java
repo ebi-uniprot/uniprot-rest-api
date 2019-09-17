@@ -1,7 +1,6 @@
 package org.uniprot.api.taxonomy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -61,18 +59,18 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
     private DataStoreManager storeManager;
 
     @Override
-    public MockMvc getMockMvc() {
+    protected MockMvc getMockMvc() {
         return mockMvc;
     }
 
     @Override
-    public String getIdRequestPath() {
+    protected String getIdRequestPath() {
         return "/taxonomy/";
     }
 
     @Override
-    public void saveEntry() {
-        long taxId = Long.valueOf(TAX_ID);
+    protected void saveEntry() {
+        long taxId = Long.parseLong(TAX_ID);
 
         TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
         TaxonomyEntry taxonomyEntry = entryBuilder.taxonId(taxId)
@@ -117,7 +115,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     private void saveMergedEntry() {
-        long mergedTaxId = Long.valueOf(MERGED_TAX_ID);
+        long mergedTaxId = Long.parseLong(MERGED_TAX_ID);
 
         TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
         TaxonomyEntry taxonomyEntry = entryBuilder.taxonId(mergedTaxId)

@@ -42,14 +42,14 @@ public abstract class AbstractGetIdParameterResolver implements ParameterResolve
         return result;
     }
 
-    public abstract GetIdParameter validIdParameter();
+    protected abstract GetIdParameter validIdParameter();
 
-    public abstract GetIdParameter invalidIdParameter();
+    protected abstract GetIdParameter invalidIdParameter();
 
-    public abstract GetIdParameter nonExistentIdParameter();
+    protected abstract GetIdParameter nonExistentIdParameter();
 
-    public abstract GetIdParameter withFilterFieldsParameter();
+    protected abstract GetIdParameter withFilterFieldsParameter();
 
-    public abstract GetIdParameter withInvalidFilterParameter();
+    protected abstract GetIdParameter withInvalidFilterParameter();
 
 }

@@ -197,7 +197,7 @@ class AbstractUUWHttpMessageConverterTest {
     }
 
     private static class FakeMessageConverter extends AbstractUUWHttpMessageConverter<Character, Character> {
-        private AtomicInteger counter = new AtomicInteger(0);
+        private final AtomicInteger counter = new AtomicInteger(0);
         private boolean hasCleanedUp;
         private boolean overrideBefore;
         private boolean overrideAfter;
@@ -207,7 +207,7 @@ class AbstractUUWHttpMessageConverterTest {
         }
 
         private boolean characterStreamIsClosed;
-        private Stream<Character> characterStream = charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
+        private final Stream<Character> characterStream = charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
 
         FakeMessageConverter(MediaType mediaType) {
             super(mediaType, Character.class);

@@ -1,6 +1,5 @@
 package org.uniprot.api.crossref.controller;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,17 +41,17 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     private DataStoreManager storeManager;
 
     @Override
-    public MockMvc getMockMvc() {
+    protected MockMvc getMockMvc() {
         return mockMvc;
     }
 
     @Override
-    public String getIdRequestPath() {
+    protected String getIdRequestPath() {
         return "/xref/";
     }
 
     @Override
-    public void saveEntry() {
+    protected void saveEntry() {
 
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
         CrossRefEntry crossRefEntry = entryBuilder.accession(ACCESSION)

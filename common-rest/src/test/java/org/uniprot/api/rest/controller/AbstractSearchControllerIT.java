@@ -37,12 +37,12 @@ public abstract class AbstractSearchControllerIT {
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @BeforeEach
-    protected void cleanData() {
+    void cleanData() {
         cleanEntries();
     }
 
     @Test
-    protected void searchCanReturnSuccess(SearchParameter queryParameter) throws Exception {
+    void searchCanReturnSuccess(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         // given
         saveEntry(SaveScenario.SEARCH_SUCCESS);
@@ -51,9 +51,7 @@ public abstract class AbstractSearchControllerIT {
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -68,7 +66,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchCanReturnNotFound(SearchParameter queryParameter) throws Exception {
+    void searchCanReturnNotFound(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
 
         saveEntry(SaveScenario.SEARCH_NOT_FOUND);
@@ -77,9 +75,7 @@ public abstract class AbstractSearchControllerIT {
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -95,7 +91,7 @@ public abstract class AbstractSearchControllerIT {
 
     //----------------------------------------- TEST QUERY -----------------------------------------------
     @Test
-    protected void searchWithoutQueryReturnBadRequest() throws Exception {
+    void searchWithoutQueryReturnBadRequest() throws Exception {
         // when
         ResultActions response = getMockMvc().perform(
                 get(getSearchRequestPath())
@@ -109,7 +105,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchAllowQueryAllDocumentsReturnSuccess() throws Exception {
+    void searchAllowQueryAllDocumentsReturnSuccess() throws Exception {
         // given
         saveEntry(SaveScenario.ALLOW_QUERY_ALL);
 
@@ -127,7 +123,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchDefaultQueryReturnSuccess() throws Exception {
+    void searchDefaultQueryReturnSuccess() throws Exception {
         // when
         ResultActions response = getMockMvc().perform(
                 get(getSearchRequestPath())
@@ -141,7 +137,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchQueryWithInvalidQueryFormatReturnBadRequest() throws Exception {
+    void searchQueryWithInvalidQueryFormatReturnBadRequest() throws Exception {
 
         // when
         ResultActions response = getMockMvc().perform(
@@ -157,7 +153,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchQueryWithInvalidFieldNameReturnBadRequest() throws Exception {
+    void searchQueryWithInvalidFieldNameReturnBadRequest() throws Exception {
         // when
         ResultActions response = getMockMvc().perform(
                 get(getSearchRequestPath())
@@ -174,7 +170,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchCanSearchWithAllSearchFields() throws Exception {
+    void searchCanSearchWithAllSearchFields() throws Exception {
         // given
         saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
 
@@ -199,7 +195,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchAllowWildcardQueryAllDocuments(SearchParameter queryParameter) throws Exception {
+    void searchAllowWildcardQueryAllDocuments(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         assertThat(queryParameter.getQueryParams().keySet(), hasItem("query"));
 
@@ -210,9 +206,7 @@ public abstract class AbstractSearchControllerIT {
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, "*");
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, "*"));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -227,16 +221,14 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchQueryWithInvalidTypeQueryReturnBadRequest(SearchParameter queryParameter) throws Exception {
+    void searchQueryWithInvalidTypeQueryReturnBadRequest(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -251,16 +243,14 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchQueryWithInvalidValueQueryReturnBadRequest(SearchParameter queryParameter) throws Exception {
+    void searchQueryWithInvalidValueQueryReturnBadRequest(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -276,7 +266,7 @@ public abstract class AbstractSearchControllerIT {
 
     //----------------------------------------- TEST SORTS -----------------------------------------------
     @Test
-    protected void searchSortWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
+    void searchSortWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("sort", "query"));
 
@@ -288,9 +278,7 @@ public abstract class AbstractSearchControllerIT {
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -306,7 +294,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchSortWithIncorrectValuesReturnBadRequest() throws Exception {
+    void searchSortWithIncorrectValuesReturnBadRequest() throws Exception {
         // when
         ResultActions response = getMockMvc().perform(
                 get(getSearchRequestPath())
@@ -325,7 +313,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchCanSearchWithAllAvailableSortFields() throws Exception {
+    void searchCanSearchWithAllAvailableSortFields() throws Exception {
         // given
         saveEntry(SaveScenario.SORT_SUCCESS);
 
@@ -351,7 +339,7 @@ public abstract class AbstractSearchControllerIT {
 
     //----------------------------------------- TEST RETURNED FIELDS -----------------------------------------------
     @Test
-    protected void searchFieldsWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
+    void searchFieldsWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("fields", "query"));
 
@@ -362,9 +350,7 @@ public abstract class AbstractSearchControllerIT {
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -379,7 +365,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchFieldsWithIncorrectValuesReturnBadRequest() throws Exception {
+    void searchFieldsWithIncorrectValuesReturnBadRequest() throws Exception {
         // when
         ResultActions response = getMockMvc().perform(
                 get(getSearchRequestPath())
@@ -396,7 +382,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchCanSearchWithAllAvailableReturnedFields() throws Exception {
+    void searchCanSearchWithAllAvailableReturnedFields() throws Exception {
 
         // given
         saveEntry(SaveScenario.SEARCH_ALL_RETURN_FIELDS);
@@ -423,7 +409,7 @@ public abstract class AbstractSearchControllerIT {
 
     //----------------------------------------- TEST CONTENT TYPES -----------------------------------------------
     @Test
-    protected void searchSuccessContentTypes(SearchContentTypeParam contentTypeParam) throws Exception {
+    void searchSuccessContentTypes(SearchContentTypeParam contentTypeParam) throws Exception {
         checkSearchContentTypeParameterInput(contentTypeParam);
 
         // given
@@ -453,7 +439,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchBadRequestContentTypes(SearchContentTypeParam contentTypeParam) throws Exception {
+    void searchBadRequestContentTypes(SearchContentTypeParam contentTypeParam) throws Exception {
         checkSearchContentTypeParameterInput(contentTypeParam);
 
         // when
@@ -487,7 +473,7 @@ public abstract class AbstractSearchControllerIT {
     //----------------------------------------- TEST PAGINATION -----------------------------------------------
 
     @Test
-    protected void searchWithInvalidPageSizeReturnBadRequest() throws Exception {
+    void searchWithInvalidPageSizeReturnBadRequest() throws Exception {
         // when
         ResultActions response = getMockMvc().perform(
                 get(getSearchRequestPath())
@@ -503,7 +489,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchWithoutPageSizeReturnDefaultPageSize() throws Exception {
+    void searchWithoutPageSizeReturnDefaultPageSize() throws Exception {
         // given
         int savedEntries = getDefaultPageSize() + 1;
         saveEntries(savedEntries);
@@ -526,7 +512,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchWithPageSize5() throws Exception {
+    void searchWithPageSize5() throws Exception {
         // given
         saveEntries(5);
 
@@ -548,7 +534,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    protected void searchCanPaginateOverTwoPagesResults() throws Exception {
+    void searchCanPaginateOverTwoPagesResults() throws Exception {
         // given
         saveEntries(6);
 

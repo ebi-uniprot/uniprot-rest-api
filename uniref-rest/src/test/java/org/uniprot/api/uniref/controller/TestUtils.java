@@ -20,8 +20,8 @@ import org.uniprot.core.xml.uniprot.XmlConverterHelper;
  *
 */
 
-public class TestUtils {
-	private static ObjectFactory xmlFactory = new ObjectFactory();
+class TestUtils {
+	private static final ObjectFactory xmlFactory = new ObjectFactory();
 
 	private TestUtils() {
 
@@ -38,14 +38,14 @@ public class TestUtils {
 		return entry;
 	}
 	
-	public static Sequence createSequence(String value) {
+	private static Sequence createSequence(String value) {
 		Sequence sequence = xmlFactory.createMemberTypeSequence();
 		sequence.setValue(value);
 		sequence.setLength(value.length());
 		sequence.setChecksum(Crc64.getCrc64(value));
 		return sequence;
 	}
-	public static MemberType createMember(String type, String id, List<PropertyType> properties) {
+	private static MemberType createMember(String type, String id, List<PropertyType> properties) {
 		MemberType member =xmlFactory.createMemberType();
 		DbReferenceType xref =xmlFactory.createDbReferenceType();
 		xref.setType(type);
@@ -55,7 +55,7 @@ public class TestUtils {
 		return member;
 	}
 	
-	public static MemberType createRepresentativeMember(String type, String id, List<PropertyType> properties, String sequence) {
+	private static MemberType createRepresentativeMember(String type, String id, List<PropertyType> properties, String sequence) {
 		MemberType member =createMember(type, id, properties);
 		member.setSequence(createSequence(sequence));
 		return member;

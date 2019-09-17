@@ -18,7 +18,6 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.DiseaseService;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.CrossReference;
@@ -111,7 +110,6 @@ class DiseaseControllerTest {
         CrossReference xr1 = new CrossReference("DT1", "ID1", Arrays.asList("p1", "p2"));
         CrossReference xr2 = new CrossReference("DT2", "ID2", Arrays.asList("p3", "p4"));
         List<CrossReference> xrefs = Arrays.asList(xr1, xr2);
-        List<CrossReference> crossReferences = xrefs;
         List<Keyword> keywords = Arrays.asList(new KeywordImpl("keyword1", "kw-1"),
                 new KeywordImpl("keyword2", "kw-2"));
 

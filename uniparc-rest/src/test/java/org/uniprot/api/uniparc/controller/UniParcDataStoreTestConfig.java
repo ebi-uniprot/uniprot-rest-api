@@ -29,10 +29,9 @@ import org.uniprot.store.search.SolrCollection;
 @TestConfiguration
 public class UniParcDataStoreTestConfig {
 	@Bean(destroyMethod = "close")
-    public DataStoreManager dataStoreManager() throws IOException,URISyntaxException{
+    public DataStoreManager dataStoreManager() throws IOException{
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
-        DataStoreManager dataStoreManager=  new DataStoreManager(sdsm);
-        return dataStoreManager;
+      return new DataStoreManager(sdsm);
     }
 
     @Bean
@@ -42,7 +41,7 @@ public class UniParcDataStoreTestConfig {
     }
     @Bean
     @Profile("offline")
-    public SolrClient uniparcSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
+    public SolrClient uniparcSolrClient(DataStoreManager dataStoreManager) {
     	 CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
          container.load();
      	
@@ -67,7 +66,7 @@ public class UniParcDataStoreTestConfig {
             }
         };
     }
-    private void addStoreInfoProteome(DataStoreManager dsm, ClosableEmbeddedSolrClient solrClient, DataStoreManager.StoreType store ) throws URISyntaxException {
+    private void addStoreInfoProteome(DataStoreManager dsm, ClosableEmbeddedSolrClient solrClient, DataStoreManager.StoreType store ) {
         dsm.addSolrClient(store, solrClient);
     }
 }

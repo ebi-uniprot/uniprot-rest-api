@@ -31,6 +31,7 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,21 +55,21 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     private DataStoreManager storeManager;
 
     @Override
-    public MockMvc getMockMvc() {
+    protected MockMvc getMockMvc() {
         return mockMvc;
     }
 
     @Override
-    public String getIdRequestPath() {
+    protected String getIdRequestPath() {
         return "/disease/";
     }
 
     @Override
-    public void saveEntry() {
+    protected void saveEntry() {
 
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
-        CrossReference xref1 = new CrossReference("MIM", "617140", Arrays.asList("phenotype"));
+        CrossReference xref1 = new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
         CrossReference xref2 = new CrossReference("MedGen", "CN238690");
         CrossReference xref3 = new CrossReference("MeSH", "D000015");
         CrossReference xref4 = new CrossReference("MeSH", "D008607");
@@ -85,7 +86,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         List<String> kwIds;
         if (diseaseEntry.getKeywords() != null) {
-            kwIds = diseaseEntry.getKeywords().stream().map(kw -> kw.getId()).collect(Collectors.toList());
+            kwIds = diseaseEntry.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();
         }
@@ -95,8 +96,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 diseaseEntry.getAlternativeNames().stream())
                 .collect(Collectors.toList());
         // content is name + accession
-        List<String> content = new ArrayList<>();
-        content.addAll(name);
+        List<String> content = new ArrayList<>(name);
         content.add(diseaseEntry.getAccession());
         DiseaseDocument document = DiseaseDocument.builder()
                 .accession(ACCESSION)

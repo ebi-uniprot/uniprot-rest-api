@@ -30,10 +30,9 @@ import org.uniprot.store.search.SolrCollection;
 public class GeneCentriDataStoreTestConfig {
 	@Bean(destroyMethod = "close")
 	   @Profile("genecentric_offline")
-    public DataStoreManager dataStoreManager() throws IOException,URISyntaxException{
+    public DataStoreManager dataStoreManager() throws IOException{
         SolrDataStoreManager sdsm = new SolrDataStoreManager();
-        DataStoreManager dataStoreManager=  new DataStoreManager(sdsm);
-        return dataStoreManager;
+      return new DataStoreManager(sdsm);
     }
 
     @Bean
@@ -43,12 +42,12 @@ public class GeneCentriDataStoreTestConfig {
     }
     @Bean("genecentric")
     @Profile("genecentric_offline")
-    public SolrClient genecentricSolrClient(DataStoreManager dataStoreManager) throws URISyntaxException {
+    public SolrClient genecentricSolrClient(DataStoreManager dataStoreManager) {
         CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
         container.load();
     	
         ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.genecentric);
-        addStoreInfoProteome(dataStoreManager, solrClient,  DataStoreManager.StoreType.GENECENTRIC );
+        addStoreInfoProteome(dataStoreManager, solrClient);
         return solrClient;
     }
 
@@ -70,8 +69,8 @@ public class GeneCentriDataStoreTestConfig {
     }
 
     
-    private void addStoreInfoProteome(DataStoreManager dsm, ClosableEmbeddedSolrClient solrClient, DataStoreManager.StoreType store ) throws URISyntaxException {
-        dsm.addSolrClient(store, solrClient);
+    private void addStoreInfoProteome(DataStoreManager dsm, ClosableEmbeddedSolrClient solrClient) {
+        dsm.addSolrClient(DataStoreManager.StoreType.GENECENTRIC, solrClient);
     }
 }
 

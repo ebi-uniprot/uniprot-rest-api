@@ -83,7 +83,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
 					.sequenceChecksum(entry.getSequence().getCrc64());
 			entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
 			builder.entryStored(getBinary(entry));
-			entry.getTaxonomies().stream().forEach(taxon -> processTaxonomy(taxon, builder));
+			entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
 			
 			UniParcDocument doc =builder.build();
 			
@@ -107,13 +107,13 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
 				builder.uniprotIsoform(xref.getId());
 			}
 			xref.getProperties().stream().filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_PROTEOME_ID))
-					.map(val -> val.getValue()).forEach(val -> builder.upid(val));
+					.map(Property::getValue).forEach(builder::upid);
 
 			xref.getProperties().stream().filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_PROTEIN_NAME))
-					.map(val -> val.getValue()).forEach(val -> builder.proteinName(val));
+					.map(Property::getValue).forEach(builder::proteinName);
 
 			xref.getProperties().stream().filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_GENE_NAME))
-					.map(val -> val.getValue()).forEach(val -> builder.geneName(val));
+					.map(Property::getValue).forEach(builder::geneName);
 
 		}
 
@@ -156,11 +156,10 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
 			List<UniParcDBCrossReference> xrefs = getXrefs();
 			List<SequenceFeature> seqFeatures = getSeqFeatures() ;
 			List<Taxonomy> taxonomies =getTaxonomies();
-			UniParcEntry entry = new UniParcEntryBuilder().uniParcId(new UniParcIdBuilder(UPI).build())
+			return new UniParcEntryBuilder().uniParcId(new UniParcIdBuilder(UPI).build())
 					.databaseCrossReferences(xrefs).sequence(sequence)
 					.sequenceFeatures(seqFeatures)
 					.taxonomies(taxonomies).build();
-			return entry;
 		}
 		private List<Taxonomy> getTaxonomies(){
 			Taxonomy taxonomy = TaxonomyBuilder.newInstance().taxonId(9606).scientificName("Homo sapiens").build();

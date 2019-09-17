@@ -112,12 +112,11 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 							.sequenceLength(434)
 							.build();
 					CanonicalProteinBuilder builder = CanonicalProteinBuilder.newInstance();
-					CanonicalProtein cProtein =builder.canonicalProtein(protein)
-					.addRelatedProtein(protein2)
-					.addRelatedProtein(protein3)
-					.build();
-					
-					return cProtein;
+
+			return builder.canonicalProtein(protein)
+			.addRelatedProtein(protein2)
+			.addRelatedProtein(protein3)
+			.build();
 		}
 		
 		@Override

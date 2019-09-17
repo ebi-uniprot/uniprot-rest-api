@@ -15,9 +15,9 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author lgonzales
  */
-public class ControllerITUtils {
+class ControllerITUtils {
 
-    public static void verifyContentTypes(String requestPath, RequestMappingHandlerMapping requestMappingHandlerMapping,
+    static void verifyContentTypes(String requestPath, RequestMappingHandlerMapping requestMappingHandlerMapping,
                                           List<ContentTypeParam> contentTypes) {
         assertThat(contentTypes, notNullValue());
         assertThat(contentTypes, not(empty()));

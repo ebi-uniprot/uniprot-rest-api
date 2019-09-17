@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.Disease;
@@ -42,10 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -53,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DiseaseController.class)
 class DiseaseControllerSearchTest {
     // accession
-    private ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
+    private final ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
     @Autowired
     private SolrTemplate solrTemplate;

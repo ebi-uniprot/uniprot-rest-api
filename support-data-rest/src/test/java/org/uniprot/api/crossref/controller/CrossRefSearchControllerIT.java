@@ -44,9 +44,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         CrossRefSearchControllerIT.CrossRefSearchParameterResolver.class})
 public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    private static String SEARCH_ACCESSION1 = "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
-    private static String SEARCH_ACCESSION2 = "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
-    private static List<String> SORTED_ACCESSIONS = new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
+    private static final String SEARCH_ACCESSION1 = "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
+    private static final String SEARCH_ACCESSION2 = "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
+    private static final List<String> SORTED_ACCESSIONS = new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
 
     @Autowired
     private MockMvc mockMvc;
@@ -112,7 +112,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i));
+        LongStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
     @Override

@@ -35,7 +35,7 @@ public abstract class AbstractGetByIdControllerIT {
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @Test
-    protected void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
+    void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // given
         saveEntry();
@@ -58,7 +58,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
+    void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
@@ -78,7 +78,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void nonExistentIdReturnFoundRequest(GetIdParameter idParameter) throws Exception {
+    void nonExistentIdReturnFoundRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
@@ -97,7 +97,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
+    void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
         assertThat(idParameter,notNullValue());
         if (Utils.notEmpty(idParameter.getFields())) {
 
@@ -126,7 +126,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void withInvalidFilterFieldsReturnBadRequest(GetIdParameter idParameter) throws Exception {
+    void withInvalidFilterFieldsReturnBadRequest(GetIdParameter idParameter) throws Exception {
         if (Utils.notEmpty(idParameter.getFields())) {
 
             checkParameterInput(idParameter);
@@ -152,7 +152,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void idSuccessContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
+    void idSuccessContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
         // given
         saveEntry();
 
@@ -177,7 +177,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
+    void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
         checkIdContentTypeParameterInput(contentTypeParam);
 
         // when

@@ -26,7 +26,7 @@ import java.util.List;
 class DiseaseDocumentToDiseaseConverterTest {
     @Autowired
     private DiseaseDocumentToDiseaseConverter toDiseaseConverter;
-    private ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
+    private final ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
     @Test
     void shouldConvertDiseaseDocToDisease() throws JsonProcessingException {

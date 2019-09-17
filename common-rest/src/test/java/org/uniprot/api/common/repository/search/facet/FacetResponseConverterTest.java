@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
  */
 class FacetResponseConverterTest {
 
-    private QueryResponse queryResponse = mock(QueryResponse.class);
+    private final QueryResponse queryResponse = mock(QueryResponse.class);
 
     @Test
     void convertFacetForNullResponse() {

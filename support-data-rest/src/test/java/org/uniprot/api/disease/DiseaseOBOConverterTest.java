@@ -14,10 +14,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
-public class DiseaseOBOConverterTest {
-    private static String NOW = OBOFormatConstants.headerDateFormat().format(new Date());
+class DiseaseOBOConverterTest {
+    private static final String NOW = OBOFormatConstants.headerDateFormat().format(new Date());
 
     @Test
     void testDiseaseOBOConverter() throws IOException, FrameMergeException {
@@ -47,7 +48,7 @@ public class DiseaseOBOConverterTest {
                 "xref: MIM:204750 \"phenotype\"";
         // create a disease object
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
-        CrossReference xref1 = new CrossReference("MIM", "617140", Arrays.asList("phenotype"));
+        CrossReference xref1 = new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
         CrossReference xref2 = new CrossReference("MedGen", "CN238690");
         CrossReference xref3 = new CrossReference("MeSH", "D000015");
         CrossReference xref4 = new CrossReference("MeSH", "D008607");
@@ -60,7 +61,7 @@ public class DiseaseOBOConverterTest {
 
         // create another disease object
         diseaseBuilder = new DiseaseBuilder();
-        CrossReference xref11 = new CrossReference("MIM", "204750", Arrays.asList("phenotype"));
+        CrossReference xref11 = new CrossReference("MIM", "204750", Collections.singletonList("phenotype"));
         CrossReference xref22 = new CrossReference("MedGen", "C1859817");
         CrossReference xref33 = new CrossReference("MeSH", "D000592");
         Disease diseaseEntry2 = diseaseBuilder.id("2-aminoadipic 2-oxoadipic aciduria")
@@ -79,7 +80,7 @@ public class DiseaseOBOConverterTest {
         Assertions.assertTrue(oboDocStr.contains(headerString));
     }
 
-    protected static String renderOboToString(OBODoc oboDoc) throws IOException {
+    static String renderOboToString(OBODoc oboDoc) throws IOException {
         OBOFormatWriter writer = new OBOFormatWriter();
         writer.setCheckStructure(true);
         StringWriter out = new StringWriter();

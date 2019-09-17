@@ -120,7 +120,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i));
+        LongStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     private void saveEntry(String accession, long suffix) {
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation" + suffix, "KW-0991" + suffix);
-        CrossReference xref1 = new CrossReference("MIM" + suffix, "617140" + suffix, Arrays.asList("phenotype" + suffix));
+        CrossReference xref1 = new CrossReference("MIM" + suffix, "617140" + suffix, Collections.singletonList("phenotype" + suffix));
         CrossReference xref2 = new CrossReference("MedGen" + suffix, "CN238690" + suffix);
         CrossReference xref3 = new CrossReference("MeSH" + suffix, "D000015" + suffix);
         CrossReference xref4 = new CrossReference("MeSH" + suffix, "D008607" + suffix);
@@ -158,7 +158,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
         List<String> kwIds;
         if (diseaseEntry.getKeywords() != null) {
-            kwIds = diseaseEntry.getKeywords().stream().map(kw -> kw.getId()).collect(Collectors.toList());
+            kwIds = diseaseEntry.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();
         }
@@ -168,8 +168,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                 diseaseEntry.getAlternativeNames().stream())
                 .collect(Collectors.toList());
         // content is name + accession
-        List<String> content = new ArrayList<>();
-        content.addAll(name);
+        List<String> content = new ArrayList<>(name);
         content.add(diseaseEntry.getAccession());
         DiseaseDocument document = DiseaseDocument.builder()
                 .accession(accession)
@@ -190,15 +189,13 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         }
     }
 
-    @Override
     @Test
-    protected void searchFacetsWithIncorrectValuesReturnBadRequest() {
+    void searchFacetsWithIncorrectValuesReturnBadRequest() {
         // do nothing.. disease doesn't have any facets
     }
 
-    @Override
     @Test
-    protected void searchCanSearchWithAllAvailableFacetsFields(){
+    void searchCanSearchWithAllAvailableFacetsFields(){
         // do nothing.. disease doesn't have any facets
     }
 

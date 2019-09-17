@@ -178,7 +178,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 	@Override
 	protected void saveEntries(int numberOfEntries) {
 		IntStream.rangeClosed(1, numberOfEntries)
-		.forEach(i-> saveEntry(i));
+		.forEach(this::saveEntry);
 	}
 	
 	
@@ -207,31 +207,30 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 			UniRefType type = UniRefType.UniRef100;
 		
 			UniRefEntryId entryId = new UniRefEntryIdBuilder(getName(ID_PREF, i)).build();
-			
-			UniRefEntry entry = new UniRefEntryBuilder()
-					.id(entryId)
-					.name(getName(NAME_PREF, i))
-					.updated(LocalDate.now())
-					.entryType(type)
-					.commonTaxonId(9606l)
-					.commonTaxon("Homo sapiens")
-					.representativeMember(createReprestativeMember(i))
-					.addMember(createMember(i))
-					.addGoTerm(new GoTermBuilder().type(GoTermType.COMPONENT).id("GO:0044444").build())
-					.addGoTerm(new GoTermBuilder().type(GoTermType.FUNCTION).id("GO:0044459").build())
-					.addGoTerm(new GoTermBuilder().type(GoTermType.PROCESS).id("GO:0032459").build())
-					.memberCount(2)
-					.build();
-			return entry;
+
+		 return new UniRefEntryBuilder()
+				 .id(entryId)
+				 .name(getName(NAME_PREF, i))
+				 .updated(LocalDate.now())
+				 .entryType(type)
+				 .commonTaxonId(9606L)
+				 .commonTaxon("Homo sapiens")
+				 .representativeMember(createReprestativeMember(i))
+				 .addMember(createMember(i))
+				 .addGoTerm(new GoTermBuilder().type(GoTermType.COMPONENT).id("GO:0044444").build())
+				 .addGoTerm(new GoTermBuilder().type(GoTermType.FUNCTION).id("GO:0044459").build())
+				 .addGoTerm(new GoTermBuilder().type(GoTermType.PROCESS).id("GO:0032459").build())
+				 .memberCount(2)
+				 .build();
 		}
 		private UniRefMember createMember(int i) {
-			String memberId = getName(ACC_2_PREF, i)  +"_HUMAN";;
+			String memberId = getName(ACC_2_PREF, i)  +"_HUMAN";
 			int length=312;
 			String pName ="some protein name"; 
 			String upi = getName(UPI_PREF, i);
 			
 			UniRefMemberIdType type =UniRefMemberIdType.UNIPROTKB;
-			UniRefMember member = new UniRefMemberBuilder()
+			return new UniRefMemberBuilder()
 					.memberIdType(type).memberId(memberId)
 					.organismName("Homo sapiens")
 					.organismTaxId(9606)
@@ -243,7 +242,6 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 					.uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
 					.uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
 					.build();
-			return member;
 		}
 		private RepresentativeMember createReprestativeMember(int i) {
 			String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVEDDFSAGSADFAFWERDGDSDGFDSHSDJHETRHJREH";
@@ -254,8 +252,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 			String upi = getName(UPI_PREF, i);
 			
 			UniRefMemberIdType type =UniRefMemberIdType.UNIPROTKB;
-			
-			RepresentativeMember member = new RepresentativeMemberBuilder()
+
+			return new RepresentativeMemberBuilder()
 					.memberIdType(type).memberId(memberId)
 					.organismName("Homo sapiens")
 					.organismTaxId(9606)
@@ -269,7 +267,6 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 					.isSeed(true)
 					.sequence(sequence)
 					.build();
-			return member;
 		}
 	
 	  static class UniRefSearchParameterResolver extends AbstractSearchParameterResolver {
