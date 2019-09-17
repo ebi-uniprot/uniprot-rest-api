@@ -56,7 +56,7 @@ public class SearchRequestDTO {
             Pattern.Flag.CASE_INSENSITIVE}, message = "{search.invalid.includeIsoform}")
     private String includeIsoform;
 
-    @Parameter(description = "Name of the facet saerch")
+    @Parameter(description = "Name of the facet search")
     @ValidFacets(facetConfig = UniprotFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
