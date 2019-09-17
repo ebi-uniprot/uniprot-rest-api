@@ -12,7 +12,7 @@ import org.uniprot.api.common.repository.search.QueryBoostsFileReader;
  */
 @Configuration
 public class UniProtQueryBoostsConfig {
-    private static final String BOOSTS_RESOURCE_LOCATION = "uniprotkb-query-boosts.config";
+    private static final String BOOSTS_RESOURCE_LOCATION = "/uniprotkb-query-boosts.config";
 
     @Bean
     public QueryBoosts uniProtKBQueryBoosts() {

@@ -18,7 +18,7 @@ class QueryBoostsFileReaderTest {
 
     @BeforeEach
     void setUp() {
-        this.reader = new QueryBoostsFileReader("test-boosts.config");
+        this.reader = new QueryBoostsFileReader("/test-boosts.config");
     }
 
     @Test
