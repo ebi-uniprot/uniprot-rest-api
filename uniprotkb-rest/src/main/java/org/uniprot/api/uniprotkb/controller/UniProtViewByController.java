@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,8 +51,9 @@ public class UniProtViewByController {
         this.viewByTaxonomyService = viewByTaxonomyService;
     }
 
-    @Tag(name = "uniprotkbview")
+    @Tag(name = "uniprotkbview", description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @GetMapping(value = "/ec", produces = {APPLICATION_JSON_VALUE})
+    @Operation(summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getEC(
             @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
@@ -64,6 +66,7 @@ public class UniProtViewByController {
 
     @Tag(name = "uniprotkbview")
     @GetMapping(value = "/keyword", produces = {APPLICATION_JSON_VALUE})
+    @Operation(summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getKeyword(
             @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
@@ -75,6 +78,7 @@ public class UniProtViewByController {
 
     @Tag(name = "uniprotkbview")
     @GetMapping(value = "/pathway", produces = {APPLICATION_JSON_VALUE})
+    @Operation(summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getPathway(
             @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
@@ -86,6 +90,7 @@ public class UniProtViewByController {
 
     @Tag(name = "uniprotkbview")
     @GetMapping(value = "/go", produces = {APPLICATION_JSON_VALUE})
+    @Operation(summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getGo(
             @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
@@ -97,6 +102,7 @@ public class UniProtViewByController {
 
     @Tag(name = "uniprotkbview")
     @GetMapping(value = "/taxonomy", produces = {APPLICATION_JSON_VALUE})
+    @Operation(summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getTaxonomy(
             @Parameter(description = "Criteria to search the views. It can take any valid solr query.")
