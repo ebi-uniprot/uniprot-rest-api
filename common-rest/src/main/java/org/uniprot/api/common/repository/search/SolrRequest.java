@@ -25,6 +25,8 @@ public class SolrRequest {
     private Sort sort;
     private FacetConfig facetConfig;
     private String termQuery;
+    private QueryBoosts queryBoosts;
+    private String defaultField;
 
     @Singular
     private List<String> termFields = new ArrayList<>();

@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.uniprot.api.uniprotkb.service.UniProtSortUtil;
 import org.uniprot.store.search.field.UniProtField;
 
 import java.util.Iterator;
@@ -104,7 +103,7 @@ class UniProtSortUtilTest {
 
     @Test
     void testCreateDefaultSortWithScore() {
-        Sort defaultSort = UniProtSortUtil.createDefaultSort(true);
+        Sort defaultSort = UniProtSortUtil.createDefaultSort();
         assertNotNull(defaultSort);
 
         Iterator<Sort.Order> sortIterator = defaultSort.iterator();
@@ -127,26 +126,4 @@ class UniProtSortUtilTest {
 
         assertFalse(sortIterator.hasNext());
     }
-
-    @Test
-    void testCreateDefaultSortWithoutScore() {
-        Sort defaultSort = UniProtSortUtil.createDefaultSort(false);
-        assertNotNull(defaultSort);
-
-        Iterator<Sort.Order> sortIterator = defaultSort.iterator();
-        assertNotNull(sortIterator);
-
-        assertTrue(sortIterator.hasNext());
-        Sort.Order order = sortIterator.next();
-        assertEquals(order.getProperty(), UniProtField.Sort.annotation_score.getSolrFieldName());
-        assertEquals(order.getDirection(), Sort.Direction.DESC);
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(order.getProperty(), UniProtField.Sort.accession.getSolrFieldName());
-        assertEquals(order.getDirection(), Sort.Direction.ASC);
-
-        assertFalse(sortIterator.hasNext());
-    }
-
 }
