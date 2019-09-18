@@ -26,7 +26,7 @@ final class TestUtils {
         return objectProxy.convertToUniProtEntry(entryObjectConverter);
     }
 
-    InputStream getResourceAsStream(String resourcePath) {
+    static InputStream getResourceAsStream(String resourcePath) {
         return TestUtils.class.getResourceAsStream(resourcePath);
     }
 
