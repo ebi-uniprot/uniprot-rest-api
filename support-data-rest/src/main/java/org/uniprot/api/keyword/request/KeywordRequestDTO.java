@@ -18,14 +18,14 @@ import lombok.Data;
 public class KeywordRequestDTO implements SearchRequest {
 
     @Parameter(description = "Criteria to search the keywords. It can take any valid solr query.")
-    @ModelFieldMeta(path = "src/main/resources/keyword_query_param_meta.json")
+    @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_query_param_meta.json")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(fieldValidatorClazz = KeywordField.Search.class, messagePrefix = "search.keyword")
     private String query;
 
     @Parameter(description = "Name of the field to be sorted on")
-    @ModelFieldMeta(path = "src/main/resources/keyword_sort_param_meta.json")
+    @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_sort_param_meta.json")
     @ValidSolrSortFields(sortFieldEnumClazz = KeywordField.Sort.class)
     private String sort;
 
@@ -33,7 +33,7 @@ public class KeywordRequestDTO implements SearchRequest {
     private String cursor;
 
     @Parameter(description = "Comma separated list of fields to be returned in response")
-    @ModelFieldMeta(path = "src/main/resources/keyword_return_field_meta.json")
+    @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_return_field_meta.json")
     @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
     private String fields;
 

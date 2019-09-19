@@ -118,7 +118,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             @PathVariable("accession")
             @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE},
                     message = "{search.invalid.accession.value}") String accession,
-            @ModelFieldMeta(path = "src/main/resources/uniprotkb_return_field_meta.json")
+            @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
             @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
             @Parameter(description = "Comma separated list of fields to be returned in response")
             @RequestParam(value = "fields", required = false) String fields) {
