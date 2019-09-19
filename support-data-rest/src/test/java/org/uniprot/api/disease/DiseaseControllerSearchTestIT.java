@@ -44,8 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(DiseaseController.class)
-@Disabled
-class DiseaseControllerSearchTest {
+class DiseaseControllerSearchTestIT {
     // accession
     private final ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
