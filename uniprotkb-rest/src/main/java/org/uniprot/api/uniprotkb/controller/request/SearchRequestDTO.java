@@ -35,14 +35,14 @@ public class SearchRequestDTO {
     @Parameter(hidden = true)
     private static final int DEFAULT_RESULTS_SIZE = 25;
 
-    @ModelFieldMeta(path = "src/main/resources/uniprotkb_query_param_meta.json")
+    @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_query_param_meta.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(fieldValidatorClazz = UniProtField.Search.class, messagePrefix = "search.uniprot")
     private String query;
 
-    @ModelFieldMeta(path = "src/main/resources/uniprotkb_return_field_meta.json")
+    @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
     private String fields;

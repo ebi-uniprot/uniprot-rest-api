@@ -191,7 +191,7 @@
                         <artifactId>openapi-maven-plugin</artifactId>
                         <version>${openapi-maven-plugin.version}</version>
                         <configuration>
-                            <packageToScan>org.uniprot.api.keyword</packageToScan>
+                            <packageLocations>org.uniprot.api.keyword</packageLocations>
                             <openApiDirectory>generated/swagger</openApiDirectory>
                             <openApiFileName>uniprot-openapi3.yaml</openApiFileName>
                             <serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>

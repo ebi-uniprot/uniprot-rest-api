@@ -1,5 +1,6 @@
 package org.uniprot.api.keyword;
 
+import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -72,6 +73,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                                                                          @PathVariable("keywordId")
                                                                          @Pattern(regexp = KEYWORD_ID_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.keyword.invalid.id}")
                                                                                  String keywordId,
+                                                                         @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_return_field_meta.json")
                                                                          @Parameter(description = "Comma separated list of fields to be returned in response")
                                                                                  @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
                                                                          @RequestParam(value = "fields", required = false)
