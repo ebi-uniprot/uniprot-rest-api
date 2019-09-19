@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -117,6 +118,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             @PathVariable("accession")
             @Pattern(regexp = FieldValueValidator.ACCESSION_REGEX, flags = {Pattern.Flag.CASE_INSENSITIVE},
                     message = "{search.invalid.accession.value}") String accession,
+            @ModelFieldMeta(path = "src/main/resources/uniprotkb_return_field_meta.json")
             @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
             @Parameter(description = "Comma separated list of fields to be returned in response")
             @RequestParam(value = "fields", required = false) String fields) {
