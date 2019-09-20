@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.uniprot</groupId>
         <artifactId>uniprot-rest-api</artifactId>
-        <version>0.11-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-domain</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -68,17 +68,17 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-common</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>controlled-vocabulary</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ff-parser</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>json-parser</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -100,17 +100,17 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-parser</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>xml-parser</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>uniprot-datastore</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
         </dependency>
         <dependency>
             <groupId>net.jodah</groupId>
@@ -164,7 +164,7 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -177,14 +177,14 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -221,7 +221,7 @@
                                 <artifactItem>
                                     <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
-                                    <version>${project.parent.version}</version>
+                                    <version>${uniprot-store.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory>

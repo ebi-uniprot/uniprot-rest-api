@@ -6,7 +6,7 @@
     <parent>
         <artifactId>uniprot-rest-api</artifactId>
         <groupId>org.uniprot</groupId>
-        <version>0.11-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>common-rest</artifactId>
@@ -23,12 +23,12 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-search</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-datastore</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -156,20 +156,20 @@
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-store.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>json-parser</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${uniprot-core.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -203,7 +203,7 @@
                                 <artifactItem>
                                     <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
-                                    <version>${project.parent.version}</version>
+                                    <version>${uniprot-store.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
