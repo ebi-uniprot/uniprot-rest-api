@@ -22,7 +22,7 @@ import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
-import org.uniprot.store.indexer.uniprotkb.processor.UniProtEntryConverter;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
 import java.io.File;
