@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -13,7 +13,6 @@
 
     <artifactId>uniprotkb-rest</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-
     <properties>
         <!-- Plugin versions -->
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
@@ -35,7 +34,7 @@
             <url>file://${basedir}/lib</url>
         </repository>
     </repositories>
-    
+
     <dependencies>
         <dependency>
             <groupId>log4j</groupId>
@@ -57,7 +56,7 @@
             <artifactId>common-rest</artifactId>
             <version>${common-rest.version}</version>
         </dependency>
-      
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-domain</artifactId>
@@ -186,11 +185,11 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
-            <!-- allows executable jar with embedded jetty to be created through,
-                "mvn package" command -->
+            <!-- allows executable jar with embedded jetty to be created 
+                through, "mvn package" command -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
