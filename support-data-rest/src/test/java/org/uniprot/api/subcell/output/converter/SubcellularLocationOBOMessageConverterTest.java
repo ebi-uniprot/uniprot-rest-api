@@ -3,8 +3,8 @@ package org.uniprot.api.subcell.output.converter;
 import org.junit.jupiter.api.Test;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.uniprot.core.cv.impl.SubcellularLocationFileReader;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.core.cv.subcell.SubcellularLocationFileReader;
 
 import java.io.IOException;
 import java.io.PrintWriter;

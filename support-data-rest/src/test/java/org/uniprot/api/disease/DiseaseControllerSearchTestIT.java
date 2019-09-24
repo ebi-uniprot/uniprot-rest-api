@@ -26,7 +26,7 @@ import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.Disease;
-import org.uniprot.core.cv.impl.DiseaseFileReader;
+import org.uniprot.core.cv.disease.DiseaseFileReader;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.search.SolrCollection;
