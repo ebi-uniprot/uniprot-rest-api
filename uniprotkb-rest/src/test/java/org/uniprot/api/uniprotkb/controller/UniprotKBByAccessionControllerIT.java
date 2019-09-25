@@ -1,7 +1,10 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,8 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -21,14 +24,21 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.cv.chebi.ChebiRepo;
+import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
-import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
-import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
+import org.uniprot.store.indexer.uniprot.mockers.*;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
+import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
+import org.uniprot.store.search.SolrCollection;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -56,25 +66,59 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     private static final String ACCESSION_ID = "Q8DIA7";
 
     @Autowired
-    private DataStoreManager storeManager;
+    private UniprotQueryRepository repository;
 
-    @Autowired
-    private MockMvc mockMvc;
+
+    private UniProtKBStoreClient storeClient;
+
+    @Override
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.UNIPROT;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.uniprot;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
 
     @Override
     protected void saveEntry() {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
-    }
-
-    @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
     }
 
     @Override
     protected String getIdRequestPath() {
         return ACCESSION_RESOURCE;
+    }
+
+    @BeforeAll
+    void initUniprotKbDataStore() {
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+                GoRelationsRepoMocker.getGoRelationRepo(),
+                PathwayRepoMocker.getPathwayRepo(),
+                Mockito.mock(ChebiRepo.class),
+                Mockito.mock(ECRepo.class),
+                new HashMap<>());
+
+        DataStoreManager dsm = getStoreManager();
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
+        dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
+        dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
+
+        storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
+                .getInstance("avro-uniprot"));
+        dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+    }
+
+    @AfterEach
+    void cleanStore() {
+        storeClient.truncate();
     }
 
     @Test
@@ -83,7 +127,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         saveEntry();
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(ACCESSION_RESOURCE + ACCESSION_ID)
                         .param("fields", "invalid, organism, invalid2")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -101,15 +145,15 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     void canSearchIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(ACCESSION_RESOURCE + "P21802-2")
                         .param("fields", "organism")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -128,15 +172,15 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     void canSearchCanonicalIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(ACCESSION_RESOURCE + "P21802-1")
                         .param("fields", "organism")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -155,13 +199,13 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     void withMergedInactiveEntryReturnTheActiveOne() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> mergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,mergedList);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(ACCESSION_RESOURCE + "B4DFC2")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -180,13 +224,13 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> demergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,demergedList);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(ACCESSION_RESOURCE + "Q00007")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -205,13 +249,13 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     void searchForDeletedInactiveEntriesReturnItself() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> deletedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT,deletedList);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(ACCESSION_RESOURCE + "I8FBX2")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 

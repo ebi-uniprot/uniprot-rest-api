@@ -64,11 +64,6 @@ class TupleStreamIterableIT {
 
     @Test
     void closingTupleStreamWrappedAsStreamWillCloseTupleStream() throws IOException {
-        when(tupleStream.read())
-                .thenReturn(tuple("accession1"))  // when calling next()
-                .thenReturn(tuple("accession2"))  // when calling next() 2nd time
-                .thenReturn(endTuple());
-
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
         Stream<String> stream = StreamSupport
                 .stream(iterable.spliterator(), false)

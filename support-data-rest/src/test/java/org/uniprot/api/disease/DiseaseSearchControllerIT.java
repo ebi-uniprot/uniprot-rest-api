@@ -3,16 +3,14 @@ package org.uniprot.api.disease;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.disease.DiseaseController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -28,8 +26,8 @@ import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
-import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.field.DiseaseField;
 import org.uniprot.store.search.field.SearchField;
@@ -60,19 +58,21 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     private static List<String> SORTED_ACCESSIONS = new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private DiseaseRepository repository;
 
     @Override
-    protected void cleanEntries() {
-        this.storeManager.cleanSolr(DataStoreManager.StoreType.DISEASE);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.DISEASE;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.disease;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -178,7 +178,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                 .build();
 
 
-        this.storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
     private ByteBuffer getDiseaseBinary(Disease entry) {

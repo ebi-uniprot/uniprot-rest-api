@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -19,12 +19,13 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.api.taxonomy.TaxonomyController;
 import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
+import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.TaxonomyField;
@@ -49,22 +50,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
-
-    @Autowired
     private TaxonomyFacetConfig facetConfig;
 
+    @Autowired
+    private TaxonomyRepository repository;
+
     @Override
-    protected void cleanEntries() {
-        storeManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.TAXONOMY;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.taxonomy;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -156,7 +159,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                 .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 
     private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {

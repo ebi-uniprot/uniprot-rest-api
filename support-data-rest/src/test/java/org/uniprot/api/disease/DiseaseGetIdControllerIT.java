@@ -8,9 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.disease.DiseaseController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -26,6 +25,7 @@ import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 import java.nio.ByteBuffer;
@@ -37,7 +37,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -49,14 +50,21 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ACCESSION = "DI-04860";
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private DiseaseRepository repository;
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.DISEASE;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.disease;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -105,7 +113,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .diseaseObj(getDiseaseBinary(diseaseEntry))
                 .build();
 
-        this.storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
     private ByteBuffer getDiseaseBinary(Disease entry) {
