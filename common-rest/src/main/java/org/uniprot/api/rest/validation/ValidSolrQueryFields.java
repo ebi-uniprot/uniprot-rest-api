@@ -1,7 +1,8 @@
 package org.uniprot.api.rest.validation;
 
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
@@ -76,9 +77,9 @@ public @interface ValidSolrQueryFields {
             boolean isValid = true;
             if (Utils.notEmpty(queryString)) {
                 try {
-                    StandardQueryParser qp = new StandardQueryParser();
+                    QueryParser qp = new QueryParser(DEFAULT_FIELD_NAME, new WhitespaceAnalyzer());
                     qp.setAllowLeadingWildcard(true);
-                    Query query = qp.parse(queryString, DEFAULT_FIELD_NAME);
+                    Query query = qp.parse(queryString);
                     if (!(query instanceof MatchAllDocsQuery)) {
                         isValid = hasValidateQueryField(query, context);
                     }
@@ -132,6 +133,11 @@ public @interface ValidSolrQueryFields {
                 WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
                 String fieldName = wildcardQuery.getTerm().field();
                 String value = wildcardQuery.getTerm().text();
+                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+            } else if (inputQuery instanceof PrefixQuery) {
+                PrefixQuery prefixQuery = (PrefixQuery) inputQuery;
+                String fieldName = prefixQuery.getPrefix().field();
+                String value = prefixQuery.getPrefix().text();
                 validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
             } else if (inputQuery instanceof TermRangeQuery) {
                 TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;

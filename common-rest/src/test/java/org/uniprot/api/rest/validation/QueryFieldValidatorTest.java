@@ -5,7 +5,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.store.search.field.BoostValue;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.SearchFieldType;
@@ -47,12 +46,32 @@ class QueryFieldValidatorTest {
     }
 
     @Test
-    void isValidSimpleAccessionWildcardQueryReturnTrue() {
+    void isValidSimpleWildcardQueryReturnTrue() {
         ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
         boolean result = validator.isValid("gene:*", null);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidSimpleMiddleWildcardQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("ec:7.2.*.1", null);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidSimplePrefixQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("ec:7.2.*", null);
         assertTrue(result);
     }
 
@@ -246,6 +265,7 @@ class QueryFieldValidatorTest {
         accession(SearchFieldType.TERM, FieldValueValidator::isAccessionValid),
         organism_id(SearchFieldType.TERM, null),
         organism_name(SearchFieldType.TERM, null),
+        ec(SearchFieldType.TERM, null),
         taxonomy_id(SearchFieldType.TERM, FieldValueValidator::isNumberValue),
         gene(SearchFieldType.TERM, null),
         cc_bpcp_kinetics(SearchFieldType.TERM, null),
