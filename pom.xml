@@ -18,6 +18,8 @@
     </description>
 
     <properties>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.version>3.8.0</maven.compiler.version>
@@ -39,7 +41,7 @@
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 
         <!-- Test coverage -->
-        <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+        <jacoco.outputDir>${project.basedir}/../target</jacoco.outputDir>
 
         <!-- Unit test report path -->
         <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
@@ -48,6 +50,8 @@
         <!-- Integration test report path -->
         <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
+        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco-ut.exec</sonar.jacoco.reportPaths>
+        <sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itReportPath>
         <uniprot-store.version>1.0-SNAPSHOT</uniprot-store.version>
         <uniprot-core.version>0.1-SNAPSHOT</uniprot-core.version>
     </properties>
@@ -58,8 +62,8 @@
         <module>uniprotkb-rest</module>
         <module>proteome-rest</module>
         <module>uniparc-rest</module>
-    <module>uniref-rest</module>
-  </modules>
+        <module>uniref-rest</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -280,7 +284,7 @@
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <destFile>${jacoco.reportPath}</destFile>
+                            <destFile>${sonar.jacoco.reportPaths}</destFile>
                             <propertyName>jacoco.agent.ut.arg</propertyName>
                             <append>true</append>
                         </configuration>
@@ -293,7 +297,7 @@
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <destFile>${jacoco.itReportPath}</destFile>
+                            <destFile>${sonar.jacoco.itReportPath}</destFile>
                             <propertyName>jacoco.agent.it.arg</propertyName>
                             <append>true</append>
                         </configuration>
