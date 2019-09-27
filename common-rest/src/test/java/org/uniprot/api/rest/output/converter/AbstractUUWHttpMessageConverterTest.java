@@ -1,6 +1,6 @@
 package org.uniprot.api.rest.output.converter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Edd
  */
-public class AbstractUUWHttpMessageConverterTest {
+class AbstractUUWHttpMessageConverterTest {
     private static final String BEFORE = "before";
     private static final String AFTER = "after";
     private static final String ENTITY_SEPARATOR = ",";
@@ -42,7 +42,7 @@ public class AbstractUUWHttpMessageConverterTest {
     private List<Character> listType;
 
     @Test
-    public void overridenMethodsCalledInCorrectOrder_beforeThenWriteThenAfterThenCleanUp() throws IOException {
+    void overridenMethodsCalledInCorrectOrder_beforeThenWriteThenAfterThenCleanUp() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         converter.setOverrideAfter(true);
         converter.setOverrideBefore(true);
@@ -56,7 +56,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void canWriteMessageConvertersOnly() throws Exception {
+    void canWriteMessageConvertersOnly() throws Exception {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
 
         ParameterizedType type = (ParameterizedType) this.getClass().getDeclaredField("listType").getGenericType();
@@ -65,7 +65,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void separatorUsedToSeparateEntities() throws IOException {
+    void separatorUsedToSeparateEntities() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         converter.setEntitySeparator(ENTITY_SEPARATOR);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -76,7 +76,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void errorDuringBeforeWritingCausesStreamToBeClosedAndCleanUp() throws IOException {
+    void errorDuringBeforeWritingCausesStreamToBeClosedAndCleanUp() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE){
             @Override
             protected void before(MessageConverterContext<Character> context, OutputStream outputStream) throws IOException {
@@ -95,7 +95,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void errorDuringAfterWritingCausesStreamToBeClosedAndCleanUp() throws IOException {
+    void errorDuringAfterWritingCausesStreamToBeClosedAndCleanUp() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE){
             @Override
             protected void after(MessageConverterContext<Character> context, OutputStream outputStream) throws IOException {
@@ -114,7 +114,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void errorDuringWriteEntityCausesStreamToBeClosedAndCleanUp() throws IOException {
+    void errorDuringWriteEntityCausesStreamToBeClosedAndCleanUp() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE){
             @Override
             protected void writeEntity(Character entity, OutputStream outputStream) throws IOException {
@@ -134,7 +134,7 @@ public class AbstractUUWHttpMessageConverterTest {
 
 
     @Test
-    public void writesCorrectNumberOfEntities() throws IOException {
+    void writesCorrectNumberOfEntities() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         assertThat(converter.getCounter(), is(0));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -145,7 +145,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void gzipFileTypeCreatesFileSuccessfully() throws IOException {
+    void gzipFileTypeCreatesFileSuccessfully() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.GZIP);
@@ -155,7 +155,7 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
-    public void normalFileTypeCreatesFileSuccessfully() throws IOException {
+    void normalFileTypeCreatesFileSuccessfully() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MessageConverterContext<Character> context = createFakeMessageConverterContext(FileType.FILE);
@@ -197,17 +197,17 @@ public class AbstractUUWHttpMessageConverterTest {
     }
 
     private static class FakeMessageConverter extends AbstractUUWHttpMessageConverter<Character, Character> {
-        private AtomicInteger counter = new AtomicInteger(0);
+        private final AtomicInteger counter = new AtomicInteger(0);
         private boolean hasCleanedUp;
         private boolean overrideBefore;
         private boolean overrideAfter;
 
-        public boolean isCharacterStreamIsClosed() {
+        boolean isCharacterStreamIsClosed() {
             return characterStreamIsClosed;
         }
 
         private boolean characterStreamIsClosed;
-        private Stream<Character> characterStream = charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
+        private final Stream<Character> characterStream = charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
 
         FakeMessageConverter(MediaType mediaType) {
             super(mediaType, Character.class);

@@ -2,28 +2,11 @@ package org.uniprot.api.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.core.CoreContainer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.server.support.EmbeddedSolrServerFactory;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.store.indexer.ClosableEmbeddedSolrClient;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.search.SolrCollection;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
-
-import static org.mockito.Mockito.mock;
 
 //@TestConfiguration
 @Slf4j
@@ -35,7 +18,7 @@ public class SolrTestConfig implements DisposableBean {
     @Value(("${solr.home}"))
     private String solrHome;
 
-    public SolrTestConfig() throws Exception {
+    private SolrTestConfig() throws Exception {
         file = Files.createTempDirectory(TEMP_DIR_PREFIX).toFile();
     }
 

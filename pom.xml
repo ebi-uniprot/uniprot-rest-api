@@ -10,7 +10,7 @@
 
     <artifactId>uniprot-rest-api</artifactId>
     <groupId>org.uniprot</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>UniProt REST API Aggregator</name>
     <description>
@@ -22,7 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.version>3.8.0</maven.compiler.version>
         <java.version>1.8</java.version>
-        <jacoco.version>0.7.8</jacoco.version>
+        <jacoco.version>0.8.4</jacoco.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
 
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
@@ -48,6 +48,8 @@
         <!-- Integration test report path -->
         <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
         <jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
+        <uniprot-store.version>1.0-SNAPSHOT</uniprot-store.version>
+        <uniprot-core.version>0.1-SNAPSHOT</uniprot-core.version>
     </properties>
 
     <modules>
@@ -61,17 +63,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-launcher</artifactId>
-                <version>${junit-platform.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-runner</artifactId>
-                <version>${junit-platform.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>net.jodah</groupId>
@@ -169,23 +160,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- Swagger dependencies -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -212,126 +186,119 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.version}</version>
-                    <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
                     <configuration>
-                        <!-- Exclude integration tests from unit test run-->
-                        <excludes>
-                            <skipITs>${skipUTs}</skipITs>
-                            <exclude>**/*IT.java</exclude>
-                            <exclude>**/IT*.java</exclude>
-                        </excludes>
-                        <argLine>${jacoco.agent.ut.arg}</argLine>
+                        <systemProperties>
+                            <property>
+                                <name>http.proxyHost</name>
+                                <value>${http.proxyHost}</value>
+                            </property>
+                            <property>
+                                <name>http.proxyPort</name>
+                                <value>${http.proxyPort}</value>
+                            </property>
+                        </systemProperties>
                     </configuration>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
                     <configuration>
-                        <forkCount>1</forkCount>
-                        <reuseForks>false</reuseForks>
-                        <skipITs>${skipITs}</skipITs>
-                        <argLine>${jacoco.agent.it.arg}</argLine>
+                        <systemProperties>
+                            <property>
+                                <name>http.proxyHost</name>
+                                <value>${http.proxyHost}</value>
+                            </property>
+                            <property>
+                                <name>http.proxyPort</name>
+                                <value>${http.proxyPort}</value>
+                            </property>
+                        </systemProperties>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
-
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
-                    <executions>
-                        <!-- Sets up jacaco for unit test coverage analysis (jacoco.agent.ut.arg) -->
-                        <execution>
-                            <id>prepare-ut-agent</id>
-                            <phase>process-test-classes</phase>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                            <configuration>
-                                <destFile>${jacoco.reportPath}</destFile>
-                                <propertyName>jacoco.agent.ut.arg</propertyName>
-                                <append>true</append>
-                            </configuration>
-                        </execution>
-                        <!-- Sets up jacaco for integration test coverage analysis (jacoco.agent.it.arg) -->
-                        <execution>
-                            <id>prepare-it-agent</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                            <configuration>
-                                <destFile>${jacoco.itReportPath}</destFile>
-                                <propertyName>jacoco.agent.it.arg</propertyName>
-                                <append>true</append>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
-
-                <plugin>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>${maven-clean-plugin.version}</version>
-                    <configuration>
-                        <filesets>
-                            <fileset>
-                                <directory>${jacoco.outputDir}</directory>
-                                <includes>
-                                    <include>**/*</include>
-                                </includes>
-                            </fileset>
-                        </filesets>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                </plugin>
-
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <!-- Exclude integration tests from unit test run -->
+                    <excludes>
+                        <skipITs>${skipUTs}</skipITs>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                    <argLine>${jacoco.agent.ut.arg}</argLine>
+                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <skipITs>${skipITs}</skipITs>
+                    <argLine>${jacoco.agent.it.arg}</argLine>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <!-- Sets up jacaco for unit test coverage analysis (jacoco.agent.ut.arg) -->
+                    <execution>
+                        <id>prepare-ut-agent</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${jacoco.reportPath}</destFile>
+                            <propertyName>jacoco.agent.ut.arg</propertyName>
+                            <append>true</append>
+                        </configuration>
+                    </execution>
+                    <!-- Sets up jacaco for integration test coverage analysis (jacoco.agent.it.arg) -->
+                    <execution>
+                        <id>prepare-it-agent</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${jacoco.itReportPath}</destFile>
+                            <propertyName>jacoco.agent.it.arg</propertyName>
+                            <append>true</append>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -370,6 +337,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
                 <checksumPolicy>warn</checksumPolicy>
             </snapshots>
             <url>${http-uniprot-private-url}/snapshot</url>

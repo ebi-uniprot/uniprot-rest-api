@@ -65,9 +65,9 @@ class UniProtViewByControllerIT {
 
 	private void mockEcService() {
 		List<ViewBy> viewBys = new ArrayList<>();
-		viewBys.add(MockServiceHelper.createViewBy("1.1.1.-", "With NAD(+) or NADP(+) as acceptor", 346l,
+		viewBys.add(MockServiceHelper.createViewBy("1.1.1.-", "With NAD(+) or NADP(+) as acceptor", 346L,
 				UniProtViewByECService.URL_PREFIX + "1.1.1.-", true));
-		viewBys.add(MockServiceHelper.createViewBy("1.1.3.-", "With oxygen as acceptor", 1l,
+		viewBys.add(MockServiceHelper.createViewBy("1.1.3.-", "With oxygen as acceptor", 1L,
 				UniProtViewByECService.URL_PREFIX + "1.1.3.-", true));
 
 		when(ecService.get(anyString(), anyString())).thenReturn(viewBys);
@@ -89,9 +89,9 @@ class UniProtViewByControllerIT {
 
 	private void mockKeywordService() {
 		List<ViewBy> viewBys = new ArrayList<>();
-		viewBys.add(MockServiceHelper.createViewBy("KW-0128", "Catecholamine metabolism", 5l,
+		viewBys.add(MockServiceHelper.createViewBy("KW-0128", "Catecholamine metabolism", 5L,
 				UniProtViewByKeywordService.URL_PREFIX + "KW-0128", false));
-		viewBys.add(MockServiceHelper.createViewBy("KW-0131", "Cell cycle", 102l,
+		viewBys.add(MockServiceHelper.createViewBy("KW-0131", "Cell cycle", 102L,
 				UniProtViewByKeywordService.URL_PREFIX + "KW-0131", true));
 
 		when(kwService.get(anyString(), anyString())).thenReturn(viewBys);
@@ -113,8 +113,8 @@ class UniProtViewByControllerIT {
 	
 	private void mockPathwayService() {
 		List<ViewBy> viewBys = new ArrayList<>();
-		viewBys.add(MockServiceHelper.createViewBy("289", "Amine and polyamine biosynthesis", 36l, null , false));
-		viewBys.add( MockServiceHelper.createViewBy("456", "Amine and polyamine degradation", 1l, null , false));
+		viewBys.add(MockServiceHelper.createViewBy("289", "Amine and polyamine biosynthesis", 36L, null , false));
+		viewBys.add( MockServiceHelper.createViewBy("456", "Amine and polyamine degradation", 1L, null , false));
 
 		when(pwService.get(anyString(), anyString())).thenReturn(viewBys);
 
@@ -135,8 +135,8 @@ class UniProtViewByControllerIT {
 	
 	private void mockGoService() {
 		List<ViewBy> viewBys = new ArrayList<>();
-		viewBys.add(MockServiceHelper.createViewBy("GO:0008150", "biological_process", 78l, UniProtViewByGoService.URL_PREFIX +"GO:0008150" , true));
-		viewBys.add( MockServiceHelper.createViewBy("GO:0005575", "cellular_component", 70l, UniProtViewByGoService.URL_PREFIX +"GO:0005575" , true));
+		viewBys.add(MockServiceHelper.createViewBy("GO:0008150", "biological_process", 78L, UniProtViewByGoService.URL_PREFIX +"GO:0008150" , true));
+		viewBys.add( MockServiceHelper.createViewBy("GO:0005575", "cellular_component", 70L, UniProtViewByGoService.URL_PREFIX +"GO:0005575" , true));
 
 		when(goService.get(anyString(), anyString())).thenReturn(viewBys);
 
@@ -156,8 +156,8 @@ class UniProtViewByControllerIT {
 	}
 	private void mockTaxonService() {
 		List<ViewBy> viewBys = new ArrayList<>();
-		viewBys.add(MockServiceHelper.createViewBy("1425170", "Homo heidelbergensis", 23l, UniProtViewByTaxonomyService.URL_PREFIX +"1425170" , false));
-		viewBys.add(MockServiceHelper.createViewBy("9606", "Homo sapiens", 50l, UniProtViewByTaxonomyService.URL_PREFIX +"9606" , false));
+		viewBys.add(MockServiceHelper.createViewBy("1425170", "Homo heidelbergensis", 23L, UniProtViewByTaxonomyService.URL_PREFIX +"1425170" , false));
+		viewBys.add(MockServiceHelper.createViewBy("9606", "Homo sapiens", 50L, UniProtViewByTaxonomyService.URL_PREFIX +"9606" , false));
 
 		when(taxonService.get(anyString(), anyString())).thenReturn(viewBys);
 

@@ -12,7 +12,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 
 import static org.hamcrest.Matchers.contains;

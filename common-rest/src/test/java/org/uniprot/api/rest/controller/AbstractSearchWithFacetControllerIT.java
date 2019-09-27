@@ -23,7 +23,7 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
 
     //----------------------------------------- TEST FACETS -----------------------------------------------
     @Test
-    protected void searchFacetsWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
+    void searchFacetsWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("facets", "query"));
 
@@ -34,9 +34,7 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
         MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> {
-            requestBuilder.param(paramName, values.toArray(new String[0]));
-        });
+        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -51,7 +49,7 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
     }
 
     @Test
-    protected void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {
+    void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {
 
         // when
         ResultActions response = getMockMvc().perform(
@@ -69,7 +67,7 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
     }
 
     @Test
-    protected void searchCanSearchWithAllAvailableFacetsFields() throws Exception {
+    void searchCanSearchWithAllAvailableFacetsFields() throws Exception {
 
         // given
         saveEntry(SaveScenario.FACETS_SUCCESS);

@@ -1,19 +1,25 @@
 package org.uniprot.api.literature;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.literature.LiteratureController;
+import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.impl.AuthorImpl;
@@ -25,6 +31,7 @@ import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
 import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
 import org.uniprot.core.uniprot.UniProtAccession;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import java.nio.ByteBuffer;
@@ -46,19 +53,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author lgonzales
  * @since 2019-07-10
  */
+@Slf4j
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(LiteratureController.class)
 @ExtendWith(value = {SpringExtension.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LiteratureMappedProteinsControllerIT {
 
     private static final String MAPPED_PROTEIN_PATH = "/literature/mapped/proteins/";
 
     @Autowired
-    private MockMvc mockMvc;
+    private LiteratureRepository repository;
 
     @Autowired
-    private DataStoreManager storeManager;
+    private MockMvc mockMvc;
+
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
+
+    @BeforeAll
+    void initSolrAndInjectItInTheRepository() {
+        storeManager.addSolrClient(DataStoreManager.StoreType.LITERATURE, SolrCollection.literature);
+        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.LITERATURE));
+        template.afterPropertiesSet();
+        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+    }
 
     @Test
     void getMappedProteinsReturnSuccess() throws Exception {

@@ -14,19 +14,19 @@ import org.uniprot.core.uniprot.UniProtEntry;
  * Contains utility methods that aid in testing
  */
 final class TestUtils {
-	private static SupportingDataMap dataMap = new SupportingDataMapImpl("keywlist.txt",
+	private static final SupportingDataMap dataMap = new SupportingDataMapImpl("keywlist.txt",
 			"humdisease.txt", null, null	
 			);
-    private static EntryObjectConverter entryObjectConverter = new EntryObjectConverter(dataMap, true);
+    private static final EntryObjectConverter entryObjectConverter = new EntryObjectConverter(dataMap, true);
 
     private TestUtils() {
     }
 
-    public static UniProtEntry convertToUniProtEntry(UniProtEntryObjectProxy objectProxy) {
+    static UniProtEntry convertToUniProtEntry(UniProtEntryObjectProxy objectProxy) {
         return objectProxy.convertToUniProtEntry(entryObjectConverter);
     }
 
-    public static InputStream getResourceAsStream(String resourcePath) {
+    static InputStream getResourceAsStream(String resourcePath) {
         return TestUtils.class.getResourceAsStream(resourcePath);
     }
 

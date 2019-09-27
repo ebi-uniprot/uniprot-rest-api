@@ -1,7 +1,8 @@
 package org.uniprot.api.rest.validation;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.uniprot.core.util.Utils;
 
 import javax.validation.Constraint;
@@ -40,10 +41,10 @@ public @interface ValidSolrQuerySyntax {
             boolean isValid = true;
             if (Utils.notEmpty(queryString)) {
                 try {
-                    StandardQueryParser standardQueryParser = new StandardQueryParser();
-                    standardQueryParser.setAllowLeadingWildcard(true);
-                    standardQueryParser.parse(queryString, "");
-                } catch (QueryNodeException e) {
+                    QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
+                    qp.setAllowLeadingWildcard(true);
+                    qp.parse(queryString);
+                } catch (ParseException e) {
                     isValid = false;
                 }
             }

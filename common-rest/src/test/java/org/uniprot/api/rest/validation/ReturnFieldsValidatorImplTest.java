@@ -110,7 +110,7 @@ class ReturnFieldsValidatorImplTest {
      */
     private static class FakeReturnFieldsValidatorImpl extends ValidReturnFields.ReturnFieldsValidatorImpl{
 
-        List<String> errorFields = new ArrayList<>();
+        final List<String> errorFields = new ArrayList<>();
 
         @Override
         public void buildErrorMessage(String field,ConstraintValidatorContextImpl contextImpl) {

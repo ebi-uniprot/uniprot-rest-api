@@ -1,20 +1,28 @@
 package org.uniprot.api.rest.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -29,13 +37,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author lgonzales
  */
 @Slf4j
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractGetByIdControllerIT {
+
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
+
+    @BeforeAll
+    void initSolrAndInjectItInTheRepository() {
+        storeManager.addSolrClient(getStoreType(), getSolrCollection());
+        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(getStoreType()));
+        template.afterPropertiesSet();
+        ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
+    }
 
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @Test
-    protected void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
+    void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // given
         saveEntry();
@@ -44,7 +67,7 @@ public abstract class AbstractGetByIdControllerIT {
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        ResultActions response = getMockMvc().perform(requestBuilder);
+        ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
         ResultActions resultActions = response.andDo(print())
@@ -58,13 +81,13 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
+    void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        ResultActions response = getMockMvc().perform(requestBuilder);
+        ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
         ResultActions resultActions = response.andDo(print())
@@ -78,13 +101,13 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void nonExistentIdReturnFoundRequest(GetIdParameter idParameter) throws Exception {
+    void nonExistentIdReturnFoundRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
                 .header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        ResultActions response = getMockMvc().perform(requestBuilder);
+        ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
         ResultActions resultActions = response.andDo(print())
@@ -97,7 +120,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
+    void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
         assertThat(idParameter,notNullValue());
         if (Utils.notEmpty(idParameter.getFields())) {
 
@@ -110,7 +133,7 @@ public abstract class AbstractGetByIdControllerIT {
                     .header(ACCEPT, MediaType.APPLICATION_JSON)
                     .param("fields",idParameter.getFields());
 
-            ResultActions response = getMockMvc().perform(requestBuilder);
+            ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
             ResultActions resultActions = response.andDo(print())
@@ -126,7 +149,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void withInvalidFilterFieldsReturnBadRequest(GetIdParameter idParameter) throws Exception {
+    void withInvalidFilterFieldsReturnBadRequest(GetIdParameter idParameter) throws Exception {
         if (Utils.notEmpty(idParameter.getFields())) {
 
             checkParameterInput(idParameter);
@@ -136,7 +159,7 @@ public abstract class AbstractGetByIdControllerIT {
                     .header(ACCEPT, MediaType.APPLICATION_JSON)
                     .param("fields",idParameter.getFields());
 
-            ResultActions response = getMockMvc().perform(requestBuilder);
+            ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
             ResultActions resultActions = response.andDo(print())
@@ -152,7 +175,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void idSuccessContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
+    void idSuccessContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
         // given
         saveEntry();
 
@@ -163,7 +186,7 @@ public abstract class AbstractGetByIdControllerIT {
             MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + contentTypeParam.getId())
                     .header(ACCEPT, contentType.getContentType());
 
-            ResultActions response = getMockMvc().perform(requestBuilder);
+            ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
             ResultActions resultActions = response.andDo(print())
@@ -177,7 +200,7 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    protected void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
+    void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
         checkIdContentTypeParameterInput(contentTypeParam);
 
         // when
@@ -186,7 +209,7 @@ public abstract class AbstractGetByIdControllerIT {
             MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + contentTypeParam.getId())
                     .header(ACCEPT, contentType.getContentType());
 
-            ResultActions response = getMockMvc().perform(requestBuilder);
+            ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
             ResultActions resultActions = response.andDo(print())
@@ -199,9 +222,21 @@ public abstract class AbstractGetByIdControllerIT {
         }
     }
 
-    protected abstract void saveEntry();
+    protected DataStoreManager getStoreManager() {
+        return storeManager;
+    }
 
-    protected abstract MockMvc getMockMvc();
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    protected abstract DataStoreManager.StoreType getStoreType();
+
+    protected abstract SolrCollection getSolrCollection();
+
+    protected abstract SolrQueryRepository getRepository();
+
+    protected abstract void saveEntry();
 
     protected abstract String getIdRequestPath();
 

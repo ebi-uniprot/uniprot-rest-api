@@ -1,6 +1,5 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -15,17 +14,15 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.uniprot.api.uniprotkb.view.TaxonomyNode;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByPathwayService;
 import org.uniprot.core.cv.pathway.UniPathway;
 import org.uniprot.core.cv.pathway.UniPathwayService;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class UniProtViewByPathwayServiceTest {
 	 @Mock
 	 private SolrClient solrClient;
@@ -36,7 +33,7 @@ class UniProtViewByPathwayServiceTest {
 	 
 	 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		solrClient =Mockito.mock(SolrClient.class);
 		unipathwayService =Mockito.mock(UniPathwayService.class);
 		mockPathwayService();
@@ -47,14 +44,14 @@ class UniProtViewByPathwayServiceTest {
 	@Test
 	void test() throws IOException, SolrServerException {
 		Map<String, Long> counts = new HashMap<>();
-		counts.put("289", 36l);
-		counts.put("456", 1l);	
+		counts.put("289", 36L);
+		counts.put("456", 1L);
 		MockServiceHelper.mockServiceQueryResponse( solrClient, "ec", counts);
 		List<ViewBy> viewBys = service.get("", "1");
 		assertEquals(2, viewBys.size());
-		ViewBy viewBy1 = MockServiceHelper.createViewBy("289", "Amine and polyamine biosynthesis", 36l, null , false);
+		ViewBy viewBy1 = MockServiceHelper.createViewBy("289", "Amine and polyamine biosynthesis", 36L, null , false);
 		assertTrue(viewBys.contains(viewBy1));
-		ViewBy viewBy2 = MockServiceHelper.createViewBy("456", "Amine and polyamine degradation", 1l, null , false);
+		ViewBy viewBy2 = MockServiceHelper.createViewBy("456", "Amine and polyamine degradation", 1L, null , false);
 		assertTrue(viewBys.contains(viewBy2));
 	}
 	void mockPathwayService() {

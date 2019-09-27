@@ -45,6 +45,17 @@ class SolrQueryConverterTest {
     }
 
     @Test
+    void convertMiddleWildcardQuery() {
+        Query allDocumentsQuery = getQueryFromString("ec:4.7.*.1");
+        SolrJsonQuery jsonQuery = SolrQueryConverter.convert(allDocumentsQuery);
+
+        assertNotNull(jsonQuery);
+        assertEquals("wildcardQuery", jsonQuery.getType());
+        assertEquals("ec", jsonQuery.getField());
+        assertEquals("4.7.*.1", jsonQuery.getValue());
+    }
+
+    @Test
     void convertDefaultFieldQuery() {
         Query allDocumentsQuery = getQueryFromString("foo");
         SolrJsonQuery jsonQuery =  SolrQueryConverter.convert(allDocumentsQuery);
@@ -127,6 +138,17 @@ class SolrQueryConverterTest {
         assertTrue(jsonQuery.getFromInclude());
         assertEquals("2018-03-08",jsonQuery.getTo());
         assertTrue(jsonQuery.getToInclude());
+    }
+
+    @Test
+    void convertPrefixQuery() {
+        Query allDocumentsQuery = getQueryFromString("ec:4.7.*");
+        SolrJsonQuery jsonQuery = SolrQueryConverter.convert(allDocumentsQuery);
+
+        assertNotNull(jsonQuery);
+        assertEquals("prefixQuery", jsonQuery.getType());
+        assertEquals("ec", jsonQuery.getField());
+        assertEquals("4.7.*", jsonQuery.getValue());
     }
 
     @Test

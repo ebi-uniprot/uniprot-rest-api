@@ -1,33 +1,26 @@
 package org.uniprot.api.common.repository.search;
 
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.core.CoreContainer;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.QueryRetrievalException;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
-import org.uniprot.store.indexer.ClosableEmbeddedSolrClient;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.SolrDataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -44,19 +37,15 @@ class SolrQueryRepositoryIT {
 
     private static GeneralSolrQueryRepository queryRepo;
 
-    private static DataStoreManager storeManager;
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
+    ;
 
     @BeforeAll
     static void setUp() {
         try {
-            SolrDataStoreManager solrStoreManager = new SolrDataStoreManager();
-            CoreContainer container = new CoreContainer(new File(System.getProperty(ClosableEmbeddedSolrClient.SOLR_HOME)).getAbsolutePath());
-            container.load();
-            ClosableEmbeddedSolrClient solrClient = new ClosableEmbeddedSolrClient(container, SolrCollection.uniprot);
-            storeManager = new DataStoreManager(solrStoreManager);
-            storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, solrClient);
-
-            SolrTemplate template = new SolrTemplate(solrClient);
+            storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+            SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
             template.afterPropertiesSet();
             queryRepo = new GeneralSolrQueryRepository(template);
         } catch (Exception e) {
@@ -67,6 +56,11 @@ class SolrQueryRepositoryIT {
     @AfterEach
     void cleanUp() {
         storeManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
+    }
+
+    @AfterAll
+    static void close() {
+        storeManager.close();
     }
 
     // getEntry -------------------

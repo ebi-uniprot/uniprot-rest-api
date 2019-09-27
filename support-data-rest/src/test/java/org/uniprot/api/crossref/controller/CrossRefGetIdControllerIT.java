@@ -1,6 +1,5 @@
 package org.uniprot.api.crossref.controller;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -8,9 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.crossref.controller.CrossRefController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.crossref.repository.CrossRefRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -21,10 +20,11 @@ import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.crossref.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -36,23 +36,30 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ACCESSION = "DB-0104";
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private CrossRefRepository repository;
 
     @Override
-    public MockMvc getMockMvc() {
-        return mockMvc;
-    }
-
-    @Override
-    public String getIdRequestPath() {
+    protected String getIdRequestPath() {
         return "/xref/";
     }
 
     @Override
-    public void saveEntry() {
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.CROSSREF;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.crossref;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
+
+    @Override
+    protected void saveEntry() {
 
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
         CrossRefEntry crossRefEntry = entryBuilder.accession(ACCESSION)
@@ -82,7 +89,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .unreviewedProteinCount(crossRefEntry.getUnreviewedProteinCount())
                 .build();
 
-        this.storeManager.saveDocs(DataStoreManager.StoreType.CROSSREF, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.CROSSREF, document);
     }
 
 

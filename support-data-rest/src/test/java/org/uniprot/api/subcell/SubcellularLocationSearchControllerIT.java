@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -24,6 +24,7 @@ import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.SubcellularLocationField;
@@ -52,19 +53,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SubcellularLocationSearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private SubcellularLocationRepository repository;
 
     @Override
-    protected void cleanEntries() {
-        storeManager.cleanSolr(DataStoreManager.StoreType.SUBCELLULAR_LOCATION);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.SUBCELLULAR_LOCATION;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.subcellularlocation;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -138,7 +141,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                 .subcellularlocationObj(getSubcellularLocationBinary(subcellularLocationEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
     }
 
     private ByteBuffer getSubcellularLocationBinary(SubcellularLocationEntry entry) {
@@ -260,6 +263,16 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                             .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                             .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                             .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                            .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                            .resultMatcher(content().string(containsString("format-version: 1.2\n")))
+                            .resultMatcher(content().string(containsString("default-namespace: uniprot:locations\n")))
+                            .resultMatcher(content().string(containsString("[Term]\n")))
+                            .resultMatcher(content().string(containsString("id: SL-0001\n")))
+                            .resultMatcher(content().string(containsString("name: Name value SL-0001\n")))
+                            .resultMatcher(content().string(containsString("def: \"Definition value SL-0001\" []\n")))
+                            .build())
                     .build();
         }
 
@@ -282,6 +295,10 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                             .build())
                     .contentTypeParam(ContentTypeParam.builder()
                             .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                            .resultMatcher(content().string(isEmptyString()))
+                            .build())
+                    .contentTypeParam(ContentTypeParam.builder()
+                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                             .resultMatcher(content().string(isEmptyString()))
                             .build())
                     .build();

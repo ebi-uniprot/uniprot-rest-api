@@ -5,17 +5,14 @@
     <parent>
         <groupId>org.uniprot</groupId>
         <artifactId>uniprot-rest-api</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>proteome-rest</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>${project.parent.version}</version>
     <name>proteome-rest</name>
     <description>Proteome Rest API</description>
 
     <properties>
-        <core.version>0.1-SNAPSHOT</core.version>
-        <uniprot-search.version>1.0-SNAPSHOT</uniprot-search.version>
-        <common-rest.version>0.0.2-SNAPSHOT</common-rest.version>
         <dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
     </properties>
 
@@ -32,17 +29,17 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>xml-parser</artifactId>
-            <version>${core.version}</version>
+            <version>${uniprot-core.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-parser</artifactId>
-            <version>${core.version}</version>
+            <version>${uniprot-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-            <version>${common-rest.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <!-- 		<dependency> -->
         <!-- 			<groupId>org.uniprot</groupId> -->
@@ -59,18 +56,24 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>common-rest</artifactId>
-            <version>${common-rest.version}</version>
+            <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.uniprot</groupId>
             <artifactId>uniprot-indexer-integration-test</artifactId>
-            <version>${uniprot-search.version}</version>
+            <version>${uniprot-store.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -107,7 +110,7 @@
                                 <artifactItem>
                                     <groupId>org.uniprot</groupId>
                                     <artifactId>uniprot-index-config</artifactId>
-                                    <version>${uniprot-search.version}</version>
+                                    <version>${uniprot-store.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/test-classes</outputDirectory>

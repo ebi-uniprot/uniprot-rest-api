@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.crossref.controller.CrossRefController;
 import org.uniprot.api.crossref.service.CrossRefService;
-import org.uniprot.api.repository.SolrTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.crossref.CrossRefEntryBuilder;

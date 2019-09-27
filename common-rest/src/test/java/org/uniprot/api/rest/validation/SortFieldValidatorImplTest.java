@@ -154,7 +154,7 @@ class SortFieldValidatorImplTest {
      */
     static class FakeSortFieldValidatorImpl extends ValidSolrSortFields.SortFieldValidatorImpl {
 
-        List<String> errorFields = new ArrayList<>();
+        final List<String> errorFields = new ArrayList<>();
 
         @Override
         public void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
@@ -183,7 +183,7 @@ class SortFieldValidatorImplTest {
         mass("mass"),
         organism("organism_sort");
 
-        private String solrFieldName;
+        private final String solrFieldName;
 
         FakeSort(String solrFieldName){
             this.solrFieldName = solrFieldName;

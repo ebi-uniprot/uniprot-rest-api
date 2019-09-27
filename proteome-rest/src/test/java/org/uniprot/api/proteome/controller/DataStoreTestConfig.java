@@ -1,33 +1,32 @@
-package org.uniprot.api.uniparc.controller;
+package org.uniprot.api.proteome.controller;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-
-import static org.mockito.Mockito.mock;
+import sun.net.www.http.HttpClient;
 
 /**
  * @author jluo
- * @date: 25 Jun 2019
+ * @date: 14 Jun 2019
  */
 @TestConfiguration
-public class UniParcDataStoreTestConfig {
+public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
     public HttpClient httpClient() {
-        return mock(HttpClient.class);
+        return Mockito.mock(HttpClient.class);
     }
 
-    @Bean
+    @Bean()
     @Profile("offline")
-    public SolrClient uniparcSolrClient() {
-        return mock(SolrClient.class);
+    public SolrClient solrClient() {
+        return Mockito.mock(SolrClient.class);
     }
 
     @Bean
@@ -46,5 +45,6 @@ public class UniParcDataStoreTestConfig {
             }
         };
     }
+
 }
 

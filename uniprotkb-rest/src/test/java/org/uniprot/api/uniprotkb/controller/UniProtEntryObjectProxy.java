@@ -29,21 +29,21 @@ import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.core.uniprot.UniProtEntry;
 
 
-public class UniProtEntryObjectProxy {
-    protected EntryObject entryObject;
-	   protected  UniprotLineParser<EntryObject>  entryParser;
-    protected UniProtEntryObjectProxy() {
+class UniProtEntryObjectProxy {
+    private EntryObject entryObject;
+	   private final UniprotLineParser<EntryObject>  entryParser;
+    private UniProtEntryObjectProxy() {
         this.entryParser = new DefaultUniprotLineParserFactory().createEntryParser();
     }
 
-    public static UniProtEntryObjectProxy createEntryFromString(String entryText) {
+    private static UniProtEntryObjectProxy createEntryFromString(String entryText) {
         UniProtEntryObjectProxy uniProtEntryObject = new UniProtEntryObjectProxy();
         uniProtEntryObject.entryObject = uniProtEntryObject.entryParser.parse(entryText);
 
         return uniProtEntryObject;
     }
 
-    public static UniProtEntryObjectProxy createEntryFromInputStream(InputStream stream) throws IOException {
+    static UniProtEntryObjectProxy createEntryFromInputStream(InputStream stream) throws IOException {
         StringBuilder entryText = new StringBuilder();
 
         try (InputStreamReader ir = new InputStreamReader(stream); BufferedReader br = new BufferedReader(ir)) {
@@ -58,7 +58,7 @@ public class UniProtEntryObjectProxy {
         return createEntryFromString(entryText.toString());
     }
     
-    public void updateEntryObject(LineType lineType, String replacement) {
+    void updateEntryObject(LineType lineType, String replacement) {
         DefaultUniprotLineParserFactory parserFactory = new DefaultUniprotLineParserFactory();
 
         if (!replacement.endsWith("\n")) {
@@ -135,7 +135,7 @@ public class UniProtEntryObjectProxy {
         }
     }
 
-    public UniProtEntry convertToUniProtEntry(EntryObjectConverter entryObjectConverter) {
+    UniProtEntry convertToUniProtEntry(EntryObjectConverter entryObjectConverter) {
         return entryObjectConverter.convert(this.entryObject);
     }
 }

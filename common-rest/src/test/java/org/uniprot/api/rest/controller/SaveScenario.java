@@ -9,5 +9,5 @@ public enum SaveScenario {
     ALLOW_WILDCARD_QUERY,
     SORT_SUCCESS,
     FIELDS_SUCCESS,
-    FACETS_SUCCESS;
+    FACETS_SUCCESS
 }

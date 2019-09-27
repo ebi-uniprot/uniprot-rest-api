@@ -8,9 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.disease.DiseaseController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -26,17 +25,20 @@ import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -48,27 +50,34 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ACCESSION = "DI-04860";
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private DiseaseRepository repository;
 
     @Override
-    public MockMvc getMockMvc() {
-        return mockMvc;
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.DISEASE;
     }
 
     @Override
-    public String getIdRequestPath() {
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.disease;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
+
+    @Override
+    protected String getIdRequestPath() {
         return "/disease/";
     }
 
     @Override
-    public void saveEntry() {
+    protected void saveEntry() {
 
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
-        CrossReference xref1 = new CrossReference("MIM", "617140", Arrays.asList("phenotype"));
+        CrossReference xref1 = new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
         CrossReference xref2 = new CrossReference("MedGen", "CN238690");
         CrossReference xref3 = new CrossReference("MeSH", "D000015");
         CrossReference xref4 = new CrossReference("MeSH", "D008607");
@@ -85,7 +94,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         List<String> kwIds;
         if (diseaseEntry.getKeywords() != null) {
-            kwIds = diseaseEntry.getKeywords().stream().map(kw -> kw.getId()).collect(Collectors.toList());
+            kwIds = diseaseEntry.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();
         }
@@ -95,8 +104,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 diseaseEntry.getAlternativeNames().stream())
                 .collect(Collectors.toList());
         // content is name + accession
-        List<String> content = new ArrayList<>();
-        content.addAll(name);
+        List<String> content = new ArrayList<>(name);
         content.add(diseaseEntry.getAccession());
         DiseaseDocument document = DiseaseDocument.builder()
                 .accession(ACCESSION)
@@ -105,7 +113,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .diseaseObj(getDiseaseBinary(diseaseEntry))
                 .build();
 
-        this.storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
     private ByteBuffer getDiseaseBinary(Disease entry) {
