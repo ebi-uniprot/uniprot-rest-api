@@ -18,6 +18,8 @@
     </description>
 
     <properties>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.version>3.8.0</maven.compiler.version>
@@ -39,7 +41,7 @@
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 
         <!-- Test coverage -->
-        <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+        <jacoco.outputDir>${project.basedir}/..</jacoco.outputDir>
 
         <!-- Unit test report path -->
         <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
@@ -58,8 +60,8 @@
         <module>uniprotkb-rest</module>
         <module>proteome-rest</module>
         <module>uniparc-rest</module>
-    <module>uniref-rest</module>
-  </modules>
+        <module>uniref-rest</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
