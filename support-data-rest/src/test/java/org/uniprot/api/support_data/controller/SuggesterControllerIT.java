@@ -2,9 +2,12 @@ package org.uniprot.api.support_data.controller;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -12,12 +15,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.DataStoreTestConfig;
+import org.uniprot.api.suggester.service.SuggesterService;
 import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
@@ -47,16 +53,30 @@ import static org.uniprot.store.search.field.SuggestField.Importance.medium;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebAppConfiguration
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SuggesterControllerIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
-    @Autowired
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
+
     private SolrTemplate solrTemplate;
+
+    @Autowired
+    SuggesterService suggesterService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
+
+    @BeforeAll
+    void initSolrAndInjectItInTheRepository() {
+        storeManager.addSolrClient(DataStoreManager.StoreType.SUGGEST, SolrCollection.suggest);
+        solrTemplate = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.SUGGEST));
+        solrTemplate.afterPropertiesSet();
+        ReflectionTestUtils.setField(suggesterService, "solrTemplate", solrTemplate);
+    }
 
     @BeforeEach
     void setUp() throws IOException, SolrServerException {

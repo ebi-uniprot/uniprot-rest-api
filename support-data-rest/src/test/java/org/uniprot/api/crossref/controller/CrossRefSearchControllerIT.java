@@ -7,10 +7,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.crossref.config.CrossRefFacetConfig;
-import org.uniprot.api.crossref.controller.CrossRefController;
+import org.uniprot.api.crossref.repository.CrossRefRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -22,6 +22,7 @@ import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.crossref.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 import org.uniprot.store.search.field.CrossRefField;
 import org.uniprot.store.search.field.SearchField;
@@ -49,22 +50,24 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
     private static final List<String> SORTED_ACCESSIONS = new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private CrossRefRepository repository;
 
     @Autowired
     private CrossRefFacetConfig facetConfig;
 
     @Override
-    protected void cleanEntries() {
-        this.storeManager.cleanSolr(DataStoreManager.StoreType.CROSSREF);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.CROSSREF;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.crossref;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -158,7 +161,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                 .unreviewedProteinCount(crossRefEntry.getUnreviewedProteinCount())
                 .build();
 
-        this.storeManager.saveDocs(DataStoreManager.StoreType.CROSSREF, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.CROSSREF, document);
     }
 
 

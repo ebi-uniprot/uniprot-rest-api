@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -17,18 +18,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.core.cv.disease.DiseaseFileReader;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
+import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
@@ -44,28 +46,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(DiseaseController.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DiseaseControllerSearchTestIT {
     // accession
     private final ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
+
     @Autowired
-    private SolrTemplate solrTemplate;
+    private DiseaseRepository repository;
 
     @Autowired
     private MockMvc mockMvc;
-    private static boolean isIndexed = false;
 
-    @BeforeEach
+    @BeforeAll
     void setUp() throws IOException, SolrServerException {
-        if (!isIndexed) {
-            DiseaseFileReader diseaseFileReader = new DiseaseFileReader();
-            List<Disease> diseases = diseaseFileReader.parse("src/test/resources/sample-humdisease.txt");
-            // convert the disease to disease document
-            List<DiseaseDocument> docs = convertToDocs(diseases);
-            this.solrTemplate.getSolrClient().addBeans(SolrCollection.disease.name(), docs);
-            this.solrTemplate.getSolrClient().commit(SolrCollection.disease.name());
-            isIndexed = true;
-        }
+        storeManager.addSolrClient(DataStoreManager.StoreType.DISEASE, SolrCollection.disease);
+        SolrTemplate solrTemplate = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.DISEASE));
+        solrTemplate.afterPropertiesSet();
+        ReflectionTestUtils.setField(repository, "solrTemplate", solrTemplate);
+
+
+        DiseaseFileReader diseaseFileReader = new DiseaseFileReader();
+        List<Disease> diseases = diseaseFileReader.parse("src/test/resources/sample-humdisease.txt");
+        // convert the disease to disease document
+        List<DiseaseDocument> docs = convertToDocs(diseases);
+        solrTemplate.getSolrClient().addBeans(SolrCollection.disease.name(), docs);
+        solrTemplate.getSolrClient().commit(SolrCollection.disease.name());
     }
 
     @Test

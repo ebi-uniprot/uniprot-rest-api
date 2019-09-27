@@ -8,9 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.keyword.KeywordController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -24,6 +23,7 @@ import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 
 import java.nio.ByteBuffer;
@@ -42,10 +42,22 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String KEYWORD_ACCESSION = "KW-0005";
 
     @Autowired
-    private MockMvc mockMvc;
+    private KeywordRepository repository;
 
-    @Autowired
-    private DataStoreManager storeManager;
+    @Override
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.KEYWORD;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.keyword;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
 
     @Override
     protected void saveEntry() {
@@ -59,12 +71,7 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .keywordObj(getKeywordBinary(keywordEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.KEYWORD, document);
-    }
-
-    @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.KEYWORD, document);
     }
 
     @Override

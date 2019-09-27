@@ -1,8 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,8 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -24,9 +27,12 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.cv.chebi.ChebiRepo;
+import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
@@ -37,10 +43,13 @@ import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
 import org.uniprot.core.uniprot.xdb.UniProtXDbType;
 import org.uniprot.core.uniprot.xdb.builder.UniProtDBCrossReferenceBuilder;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
-import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
-import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
+import org.uniprot.store.indexer.uniprot.mockers.*;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
+import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
@@ -50,10 +59,7 @@ import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniProtField;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -82,23 +88,60 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String ACCESSION_SP = "Q8DIA7";
 
     @Autowired
-    private DataStoreManager storeManager;
+    private UniprotQueryRepository repository;
 
-    @Autowired
-    private MockMvc mockMvc;
+    private UniProtKBStoreClient storeClient;
 
     @Autowired
     private UniprotFacetConfig facetConfig;
+
+    @BeforeAll
+    void initUniprotKbDataStore() {
+        DataStoreManager dsm = getStoreManager();
+        dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT,
+                new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+                        GoRelationsRepoMocker.getGoRelationRepo(),
+                        PathwayRepoMocker.getPathwayRepo(),
+                        Mockito.mock(ChebiRepo.class),
+                        Mockito.mock(ECRepo.class),
+                        new HashMap<>()));
+        dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
+        dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
+
+        storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
+                .getInstance("avro-uniprot"));
+        dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+    }
+
+    @AfterEach
+    void cleanStore() {
+        storeClient.truncate();
+    }
+
+    @Override
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.UNIPROT;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.uniprot;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
 
     @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:P21802&includeIsoform=invalid")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -114,16 +157,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:B4DFC2&fields=accession,gene_primary")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -140,16 +183,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:P21802&fields=accession,gene_primary")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -168,16 +211,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession_id:P21802-1&fields=accession,gene_primary")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -195,16 +238,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=gene:FGFR2&fields=accession,gene_primary&includeIsoform=true")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -221,16 +264,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:P21802&fields=accession,gene_primary&includeIsoform=true")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -247,16 +290,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=((gene:FGFR2) AND (is_isoform:true))&fields=accession,gene_primary")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -274,10 +317,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:" + acc + "&facets=reviewed")
                         .header(ACCEPT, APPLICATION_XML_VALUE));
 
@@ -292,13 +335,13 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     void searchForMergedInactiveEntriesAlsoReturnsActiveOne() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> mergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:Q14301&fields=accession,organism")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -313,13 +356,13 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> demergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=accession:Q00007&fields=accession,organism")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -337,13 +380,13 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     void searchForDeletedInactiveEntriesReturnItself() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> deletedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=mnemonic:I8FBX2_YERPE&fields=accession,organism")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -360,16 +403,16 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     void defaultSearchWithMatchedFields() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -386,10 +429,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     void badDefaultSearchWithMatchedFields() throws Exception {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=gene:Fibroblast&fields=accession,gene_primary&showMatchedFields=true")
                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -405,10 +448,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         // given
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
-        ResultActions response = mockMvc.perform(
+        ResultActions response = getMockMvc().perform(
                 get(SEARCH_RESOURCE + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
                         .header(ACCEPT, APPLICATION_XML_VALUE));
 
@@ -417,16 +460,6 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
                 .andExpect(content().string(containsString("Invalid content type received, 'application/xml'. Expected one of [application/json]")));
-    }
-
-    @Override
-    protected void cleanEntries() {
-        storeManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
-    }
-
-    @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
     }
 
     @Override
@@ -502,13 +535,13 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Override
     protected void saveEntry(SaveScenario saveContext) {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); //P21802
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP); //Q8DIA7
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM); //P21802-2
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext) || SaveScenario.SEARCH_ALL_RETURN_FIELDS
                 .equals(saveContext)) {
@@ -609,8 +642,8 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                                        .build())
                     .build();
 
-            storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
-            storeManager.saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
+            getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
+            getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
         }
     }
 
@@ -637,8 +670,8 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             .active()
                             .build();
 
-                    storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
-                    storeManager.saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
+                    getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
+                    getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
                 });
     }
 

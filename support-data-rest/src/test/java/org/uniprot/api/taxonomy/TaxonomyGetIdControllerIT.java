@@ -11,10 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.DataStoreTestConfig;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -23,13 +23,14 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.api.taxonomy.TaxonomyController;
+import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
 import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
 import org.uniprot.core.taxonomy.builder.TaxonomyInactiveReasonBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 import java.nio.ByteBuffer;
@@ -53,14 +54,21 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String MERGED_TAX_ID = "100";
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private TaxonomyRepository repository;
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.TAXONOMY;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.taxonomy;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -89,7 +97,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY,document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 
     @Test
@@ -133,7 +141,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 
     private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {

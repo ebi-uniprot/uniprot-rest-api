@@ -22,9 +22,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -63,12 +62,13 @@ class StoreStreamerIT {
                 .build();
     }
 
-    @Test
-    void canCreateSearchStoreStream() {
-        createSearchStoreStream(1, tupleStream(singletonList("a")));
-        assertThat(storeStreamer, is(notNullValue()));
-    }
-
+    /*
+        @Test
+        void canCreateSearchStoreStream() {
+            createSearchStoreStream(1, tupleStream(singletonList("a")));
+            assertThat(storeStreamer, is(notNullValue()));
+        }
+    */
     @Test
     void canTransformSourceStreamWithUnaryBatchSize() {
         createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));

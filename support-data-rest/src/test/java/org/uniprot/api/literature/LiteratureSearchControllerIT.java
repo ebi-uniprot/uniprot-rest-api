@@ -8,10 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.literature.LiteratureController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
+import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -30,6 +30,7 @@ import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
 import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.field.LiteratureField;
 import org.uniprot.store.search.field.SearchField;
@@ -58,22 +59,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
-
-    @Autowired
     private LiteratureFacetConfig facetConfig;
 
+    @Autowired
+    private LiteratureRepository repository;
+
     @Override
-    protected void cleanEntries() {
-        storeManager.cleanSolr(DataStoreManager.StoreType.LITERATURE);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.LITERATURE;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.literature;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -158,7 +161,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                 .literatureObj(getLiteratureBinary(entry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
     private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {

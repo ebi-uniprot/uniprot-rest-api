@@ -8,9 +8,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.literature.LiteratureController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -27,6 +27,7 @@ import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
 import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import java.nio.ByteBuffer;
@@ -49,10 +50,22 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final long PUBMED_ID = 100L;
 
     @Autowired
-    private MockMvc mockMvc;
+    private LiteratureRepository repository;
 
-    @Autowired
-    private DataStoreManager storeManager;
+    @Override
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.LITERATURE;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.literature;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
 
     @Override
     protected void saveEntry() {
@@ -73,12 +86,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .literatureObj(getLiteratureBinary(literatureEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
-    }
-
-    @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
     @Override

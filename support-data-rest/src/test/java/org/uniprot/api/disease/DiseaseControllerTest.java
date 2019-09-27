@@ -16,8 +16,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.disease.DiseaseController;
-import org.uniprot.api.disease.DiseaseService;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.CrossReference;

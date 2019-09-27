@@ -25,7 +25,6 @@ import org.uniprot.api.uniprotkb.repository.store.ResultsConfig;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
 import java.util.stream.Stream;
@@ -59,8 +58,6 @@ class UniProtKBDownloadIT {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private DataStoreManager storeManager;
 
     @MockBean
     private TupleStreamTemplate tupleStreamTemplate;
@@ -77,7 +74,6 @@ class UniProtKBDownloadIT {
     void canReachDownloadEndpoint() throws Exception {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         String acc = entry.getPrimaryAccession().getValue();
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry);
 
         mockStreamerResponseOf(entry);
 

@@ -8,8 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -23,6 +23,7 @@ import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 
 import java.nio.ByteBuffer;
@@ -41,10 +42,22 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
     private static final String SUBCELL_ACCESSION = "SL-0005";
 
     @Autowired
-    private MockMvc mockMvc;
+    private SubcellularLocationRepository repository;
 
-    @Autowired
-    private DataStoreManager storeManager;
+    @Override
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.SUBCELLULAR_LOCATION;
+    }
+
+    @Override
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.subcellularlocation;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
+    }
 
     @Override
     protected void saveEntry() {
@@ -59,12 +72,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                 .subcellularlocationObj(getSubcellularLocationBinary(subcellularLocationEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
-    }
-
-    @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
     }
 
     @Override

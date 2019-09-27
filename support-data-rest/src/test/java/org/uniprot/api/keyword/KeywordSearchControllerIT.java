@@ -8,9 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.keyword.KeywordController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -25,6 +24,7 @@ import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.field.KeywordField;
 import org.uniprot.store.search.field.SearchField;
@@ -50,19 +50,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private KeywordRepository repository;
 
     @Override
-    protected void cleanEntries() {
-        storeManager.cleanSolr(DataStoreManager.StoreType.KEYWORD);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.KEYWORD;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.keyword;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -137,7 +139,7 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                 .keywordObj(getKeywordBinary(keywordEntry))
                 .build();
 
-        storeManager.saveDocs(DataStoreManager.StoreType.KEYWORD, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.KEYWORD, document);
     }
 
     private ByteBuffer getKeywordBinary(KeywordEntry entry) {
