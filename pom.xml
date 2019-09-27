@@ -39,7 +39,7 @@
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 
         <!-- Test coverage -->
-        <jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+        <jacoco.outputDir>${project.basedir}/../target</jacoco.outputDir>
 
         <!-- Unit test report path -->
         <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
