@@ -3,16 +3,14 @@ package org.uniprot.api.disease;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.disease.DiseaseController;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -28,8 +26,8 @@ import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
-import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.field.DiseaseField;
 import org.uniprot.store.search.field.SearchField;
@@ -60,19 +58,21 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     private static List<String> SORTED_ACCESSIONS = new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private DataStoreManager storeManager;
+    private DiseaseRepository repository;
 
     @Override
-    protected void cleanEntries() {
-        this.storeManager.cleanSolr(DataStoreManager.StoreType.DISEASE);
+    protected DataStoreManager.StoreType getStoreType() {
+        return DataStoreManager.StoreType.DISEASE;
     }
 
     @Override
-    protected MockMvc getMockMvc() {
-        return mockMvc;
+    protected SolrCollection getSolrCollection() {
+        return SolrCollection.disease;
+    }
+
+    @Override
+    protected SolrQueryRepository getRepository() {
+        return repository;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i));
+        LongStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     private void saveEntry(String accession, long suffix) {
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation" + suffix, "KW-0991" + suffix);
-        CrossReference xref1 = new CrossReference("MIM" + suffix, "617140" + suffix, Arrays.asList("phenotype" + suffix));
+        CrossReference xref1 = new CrossReference("MIM" + suffix, "617140" + suffix, Collections.singletonList("phenotype" + suffix));
         CrossReference xref2 = new CrossReference("MedGen" + suffix, "CN238690" + suffix);
         CrossReference xref3 = new CrossReference("MeSH" + suffix, "D000015" + suffix);
         CrossReference xref4 = new CrossReference("MeSH" + suffix, "D008607" + suffix);
@@ -158,7 +158,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
         List<String> kwIds;
         if (diseaseEntry.getKeywords() != null) {
-            kwIds = diseaseEntry.getKeywords().stream().map(kw -> kw.getId()).collect(Collectors.toList());
+            kwIds = diseaseEntry.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();
         }
@@ -168,8 +168,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                 diseaseEntry.getAlternativeNames().stream())
                 .collect(Collectors.toList());
         // content is name + accession
-        List<String> content = new ArrayList<>();
-        content.addAll(name);
+        List<String> content = new ArrayList<>(name);
         content.add(diseaseEntry.getAccession());
         DiseaseDocument document = DiseaseDocument.builder()
                 .accession(accession)
@@ -179,7 +178,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                 .build();
 
 
-        this.storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, document);
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
     private ByteBuffer getDiseaseBinary(Disease entry) {
@@ -190,15 +189,13 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         }
     }
 
-    @Override
     @Test
-    protected void searchFacetsWithIncorrectValuesReturnBadRequest() {
+    void searchFacetsWithIncorrectValuesReturnBadRequest() {
         // do nothing.. disease doesn't have any facets
     }
 
-    @Override
     @Test
-    protected void searchCanSearchWithAllAvailableFacetsFields(){
+    void searchCanSearchWithAllAvailableFacetsFields(){
         // do nothing.. disease doesn't have any facets
     }
 

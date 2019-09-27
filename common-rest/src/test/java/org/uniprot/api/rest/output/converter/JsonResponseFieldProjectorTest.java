@@ -28,16 +28,16 @@ import java.util.stream.Stream;
 /**
  * @author sahmad
  */
-public class JsonResponseFieldProjectorTest {
+class JsonResponseFieldProjectorTest {
 
-    private JsonResponseFieldProjector fieldProjector = new JsonResponseFieldProjector();
+    private final JsonResponseFieldProjector fieldProjector = new JsonResponseFieldProjector();
     private Disease disease;
 
     @BeforeEach
     void setUp() {
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
-        CrossReference xref1 = new CrossReference("MIM", "617140", Arrays.asList("phenotype"));
+        CrossReference xref1 = new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
         CrossReference xref2 = new CrossReference("MedGen", "CN238690");
         CrossReference xref3 = new CrossReference("MeSH", "D000015");
         CrossReference xref4 = new CrossReference("MeSH", "D008607");

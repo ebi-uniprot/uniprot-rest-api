@@ -81,11 +81,11 @@ class ValidFacetsValidatorTest {
 
     static class FakeValidIncludeFacetsValidator extends ValidFacets.ValidIncludeFacetsValidator{
 
-        List<String> errorFields = new ArrayList<>();
+        final List<String> errorFields = new ArrayList<>();
 
         HttpServletRequest mockedRequest;
 
-        Collection<String> mockedFacetNames = new ArrayList<>();
+        final Collection<String> mockedFacetNames = new ArrayList<>();
 
         @Override
         void buildInvalidFacetNameMessage(String facetName, Collection<String> validNames, ConstraintValidatorContextImpl contextImpl) {

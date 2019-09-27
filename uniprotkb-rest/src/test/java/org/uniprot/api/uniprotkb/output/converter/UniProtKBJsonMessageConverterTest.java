@@ -7,12 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.uniprotkb.output.converter.UniProtKBJsonMessageConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,23 +31,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
  *
  * @author Edd
  */
-public class UniProtKBJsonMessageConverterTest {
+class UniProtKBJsonMessageConverterTest {
     private UniProtKBJsonMessageConverterTester converter;
     private ByteArrayOutputStream outputStream;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         converter = new UniProtKBJsonMessageConverterTester();
         outputStream = new ByteArrayOutputStream();
     }
 
     @Test
-    public void hasCorrectMediaType() {
+    void hasCorrectMediaType() {
         assertThat(converter.getSupportedMediaTypes(), is(singletonList(APPLICATION_JSON)));
     }
 
     @Test
-    public void beforeWritesCorrectlyWithoutFacets() throws IOException {
+    void beforeWritesCorrectlyWithoutFacets() throws IOException {
         // only interested in response being a valid JSON object (not actual entities written)
         MessageConverterContext<String> context = MessageConverterContext.<String>builder()
                 .build();
@@ -62,7 +61,7 @@ public class UniProtKBJsonMessageConverterTest {
     }
 
     @Test
-    public void beforeWritesCorrectlyWithFacets() throws IOException {
+    void beforeWritesCorrectlyWithFacets() throws IOException {
         // only interested in response being a valid JSON object (not actual entities written)
 
         // given

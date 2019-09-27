@@ -25,6 +25,8 @@ public class SolrQueryConverter{
             result = buildMatchAllDocsQuery();
         } else if (inputQuery instanceof WildcardQuery) {
             result = buildWildcardQuery((WildcardQuery) inputQuery);
+        } else if (inputQuery instanceof PrefixQuery) {
+            result = buildPrefixQuery((PrefixQuery) inputQuery);
         } else if (inputQuery instanceof TermRangeQuery) {
             result = buildTermRangeQuery((TermRangeQuery) inputQuery);
         } else if (inputQuery instanceof PhraseQuery) {
@@ -112,6 +114,14 @@ public class SolrQueryConverter{
                 .type("termQuery")
                 .field(termQuery.getTerm().field())
                 .value(termQuery.getTerm().text())
+                .build();
+    }
+
+    private static SolrJsonQuery buildPrefixQuery(PrefixQuery prefixQuery) {
+        return SolrJsonQuery.builder()
+                .type("prefixQuery")
+                .field(prefixQuery.getPrefix().field())
+                .value(prefixQuery.getPrefix().text() + "*")
                 .build();
     }
 }

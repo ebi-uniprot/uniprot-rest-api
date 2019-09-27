@@ -87,11 +87,11 @@ class ContentTypeValidatorTest {
     }
 
     static class FakeContentTypeValidator extends ValidContentTypes.ContentTypesValidator {
-        List<String> errorFields = new ArrayList<>();
+        final List<String> errorFields = new ArrayList<>();
 
         HttpServletRequest mockedRequest;
 
-        Collection<String> mockedValidContentTypes = new ArrayList<>();
+        final Collection<String> mockedValidContentTypes = new ArrayList<>();
 
         @Override
         void buildUnsupportedContentTypeErrorMessage(String contentType, ConstraintValidatorContextImpl contextImpl) {

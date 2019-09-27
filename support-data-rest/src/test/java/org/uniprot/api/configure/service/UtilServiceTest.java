@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class UtilServiceTest {
 
-    private UtilService service = new UtilService();
+    private final UtilService service = new UtilService();
 
     @Test
     void convertValidQuery() {

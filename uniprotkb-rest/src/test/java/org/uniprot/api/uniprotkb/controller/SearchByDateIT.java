@@ -1,45 +1,59 @@
 package org.uniprot.api.uniprotkb.controller;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.cv.chebi.ChebiRepo;
+import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
+import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.field.UniProtField;
 
-@RunWith(SpringRunner.class)
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-public class SearchByDateIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SearchByDateIT {
 	  private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 	  private static final String UNIPROT_FLAT_FILE_ENTRY_PATH = "/it/P0A377.43.dat";
 	    private static final String DT_LINE =
@@ -69,21 +83,42 @@ public class SearchByDateIT {
 	    private static final String UPDATE_DATE_BST = "02-APR-2014";
 	    private static final String ACC_LINE = "AC   %s;";
 	    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	    
-	    @Autowired
-	    private  DataStoreManager storeManager;
 
-	    @Autowired
-	    private  WebApplicationContext webApplicationContext;
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
 
-	    private static MockMvc mockMvc;
+    @Autowired
+    private UniprotQueryRepository repository;
 
-	    @Before
-	    public  void setUp() throws IOException {
-	        mockMvc = MockMvcBuilders.
-	                webAppContextSetup(webApplicationContext)
-	                .build();
-	        
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
+
+    @BeforeAll
+	    void setUp() throws IOException {
+        mockMvc = MockMvcBuilders.
+                webAppContextSetup(webApplicationContext)
+                .build();
+
+        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
+        template.afterPropertiesSet();
+        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+                GoRelationsRepoMocker.getGoRelationRepo(),
+                PathwayRepoMocker.getPathwayRepo(),
+                Mockito.mock(ChebiRepo.class),
+                Mockito.mock(ECRepo.class),
+                new HashMap<>());
+
+        storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
+
+        UniProtKBStoreClient storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
+                .getInstance("avro-uniprot"));
+        storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+
 	        InputStream resourceAsStream = TestUtils.getResourceAsStream(UNIPROT_FLAT_FILE_ENTRY_PATH);
 	        UniProtEntryObjectProxy entryProxy = UniProtEntryObjectProxy.createEntryFromInputStream(resourceAsStream);
 
@@ -137,7 +172,7 @@ public class SearchByDateIT {
 	    	return sb.toString();
 	    }
 	    @Test
-	    public void searchForCreatedBefore30SEP1989Returns0Documents() throws Exception {
+	    void searchForCreatedBefore30SEP1989Returns0Documents() throws Exception {
 	       
 	        LocalDate creationDate = LocalDate.of(1989, 9, 30);
 	
@@ -168,7 +203,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForCreatedBefore01OCT1989Returns1Document() throws Exception {
+	    void searchForCreatedBefore01OCT1989Returns1Document() throws Exception {
 	        LocalDate creationDate =  LocalDate.of(1989, 10, 1);
 	        String query = buildQuery(UniProtField.Search.created.name(),
 	        		"*", false, creationDate.atStartOfDay().format(DATE_FORMAT), false);
@@ -177,7 +212,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForCreatedBefore15MAR1999Returns2Documents() throws Exception {
+	    void searchForCreatedBefore15MAR1999Returns2Documents() throws Exception {
 	    	   LocalDate creationDate =  LocalDate.of(1999, 3, 15);
 	    	   String query = buildQuery(UniProtField.Search.created.name(),
 		        		"*", false, creationDate.atStartOfDay().format(DATE_FORMAT), false);
@@ -186,7 +221,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForUpdatedBefore26OCT2004Returns0Documents() throws Exception {
+	    void searchForUpdatedBefore26OCT2004Returns0Documents() throws Exception {
 	    	  LocalDate updateDate =  LocalDate.of(2004, 10, 26);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  "*", false, updateDate.atStartOfDay().format(DATE_FORMAT), false);
@@ -196,7 +231,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForUpdatedBefore27OCT2004Returns1Documents() throws Exception {
+	    void searchForUpdatedBefore27OCT2004Returns1Documents() throws Exception {
 	    	 LocalDate updateDate =  LocalDate.of(2004, 10, 27);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			 "*" , false, updateDate.atStartOfDay().format(DATE_FORMAT), false);
@@ -205,7 +240,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForUpdatedBefore08FEB2006Returns2Documents() throws Exception {
+	    void searchForUpdatedBefore08FEB2006Returns2Documents() throws Exception {
 	        LocalDate updateDate =  LocalDate.of(2006, 2, 8);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			 "*" , false, updateDate.atStartOfDay().format(DATE_FORMAT), false);	    	  
@@ -213,7 +248,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForCreatedAfter31MAR2014Returns1Document() throws Exception {
+	    void searchForCreatedAfter31MAR2014Returns1Document() throws Exception {
 	    	
 	    	 LocalDate creationDate =  LocalDate.of(2014, 3, 30);
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
@@ -224,7 +259,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForCreatedAfter30JUL2003Returns3Documents() throws Exception {
+	    void searchForCreatedAfter30JUL2003Returns3Documents() throws Exception {
 	    	LocalDate creationDate =  LocalDate.of(2003, 7, 29);
 	    	  String query = buildQuery(UniProtField.Search.created.name(), 
 	    			  creationDate.atStartOfDay().format(DATE_FORMAT), false,  "*", false);	    	  
@@ -232,7 +267,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForCreatedAfter15MAR1999Returns2Documents() throws Exception {
+	    void searchForCreatedAfter15MAR1999Returns2Documents() throws Exception {
 	    	
 	    	LocalDate creationDate =  LocalDate.of(1999, 3, 15);
 	    	  String query = buildQuery(UniProtField.Search.created.name(),
@@ -243,7 +278,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForUpdatedAfter02APR2014Returns3Documents() throws Exception {
+	    void searchForUpdatedAfter02APR2014Returns3Documents() throws Exception {
 	    	LocalDate updateDate =  LocalDate.of(2014, 4, 1);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  updateDate.atStartOfDay().format(DATE_FORMAT), true, "*" , true);	    	  
@@ -251,7 +286,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForUpdatedAfter01JAN2013Returns3Documents() throws Exception {
+	    void searchForUpdatedAfter01JAN2013Returns3Documents() throws Exception {
 	    	LocalDate updateDate =  LocalDate.of(2012, 12, 31);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  updateDate.atStartOfDay().format(DATE_FORMAT) , true, "*", true);	    	  
@@ -259,7 +294,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchForUpdatedAfter07FEB2006Returns4Documents() throws Exception {
+	    void searchForUpdatedAfter07FEB2006Returns4Documents() throws Exception {
 	    	LocalDate updateDate =  LocalDate.of(2006, 2, 6);
 	    	  String query = buildQuery(UniProtField.Search.modified.name(),
 	    			  updateDate.atStartOfDay().format(DATE_FORMAT) , true, "*", true);	    	  
@@ -267,7 +302,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchCreationBetween20FEB1979And10Dec1979Returns0Documents() throws Exception {
+	    void searchCreationBetween20FEB1979And10Dec1979Returns0Documents() throws Exception {
 	    	LocalDate startDate = LocalDate.of(1979, 2, 20);
 	    	LocalDate endDate = LocalDate.of(1979, 12, 10);
 
@@ -279,7 +314,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void createdBetween01JAN1989And01JAN2000ReturnsEntry1And3() throws Exception {
+	    void createdBetween01JAN1989And01JAN2000ReturnsEntry1And3() throws Exception {
 	    	LocalDate startDate = LocalDate.of(1989, 1, 1);
 	    	LocalDate endDate = LocalDate.of(2000, 1, 1);
 
@@ -292,7 +327,7 @@ public class SearchByDateIT {
 
 	    
 	    @Test
-	    public void searchUpdateBetween20FEB1979And10Dec1979Returns0Documents() throws Exception {
+	    void searchUpdateBetween20FEB1979And10Dec1979Returns0Documents() throws Exception {
 	    	LocalDate startDate = LocalDate.of(1979, 2, 20);
 	    	LocalDate endDate = LocalDate.of(1979, 12, 10);
 
@@ -305,7 +340,7 @@ public class SearchByDateIT {
 	  
 	    
 	    @Test
-	    public void updatedBetween01JAN2004And01JAN2006ReturnsEntry1And3() throws Exception {
+	    void updatedBetween01JAN2004And01JAN2006ReturnsEntry1And3() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2004, 1, 1);
 	    	LocalDate endDate = LocalDate.of(2006, 12, 1);
 
@@ -320,7 +355,7 @@ public class SearchByDateIT {
 	     * Entry created:   29 March 2014, therefore this date is GMT
 	     */
 	    @Test
-	    public void searchExplicitGMTEntryTestUpperBound() throws Exception {
+	    void searchExplicitGMTEntryTestUpperBound() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 28);
 	    	LocalDate endDate = LocalDate.of(2014, 3, 29);
 
@@ -331,7 +366,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchExplicitGMTEntryTestExactDay() throws Exception {
+	    void searchExplicitGMTEntryTestExactDay() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 29);
 	    	LocalDate endDate = LocalDate.of(2014, 3, 29);
 
@@ -343,7 +378,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchExplicitGMTEntryTestOver() throws Exception {
+	    void searchExplicitGMTEntryTestOver() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 28);
 	    	LocalDate endDate = LocalDate.of(2014, 3, 30);
 
@@ -354,7 +389,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchExplicitGMTEntryTestLowerBound() throws Exception {
+	    void searchExplicitGMTEntryTestLowerBound() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 29);
 	    	LocalDate endDate = LocalDate.of(2014, 3, 30);
 
@@ -371,7 +406,7 @@ public class SearchByDateIT {
 	     * Entry created:   31 March 2014, therefore this date is GMT
 	     */
 	    @Test
-	    public void searchExplicitBSTEntryTestUpperBound() throws Exception {
+	    void searchExplicitBSTEntryTestUpperBound() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 30);
 	    	LocalDate endDate = LocalDate.of(2014, 3, 31);
 
@@ -382,7 +417,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchExplicitBSTEntryTestExactDay() throws Exception {
+	    void searchExplicitBSTEntryTestExactDay() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 30);
 	    	LocalDate endDate = LocalDate.of(2014, 3, 31);
 
@@ -393,7 +428,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchExplicitBSTEntryTestOver() throws Exception {
+	    void searchExplicitBSTEntryTestOver() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 30);
 	    	LocalDate endDate = LocalDate.of(2014, 4, 1);
 
@@ -404,7 +439,7 @@ public class SearchByDateIT {
 	    }
 
 	    @Test
-	    public void searchExplicitBSTEntryTestLowerBound() throws Exception {
+	    void searchExplicitBSTEntryTestLowerBound() throws Exception {
 	    	LocalDate startDate = LocalDate.of(2014, 3, 30);
 	    	LocalDate endDate = LocalDate.of(2014, 4, 1);
 

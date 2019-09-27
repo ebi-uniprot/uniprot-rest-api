@@ -1,21 +1,19 @@
 package org.uniprot.api.subcell.output.converter;
 
-import org.junit.jupiter.api.Test;
-import org.obolibrary.oboformat.model.Frame;
-import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.uniprot.core.cv.impl.SubcellularLocationFileReader;
-import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.writer.OBOFormatWriter;
+import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.core.cv.subcell.SubcellularLocationFileReader;
 
 /**
  * @author lgonzales

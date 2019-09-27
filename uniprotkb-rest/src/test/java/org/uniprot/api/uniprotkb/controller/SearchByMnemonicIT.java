@@ -1,25 +1,41 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.cv.chebi.ChebiRepo;
+import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.flatfile.writer.LineType;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
+import org.uniprot.store.search.SolrCollection;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -30,11 +46,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
-public class SearchByMnemonicIT {
-    public static final String ACC_LINE = "AC   %s;";
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SearchByMnemonicIT {
+    private static final String ACC_LINE = "AC   %s;";
     private static final String UNIPROT_FLAT_FILE_ENTRY_PATH = "/it/P0A377.43.dat";
     private static final String TARGET_ACCESSION = "Q197F5";
     private static final String TARGET_ID = "CYC_HUMAN";
@@ -42,19 +59,40 @@ public class SearchByMnemonicIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
+
     @Autowired
-    private DataStoreManager storeManager;
+    private UniprotQueryRepository repository;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private static MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeAll
+    void setUp() throws IOException {
         mockMvc = MockMvcBuilders.
                 webAppContextSetup(webApplicationContext)
                 .build();
+
+        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
+        template.afterPropertiesSet();
+        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
+                GoRelationsRepoMocker.getGoRelationRepo(),
+                PathwayRepoMocker.getPathwayRepo(),
+                Mockito.mock(ChebiRepo.class),
+                Mockito.mock(ECRepo.class),
+                new HashMap<>());
+
+        storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
+
+        UniProtKBStoreClient storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
+                .getInstance("avro-uniprot"));
+        storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
         InputStream resourceAsStream = TestUtils.getResourceAsStream(UNIPROT_FLAT_FILE_ENTRY_PATH);
         UniProtEntryObjectProxy entryProxy = UniProtEntryObjectProxy.createEntryFromInputStream(resourceAsStream);
 
@@ -75,7 +113,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpoint() throws Exception {
+    void canReachSearchEndpoint() throws Exception {
 
         // when
         ResultActions response = mockMvc.perform(
@@ -91,7 +129,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpointMixCase() throws Exception {
+    void canReachSearchEndpointMixCase() throws Exception {
 
         // when
         ResultActions response = mockMvc.perform(
@@ -107,7 +145,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpointWithDefault() throws Exception {
+    void canReachSearchEndpointWithDefault() throws Exception {
     
        // when
        ResultActions response = mockMvc.perform(
@@ -123,7 +161,7 @@ public class SearchByMnemonicIT {
     }
 
     @Test
-    public void canReachSearchEndpointPartNotAvailable() throws Exception {
+    void canReachSearchEndpointPartNotAvailable() throws Exception {
 
         // when
         ResultActions response = mockMvc.perform(

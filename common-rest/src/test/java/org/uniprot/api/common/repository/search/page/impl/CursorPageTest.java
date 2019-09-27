@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class CursorPageTest {
 
-    private static UriComponentsBuilder uriBuilder =  UriComponentsBuilder.fromHttpUrl("http://localhost/test");
+    private static final UriComponentsBuilder uriBuilder =  UriComponentsBuilder.fromHttpUrl("http://localhost/test");
 
     @Test
     void firstPageOnlyShouldNotHaveNextLink() {

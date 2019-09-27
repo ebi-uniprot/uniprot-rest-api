@@ -220,8 +220,6 @@ class SolrRequestConverterTest {
                 .build();
 
         // when
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> {
-            converter.toQuery(request);
-        });
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> converter.toQuery(request));
     }
 }
