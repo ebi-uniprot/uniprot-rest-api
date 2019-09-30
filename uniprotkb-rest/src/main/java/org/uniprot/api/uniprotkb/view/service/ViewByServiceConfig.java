@@ -28,11 +28,13 @@ public class ViewByServiceConfig {
 
     @Bean
     public ECRepo ecService() {
+        // TODO: 30/09/19 needs to read from a property
         return ECRepoFactory.get("");
     }
 
     @Bean
     public UniPathwayService pathwayService() {
+        // TODO: 30/09/19 should be read from a property, not a hardcoded path
         return new UniPathwayServiceImpl(UNIPATHWAY_TXT);
     }
 
