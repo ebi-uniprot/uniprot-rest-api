@@ -27,7 +27,7 @@ class CursorPageTest {
 
         page.setNextCursor(
                 "nextCursor"); // solr will always have a next cursor, even for single search
-                               // page...
+        // page...
         String nextCursor = page.getEncryptedNextCursor();
         assertThat(nextCursor, CoreMatchers.is("ahtuei6gxf98bwdgsi9e"));
 

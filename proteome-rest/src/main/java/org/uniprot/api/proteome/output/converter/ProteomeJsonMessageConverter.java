@@ -26,6 +26,6 @@ public class ProteomeJsonMessageConverter extends JsonMessageConverter<ProteomeE
     @Override
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
         return new HashMap<>(); // TODO: Filters are not being applied for proteome entry in JSON
-                                // FORMAT.....
+        // FORMAT.....
     }
 }

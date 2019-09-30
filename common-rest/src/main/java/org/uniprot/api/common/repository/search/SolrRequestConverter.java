@@ -51,7 +51,7 @@ public class SolrRequestConverter {
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
-        if (nonNull(request.getQueryBoosts())) {
+        if (notNull(request.getQueryBoosts())) {
             setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
         }
 
@@ -92,7 +92,7 @@ public class SolrRequestConverter {
             for (String facetName : request.getFacets()) {
                 FacetProperty facetProperty =
                         request.getFacetConfig().getFacetPropertyMap().get(facetName);
-                if (Utils.notEmpty(facetProperty.getInterval())) {
+                if (Utils.notNullOrEmpty(facetProperty.getInterval())) {
                     throw new UnsupportedOperationException(
                             "Interval facets are not supported by Spring Data Solr");
                 }
@@ -152,7 +152,7 @@ public class SolrRequestConverter {
 
             for (String facetName : facets) {
                 FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facetName);
-                if (Utils.notEmpty(facetProperty.getInterval())) {
+                if (Utils.notNullOrEmpty(facetProperty.getInterval())) {
                     String[] facetIntervals =
                             facetProperty.getInterval().values().toArray(new String[0]);
                     solrQuery.addIntervalFacets(facetName, facetIntervals);
@@ -180,7 +180,7 @@ public class SolrRequestConverter {
         }
 
         static void setSort(SolrQuery solrQuery, Sort sort) {
-            if (nonNull(sort)) {
+            if (notNull(sort)) {
                 for (Sort.Order order : sort) {
                     solrQuery.addSort(
                             order.getProperty(),
@@ -193,7 +193,7 @@ public class SolrRequestConverter {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries
-                if (notEmpty(boosts.getAdvancedSearchBoosts())) {
+                if (notNullOrEmpty(boosts.getAdvancedSearchBoosts())) {
                     boosts.getAdvancedSearchBoosts()
                             .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
                 }
@@ -202,7 +202,7 @@ public class SolrRequestConverter {
                 }
             } else {
                 // a default query
-                if (notEmpty(boosts.getDefaultSearchBoosts())) {
+                if (notNullOrEmpty(boosts.getDefaultSearchBoosts())) {
                     // replace all occurrences of "{query}" with X, given that q=X
                     boosts.getDefaultSearchBoosts().stream()
                             .map(boost -> boost.replaceAll("\\{query\\}", "(" + query + ")"))

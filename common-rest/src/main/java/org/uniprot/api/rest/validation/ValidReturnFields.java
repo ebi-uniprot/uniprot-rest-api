@@ -64,7 +64,7 @@ public @interface ValidReturnFields {
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if (Utils.notEmpty(value)) {
+            if (Utils.notNullOrEmpty(value)) {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
                 String[] fieldList = value.split("\\s*,\\s*");

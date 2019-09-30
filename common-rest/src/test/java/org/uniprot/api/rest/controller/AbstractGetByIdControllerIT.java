@@ -130,7 +130,7 @@ public abstract class AbstractGetByIdControllerIT {
     @Test
     void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
         assertThat(idParameter, notNullValue());
-        if (Utils.notEmpty(idParameter.getFields())) {
+        if (Utils.notNullOrEmpty(idParameter.getFields())) {
 
             checkParameterInput(idParameter);
 
@@ -164,7 +164,7 @@ public abstract class AbstractGetByIdControllerIT {
 
     @Test
     void withInvalidFilterFieldsReturnBadRequest(GetIdParameter idParameter) throws Exception {
-        if (Utils.notEmpty(idParameter.getFields())) {
+        if (Utils.notNullOrEmpty(idParameter.getFields())) {
 
             checkParameterInput(idParameter);
 

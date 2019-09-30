@@ -27,7 +27,7 @@ public class SubcellularLocationEntryFilter {
     public static SubcellularLocationEntry filterEntry(
             SubcellularLocationEntry entry, List<String> fields) {
         SubcellularLocationEntryImpl entryImpl = (SubcellularLocationEntryImpl) entry;
-        if (Utils.notEmpty(fields)) {
+        if (Utils.notNullOrEmpty(fields)) {
             for (SubcellularLocationField.ResultFields field :
                     SubcellularLocationField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {

@@ -71,7 +71,7 @@ public abstract class SolrQueryRepository<T> {
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
             List<Facet> facets = new ArrayList<>();
-            if (Utils.nonNull(facetConverter)) {
+            if (Utils.notNull(facetConverter)) {
                 facets = facetConverter.convert(solrResponse);
             }
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);

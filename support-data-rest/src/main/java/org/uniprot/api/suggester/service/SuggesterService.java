@@ -1,6 +1,6 @@
 package org.uniprot.api.suggester.service;
 
-import static org.uniprot.core.util.Utils.notEmpty;
+import static org.uniprot.core.util.Utils.notNullOrEmpty;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -83,7 +83,7 @@ public class SuggesterService {
                 .map(
                         doc -> {
                             String value = doc.value;
-                            if (notEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
+                            if (notNullOrEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
                                 StringJoiner joiner = new StringJoiner("/", " (", ")");
                                 doc.altValues.forEach(joiner::add);
                                 value += joiner.toString();

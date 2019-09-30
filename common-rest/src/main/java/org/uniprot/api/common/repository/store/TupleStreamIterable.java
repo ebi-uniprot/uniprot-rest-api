@@ -64,9 +64,8 @@ class TupleStreamIterable implements Iterable<String> {
             @Override
             public String next() {
                 if (!atEnd
-                        && next
-                                != current) { // hasNext has already retrieved the next element, to
-                                              // see if it exists
+                        && next != current) { // hasNext has already retrieved the next element, to
+                    // see if it exists
                     current = next;
                 } else {
                     current = nextTupleFromStream();

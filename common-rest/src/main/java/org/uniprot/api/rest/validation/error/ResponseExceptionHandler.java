@@ -1,7 +1,7 @@
 package org.uniprot.api.rest.validation.error;
 
 import static java.util.Collections.singletonList;
-import static org.uniprot.core.util.Utils.notEmpty;
+import static org.uniprot.core.util.Utils.notNullOrEmpty;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -216,7 +216,7 @@ public class ResponseExceptionHandler {
     private MediaType getContentTypeFromRequest(HttpServletRequest request) {
         MediaType result = MediaType.APPLICATION_JSON;
         String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        if (notEmpty(acceptHeader)) {
+        if (notNullOrEmpty(acceptHeader)) {
             result = MediaType.valueOf(acceptHeader);
         }
         return result;

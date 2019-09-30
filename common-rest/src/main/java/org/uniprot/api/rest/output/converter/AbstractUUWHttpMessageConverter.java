@@ -56,7 +56,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         boolean result = false;
         if (this.canWrite(mediaType)
                 && MessageConverterContext.class.isAssignableFrom(clazz)
-                && Utils.nonNull(type)) {
+                && Utils.notNull(type)) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             String typeClassName = parameterizedType.getActualTypeArguments()[0].getTypeName();
             result = typeClassName.equals(messageConverterEntryClass.getName());

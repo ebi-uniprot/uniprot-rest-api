@@ -28,19 +28,19 @@ public interface SearchRequest {
     int getSize();
 
     default boolean hasFields() {
-        return Utils.notEmpty(getFields());
+        return Utils.notNullOrEmpty(getFields());
     }
 
     default boolean hasSort() {
-        return Utils.notEmpty(getSort());
+        return Utils.notNullOrEmpty(getSort());
     }
 
     default boolean hasCursor() {
-        return Utils.notEmpty(getCursor());
+        return Utils.notNullOrEmpty(getCursor());
     }
 
     default boolean hasFacets() {
-        return Utils.notEmpty(getFacets());
+        return Utils.notNullOrEmpty(getFacets());
     }
 
     default SimpleQuery getSimpleQuery() {

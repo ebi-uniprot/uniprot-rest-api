@@ -110,9 +110,8 @@ class JsonResponseFieldProjectorTest {
     }
 
     @Test
-    void
-            testProjectFewValidOneInvalidFields() { // it should ignore invalid fields and return
-                                                    // only valid fields
+    void testProjectFewValidOneInvalidFields() { // it should ignore invalid fields and return
+        // only valid fields
         List<String> returnFields =
                 Stream.of("id", "invalid_field_name", "unreviewed_protein_count")
                         .collect(Collectors.toList());

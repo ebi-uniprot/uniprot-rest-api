@@ -1,6 +1,6 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.core.util.Utils.nonNull;
+import static org.uniprot.core.util.Utils.notNull;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ public class QueryBoostsFileReader {
     private void initialiseBoosts() {
         log.info("Loading boosts ...");
         InputStream resourceAsStream = getClass().getResourceAsStream(boostsResourceLocation);
-        if (nonNull(resourceAsStream)) {
+        if (notNull(resourceAsStream)) {
 
             Stream<String> lines =
                     new BufferedReader(new InputStreamReader(resourceAsStream)).lines();

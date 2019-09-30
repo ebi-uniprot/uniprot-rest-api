@@ -170,7 +170,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                         .getInactiveReason()
                         .getInactiveReasonType()
                         .equals(InactiveReasonType.MERGED)
-                && Utils.notEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
+                && Utils.notNullOrEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
     }
 
     private void setPreviewInfo(SearchRequestDTO searchRequest, boolean preview) {

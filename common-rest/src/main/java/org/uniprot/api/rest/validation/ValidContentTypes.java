@@ -66,7 +66,7 @@ public @interface ValidContentTypes {
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if (Utils.notEmpty(value)) {
+            if (Utils.notNullOrEmpty(value)) {
                 // validate if the accept is for application/json
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;

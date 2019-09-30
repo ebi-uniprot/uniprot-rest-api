@@ -22,10 +22,10 @@ public class TermInfoConverter implements Converter<QueryResponse, List<TermInfo
     public List<TermInfo> convert(QueryResponse queryResponse) {
         TermsResponse termsResponse = queryResponse.getTermsResponse();
 
-        if (Utils.nonNull(termsResponse)) {
+        if (Utils.notNull(termsResponse)) {
             return termsResponse.getTermMap().entrySet().stream()
                     .map(this::termEntryToTermInfo)
-                    .filter(Utils::nonNull)
+                    .filter(Utils::notNull)
                     .collect(Collectors.toList());
         } else {
             return emptyList();

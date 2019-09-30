@@ -26,7 +26,7 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
         frame.addClause(getIdClause(diseaseEntry));
         frame.addClause(getNameClause(diseaseEntry));
 
-        if (Utils.notEmpty(diseaseEntry.getAlternativeNames())) {
+        if (Utils.notNullOrEmpty(diseaseEntry.getAlternativeNames())) {
             for (String syn : diseaseEntry.getAlternativeNames()) {
                 frame.addClause(getSynonymClause(syn));
             }
@@ -73,7 +73,7 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
     public Clause getXRefClause(CrossReference crossRef) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_XREF);
         Xref xref = new Xref(crossRef.getDatabaseType() + ":" + crossRef.getId());
-        if (Utils.notEmpty(crossRef.getProperties())) {
+        if (Utils.notNullOrEmpty(crossRef.getProperties())) {
             xref.setAnnotation(crossRef.getProperties().get(0));
         }
         clause.setValues(Collections.singletonList(xref));

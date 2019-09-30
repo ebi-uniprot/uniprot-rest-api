@@ -83,6 +83,6 @@ public class SearchRequestDTO {
     }
 
     public boolean hasFacets() {
-        return Utils.notEmpty(facets);
+        return Utils.notNullOrEmpty(facets);
     }
 }

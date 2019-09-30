@@ -28,9 +28,9 @@ public class JsonResponseFieldProjector {
         Map<String, List<String>>
                 camelCaseFieldNameValuesMap; // map to keep java field name with its values if any
 
-        if (!Utils.notEmpty(
+        if (!Utils.notNullOrEmpty(
                 filterFieldMap)) { // if the filter field map is empty return all fields from
-                                   // allFields
+            // allFields
             camelCaseFieldNameValuesMap =
                     allFields.stream()
                             .filter(f -> f.getJavaFieldName() != null)
@@ -78,9 +78,8 @@ public class JsonResponseFieldProjector {
         for (Map.Entry<String, List<String>> entry : camelCaseFieldNameValuesMap.entrySet()) {
             String javaFieldName = entry.getKey();
             List<String> values =
-                    entry
-                            .getValue(); // values to be returned e.g. comment with type function
-                                         // and domain
+                    entry.getValue(); // values to be returned e.g. comment with type function
+            // and domain
             Object fieldValue = getFieldValue(source, javaFieldName, values);
             if (fieldValue != null) {
                 target.put(javaFieldName, fieldValue);
@@ -128,10 +127,10 @@ public class JsonResponseFieldProjector {
     }
 
     private Object getObjectsWithValues(Object fieldValue, List<String> neededFieldValues) {
-        if (Utils.notEmpty(neededFieldValues)
+        if (Utils.notNullOrEmpty(neededFieldValues)
                 && fieldValue != null
                 && fieldValue instanceof List<?>
-                && Utils.notEmpty((List<?>) fieldValue)) {
+                && Utils.notNullOrEmpty((List<?>) fieldValue)) {
             // comment
             if (((List<?>) fieldValue).get(0)
                     instanceof Comment) { // check one to decide the type of list items

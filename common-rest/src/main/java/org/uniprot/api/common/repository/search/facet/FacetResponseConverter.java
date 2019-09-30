@@ -36,13 +36,13 @@ public class FacetResponseConverter implements Converter<QueryResponse, List<Fac
     @Override
     public List<Facet> convert(QueryResponse queryResponse) {
         List<Facet> facetResult = new ArrayList<>();
-        if (Utils.notEmpty(queryResponse.getFacetFields())) {
+        if (Utils.notNullOrEmpty(queryResponse.getFacetFields())) {
             for (FacetField facetField : queryResponse.getFacetFields()) {
                 // Iterating over all Query response Facets
                 facetResult.add(convertFieldFacets(facetField));
             }
         }
-        if (Utils.notEmpty(queryResponse.getIntervalFacets())) {
+        if (Utils.notNullOrEmpty(queryResponse.getIntervalFacets())) {
             for (IntervalFacet intervalFacet : queryResponse.getIntervalFacets()) {
                 facetResult.add(convertIntervalFacets(intervalFacet));
             }
@@ -60,7 +60,7 @@ public class FacetResponseConverter implements Converter<QueryResponse, List<Fac
     private Facet convertIntervalFacets(IntervalFacet intervalFacet) {
         // Iterating over all Query response Interval Facets
         List<FacetItem> values = new ArrayList<>();
-        if (Utils.notEmpty(intervalFacet.getIntervals())) {
+        if (Utils.notNullOrEmpty(intervalFacet.getIntervals())) {
             for (IntervalFacet.Count count : intervalFacet.getIntervals()) {
                 // Iterating over all query response interval facet items
                 if (count != null) {
@@ -95,7 +95,7 @@ public class FacetResponseConverter implements Converter<QueryResponse, List<Fac
      */
     private Facet convertFieldFacets(FacetField facetField) {
         List<FacetItem> values = new ArrayList<>();
-        if (Utils.notEmpty(facetField.getValues())) {
+        if (Utils.notNullOrEmpty(facetField.getValues())) {
             for (FacetField.Count count : facetField.getValues()) {
                 // Iterating over all query response facet items
                 if (count != null) {

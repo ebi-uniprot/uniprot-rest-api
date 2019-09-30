@@ -136,9 +136,8 @@ public class TupleStreamTemplate {
         if (streamContext == null) {
             StreamContext streamContext = new StreamContext();
             streamContext.workerID =
-                    collection
-                            .hashCode(); // this should be the same for each collection, so that
-                                         // they share client caches
+                    collection.hashCode(); // this should be the same for each collection, so that
+            // they share client caches
             streamContext.numWorkers = 1;
             SolrClientCache solrClientCache = new SolrClientCache(httpClient);
             solrClientCache.getCloudSolrClient(zookeeperHost);

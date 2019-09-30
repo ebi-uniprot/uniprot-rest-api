@@ -24,7 +24,7 @@ public class TaxonomyEntryFilter {
     }
 
     public static TaxonomyEntry filterEntry(TaxonomyEntry entry, List<String> fields) {
-        if (Utils.notEmpty(fields)) {
+        if (Utils.notNullOrEmpty(fields)) {
             TaxonomyEntryBuilder builder = new TaxonomyEntryBuilder().from(entry);
             builder.hidden(null);
             builder.active(null);
