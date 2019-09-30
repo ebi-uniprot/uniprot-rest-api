@@ -1,13 +1,14 @@
 package org.uniprot.api.rest.output.context;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import lombok.Builder;
 import lombok.Data;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.term.TermInfo;
-
-import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Created 07/09/18
@@ -18,8 +19,7 @@ import java.util.stream.Stream;
 @Data
 public class MessageConverterContext<T> {
     public static final FileType DEFAULT_FILE_TYPE = FileType.FILE;
-    @Builder.Default
-    private FileType fileType = DEFAULT_FILE_TYPE;
+    @Builder.Default private FileType fileType = DEFAULT_FILE_TYPE;
     private MediaType contentType;
     private Stream<T> entities;
     private Stream<String> entityIds;

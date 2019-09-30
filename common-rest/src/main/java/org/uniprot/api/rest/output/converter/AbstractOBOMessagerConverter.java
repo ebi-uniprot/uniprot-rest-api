@@ -1,5 +1,8 @@
 package org.uniprot.api.rest.output.converter;
 
+import java.io.*;
+import java.util.Date;
+
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
@@ -7,11 +10,8 @@ import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
-import java.io.*;
-import java.util.Date;
-
-
-public abstract class AbstractOBOMessagerConverter<T> extends AbstractEntityHttpMessageConverter<T> {
+public abstract class AbstractOBOMessagerConverter<T>
+        extends AbstractEntityHttpMessageConverter<T> {
 
     private final OBOFormatWriter oboFormatWriter;
 
@@ -20,19 +20,28 @@ public abstract class AbstractOBOMessagerConverter<T> extends AbstractEntityHttp
         this.oboFormatWriter = new OBOFormatWriter();
     }
 
-    abstract protected Frame getTermFrame(T entity);
-    abstract protected String getHeaderNamespace();
+    protected abstract Frame getTermFrame(T entity);
 
-    public Frame getHeaderFrame(){
+    protected abstract String getHeaderNamespace();
+
+    public Frame getHeaderFrame() {
         Frame headerFrame = new Frame(Frame.FrameType.HEADER);
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_FORMAT_VERSION, "1.2"));
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_DATE, OBOFormatConstants.headerDateFormat().format(new Date())));
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_DEFAULT_NAMESPACE, getHeaderNamespace()));
+        headerFrame.addClause(
+                new Clause(OBOFormatConstants.OboFormatTag.TAG_FORMAT_VERSION, "1.2"));
+        headerFrame.addClause(
+                new Clause(
+                        OBOFormatConstants.OboFormatTag.TAG_DATE,
+                        OBOFormatConstants.headerDateFormat().format(new Date())));
+        headerFrame.addClause(
+                new Clause(
+                        OBOFormatConstants.OboFormatTag.TAG_DEFAULT_NAMESPACE,
+                        getHeaderNamespace()));
         return headerFrame;
     }
 
     @Override
-    protected void before(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
+    protected void before(MessageConverterContext<T> context, OutputStream outputStream)
+            throws IOException {
         Frame headerFrame = getHeaderFrame();
         StringWriter out = new StringWriter();
         this.oboFormatWriter.writeHeader(headerFrame, new PrintWriter(out), null);
@@ -47,4 +56,3 @@ public abstract class AbstractOBOMessagerConverter<T> extends AbstractEntityHttp
         outputStream.write(out.getBuffer().toString().getBytes());
     }
 }
-

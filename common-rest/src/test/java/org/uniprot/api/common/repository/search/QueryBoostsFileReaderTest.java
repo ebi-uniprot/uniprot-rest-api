@@ -1,12 +1,12 @@
 package org.uniprot.api.common.repository.search;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created 04/09/19
@@ -28,13 +28,16 @@ class QueryBoostsFileReaderTest {
 
     @Test
     void missingFileCausesException() {
-        assertThrows(QueryBoostCreationException.class, () -> new QueryBoostsFileReader("this-file-does-not-exist"));
+        assertThrows(
+                QueryBoostCreationException.class,
+                () -> new QueryBoostsFileReader("this-file-does-not-exist"));
     }
 
     @Test
     void defaultBoostsLoadedCorrectly() {
-        assertThat(reader.getQueryBoosts().getDefaultSearchBoosts(),
-                   containsInAnyOrder("default1:{query}^1.0", "default2:9606^2.0"));
+        assertThat(
+                reader.getQueryBoosts().getDefaultSearchBoosts(),
+                containsInAnyOrder("default1:{query}^1.0", "default2:9606^2.0"));
     }
 
     @Test
@@ -49,6 +52,8 @@ class QueryBoostsFileReaderTest {
 
     @Test
     void advancedBoostFunctionsLoadedCorrectly() {
-        assertThat(reader.getQueryBoosts().getAdvancedSearchBoostFunctions(), is("advanced1,advanced2"));
+        assertThat(
+                reader.getQueryBoosts().getAdvancedSearchBoostFunctions(),
+                is("advanced1,advanced2"));
     }
 }

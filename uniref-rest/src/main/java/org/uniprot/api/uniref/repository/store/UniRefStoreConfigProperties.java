@@ -1,15 +1,13 @@
 package org.uniprot.api.uniref.repository.store;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Data;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 /**
- *
  * @author jluo
  * @date: 20 Aug 2019
- *
-*/
+ */
 @ConfigurationProperties(prefix = "voldemort.uniref")
 @Data
 public class UniRefStoreConfigProperties {
@@ -17,4 +15,3 @@ public class UniRefStoreConfigProperties {
     private int numberOfConnections;
     private String storeName;
 }
-

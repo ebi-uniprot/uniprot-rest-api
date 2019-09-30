@@ -1,5 +1,15 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,25 +23,12 @@ import org.uniprot.core.cv.ec.EC;
 import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.ec.impl.ECImpl;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
-
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByECServiceTest {
-    @Mock
-    private SolrClient solrClient;
+    @Mock private SolrClient solrClient;
 
-    @Mock
-    private ECRepo ecRepo;
+    @Mock private ECRepo ecRepo;
     private UniProtViewByECService service;
-
 
     @BeforeEach
     void setup() {
@@ -49,11 +46,21 @@ class UniProtViewByECServiceTest {
         MockServiceHelper.mockServiceQueryResponse(solrClient, "ec", counts);
         List<ViewBy> viewBys = service.get("", "1.1");
         assertEquals(2, viewBys.size());
-        ViewBy viewBy1 = MockServiceHelper
-                .createViewBy("1.1.1.-", "With NAD(+) or NADP(+) as acceptor", 346L, UniProtViewByECService.URL_PREFIX + "1.1.1.-", true);
+        ViewBy viewBy1 =
+                MockServiceHelper.createViewBy(
+                        "1.1.1.-",
+                        "With NAD(+) or NADP(+) as acceptor",
+                        346L,
+                        UniProtViewByECService.URL_PREFIX + "1.1.1.-",
+                        true);
         assertTrue(viewBys.contains(viewBy1));
-        ViewBy viewBy2 = MockServiceHelper
-                .createViewBy("1.1.3.-", "With oxygen as acceptor", 1L, UniProtViewByECService.URL_PREFIX + "1.1.3.-", true);
+        ViewBy viewBy2 =
+                MockServiceHelper.createViewBy(
+                        "1.1.3.-",
+                        "With oxygen as acceptor",
+                        1L,
+                        UniProtViewByECService.URL_PREFIX + "1.1.3.-",
+                        true);
         assertTrue(viewBys.contains(viewBy2));
     }
 

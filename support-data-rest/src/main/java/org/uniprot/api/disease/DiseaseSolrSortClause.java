@@ -10,7 +10,8 @@ public class DiseaseSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
-        Sort defaultSort = new Sort(Sort.Direction.ASC, DiseaseField.Sort.accession.getSolrFieldName());
+        Sort defaultSort =
+                new Sort(Sort.Direction.ASC, DiseaseField.Sort.accession.getSolrFieldName());
 
         if (hasScore) {
             defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
@@ -28,5 +29,4 @@ public class DiseaseSolrSortClause extends AbstractSolrSortClause {
     protected String getSolrSortFieldName(String name) {
         return name;
     }
-
 }

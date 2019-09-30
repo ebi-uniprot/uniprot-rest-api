@@ -13,12 +13,14 @@ import org.uniprot.store.search.field.UniProtField;
 public class UniProtKBJsonMessageConverter extends JsonMessageConverter<UniProtEntry> {
 
     public UniProtKBJsonMessageConverter() {
-        super(UniprotJsonConfig.getInstance().getSimpleObjectMapper(), UniProtEntry.class, Arrays.asList(UniProtField.ResultFields.values()));
+        super(
+                UniprotJsonConfig.getInstance().getSimpleObjectMapper(),
+                UniProtEntry.class,
+                Arrays.asList(UniProtField.ResultFields.values()));
     }
 
     @Override
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
         return FieldsParser.parseForFilters(fields);
     }
-
 }

@@ -1,14 +1,14 @@
 package org.uniprot.api.common.repository.store;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.uniprot.api.common.repository.store.TupleStreamTemplate.TupleStreamBuilder.fieldsToReturn;
 import static org.uniprot.api.common.repository.store.TupleStreamTemplate.TupleStreamBuilder.sortToString;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Sort;
 
 /**
  * Created 23/10/18

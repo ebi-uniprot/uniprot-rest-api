@@ -14,8 +14,15 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Repository
 public class LiteratureRepository extends SolrQueryRepository<LiteratureDocument> {
 
-    protected LiteratureRepository(SolrTemplate solrTemplate, LiteratureFacetConfig facetConfig, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.literature, LiteratureDocument.class, facetConfig, requestConverter);
+    protected LiteratureRepository(
+            SolrTemplate solrTemplate,
+            LiteratureFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.literature,
+                LiteratureDocument.class,
+                facetConfig,
+                requestConverter);
     }
-
 }

@@ -1,12 +1,6 @@
 package org.uniprot.api.common.repository.store;
 
-import lombok.Builder;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.slf4j.Logger;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.store.datastore.UniProtStoreClient;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -14,20 +8,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import lombok.Builder;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.slf4j.Logger;
+import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.store.datastore.UniProtStoreClient;
 
 /**
- * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored fields).
- * Clients of this class need not know what store they need to access. They need only provide the query that
- * needs answering, in addition to the sortable fields.
+ * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored
+ * fields). Clients of this class need not know what store they need to access. They need only
+ * provide the query that needs answering, in addition to the sortable fields.
  *
- * Created 22/08/18
+ * <p>Created 22/08/18
  *
  * @author Edd
  */
@@ -46,12 +46,12 @@ public class StoreStreamer<T> {
             TupleStream tupleStream = tupleStreamTemplate.create(request, id);
             tupleStream.open();
 
-            BatchStoreIterable<T> batchStoreIterable = new BatchStoreIterable<>(
-                    new TupleStreamIterable(tupleStream, id),
-                    storeClient,
-                    streamerBatchSize);
-            return StreamSupport
-                    .stream(batchStoreIterable.spliterator(), false)
+            BatchStoreIterable<T> batchStoreIterable =
+                    new BatchStoreIterable<>(
+                            new TupleStreamIterable(tupleStream, id),
+                            storeClient,
+                            streamerBatchSize);
+            return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                     .flatMap(Collection::stream)
                     .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
@@ -63,8 +63,8 @@ public class StoreStreamer<T> {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(request, id);
             tupleStream.open();
-            return StreamSupport
-                    .stream(new TupleStreamIterable(tupleStream, id).spliterator(), false)
+            return StreamSupport.stream(
+                            new TupleStreamIterable(tupleStream, id).spliterator(), false)
                     .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -76,16 +76,19 @@ public class StoreStreamer<T> {
             TupleStream tupleStream = tupleStreamTemplate.create(request, defaultsField);
             tupleStream.open();
 
-            TupleStreamIterable sourceIterable = new TupleStreamIterable(tupleStream, defaultsField);
-            BatchIterable<T> batchIterable = new BatchIterable<T>(sourceIterable, streamerBatchSize) {
-                @Override
-                List<T> convertBatch(List<String> batch) {
-                    return batch.stream().map(defaultsConverter).collect(Collectors.toList());
-                }
-            };
+            TupleStreamIterable sourceIterable =
+                    new TupleStreamIterable(tupleStream, defaultsField);
+            BatchIterable<T> batchIterable =
+                    new BatchIterable<T>(sourceIterable, streamerBatchSize) {
+                        @Override
+                        List<T> convertBatch(List<String> batch) {
+                            return batch.stream()
+                                    .map(defaultsConverter)
+                                    .collect(Collectors.toList());
+                        }
+                    };
 
-            return StreamSupport
-                    .stream(batchIterable.spliterator(), false)
+            return StreamSupport.stream(batchIterable.spliterator(), false)
                     .flatMap(Collection::stream)
                     .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
@@ -108,15 +111,16 @@ public class StoreStreamer<T> {
         private UniProtStoreClient<T> storeClient;
         private RetryPolicy<Object> retryPolicy;
 
-        BatchStoreIterable(Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
+        BatchStoreIterable(
+                Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
-            retryPolicy = new RetryPolicy<>()
-                    .handle(IOException.class)          
-                    .withDelay(Duration.ofMillis(500))
-             //      .withDelay(500,TimeUnit.MILLISECONDS)
-                   .withMaxRetries(5);
-       
+            retryPolicy =
+                    new RetryPolicy<>()
+                            .handle(IOException.class)
+                            .withDelay(Duration.ofMillis(500))
+                            //      .withDelay(500,TimeUnit.MILLISECONDS)
+                            .withMaxRetries(5);
         }
 
         @Override

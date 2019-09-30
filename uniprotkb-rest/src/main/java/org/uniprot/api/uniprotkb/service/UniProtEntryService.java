@@ -1,6 +1,14 @@
 package org.uniprot.api.uniprotkb.service;
 
-import com.google.common.base.Strings;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -23,14 +31,7 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.UniProtField;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import com.google.common.base.Strings;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
@@ -43,12 +44,13 @@ public class UniProtEntryService {
     private UniprotQueryRepository repository;
     private UniprotFacetConfig uniprotFacetConfig;
 
-    public UniProtEntryService(UniprotQueryRepository repository,
-                               UniprotFacetConfig uniprotFacetConfig,
-                               UniProtTermsConfig uniProtTermsConfig,
-                               QueryBoosts uniProtKBQueryBoosts,
-                               UniProtKBStoreClient entryStore,
-                               StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer) {
+    public UniProtEntryService(
+            UniprotQueryRepository repository,
+            UniprotFacetConfig uniprotFacetConfig,
+            UniProtTermsConfig uniProtTermsConfig,
+            QueryBoosts uniProtKBQueryBoosts,
+            UniProtKBStoreClient entryStore,
+            StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer) {
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
         this.queryBoosts = uniProtKBQueryBoosts;
@@ -60,22 +62,26 @@ public class UniProtEntryService {
     public QueryResult<UniProtEntry> search(SearchRequestDTO request) {
         SolrRequest solrRequest = createSolrRequest(request, true);
 
-        QueryResult<UniProtDocument> results = repository
-                .searchPage(solrRequest, request.getCursor(), request.getSize());
+        QueryResult<UniProtDocument> results =
+                repository.searchPage(solrRequest, request.getCursor(), request.getSize());
 
-        return resultsConverter.convertQueryResult(results, FieldsParser.parseForFilters(request.getFields()));
+        return resultsConverter.convertQueryResult(
+                results, FieldsParser.parseForFilters(request.getFields()));
     }
 
     public UniProtEntry getByAccession(String accession, String fields) {
         try {
             Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
-            SolrRequest solrRequest = SolrRequest.builder().query(ACCESSION + ":" + accession.toUpperCase()).build();
+            SolrRequest solrRequest =
+                    SolrRequest.builder().query(ACCESSION + ":" + accession.toUpperCase()).build();
             Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
-            Optional<UniProtEntry> optionalUniProtEntry = optionalDoc
-                    .map(doc -> resultsConverter.convertDoc(doc, filters))
-                    .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+            Optional<UniProtEntry> optionalUniProtEntry =
+                    optionalDoc
+                            .map(doc -> resultsConverter.convertDoc(doc, filters))
+                            .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
 
-            return optionalUniProtEntry.orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+            return optionalUniProtEntry.orElseThrow(
+                    () -> new ResourceNotFoundException("{search.not.found}"));
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -86,10 +92,12 @@ public class UniProtEntryService {
 
     public Stream<UniProtEntry> stream(SearchRequestDTO request, MediaType contentType) {
         SolrRequest solrRequest = createSolrRequest(request, false);
-        boolean defaultFieldsOnly = FieldsParser
-                .isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        if (defaultFieldsOnly && (contentType.equals(APPLICATION_JSON) || contentType
-                .equals(TSV_MEDIA_TYPE) || contentType.equals(XLS_MEDIA_TYPE))) {
+        boolean defaultFieldsOnly =
+                FieldsParser.isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
+        if (defaultFieldsOnly
+                && (contentType.equals(APPLICATION_JSON)
+                        || contentType.equals(TSV_MEDIA_TYPE)
+                        || contentType.equals(XLS_MEDIA_TYPE))) {
             return storeStreamer.defaultFieldStream(solrRequest);
         } else {
             return storeStreamer.idsToStoreStream(solrRequest);
@@ -104,7 +112,7 @@ public class UniProtEntryService {
     private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
         requestBuilder.queryBoosts(queryBoosts);
-        
+
         String requestedQuery = request.getQuery();
 
         if (needsToFilterIsoform(request)) {
@@ -137,20 +145,21 @@ public class UniProtEntryService {
 
     /**
      * This method verify if we need to add isoform filter query to remove isoform entries
-     * <p>
-     * if does not have id fields (we can not filter isoforms when querying for IDS)
-     * AND
-     * has includeIsoform params in the request URL
-     * Then we analyze the includeIsoform request parameter.
-     * IMPORTANT: Implementing this way, query search has precedence over isoform request parameter
+     *
+     * <p>if does not have id fields (we can not filter isoforms when querying for IDS) AND has
+     * includeIsoform params in the request URL Then we analyze the includeIsoform request
+     * parameter. IMPORTANT: Implementing this way, query search has precedence over isoform request
+     * parameter
      *
      * @return true if we need to add isoform filter query
      */
     private boolean needsToFilterIsoform(SearchRequestDTO request) {
-        boolean hasIdFieldTerms = SolrQueryUtil.hasFieldTerms(request.getQuery(),
-                                                              UniProtField.Search.accession_id.name(),
-                                                              UniProtField.Search.mnemonic.name(),
-                                                              UniProtField.Search.is_isoform.name());
+        boolean hasIdFieldTerms =
+                SolrQueryUtil.hasFieldTerms(
+                        request.getQuery(),
+                        UniProtField.Search.accession_id.name(),
+                        UniProtField.Search.mnemonic.name(),
+                        UniProtField.Search.is_isoform.name());
 
         if (!hasIdFieldTerms) {
             return !request.isIncludeIsoform();

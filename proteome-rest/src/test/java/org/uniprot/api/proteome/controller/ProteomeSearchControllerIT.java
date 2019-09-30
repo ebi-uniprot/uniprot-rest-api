@@ -1,7 +1,18 @@
 package org.uniprot.api.proteome.controller;
 
-import com.beust.jcommander.internal.Lists;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,36 +50,33 @@ import org.uniprot.store.search.field.ProteomeField;
 import org.uniprot.store.search.field.ProteomeResultFields;
 import org.uniprot.store.search.field.SearchField;
 
-import java.nio.ByteBuffer;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.beust.jcommander.internal.Lists;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author jluo
  * @date: 13 Jun 2019
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, ProteomeRestApplication.class, ErrorHandlerConfig.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            ProteomeRestApplication.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ProteomeController.class)
-@ExtendWith(value = {SpringExtension.class, ProteomeSearchControllerIT.ProteomeSearchContentTypeParamResolver.class,
-        ProteomeSearchControllerIT.ProteomeSearchParameterResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            ProteomeSearchControllerIT.ProteomeSearchContentTypeParamResolver.class,
+            ProteomeSearchControllerIT.ProteomeSearchParameterResolver.class
+        })
 public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
     private static final String UPID_PREF = "UP000005";
 
-    @Autowired
-    private ProteomeQueryRepository repository;
+    @Autowired private ProteomeQueryRepository repository;
 
-    @Autowired
-    private ProteomeFacetConfig facetConfig;
+    @Autowired private ProteomeFacetConfig facetConfig;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -139,22 +147,18 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllReturnedFields() {
-        return Lists.newArrayList(
-                ProteomeResultFields.INSTANCE.getAllFields()
-                        .keySet());
+        return Lists.newArrayList(ProteomeResultFields.INSTANCE.getAllFields().keySet());
     }
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(231);
         saveEntry(520);
-
     }
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        IntStream.rangeClosed(1, numberOfEntries)
-                .forEach(this::saveEntry);
+        IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
     private void saveEntry(int i) {
@@ -184,7 +188,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
     private ByteBuffer getBinary(ProteomeEntry entry) {
         try {
-            return ByteBuffer.wrap(ProteomeJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    ProteomeJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
@@ -195,15 +202,14 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
             return prefix + "00" + i;
         } else if (i < 100) {
             return prefix + "0" + i;
-        } else
-            return prefix + i;
-
+        } else return prefix + i;
     }
 
     private ProteomeEntry createEntry(int i) {
         ProteomeId proteomeId = new ProteomeIdBuilder(getName(UPID_PREF, i)).build();
         String description = getName("Description", i);
-        Taxonomy taxonomy = TaxonomyBuilder.newInstance().taxonId(9606).scientificName("Homo sapiens").build();
+        Taxonomy taxonomy =
+                TaxonomyBuilder.newInstance().taxonId(9606).scientificName("Homo sapiens").build();
         LocalDate modified = LocalDate.of(2015, 11, 5);
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
@@ -217,34 +223,37 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         List<Component> components = new ArrayList<>();
         Component component1 =
                 ComponentBuilder.newInstance()
-                        .name("someName1").description("some description")
+                        .name("someName1")
+                        .description("some description")
                         .type(org.uniprot.core.proteome.ComponentType.UNPLACED)
                         .build();
 
         Component component2 =
                 ComponentBuilder.newInstance()
-                        .name("someName2").description("some description 2")
+                        .name("someName2")
+                        .description("some description 2")
                         .type(org.uniprot.core.proteome.ComponentType.SEGMENTED_GENOME)
                         .build();
 
         components.add(component1);
         components.add(component2);
         List<Citation> citations = new ArrayList<>();
-        ProteomeEntryBuilder builder = ProteomeEntryBuilder.newInstance().proteomeId(proteomeId)
-                .description(description)
-                .taxonomy(taxonomy)
-                .modified(modified)
-                .proteomeType(ProteomeType.NORMAL)
-                //	.redundantTo(redId)
-                .dbXReferences(xrefs)
-                .components(components)
-                .superkingdom(Superkingdom.EUKARYOTA)
-                .references(citations)
-                .annotationScore(15);
+        ProteomeEntryBuilder builder =
+                ProteomeEntryBuilder.newInstance()
+                        .proteomeId(proteomeId)
+                        .description(description)
+                        .taxonomy(taxonomy)
+                        .modified(modified)
+                        .proteomeType(ProteomeType.NORMAL)
+                        //	.redundantTo(redId)
+                        .dbXReferences(xrefs)
+                        .components(components)
+                        .superkingdom(Superkingdom.EUKARYOTA)
+                        .references(citations)
+                        .annotationScore(15);
 
         return builder.build();
     }
-
 
     static class ProteomeSearchParameterResolver extends AbstractSearchParameterResolver {
 
@@ -268,7 +277,9 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upid:*"))
-                    .resultMatcher(jsonPath("$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
                     .build();
         }
 
@@ -277,22 +288,30 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("organism_name:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*",
-                            contains("'organism_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "'organism_name' filter type 'range' is invalid. Expected 'term' filter type")))
                     .build();
         }
 
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("upid:INVALID OR organism_id:INVALID " +
-                            "OR organism_name:INVALID OR taxonomy_id:invalid OR superkingdom:invalid"))
+                    .queryParam(
+                            "query",
+                            Collections.singletonList(
+                                    "upid:INVALID OR organism_id:INVALID "
+                                            + "OR organism_name:INVALID OR taxonomy_id:invalid OR superkingdom:invalid"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
-                            "The 'upid' value has invalid format. It should be a valid Proteome UPID",
-                            "The organism id filter value should be a number",
-                            "The taxonomy id filter value should be a number"
-                    )))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    containsInAnyOrder(
+                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID",
+                                            "The organism id filter value should be a number",
+                                            "The taxonomy id filter value should be a number")))
                     .build();
         }
 
@@ -301,7 +320,9 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("annotation_score desc"))
-                    .resultMatcher(jsonPath("$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
                     .build();
         }
 
@@ -310,9 +331,13 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("organism"))
-                    .resultMatcher(jsonPath("$.results.*.id.value", contains("UP000005231", "UP000005520")))
-
-                    .resultMatcher(jsonPath("$.results.*.description", contains("Description231", "Description520")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.description",
+                                    contains("Description231", "Description520")))
                     .build();
         }
 
@@ -321,42 +346,65 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("reference"))
-                    .resultMatcher(jsonPath("$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
                     .build();
         }
     }
 
-
-    static class ProteomeSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class ProteomeSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("organism_id:9606")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.id.value", contains("UP000005231", "UP000005520")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("UP000005231")))
-                            .resultMatcher(content().string(containsString("UP000005520")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("UP000005231")))
-                            .resultMatcher(content().string(containsString("UP000005520")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("\tOrganism\tOrganism ID\tProtein count")))
-                            .resultMatcher(content().string(containsString("UP000005231\tHomo sapiens\t9606\t0")))
-                            .resultMatcher(content().string(containsString("UP000005520\tHomo sapiens\t9606\t0")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.id.value",
+                                                    contains("UP000005231", "UP000005520")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(content().string(containsString("UP000005231")))
+                                    .resultMatcher(content().string(containsString("UP000005520")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString("UP000005231")))
+                                    .resultMatcher(content().string(containsString("UP000005520")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "\tOrganism\tOrganism ID\tProtein count")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "UP000005231\tHomo sapiens\t9606\t0")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "UP000005520\tHomo sapiens\t9606\t0")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -364,29 +412,41 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("upid:invalid")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
 }
-

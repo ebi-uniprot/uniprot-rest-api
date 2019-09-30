@@ -12,9 +12,16 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
  * @since 2019-07-19
  */
 @Repository
-public class SubcellularLocationRepository extends SolrQueryRepository<SubcellularLocationDocument> {
+public class SubcellularLocationRepository
+        extends SolrQueryRepository<SubcellularLocationDocument> {
 
-    protected SubcellularLocationRepository(SolrTemplate solrTemplate, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.subcellularlocation, SubcellularLocationDocument.class, null, requestConverter);
+    protected SubcellularLocationRepository(
+            SolrTemplate solrTemplate, SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.subcellularlocation,
+                SubcellularLocationDocument.class,
+                null,
+                requestConverter);
     }
 }

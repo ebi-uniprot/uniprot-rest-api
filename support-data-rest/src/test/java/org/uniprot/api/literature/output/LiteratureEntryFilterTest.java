@@ -1,7 +1,12 @@
 package org.uniprot.api.literature.output;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.literature.output.LiteratureEntryFilter;
 import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -12,12 +17,6 @@ import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
 import org.uniprot.core.literature.builder.LiteratureStatisticsBuilder;
 import org.uniprot.core.uniprot.impl.UniProtAccessionImpl;
 import org.uniprot.store.search.field.LiteratureField;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -60,9 +59,10 @@ class LiteratureEntryFilterTest {
     @Test
     void filterWithAllFieldsEntry() {
         LiteratureEntry entry = getCompleteLiteratureEntry();
-        List<String> allFields = Arrays.stream(LiteratureField.ResultFields.values())
-                .map(LiteratureField.ResultFields::name)
-                .collect(Collectors.toList());
+        List<String> allFields =
+                Arrays.stream(LiteratureField.ResultFields.values())
+                        .map(LiteratureField.ResultFields::name)
+                        .collect(Collectors.toList());
 
         LiteratureEntry filterEntry = LiteratureEntryFilter.filterEntry(entry, allFields);
         assertNotNull(filterEntry);
@@ -88,7 +88,6 @@ class LiteratureEntryFilterTest {
         assertTrue(filterEntry.getAuthors().isEmpty());
         assertTrue(filterEntry.getAuthoringGroup().isEmpty());
         assertTrue(filterEntry.getLiteratureMappedReferences().isEmpty());
-
     }
 
     private LiteratureEntry getCompleteLiteratureEntry() {
@@ -127,5 +126,4 @@ class LiteratureEntryFilterTest {
                 .uniprotAccession(new UniProtAccessionImpl("P12345"))
                 .build();
     }
-
 }

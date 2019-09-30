@@ -8,18 +8,12 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 
-/**
- * Hello world!
- *
- */
-
+/** Hello world! */
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
-@ComponentScan(basePackages = {"org.uniprot.api.uniparc","org.uniprot.api.rest"})
-public class UniParcRestApplication 
-{
-    public static void main( String[] args )
-    {
-    	SpringApplication.run(UniParcRestApplication.class, args);
+@ComponentScan(basePackages = {"org.uniprot.api.uniparc", "org.uniprot.api.rest"})
+public class UniParcRestApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UniParcRestApplication.class, args);
     }
 }

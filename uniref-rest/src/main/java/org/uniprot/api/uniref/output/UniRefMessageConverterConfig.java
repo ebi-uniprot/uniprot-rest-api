@@ -10,6 +10,9 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,36 +33,35 @@ import org.uniprot.api.uniref.output.converter.UniRefXmlMessageConverter;
 import org.uniprot.api.uniref.output.converter.UniRefXslMessageConverter;
 import org.uniprot.core.uniref.UniRefEntry;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
- *
  * @author jluo
  * @date: 22 Aug 2019
- *
-*/
+ */
 @Configuration
 @ConfigurationProperties(prefix = "download")
 @Getter
 @Setter
 public class UniRefMessageConverterConfig {
-	private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
+    private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
 
     @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(ThreadPoolTaskExecutor configurableTaskExecutor) {
+    public ThreadPoolTaskExecutor downloadTaskExecutor(
+            ThreadPoolTaskExecutor configurableTaskExecutor) {
         configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
         configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
         configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
         configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
         configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(taskExecutor.isWaitForTasksToCompleteOnShutdown());
+        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
+                taskExecutor.isWaitForTasksToCompleteOnShutdown());
         return configurableTaskExecutor;
     }
+
     @Bean
     public ThreadPoolTaskExecutor configurableTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
+
     @Bean
     public WebMvcConfigurer extendedMessageConverters() {
         return new WebMvcConfigurer() {
@@ -68,27 +70,28 @@ public class UniRefMessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
-                converters.add( new UniRefFastaMessageConverter());
-                converters.add( new UniRefTsvMessageConverter());
-                converters.add( new UniRefXslMessageConverter());
-    
+                converters.add(new UniRefFastaMessageConverter());
+                converters.add(new UniRefTsvMessageConverter());
+                converters.add(new UniRefXslMessageConverter());
+
                 converters.add(0, new UniRefJsonMessageConverter());
                 converters.add(1, new UniRefXmlMessageConverter("", ""));
-                
-              
             }
         };
     }
-    @Bean 
-    public MessageConverterContextFactory<UniRefEntry> uniparcMessageConverterContextFactory() {
-        MessageConverterContextFactory<UniRefEntry> contextFactory = new MessageConverterContextFactory<>();
 
-        asList(uniparcContext(LIST_MEDIA_TYPE),
-        		uniparcContext(APPLICATION_XML),
-        		uniparcContext(APPLICATION_JSON),
-        		uniparcContext(FASTA_MEDIA_TYPE),
-        		uniparcContext(TSV_MEDIA_TYPE),
-        		uniparcContext(XLS_MEDIA_TYPE))
+    @Bean
+    public MessageConverterContextFactory<UniRefEntry> uniparcMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniRefEntry> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(
+                        uniparcContext(LIST_MEDIA_TYPE),
+                        uniparcContext(APPLICATION_XML),
+                        uniparcContext(APPLICATION_JSON),
+                        uniparcContext(FASTA_MEDIA_TYPE),
+                        uniparcContext(TSV_MEDIA_TYPE),
+                        uniparcContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -100,6 +103,4 @@ public class UniRefMessageConverterConfig {
                 .contentType(contentType)
                 .build();
     }
-   
 }
-

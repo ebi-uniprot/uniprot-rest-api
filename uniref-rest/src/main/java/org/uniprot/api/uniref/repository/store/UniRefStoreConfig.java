@@ -8,27 +8,25 @@ import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortRemoteUniRefEntryStore;
 
 /**
- *
  * @author jluo
  * @date: 20 Aug 2019
- *
-*/
+ */
 @Configuration
 public class UniRefStoreConfig {
-	@Bean
+    @Bean
     public UniRefStoreConfigProperties storeConfigProperties() {
         return new UniRefStoreConfigProperties();
     }
 
     @Bean
     @Profile("live")
-    public UniRefStoreClient uniProtStoreClient(UniRefStoreConfigProperties unirefStoreConfigProperties) {
+    public UniRefStoreClient uniProtStoreClient(
+            UniRefStoreConfigProperties unirefStoreConfigProperties) {
         VoldemortClient<UniRefEntry> client =
-                new VoldemortRemoteUniRefEntryStore(unirefStoreConfigProperties
-                                                             .getNumberOfConnections(),
-                                                             unirefStoreConfigProperties.getStoreName(),
-                                                             unirefStoreConfigProperties.getHost());
+                new VoldemortRemoteUniRefEntryStore(
+                        unirefStoreConfigProperties.getNumberOfConnections(),
+                        unirefStoreConfigProperties.getStoreName(),
+                        unirefStoreConfigProperties.getHost());
         return new UniRefStoreClient(client);
     }
 }
-

@@ -1,6 +1,5 @@
 package org.uniprot.api.rest.output.converter;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -15,5 +14,4 @@ public class ListMessageConverter extends AbstractEntityIdHttpMessageConverter<S
     protected void writeEntity(String entity, OutputStream outputStream) throws IOException {
         outputStream.write((entity + "\n").getBytes());
     }
-
 }

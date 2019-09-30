@@ -1,13 +1,13 @@
 package org.uniprot.api.common.repository.search;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.uniprot.core.util.Utils.nonNull;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Stream;
 
-import static org.uniprot.core.util.Utils.nonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 04/09/19
@@ -35,7 +35,8 @@ public class QueryBoostsFileReader {
         InputStream resourceAsStream = getClass().getResourceAsStream(boostsResourceLocation);
         if (nonNull(resourceAsStream)) {
 
-            Stream<String> lines = new BufferedReader(new InputStreamReader(resourceAsStream)).lines();
+            Stream<String> lines =
+                    new BufferedReader(new InputStreamReader(resourceAsStream)).lines();
             BoostType boostType = BoostType.DEFAULT_SEARCH;
             for (String line : lines.toArray(String[]::new)) {
                 if (line.startsWith(BoostType.DEFAULT_SEARCH.prefix)) {

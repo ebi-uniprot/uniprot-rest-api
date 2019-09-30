@@ -1,5 +1,14 @@
 package org.uniprot.api.rest.service;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.result.Cursor;
@@ -14,23 +23,12 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 /**
  * @param <T>
  * @param <R>
  * @author lgonzales
  */
-
-
-@PropertySource( "classpath:common-message.properties")
+@PropertySource("classpath:common-message.properties")
 public class BasicSearchService<T, R extends Document> {
     private final SolrQueryRepository<R> repository;
     private final Function<R, T> entryConverter;
@@ -44,12 +42,15 @@ public class BasicSearchService<T, R extends Document> {
         try {
             String query = idField + ":" + value;
             SolrRequest solrRequest = SolrRequest.builder().query(query).build();
-            R document = repository.getEntry(solrRequest)
-                    .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+            R document =
+                    repository
+                            .getEntry(solrRequest)
+                            .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
 
             T entry = entryConverter.apply(document);
             if (entry == null) {
-                String message = entryConverter.getClass() + " can not convert object for: [" + value + "]";
+                String message =
+                        entryConverter.getClass() + " can not convert object for: [" + value + "]";
                 throw new ServiceException(message);
             } else {
                 return entry;
@@ -64,28 +65,38 @@ public class BasicSearchService<T, R extends Document> {
 
     public QueryResult<T> search(SolrRequest request, String cursor, int pageSize) {
         QueryResult<R> results = repository.searchPage(request, cursor, pageSize);
-        List<T> converted = results.getContent().stream()
-                .map(entryConverter)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<T> converted =
+                results.getContent().stream()
+                        .map(entryConverter)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
     public Stream<T> download(SolrRequest request) {
         Cursor<R> results = repository.getAll(request);
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(results, Spliterator.ORDERED), false)
+        return StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(results, Spliterator.ORDERED), false)
                 .map(entryConverter)
                 .filter(Objects::nonNull);
     }
 
-    public SolrRequest createSolrRequest(SearchRequest request, FacetConfig facetConfig,
-                                         AbstractSolrSortClause solrSortClause, DefaultSearchHandler defaultSearchHandler) {
-        SolrRequest.SolrRequestBuilder builder = createSolrRequestBuilder(request, facetConfig, solrSortClause, defaultSearchHandler);
+    public SolrRequest createSolrRequest(
+            SearchRequest request,
+            FacetConfig facetConfig,
+            AbstractSolrSortClause solrSortClause,
+            DefaultSearchHandler defaultSearchHandler) {
+        SolrRequest.SolrRequestBuilder builder =
+                createSolrRequestBuilder(
+                        request, facetConfig, solrSortClause, defaultSearchHandler);
         return builder.build();
     }
 
-    private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(SearchRequest request, FacetConfig facetConfig,
-                                                                    AbstractSolrSortClause solrSortClause, DefaultSearchHandler defaultSearchHandler) {
+    private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            SearchRequest request,
+            FacetConfig facetConfig,
+            AbstractSolrSortClause solrSortClause,
+            DefaultSearchHandler defaultSearchHandler) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
         String requestedQuery = request.getQuery();
 

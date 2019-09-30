@@ -1,6 +1,17 @@
 package org.uniprot.api.literature;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -35,17 +46,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.field.LiteratureField;
 import org.uniprot.store.search.field.SearchField;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -54,15 +55,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(LiteratureController.class)
-@ExtendWith(value = {SpringExtension.class, LiteratureSearchControllerIT.LiteratureSearchContentTypeParamResolver.class,
-        LiteratureSearchControllerIT.LiteratureSearchParameterResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            LiteratureSearchControllerIT.LiteratureSearchContentTypeParamResolver.class,
+            LiteratureSearchControllerIT.LiteratureSearchParameterResolver.class
+        })
 public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    @Autowired
-    private LiteratureFacetConfig facetConfig;
+    @Autowired private LiteratureFacetConfig facetConfig;
 
-    @Autowired
-    private LiteratureRepository repository;
+    @Autowired private LiteratureRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -136,37 +139,46 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
     }
 
     private void saveEntry(long pubMedId, boolean facet) {
-        LiteratureMappedReference mappedReference = new LiteratureMappedReferenceBuilder().source("source").build();
+        LiteratureMappedReference mappedReference =
+                new LiteratureMappedReferenceBuilder().source("source").build();
 
-        LiteratureEntry entry = new LiteratureEntryBuilder()
-                .pubmedId(pubMedId)
-                .doiId("doi " + pubMedId)
-                .title("title " + pubMedId)
-                .addAuthor(new AuthorImpl("author " + pubMedId))
-                .journal("journal " + pubMedId)
-                .publicationDate(new PublicationDateImpl("2019"))
-                .addLiteratureMappedReference(mappedReference)
-                .build();
+        LiteratureEntry entry =
+                new LiteratureEntryBuilder()
+                        .pubmedId(pubMedId)
+                        .doiId("doi " + pubMedId)
+                        .title("title " + pubMedId)
+                        .addAuthor(new AuthorImpl("author " + pubMedId))
+                        .journal("journal " + pubMedId)
+                        .publicationDate(new PublicationDateImpl("2019"))
+                        .addLiteratureMappedReference(mappedReference)
+                        .build();
 
-        LiteratureDocument document = LiteratureDocument.builder()
-                .id(String.valueOf(pubMedId))
-                .doi(entry.getDoiId())
-                .title(entry.getTitle())
-                .author(entry.getAuthors().stream().map(Author::getValue).collect(Collectors.toSet()))
-                .journal(entry.getJournal().getName())
-                .published(entry.getPublicationDate().getValue())
-                .citedin(facet)
-                .mappedin(facet)
-                .content(Collections.singleton(String.valueOf(pubMedId)))
-                .literatureObj(getLiteratureBinary(entry))
-                .build();
+        LiteratureDocument document =
+                LiteratureDocument.builder()
+                        .id(String.valueOf(pubMedId))
+                        .doi(entry.getDoiId())
+                        .title(entry.getTitle())
+                        .author(
+                                entry.getAuthors().stream()
+                                        .map(Author::getValue)
+                                        .collect(Collectors.toSet()))
+                        .journal(entry.getJournal().getName())
+                        .published(entry.getPublicationDate().getValue())
+                        .citedin(facet)
+                        .mappedin(facet)
+                        .content(Collections.singleton(String.valueOf(pubMedId)))
+                        .literatureObj(getLiteratureBinary(entry))
+                        .build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
     private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
         try {
-            return ByteBuffer.wrap(LiteratureJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    LiteratureJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
         }
@@ -181,7 +193,8 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10)))
                     .resultMatcher(jsonPath("$.results.*.title", contains("title 10")))
                     .resultMatcher(jsonPath("$.results.*.publicationDate", contains("2019")))
-                    .resultMatcher(jsonPath("$.results.*.literatureMappedReferences").doesNotExist())
+                    .resultMatcher(
+                            jsonPath("$.results.*.literatureMappedReferences").doesNotExist())
                     .build();
         }
 
@@ -198,8 +211,14 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("title:*"))
                     .resultMatcher(jsonPath("$.results.*.pubmedId", containsInAnyOrder(10, 20)))
-                    .resultMatcher(jsonPath("$.results.*.title", containsInAnyOrder("title 10", "title 20")))
-                    .resultMatcher(jsonPath("$.results.*.publicationDate", containsInAnyOrder("2019", "2019")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.title",
+                                    containsInAnyOrder("title 10", "title 20")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.publicationDate",
+                                    containsInAnyOrder("2019", "2019")))
                     .build();
         }
 
@@ -208,19 +227,29 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("title:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("'title' filter type 'range' is invalid. Expected 'term' filter type")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "'title' filter type 'range' is invalid. Expected 'term' filter type")))
                     .build();
         }
 
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("id:INVALID OR citedin:INVALID OR mappedin:INVALID"))
+                    .queryParam(
+                            "query",
+                            Collections.singletonList(
+                                    "id:INVALID OR citedin:INVALID OR mappedin:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
-                            "The PubMed id value should be a number",
-                            "The literature mappedin filter value should be a boolean",
-                            "The literature citedin filter value should be a boolean")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    containsInAnyOrder(
+                                            "The PubMed id value should be a number",
+                                            "The literature mappedin filter value should be a boolean",
+                                            "The literature citedin filter value should be a boolean")))
                     .build();
         }
 
@@ -261,34 +290,60 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         }
     }
 
-
-    static class LiteratureSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class LiteratureSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("id:10 OR id:20")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.pubmedId", containsInAnyOrder(10, 20)))
-                            .resultMatcher(jsonPath("$.results.*.title", containsInAnyOrder("title 10", "title 20")))
-                            .resultMatcher(jsonPath("$.results.*.publicationDate", containsInAnyOrder("2019", "2019")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("10")))
-                            .resultMatcher(content().string(containsString("20")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("PubMed ID\tTitle\tReference\tAbstract/Summary")))
-                            .resultMatcher(content().string(containsString("10\ttitle 10\tjournal 10:(2019)")))
-                            .resultMatcher(content().string(containsString("20\ttitle 20\tjournal 20:(2019)")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.pubmedId",
+                                                    containsInAnyOrder(10, 20)))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.title",
+                                                    containsInAnyOrder("title 10", "title 20")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.publicationDate",
+                                                    containsInAnyOrder("2019", "2019")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString("10")))
+                                    .resultMatcher(content().string(containsString("20")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "PubMed ID\tTitle\tReference\tAbstract/Summary")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "10\ttitle 10\tjournal 10:(2019)")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "20\ttitle 20\tjournal 20:(2019)")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -296,25 +351,32 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("id:invalid")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The PubMed id value should be a number")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The PubMed id value should be a number")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
-
 }

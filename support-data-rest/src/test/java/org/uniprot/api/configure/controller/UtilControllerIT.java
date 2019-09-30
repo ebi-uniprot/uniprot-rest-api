@@ -1,5 +1,12 @@
 package org.uniprot.api.configure.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,77 +21,66 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(UtilControllerIT.class)
 class UtilControllerIT {
 
     private static final String PARSE_QUERY_RESOURCE = "/util/queryParser";
     private static final String QUERY_PARAM = "query";
 
-    @Autowired
-    private MockMvc mockMvc;
-
+    @Autowired private MockMvc mockMvc;
 
     @Test
     void validQueryRequest() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(PARSE_QUERY_RESOURCE)
-                        .param(QUERY_PARAM,"accession:P21802")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(PARSE_QUERY_RESOURCE)
+                                .param(QUERY_PARAM, "accession:P21802")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.type",is("termQuery")))
-                .andExpect(jsonPath("$.field",is("accession")))
-                .andExpect(jsonPath("$.value",is("P21802")));
+                .andExpect(jsonPath("$.type", is("termQuery")))
+                .andExpect(jsonPath("$.field", is("accession")))
+                .andExpect(jsonPath("$.value", is("P21802")));
     }
 
     @Test
     void requiredQueryRequest() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(PARSE_QUERY_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(get(PARSE_QUERY_RESOURCE).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.messages.*",contains("query is a required parameter")));
+                .andExpect(jsonPath("$.messages.*", contains("query is a required parameter")));
     }
 
     @Test
     void invalidQueryRequest() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(PARSE_QUERY_RESOURCE)
-                        .param(QUERY_PARAM,"length:[1 TO ]")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(PARSE_QUERY_RESOURCE)
+                                .param(QUERY_PARAM, "length:[1 TO ]")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.messages.*",contains("query parameter has an invalid syntax")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*", contains("query parameter has an invalid syntax")));
     }
-
 }

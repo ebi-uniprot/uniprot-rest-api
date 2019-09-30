@@ -17,28 +17,31 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 
 public class MockServiceHelper {
-	public static   void mockServiceQueryResponse(SolrClient solrClient, String name, 
-			Map<String, Long> counts)  throws SolrServerException, IOException{
-    	List<FacetField> facetResponse = new ArrayList<>();
-    	FacetField field1 =new FacetField(name);
-    	
-    	for(Map.Entry<String, Long> count:counts.entrySet()) {
-    		field1.add(count.getKey(), count.getValue());
-    	}
-    	facetResponse.add(field1);
+    public static void mockServiceQueryResponse(
+            SolrClient solrClient, String name, Map<String, Long> counts)
+            throws SolrServerException, IOException {
+        List<FacetField> facetResponse = new ArrayList<>();
+        FacetField field1 = new FacetField(name);
+
+        for (Map.Entry<String, Long> count : counts.entrySet()) {
+            field1.add(count.getKey(), count.getValue());
+        }
+        facetResponse.add(field1);
         QueryResponse queryResponse = mock(QueryResponse.class);
-        
+
         when(queryResponse.getFacetFields()).thenReturn(facetResponse);
         when(solrClient.query(anyString(), any())).thenReturn(queryResponse);
     }
-	public static ViewBy createViewBy(String id, String label, long count, String link, boolean expand ) {
-		ViewBy viewBy = new ViewBy();
-		viewBy.setId(id);
-		viewBy.setLabel(label);
-		viewBy.setCount(count);
-		viewBy.setLink(link);
-		viewBy.setExpand(expand);
-		
-		return viewBy;
-	}
+
+    public static ViewBy createViewBy(
+            String id, String label, long count, String link, boolean expand) {
+        ViewBy viewBy = new ViewBy();
+        viewBy.setId(id);
+        viewBy.setLabel(label);
+        viewBy.setCount(count);
+        viewBy.setLink(link);
+        viewBy.setExpand(expand);
+
+        return viewBy;
+    }
 }

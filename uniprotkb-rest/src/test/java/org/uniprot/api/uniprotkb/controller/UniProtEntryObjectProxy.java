@@ -28,10 +28,10 @@ import org.uniprot.core.flatfile.parser.impl.sq.SqLineObject;
 import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.core.uniprot.UniProtEntry;
 
-
 class UniProtEntryObjectProxy {
     private EntryObject entryObject;
-	   private final UniprotLineParser<EntryObject>  entryParser;
+    private final UniprotLineParser<EntryObject> entryParser;
+
     private UniProtEntryObjectProxy() {
         this.entryParser = new DefaultUniprotLineParserFactory().createEntryParser();
     }
@@ -43,21 +43,22 @@ class UniProtEntryObjectProxy {
         return uniProtEntryObject;
     }
 
-    static UniProtEntryObjectProxy createEntryFromInputStream(InputStream stream) throws IOException {
+    static UniProtEntryObjectProxy createEntryFromInputStream(InputStream stream)
+            throws IOException {
         StringBuilder entryText = new StringBuilder();
 
-        try (InputStreamReader ir = new InputStreamReader(stream); BufferedReader br = new BufferedReader(ir)) {
+        try (InputStreamReader ir = new InputStreamReader(stream);
+                BufferedReader br = new BufferedReader(ir)) {
             String line;
 
             while ((line = br.readLine()) != null) {
-                entryText.append(line)
-                        .append("\n");
+                entryText.append(line).append("\n");
             }
         }
 
         return createEntryFromString(entryText.toString());
     }
-    
+
     void updateEntryObject(LineType lineType, String replacement) {
         DefaultUniprotLineParserFactory parserFactory = new DefaultUniprotLineParserFactory();
 
@@ -131,7 +132,8 @@ class UniProtEntryObjectProxy {
                 entryObject.sq = sqLineParser.parse(replacement);
                 break;
             default:
-                throw new IllegalArgumentException("Line type to update not implemented: " + lineType);
+                throw new IllegalArgumentException(
+                        "Line type to update not implemented: " + lineType);
         }
     }
 

@@ -1,16 +1,16 @@
 package org.uniprot.api.common.repository.search.page.impl;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.repository.search.page.Page;
 
-import java.math.BigInteger;
-import java.util.Optional;
-
 /**
- * This class implements a cursor page with string nextCursor, pageSize  and totalElements capabilities
- * to navigate over result.
+ * This class implements a cursor page with string nextCursor, pageSize and totalElements
+ * capabilities to navigate over result.
  *
  * @author lgonzales
  */
@@ -27,7 +27,7 @@ public class CursorPage implements Page {
     private Long totalElements;
     private Long offset;
 
-    private CursorPage(String cursor, Long offset,Integer pageSize){
+    private CursorPage(String cursor, Long offset, Integer pageSize) {
         this.cursor = cursor;
         this.pageSize = pageSize;
         this.offset = offset;
@@ -40,10 +40,10 @@ public class CursorPage implements Page {
      * @param pageSize current page size
      * @return CursorPage object
      */
-    public static CursorPage of(String cursor, Integer pageSize){
-        if(cursor == null) { //if is first page...
+    public static CursorPage of(String cursor, Integer pageSize) {
+        if (cursor == null) { // if is first page...
             return new CursorPage(null, 0L, pageSize);
-        }else {
+        } else {
             byte[] bytes = new BigInteger(cursor, 36).toByteArray();
             String encryptedCursor = new String(bytes);
             String[] parsedCursor = encryptedCursor.split(DELIMITER);
@@ -56,7 +56,7 @@ public class CursorPage implements Page {
     }
 
     /**
-     *  if has next page, return its link
+     * if has next page, return its link
      *
      * @param uriBuilder URL without pagination parameters
      * @return next page link URL
@@ -64,7 +64,7 @@ public class CursorPage implements Page {
     @Override
     public Optional<String> getNextPageLink(UriComponentsBuilder uriBuilder) {
         Optional<String> nextPageLink = Optional.empty();
-        if(hasNextPage()) {
+        if (hasNextPage()) {
             uriBuilder.replaceQueryParam(CURSOR_PARAM_NAME, getEncryptedNextCursor());
             uriBuilder.replaceQueryParam(SIZE_PARAM_NAME, pageSize);
             nextPageLink = Optional.of(uriBuilder.build().encode().toUriString());
@@ -72,21 +72,21 @@ public class CursorPage implements Page {
         return nextPageLink;
     }
 
-    public String getCursor(){
+    public String getCursor() {
         return this.cursor;
     }
 
-    public void setNextCursor(String nextCursor){
+    public void setNextCursor(String nextCursor) {
         this.nextCursor = nextCursor;
     }
 
-    public String getEncryptedNextCursor(){
-        Long nextOffset = (offset+pageSize);
-        String concatenatedCursor = nextOffset+DELIMITER+nextCursor;
+    public String getEncryptedNextCursor() {
+        Long nextOffset = (offset + pageSize);
+        String concatenatedCursor = nextOffset + DELIMITER + nextCursor;
         return new BigInteger(concatenatedCursor.getBytes()).toString(36);
     }
 
-    public void setTotalElements(Long totalElements){
+    public void setTotalElements(Long totalElements) {
         this.totalElements = totalElements;
     }
 
@@ -98,10 +98,9 @@ public class CursorPage implements Page {
     /**
      * Check if should have next page link
      *
-     * @return true if (offset + pageSize)  < totalElements
+     * @return true if (offset + pageSize) < totalElements
      */
     private boolean hasNextPage() {
-        return (offset + pageSize)  < totalElements;
+        return (offset + pageSize) < totalElements;
     }
-
 }

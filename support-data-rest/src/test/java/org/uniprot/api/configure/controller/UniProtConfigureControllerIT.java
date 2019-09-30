@@ -1,5 +1,12 @@
 package org.uniprot.api.configure.controller;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,49 +22,37 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.api.support_data.controller.UniProtConfigureController;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(UniProtConfigureController.class)
 class UniProtConfigureControllerIT {
 
     private static final String BASIC_RESOURCE = "/configure/uniprotkb";
 
-    @Autowired
-    private MockMvc mockMvc;
-
+    @Autowired private MockMvc mockMvc;
 
     @Test
     void canGetUniProtSearchTerms() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(BASIC_RESOURCE+"/search_terms")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/search_terms")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         validateResponse(response);
     }
 
-
     @Test
     void canGetAnnotationEvidences() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(BASIC_RESOURCE+"/annotation_evidences")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/annotation_evidences")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         validateResponse(response);
@@ -67,9 +62,10 @@ class UniProtConfigureControllerIT {
     void canGetGoEvidences() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(BASIC_RESOURCE+"/go_evidences")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/go_evidences")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         validateResponse(response);
@@ -79,9 +75,9 @@ class UniProtConfigureControllerIT {
     void canGetDatabases() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(BASIC_RESOURCE+"/databases")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/databases").header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         validateResponse(response);
@@ -91,9 +87,10 @@ class UniProtConfigureControllerIT {
     void canGetResultFields() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(BASIC_RESOURCE+"/resultfields")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/resultfields")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         validateResponse(response);
@@ -105,5 +102,4 @@ class UniProtConfigureControllerIT {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.size()", is(greaterThan(0))));
     }
-
 }

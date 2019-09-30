@@ -1,12 +1,12 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Data;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
 @ConfigurationProperties(prefix = "solr")
 public class ConfigProperties {
-	private String uniprotCollection;
-	//private String ecCollection;
+    private String uniprotCollection;
+    // private String ecCollection;
 }

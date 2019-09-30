@@ -1,27 +1,35 @@
 package org.uniprot.api.rest.controller.param.resolver;
 
+import java.lang.reflect.Method;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 
-import java.lang.reflect.Method;
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 public abstract class AbstractGetIdParameterResolver implements ParameterResolver {
 
     @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public boolean supportsParameter(
+            ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
         return parameterContext.getParameter().getType().equals(GetIdParameter.class);
     }
 
     @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public Object resolveParameter(
+            ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
         GetIdParameter result = null;
-        Method method = extensionContext.getTestMethod().orElseThrow(() -> new RuntimeException("AbstractGetIdParameterResolver: Unable to find tested method"));
+        Method method =
+                extensionContext
+                        .getTestMethod()
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "AbstractGetIdParameterResolver: Unable to find tested method"));
         switch (method.getName()) {
             case "validIdReturnSuccess":
                 result = validIdParameter();
@@ -51,5 +59,4 @@ public abstract class AbstractGetIdParameterResolver implements ParameterResolve
     protected abstract GetIdParameter withFilterFieldsParameter();
 
     protected abstract GetIdParameter withInvalidFilterParameter();
-
 }

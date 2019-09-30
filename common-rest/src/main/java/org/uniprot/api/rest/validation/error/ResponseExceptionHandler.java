@@ -1,5 +1,19 @@
 package org.uniprot.api.rest.validation.error;
 
+import static java.util.Collections.singletonList;
+import static org.uniprot.core.util.Utils.notEmpty;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -18,19 +32,6 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import static java.util.Collections.singletonList;
-import static org.uniprot.core.util.Utils.notEmpty;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -54,12 +55,13 @@ public class ResponseExceptionHandler {
     /**
      * Bad Request exception handler that was caught during request
      *
-     * @param ex      throw exception
+     * @param ex throw exception
      * @param request http request
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler(value = {ConstraintViolationException.class})
-    public ResponseEntity<ErrorInfo> constraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> constraintViolationException(
+            ConstraintViolationException ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
 
         for (ConstraintViolation error : ex.getConstraintViolations()) {
@@ -76,12 +78,13 @@ public class ResponseExceptionHandler {
     /**
      * Resource not found exception handler that was caught during request
      *
-     * @param ex      throw exception
+     * @param ex throw exception
      * @param request http request
      * @return 404 Not Found error response with error message details
      */
     @ExceptionHandler(value = {NoHandlerFoundException.class, ResourceNotFoundException.class})
-    public ResponseEntity<ErrorInfo> noHandlerFoundException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> noHandlerFoundException(
+            Exception ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(NOT_FOUND_MESSAGE, null, Locale.getDefault()));
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
@@ -94,12 +97,13 @@ public class ResponseExceptionHandler {
     /**
      * Internal Server Error exception handler
      *
-     * @param ex      throw exception
+     * @param ex throw exception
      * @param request http request
      * @return 500 Internal server error response
      */
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
-    public ResponseEntity<ErrorInfo> handleInternalServerError(Throwable ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> handleInternalServerError(
+            Throwable ex, HttpServletRequest request) {
         logger.error("handleThrowableBadRequest: ", ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
@@ -115,12 +119,13 @@ public class ResponseExceptionHandler {
     /**
      * Bad Request exception handler that was caught during request
      *
-     * @param ex      throw exception
+     * @param ex throw exception
      * @param request http request
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler({BindException.class})
-    public ResponseEntity<ErrorInfo> handleBindExceptionBadRequest(BindException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> handleBindExceptionBadRequest(
+            BindException ex, HttpServletRequest request) {
         List<String> messages = new ArrayList<>();
 
         for (FieldError error : ex.getFieldErrors()) {
@@ -141,15 +146,19 @@ public class ResponseExceptionHandler {
     /**
      * Bad Request exception handler that was caught during request
      *
-     * @param ex      throw exception
+     * @param ex throw exception
      * @param request http request
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler({MissingServletRequestParameterException.class})
-    public ResponseEntity<ErrorInfo> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                             HttpServletRequest request) {
-        List<String> messages = singletonList(messageSource.getMessage(REQUIRED_REQUEST_PARAM, new Object[]{
-                ex.getParameterName()}, Locale.getDefault()));
+    public ResponseEntity<ErrorInfo> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, HttpServletRequest request) {
+        List<String> messages =
+                singletonList(
+                        messageSource.getMessage(
+                                REQUIRED_REQUEST_PARAM,
+                                new Object[] {ex.getParameterName()},
+                                Locale.getDefault()));
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
 
         addDebugError(request, ex, messages);
@@ -162,15 +171,19 @@ public class ResponseExceptionHandler {
     /**
      * Bad Request exception handler that was caught during request
      *
-     * @param ex      throw exception
+     * @param ex throw exception
      * @param request http request
      * @return 400 Bad request error response with error message details
      */
     @ExceptionHandler({InvalidRequestException.class})
-    public ResponseEntity<ErrorInfo> handleInvalidRequestExceptionBadRequest(InvalidRequestException ex, HttpServletRequest request) {
-        List<String> messages = singletonList(messageSource.getMessage(INVALID_REQUEST,
-                                                                       new Object[]{ex.getMessage()},
-                                                                       Locale.getDefault()));
+    public ResponseEntity<ErrorInfo> handleInvalidRequestExceptionBadRequest(
+            InvalidRequestException ex, HttpServletRequest request) {
+        List<String> messages =
+                singletonList(
+                        messageSource.getMessage(
+                                INVALID_REQUEST,
+                                new Object[] {ex.getMessage()},
+                                Locale.getDefault()));
 
         addDebugError(request, ex, messages);
 
@@ -178,15 +191,17 @@ public class ResponseExceptionHandler {
     }
 
     /**
-     * If there is debugError in the request, this method also print exception causes to help in the debug error
+     * If there is debugError in the request, this method also print exception causes to help in the
+     * debug error
      *
-     * @param request   Request Object.
+     * @param request Request Object.
      * @param exception the exception that was captured.
-     * @param error     List of existing message.
+     * @param error List of existing message.
      */
-    private static void addDebugError(HttpServletRequest request, Throwable exception, List<String> error) {
-        if (request.getParameter("debugError") != null &&
-                request.getParameter("debugError").equalsIgnoreCase("true")) {
+    private static void addDebugError(
+            HttpServletRequest request, Throwable exception, List<String> error) {
+        if (request.getParameter("debugError") != null
+                && request.getParameter("debugError").equalsIgnoreCase("true")) {
 
             Throwable cause = exception.getCause();
             while (cause != null) {
@@ -195,7 +210,6 @@ public class ResponseExceptionHandler {
                 }
                 cause = cause.getCause();
             }
-
         }
     }
 
@@ -208,7 +222,8 @@ public class ResponseExceptionHandler {
         return result;
     }
 
-    private ResponseEntity<ErrorInfo> getBadRequestResponseEntity(HttpServletRequest request, List<String> messages) {
+    private ResponseEntity<ErrorInfo> getBadRequestResponseEntity(
+            HttpServletRequest request, List<String> messages) {
         ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(getContentTypeFromRequest(request))

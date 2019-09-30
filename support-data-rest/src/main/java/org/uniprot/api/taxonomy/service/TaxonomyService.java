@@ -1,5 +1,9 @@
 package org.uniprot.api.taxonomy.service;
 
+import static org.uniprot.store.search.field.TaxonomyField.Search;
+
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -10,10 +14,6 @@ import org.uniprot.api.taxonomy.request.TaxonomyRequestDTO;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-
-import static org.uniprot.store.search.field.TaxonomyField.Search;
-
-import java.util.stream.Stream;
 
 @Service
 public class TaxonomyService {
@@ -26,7 +26,8 @@ public class TaxonomyService {
     public TaxonomyService(TaxonomyRepository repository, TaxonomyFacetConfig facetConfig) {
         this.basicService = new BasicSearchService<>(repository, new TaxonomyEntryConverter());
         this.facetConfig = facetConfig;
-        this.defaultSearchHandler = new DefaultSearchHandler(Search.content, Search.id, Search.getBoostFields());
+        this.defaultSearchHandler =
+                new DefaultSearchHandler(Search.content, Search.id, Search.getBoostFields());
         this.taxonomySortClause = new TaxonomySortClause();
     }
 
@@ -35,13 +36,16 @@ public class TaxonomyService {
     }
 
     public QueryResult<TaxonomyEntry> search(TaxonomyRequestDTO request) {
-        SolrRequest solrQuery = basicService.createSolrRequest(request, facetConfig, taxonomySortClause, defaultSearchHandler);
+        SolrRequest solrQuery =
+                basicService.createSolrRequest(
+                        request, facetConfig, taxonomySortClause, defaultSearchHandler);
         return basicService.search(solrQuery, request.getCursor(), request.getSize());
     }
 
     public Stream<TaxonomyEntry> download(TaxonomyRequestDTO request) {
-        SolrRequest query = basicService.createSolrRequest(request, facetConfig, taxonomySortClause, defaultSearchHandler);
+        SolrRequest query =
+                basicService.createSolrRequest(
+                        request, facetConfig, taxonomySortClause, defaultSearchHandler);
         return basicService.download(query);
     }
-
 }

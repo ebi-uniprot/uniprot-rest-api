@@ -1,5 +1,14 @@
 package org.uniprot.api.common.repository.search;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -21,31 +30,20 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 class SolrQueryRepositoryIT {
 
     private static GeneralSolrQueryRepository queryRepo;
 
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
-    ;
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();;
 
     @BeforeAll
     static void setUp() {
         try {
             storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-            SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
+            SolrTemplate template =
+                    new SolrTemplate(
+                            storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
             template.afterPropertiesSet();
             queryRepo = new GeneralSolrQueryRepository(template);
         } catch (Exception e) {
@@ -71,7 +69,8 @@ class SolrQueryRepositoryIT {
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, UniProtDocMocker.createDoc(acc));
 
         // when
-        Optional<UniProtDocument> entry = queryRepo.getEntry(queryWithoutFacets("accession:" + acc));
+        Optional<UniProtDocument> entry =
+                queryRepo.getEntry(queryWithoutFacets("accession:" + acc));
 
         // then
         assertThat(entry.isPresent(), CoreMatchers.is(true));
@@ -82,7 +81,8 @@ class SolrQueryRepositoryIT {
     void getEntryWhenNotPresent() {
         // when
         String acc = "XXXXXX";
-        Optional<UniProtDocument> entry = queryRepo.getEntry(queryWithoutFacets("accession:" + acc));
+        Optional<UniProtDocument> entry =
+                queryRepo.getEntry(queryWithoutFacets("accession:" + acc));
 
         // then
         assertThat(entry.isPresent(), CoreMatchers.is(false));
@@ -91,8 +91,9 @@ class SolrQueryRepositoryIT {
     @Test
     void invalidQueryExceptionReturned() {
         QueryRetrievalException thrown =
-                assertThrows(QueryRetrievalException.class,
-                             () -> queryRepo.getEntry(queryWithoutFacets("invalid:invalid")));
+                assertThrows(
+                        QueryRetrievalException.class,
+                        () -> queryRepo.getEntry(queryWithoutFacets("invalid:invalid")));
 
         assertEquals("Error executing solr query", thrown.getMessage());
     }
@@ -103,25 +104,27 @@ class SolrQueryRepositoryIT {
         int docCount = 2;
         List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
-        List<String> savedAccs = docs.stream()
-                .map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        List<String> savedAccs =
+                docs.stream().map(doc -> doc.accession).collect(Collectors.toList());
 
         List<String> expectedPage1Accs = asList(savedAccs.get(0), savedAccs.get(1));
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
         CursorPage page = CursorPage.of(null, 2);
-        QueryResult<UniProtDocument> queryResult = queryRepo
-                .searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
-        List<String> page1Accs = queryResult.getContent().stream()
-                .map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        QueryResult<UniProtDocument> queryResult =
+                queryRepo.searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
+        List<String> page1Accs =
+                queryResult.getContent().stream()
+                        .map(doc -> doc.accession)
+                        .collect(Collectors.toList());
 
         // then
         assertNotNull(queryResult.getPage());
         page = (CursorPage) queryResult.getPage();
-        assertFalse(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        assertFalse(
+                page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test"))
+                        .isPresent());
 
         assertThat(page1Accs, CoreMatchers.is(expectedPage1Accs));
 
@@ -138,12 +141,15 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         String accQuery = "default value";
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), null, null);
+        QueryResult<UniProtDocument> queryResult =
+                queryRepo.searchPage(queryWithoutFacets(accQuery), null, null);
 
         // then
         assertNotNull(queryResult.getPage());
         CursorPage page = (CursorPage) queryResult.getPage();
-        assertFalse(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        assertFalse(
+                page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test"))
+                        .isPresent());
 
         assertNotNull(queryResult.getContent());
         assertEquals(1, queryResult.getContent().size());
@@ -164,11 +170,12 @@ class SolrQueryRepositoryIT {
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
 
         // when attempt to fetch page 1
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithMatchedFields(findMe), null, null);
+        QueryResult<UniProtDocument> queryResult =
+                queryRepo.searchPage(queryWithMatchedFields(findMe), null, null);
 
         // then
         assertNotNull(queryResult.getMatchedFields());
-//        assertThat(queryResult.getMatchedFields(), is(not(emptyList())));
+        //        assertThat(queryResult.getMatchedFields(), is(not(emptyList())));
         // TODO: 14/06/19 fix this
     }
 
@@ -184,8 +191,11 @@ class SolrQueryRepositoryIT {
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
 
         // when attempt to fetch then error occurs
-        assertThrows(InvalidRequestException.class, () -> queryRepo
-                .searchPage(queryWithMatchedFields("accession:" + findMe), null, null));
+        assertThrows(
+                InvalidRequestException.class,
+                () ->
+                        queryRepo.searchPage(
+                                queryWithMatchedFields("accession:" + findMe), null, null));
     }
 
     @Test
@@ -194,9 +204,8 @@ class SolrQueryRepositoryIT {
         int docCount = 5;
         List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
-        List<String> savedAccs = docs.stream()
-                .map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        List<String> savedAccs =
+                docs.stream().map(doc -> doc.accession).collect(Collectors.toList());
 
         List<String> expectedPage1Accs = asList(savedAccs.get(0), savedAccs.get(1));
         List<String> expectedPage2Accs = asList(savedAccs.get(2), savedAccs.get(3));
@@ -205,36 +214,45 @@ class SolrQueryRepositoryIT {
         // when attempt to fetch page 1
         String accQuery = "accession:*";
         CursorPage page = CursorPage.of(null, 2);
-        QueryResult<UniProtDocument> queryResult = queryRepo
-                .searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
-        List<String> page1Accs = queryResult.getContent().stream()
-                .map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        QueryResult<UniProtDocument> queryResult =
+                queryRepo.searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
+        List<String> page1Accs =
+                queryResult.getContent().stream()
+                        .map(doc -> doc.accession)
+                        .collect(Collectors.toList());
 
         assertNotNull(queryResult.getPage());
         page = (CursorPage) queryResult.getPage();
-        assertTrue(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        assertTrue(
+                page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test"))
+                        .isPresent());
         String nextCursor = page.getEncryptedNextCursor();
 
         // ... and attempt to fetch page 2
         queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), nextCursor, 2);
-        List<String> page2Accs = queryResult.getContent().stream()
-                .map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        List<String> page2Accs =
+                queryResult.getContent().stream()
+                        .map(doc -> doc.accession)
+                        .collect(Collectors.toList());
 
         assertNotNull(queryResult.getPage());
         page = (CursorPage) queryResult.getPage();
-        assertTrue(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        assertTrue(
+                page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test"))
+                        .isPresent());
         nextCursor = page.getEncryptedNextCursor();
 
         // ... and attempt to fetch last page 3
         queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), nextCursor, 2);
-        List<String> page3Accs = queryResult.getContent().stream()
-                .map(doc -> doc.accession)
-                .collect(Collectors.toList());
+        List<String> page3Accs =
+                queryResult.getContent().stream()
+                        .map(doc -> doc.accession)
+                        .collect(Collectors.toList());
 
         page = (CursorPage) queryResult.getPage();
-        assertFalse(page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test")).isPresent());
+        assertFalse(
+                page.getNextPageLink(UriComponentsBuilder.fromHttpUrl("http://localhost/test"))
+                        .isPresent());
 
         // then
         assertThat(page1Accs, CoreMatchers.is(expectedPage1Accs));
@@ -251,7 +269,8 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with no facets
         String accQuery = "accession:*";
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), null, 2);
+        QueryResult<UniProtDocument> queryResult =
+                queryRepo.searchPage(queryWithoutFacets(accQuery), null, 2);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(0));
@@ -319,7 +338,12 @@ class SolrQueryRepositoryIT {
 
     private static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
         GeneralSolrQueryRepository(SolrTemplate template) {
-            super(template, SolrCollection.uniprot, UniProtDocument.class, new FakeFacetConfig(), new GeneralSolrRequestConverter());
+            super(
+                    template,
+                    SolrCollection.uniprot,
+                    UniProtDocument.class,
+                    new FakeFacetConfig(),
+                    new GeneralSolrRequestConverter());
         }
     }
 

@@ -1,6 +1,17 @@
 package org.uniprot.api.rest.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,31 +36,16 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.field.SearchField;
 
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractSearchControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @AfterEach
     void cleanData() {
@@ -71,17 +67,23 @@ public abstract class AbstractSearchControllerIT {
         saveEntry(SaveScenario.SEARCH_SUCCESS);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
+        queryParameter
+                .getQueryParams()
+                .forEach(
+                        (paramName, values) ->
+                                requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -95,30 +97,36 @@ public abstract class AbstractSearchControllerIT {
         saveEntry(SaveScenario.SEARCH_NOT_FOUND);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
+        queryParameter
+                .getQueryParams()
+                .forEach(
+                        (paramName, values) ->
+                                requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
     }
 
-    //----------------------------------------- TEST QUERY -----------------------------------------------
+    // ----------------------------------------- TEST QUERY
+    // -----------------------------------------------
     @Test
     void searchWithoutQueryReturnBadRequest() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(get(getSearchRequestPath()).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -133,10 +141,11 @@ public abstract class AbstractSearchControllerIT {
         saveEntry(SaveScenario.ALLOW_QUERY_ALL);
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .param("query", "*:*")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -148,10 +157,11 @@ public abstract class AbstractSearchControllerIT {
     @Test
     void searchDefaultQueryReturnSuccess() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .param("query", "defaultQuery")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "defaultQuery")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -163,33 +173,42 @@ public abstract class AbstractSearchControllerIT {
     void searchQueryWithInvalidQueryFormatReturnBadRequest() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .param("query", "invalidfield(:invalidValue AND :invalid:10)")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "invalidfield(:invalidValue AND :invalid:10)")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", contains("query parameter has an invalid syntax")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*", contains("query parameter has an invalid syntax")));
     }
 
     @Test
     void searchQueryWithInvalidFieldNameReturnBadRequest() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .param("query", "invalidfield:invalidValue OR invalidfield2:invalidValue2")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param(
+                                        "query",
+                                        "invalidfield:invalidValue OR invalidfield2:invalidValue2")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("'invalidfield' is not a valid search field",
-                                "'invalidfield2' is not a valid search field")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "'invalidfield' is not a valid search field",
+                                        "'invalidfield2' is not a valid search field")));
     }
 
     @Test
@@ -204,10 +223,11 @@ public abstract class AbstractSearchControllerIT {
         for (SearchField searchField : searchFields) {
             // when
             String fieldValue = getFieldValueForField(searchField);
-            ResultActions response = mockMvc.perform(
-                    get(getSearchRequestPath())
-                            .param("query", searchField + ":" + fieldValue)
-                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            ResultActions response =
+                    mockMvc.perform(
+                            get(getSearchRequestPath())
+                                    .param("query", searchField + ":" + fieldValue)
+                                    .header(ACCEPT, APPLICATION_JSON_VALUE));
 
             // then
             response.andDo(print())
@@ -226,17 +246,21 @@ public abstract class AbstractSearchControllerIT {
         saveEntry(SaveScenario.ALLOW_WILDCARD_QUERY);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, "*"));
+        queryParameter
+                .getQueryParams()
+                .forEach((paramName, values) -> requestBuilder.param(paramName, "*"));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -244,21 +268,28 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    void searchQueryWithInvalidTypeQueryReturnBadRequest(SearchParameter queryParameter) throws Exception {
+    void searchQueryWithInvalidTypeQueryReturnBadRequest(SearchParameter queryParameter)
+            throws Exception {
         checkSearchParameterInput(queryParameter);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
+        queryParameter
+                .getQueryParams()
+                .forEach(
+                        (paramName, values) ->
+                                requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -266,73 +297,89 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
-    void searchQueryWithInvalidValueQueryReturnBadRequest(SearchParameter queryParameter) throws Exception {
+    void searchQueryWithInvalidValueQueryReturnBadRequest(SearchParameter queryParameter)
+            throws Exception {
         checkSearchParameterInput(queryParameter);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
+        queryParameter
+                .getQueryParams()
+                .forEach(
+                        (paramName, values) ->
+                                requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
     }
 
-    //----------------------------------------- TEST SORTS -----------------------------------------------
+    // ----------------------------------------- TEST SORTS
+    // -----------------------------------------------
     @Test
     void searchSortWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
         checkSearchParameterInput(queryParameter);
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("sort", "query"));
 
-
         // given
         saveEntry(SaveScenario.SORT_SUCCESS);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
+        queryParameter
+                .getQueryParams()
+                .forEach(
+                        (paramName, values) ->
+                                requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
-
     }
 
     @Test
     void searchSortWithIncorrectValuesReturnBadRequest() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .param("query", "*:*")
-                        .param("sort", "invalidField desc,invalidField1 invalidSort1")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .param("sort", "invalidField desc,invalidField1 invalidSort1")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("Invalid sort field order 'invalidsort1'. Expected asc or desc",
-                                "Invalid sort field 'invalidfield1'",
-                                "Invalid sort field 'invalidfield'")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid sort field order 'invalidsort1'. Expected asc or desc",
+                                        "Invalid sort field 'invalidfield1'",
+                                        "Invalid sort field 'invalidfield'")));
     }
 
     @Test
@@ -346,11 +393,12 @@ public abstract class AbstractSearchControllerIT {
 
         for (String sortField : sortFields) {
             // when
-            ResultActions response = mockMvc.perform(
-                    get(getSearchRequestPath())
-                            .param("query", "*:*")
-                            .param("sort", sortField + " asc")
-                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            ResultActions response =
+                    mockMvc.perform(
+                            get(getSearchRequestPath())
+                                    .param("query", "*:*")
+                                    .param("sort", sortField + " asc")
+                                    .header(ACCEPT, APPLICATION_JSON_VALUE));
 
             // then
             response.andDo(print())
@@ -360,9 +408,11 @@ public abstract class AbstractSearchControllerIT {
         }
     }
 
-    //----------------------------------------- TEST RETURNED FIELDS -----------------------------------------------
+    // ----------------------------------------- TEST RETURNED FIELDS
+    // -----------------------------------------------
     @Test
-    void searchFieldsWithCorrectValuesReturnSuccess(SearchParameter queryParameter) throws Exception {
+    void searchFieldsWithCorrectValuesReturnSuccess(SearchParameter queryParameter)
+            throws Exception {
         checkSearchParameterInput(queryParameter);
         assertThat(queryParameter.getQueryParams().keySet(), hasItems("fields", "query"));
 
@@ -370,17 +420,23 @@ public abstract class AbstractSearchControllerIT {
         saveEntry(SaveScenario.FIELDS_SUCCESS);
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath()).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        queryParameter.getQueryParams().forEach((paramName, values) -> requestBuilder.param(paramName, values.toArray(new String[0])));
+        queryParameter
+                .getQueryParams()
+                .forEach(
+                        (paramName, values) ->
+                                requestBuilder.param(paramName, values.toArray(new String[0])));
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -390,18 +446,22 @@ public abstract class AbstractSearchControllerIT {
     @Test
     void searchFieldsWithIncorrectValuesReturnBadRequest() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .param("query", "*:*")
-                        .param("fields", "invalidField, otherInvalid")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .param("fields", "invalidField, otherInvalid")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("Invalid fields parameter value 'invalidField'",
-                                "Invalid fields parameter value 'otherInvalid'")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'invalidField'",
+                                        "Invalid fields parameter value 'otherInvalid'")));
     }
 
     @Test
@@ -416,11 +476,12 @@ public abstract class AbstractSearchControllerIT {
 
         for (String returnField : returnFields) {
             // when
-            ResultActions response = mockMvc.perform(
-                    get(getSearchRequestPath())
-                            .param("query", "*:*")
-                            .param("fields", returnField)
-                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            ResultActions response =
+                    mockMvc.perform(
+                            get(getSearchRequestPath())
+                                    .param("query", "*:*")
+                                    .param("fields", returnField)
+                                    .header(ACCEPT, APPLICATION_JSON_VALUE));
 
             // then
             response.andDo(print())
@@ -430,7 +491,8 @@ public abstract class AbstractSearchControllerIT {
         }
     }
 
-    //----------------------------------------- TEST CONTENT TYPES -----------------------------------------------
+    // ----------------------------------------- TEST CONTENT TYPES
+    // -----------------------------------------------
     @Test
     void searchSuccessContentTypes(SearchContentTypeParam contentTypeParam) throws Exception {
         checkSearchContentTypeParameterInput(contentTypeParam);
@@ -444,16 +506,21 @@ public abstract class AbstractSearchControllerIT {
 
         for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
             // when
-            MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                    .param("query", contentTypeParam.getQuery())
-                    .header(ACCEPT, contentType.getContentType());
+            MockHttpServletRequestBuilder requestBuilder =
+                    get(getSearchRequestPath())
+                            .param("query", contentTypeParam.getQuery())
+                            .header(ACCEPT, contentType.getContentType());
 
             ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
-            ResultActions resultActions = response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType.getContentType().toString()));
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.OK.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    contentType.getContentType().toString()));
 
             for (ResultMatcher resultMatcher : contentType.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
@@ -468,16 +535,21 @@ public abstract class AbstractSearchControllerIT {
         // when
         for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
             // when
-            MockHttpServletRequestBuilder requestBuilder = get(getSearchRequestPath())
-                    .param("query", contentTypeParam.getQuery())
-                    .header(ACCEPT, contentType.getContentType());
+            MockHttpServletRequestBuilder requestBuilder =
+                    get(getSearchRequestPath())
+                            .param("query", contentTypeParam.getQuery())
+                            .header(ACCEPT, contentType.getContentType());
 
             ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
-            ResultActions resultActions = response.andDo(print())
-                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType.getContentType().toString()));
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    contentType.getContentType().toString()));
 
             for (ResultMatcher resultMatcher : contentType.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
@@ -490,19 +562,24 @@ public abstract class AbstractSearchControllerIT {
         assertThat(contentTypeParam.getQuery(), not(isEmptyOrNullString()));
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(emptyIterable()));
-        ControllerITUtils.verifyContentTypes(getSearchRequestPath(), requestMappingHandlerMapping, contentTypeParam.getContentTypeParams());
+        ControllerITUtils.verifyContentTypes(
+                getSearchRequestPath(),
+                requestMappingHandlerMapping,
+                contentTypeParam.getContentTypeParams());
     }
 
-    //----------------------------------------- TEST PAGINATION -----------------------------------------------
+    // ----------------------------------------- TEST PAGINATION
+    // -----------------------------------------------
 
     @Test
     void searchWithInvalidPageSizeReturnBadRequest() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "*:*")
-                        .param("size", "0"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*")
+                                .param("size", "0"));
 
         // then
         response.andDo(print())
@@ -518,10 +595,11 @@ public abstract class AbstractSearchControllerIT {
         saveEntries(savedEntries);
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "*:*"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*"));
 
         // then
         response.andDo(print())
@@ -529,7 +607,10 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", String.valueOf(savedEntries)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("size=" + getDefaultPageSize())))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LINK,
+                                        containsString("size=" + getDefaultPageSize())))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
                 .andExpect(jsonPath("$.results.size()", is(getDefaultPageSize())));
     }
@@ -540,11 +621,12 @@ public abstract class AbstractSearchControllerIT {
         saveEntries(5);
 
         // when page
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "*:*")
-                        .param("size", "5"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*")
+                                .param("size", "5"));
 
         // then page
         response.andDo(print())
@@ -553,7 +635,6 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(header().string("X-TotalRecords", "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(5)));
-
     }
 
     @Test
@@ -562,11 +643,12 @@ public abstract class AbstractSearchControllerIT {
         saveEntries(6);
 
         // when first page
-        ResultActions response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "*:*")
-                        .param("size", "5"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*")
+                                .param("size", "5"));
 
         // then first page
         response.andDo(print())
@@ -583,12 +665,13 @@ public abstract class AbstractSearchControllerIT {
 
         String cursor = linkHeader.split("\\?")[1].split("&")[1].split("=")[1];
         // when last page
-        response = mockMvc.perform(
-                get(getSearchRequestPath())
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "*:*")
-                        .param("cursor", cursor)
-                        .param("size", "5"));
+        response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*")
+                                .param("cursor", cursor)
+                                .param("size", "5"));
 
         // then last page
         response.andDo(print())
@@ -643,7 +726,6 @@ public abstract class AbstractSearchControllerIT {
         return value;
     }
 
-
     void checkSearchParameterInput(SearchParameter queryParameter) {
         assertThat(queryParameter, notNullValue());
         assertThat(queryParameter.getQueryParams(), notNullValue());
@@ -651,5 +733,4 @@ public abstract class AbstractSearchControllerIT {
         assertThat(queryParameter.getResultMatchers(), notNullValue());
         assertThat(queryParameter.getResultMatchers(), not(emptyIterable()));
     }
-
 }

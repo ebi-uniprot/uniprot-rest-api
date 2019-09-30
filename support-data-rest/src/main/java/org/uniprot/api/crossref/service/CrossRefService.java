@@ -20,22 +20,24 @@ public class CrossRefService {
     private BasicSearchService<CrossRefEntry, CrossRefDocument> basicService;
     private DefaultSearchHandler defaultSearchHandler;
 
-    @Autowired
-    private DiseaseSolrSortClause solrSortClause;
-    @Autowired
-    private CrossRefFacetConfig crossRefFacetConfig;
+    @Autowired private DiseaseSolrSortClause solrSortClause;
+    @Autowired private CrossRefFacetConfig crossRefFacetConfig;
 
     @Autowired
     public void setDefaultSearchHandler() {
-        this.defaultSearchHandler = new DefaultSearchHandler(CrossRefField.Search.content,
-                CrossRefField.Search.accession, CrossRefField.Search.getBoostFields());
+        this.defaultSearchHandler =
+                new DefaultSearchHandler(
+                        CrossRefField.Search.content,
+                        CrossRefField.Search.accession,
+                        CrossRefField.Search.getBoostFields());
     }
 
     @Autowired
-    public void setBasicService(CrossRefRepository crossRefRepository, CrossRefEntryConverter toCrossRefEntryConverter) {
+    public void setBasicService(
+            CrossRefRepository crossRefRepository,
+            CrossRefEntryConverter toCrossRefEntryConverter) {
         this.basicService = new BasicSearchService<>(crossRefRepository, toCrossRefEntryConverter);
     }
-
 
     public CrossRefEntry findByAccession(final String accession) {
         return this.basicService.getEntity(CrossRefField.Search.accession.name(), accession);
@@ -43,8 +45,12 @@ public class CrossRefService {
 
     public QueryResult<CrossRefEntry> search(CrossRefSearchRequest request) {
 
-        SolrRequest solrRequest = this.basicService.createSolrRequest(request, this.crossRefFacetConfig,
-                this.solrSortClause, this.defaultSearchHandler);
+        SolrRequest solrRequest =
+                this.basicService.createSolrRequest(
+                        request,
+                        this.crossRefFacetConfig,
+                        this.solrSortClause,
+                        this.defaultSearchHandler);
 
         return this.basicService.search(solrRequest, request.getCursor(), request.getSize());
     }

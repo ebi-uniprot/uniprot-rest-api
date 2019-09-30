@@ -1,12 +1,8 @@
 package org.uniprot.api.common.repository.search.facet;
 
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.IntervalFacet;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.repository.search.facet.Facet;
-import org.uniprot.api.common.repository.search.facet.FacetItem;
-import org.uniprot.api.common.repository.search.facet.FacetResponseConverter;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -14,14 +10,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.IntervalFacet;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.junit.jupiter.api.Test;
 
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 class FacetResponseConverterTest {
 
     private final QueryResponse queryResponse = mock(QueryResponse.class);
@@ -33,33 +27,32 @@ class FacetResponseConverterTest {
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
-        assertEquals(0,facets.size());
+        assertEquals(0, facets.size());
     }
-
 
     @Test
     void convertFacetWithLabel() {
-        List<FacetField> fieldList = getFacetFields("fragment","reviewed");
+        List<FacetField> fieldList = getFacetFields("fragment", "reviewed");
 
         when(queryResponse.getFacetFields()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
-        assertEquals(2,facets.size());
+        assertEquals(2, facets.size());
 
         Facet reviewed = facets.get(0);
-        assertEquals("Status",reviewed.getLabel());
-        assertEquals("reviewed",reviewed.getName());
+        assertEquals("Status", reviewed.getLabel());
+        assertEquals("reviewed", reviewed.getName());
         assertFalse(reviewed.isAllowMultipleSelection());
         assertNotNull(reviewed.getValues());
-        assertEquals(2,reviewed.getValues().size());
+        assertEquals(2, reviewed.getValues().size());
 
         FacetItem itemValue = reviewed.getValues().get(0);
         assertNotNull(itemValue);
-        assertEquals("Reviewed (Swiss-Prot)",itemValue.getLabel());
-        assertEquals("true",itemValue.getValue());
-        assertEquals(Long.valueOf(10L),itemValue.getCount());
+        assertEquals("Reviewed (Swiss-Prot)", itemValue.getLabel());
+        assertEquals("true", itemValue.getValue());
+        assertEquals(Long.valueOf(10L), itemValue.getCount());
     }
 
     @Test
@@ -73,24 +66,24 @@ class FacetResponseConverterTest {
         assertNotNull(facets);
 
         Facet popularOrganism = facets.get(0);
-        assertEquals("Popular organisms",popularOrganism.getLabel());
-        assertEquals("popular_organism",popularOrganism.getName());
+        assertEquals("Popular organisms", popularOrganism.getLabel());
+        assertEquals("popular_organism", popularOrganism.getName());
         assertTrue(popularOrganism.isAllowMultipleSelection());
         assertNotNull(popularOrganism.getValues());
-        assertEquals(3,popularOrganism.getValues().size());
+        assertEquals(3, popularOrganism.getValues().size());
 
         FacetItem itemValue = popularOrganism.getValues().get(0);
         assertNotNull(itemValue);
         assertNull(itemValue.getLabel());
-        assertEquals("Human",itemValue.getValue());
-        assertEquals(Long.valueOf(11L),itemValue.getCount());
-
+        assertEquals("Human", itemValue.getValue());
+        assertEquals(Long.valueOf(11L), itemValue.getCount());
     }
 
     @Test
     void convertIntervalFacet() throws Exception {
         IntervalFacet intervalFacet = getLengthIntervalFacet();
-        when(queryResponse.getIntervalFacets()).thenReturn(Collections.singletonList(intervalFacet));
+        when(queryResponse.getIntervalFacets())
+                .thenReturn(Collections.singletonList(intervalFacet));
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
@@ -110,21 +103,21 @@ class FacetResponseConverterTest {
         assertEquals(Long.valueOf(10L), itemValue.getCount());
     }
 
-    private List<FacetField> getFacetFields(String ... name) {
+    private List<FacetField> getFacetFields(String... name) {
         List<FacetField> fieldList = new ArrayList<>(1);
-        if(Arrays.binarySearch(name,"reviewed") >= 0) {
+        if (Arrays.binarySearch(name, "reviewed") >= 0) {
             FacetField ffield = new FacetField("reviewed");
             ffield.add("true", 10L);
             ffield.add("false", 20L);
             fieldList.add(ffield);
         }
-        if(Arrays.binarySearch(name,"fragment") >= 0) {
+        if (Arrays.binarySearch(name, "fragment") >= 0) {
             FacetField ffield = new FacetField("fragment");
             ffield.add("false", 21L);
             ffield.add("true", 11L);
             fieldList.add(ffield);
         }
-        if(Arrays.binarySearch(name,"popular_organism") >= 0) {
+        if (Arrays.binarySearch(name, "popular_organism") >= 0) {
             FacetField ffield = new FacetField("popular_organism");
             ffield.add("Human", 11L);
             ffield.add("Mouse", 21L);
@@ -136,17 +129,18 @@ class FacetResponseConverterTest {
 
     private IntervalFacet getLengthIntervalFacet() throws Exception {
         List<IntervalFacet.Count> counts = new ArrayList<>();
-        Constructor countConstructor = Class.forName("org.apache.solr.client.solrj.response.IntervalFacet$Count")
-                .getDeclaredConstructor(String.class, Integer.TYPE);
+        Constructor countConstructor =
+                Class.forName("org.apache.solr.client.solrj.response.IntervalFacet$Count")
+                        .getDeclaredConstructor(String.class, Integer.TYPE);
         countConstructor.setAccessible(true);
         counts.add((IntervalFacet.Count) countConstructor.newInstance("[1,200]", 10));
         counts.add((IntervalFacet.Count) countConstructor.newInstance("[201,400]", 15));
         counts.add((IntervalFacet.Count) countConstructor.newInstance("[801,*]", 20));
 
-        Constructor constructor = Class.forName("org.apache.solr.client.solrj.response.IntervalFacet")
-                .getDeclaredConstructor(String.class, List.class);
+        Constructor constructor =
+                Class.forName("org.apache.solr.client.solrj.response.IntervalFacet")
+                        .getDeclaredConstructor(String.class, List.class);
         constructor.setAccessible(true);
         return (IntervalFacet) constructor.newInstance("length", counts);
     }
-
 }

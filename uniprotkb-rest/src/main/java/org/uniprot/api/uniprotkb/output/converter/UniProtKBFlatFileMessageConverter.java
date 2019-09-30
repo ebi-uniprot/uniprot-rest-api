@@ -8,7 +8,8 @@ import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.flatfile.writer.impl.UniProtFlatfileWriter;
 import org.uniprot.core.uniprot.UniProtEntry;
 
-public class UniProtKBFlatFileMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
+public class UniProtKBFlatFileMessageConverter
+        extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     public UniProtKBFlatFileMessageConverter() {
         super(UniProtMediaType.FF_MEDIA_TYPE, UniProtEntry.class);
     }

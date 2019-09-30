@@ -1,17 +1,16 @@
 package org.uniprot.api.rest.output;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.rest.output.UniProtMediaType;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
+import org.junit.jupiter.api.Test;
+
 /**
- * Ensure file extensions associated with media types are as expected, so that downloads
- * produce expected results.
- * 
- * Created 22/10/18
+ * Ensure file extensions associated with media types are as expected, so that downloads produce
+ * expected results.
+ *
+ * <p>Created 22/10/18
  *
  * @author Edd
  */

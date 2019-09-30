@@ -1,8 +1,8 @@
 package org.uniprot.api.common.repository.search.page;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.util.Optional;
+
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Page interface to help navigate over the result.
@@ -18,12 +18,10 @@ public interface Page {
     Long getTotalElements();
 
     /**
-     *  if has next page, return its link
+     * if has next page, return its link
      *
      * @param uriBuilder URL without pagination parameters
      * @return next page link URL
      */
     Optional<String> getNextPageLink(UriComponentsBuilder uriBuilder);
-
-
 }

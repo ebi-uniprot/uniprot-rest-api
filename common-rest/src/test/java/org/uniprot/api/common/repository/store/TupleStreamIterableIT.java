@@ -1,5 +1,17 @@
 package org.uniprot.api.common.repository.store;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.hamcrest.Matchers;
@@ -9,18 +21,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
 /**
  * Created 17/08/18
  *
@@ -28,16 +28,15 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class TupleStreamIterableIT {
-    private final static String ID = "id";
+    private static final String ID = "id";
 
-    @Mock
-    private TupleStream tupleStream;
+    @Mock private TupleStream tupleStream;
 
     @Test
     void tupleStreamToStreamWithElements() throws IOException {
         when(tupleStream.read())
-                .thenReturn(tuple("accession1"))  // when calling next()
-                .thenReturn(tuple("accession2"))  // when calling next() 2nd time
+                .thenReturn(tuple("accession1")) // when calling next()
+                .thenReturn(tuple("accession2")) // when calling next() 2nd time
                 .thenReturn(endTuple());
 
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
@@ -49,14 +48,13 @@ class TupleStreamIterableIT {
     @Test
     void tupleStreamWrappedAsStreamHasCorrectElements() throws IOException {
         when(tupleStream.read())
-                .thenReturn(tuple("accession1"))  // when calling next()
-                .thenReturn(tuple("accession2"))  // when calling next() 2nd time
+                .thenReturn(tuple("accession1")) // when calling next()
+                .thenReturn(tuple("accession2")) // when calling next() 2nd time
                 .thenReturn(endTuple());
 
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
-        List<String> contents = StreamSupport
-                .stream(iterable.spliterator(), false)
-                .collect(Collectors.toList());
+        List<String> contents =
+                StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
 
         assertThat(contents, contains("accession1", "accession2"));
         Mockito.verify(tupleStream).close();
@@ -65,9 +63,8 @@ class TupleStreamIterableIT {
     @Test
     void closingTupleStreamWrappedAsStreamWillCloseTupleStream() throws IOException {
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
-        Stream<String> stream = StreamSupport
-                .stream(iterable.spliterator(), false)
-                .onClose(this::closeTupleStream);
+        Stream<String> stream =
+                StreamSupport.stream(iterable.spliterator(), false).onClose(this::closeTupleStream);
 
         stream.close();
 
@@ -77,14 +74,13 @@ class TupleStreamIterableIT {
     @Test
     void closingTupleStreamWrappedAsStreamAfterOneReadWillCloseTupleStream() throws IOException {
         when(tupleStream.read())
-                .thenReturn(tuple("accession1"))  // when calling next()
-                .thenReturn(tuple("accession2"))  // when calling next() 2nd time
+                .thenReturn(tuple("accession1")) // when calling next()
+                .thenReturn(tuple("accession2")) // when calling next() 2nd time
                 .thenReturn(endTuple());
 
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
-        Stream<String> stream = StreamSupport
-                .stream(iterable.spliterator(), false)
-                .onClose(this::closeTupleStream);
+        Stream<String> stream =
+                StreamSupport.stream(iterable.spliterator(), false).onClose(this::closeTupleStream);
 
         stream.findFirst();
         stream.close();
@@ -107,7 +103,7 @@ class TupleStreamIterableIT {
                 .thenThrow(IOException.class)
                 .thenThrow(IOException.class)
                 .thenThrow(IOException.class)
-                .thenReturn(tuple("accession1"))  // when calling next()
+                .thenReturn(tuple("accession1")) // when calling next()
                 .thenReturn(endTuple());
 
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);
@@ -125,7 +121,7 @@ class TupleStreamIterableIT {
                 .thenThrow(IOException.class)
                 .thenThrow(IOException.class)
                 .thenThrow(IOException.class)
-                .thenReturn(tuple("accession1"))  // when calling next()
+                .thenReturn(tuple("accession1")) // when calling next()
                 .thenReturn(endTuple());
 
         TupleStreamIterable iterable = new TupleStreamIterable(tupleStream, ID);

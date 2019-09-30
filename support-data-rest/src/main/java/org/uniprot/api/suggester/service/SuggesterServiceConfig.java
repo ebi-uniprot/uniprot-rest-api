@@ -8,7 +8,7 @@ import org.uniprot.store.search.SolrCollection;
 /**
  * Provides beans used to give access to suggestions retrieved from a Solr instance.
  *
- * Created 18/07/18
+ * <p>Created 18/07/18
  *
  * @author Edd
  */

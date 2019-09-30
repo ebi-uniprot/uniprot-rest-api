@@ -8,7 +8,8 @@ import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.parser.fasta.uniprot.UniprotFastaParser;
 import org.uniprot.core.uniprot.UniProtEntry;
 
-public class UniProtKBFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
+public class UniProtKBFastaMessageConverter
+        extends AbstractEntityHttpMessageConverter<UniProtEntry> {
     public UniProtKBFastaMessageConverter() {
         super(UniProtMediaType.FASTA_MEDIA_TYPE, UniProtEntry.class);
     }

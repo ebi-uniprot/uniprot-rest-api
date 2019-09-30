@@ -1,6 +1,17 @@
 package org.uniprot.api.keyword;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,28 +40,20 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.field.KeywordField;
 import org.uniprot.store.search.field.SearchField;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(KeywordController.class)
-@ExtendWith(value = {SpringExtension.class, KeywordSearchControllerIT.KeywordSearchContentTypeParamResolver.class,
-        KeywordSearchControllerIT.KeywordSearchParameterResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            KeywordSearchControllerIT.KeywordSearchContentTypeParamResolver.class,
+            KeywordSearchControllerIT.KeywordSearchParameterResolver.class
+        })
 public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
-    @Autowired
-    private KeywordRepository repository;
+    @Autowired private KeywordRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -115,7 +118,8 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry("KW-000" + i, i % 2 == 0));
+        LongStream.rangeClosed(1, numberOfEntries)
+                .forEach(i -> saveEntry("KW-000" + i, i % 2 == 0));
     }
 
     @Override
@@ -130,21 +134,23 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         keywordEntry.setKeyword(new KeywordImpl("my keyword " + keywordId, keywordId));
         keywordEntry.setCategory(new KeywordImpl("Ligand", "KW-9993"));
 
-        KeywordDocument document = KeywordDocument.builder()
-                .id(keywordId)
-                .name("my keyword " + keywordId)
-                .ancestor(Collections.singletonList("ancestor"))
-                .parent(Collections.singletonList("parent"))
-                .content(Collections.singletonList("content"))
-                .keywordObj(getKeywordBinary(keywordEntry))
-                .build();
+        KeywordDocument document =
+                KeywordDocument.builder()
+                        .id(keywordId)
+                        .name("my keyword " + keywordId)
+                        .ancestor(Collections.singletonList("ancestor"))
+                        .parent(Collections.singletonList("parent"))
+                        .content(Collections.singletonList("content"))
+                        .keywordObj(getKeywordBinary(keywordEntry))
+                        .build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.KEYWORD, document);
     }
 
     private ByteBuffer getKeywordBinary(KeywordEntry entry) {
         try {
-            return ByteBuffer.wrap(KeywordJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    KeywordJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse KeywordEntry to binary json: ", e);
         }
@@ -157,7 +163,8 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("keyword_id:KW-0001"))
                     .resultMatcher(jsonPath("$.results.*.keyword.accession", contains("KW-0001")))
-                    .resultMatcher(jsonPath("$.results.*.keyword.id", contains("my keyword KW-0001")))
+                    .resultMatcher(
+                            jsonPath("$.results.*.keyword.id", contains("my keyword KW-0001")))
                     .resultMatcher(jsonPath("$.results.*.definition", contains("Definition value")))
                     .build();
         }
@@ -174,9 +181,18 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("name:*"))
-                    .resultMatcher(jsonPath("$.results.*.keyword.accession", containsInAnyOrder("KW-0001", "KW-0002")))
-                    .resultMatcher(jsonPath("$.results.*.keyword.id", containsInAnyOrder("my keyword KW-0001", "my keyword KW-0002")))
-                    .resultMatcher(jsonPath("$.results.*.definition", containsInAnyOrder("Definition value", "Definition value")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.accession",
+                                    containsInAnyOrder("KW-0001", "KW-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.id",
+                                    containsInAnyOrder("my keyword KW-0001", "my keyword KW-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.definition",
+                                    containsInAnyOrder("Definition value", "Definition value")))
                     .build();
         }
 
@@ -185,18 +201,26 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("name:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
                     .build();
         }
 
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("keyword_id:INVALID OR id:INVALID"))
+                    .queryParam(
+                            "query", Collections.singletonList("keyword_id:INVALID OR id:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
-                            "The keyword id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'",
-                            "The keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    containsInAnyOrder(
+                                            "The keyword id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'",
+                                            "The keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'")))
                     .build();
         }
 
@@ -205,9 +229,18 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("name desc"))
-                    .resultMatcher(jsonPath("$.results.*.keyword.accession", contains("KW-0002", "KW-0001")))
-                    .resultMatcher(jsonPath("$.results.*.keyword.id", contains("my keyword KW-0002", "my keyword KW-0001")))
-                    .resultMatcher(jsonPath("$.results.*.definition", contains("Definition value", "Definition value")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.accession",
+                                    contains("KW-0002", "KW-0001")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.id",
+                                    contains("my keyword KW-0002", "my keyword KW-0001")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.definition",
+                                    contains("Definition value", "Definition value")))
                     .build();
         }
 
@@ -216,8 +249,14 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("id,name"))
-                    .resultMatcher(jsonPath("$.results.*.keyword.accession", contains("KW-0001", "KW-0002")))
-                    .resultMatcher(jsonPath("$.results.*.keyword.id", contains("my keyword KW-0001", "my keyword KW-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.accession",
+                                    contains("KW-0001", "KW-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.id",
+                                    contains("my keyword KW-0001", "my keyword KW-0002")))
                     .resultMatcher(jsonPath("$.results.*.definition").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.category").doesNotExist())
                     .build();
@@ -229,34 +268,64 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         }
     }
 
-
-    static class KeywordSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class KeywordSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("keyword_id:KW-0001 OR keyword_id:KW-0002")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.keyword.accession", containsInAnyOrder("KW-0002", "KW-0001")))
-                            .resultMatcher(jsonPath("$.results.*.keyword.id", containsInAnyOrder("my keyword KW-0002", "my keyword KW-0001")))
-                            .resultMatcher(jsonPath("$.results.*.definition", containsInAnyOrder("Definition value", "Definition value")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("KW-0001")))
-                            .resultMatcher(content().string(containsString("KW-0002")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Keyword ID\tName\tDescription\tCategory")))
-                            .resultMatcher(content().string(containsString("KW-0001\tmy keyword KW-0001\tDefinition value\tLigand")))
-                            .resultMatcher(content().string(containsString("KW-0002\tmy keyword KW-0002\tDefinition value\tLigand")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.keyword.accession",
+                                                    containsInAnyOrder("KW-0002", "KW-0001")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.keyword.id",
+                                                    containsInAnyOrder(
+                                                            "my keyword KW-0002",
+                                                            "my keyword KW-0001")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.definition",
+                                                    containsInAnyOrder(
+                                                            "Definition value",
+                                                            "Definition value")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString("KW-0001")))
+                                    .resultMatcher(content().string(containsString("KW-0002")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Keyword ID\tName\tDescription\tCategory")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "KW-0001\tmy keyword KW-0001\tDefinition value\tLigand")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "KW-0002\tmy keyword KW-0002\tDefinition value\tLigand")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -264,25 +333,32 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("keyword_id:invalid")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
-
 }

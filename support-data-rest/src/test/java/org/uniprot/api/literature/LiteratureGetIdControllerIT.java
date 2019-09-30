@@ -1,6 +1,11 @@
 package org.uniprot.api.literature;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,11 +35,7 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
-import java.nio.ByteBuffer;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -43,14 +44,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(LiteratureController.class)
-@ExtendWith(value = {SpringExtension.class, LiteratureGetIdControllerIT.LiteratureGetIdParameterResolver.class,
-        LiteratureGetIdControllerIT.LiteratureGetIdContentTypeParamResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            LiteratureGetIdControllerIT.LiteratureGetIdParameterResolver.class,
+            LiteratureGetIdControllerIT.LiteratureGetIdContentTypeParamResolver.class
+        })
 class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final long PUBMED_ID = 100L;
 
-    @Autowired
-    private LiteratureRepository repository;
+    @Autowired private LiteratureRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -69,22 +73,25 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        LiteratureMappedReference mappedReference = new LiteratureMappedReferenceBuilder().source("source").build();
+        LiteratureMappedReference mappedReference =
+                new LiteratureMappedReferenceBuilder().source("source").build();
 
-        LiteratureEntry literatureEntry = new LiteratureEntryBuilder()
-                .pubmedId(PUBMED_ID)
-                .title("The Title")
-                .addAuthor(new AuthorImpl("The Author"))
-                .literatureAbstract("literature abstract")
-                .publicationDate(new PublicationDateImpl("2019"))
-                .addLiteratureMappedReference(mappedReference)
-                .firstPage("10")
-                .build();
+        LiteratureEntry literatureEntry =
+                new LiteratureEntryBuilder()
+                        .pubmedId(PUBMED_ID)
+                        .title("The Title")
+                        .addAuthor(new AuthorImpl("The Author"))
+                        .literatureAbstract("literature abstract")
+                        .publicationDate(new PublicationDateImpl("2019"))
+                        .addLiteratureMappedReference(mappedReference)
+                        .firstPage("10")
+                        .build();
 
-        LiteratureDocument document = LiteratureDocument.builder()
-                .id(String.valueOf(PUBMED_ID))
-                .literatureObj(getLiteratureBinary(literatureEntry))
-                .build();
+        LiteratureDocument document =
+                LiteratureDocument.builder()
+                        .id(String.valueOf(PUBMED_ID))
+                        .literatureObj(getLiteratureBinary(literatureEntry))
+                        .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
@@ -96,7 +103,10 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
         try {
-            return ByteBuffer.wrap(LiteratureJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    LiteratureJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
         }
@@ -106,7 +116,8 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter validIdParameter() {
-            return GetIdParameter.builder().id(String.valueOf(PUBMED_ID))
+            return GetIdParameter.builder()
+                    .id(String.valueOf(PUBMED_ID))
                     .resultMatcher(jsonPath("$.pubmedId", is(100)))
                     .resultMatcher(jsonPath("$.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.title", is("The Title")))
@@ -116,15 +127,20 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter invalidIdParameter() {
-            return GetIdParameter.builder().id("INVALID")
+            return GetIdParameter.builder()
+                    .id("INVALID")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("The PubMed id value should be a number")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("The PubMed id value should be a number")))
                     .build();
         }
 
         @Override
         public GetIdParameter nonExistentIdParameter() {
-            return GetIdParameter.builder().id("999")
+            return GetIdParameter.builder()
+                    .id("999")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
@@ -132,7 +148,9 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withFilterFieldsParameter() {
-            return GetIdParameter.builder().id(String.valueOf(PUBMED_ID)).fields("id,title,mapped_references")
+            return GetIdParameter.builder()
+                    .id(String.valueOf(PUBMED_ID))
+                    .fields("id,title,mapped_references")
                     .resultMatcher(jsonPath("$.pubmedId", is(100)))
                     .resultMatcher(jsonPath("$.title", is("The Title")))
                     .resultMatcher(jsonPath("$.authors").doesNotExist())
@@ -142,38 +160,61 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withInvalidFilterParameter() {
-            return GetIdParameter.builder().id(String.valueOf(PUBMED_ID)).fields("invalid")
+            return GetIdParameter.builder()
+                    .id(String.valueOf(PUBMED_ID))
+                    .fields("invalid")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
     }
 
-    static class LiteratureGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+    static class LiteratureGetIdContentTypeParamResolver
+            extends AbstractGetIdContentTypeParamResolver {
 
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id(String.valueOf(PUBMED_ID))
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.pubmedId", is(100)))
-                            .resultMatcher(jsonPath("$.authors", contains("The Author")))
-                            .resultMatcher(jsonPath("$.title", is("The Title")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(String.valueOf(PUBMED_ID))))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("PubMed ID\tTitle\tReference\tAbstract/Summary")))
-                            .resultMatcher(content().string(containsString("100\tThe Title\t10(2019)\tliterature abstract")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.pubmedId", is(100)))
+                                    .resultMatcher(jsonPath("$.authors", contains("The Author")))
+                                    .resultMatcher(jsonPath("$.title", is("The Title")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    String.valueOf(PUBMED_ID))))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "PubMed ID\tTitle\tReference\tAbstract/Summary")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "100\tThe Title\t10(2019)\tliterature abstract")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -181,25 +222,32 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id("INVALID")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The PubMed id value should be a number")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The PubMed id value should be a number")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
-
 }

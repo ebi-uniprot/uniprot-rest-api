@@ -15,7 +15,8 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 /**
  * A fake RESTful application that returns a single configurable resource.
  *
- * Created 15/12/16
+ * <p>Created 15/12/16
+ *
  * @author Edd
  */
 @Profile("allow-origins-integration-test")
@@ -34,16 +35,18 @@ public class FakeRESTApp {
     @Import(HttpCommonHeaderConfig.class)
     static class FakeController {
         private String value;
-        private final static String DEFAULT_VALUE = "value";
+        private static final String DEFAULT_VALUE = "value";
 
         FakeController() {
             this.value = DEFAULT_VALUE;
         }
 
-        @RequestMapping(value = RESOURCE_1_URL, method = {RequestMethod.GET},
+        @RequestMapping(
+                value = RESOURCE_1_URL,
+                method = {RequestMethod.GET},
                 produces = {MediaType.APPLICATION_JSON_VALUE})
         public String getResource1() {
-            return "{ resource1Attribute : " + this.value+" }";
+            return "{ resource1Attribute : " + this.value + " }";
         }
     }
 }

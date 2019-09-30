@@ -1,11 +1,11 @@
 package org.uniprot.api.rest.output.converter;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.comment.Comment;
@@ -16,50 +16,53 @@ import org.uniprot.store.search.field.ReturnField;
 
 /**
  * @author sahmad
- * <p>
- * Returns a map of root level fields with their values for the json writer
+ *     <p>Returns a map of root level fields with their values for the json writer
  */
 @Slf4j
 public class JsonResponseFieldProjector {
 
     // Get a map containing the object's projected fields
-    public Map<String, Object> project(Object entry, Map<String, List<String>> filterFieldMap, List<ReturnField> allFields) {
+    public Map<String, Object> project(
+            Object entry, Map<String, List<String>> filterFieldMap, List<ReturnField> allFields) {
 
-        Map<String, List<String>> camelCaseFieldNameValuesMap;// map to keep java field name with its values if any
+        Map<String, List<String>>
+                camelCaseFieldNameValuesMap; // map to keep java field name with its values if any
 
-        if (!Utils.notEmpty(filterFieldMap)) { // if the filter field map is empty return all fields from allFields
-            camelCaseFieldNameValuesMap = allFields
-                    .stream()
-                    .filter(f -> f.getJavaFieldName() != null)
-                    .collect(
-                            Collectors.toMap(ReturnField::getJavaFieldName, f -> Collections.emptyList(), (oldKey, newKey) -> oldKey)
-                    );
-        } else {
-            camelCaseFieldNameValuesMap = allFields
-                    .stream()
-                    .filter(f -> isResponseField(f, filterFieldMap))
-                    .collect(
-                            Collectors.toMap(
+        if (!Utils.notEmpty(
+                filterFieldMap)) { // if the filter field map is empty return all fields from
+                                   // allFields
+            camelCaseFieldNameValuesMap =
+                    allFields.stream()
+                            .filter(f -> f.getJavaFieldName() != null)
+                            .collect(
+                                    Collectors.toMap(
                                             ReturnField::getJavaFieldName,
-                                            f -> filterFieldMap.getOrDefault(f.toString(), Collections.emptyList()),
-                                            (oldKey, newKey) -> oldKey
-                                            )
-                            );
-
+                                            f -> Collections.emptyList(),
+                                            (oldKey, newKey) -> oldKey));
+        } else {
+            camelCaseFieldNameValuesMap =
+                    allFields.stream()
+                            .filter(f -> isResponseField(f, filterFieldMap))
+                            .collect(
+                                    Collectors.toMap(
+                                            ReturnField::getJavaFieldName,
+                                            f ->
+                                                    filterFieldMap.getOrDefault(
+                                                            f.toString(), Collections.emptyList()),
+                                            (oldKey, newKey) -> oldKey));
         }
 
         // create the Map instance to be returned with root fields populated
         Map<String, Object> projectedMap = buildMapWithFields(entry, camelCaseFieldNameValuesMap);
 
         return projectedMap;
-
     }
 
     // whether this field will be returned in json response or not.
     private boolean isResponseField(ReturnField rf, Map<String, List<String>> filterFieldMap) {
 
-        if((filterFieldMap.containsKey(rf.toString()) || rf.isMandatoryJsonField())
-                && rf.getJavaFieldName() != null){
+        if ((filterFieldMap.containsKey(rf.toString()) || rf.isMandatoryJsonField())
+                && rf.getJavaFieldName() != null) {
             return true;
         }
 
@@ -67,13 +70,17 @@ public class JsonResponseFieldProjector {
     }
 
     // Get a map with provided field names and values
-    private Map<String, Object> buildMapWithFields(Object source, Map<String, List<String>> camelCaseFieldNameValuesMap) {
+    private Map<String, Object> buildMapWithFields(
+            Object source, Map<String, List<String>> camelCaseFieldNameValuesMap) {
 
         Map<String, Object> target = new HashMap<>();
 
         for (Map.Entry<String, List<String>> entry : camelCaseFieldNameValuesMap.entrySet()) {
             String javaFieldName = entry.getKey();
-            List<String> values = entry.getValue();// values to be returned e.g. comment with type function and domain
+            List<String> values =
+                    entry
+                            .getValue(); // values to be returned e.g. comment with type function
+                                         // and domain
             Object fieldValue = getFieldValue(source, javaFieldName, values);
             if (fieldValue != null) {
                 target.put(javaFieldName, fieldValue);
@@ -89,7 +96,9 @@ public class JsonResponseFieldProjector {
             Field sourceField = getField(source.getClass(), fieldName);
             if (sourceField != null) {
                 sourceField.setAccessible(true);
-                Object fieldValue = sourceField.get(source); // extract the value of sourceField from source object
+                Object fieldValue =
+                        sourceField.get(
+                                source); // extract the value of sourceField from source object
                 if (source instanceof UniProtEntry) { // check the values for UniProtEntry
                     fieldValue = getObjectsWithValues(fieldValue, neededFieldValues);
                 }
@@ -105,11 +114,13 @@ public class JsonResponseFieldProjector {
         Field field = null;
         try {
             field = source.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException nsf) { // go up the hierarchy to see if the field is defined in parent class
+        } catch (
+                NoSuchFieldException
+                        nsf) { // go up the hierarchy to see if the field is defined in parent class
             if (source.getSuperclass() != Object.class) {
                 field = getField(source.getSuperclass(), fieldName);
             } else {
-                log.warn("{} not found", fieldName);// incorrect fieldName provided
+                log.warn("{} not found", fieldName); // incorrect fieldName provided
             }
         }
 
@@ -117,23 +128,31 @@ public class JsonResponseFieldProjector {
     }
 
     private Object getObjectsWithValues(Object fieldValue, List<String> neededFieldValues) {
-        if (Utils.notEmpty(neededFieldValues) && fieldValue != null
-                && fieldValue instanceof List<?> && Utils.notEmpty((List<?>) fieldValue)) {
+        if (Utils.notEmpty(neededFieldValues)
+                && fieldValue != null
+                && fieldValue instanceof List<?>
+                && Utils.notEmpty((List<?>) fieldValue)) {
             // comment
-            if (((List<?>) fieldValue).get(0) instanceof Comment) { // check one to decide the type of list items
-                Predicate<Comment> filter = UniProtEntryFilters.createCommentFilter(neededFieldValues);
+            if (((List<?>) fieldValue).get(0)
+                    instanceof Comment) { // check one to decide the type of list items
+                Predicate<Comment> filter =
+                        UniProtEntryFilters.createCommentFilter(neededFieldValues);
                 List<Comment> comments = (List<Comment>) fieldValue;
                 comments.removeIf(comment -> !filter.test(comment));
                 return comments;
             } else if (((List<?>) fieldValue).get(0) instanceof Feature) { // feature
-                Predicate<Feature> filter = UniProtEntryFilters.createFeatureFilter(neededFieldValues);
+                Predicate<Feature> filter =
+                        UniProtEntryFilters.createFeatureFilter(neededFieldValues);
                 List<Feature> features = (List<Feature>) fieldValue;
                 features.removeIf(feature -> !filter.test(feature));
                 return features;
 
-            } else if (((List<?>) fieldValue).get(0) instanceof UniProtDBCrossReference) { // cross ref
-                Predicate<UniProtDBCrossReference> filter = UniProtEntryFilters.createDbReferenceFilter(neededFieldValues);
-                List<UniProtDBCrossReference> crossReferences = (List<UniProtDBCrossReference>) fieldValue;
+            } else if (((List<?>) fieldValue).get(0)
+                    instanceof UniProtDBCrossReference) { // cross ref
+                Predicate<UniProtDBCrossReference> filter =
+                        UniProtEntryFilters.createDbReferenceFilter(neededFieldValues);
+                List<UniProtDBCrossReference> crossReferences =
+                        (List<UniProtDBCrossReference>) fieldValue;
                 crossReferences.removeIf(xref -> !filter.test(xref));
                 return crossReferences;
             }

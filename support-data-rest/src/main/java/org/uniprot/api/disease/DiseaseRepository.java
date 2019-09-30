@@ -7,9 +7,6 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
-import java.util.HashMap;
-
-
 @Repository
 public class DiseaseRepository extends SolrQueryRepository<DiseaseDocument> {
     public DiseaseRepository(SolrTemplate solrTemplate, SolrRequestConverter requestConverter) {

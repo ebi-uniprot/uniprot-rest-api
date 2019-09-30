@@ -1,21 +1,23 @@
 package org.uniprot.api.rest.output.converter;
 
+import java.lang.reflect.Type;
+import java.util.stream.Stream;
+
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
-import java.lang.reflect.Type;
-import java.util.stream.Stream;
-
 /**
- * Extends {@link AbstractUUWHttpMessageConverter} by implementing {@link AbstractEntityHttpMessageConverter#entitiesToWrite(MessageConverterContext)}
- * so that it returns an entity ID (not actual entity) stream.
+ * Extends {@link AbstractUUWHttpMessageConverter} by implementing {@link
+ * AbstractEntityHttpMessageConverter#entitiesToWrite(MessageConverterContext)} so that it returns
+ * an entity ID (not actual entity) stream.
  *
- * Created 31/10/18
+ * <p>Created 31/10/18
  *
  * @author Edd
  */
-public abstract class AbstractEntityIdHttpMessageConverter<C> extends AbstractUUWHttpMessageConverter<C, String> {
+public abstract class AbstractEntityIdHttpMessageConverter<C>
+        extends AbstractUUWHttpMessageConverter<C, String> {
 
     AbstractEntityIdHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
         super(mediaType, messageConverterEntryClass);

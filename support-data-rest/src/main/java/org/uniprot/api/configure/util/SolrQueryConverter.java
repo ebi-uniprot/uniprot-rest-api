@@ -1,21 +1,20 @@
 package org.uniprot.api.configure.util;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.*;
-import org.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.*;
+import org.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
+
 /**
- *  This class convert Solr {@link Query} to {@link SolrJsonQuery}.
+ * This class convert Solr {@link Query} to {@link SolrJsonQuery}.
  *
  * @author lgonzales
- *
  */
-public class SolrQueryConverter{
+public class SolrQueryConverter {
 
     public static SolrJsonQuery convert(Query inputQuery) {
         SolrJsonQuery result;
@@ -33,8 +32,8 @@ public class SolrQueryConverter{
             result = buildPhraseQuery((PhraseQuery) inputQuery);
         } else if (inputQuery instanceof BooleanQuery) {
             result = buildBooleanQuery((BooleanQuery) inputQuery);
-        }else{
-            throw new RuntimeException("Unsupported query type"+inputQuery.getClass().getName());
+        } else {
+            throw new RuntimeException("Unsupported query type" + inputQuery.getClass().getName());
         }
         return result;
     }
@@ -46,15 +45,12 @@ public class SolrQueryConverter{
             clauseQuery.setQueryOperator(getQueryOperator(clause));
             booleanQueries.add(clauseQuery);
         }
-        return  SolrJsonQuery.builder()
-                .type("booleanQuery")
-                .booleanQuery(booleanQueries)
-                .build();
+        return SolrJsonQuery.builder().type("booleanQuery").booleanQuery(booleanQueries).build();
     }
 
     private static String getQueryOperator(BooleanClause clause) {
         String result = "";
-        switch (clause.getOccur()){
+        switch (clause.getOccur()) {
             case MUST:
                 result = "AND";
                 break;
@@ -69,16 +65,13 @@ public class SolrQueryConverter{
     }
 
     private static SolrJsonQuery buildPhraseQuery(PhraseQuery phraseQuery) {
-        String value = Arrays.stream(phraseQuery.getTerms())
-                .map(Term::text)
-                .collect(Collectors.joining(" "));
+        String value =
+                Arrays.stream(phraseQuery.getTerms())
+                        .map(Term::text)
+                        .collect(Collectors.joining(" "));
         String fieldName = phraseQuery.getTerms()[0].field();
 
-        return SolrJsonQuery.builder()
-                .type("phraseQuery")
-                .field(fieldName)
-                .value(value)
-                .build();
+        return SolrJsonQuery.builder().type("phraseQuery").field(fieldName).value(value).build();
     }
 
     private static SolrJsonQuery buildTermRangeQuery(TermRangeQuery rangeQuery) {
@@ -90,7 +83,6 @@ public class SolrQueryConverter{
                 .to(rangeQuery.getUpperTerm().utf8ToString())
                 .toInclude(rangeQuery.includesUpper())
                 .build();
-
     }
 
     private static SolrJsonQuery buildWildcardQuery(WildcardQuery wildcardQuery) {
@@ -102,15 +94,11 @@ public class SolrQueryConverter{
     }
 
     private static SolrJsonQuery buildMatchAllDocsQuery() {
-        return SolrJsonQuery.builder()
-                .type("matchAllDocsQuery")
-                .field("*")
-                .value("*")
-                .build();
+        return SolrJsonQuery.builder().type("matchAllDocsQuery").field("*").value("*").build();
     }
 
     private static SolrJsonQuery buildTermQuery(TermQuery termQuery) {
-        return  SolrJsonQuery.builder()
+        return SolrJsonQuery.builder()
                 .type("termQuery")
                 .field(termQuery.getTerm().field())
                 .value(termQuery.getTerm().text())

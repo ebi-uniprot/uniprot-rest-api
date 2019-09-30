@@ -1,20 +1,17 @@
 package org.uniprot.api.rest.output.context;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.uniprot.api.common.repository.search.facet.Facet;
-import org.uniprot.api.common.repository.search.term.TermInfo;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-
-import java.util.List;
-import java.util.stream.Stream;
-
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.uniprot.api.rest.output.context.MessageConverterContext.DEFAULT_FILE_TYPE;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.term.TermInfo;
 
 /**
  * Created 08/11/18
@@ -30,19 +27,21 @@ class MessageConverterContextTest {
         Stream<String> entityIdStream = Stream.of("a.id", "b.id");
         List<Facet> facets = emptyList();
         List<TermInfo> matchedFields = emptyList();
-        MessageConverterContextFactory.Resource resource = MessageConverterContextFactory.Resource.UNIPROT;
+        MessageConverterContextFactory.Resource resource =
+                MessageConverterContextFactory.Resource.UNIPROT;
         String fields = "field1,field2";
-        
-        MessageConverterContext<String> context = MessageConverterContext.<String>builder()
-                .fileType(fileType)
-                .contentType(contentType)
-                .entities(entityStream)
-                .entityIds(entityIdStream)
-                .facets(facets)
-                .matchedFields(matchedFields)
-                .fields(fields)
-                .resource(resource)
-                .build();
+
+        MessageConverterContext<String> context =
+                MessageConverterContext.<String>builder()
+                        .fileType(fileType)
+                        .contentType(contentType)
+                        .entities(entityStream)
+                        .entityIds(entityIdStream)
+                        .facets(facets)
+                        .matchedFields(matchedFields)
+                        .fields(fields)
+                        .resource(resource)
+                        .build();
 
         assertThat(context.getContentType(), is(contentType));
         assertThat(context.getFileType(), is(fileType));
@@ -62,19 +61,21 @@ class MessageConverterContextTest {
         Stream<String> entityIdStream = Stream.of("a.id", "b.id");
         List<Facet> facets = emptyList();
         List<TermInfo> matchedFIelds = emptyList();
-        MessageConverterContextFactory.Resource resource = MessageConverterContextFactory.Resource.UNIPROT;
+        MessageConverterContextFactory.Resource resource =
+                MessageConverterContextFactory.Resource.UNIPROT;
         String fields = "field1,field2";
 
-        MessageConverterContext<String> context = MessageConverterContext.<String>builder()
-                .fileType(fileType)
-                .contentType(contentType)
-                .entities(entityStream)
-                .entityIds(entityIdStream)
-                .facets(facets)
-                .matchedFields(matchedFIelds)
-                .fields(fields)
-                .resource(resource)
-                .build();
+        MessageConverterContext<String> context =
+                MessageConverterContext.<String>builder()
+                        .fileType(fileType)
+                        .contentType(contentType)
+                        .entities(entityStream)
+                        .entityIds(entityIdStream)
+                        .facets(facets)
+                        .matchedFields(matchedFIelds)
+                        .fields(fields)
+                        .resource(resource)
+                        .build();
 
         MessageConverterContext<String> contextCopy = context.asCopy();
 
@@ -90,8 +91,7 @@ class MessageConverterContextTest {
 
     @Test
     void defaultFileTypeIsUsed() {
-        MessageConverterContext<String> context = MessageConverterContext.<String>builder()
-                .build();
+        MessageConverterContext<String> context = MessageConverterContext.<String>builder().build();
 
         assertThat(context.getFileType(), is(DEFAULT_FILE_TYPE));
     }

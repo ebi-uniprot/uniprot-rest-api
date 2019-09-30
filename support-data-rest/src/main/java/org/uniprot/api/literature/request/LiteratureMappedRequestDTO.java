@@ -1,8 +1,8 @@
 package org.uniprot.api.literature.request;
 
-import lombok.Data;
-
 import javax.validation.constraints.Positive;
+
+import lombok.Data;
 
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -26,5 +26,4 @@ public class LiteratureMappedRequestDTO {
 
     @ValidSolrSortFields(sortFieldEnumClazz = LiteratureField.Sort.class)
     private String sort;
-
 }

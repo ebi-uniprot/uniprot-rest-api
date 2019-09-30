@@ -1,5 +1,17 @@
 package org.uniprot.api.support_data.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONOMY;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,57 +37,48 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.support_data.SupportDataApplication;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONOMY;
-
 /**
  * Created 19/05/19
  *
  * @author Edd
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {SuggesterControllerWithServerErrorsIT.OtherConfig.class, DataStoreTestConfig.class, SupportDataApplication.class})
+@SpringBootTest(
+        classes = {
+            SuggesterControllerWithServerErrorsIT.OtherConfig.class,
+            DataStoreTestConfig.class,
+            SupportDataApplication.class
+        })
 @WebAppConfiguration
 @ActiveProfiles({"server-errors"})
 class SuggesterControllerWithServerErrorsIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
-    @Autowired
-    private SolrClient uniProtSolrClient;
+    @Autowired private SolrClient uniProtSolrClient;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.
-                webAppContextSetup(webApplicationContext)
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     void solrErrorCauses500() throws Exception {
         // given
         doThrow(IllegalStateException.class)
-                .when(uniProtSolrClient).query(anyString(), any(SolrQuery.class));
-        
+                .when(uniProtSolrClient)
+                .query(anyString(), any(SolrQuery.class));
+
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "anything")
-                        .param("dict", TAXONOMY.name()));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "anything")
+                                .param("dict", TAXONOMY.name()));
 
         // then
         response.andDo(print())

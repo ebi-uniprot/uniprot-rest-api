@@ -1,6 +1,12 @@
 package org.uniprot.api.proteome.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,27 +36,30 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentricDocumentBuilder;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author jluo
  * @date: 14 Jun 2019
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, ProteomeRestApplication.class, ErrorHandlerConfig.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            ProteomeRestApplication.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(GeneCentricController.class)
-@ExtendWith(value = {SpringExtension.class, GeneCentricGetIdControllerIT.GeneCentricGetIdParameterResolver.class,
-        GeneCentricGetIdControllerIT.GeneCentricGetIdContentTypeParamResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            GeneCentricGetIdControllerIT.GeneCentricGetIdParameterResolver.class,
+            GeneCentricGetIdControllerIT.GeneCentricGetIdContentTypeParamResolver.class
+        })
 public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ACCESSION = "P21312";
 
-    @Autowired
-    private GeneCentricQueryRepository repository;
+    @Autowired private GeneCentricQueryRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -80,35 +89,41 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private ByteBuffer getBinary(CanonicalProtein entry) {
         try {
-            return ByteBuffer.wrap(ProteomeJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    ProteomeJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
     }
 
     private CanonicalProtein create() {
-        Protein protein = ProteinBuilder.newInstance()
-                .accession(ACCESSION)
-                .entryType(UniProtEntryType.SWISSPROT)
-                .geneName("some gene")
-                .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
-                .sequenceLength(324)
-                .build();
+        Protein protein =
+                ProteinBuilder.newInstance()
+                        .accession(ACCESSION)
+                        .entryType(UniProtEntryType.SWISSPROT)
+                        .geneName("some gene")
+                        .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
+                        .sequenceLength(324)
+                        .build();
 
-        Protein protein2 = ProteinBuilder.newInstance()
-                .accession("P21912")
-                .entryType(UniProtEntryType.SWISSPROT)
-                .geneName("some gene1")
-                .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
-                .sequenceLength(334)
-                .build();
-        Protein protein3 = ProteinBuilder.newInstance()
-                .accession("P31912")
-                .entryType(UniProtEntryType.TREMBL)
-                .geneName("some gene3")
-                .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
-                .sequenceLength(434)
-                .build();
+        Protein protein2 =
+                ProteinBuilder.newInstance()
+                        .accession("P21912")
+                        .entryType(UniProtEntryType.SWISSPROT)
+                        .geneName("some gene1")
+                        .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
+                        .sequenceLength(334)
+                        .build();
+        Protein protein3 =
+                ProteinBuilder.newInstance()
+                        .accession("P31912")
+                        .entryType(UniProtEntryType.TREMBL)
+                        .geneName("some gene3")
+                        .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
+                        .sequenceLength(434)
+                        .build();
         CanonicalProteinBuilder builder = CanonicalProteinBuilder.newInstance();
 
         return builder.canonicalProtein(protein)
@@ -126,26 +141,34 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter validIdParameter() {
-            return GetIdParameter.builder().id(ACCESSION)
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
                     .resultMatcher(jsonPath("$.*.accession.value", contains(ACCESSION)))
-//		                    .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//		                    .resultMatcher(jsonPath("$.commonName",is("common")))
-//		                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-//		                    .resultMatcher(jsonPath("$.links",contains("link")))
+                    //
+                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
+                    //		                    .resultMatcher(jsonPath("$.commonName",is("common")))
+                    //		                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
+                    //		                    .resultMatcher(jsonPath("$.links",contains("link")))
                     .build();
         }
 
         @Override
         public GetIdParameter invalidIdParameter() {
-            return GetIdParameter.builder().id("INVALID")
+            return GetIdParameter.builder()
+                    .id("INVALID")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                     .build();
         }
 
         @Override
         public GetIdParameter nonExistentIdParameter() {
-            return GetIdParameter.builder().id("P21910")
+            return GetIdParameter.builder()
+                    .id("P21910")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
@@ -153,51 +176,77 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withFilterFieldsParameter() {
-            return GetIdParameter.builder().id(ACCESSION).fields("accession_id")
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
+                    .fields("accession_id")
                     .resultMatcher(jsonPath("$.*.accession.value", contains(ACCESSION)))
-//		                    .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//		                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
-//		                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
-//		                    .resultMatcher(jsonPath("$.links").doesNotExist())
+                    //
+                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
+                    //		                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
+                    //		                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
+                    //		                    .resultMatcher(jsonPath("$.links").doesNotExist())
                     .build();
         }
 
         @Override
         public GetIdParameter withInvalidFilterParameter() {
-            return GetIdParameter.builder().id(ACCESSION).fields("invalid")
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
+                    .fields("invalid")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
     }
 
-    static class GeneCentricGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+    static class GeneCentricGetIdContentTypeParamResolver
+            extends AbstractGetIdContentTypeParamResolver {
 
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id(ACCESSION)
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.*.accession.value", contains(ACCESSION)))
-//		                            .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//		                            .resultMatcher(jsonPath("$.commonName",is("common")))
-//		                            .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-//		                            .resultMatcher(jsonPath("$.links",contains("link")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("accession=\"" + ACCESSION + "\"")))
-//	                        .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-//	                        .resultMatcher(jsonPath("$.commonName",is("common")))
-//	                        .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-//	                        .resultMatcher(jsonPath("$.links",contains("link")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(ACCESSION)))
-                            .build())
-
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath("$.*.accession.value", contains(ACCESSION)))
+                                    //
+                                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.commonName",is("common")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.links",contains("link")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "accession=\""
+                                                                            + ACCESSION
+                                                                            + "\"")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.commonName",is("common")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
+                                    //
+                                    // .resultMatcher(jsonPath("$.links",contains("link")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString(ACCESSION)))
+                                    .build())
                     .build();
         }
 
@@ -205,23 +254,31 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id("INVALID")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
 }
-
-
-

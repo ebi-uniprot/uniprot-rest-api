@@ -1,22 +1,23 @@
 package org.uniprot.api.rest.output.header;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.OncePerRequestFilter;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
+
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
  *
- * Created 05/09/18
+ * <p>Created 05/09/18
  *
  * @author Edd
  */
@@ -25,11 +26,12 @@ public class HttpCommonHeaderConfig {
     static final String ALLOW_ALL_ORIGINS = "*";
 
     /**
-     * Defines a simple request filter that adds an Access-Control-Allow-Origin header with the value '*' to REST
-     * requests.
-     * <p>
-     * The reason for explicitly providing an all origins value, '*', is that web-caching of requests from one
-     * origin interferes with those from another origin, even when the same resource is fetched.
+     * Defines a simple request filter that adds an Access-Control-Allow-Origin header with the
+     * value '*' to REST requests.
+     *
+     * <p>The reason for explicitly providing an all origins value, '*', is that web-caching of
+     * requests from one origin interferes with those from another origin, even when the same
+     * resource is fetched.
      *
      * @return
      */
@@ -37,7 +39,9 @@ public class HttpCommonHeaderConfig {
     public OncePerRequestFilter originsFilter() {
         return new OncePerRequestFilter() {
             @Override
-            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+            protected void doFilterInternal(
+                    HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+                    throws ServletException, IOException {
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords");
                 chain.doFilter(request, response);

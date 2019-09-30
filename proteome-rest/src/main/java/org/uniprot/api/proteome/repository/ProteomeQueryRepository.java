@@ -8,16 +8,21 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
 /**
- *
  * @author jluo
  * @date: 24 Apr 2019
- *
-*/
+ */
 @Repository
 public class ProteomeQueryRepository extends SolrQueryRepository<ProteomeDocument> {
 
-    public ProteomeQueryRepository(SolrTemplate solrTemplate, ProteomeFacetConfig facetConfig, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.proteome, ProteomeDocument.class, facetConfig, requestConverter);
-	    }
+    public ProteomeQueryRepository(
+            SolrTemplate solrTemplate,
+            ProteomeFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.proteome,
+                ProteomeDocument.class,
+                facetConfig,
+                requestConverter);
+    }
 }
-

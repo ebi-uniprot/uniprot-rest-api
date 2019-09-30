@@ -1,5 +1,18 @@
 package org.uniprot.api.common.repository.store;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,19 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created 22/08/18
@@ -45,8 +45,7 @@ class StoreStreamerIT {
     private SolrRequest solrRequest;
     private static final Logger LOGGER = getLogger(StoreStreamerIT.class);
 
-    @Mock
-    private VoldemortClient<String> fakeClient;
+    @Mock private VoldemortClient<String> fakeClient;
 
     static String transformString(String id) {
         return id + "-transformed";
@@ -55,11 +54,12 @@ class StoreStreamerIT {
     @BeforeEach
     void setUp() {
         fakeUniProtStoreClient = new FakeUniProtStoreClient(fakeClient);
-        solrRequest = SolrRequest.builder()
-                .query(FAKE_QUERY)
-                .sort(FAKE_SORT)
-                .filterQuery(FAKE_FILTER_QUERY)
-                .build();
+        solrRequest =
+                SolrRequest.builder()
+                        .query(FAKE_QUERY)
+                        .sort(FAKE_SORT)
+                        .filterQuery(FAKE_FILTER_QUERY)
+                        .build();
     }
 
     /*
@@ -74,12 +74,14 @@ class StoreStreamerIT {
         createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
-        assertThat(results, contains(
-                transformString("a"),
-                transformString("b"),
-                transformString("c"),
-                transformString("d"),
-                transformString("e")));
+        assertThat(
+                results,
+                contains(
+                        transformString("a"),
+                        transformString("b"),
+                        transformString("c"),
+                        transformString("d"),
+                        transformString("e")));
     }
 
     @Test
@@ -87,12 +89,14 @@ class StoreStreamerIT {
         createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
-        assertThat(results, contains(
-                transformString("a"),
-                transformString("b"),
-                transformString("c"),
-                transformString("d"),
-                transformString("e")));
+        assertThat(
+                results,
+                contains(
+                        transformString("a"),
+                        transformString("b"),
+                        transformString("c"),
+                        transformString("d"),
+                        transformString("e")));
     }
 
     @Test
@@ -100,12 +104,14 @@ class StoreStreamerIT {
         createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
-        assertThat(results, contains(
-                transformString("a"),
-                transformString("b"),
-                transformString("c"),
-                transformString("d"),
-                transformString("e")));
+        assertThat(
+                results,
+                contains(
+                        transformString("a"),
+                        transformString("b"),
+                        transformString("c"),
+                        transformString("d"),
+                        transformString("e")));
     }
 
     @Test
@@ -113,25 +119,29 @@ class StoreStreamerIT {
         createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
         Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
         List<String> results = storeStream.collect(Collectors.toList());
-        assertThat(results, contains(
-                transformString("a"),
-                transformString("b"),
-                transformString("c"),
-                transformString("d"),
-                transformString("e")));
+        assertThat(
+                results,
+                contains(
+                        transformString("a"),
+                        transformString("b"),
+                        transformString("c"),
+                        transformString("d"),
+                        transformString("e")));
     }
 
     private void createSearchStoreStream(int streamerBatchSize, TupleStream tupleStream) {
         TupleStreamTemplate mockTupleStreamTemplate = mock(TupleStreamTemplate.class);
-        when(mockTupleStreamTemplate.create(ArgumentMatchers.any(),ArgumentMatchers.any())).thenReturn(tupleStream);
-        this.storeStreamer = StoreStreamer.<String>builder()
-                .storeClient(fakeUniProtStoreClient)
-                .streamerBatchSize(streamerBatchSize)
-                .id(ID)
-                .tupleStreamTemplate(mockTupleStreamTemplate)
-                .defaultsField(DEFAULTS)
-                .defaultsConverter(s -> s)
-                .build();
+        when(mockTupleStreamTemplate.create(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(tupleStream);
+        this.storeStreamer =
+                StoreStreamer.<String>builder()
+                        .storeClient(fakeUniProtStoreClient)
+                        .streamerBatchSize(streamerBatchSize)
+                        .id(ID)
+                        .tupleStreamTemplate(mockTupleStreamTemplate)
+                        .defaultsField(DEFAULTS)
+                        .defaultsConverter(s -> s)
+                        .build();
     }
 
     private TupleStream tupleStream(Collection<String> values) {
@@ -146,7 +156,7 @@ class StoreStreamerIT {
 
             ongoingStubbing.thenReturn(endTuple());
         } catch (IOException e) {
-            LOGGER.error("Error when tupleStream",e);
+            LOGGER.error("Error when tupleStream", e);
         }
 
         return mockTupleStream;
@@ -192,8 +202,6 @@ class StoreStreamerIT {
         }
 
         @Override
-        public void saveEntry(String s) {
-
-        }
+        public void saveEntry(String s) {}
     }
 }

@@ -14,43 +14,35 @@ import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.field.UniParcResultFields;
 
 /**
- *
  * @author jluo
  * @date: 25 Jun 2019
- *
-*/
-
+ */
 public class UniParcXslMessageConverter extends AbstractXslMessegerConverter<UniParcEntry> {
-	    private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
+    private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
 
-	    public UniParcXslMessageConverter() {
-	        super(UniParcEntry.class);
-	    }
+    public UniParcXslMessageConverter() {
+        super(UniParcEntry.class);
+    }
 
-	    @Override
-	    protected void initBefore(MessageConverterContext<UniParcEntry> context) {
-	    	tlFields.set(OutputFieldsParser.parse(context.getFields(), UniParcRequest.DEFAULT_FIELDS));
-	    }
+    @Override
+    protected void initBefore(MessageConverterContext<UniParcEntry> context) {
+        tlFields.set(OutputFieldsParser.parse(context.getFields(), UniParcRequest.DEFAULT_FIELDS));
+    }
 
-	    @Override
-	    protected List<String> getHeader() {
-	        List<String> fields = tlFields.get();
-	        return fields.stream().map(this::getFieldDisplayName).collect(Collectors.toList());
+    @Override
+    protected List<String> getHeader() {
+        List<String> fields = tlFields.get();
+        return fields.stream().map(this::getFieldDisplayName).collect(Collectors.toList());
+    }
 
-	    }
+    @Override
+    protected List<String> entry2TsvStrings(UniParcEntry entity) {
+        return new UniParcEntryMap(entity, tlFields.get()).getData();
+    }
 
-	    @Override
-	    protected List<String> entry2TsvStrings(UniParcEntry entity) {
-	    	return new UniParcEntryMap(entity, tlFields.get()).getData();
-	    }
-
-	    private String getFieldDisplayName(String field) {
-			Optional<Field> opField = UniParcResultFields.INSTANCE.getField(field);
-			if (opField.isPresent())
-				return opField.get().getLabel();
-			else
-				return field;
-		}
-
+    private String getFieldDisplayName(String field) {
+        Optional<Field> opField = UniParcResultFields.INSTANCE.getField(field);
+        if (opField.isPresent()) return opField.get().getLabel();
+        else return field;
+    }
 }
-

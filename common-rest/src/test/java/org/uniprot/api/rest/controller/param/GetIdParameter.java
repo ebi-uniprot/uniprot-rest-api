@@ -1,15 +1,14 @@
 package org.uniprot.api.rest.controller.param;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import java.util.List;
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 @Data
 @Builder
 public class GetIdParameter {
@@ -18,7 +17,5 @@ public class GetIdParameter {
 
     private String fields;
 
-    @Singular
-    private List<ResultMatcher> resultMatchers;
-
+    @Singular private List<ResultMatcher> resultMatchers;
 }

@@ -44,7 +44,7 @@ public class TaxonomyTsvMessageConverter extends AbstractTsvMessagerConverter<Ta
         List<String> fields = tlFields.get();
 
         return fields.stream()
-                .map(field -> mappedField.getOrDefault(field,""))
+                .map(field -> mappedField.getOrDefault(field, ""))
                 .collect(Collectors.toList());
     }
 }

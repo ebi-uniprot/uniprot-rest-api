@@ -1,27 +1,35 @@
 package org.uniprot.api.rest.controller.param.resolver;
 
+import java.lang.reflect.Method;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 
-import java.lang.reflect.Method;
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 public abstract class AbstractSearchParameterResolver implements ParameterResolver {
 
     @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public boolean supportsParameter(
+            ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
         return parameterContext.getParameter().getType().equals(SearchParameter.class);
     }
 
     @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public Object resolveParameter(
+            ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
         SearchParameter result = null;
-        Method method = extensionContext.getTestMethod().orElseThrow(() -> new RuntimeException("AbstractContentTypeRequestParam: Unable to find tested method"));
+        Method method =
+                extensionContext
+                        .getTestMethod()
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "AbstractContentTypeRequestParam: Unable to find tested method"));
         switch (method.getName()) {
             case "searchCanReturnSuccess":
                 result = searchCanReturnSuccessParameter();
@@ -66,5 +74,4 @@ public abstract class AbstractSearchParameterResolver implements ParameterResolv
     protected abstract SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter();
 
     protected abstract SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter();
-
 }

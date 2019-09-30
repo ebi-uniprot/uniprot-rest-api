@@ -1,5 +1,11 @@
 package org.uniprot.api.uniref.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,23 +42,25 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import java.time.LocalDate;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniRefRestApplication.class, ErrorHandlerConfig.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            UniRefRestApplication.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRefController.class)
-@ExtendWith(value = {SpringExtension.class, UniRefGetIdControllerIT.UniRefGetIdParameterResolver.class,
-        UniRefGetIdControllerIT.UniRefGetIdContentTypeParamResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            UniRefGetIdControllerIT.UniRefGetIdParameterResolver.class,
+            UniRefGetIdControllerIT.UniRefGetIdContentTypeParamResolver.class
+        })
 public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ID = "UniRef50_P03923";
     private static final String NAME = "Cluster: MoeK5";
 
-    @Autowired
-    private UniRefQueryRepository repository;
+    @Autowired private UniRefQueryRepository repository;
 
     private UniRefStoreClient storeClient;
 
@@ -78,10 +86,13 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @BeforeAll
     void initDataStore() {
-        storeClient = new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
+        storeClient =
+                new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
         getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
-        getStoreManager().addDocConverter(DataStoreManager.StoreType.UNIREF,
-                new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+        getStoreManager()
+                .addDocConverter(
+                        DataStoreManager.StoreType.UNIREF,
+                        new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
     @AfterEach
@@ -128,7 +139,8 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
         return new UniRefMemberBuilder()
-                .memberIdType(type).memberId(memberId)
+                .memberIdType(type)
+                .memberId(memberId)
                 .organismName("Homo sapiens")
                 .organismTaxId(9606)
                 .sequenceLength(length)
@@ -152,7 +164,8 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
 
         return new RepresentativeMemberBuilder()
-                .memberIdType(type).memberId(memberId)
+                .memberIdType(type)
+                .memberId(memberId)
                 .organismName("Homo sapiens")
                 .organismTaxId(9606)
                 .sequenceLength(length)
@@ -171,22 +184,26 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter validIdParameter() {
-            return GetIdParameter.builder().id(ID)
-                    .resultMatcher(jsonPath("$.id", is(ID)))
-                    .build();
+            return GetIdParameter.builder().id(ID).resultMatcher(jsonPath("$.id", is(ID))).build();
         }
 
         @Override
         public GetIdParameter invalidIdParameter() {
-            return GetIdParameter.builder().id("INVALID")
+            return GetIdParameter.builder()
+                    .id("INVALID")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
                     .build();
         }
 
         @Override
         public GetIdParameter nonExistentIdParameter() {
-            return GetIdParameter.builder().id("UniRef50_P03925")
+            return GetIdParameter.builder()
+                    .id("UniRef50_P03925")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
@@ -194,16 +211,23 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withFilterFieldsParameter() {
-            return GetIdParameter.builder().id(ID).fields("id,name,count")
+            return GetIdParameter.builder()
+                    .id(ID)
+                    .fields("id,name,count")
                     .resultMatcher(jsonPath("$.id", is(ID)))
                     .build();
         }
 
         @Override
         public GetIdParameter withInvalidFilterParameter() {
-            return GetIdParameter.builder().id(ID).fields("invalid")
+            return GetIdParameter.builder()
+                    .id(ID)
+                    .fields("invalid")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
     }
@@ -214,31 +238,46 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdContentTypeParam idSuccessContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id(ID)
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.id", is(ID)))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString(ID)))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(ID)))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(ID)))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
-                            .resultMatcher(content().string(containsString("UniRef50_P03923	Cluster: MoeK5	Homo sapiens	2	2019-08-27")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.id", is(ID)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(content().string(containsString(ID)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString(ID)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString(ID)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "UniRef50_P03923	Cluster: MoeK5	Homo sapiens	2	2019-08-27")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -246,33 +285,46 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id("INVALID")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
 }
-

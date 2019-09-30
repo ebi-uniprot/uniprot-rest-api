@@ -1,12 +1,12 @@
 package org.uniprot.api.subcell.output;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.SubcellularLocationField;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author lgonzales
@@ -24,10 +24,12 @@ public class SubcellularLocationEntryFilter {
         return Arrays.asList(fields.split(COMMA));
     }
 
-    public static SubcellularLocationEntry filterEntry(SubcellularLocationEntry entry, List<String> fields) {
+    public static SubcellularLocationEntry filterEntry(
+            SubcellularLocationEntry entry, List<String> fields) {
         SubcellularLocationEntryImpl entryImpl = (SubcellularLocationEntryImpl) entry;
         if (Utils.notEmpty(fields)) {
-            for (SubcellularLocationField.ResultFields field : SubcellularLocationField.ResultFields.values()) {
+            for (SubcellularLocationField.ResultFields field :
+                    SubcellularLocationField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {
                     remove(entryImpl, field);
                 }
@@ -36,7 +38,8 @@ public class SubcellularLocationEntryFilter {
         return entryImpl;
     }
 
-    private static void remove(SubcellularLocationEntryImpl entry, SubcellularLocationField.ResultFields field) {
+    private static void remove(
+            SubcellularLocationEntryImpl entry, SubcellularLocationField.ResultFields field) {
         switch (field) {
             case id:
             case accession:

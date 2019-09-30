@@ -1,9 +1,9 @@
 package org.uniprot.api.disease;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+
+import lombok.Data;
 
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -18,7 +18,9 @@ public class DiseaseSearchRequest implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = DiseaseField.Search.class, messagePrefix = "search.disease")
+    @ValidSolrQueryFields(
+            fieldValidatorClazz = DiseaseField.Search.class,
+            messagePrefix = "search.disease")
     private String query;
 
     @ValidSolrSortFields(sortFieldEnumClazz = DiseaseField.Sort.class)
@@ -36,5 +38,4 @@ public class DiseaseSearchRequest implements SearchRequest {
     public String getFacets() {
         return "";
     }
-
 }

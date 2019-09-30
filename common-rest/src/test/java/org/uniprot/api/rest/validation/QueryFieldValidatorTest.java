@@ -1,5 +1,13 @@
 package org.uniprot.api.rest.validation;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.rest.validation.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
+
+import java.util.*;
+import java.util.function.Predicate;
+
+import javax.validation.ConstraintValidatorContext;
+
 import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
@@ -9,13 +17,6 @@ import org.uniprot.store.search.field.BoostValue;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.SearchFieldType;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
-
-import javax.validation.ConstraintValidatorContext;
-import java.util.*;
-import java.util.function.Predicate;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.rest.validation.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
 
 /**
  * Unit Test class to validate QueryFieldValidator class behaviour
@@ -33,7 +34,6 @@ class QueryFieldValidatorTest {
         boolean result = validator.isValid("P21802-2", null);
         assertTrue(result);
     }
-
 
     @Test
     void isValidSimpleAccessionQueryReturnTrue() {
@@ -101,9 +101,12 @@ class QueryFieldValidatorTest {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
-        boolean result = validator.isValid("((organism_id:9606) OR " +
-                                                   "(gene:\"CDC7\") OR " +
-                                                   "((cc_bpcp_kinetics:\"value\" AND ccev_bpcp_kinetics:\"value\")))", null);
+        boolean result =
+                validator.isValid(
+                        "((organism_id:9606) OR "
+                                + "(gene:\"CDC7\") OR "
+                                + "((cc_bpcp_kinetics:\"value\" AND ccev_bpcp_kinetics:\"value\")))",
+                        null);
         assertTrue(result);
     }
 
@@ -113,9 +116,12 @@ class QueryFieldValidatorTest {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
-        boolean result = validator.isValid("(((organism_id:9606) OR (organism_id:1234)) AND " +
-                                                   "(gene:\"CDC7\") AND " +
-                                                   "((cc_bpcp_kinetics:1234 AND ccev_bpcp_kinetics:\"the value\")))", null);
+        boolean result =
+                validator.isValid(
+                        "(((organism_id:9606) OR (organism_id:1234)) AND "
+                                + "(gene:\"CDC7\") AND "
+                                + "((cc_bpcp_kinetics:1234 AND ccev_bpcp_kinetics:\"the value\")))",
+                        null);
         assertTrue(result);
     }
 
@@ -128,7 +134,9 @@ class QueryFieldValidatorTest {
         boolean result = validator.isValid("organism_name:human^2", null);
         assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.INVALID_TYPE).size());
-        assertEquals("org.apache.lucene.search.BoostQuery", validator.getErrorFields(ErrorType.INVALID_TYPE).get(0));
+        assertEquals(
+                "org.apache.lucene.search.BoostQuery",
+                validator.getErrorFields(ErrorType.INVALID_TYPE).get(0));
     }
 
     @Test
@@ -161,8 +169,7 @@ class QueryFieldValidatorTest {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
-        boolean result = validator.isValid("accession:P21802 OR " +
-                                                   "accession:invalidValue", null);
+        boolean result = validator.isValid("accession:P21802 OR " + "accession:invalidValue", null);
         assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("accession", validator.getErrorFields(ErrorType.VALUE).get(0));
@@ -174,8 +181,8 @@ class QueryFieldValidatorTest {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
-        boolean result = validator.isValid("proteome:UP123456789 OR " +
-                                                   "proteome:notProteomeId", null);
+        boolean result =
+                validator.isValid("proteome:UP123456789 OR " + "proteome:notProteomeId", null);
         assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("proteome", validator.getErrorFields(ErrorType.VALUE).get(0));
@@ -209,22 +216,25 @@ class QueryFieldValidatorTest {
         ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
 
         Class<? extends SearchField> returnFieldValidator = FakeSearchFields.class;
-        OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validReturnFields.fieldValidatorClazz());
+        OngoingStubbing<Class<?>> ongoingStubbing =
+                Mockito.when(validReturnFields.fieldValidatorClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
         return validReturnFields;
     }
 
-    /**
-     * this class is responsible to fake buildErrorMessage to help tests with
-     */
+    /** this class is responsible to fake buildErrorMessage to help tests with */
     static class FakeQueryFieldValidator extends ValidSolrQueryFields.QueryFieldValidator {
 
         enum ErrorType {
-            VALUE, TYPE, FIELD, INVALID_TYPE
+            VALUE,
+            TYPE,
+            FIELD,
+            INVALID_TYPE
         }
 
         FakeQueryFieldValidator() {
-            Arrays.stream(ErrorType.values()).forEach(errorType -> errorFields.put(errorType, new ArrayList<>()));
+            Arrays.stream(ErrorType.values())
+                    .forEach(errorType -> errorFields.put(errorType, new ArrayList<>()));
         }
 
         final Map<ErrorType, List<String>> errorFields = new HashMap<>();
@@ -233,19 +243,23 @@ class QueryFieldValidatorTest {
             return errorFields.get(errorType);
         }
 
-
         @Override
-        public void addFieldValueErrorMessage(String fieldName, String value, ConstraintValidatorContextImpl contextImpl) {
+        public void addFieldValueErrorMessage(
+                String fieldName, String value, ConstraintValidatorContextImpl contextImpl) {
             errorFields.get(ErrorType.VALUE).add(fieldName);
         }
 
         @Override
-        public void addFieldTypeErrorMessage(String fieldName, SearchFieldType type, ConstraintValidatorContextImpl contextImpl) {
+        public void addFieldTypeErrorMessage(
+                String fieldName,
+                SearchFieldType type,
+                ConstraintValidatorContextImpl contextImpl) {
             errorFields.get(ErrorType.TYPE).add(fieldName);
         }
 
         @Override
-        public void addFieldNameErrorMessage(String fieldName, ConstraintValidatorContextImpl contextImpl) {
+        public void addFieldNameErrorMessage(
+                String fieldName, ConstraintValidatorContextImpl contextImpl) {
             errorFields.get(ErrorType.FIELD).add(fieldName);
         }
 
@@ -255,11 +269,7 @@ class QueryFieldValidatorTest {
         }
     }
 
-    /**
-     * this enum is responsible to fake SearchField to help tests
-     */
-
-
+    /** this enum is responsible to fake SearchField to help tests */
     enum FakeSearchFields implements SearchField {
         active(SearchFieldType.TERM, FieldValueValidator::isBooleanValue),
         accession(SearchFieldType.TERM, FieldValueValidator::isAccessionValid),
@@ -304,6 +314,4 @@ class QueryFieldValidatorTest {
             return this.searchFieldType;
         }
     }
-
-
 }

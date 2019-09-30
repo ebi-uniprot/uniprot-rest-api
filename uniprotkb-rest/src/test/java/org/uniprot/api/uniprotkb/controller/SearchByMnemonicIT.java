@@ -1,5 +1,17 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,19 +45,6 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-
-import static org.hamcrest.Matchers.contains;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
-
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
@@ -59,67 +58,71 @@ class SearchByMnemonicIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    @Autowired
-    private UniprotQueryRepository repository;
+    @Autowired private UniprotQueryRepository repository;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
     @BeforeAll
     void setUp() throws IOException {
-        mockMvc = MockMvcBuilders.
-                webAppContextSetup(webApplicationContext)
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
+        SolrTemplate template =
+                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
         template.afterPropertiesSet();
         ReflectionTestUtils.setField(repository, "solrTemplate", template);
 
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(),
-                PathwayRepoMocker.getPathwayRepo(),
-                Mockito.mock(ChebiRepo.class),
-                Mockito.mock(ECRepo.class),
-                new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter =
+                new UniProtEntryConverter(
+                        TaxonomyRepoMocker.getTaxonomyRepo(),
+                        GoRelationsRepoMocker.getGoRelationRepo(),
+                        PathwayRepoMocker.getPathwayRepo(),
+                        Mockito.mock(ChebiRepo.class),
+                        Mockito.mock(ECRepo.class),
+                        new HashMap<>());
 
         storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
 
-        UniProtKBStoreClient storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
-                .getInstance("avro-uniprot"));
+        UniProtKBStoreClient storeClient =
+                new UniProtKBStoreClient(
+                        VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
         InputStream resourceAsStream = TestUtils.getResourceAsStream(UNIPROT_FLAT_FILE_ENTRY_PATH);
-        UniProtEntryObjectProxy entryProxy = UniProtEntryObjectProxy.createEntryFromInputStream(resourceAsStream);
+        UniProtEntryObjectProxy entryProxy =
+                UniProtEntryObjectProxy.createEntryFromInputStream(resourceAsStream);
 
-        //Entry 1
+        // Entry 1
         entryProxy.updateEntryObject(LineType.AC, String.format(ACC_LINE, "Q197F4"));
         entryProxy.updateEntryObject(LineType.ID, String.format(ID_LINE, "CYC_PANTR"));
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, TestUtils.convertToUniProtEntry(entryProxy));
+        storeManager.save(
+                DataStoreManager.StoreType.UNIPROT, TestUtils.convertToUniProtEntry(entryProxy));
 
-        //Entry 2
+        // Entry 2
         entryProxy.updateEntryObject(LineType.AC, String.format(ACC_LINE, TARGET_ACCESSION));
         entryProxy.updateEntryObject(LineType.ID, String.format(ID_LINE, TARGET_ID));
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, TestUtils.convertToUniProtEntry(entryProxy));
+        storeManager.save(
+                DataStoreManager.StoreType.UNIPROT, TestUtils.convertToUniProtEntry(entryProxy));
 
-        //Entry 3
+        // Entry 3
         entryProxy.updateEntryObject(LineType.AC, String.format(ACC_LINE, "Q197F6"));
         entryProxy.updateEntryObject(LineType.ID, String.format(ID_LINE, "AATM_RABIT"));
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, TestUtils.convertToUniProtEntry(entryProxy));
+        storeManager.save(
+                DataStoreManager.StoreType.UNIPROT, TestUtils.convertToUniProtEntry(entryProxy));
     }
 
     @Test
     void canReachSearchEndpoint() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "mnemonic:" + TARGET_ID));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "mnemonic:" + TARGET_ID));
 
         // then
         response.andDo(print())
@@ -132,10 +135,11 @@ class SearchByMnemonicIT {
     void canReachSearchEndpointMixCase() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "mnemonic:cYc_Human"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "mnemonic:cYc_Human"));
 
         // then
         response.andDo(print())
@@ -146,12 +150,13 @@ class SearchByMnemonicIT {
 
     @Test
     void canReachSearchEndpointWithDefault() throws Exception {
-    
-       // when
-       ResultActions response = mockMvc.perform(
-               get(SEARCH_RESOURCE)
-                       .header(ACCEPT, APPLICATION_JSON_VALUE)
-                       .param("query", "mnemonic_default:AATM_RABIT"));
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "mnemonic_default:AATM_RABIT"));
 
         // then
         response.andDo(print())
@@ -164,16 +169,16 @@ class SearchByMnemonicIT {
     void canReachSearchEndpointPartNotAvailable() throws Exception {
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "mnemonic:AATM"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "mnemonic:AATM"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-
-       .andExpect(jsonPath("$.results.*.primaryAccession").doesNotExist());
-   }
+                .andExpect(jsonPath("$.results.*.primaryAccession").doesNotExist());
+    }
 }

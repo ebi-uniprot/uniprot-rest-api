@@ -1,6 +1,17 @@
 package org.uniprot.api.uniref.controller;
 
-import com.beust.jcommander.internal.Lists;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,29 +53,26 @@ import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefResultFields;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.beust.jcommander.internal.Lists;
 
 /**
  * @author jluo
  * @date: 27 Aug 2019
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniRefRestApplication.class, ErrorHandlerConfig.class})
-
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            UniRefRestApplication.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRefController.class)
-@ExtendWith(value = {SpringExtension.class, UniRefSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
-        UniRefSearchControllerIT.UniRefSearchParameterResolver.class})
-
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            UniRefSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
+            UniRefSearchControllerIT.UniRefSearchParameterResolver.class
+        })
 public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     private static final String ID_PREF = "UniRef50_P039";
     private static final String NAME_PREF = "Cluster: MoeK5 ";
@@ -72,20 +80,21 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     private static final String ACC_2_PREF = "P123";
     private static final String UPI_PREF = "UPI0000083A";
 
-    @Autowired
-    private UniRefQueryRepository repository;
+    @Autowired private UniRefQueryRepository repository;
 
-    @Autowired
-    private UniRefFacetConfig facetConfig;
+    @Autowired private UniRefFacetConfig facetConfig;
 
     private UniRefStoreClient storeClient;
 
     @BeforeAll
     void initDataStore() {
-        storeClient = new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
+        storeClient =
+                new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
         getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
-        getStoreManager().addDocConverter(DataStoreManager.StoreType.UNIREF,
-                new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+        getStoreManager()
+                .addDocConverter(
+                        DataStoreManager.StoreType.UNIREF,
+                        new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
     @AfterEach
@@ -167,24 +176,19 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllReturnedFields() {
-        return Lists.newArrayList(
-                UniRefResultFields.INSTANCE.getAllFields()
-                        .keySet());
+        return Lists.newArrayList(UniRefResultFields.INSTANCE.getAllFields().keySet());
     }
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(11);
         saveEntry(20);
-
     }
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        IntStream.rangeClosed(1, numberOfEntries)
-                .forEach(this::saveEntry);
+        IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
-
 
     private void saveEntry(int i) {
         UniRefEntry unirefEntry = createEntry(i);
@@ -193,18 +197,13 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         Entry entry = converter.toXml(unirefEntry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, unirefEntry);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
-
     }
-
 
     private String getName(String prefix, int i) {
         if (i < 10) {
             return prefix + "0" + i;
-        } else
-            return prefix + i;
-
+        } else return prefix + i;
     }
-
 
     private UniRefEntry createEntry(int i) {
 
@@ -236,7 +235,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 
         UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
         return new UniRefMemberBuilder()
-                .memberIdType(type).memberId(memberId)
+                .memberIdType(type)
+                .memberId(memberId)
                 .organismName("Homo sapiens")
                 .organismTaxId(9606)
                 .sequenceLength(length)
@@ -260,7 +260,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
 
         return new RepresentativeMemberBuilder()
-                .memberIdType(type).memberId(memberId)
+                .memberIdType(type)
+                .memberId(memberId)
                 .organismName("Homo sapiens")
                 .organismTaxId(9606)
                 .sequenceLength(length)
@@ -297,7 +298,10 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("id:*"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("UniRef50_P03911", "UniRef50_P03920")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UniRef50_P03911", "UniRef50_P03920")))
                     .build();
         }
 
@@ -306,24 +310,32 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("taxonomy_name:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*",
-                            contains("'taxonomy_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'term' filter type")))
                     .build();
         }
 
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("id:INVALID OR taxonomy_id:INVALID " +
-                            "OR length:INVALID OR count:INVALID  OR upi:INVALID"))
+                    .queryParam(
+                            "query",
+                            Collections.singletonList(
+                                    "id:INVALID OR taxonomy_id:INVALID "
+                                            + "OR length:INVALID OR count:INVALID  OR upi:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
-                            "The 'id' value has invalid format. It should be a valid UniRef Cluster id",
-                            "The taxonomy id filter value should be a number",
-                            "'length' filter type 'term' is invalid. Expected 'range' filter type",
-                            "'count' filter type 'term' is invalid. Expected 'range' filter type",
-                            "The 'upi' value has invalid format. It should be a valid UniParc UPI"
-                    )))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    containsInAnyOrder(
+                                            "The 'id' value has invalid format. It should be a valid UniRef Cluster id",
+                                            "The taxonomy id filter value should be a number",
+                                            "'length' filter type 'term' is invalid. Expected 'range' filter type",
+                                            "'count' filter type 'term' is invalid. Expected 'range' filter type",
+                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                     .build();
         }
 
@@ -332,7 +344,10 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("id desc"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("UniRef50_P03920", "UniRef50_P03911")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UniRef50_P03920", "UniRef50_P03911")))
                     .build();
         }
 
@@ -341,9 +356,10 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("name"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("UniRef50_P03911", "UniRef50_P03920")))
-
-
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UniRef50_P03911", "UniRef50_P03920")))
                     .build();
         }
 
@@ -352,47 +368,77 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     //    .queryParam("facets", Collections.singletonList("reference"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("UniRef50_P03911", "UniRef50_P03920")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UniRef50_P03911", "UniRef50_P03920")))
                     .build();
         }
     }
 
-
-    static class UniRefSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class UniRefSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("taxonomy_id:9606")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.id", contains("UniRef50_P03911", "UniRef50_P03920")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("UniRef50_P03911")))
-                            .resultMatcher(content().string(containsString("UniRef50_P03920")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("UniRef50_P03911")))
-                            .resultMatcher(content().string(containsString("UniRef50_P03920")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
-                            .resultMatcher(content().string(containsString("UniRef50_P03911	Cluster: MoeK5 11	Homo sapiens	2	2019-08-27")))
-                            .resultMatcher(content().string(containsString("UniRef50_P03920	Cluster: MoeK5 20	Homo sapiens	2	2019-08-27")))
-
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.id",
+                                                    contains("UniRef50_P03911", "UniRef50_P03920")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content().string(containsString("UniRef50_P03911")))
+                                    .resultMatcher(
+                                            content().string(containsString("UniRef50_P03920")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().string(containsString("UniRef50_P03911")))
+                                    .resultMatcher(
+                                            content().string(containsString("UniRef50_P03920")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "UniRef50_P03911	Cluster: MoeK5 11	Homo sapiens	2	2019-08-27")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "UniRef50_P03920	Cluster: MoeK5 20	Homo sapiens	2	2019-08-27")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -400,34 +446,48 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("upi:invalid")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
     }
-
 }
-

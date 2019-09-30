@@ -7,9 +7,7 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 @Repository
 public class KeywordRepository extends SolrQueryRepository<KeywordDocument> {
 

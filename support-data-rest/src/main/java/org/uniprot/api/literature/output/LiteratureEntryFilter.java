@@ -37,7 +37,8 @@ public class LiteratureEntryFilter {
         return entryBuilder.build();
     }
 
-    private static void remove(LiteratureEntryBuilder entryBuilder, LiteratureField.ResultFields field) {
+    private static void remove(
+            LiteratureEntryBuilder entryBuilder, LiteratureField.ResultFields field) {
         switch (field) {
             case id:
             case reference:

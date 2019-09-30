@@ -1,5 +1,12 @@
 package org.uniprot.api.subcell.output;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.cv.keyword.impl.GeneOntologyImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
@@ -8,13 +15,6 @@ import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationStatisticsImpl;
 import org.uniprot.store.search.field.SubcellularLocationField;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -49,7 +49,8 @@ class SubcellularLocationEntryFilterTest {
     @Test
     void filterWithoutFieldsEntry() {
         SubcellularLocationEntry entry = getCompleteSubcellularLocationEntry(true);
-        SubcellularLocationEntry filterEntry = SubcellularLocationEntryFilter.filterEntry(entry, null);
+        SubcellularLocationEntry filterEntry =
+                SubcellularLocationEntryFilter.filterEntry(entry, null);
         assertNotNull(filterEntry);
         assertEquals(entry, filterEntry);
     }
@@ -57,15 +58,16 @@ class SubcellularLocationEntryFilterTest {
     @Test
     void filterWithAllFieldsEntry() {
         SubcellularLocationEntry entry = getCompleteSubcellularLocationEntry(true);
-        List<String> allFields = Arrays.stream(SubcellularLocationField.ResultFields.values())
-                .map(SubcellularLocationField.ResultFields::name)
-                .collect(Collectors.toList());
+        List<String> allFields =
+                Arrays.stream(SubcellularLocationField.ResultFields.values())
+                        .map(SubcellularLocationField.ResultFields::name)
+                        .collect(Collectors.toList());
 
-        SubcellularLocationEntry filterEntry = SubcellularLocationEntryFilter.filterEntry(entry, allFields);
+        SubcellularLocationEntry filterEntry =
+                SubcellularLocationEntryFilter.filterEntry(entry, allFields);
         assertNotNull(filterEntry);
         assertEquals(entry, filterEntry);
     }
-
 
     private SubcellularLocationEntry getCompleteSubcellularLocationEntry(boolean hasChild) {
         SubcellularLocationEntryImpl entry = new SubcellularLocationEntryImpl();
@@ -87,5 +89,4 @@ class SubcellularLocationEntryFilterTest {
         }
         return entry;
     }
-
 }

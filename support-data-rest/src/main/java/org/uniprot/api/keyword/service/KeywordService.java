@@ -1,5 +1,7 @@
 package org.uniprot.api.keyword.service;
 
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -11,8 +13,6 @@ import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.field.KeywordField;
 
-import java.util.stream.Stream;
-
 @Service
 public class KeywordService {
     private final BasicSearchService<KeywordEntry, KeywordDocument> basicService;
@@ -21,7 +21,11 @@ public class KeywordService {
 
     public KeywordService(KeywordRepository repository) {
         this.basicService = new BasicSearchService<>(repository, new KeywordEntryConverter());
-        this.defaultSearchHandler = new DefaultSearchHandler(KeywordField.Search.content, KeywordField.Search.id, KeywordField.Search.getBoostFields());
+        this.defaultSearchHandler =
+                new DefaultSearchHandler(
+                        KeywordField.Search.content,
+                        KeywordField.Search.id,
+                        KeywordField.Search.getBoostFields());
         this.keywordSortClause = new KeywordSortClause();
     }
 
@@ -30,12 +34,16 @@ public class KeywordService {
     }
 
     public QueryResult<KeywordEntry> search(KeywordRequestDTO request) {
-        SolrRequest solrRequest = basicService.createSolrRequest(request, null, keywordSortClause, defaultSearchHandler);
+        SolrRequest solrRequest =
+                basicService.createSolrRequest(
+                        request, null, keywordSortClause, defaultSearchHandler);
         return basicService.search(solrRequest, request.getCursor(), request.getSize());
     }
 
     public Stream<KeywordEntry> download(KeywordRequestDTO request) {
-        SolrRequest solrRequest = basicService.createSolrRequest(request, null, keywordSortClause, defaultSearchHandler);
+        SolrRequest solrRequest =
+                basicService.createSolrRequest(
+                        request, null, keywordSortClause, defaultSearchHandler);
         return basicService.download(solrRequest);
     }
 }

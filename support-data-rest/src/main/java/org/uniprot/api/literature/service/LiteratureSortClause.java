@@ -25,5 +25,4 @@ public class LiteratureSortClause extends AbstractSolrSortClause {
     protected String getSolrSortFieldName(String name) {
         return LiteratureField.Sort.valueOf(name).getSolrFieldName();
     }
-
 }

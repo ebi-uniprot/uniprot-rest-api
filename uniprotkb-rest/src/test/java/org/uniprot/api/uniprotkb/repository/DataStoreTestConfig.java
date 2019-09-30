@@ -1,5 +1,9 @@
 package org.uniprot.api.uniprotkb.repository;
 
+import static org.mockito.Mockito.mock;
+
+import java.net.URISyntaxException;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -12,17 +16,12 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
-import java.net.URISyntaxException;
-
-import static org.mockito.Mockito.mock;
-
-
 /**
- * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override production ones.
- * For example, this allows us to use embedded Solr data stores or in memory Voldemort instances, rather than ones
- * running on VMs.
- * <p>
- * Created 14/09/18
+ * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override
+ * production ones. For example, this allows us to use embedded Solr data stores or in memory
+ * Voldemort instances, rather than ones running on VMs.
+ *
+ * <p>Created 14/09/18
  *
  * @author Edd
  */
@@ -42,10 +41,11 @@ public class DataStoreTestConfig {
     }
 
     @SuppressWarnings("rawtypes")
-	@Bean
+    @Bean
     @Profile("offline")
     public UniProtKBStoreClient primaryUniProtStoreClient() {
-        return new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
+        return new UniProtKBStoreClient(
+                VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
     }
 
     @Bean

@@ -1,6 +1,18 @@
 package org.uniprot.api.proteome.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,28 +46,26 @@ import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentri
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.SearchField;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author jluo
  * @date: 17 Jun 2019
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, ProteomeRestApplication.class, ErrorHandlerConfig.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            ProteomeRestApplication.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(GeneCentricController.class)
-@ExtendWith(value = {SpringExtension.class, GeneCentricSearchControllerIT.GeneCentricSearchParameterResolver.class,
-        GeneCentricSearchControllerIT.GeneCentricSearchContentTypeParamResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            GeneCentricSearchControllerIT.GeneCentricSearchParameterResolver.class,
+            GeneCentricSearchControllerIT.GeneCentricSearchContentTypeParamResolver.class
+        })
 public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
     private static final String ACCESSION_PREF = "P00";
     private static final String RELATED_ACCESSION_PREF_1 = "P20";
@@ -63,11 +73,9 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
     private static final String UPID = "UP000005640";
     private static final int TAX_ID = 9606;
 
-    @Autowired
-    private GeneCentricQueryRepository repository;
+    @Autowired private GeneCentricQueryRepository repository;
 
-    @Autowired
-    private GeneCentricFacetConfig facetConfig;
+    @Autowired private GeneCentricFacetConfig facetConfig;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -155,9 +163,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        IntStream.rangeClosed(1, numberOfEntries)
-                .forEach(this::saveEntry);
-
+        IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
     private String getName(String prefix, int i) {
@@ -165,9 +171,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
             return prefix + "00" + i;
         } else if (i < 100) {
             return prefix + "0" + i;
-        } else
-            return prefix + i;
-
+        } else return prefix + i;
     }
 
     private GeneCentricDocument createDocument(int i) {
@@ -179,44 +183,68 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         GeneCentricDocumentBuilder builder = GeneCentricDocument.builder();
         List<String> accessions = new ArrayList<>();
         accessions.add(protein.getCanonicalProtein().getAccession().getValue());
-        protein.getRelatedProteins().stream().map(val -> val.getAccession().getValue())
+        protein.getRelatedProteins().stream()
+                .map(val -> val.getAccession().getValue())
                 .forEach(accessions::add);
         List<String> genes = new ArrayList<>();
         genes.add(protein.getCanonicalProtein().getGeneName());
         protein.getRelatedProteins().stream().map(Protein::getGeneName).forEach(genes::add);
 
-        builder.accession(protein.getCanonicalProtein().getAccession().getValue()).accessions(accessions)
-                .geneNames(genes).reviewed(protein.getCanonicalProtein().getEntryType() == UniProtEntryType.SWISSPROT)
-                .upid(UPID).organismTaxId(TAX_ID);
+        builder.accession(protein.getCanonicalProtein().getAccession().getValue())
+                .accessions(accessions)
+                .geneNames(genes)
+                .reviewed(
+                        protein.getCanonicalProtein().getEntryType() == UniProtEntryType.SWISSPROT)
+                .upid(UPID)
+                .organismTaxId(TAX_ID);
         builder.geneCentricStored(getBinary(protein));
         return builder.build();
     }
 
     private CanonicalProtein createProtein(int i) {
-        Protein protein = ProteinBuilder.newInstance().accession(getName(ACCESSION_PREF, i))
-                .entryType(UniProtEntryType.SWISSPROT).geneName(getName("gene", i))
-                .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL).sequenceLength(324).build();
+        Protein protein =
+                ProteinBuilder.newInstance()
+                        .accession(getName(ACCESSION_PREF, i))
+                        .entryType(UniProtEntryType.SWISSPROT)
+                        .geneName(getName("gene", i))
+                        .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
+                        .sequenceLength(324)
+                        .build();
 
-        Protein protein2 = ProteinBuilder.newInstance().accession(getName(RELATED_ACCESSION_PREF_1, i))
-                .entryType(UniProtEntryType.SWISSPROT).geneName(getName("agene", i))
-                .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL).sequenceLength(334).build();
-        Protein protein3 = ProteinBuilder.newInstance().accession(getName(RELATED_ACCESSION_PREF_2, i))
-                .entryType(UniProtEntryType.TREMBL).geneName(getName("twogene", i))
-                .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN).sequenceLength(434).build();
+        Protein protein2 =
+                ProteinBuilder.newInstance()
+                        .accession(getName(RELATED_ACCESSION_PREF_1, i))
+                        .entryType(UniProtEntryType.SWISSPROT)
+                        .geneName(getName("agene", i))
+                        .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
+                        .sequenceLength(334)
+                        .build();
+        Protein protein3 =
+                ProteinBuilder.newInstance()
+                        .accession(getName(RELATED_ACCESSION_PREF_2, i))
+                        .entryType(UniProtEntryType.TREMBL)
+                        .geneName(getName("twogene", i))
+                        .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
+                        .sequenceLength(434)
+                        .build();
         CanonicalProteinBuilder builder = CanonicalProteinBuilder.newInstance();
 
-        return builder.canonicalProtein(protein).addRelatedProtein(protein2)
-                .addRelatedProtein(protein3).build();
+        return builder.canonicalProtein(protein)
+                .addRelatedProtein(protein2)
+                .addRelatedProtein(protein3)
+                .build();
     }
 
     private ByteBuffer getBinary(CanonicalProtein entry) {
         try {
-            return ByteBuffer.wrap(ProteomeJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    ProteomeJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
     }
-
 
     static class GeneCentricSearchParameterResolver extends AbstractSearchParameterResolver {
 
@@ -224,7 +252,12 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("gene:*"))
-                    .resultMatcher(jsonPath("$.results.*..accession.value", contains("P00123", "P20123", "P30123", "P00124", "P20124", "P30124")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*..accession.value",
+                                    contains(
+                                            "P00123", "P20123", "P30123", "P00124", "P20124",
+                                            "P30124")))
                     .build();
         }
 
@@ -240,7 +273,8 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("gene:*"))
-                    .resultMatcher(jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
+                    .resultMatcher(
+                            jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
                     .build();
         }
 
@@ -249,22 +283,29 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("gene:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*",
-                            contains("'gene' filter type 'range' is invalid. Expected 'term' filter type")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "'gene' filter type 'range' is invalid. Expected 'term' filter type")))
                     .build();
         }
 
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("upid:INVALID OR organism_id:INVALID " +
-                            "OR reviewed:invalid"))
+                    .queryParam(
+                            "query",
+                            Collections.singletonList(
+                                    "upid:INVALID OR organism_id:INVALID " + "OR reviewed:invalid"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
-                            "The 'upid' value has invalid format. It should be a valid Proteome UPID",
-                            "The organism id filter value should be a number",
-                            "The reviewed id filter value should be a true or false"
-                    )))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    containsInAnyOrder(
+                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID",
+                                            "The organism id filter value should be a number",
+                                            "The reviewed id filter value should be a true or false")))
                     .build();
         }
 
@@ -273,7 +314,8 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("accession_id asc"))
-                    .resultMatcher(jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
+                    .resultMatcher(
+                            jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
                     .build();
         }
 
@@ -282,9 +324,15 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("accession_id"))
-                    .resultMatcher(jsonPath("$.results.*..accession.value", contains("P00123", "P20123", "P30123", "P00124", "P20124", "P30124")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*..accession.value",
+                                    contains(
+                                            "P00123", "P20123", "P30123", "P00124", "P20124",
+                                            "P30124")))
 
-                    //              .resultMatcher(jsonPath("$.results.*.description",contains("Description231","Description520")))
+                    //
+                    // .resultMatcher(jsonPath("$.results.*.description",contains("Description231","Description520")))
                     .build();
         }
 
@@ -293,42 +341,60 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("reviewed:true"))
                     .queryParam("facets", Collections.singletonList("reviewed"))
-                    .resultMatcher(jsonPath("$.results.*..accession.value", contains("P00123", "P20123", "P30123", "P00124", "P20124", "P30124")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*..accession.value",
+                                    contains(
+                                            "P00123", "P20123", "P30123", "P00124", "P20124",
+                                            "P30124")))
                     .build();
         }
     }
 
-
-    static class GeneCentricSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class GeneCentricSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("organism_id:9606")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("P00123")))
-                            .resultMatcher(content().string(containsString("P00124")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("P00123")))
-                            .resultMatcher(content().string(containsString("P00124")))
-                            .build())
-//	                    .contentTypeParam(ContentTypeParam.builder()
-//	                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-//	                            .resultMatcher(content().string(containsString("\tOrganism\tOrganism ID\tProtein count")))
-//	                            .resultMatcher(content().string(containsString("UP000005231\tHomo sapiens\t9606\t0")))
-//	                            .resultMatcher(content().string(containsString("UP000005520\tHomo sapiens\t9606\t0")))
-//	                            .build())
-//	                    .contentTypeParam(ContentTypeParam.builder()
-//	                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-//	                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-//	                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*..accession.value",
+                                                    hasItems("P00123", "P00124")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(content().string(containsString("P00123")))
+                                    .resultMatcher(content().string(containsString("P00124")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString("P00123")))
+                                    .resultMatcher(content().string(containsString("P00124")))
+                                    .build())
+                    //	                    .contentTypeParam(ContentTypeParam.builder()
+                    //	                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                    //
+                    // .resultMatcher(content().string(containsString("\tOrganism\tOrganism
+                    // ID\tProtein count")))
+                    //
+                    // .resultMatcher(content().string(containsString("UP000005231\tHomo
+                    // sapiens\t9606\t0")))
+                    //
+                    // .resultMatcher(content().string(containsString("UP000005520\tHomo
+                    // sapiens\t9606\t0")))
+                    //	                            .build())
+                    //	                    .contentTypeParam(ContentTypeParam.builder()
+                    //	                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                    //
+                    // .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                    //	                            .build())
                     .build();
         }
 
@@ -336,29 +402,39 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("upid:invalid")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("The 'upid' value has invalid format. It should be a valid Proteome UPID")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-//	                    .contentTypeParam(ContentTypeParam.builder()
-//	                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-//	                            .resultMatcher(content().string(isEmptyString()))
-//	                            .build())
-//	                    .contentTypeParam(ContentTypeParam.builder()
-//	                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-//	                            .resultMatcher(content().string(isEmptyString()))
-//	                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    //	                    .contentTypeParam(ContentTypeParam.builder()
+                    //	                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                    //	                            .resultMatcher(content().string(isEmptyString()))
+                    //	                            .build())
+                    //	                    .contentTypeParam(ContentTypeParam.builder()
+                    //	                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                    //	                            .resultMatcher(content().string(isEmptyString()))
+                    //	                            .build())
                     .build();
         }
     }
-
 }

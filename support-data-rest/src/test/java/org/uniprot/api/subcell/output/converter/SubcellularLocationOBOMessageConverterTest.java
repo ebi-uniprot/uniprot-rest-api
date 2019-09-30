@@ -21,10 +21,9 @@ import org.uniprot.core.cv.subcell.SubcellularLocationFileReader;
  */
 class SubcellularLocationOBOMessageConverterTest {
 
-
     @Test
     void canParseRequiredOBOFields() throws IOException {
-        //when
+        // when
         List<String> sampleLines = new ArrayList<>();
         sampleLines.add("_______________________________");
         sampleLines.add("ID   Acidocalcisome.");
@@ -32,16 +31,18 @@ class SubcellularLocationOBOMessageConverterTest {
         sampleLines.add("DE   The acidocalcisome");
         sampleLines.add("//");
 
-        SubcellularLocationOBOMessageConverter converter = new SubcellularLocationOBOMessageConverter();
+        SubcellularLocationOBOMessageConverter converter =
+                new SubcellularLocationOBOMessageConverter();
         OBOFormatWriter oboFormatWriter = new OBOFormatWriter();
 
-        SubcellularLocationFileReader subcellularLocationFileReader = new SubcellularLocationFileReader();
-        List<SubcellularLocationEntry> entries = subcellularLocationFileReader.parseLines(sampleLines);
+        SubcellularLocationFileReader subcellularLocationFileReader =
+                new SubcellularLocationFileReader();
+        List<SubcellularLocationEntry> entries =
+                subcellularLocationFileReader.parseLines(sampleLines);
         assertNotNull(entries);
         assertEquals(1, entries.size());
 
-
-        //do
+        // do
         Frame frame = converter.getTermFrame(entries.get(0));
         assertNotNull(frame);
 
@@ -49,20 +50,21 @@ class SubcellularLocationOBOMessageConverterTest {
         oboFormatWriter.write(frame, new PrintWriter(out), null);
         String oboFormatStr = out.getBuffer().toString();
 
-        //check
+        // check
 
-        String expectedOutput = "[Term]\n" +
-                "id: SL-0002\n" +
-                "name: Acidocalcisome\n" +
-                "namespace: uniprot:locations:cellular_component\n" +
-                "def: \"The acidocalcisome\" []\n\n";
+        String expectedOutput =
+                "[Term]\n"
+                        + "id: SL-0002\n"
+                        + "name: Acidocalcisome\n"
+                        + "namespace: uniprot:locations:cellular_component\n"
+                        + "def: \"The acidocalcisome\" []\n\n";
         assertNotNull(oboFormatStr);
         assertEquals(expectedOutput, oboFormatStr);
     }
 
     @Test
     void canParseAllOBOFields() throws IOException {
-        //when
+        // when
         List<String> sampleLines = new ArrayList<>();
         sampleLines.add("_______________________________");
         sampleLines.add("ID   Acidocalcisome.");
@@ -75,16 +77,18 @@ class SubcellularLocationOBOMessageConverterTest {
         sampleLines.add("HI   Acidocalcisome.");
         sampleLines.add("//");
 
-        SubcellularLocationOBOMessageConverter converter = new SubcellularLocationOBOMessageConverter();
+        SubcellularLocationOBOMessageConverter converter =
+                new SubcellularLocationOBOMessageConverter();
         OBOFormatWriter oboFormatWriter = new OBOFormatWriter();
 
-        SubcellularLocationFileReader subcellularLocationFileReader = new SubcellularLocationFileReader();
-        List<SubcellularLocationEntry> entries = subcellularLocationFileReader.parseLines(sampleLines);
+        SubcellularLocationFileReader subcellularLocationFileReader =
+                new SubcellularLocationFileReader();
+        List<SubcellularLocationEntry> entries =
+                subcellularLocationFileReader.parseLines(sampleLines);
         assertNotNull(entries);
         assertEquals(1, entries.size());
 
-
-        //do
+        // do
         Frame frame = converter.getTermFrame(entries.get(0));
         assertNotNull(frame);
 
@@ -92,18 +96,19 @@ class SubcellularLocationOBOMessageConverterTest {
         oboFormatWriter.write(frame, new PrintWriter(out), null);
         String oboFormatStr = out.getBuffer().toString();
 
-        //check
+        // check
 
-        String expectedOutput = "[Term]\n" +
-                "id: SL-0002\n" +
-                "name: Acidocalcisome\n" +
-                "namespace: uniprot:locations:cellular_component\n" +
-                "def: \"The acidocalcisome\" []\n" +
-                "synonym: \"Acidocalcisome lumen\" [UniProt]\n" +
-                "xref: GO:0002081 \"outer acrosomal membrane\"\n" +
-                "xref: http://www.cf.ac.uk/biosi/staff/ehrmann/tools/ecce/ecce.htm\n" +
-                "is_a: SL-0002\n" +
-                "relationship: part_of SL-0002\n\n";
+        String expectedOutput =
+                "[Term]\n"
+                        + "id: SL-0002\n"
+                        + "name: Acidocalcisome\n"
+                        + "namespace: uniprot:locations:cellular_component\n"
+                        + "def: \"The acidocalcisome\" []\n"
+                        + "synonym: \"Acidocalcisome lumen\" [UniProt]\n"
+                        + "xref: GO:0002081 \"outer acrosomal membrane\"\n"
+                        + "xref: http://www.cf.ac.uk/biosi/staff/ehrmann/tools/ecce/ecce.htm\n"
+                        + "is_a: SL-0002\n"
+                        + "relationship: part_of SL-0002\n\n";
         assertNotNull(oboFormatStr);
         assertEquals(expectedOutput, oboFormatStr);
     }

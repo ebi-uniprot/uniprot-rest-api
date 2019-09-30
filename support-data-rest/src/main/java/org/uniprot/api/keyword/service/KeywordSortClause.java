@@ -4,9 +4,7 @@ import org.springframework.data.domain.Sort;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.field.KeywordField;
 
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 public class KeywordSortClause extends AbstractSolrSortClause {
 
     @Override
@@ -25,5 +23,4 @@ public class KeywordSortClause extends AbstractSolrSortClause {
     protected String getSolrSortFieldName(String name) {
         return KeywordField.Sort.valueOf(name).getSolrFieldName();
     }
-
 }

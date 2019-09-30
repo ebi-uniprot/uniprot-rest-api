@@ -8,7 +8,7 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 /**
  * This class represents configurable properties of {@link StoreStreamer} instances.
  *
- * Created 22/08/18
+ * <p>Created 22/08/18
  *
  * @author Edd
  */

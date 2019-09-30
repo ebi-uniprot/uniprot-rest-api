@@ -32,7 +32,6 @@ public class UniProtKBXslMessageConverter extends AbstractXslMessegerConverter<U
     protected List<String> getHeader() {
         List<String> fields = tlFields.get();
         return fields.stream().map(this::getFieldDisplayName).collect(Collectors.toList());
-
     }
 
     @Override
@@ -44,16 +43,11 @@ public class UniProtKBXslMessageConverter extends AbstractXslMessegerConverter<U
             UniProtEntryFilters.filterEntry(entity, filterParams);
         EntryMap dlEntry = new EntryMap(entity, fields);
         return dlEntry.getData();
-
-
     }
 
     private String getFieldDisplayName(String field) {
         Optional<Field> opField = UniProtResultFields.INSTANCE.getField(field);
-        if (opField.isPresent())
-            return opField.get().getLabel();
-        else
-            return field;
+        if (opField.isPresent()) return opField.get().getLabel();
+        else return field;
     }
-
 }

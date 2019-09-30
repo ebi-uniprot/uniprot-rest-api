@@ -14,9 +14,9 @@ import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
  * @author lgonzales
  */
 @SpringBootApplication
-//@EnableSolrRepositories(basePackages = {"org.uniprot.api.uniprotkb.repository.search.impl"})
-@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ViewByServiceConfig.class })
-@ComponentScan(basePackages = {"org.uniprot.api.uniprotkb","org.uniprot.api.rest"})
+// @EnableSolrRepositories(basePackages = {"org.uniprot.api.uniprotkb.repository.search.impl"})
+@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ViewByServiceConfig.class})
+@ComponentScan(basePackages = {"org.uniprot.api.uniprotkb", "org.uniprot.api.rest"})
 public class UniProtKBREST {
     public static void main(String[] args) {
         SpringApplication.run(UniProtKBREST.class, args);

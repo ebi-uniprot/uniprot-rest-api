@@ -1,6 +1,17 @@
 package org.uniprot.api.disease;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,29 +39,22 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(DiseaseController.class)
-@ExtendWith(value = {SpringExtension.class, DiseaseGetIdControllerIT.DiseaseGetIdParameterResolver.class,
-        DiseaseGetIdControllerIT.DiseaseGetIdContentTypeParamResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            DiseaseGetIdControllerIT.DiseaseGetIdParameterResolver.class,
+            DiseaseGetIdControllerIT.DiseaseGetIdContentTypeParamResolver.class
+        })
 public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String ACCESSION = "DI-04860";
 
-    @Autowired
-    private DiseaseRepository repository;
+    @Autowired private DiseaseRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -77,48 +81,66 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
-        CrossReference xref1 = new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
+        CrossReference xref1 =
+                new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
         CrossReference xref2 = new CrossReference("MedGen", "CN238690");
         CrossReference xref3 = new CrossReference("MeSH", "D000015");
         CrossReference xref4 = new CrossReference("MeSH", "D008607");
-        Disease diseaseEntry = diseaseBuilder.id("ZTTK syndrome")
-                .accession(ACCESSION)
-                .acronym("ZTTKS")
-                .definition("An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
-                .alternativeNames(Arrays.asList("Zhu-Tokita-Takenouchi-Kim syndrome", "ZTTK multiple congenital anomalies-mental retardation syndrome"))
-                .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
-                .keywords(keyword)
-                .reviewedProteinCount(1L)
-                .unreviewedProteinCount(0L)
-                .build();
+        Disease diseaseEntry =
+                diseaseBuilder
+                        .id("ZTTK syndrome")
+                        .accession(ACCESSION)
+                        .acronym("ZTTKS")
+                        .definition(
+                                "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
+                        .alternativeNames(
+                                Arrays.asList(
+                                        "Zhu-Tokita-Takenouchi-Kim syndrome",
+                                        "ZTTK multiple congenital anomalies-mental retardation syndrome"))
+                        .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
+                        .keywords(keyword)
+                        .reviewedProteinCount(1L)
+                        .unreviewedProteinCount(0L)
+                        .build();
 
         List<String> kwIds;
         if (diseaseEntry.getKeywords() != null) {
-            kwIds = diseaseEntry.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
+            kwIds =
+                    diseaseEntry.getKeywords().stream()
+                            .map(Keyword::getId)
+                            .collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();
         }
         // name is a combination of id, acronym, definition, synonyms, keywords
-        List<String> name = Stream.concat(Stream.concat(Stream.of(diseaseEntry.getId(), diseaseEntry.getAcronym(), diseaseEntry.getDefinition()),
-                kwIds.stream()),
-                diseaseEntry.getAlternativeNames().stream())
-                .collect(Collectors.toList());
+        List<String> name =
+                Stream.concat(
+                                Stream.concat(
+                                        Stream.of(
+                                                diseaseEntry.getId(),
+                                                diseaseEntry.getAcronym(),
+                                                diseaseEntry.getDefinition()),
+                                        kwIds.stream()),
+                                diseaseEntry.getAlternativeNames().stream())
+                        .collect(Collectors.toList());
         // content is name + accession
         List<String> content = new ArrayList<>(name);
         content.add(diseaseEntry.getAccession());
-        DiseaseDocument document = DiseaseDocument.builder()
-                .accession(ACCESSION)
-                .name(name)
-                .content(content)
-                .diseaseObj(getDiseaseBinary(diseaseEntry))
-                .build();
+        DiseaseDocument document =
+                DiseaseDocument.builder()
+                        .accession(ACCESSION)
+                        .name(name)
+                        .content(content)
+                        .diseaseObj(getDiseaseBinary(diseaseEntry))
+                        .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
     private ByteBuffer getDiseaseBinary(Disease entry) {
         try {
-            return ByteBuffer.wrap(DiseaseJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    DiseaseJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse Disease to binary json: ", e);
         }
@@ -128,34 +150,48 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter validIdParameter() {
-            return GetIdParameter.builder().id(ACCESSION)
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
                     .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
-                    .resultMatcher(jsonPath("$.definition", containsString("characterized by intellectual disability")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.definition",
+                                    containsString("characterized by intellectual disability")))
                     .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.keywords.length()", is(1)))
                     .resultMatcher(jsonPath("$.keywords[0].id", is("Mental retardation")))
                     .resultMatcher(jsonPath("$.keywords[0].accession", is("KW-0991")))
                     .resultMatcher(jsonPath("$.alternativeNames.length()", is(2)))
-                    .resultMatcher(jsonPath("$.alternativeNames", containsInAnyOrder(  "Zhu-Tokita-Takenouchi-Kim syndrome",
-                            "ZTTK multiple congenital anomalies-mental retardation syndrome")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.alternativeNames",
+                                    containsInAnyOrder(
+                                            "Zhu-Tokita-Takenouchi-Kim syndrome",
+                                            "ZTTK multiple congenital anomalies-mental retardation syndrome")))
                     .resultMatcher(jsonPath("$.crossReferences.length()", is(4)))
                     .build();
         }
 
         @Override
         public GetIdParameter invalidIdParameter() {
-            return GetIdParameter.builder().id("INVALID")
+            return GetIdParameter.builder()
+                    .id("INVALID")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")))
                     .build();
         }
 
         @Override
         public GetIdParameter nonExistentIdParameter() {
-            return GetIdParameter.builder().id("DI-00000")
+            return GetIdParameter.builder()
+                    .id("DI-00000")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
@@ -163,7 +199,9 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withFilterFieldsParameter() {
-            return GetIdParameter.builder().id(ACCESSION).fields("id,accession,reviewed_protein_count")
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
+                    .fields("id,accession,reviewed_protein_count")
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
@@ -175,62 +213,89 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter withInvalidFilterParameter() {
-            return GetIdParameter.builder().id(ACCESSION).fields("invalid")
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
+                    .fields("invalid")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
     }
 
-    static class DiseaseGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+    static class DiseaseGetIdContentTypeParamResolver
+            extends AbstractGetIdContentTypeParamResolver {
 
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {
 
             String fmtStr = "format-version: 1.2";
             String defaultNSStr = "default-namespace: uniprot:diseases";
-            String termStr = "[Term]\n" +
-                    "id: DI-04860\n" +
-                    "name: ZTTK syndrome\n" +
-                    "def: \"An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.\" []\n" +
-                    "synonym: \"Zhu-Tokita-Takenouchi-Kim syndrome\" [UniProt]\n" +
-                    "synonym: \"ZTTK multiple congenital anomalies-mental retardation syndrome\" [UniProt]\n" +
-                    "xref: MedGen:CN238690\n" +
-                    "xref: MeSH:D000015\n" +
-                    "xref: MeSH:D008607\n" +
-                    "xref: MIM:617140 \"phenotype\"";
+            String termStr =
+                    "[Term]\n"
+                            + "id: DI-04860\n"
+                            + "name: ZTTK syndrome\n"
+                            + "def: \"An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.\" []\n"
+                            + "synonym: \"Zhu-Tokita-Takenouchi-Kim syndrome\" [UniProt]\n"
+                            + "synonym: \"ZTTK multiple congenital anomalies-mental retardation syndrome\" [UniProt]\n"
+                            + "xref: MedGen:CN238690\n"
+                            + "xref: MeSH:D000015\n"
+                            + "xref: MeSH:D008607\n"
+                            + "xref: MIM:617140 \"phenotype\"";
 
             return GetIdContentTypeParam.builder()
                     .id(ACCESSION)
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
-                            .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
-                            .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
-                            .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
-                            .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
-                            .resultMatcher(jsonPath("$.definition", containsString("characterized by intellectual disability")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("ZTTK syndrome")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Name\tDisease ID\tMnemonic\tDescription")))
-                            .resultMatcher(content().string(containsString("ZTTK syndrome\tDI-04860\tZTTKS\tAn autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
-                            .resultMatcher(content().string(containsString(fmtStr)))
-                            .resultMatcher(content().string(containsString(defaultNSStr)))
-                            .resultMatcher(content().string(containsString(termStr)))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
+                                    .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
+                                    .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
+                                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
+                                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.definition",
+                                                    containsString(
+                                                            "characterized by intellectual disability")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().string(containsString("ZTTK syndrome")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Name\tDisease ID\tMnemonic\tDescription")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "ZTTK syndrome\tDI-04860\tZTTKS\tAn autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                                    .resultMatcher(content().string(containsString(fmtStr)))
+                                    .resultMatcher(content().string(containsString(defaultNSStr)))
+                                    .resultMatcher(content().string(containsString(termStr)))
+                                    .build())
                     .build();
         }
 
@@ -238,27 +303,36 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id("INVALID")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The disease id value has invalid format. It should match the regular expression 'DI-[0-9]{5}'")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }

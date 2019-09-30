@@ -1,9 +1,9 @@
 package org.uniprot.api.common.repository.search.facet;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 /**
  * Facet Advanced Search Response Object

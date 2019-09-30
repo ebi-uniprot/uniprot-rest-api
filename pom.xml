@@ -1,49 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.3.RELEASE</version>
-    </parent>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.3.RELEASE</version>
+	</parent>
 
-    <artifactId>uniprot-rest-api</artifactId>
-    <groupId>org.uniprot</groupId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>UniProt REST API Aggregator</name>
-    <description>
-        Parent and aggregator pom configured to build certain parts, or all of the UniProt Backend project
-    </description>
+	<artifactId>uniprot-rest-api</artifactId>
+	<groupId>org.uniprot</groupId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>UniProt REST API Aggregator</name>
+	<description>
+		Parent and aggregator pom configured to build certain parts, or all of the
+		UniProt Backend project
+	</description>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.version>3.8.0</maven.compiler.version>
-        <java.version>1.8</java.version>
-        <jacoco.version>0.8.4</jacoco.version>
-        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.version>3.8.0</maven.compiler.version>
+		<java.version>1.8</java.version>
+		<jacoco.version>0.8.4</jacoco.version>
+		<maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
 
-        <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
-        <http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
-        <failsafe.version>2.0.1</failsafe.version>
-        <solr.core>7.5.0</solr.core>
-        <solrj.version>7.5.0</solrj.version>
-        <hamcrest-all.version>1.3</hamcrest-all.version>
-        <mockito.jupiter.version>2.17.0</mockito.jupiter.version>
-        <junit-platform.version>1.1.0</junit-platform.version>
+		<spring.boot.version>2.0.3.RELEASE</spring.boot.version>
+		<http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
+		<failsafe.version>2.0.1</failsafe.version>
+		<solr.core>7.5.0</solr.core>
+		<solrj.version>7.5.0</solrj.version>
+		<hamcrest-all.version>1.3</hamcrest-all.version>
+		<mockito.jupiter.version>2.17.0</mockito.jupiter.version>
+		<junit-platform.version>1.1.0</junit-platform.version>
 
-        <!-- Use most recent failsafe and surefire plugin versions -->
-        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
+		<!-- Use most recent failsafe and surefire plugin versions -->
+		<maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+		<maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 
-        <!-- Test coverage -->
-        <jacoco.outputDir>${project.basedir}/../target</jacoco.outputDir>
+		<!-- Test coverage -->
+		<jacoco.outputDir>${project.basedir}/../target</jacoco.outputDir>
 
-        <!-- Unit test report path -->
-        <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-        <jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</jacoco.reportPath>
+		<!-- Unit test report path -->
+		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
+		<jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</jacoco.reportPath>
 
 		<!-- Integration test report path -->
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
@@ -55,205 +58,205 @@
 		<spotless.version>1.24.1</spotless.version>
 	</properties>
 
-    <modules>
-        <module>common-rest</module>
-        <module>support-data-rest</module>
-        <module>uniprotkb-rest</module>
-        <module>proteome-rest</module>
-        <module>uniparc-rest</module>
-    <module>uniref-rest</module>
-  </modules>
+	<modules>
+		<module>common-rest</module>
+		<module>support-data-rest</module>
+		<module>uniprotkb-rest</module>
+		<module>proteome-rest</module>
+		<module>uniparc-rest</module>
+		<module>uniref-rest</module>
+	</modules>
 
-    <dependencyManagement>
-        <dependencies>
+	<dependencyManagement>
+		<dependencies>
 
-            <dependency>
-                <groupId>net.jodah</groupId>
-                <artifactId>failsafe</artifactId>
-                <version>${failsafe.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>net.jodah</groupId>
+				<artifactId>failsafe</artifactId>
+				<version>${failsafe.version}</version>
+			</dependency>
 
-            <!-- Solr Data -->
-            <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-core</artifactId>
-                <version>${solrj.version}</version>
-                <exclusions>
-                    <!-- Required to prevent logger cycle -> StackOverFlowError -->
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-slf4j-impl</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+			<!-- Solr Data -->
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-core</artifactId>
+				<version>${solrj.version}</version>
+				<exclusions>
+					<!-- Required to prevent logger cycle -> StackOverFlowError -->
+					<exclusion>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-slf4j-impl</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 
-            <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-solrj</artifactId>
-                <version>${solrj.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>jcl-over-slf4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>stax2-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>woodstox-core-asl</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-solrj</artifactId>
+				<version>${solrj.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>jcl-over-slf4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.woodstox</groupId>
+						<artifactId>stax2-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.woodstox</groupId>
+						<artifactId>woodstox-core-asl</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
-    <dependencies>
-        <!-- Tests -->
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>${hamcrest-all.version}</version>
-            <scope>test</scope>
-        </dependency>
+	<dependencies>
+		<!-- Tests -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>${hamcrest-all.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>${hamcrest.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mockito.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <!-- Swagger dependencies -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+		<!-- Swagger dependencies -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                    <configuration>
-                        <systemProperties>
-                            <property>
-                                <name>http.proxyHost</name>
-                                <value>${http.proxyHost}</value>
-                            </property>
-                            <property>
-                                <name>http.proxyPort</name>
-                                <value>${http.proxyPort}</value>
-                            </property>
-                        </systemProperties>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven-failsafe-plugin.version}</version>
-                    <configuration>
-                        <systemProperties>
-                            <property>
-                                <name>http.proxyHost</name>
-                                <value>${http.proxyHost}</value>
-                            </property>
-                            <property>
-                                <name>http.proxyPort</name>
-                                <value>${http.proxyPort}</value>
-                            </property>
-                        </systemProperties>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <!-- Exclude integration tests from unit test run -->
-                    <excludes>
-                        <skipITs>${skipUTs}</skipITs>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
-                    <argLine>${jacoco.agent.ut.arg}</argLine>
-                </configuration>
-            </plugin>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${maven-surefire-plugin.version}</version>
+					<configuration>
+						<systemProperties>
+							<property>
+								<name>http.proxyHost</name>
+								<value>${http.proxyHost}</value>
+							</property>
+							<property>
+								<name>http.proxyPort</name>
+								<value>${http.proxyPort}</value>
+							</property>
+						</systemProperties>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>${maven-failsafe-plugin.version}</version>
+					<configuration>
+						<systemProperties>
+							<property>
+								<name>http.proxyHost</name>
+								<value>${http.proxyHost}</value>
+							</property>
+							<property>
+								<name>http.proxyPort</name>
+								<value>${http.proxyPort}</value>
+							</property>
+						</systemProperties>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Exclude integration tests from unit test run -->
+					<excludes>
+						<skipITs>${skipUTs}</skipITs>
+						<exclude>**/*IT.java</exclude>
+					</excludes>
+					<argLine>${jacoco.agent.ut.arg}</argLine>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -347,105 +350,105 @@
 		</plugins>
 	</build>
 
-    <repositories>
-        <repository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
-        </repository>
-        <repository>
-            <id>spring-libs-milestone</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>uniprot-artifactory-release</id>
-            <name>UniProt Artifactory for Releases</name>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <url>${http-uniprot-private-url}/release</url>
-        </repository>
-        <repository>
-            <id>uniprot-artifactory-snapshots</id>
-            <name>UniProt Artifactory for Snapshots</name>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <url>${http-uniprot-private-url}/snapshot</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>spring-releases</id>
+			<url>https://repo.spring.io/libs-release</url>
+		</repository>
+		<repository>
+			<id>spring-libs-milestone</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>uniprot-artifactory-release</id>
+			<name>UniProt Artifactory for Releases</name>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<url>${http-uniprot-private-url}/release</url>
+		</repository>
+		<repository>
+			<id>uniprot-artifactory-snapshots</id>
+			<name>UniProt Artifactory for Snapshots</name>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<url>${http-uniprot-private-url}/snapshot</url>
+		</repository>
+	</repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>spring-libs-milestone</id>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>uniprot-artifactory-snapshots</id>
-            <name>UniProt Artifactory for Snapshots</name>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <url>${http-uniprot-private-url}/snapshot</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>uniprot-artifactory-releases-plugin</id>
-            <name>UniProt Plugin Release Repository</name>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <url>${http-uniprot-private-url}/release</url>
-        </pluginRepository>
-    </pluginRepositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-releases</id>
+			<url>https://repo.spring.io/libs-release</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>spring-libs-milestone</id>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>uniprot-artifactory-snapshots</id>
+			<name>UniProt Artifactory for Snapshots</name>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<url>${http-uniprot-private-url}/snapshot</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>uniprot-artifactory-releases-plugin</id>
+			<name>UniProt Plugin Release Repository</name>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<url>${http-uniprot-private-url}/release</url>
+		</pluginRepository>
+	</pluginRepositories>
 
-    <profiles>
-        <!-- active when running on jenkins -->
-        <profile>
-            <id>jenkins</id>
-            <activation>
-                <property>
-                    <name>env.BUILD_NUMBER</name>
-                </property>
-            </activation>
-            <distributionManagement>
-                <repository>
-                    <id>uniprot-artifactory-deploy-release</id>
-                    <name>Deploy Uniprot Maven Release</name>
-                    <url>${http-uniprot-private-url}/release</url>
-                </repository>
-                <snapshotRepository>
-                    <uniqueVersion>false</uniqueVersion>
-                    <id>uniprot-artifactory-deploy-snapshot</id>
-                    <name>Deploy Uniprot Maven Snapshot</name>
-                    <url>${http-uniprot-private-url}/snapshot</url>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-    </profiles>
+	<profiles>
+		<!-- active when running on jenkins -->
+		<profile>
+			<id>jenkins</id>
+			<activation>
+				<property>
+					<name>env.BUILD_NUMBER</name>
+				</property>
+			</activation>
+			<distributionManagement>
+				<repository>
+					<id>uniprot-artifactory-deploy-release</id>
+					<name>Deploy Uniprot Maven Release</name>
+					<url>${http-uniprot-private-url}/release</url>
+				</repository>
+				<snapshotRepository>
+					<uniqueVersion>false</uniqueVersion>
+					<id>uniprot-artifactory-deploy-snapshot</id>
+					<name>Deploy Uniprot Maven Snapshot</name>
+					<url>${http-uniprot-private-url}/snapshot</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 </project>

@@ -1,5 +1,18 @@
 package org.uniprot.api.rest.validation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,22 +22,11 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.core.util.Utils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
- * This Include Facets Constraint Validator class is responsible to verify if the parameter value is true or false,
- * <p>
- * WHEN THE VALUE IS TRUE, it must also verify if the accept content type is "application/json"
+ * This Include Facets Constraint Validator class is responsible to verify if the parameter value is
+ * true or false,
+ *
+ * <p>WHEN THE VALUE IS TRUE, it must also verify if the accept content type is "application/json"
  * because facets are only supported by json format requests.
  *
  * @author lgonzales
@@ -42,13 +44,12 @@ public @interface ValidFacets {
     Class<? extends Payload>[] payload() default {};
 
     class ValidIncludeFacetsValidator implements ConstraintValidator<ValidFacets, String> {
-        private static final Logger LOGGER = LoggerFactory.getLogger(ValidIncludeFacetsValidator.class);
+        private static final Logger LOGGER =
+                LoggerFactory.getLogger(ValidIncludeFacetsValidator.class);
 
-        @Autowired
-        private HttpServletRequest request;
+        @Autowired private HttpServletRequest request;
 
-        @Autowired
-        private ApplicationContext applicationContext;
+        @Autowired private ApplicationContext applicationContext;
 
         private Collection<String> facetNames;
 
@@ -56,7 +57,8 @@ public @interface ValidFacets {
         public void initialize(ValidFacets constraintAnnotation) {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             try {
-                FacetConfig facetConfig = applicationContext.getBean(constraintAnnotation.facetConfig());
+                FacetConfig facetConfig =
+                        applicationContext.getBean(constraintAnnotation.facetConfig());
                 facetNames = facetConfig.getFacetNames();
             } catch (Exception e) {
                 LOGGER.error("Unable to instantiate facet config", e);
@@ -69,7 +71,8 @@ public @interface ValidFacets {
             boolean isValid = true;
             if (Utils.notEmpty(value)) {
                 // verify if facet name is valid.
-                ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
+                ConstraintValidatorContextImpl contextImpl =
+                        (ConstraintValidatorContextImpl) context;
                 String[] facetList = value.split("\\s*,\\s*");
                 for (String facet : facetList) {
                     if (!getFacetNames().contains(facet)) {
@@ -93,7 +96,10 @@ public @interface ValidFacets {
             return facetNames;
         }
 
-        void buildInvalidFacetNameMessage(String facetName, Collection<String> validNames, ConstraintValidatorContextImpl contextImpl) {
+        void buildInvalidFacetNameMessage(
+                String facetName,
+                Collection<String> validNames,
+                ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = "{search.invalid.facet.name}";
             contextImpl.addMessageParameter("0", facetName);
             contextImpl.addMessageParameter("1", "[" + String.join(", ", validNames) + "]");

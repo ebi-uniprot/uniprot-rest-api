@@ -1,6 +1,17 @@
 package org.uniprot.api.subcell;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,17 +40,7 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -48,12 +49,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(SubcellularLocationController.class)
-@ExtendWith(value = {SpringExtension.class, SubcellularLocationSearchControllerIT.SubcellularLocationSearchContentTypeParamResolver.class,
-        SubcellularLocationSearchControllerIT.SubcellularLocationSearchParameterResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            SubcellularLocationSearchControllerIT.SubcellularLocationSearchContentTypeParamResolver
+                    .class,
+            SubcellularLocationSearchControllerIT.SubcellularLocationSearchParameterResolver.class
+        })
 public class SubcellularLocationSearchControllerIT extends AbstractSearchControllerIT {
 
-    @Autowired
-    private SubcellularLocationRepository repository;
+    @Autowired private SubcellularLocationRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -117,7 +122,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry("SL-000"+i));
+        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry("SL-000" + i));
     }
 
     @Override
@@ -126,33 +131,40 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         saveEntry("SL-0002");
     }
 
-    private void saveEntry(String  accession) {
+    private void saveEntry(String accession) {
         SubcellularLocationEntryImpl subcellularLocationEntry = new SubcellularLocationEntryImpl();
-        subcellularLocationEntry.setId("Name value "+accession);
+        subcellularLocationEntry.setId("Name value " + accession);
         subcellularLocationEntry.setAccession(accession);
         subcellularLocationEntry.setCategory(SubcellLocationCategory.LOCATION);
-        subcellularLocationEntry.setDefinition("Definition value "+accession);
+        subcellularLocationEntry.setDefinition("Definition value " + accession);
 
-        SubcellularLocationDocument document = SubcellularLocationDocument.builder()
-                .id(accession)
-                .name("Name value "+accession)
-                .category(SubcellLocationCategory.LOCATION.getCategory())
-                .content(Collections.singletonList("Content value "+accession))
-                .subcellularlocationObj(getSubcellularLocationBinary(subcellularLocationEntry))
-                .build();
+        SubcellularLocationDocument document =
+                SubcellularLocationDocument.builder()
+                        .id(accession)
+                        .name("Name value " + accession)
+                        .category(SubcellLocationCategory.LOCATION.getCategory())
+                        .content(Collections.singletonList("Content value " + accession))
+                        .subcellularlocationObj(
+                                getSubcellularLocationBinary(subcellularLocationEntry))
+                        .build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
     }
 
     private ByteBuffer getSubcellularLocationBinary(SubcellularLocationEntry entry) {
         try {
-            return ByteBuffer.wrap(SubcellularLocationJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
+            return ByteBuffer.wrap(
+                    SubcellularLocationJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse SubcellularLocationEntry to binary json: ", e);
+            throw new RuntimeException(
+                    "Unable to parse SubcellularLocationEntry to binary json: ", e);
         }
     }
 
-    static class SubcellularLocationSearchParameterResolver extends AbstractSearchParameterResolver {
+    static class SubcellularLocationSearchParameterResolver
+            extends AbstractSearchParameterResolver {
 
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
@@ -161,7 +173,9 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                     .resultMatcher(jsonPath("$.results.*.id", contains("Name value SL-0001")))
                     .resultMatcher(jsonPath("$.results.*.accession", contains("SL-0001")))
                     .resultMatcher(jsonPath("$.results.*.category", contains("Cellular component")))
-                    .resultMatcher(jsonPath("$.results.*.definition", contains("Definition value SL-0001")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.definition", contains("Definition value SL-0001")))
                     .build();
         }
 
@@ -177,10 +191,22 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("definition:*"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("Name value SL-0001","Name value SL-0002")))
-                    .resultMatcher(jsonPath("$.results.*.accession", contains("SL-0001","SL-0002")))
-                    .resultMatcher(jsonPath("$.results.*.category", contains("Cellular component","Cellular component")))
-                    .resultMatcher(jsonPath("$.results.*.definition", contains("Definition value SL-0001","Definition value SL-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("Name value SL-0001", "Name value SL-0002")))
+                    .resultMatcher(
+                            jsonPath("$.results.*.accession", contains("SL-0001", "SL-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.category",
+                                    contains("Cellular component", "Cellular component")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.definition",
+                                    contains(
+                                            "Definition value SL-0001",
+                                            "Definition value SL-0002")))
                     .build();
         }
 
@@ -189,7 +215,11 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("name:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
                     .build();
         }
 
@@ -198,8 +228,11 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("id:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", containsInAnyOrder(
-                            "The subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    containsInAnyOrder(
+                                            "The subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                     .build();
         }
 
@@ -208,10 +241,22 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("name desc"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("Name value SL-0002","Name value SL-0001")))
-                    .resultMatcher(jsonPath("$.results.*.accession", contains("SL-0002","SL-0001")))
-                    .resultMatcher(jsonPath("$.results.*.category", contains("Cellular component","Cellular component")))
-                    .resultMatcher(jsonPath("$.results.*.definition", contains("Definition value SL-0002","Definition value SL-0001")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("Name value SL-0002", "Name value SL-0001")))
+                    .resultMatcher(
+                            jsonPath("$.results.*.accession", contains("SL-0002", "SL-0001")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.category",
+                                    contains("Cellular component", "Cellular component")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.definition",
+                                    contains(
+                                            "Definition value SL-0002",
+                                            "Definition value SL-0001")))
                     .build();
         }
 
@@ -220,9 +265,15 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("id,category"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("Name value SL-0001","Name value SL-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("Name value SL-0001", "Name value SL-0002")))
                     .resultMatcher(jsonPath("$.results.*.accession").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.category", contains("Cellular component","Cellular component")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.category",
+                                    contains("Cellular component", "Cellular component")))
                     .resultMatcher(jsonPath("$.results.*.definition").doesNotExist())
                     .build();
         }
@@ -233,46 +284,99 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         }
     }
 
-
-    static class SubcellularLocationSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class SubcellularLocationSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("id:SL-0001 OR id:SL-0002")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.results.*.accession", containsInAnyOrder("SL-0001","SL-0002")))
-                            .resultMatcher(jsonPath("$.results.*.id", containsInAnyOrder("Name value SL-0001","Name value SL-0002")))
-                            .resultMatcher(jsonPath("$.results.*.definition", containsInAnyOrder("Definition value SL-0001","Definition value SL-0002")))
-                            .resultMatcher(jsonPath("$.results.*.category", containsInAnyOrder("Cellular component","Cellular component")))
-
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("SL-0001")))
-                            .resultMatcher(content().string(containsString("SL-0002")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Subcellular location ID\tDescription\tCategory\tAlias")))
-                            .resultMatcher(content().string(containsString("SL-0001\tDefinition value SL-0001\tCellular component\tName value SL-0001")))
-                            .resultMatcher(content().string(containsString("SL-0002\tDefinition value SL-0002\tCellular component\tName value SL-0002")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
-                            .resultMatcher(content().string(containsString("format-version: 1.2\n")))
-                            .resultMatcher(content().string(containsString("default-namespace: uniprot:locations\n")))
-                            .resultMatcher(content().string(containsString("[Term]\n")))
-                            .resultMatcher(content().string(containsString("id: SL-0001\n")))
-                            .resultMatcher(content().string(containsString("name: Name value SL-0001\n")))
-                            .resultMatcher(content().string(containsString("def: \"Definition value SL-0001\" []\n")))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.accession",
+                                                    containsInAnyOrder("SL-0001", "SL-0002")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.id",
+                                                    containsInAnyOrder(
+                                                            "Name value SL-0001",
+                                                            "Name value SL-0002")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.definition",
+                                                    containsInAnyOrder(
+                                                            "Definition value SL-0001",
+                                                            "Definition value SL-0002")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.results.*.category",
+                                                    containsInAnyOrder(
+                                                            "Cellular component",
+                                                            "Cellular component")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString("SL-0001")))
+                                    .resultMatcher(content().string(containsString("SL-0002")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Subcellular location ID\tDescription\tCategory\tAlias")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "SL-0001\tDefinition value SL-0001\tCellular component\tName value SL-0001")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "SL-0002\tDefinition value SL-0002\tCellular component\tName value SL-0002")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "format-version: 1.2\n")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "default-namespace: uniprot:locations\n")))
+                                    .resultMatcher(content().string(containsString("[Term]\n")))
+                                    .resultMatcher(
+                                            content().string(containsString("id: SL-0001\n")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "name: Name value SL-0001\n")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "def: \"Definition value SL-0001\" []\n")))
+                                    .build())
                     .build();
         }
 
@@ -280,29 +384,37 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
                     .query("id:invalid")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
-
 }

@@ -1,6 +1,11 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -11,18 +16,14 @@ import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.ec.EC;
 import org.uniprot.core.cv.ec.ECRepo;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.google.common.base.Strings;
 
-//@Service
+// @Service
 public class UniProtViewByECService implements UniProtViewByService {
     private final SolrClient solrClient;
     private final String uniprotCollection;
     private final ECRepo ecRepo;
-    public final static String URL_PREFIX = "https://enzyme.expasy.org/EC/";
+    public static final String URL_PREFIX = "https://enzyme.expasy.org/EC/";
 
     public UniProtViewByECService(SolrClient solrClient, String uniprotCollection, ECRepo ecRepo) {
         this.solrClient = solrClient;
@@ -56,8 +57,10 @@ public class UniProtViewByECService implements UniProtViewByService {
                 FacetField ff = fflist.get(0);
                 List<FacetField.Count> counts = ff.getValues();
                 return counts.stream()
-                        //.filter(val -> val.getCount()>0)
-                        .map(this::convert).sorted(ViewBy.SORT_BY_ID).collect(Collectors.toList());
+                        // .filter(val -> val.getCount()>0)
+                        .map(this::convert)
+                        .sorted(ViewBy.SORT_BY_ID)
+                        .collect(Collectors.toList());
             }
         } catch (SolrServerException | IOException e) {
             throw new UniProtViewByServiceException(e);

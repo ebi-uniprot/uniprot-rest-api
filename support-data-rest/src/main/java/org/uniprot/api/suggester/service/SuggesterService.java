@@ -1,6 +1,14 @@
 package org.uniprot.api.suggester.service;
 
+import static org.uniprot.core.util.Utils.notEmpty;
+
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -13,13 +21,6 @@ import org.uniprot.store.search.document.suggest.SuggestDocument;
 import org.uniprot.store.search.field.QueryBuilder;
 import org.uniprot.store.search.field.SuggestField;
 
-import static org.uniprot.core.util.Utils.notEmpty;
-
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * Created 18/07/18
  *
@@ -31,11 +32,11 @@ public class SuggesterService {
     private static String errorFormat;
 
     static {
-        String dicts = Stream
-                .of(SuggestDictionary.values())
-                .map(Enum::name)
-                .map(String::toLowerCase)
-                .collect(Collectors.joining(", ", "[", "]"));
+        String dicts =
+                Stream.of(SuggestDictionary.values())
+                        .map(Enum::name)
+                        .map(String::toLowerCase)
+                        .collect(Collectors.joining(", ", "[", "]"));
         errorFormat = "Unknown dictionary: '%s'. Expected one of " + dicts + ".";
     }
 
@@ -48,12 +49,15 @@ public class SuggesterService {
     }
 
     public Suggestions findSuggestions(String dictionaryStr, String queryStr) {
-        SimpleQuery query = new SimpleQuery(createQueryString(getDictionary(dictionaryStr), queryStr));
+        SimpleQuery query =
+                new SimpleQuery(createQueryString(getDictionary(dictionaryStr), queryStr));
         query.setRequestHandler(SUGGEST_SEARCH_HANDLER);
 
         try {
-            List<SuggestDocument> content = solrTemplate.query(collection.name(), query, SuggestDocument.class)
-                    .getContent();
+            List<SuggestDocument> content =
+                    solrTemplate
+                            .query(collection.name(), query, SuggestDocument.class)
+                            .getContent();
             return Suggestions.builder()
                     .dictionary(dictionaryStr)
                     .query(queryStr)
@@ -61,7 +65,8 @@ public class SuggesterService {
                     .build();
         } catch (Exception e) {
             log.error("Problem when retrieving suggestions", e);
-            throw new ServiceException("An internal server error occurred when retrieving suggestions.", e);
+            throw new ServiceException(
+                    "An internal server error occurred when retrieving suggestions.", e);
         }
     }
 
@@ -75,23 +80,24 @@ public class SuggesterService {
 
     List<Suggestion> convertDocs(List<SuggestDocument> content) {
         return content.stream()
-                .map(doc -> {
-                    String value = doc.value;
-                    if (notEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
-                        StringJoiner joiner = new StringJoiner("/", " (", ")");
-                        doc.altValues.forEach(joiner::add);
-                        value += joiner.toString();
-                    }
-                    return Suggestion.builder()
-                            .id(doc.id)
-                            .value(value)
-                            .build();
-                })
+                .map(
+                        doc -> {
+                            String value = doc.value;
+                            if (notEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
+                                StringJoiner joiner = new StringJoiner("/", " (", ")");
+                                doc.altValues.forEach(joiner::add);
+                                value += joiner.toString();
+                            }
+                            return Suggestion.builder().id(doc.id).value(value).build();
+                        })
                 .collect(Collectors.toList());
     }
 
     private String createQueryString(SuggestDictionary dict, String query) {
-        return "\"" + query + "\"" +
-                " +" + QueryBuilder.query(SuggestField.Search.dict.name(), dict.name());
+        return "\""
+                + query
+                + "\""
+                + " +"
+                + QueryBuilder.query(SuggestField.Search.dict.name(), dict.name());
     }
 }

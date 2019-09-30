@@ -14,42 +14,35 @@ import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.field.ProteomeResultFields;
 
 /**
- *
  * @author jluo
  * @date: 29 Apr 2019
- *
  */
-
 public class ProteomeXslMessageConverter extends AbstractXslMessegerConverter<ProteomeEntry> {
-	private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
+    private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
 
-	public ProteomeXslMessageConverter() {
-		super(ProteomeEntry.class);
-	}
+    public ProteomeXslMessageConverter() {
+        super(ProteomeEntry.class);
+    }
 
-	@Override
-	protected void initBefore(MessageConverterContext<ProteomeEntry> context) {
-		tlFields.set(OutputFieldsParser.parse(context.getFields(), ProteomeRequest.DEFAULT_FIELDS));
+    @Override
+    protected void initBefore(MessageConverterContext<ProteomeEntry> context) {
+        tlFields.set(OutputFieldsParser.parse(context.getFields(), ProteomeRequest.DEFAULT_FIELDS));
+    }
 
-	}
+    @Override
+    protected List<String> getHeader() {
+        List<String> fields = tlFields.get();
+        return fields.stream().map(this::getFieldDisplayName).collect(Collectors.toList());
+    }
 
-	@Override
-	protected List<String> getHeader() {
-		List<String> fields = tlFields.get();
-		return fields.stream().map(this::getFieldDisplayName).collect(Collectors.toList());
+    @Override
+    protected List<String> entry2TsvStrings(ProteomeEntry entity) {
+        return new ProteomeEntryMap(entity, tlFields.get()).getData();
+    }
 
-	}
-
-	@Override
-	protected List<String> entry2TsvStrings(ProteomeEntry entity) {
-		return new ProteomeEntryMap(entity, tlFields.get()).getData();
-	}
-
-	private String getFieldDisplayName(String field) {
-		Optional<Field> opField = ProteomeResultFields.INSTANCE.getField(field);
-		if (opField.isPresent())
-			return opField.get().getLabel();
-		else
-			return field;
-	}
+    private String getFieldDisplayName(String field) {
+        Optional<Field> opField = ProteomeResultFields.INSTANCE.getField(field);
+        if (opField.isPresent()) return opField.get().getLabel();
+        else return field;
+    }
 }

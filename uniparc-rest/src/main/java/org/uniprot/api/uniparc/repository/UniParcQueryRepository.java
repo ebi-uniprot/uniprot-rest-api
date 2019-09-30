@@ -8,15 +8,20 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 /**
- *
  * @author jluo
  * @date: 20 Jun 2019
- *
  */
 @Repository
 public class UniParcQueryRepository extends SolrQueryRepository<UniParcDocument> {
-    public UniParcQueryRepository(SolrTemplate solrTemplate, UniParcFacetConfig facetConfig,
-                                  SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.uniparc, UniParcDocument.class, facetConfig, requestConverter);
-	}
+    public UniParcQueryRepository(
+            SolrTemplate solrTemplate,
+            UniParcFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.uniparc,
+                UniParcDocument.class,
+                facetConfig,
+                requestConverter);
+    }
 }

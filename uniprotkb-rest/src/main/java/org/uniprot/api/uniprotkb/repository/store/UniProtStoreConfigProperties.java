@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

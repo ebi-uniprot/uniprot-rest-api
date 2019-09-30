@@ -28,5 +28,4 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
     protected String getSolrSortFieldName(String name) {
         return name;
     }
-
 }

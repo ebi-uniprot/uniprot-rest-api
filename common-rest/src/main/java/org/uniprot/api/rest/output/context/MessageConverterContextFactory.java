@@ -1,11 +1,12 @@
 package org.uniprot.api.rest.output.context;
 
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.http.MediaType;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Builder;
+import lombok.Data;
+
+import org.springframework.http.MediaType;
 
 /**
  * Created 10/09/18
@@ -16,8 +17,11 @@ public class MessageConverterContextFactory<T> {
     private final Map<Pair, MessageConverterContext<T>> converters = new HashMap<>();
 
     public void addMessageConverterContext(MessageConverterContext<T> converter) {
-        Pair pair = Pair.builder().contentType(converter.getContentType()).resource(converter.getResource())
-                .build();
+        Pair pair =
+                Pair.builder()
+                        .contentType(converter.getContentType())
+                        .resource(converter.getResource())
+                        .build();
         this.converters.put(pair, converter);
     }
 
@@ -37,7 +41,16 @@ public class MessageConverterContextFactory<T> {
     }
 
     public enum Resource {
-        UNIPROT, UNIREF, UNIPARC, PROTEOME, TAXONOMY, GENECENTRIC, KEYWORD, LITERATURE, DISEASE, CROSSREF,
+        UNIPROT,
+        UNIREF,
+        UNIPARC,
+        PROTEOME,
+        TAXONOMY,
+        GENECENTRIC,
+        KEYWORD,
+        LITERATURE,
+        DISEASE,
+        CROSSREF,
         SUBCELLULAR_LOCATION
     }
 }

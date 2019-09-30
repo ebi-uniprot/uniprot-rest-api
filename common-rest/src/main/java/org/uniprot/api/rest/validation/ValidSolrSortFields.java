@@ -1,12 +1,5 @@
 package org.uniprot.api.rest.validation;
 
-
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,8 +9,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+
 /**
- * This is the solr query solr validator is responsible to verify if the sort field parameter has valid field names
+ * This is the solr query solr validator is responsible to verify if the sort field parameter has
+ * valid field names
  *
  * @author lgonzales
  */
@@ -36,10 +37,10 @@ public @interface ValidSolrSortFields {
 
     class SortFieldValidatorImpl implements ConstraintValidator<ValidSolrSortFields, String> {
 
-        private static final String SORT_FORMAT = "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
+        private static final String SORT_FORMAT =
+                "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
         private static final String SORT_ORDER = "^asc|desc$";
         private List<String> valueList;
-
 
         @Override
         public void initialize(ValidSolrSortFields constraintAnnotation) {
@@ -51,7 +52,6 @@ public @interface ValidSolrSortFields {
             for (Enum enumVal : enumValArr) {
                 valueList.add(enumVal.name().toLowerCase());
             }
-
         }
 
         @Override
@@ -78,7 +78,7 @@ public @interface ValidSolrSortFields {
                                 addInvalidSortOrderErrorMessage(contextImpl, sortOrder);
                                 result = false;
                             }
-                            index++; //the comma is another group
+                            index++; // the comma is another group
                         }
                         if (!result && contextImpl != null) {
                             contextImpl.disableDefaultConstraintViolation();
@@ -92,19 +92,22 @@ public @interface ValidSolrSortFields {
             return result;
         }
 
-        public void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
+        public void addInvalidSortFormatErrorMessage(
+                ConstraintValidatorContextImpl contextImpl, String value) {
             String errorMessage = "{search.invalid.sort.format}";
             contextImpl.addMessageParameter("0", value);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        public void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
+        public void addInvalidSortOrderErrorMessage(
+                ConstraintValidatorContextImpl contextImpl, String sortOrder) {
             String errorMessage = "{search.invalid.sort.order}";
             contextImpl.addMessageParameter("0", sortOrder);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        public void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
+        public void addInvalidSortFieldErrorMessage(
+                ConstraintValidatorContextImpl contextImpl, String sortField) {
             String errorMessage = "{search.invalid.sort.field}";
             contextImpl.addMessageParameter("0", sortField);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
@@ -119,6 +122,5 @@ public @interface ValidSolrSortFields {
             }
             return groups;
         }
-
     }
 }

@@ -1,6 +1,15 @@
 package org.uniprot.api.rest.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,24 +33,12 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractGetByIdControllerIT {
 
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
@@ -51,11 +48,9 @@ public abstract class AbstractGetByIdControllerIT {
         ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
     }
 
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     @Test
     void validIdReturnSuccess(GetIdParameter idParameter) throws Exception {
@@ -64,55 +59,68 @@ public abstract class AbstractGetByIdControllerIT {
         saveEntry();
 
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath() + idParameter.getId())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(
+                                                HttpHeaders.CONTENT_TYPE,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
-
     }
 
     @Test
     void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath() + idParameter.getId())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                        .andExpect(
+                                header().string(
+                                                HttpHeaders.CONTENT_TYPE,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
-
     }
 
     @Test
     void nonExistentIdReturnFoundRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
-        MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath() + idParameter.getId())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        ResultActions resultActions = response.andDo(print())
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                        .andExpect(
+                                header().string(
+                                                HttpHeaders.CONTENT_TYPE,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -121,30 +129,36 @@ public abstract class AbstractGetByIdControllerIT {
 
     @Test
     void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
-        assertThat(idParameter,notNullValue());
+        assertThat(idParameter, notNullValue());
         if (Utils.notEmpty(idParameter.getFields())) {
 
             checkParameterInput(idParameter);
 
-            //when
+            // when
             saveEntry();
 
-            MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
-                    .header(ACCEPT, MediaType.APPLICATION_JSON)
-                    .param("fields",idParameter.getFields());
+            MockHttpServletRequestBuilder requestBuilder =
+                    get(getIdRequestPath() + idParameter.getId())
+                            .header(ACCEPT, MediaType.APPLICATION_JSON)
+                            .param("fields", idParameter.getFields());
 
             ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
-            ResultActions resultActions = response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.OK.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    MediaType.APPLICATION_JSON_VALUE));
 
             for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
             }
         } else {
-            log.info("Filter fields are not being tested, I am assuming that this is not a supported feature for this endpoint");
+            log.info(
+                    "Filter fields are not being tested, I am assuming that this is not a supported feature for this endpoint");
         }
     }
 
@@ -154,23 +168,29 @@ public abstract class AbstractGetByIdControllerIT {
 
             checkParameterInput(idParameter);
 
-            //when
-            MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + idParameter.getId())
-                    .header(ACCEPT, MediaType.APPLICATION_JSON)
-                    .param("fields",idParameter.getFields());
+            // when
+            MockHttpServletRequestBuilder requestBuilder =
+                    get(getIdRequestPath() + idParameter.getId())
+                            .header(ACCEPT, MediaType.APPLICATION_JSON)
+                            .param("fields", idParameter.getFields());
 
             ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
-            ResultActions resultActions = response.andDo(print())
-                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    MediaType.APPLICATION_JSON_VALUE));
 
             for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
             }
         } else {
-            log.info("Filter fields are not being tested, I am assuming that this is not a supported feature for this endpoint");
+            log.info(
+                    "Filter fields are not being tested, I am assuming that this is not a supported feature for this endpoint");
         }
     }
 
@@ -181,17 +201,22 @@ public abstract class AbstractGetByIdControllerIT {
 
         checkIdContentTypeParameterInput(contentTypeParam);
 
-        for(ContentTypeParam contentType: contentTypeParam.getContentTypeParams()) {
+        for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
             // when
-            MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + contentTypeParam.getId())
-                    .header(ACCEPT, contentType.getContentType());
+            MockHttpServletRequestBuilder requestBuilder =
+                    get(getIdRequestPath() + contentTypeParam.getId())
+                            .header(ACCEPT, contentType.getContentType());
 
             ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
-            ResultActions resultActions = response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType.getContentType().toString()));
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.OK.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    contentType.getContentType().toString()));
 
             for (ResultMatcher resultMatcher : contentType.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
@@ -204,17 +229,22 @@ public abstract class AbstractGetByIdControllerIT {
         checkIdContentTypeParameterInput(contentTypeParam);
 
         // when
-        for(ContentTypeParam contentType: contentTypeParam.getContentTypeParams()) {
+        for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
             // when
-            MockHttpServletRequestBuilder requestBuilder = get(getIdRequestPath() + contentTypeParam.getId())
-                    .header(ACCEPT, contentType.getContentType());
+            MockHttpServletRequestBuilder requestBuilder =
+                    get(getIdRequestPath() + contentTypeParam.getId())
+                            .header(ACCEPT, contentType.getContentType());
 
             ResultActions response = mockMvc.perform(requestBuilder);
 
             // then
-            ResultActions resultActions = response.andDo(print())
-                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType.getContentType().toString()));
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    contentType.getContentType().toString()));
 
             for (ResultMatcher resultMatcher : contentType.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
@@ -252,7 +282,9 @@ public abstract class AbstractGetByIdControllerIT {
         assertThat(contentTypeParam, notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
-        ControllerITUtils.verifyContentTypes(getIdRequestPath(), requestMappingHandlerMapping, contentTypeParam.getContentTypeParams());
+        ControllerITUtils.verifyContentTypes(
+                getIdRequestPath(),
+                requestMappingHandlerMapping,
+                contentTypeParam.getContentTypeParams());
     }
-
 }

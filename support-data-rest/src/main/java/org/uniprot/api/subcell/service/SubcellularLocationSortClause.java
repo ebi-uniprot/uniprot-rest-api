@@ -25,5 +25,4 @@ public class SubcellularLocationSortClause extends AbstractSolrSortClause {
     protected String getSolrSortFieldName(String name) {
         return SubcellularLocationField.Sort.valueOf(name).getSolrFieldName();
     }
-
 }

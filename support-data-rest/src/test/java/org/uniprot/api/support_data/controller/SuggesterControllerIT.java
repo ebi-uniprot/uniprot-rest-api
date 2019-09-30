@@ -1,5 +1,21 @@
 package org.uniprot.api.support_data.controller;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
+import static org.uniprot.store.search.field.SuggestField.Importance.medium;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,22 +45,6 @@ import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
 import org.uniprot.store.search.field.SuggestField;
 
-import java.io.IOException;
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
-import static org.uniprot.store.search.field.SuggestField.Importance.medium;
-
 /**
  * Created 19/05/19
  *
@@ -57,32 +57,28 @@ import static org.uniprot.store.search.field.SuggestField.Importance.medium;
 class SuggesterControllerIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     private SolrTemplate solrTemplate;
 
-    @Autowired
-    SuggesterService suggesterService;
+    @Autowired SuggesterService suggesterService;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(DataStoreManager.StoreType.SUGGEST, SolrCollection.suggest);
-        solrTemplate = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.SUGGEST));
+        solrTemplate =
+                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.SUGGEST));
         solrTemplate.afterPropertiesSet();
         ReflectionTestUtils.setField(suggesterService, "solrTemplate", solrTemplate);
     }
 
     @BeforeEach
     void setUp() throws IOException, SolrServerException {
-        mockMvc = MockMvcBuilders.
-                webAppContextSetup(webApplicationContext)
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         populateIndexWithDocs();
     }
@@ -101,11 +97,12 @@ class SuggesterControllerIT {
         saveSuggestionDoc(id, "myValue", emptyList());
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("dict", SuggestDictionary.TAXONOMY.name())
-                        .param("query", id));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", SuggestDictionary.TAXONOMY.name())
+                                .param("query", id));
 
         // then
         response.andDo(print())
@@ -123,11 +120,12 @@ class SuggesterControllerIT {
         saveSuggestionDoc(id2, "black dog", emptyList());
 
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("dict", SuggestDictionary.TAXONOMY.name())
-                        .param("query", "dog"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", SuggestDictionary.TAXONOMY.name())
+                                .param("query", "dog"));
 
         // then
         response.andDo(print())
@@ -139,11 +137,12 @@ class SuggesterControllerIT {
     @Test
     void findsNoSuggestions() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("dict", SuggestDictionary.TAXONOMY.name())
-                        .param("query", "XXXXXXXXXXXX"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", SuggestDictionary.TAXONOMY.name())
+                                .param("query", "XXXXXXXXXXXX"));
 
         // then
         response.andDo(print())
@@ -156,10 +155,11 @@ class SuggesterControllerIT {
     void missingRequiredDictField() throws Exception {
         // when
         String requiredParam = "dict";
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "XXXXXXXXXXXX"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "XXXXXXXXXXXX"));
 
         // then
         response.andDo(print())
@@ -172,10 +172,11 @@ class SuggesterControllerIT {
     void missingRequiredQueryField() throws Exception {
         // when
         String requiredParam = "query";
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("dict", TAXONOMY.name()));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", TAXONOMY.name()));
 
         // then
         response.andDo(print())
@@ -187,11 +188,12 @@ class SuggesterControllerIT {
     @Test
     void unknownDictionaryCausesBadRequest() throws Exception {
         // when
-        ResultActions response = mockMvc.perform(
-                get(SEARCH_RESOURCE)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE)
-                        .param("query", "anything")
-                        .param("dict", "INVALID_DICTIONARY"));
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "anything")
+                                .param("dict", "INVALID_DICTIONARY"));
 
         // then
         response.andDo(print())
@@ -200,20 +202,30 @@ class SuggesterControllerIT {
                 .andExpect(jsonPath("$.messages", hasItem(containsString("Unknown dictionary"))));
     }
 
-    private void saveSuggestionDoc(String id, String value, List<String> altValues) throws IOException, SolrServerException {
-        saveSuggestionDoc(id, value, altValues, SuggestDictionary.TAXONOMY, SuggestField.Importance.medium);
+    private void saveSuggestionDoc(String id, String value, List<String> altValues)
+            throws IOException, SolrServerException {
+        saveSuggestionDoc(
+                id, value, altValues, SuggestDictionary.TAXONOMY, SuggestField.Importance.medium);
     }
 
-    private void saveSuggestionDoc(String id, String value, List<String> altValues, SuggestDictionary dict, SuggestField.Importance importance) throws IOException, SolrServerException {
+    private void saveSuggestionDoc(
+            String id,
+            String value,
+            List<String> altValues,
+            SuggestDictionary dict,
+            SuggestField.Importance importance)
+            throws IOException, SolrServerException {
         SolrClient solrClient = solrTemplate.getSolrClient();
         String collection = SolrCollection.suggest.name();
-        solrClient.addBean(collection, SuggestDocument.builder()
-                .dictionary(dict.name())
-                .id(id)
-                .value(value)
-                .altValues(altValues)
-                .importance(importance.name())
-                .build());
+        solrClient.addBean(
+                collection,
+                SuggestDocument.builder()
+                        .dictionary(dict.name())
+                        .id(id)
+                        .value(value)
+                        .altValues(altValues)
+                        .importance(importance.name())
+                        .build());
         solrClient.commit(collection);
     }
 }

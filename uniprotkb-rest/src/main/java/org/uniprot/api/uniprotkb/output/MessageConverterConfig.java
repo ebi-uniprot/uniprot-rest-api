@@ -1,7 +1,15 @@
 package org.uniprot.api.uniprotkb.output;
 
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,13 +26,6 @@ import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.uniprotkb.output.converter.*;
 import org.uniprot.core.uniprot.UniProtEntry;
 
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
 /**
  * Created 21/08/18
  *
@@ -38,13 +39,15 @@ public class MessageConverterConfig {
     private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
 
     @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(ThreadPoolTaskExecutor configurableTaskExecutor) {
+    public ThreadPoolTaskExecutor downloadTaskExecutor(
+            ThreadPoolTaskExecutor configurableTaskExecutor) {
         configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
         configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
         configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
         configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
         configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(taskExecutor.isWaitForTasksToCompleteOnShutdown());
+        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
+                taskExecutor.isWaitForTasksToCompleteOnShutdown());
         return configurableTaskExecutor;
     }
 
@@ -78,16 +81,18 @@ public class MessageConverterConfig {
 
     @Bean
     public MessageConverterContextFactory<UniProtEntry> messageConverterContextFactory() {
-        MessageConverterContextFactory<UniProtEntry> contextFactory = new MessageConverterContextFactory<>();
+        MessageConverterContextFactory<UniProtEntry> contextFactory =
+                new MessageConverterContextFactory<>();
 
-        asList(context(LIST_MEDIA_TYPE),
-               context(FF_MEDIA_TYPE),
-               context(APPLICATION_XML),
-               context(APPLICATION_JSON),
-               context(TSV_MEDIA_TYPE),
-               context(FASTA_MEDIA_TYPE),
-               context(XLS_MEDIA_TYPE),
-               context(GFF_MEDIA_TYPE))
+        asList(
+                        context(LIST_MEDIA_TYPE),
+                        context(FF_MEDIA_TYPE),
+                        context(APPLICATION_XML),
+                        context(APPLICATION_JSON),
+                        context(TSV_MEDIA_TYPE),
+                        context(FASTA_MEDIA_TYPE),
+                        context(XLS_MEDIA_TYPE),
+                        context(GFF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

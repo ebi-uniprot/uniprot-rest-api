@@ -1,5 +1,7 @@
 package org.uniprot.api.subcell.output.converter;
 
+import java.util.Collections;
+
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
@@ -9,13 +11,12 @@ import org.uniprot.core.cv.keyword.GeneOntology;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.util.Utils;
 
-import java.util.Collections;
-
 /**
  * @author lgonzales
  * @since 2019-08-29
  */
-public class SubcellularLocationOBOMessageConverter extends AbstractOBOMessagerConverter<SubcellularLocationEntry> {
+public class SubcellularLocationOBOMessageConverter
+        extends AbstractOBOMessagerConverter<SubcellularLocationEntry> {
     private static final String SUBCELLULAR_LOCATION_NAMESPACE = "uniprot:locations";
 
     public SubcellularLocationOBOMessageConverter() {
@@ -41,13 +42,13 @@ public class SubcellularLocationOBOMessageConverter extends AbstractOBOMessagerC
         frame.addClause(getDefClause(subcellularLocationEntry));
 
         // add xref
-        if(Utils.notEmpty(subcellularLocationEntry.getLinks())) {
+        if (Utils.notEmpty(subcellularLocationEntry.getLinks())) {
             for (String xref : subcellularLocationEntry.getLinks()) {
                 frame.addClause(getLinksXRefClause(xref));
             }
         }
         // add xref for GO terms
-        if(Utils.notEmpty(subcellularLocationEntry.getGeneOntologies())) {
+        if (Utils.notEmpty(subcellularLocationEntry.getGeneOntologies())) {
             for (GeneOntology go : subcellularLocationEntry.getGeneOntologies()) {
                 frame.addClause(getGeneOntologyXRefClause(go));
             }
@@ -93,22 +94,30 @@ public class SubcellularLocationOBOMessageConverter extends AbstractOBOMessagerC
     }
 
     private Clause getNameSpaceClause(SubcellularLocationEntry subcellularLocationEntry) {
-        String nameSpace = SUBCELLULAR_LOCATION_NAMESPACE +
-                ":" +
-                subcellularLocationEntry.getCategory().toDisplayName().toLowerCase().replace(' ', '_');
-        return  new Clause(OBOFormatConstants.OboFormatTag.TAG_NAMESPACE, nameSpace);
+        String nameSpace =
+                SUBCELLULAR_LOCATION_NAMESPACE
+                        + ":"
+                        + subcellularLocationEntry
+                                .getCategory()
+                                .toDisplayName()
+                                .toLowerCase()
+                                .replace(' ', '_');
+        return new Clause(OBOFormatConstants.OboFormatTag.TAG_NAMESPACE, nameSpace);
     }
 
     private Clause getDefClause(SubcellularLocationEntry subcellularLocationEntry) {
-        return new Clause(OBOFormatConstants.OboFormatTag.TAG_DEF, subcellularLocationEntry.getDefinition());
+        return new Clause(
+                OBOFormatConstants.OboFormatTag.TAG_DEF, subcellularLocationEntry.getDefinition());
     }
 
     private Clause getIdClause(SubcellularLocationEntry subcellularLocationEntry) {
-        return new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, subcellularLocationEntry.getAccession());
+        return new Clause(
+                OBOFormatConstants.OboFormatTag.TAG_ID, subcellularLocationEntry.getAccession());
     }
 
     private Clause getNameClause(SubcellularLocationEntry subcellularLocationEntry) {
-        return new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, subcellularLocationEntry.getId());
+        return new Clause(
+                OBOFormatConstants.OboFormatTag.TAG_NAME, subcellularLocationEntry.getId());
     }
 
     private Clause getIsAClause(SubcellularLocationEntry isA) {
@@ -116,7 +125,7 @@ public class SubcellularLocationOBOMessageConverter extends AbstractOBOMessagerC
     }
 
     private Clause getRelationshipClause(SubcellularLocationEntry partOf) {
-        Clause clause =  new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, "part_of");
+        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, "part_of");
         clause.addValue(partOf.getAccession());
         return clause;
     }

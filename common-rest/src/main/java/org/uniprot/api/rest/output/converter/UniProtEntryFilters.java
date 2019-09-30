@@ -14,12 +14,13 @@ import org.uniprot.store.search.field.UniProtField;
 public class UniProtEntryFilters {
     private static final String ALL = "all";
 
-
-    public static UniProtEntry filterEntry(UniProtEntry entry, Map<String, List<String>> filterParams) {
+    public static UniProtEntry filterEntry(
+            UniProtEntry entry, Map<String, List<String>> filterParams) {
         if ((filterParams != null) && !filterParams.isEmpty()) {
             UniProtEntryBuilder.ActiveEntryBuilder builder = new UniProtEntryBuilder().from(entry);
             for (UniProtField.ResultFields component : UniProtField.ResultFields.values()) {
-                if (component.isMandatoryJsonField() == false && !filterParams.containsKey(component.name())) {
+                if (component.isMandatoryJsonField() == false
+                        && !filterParams.containsKey(component.name())) {
                     remove(builder, component);
                 } else if (component == UniProtField.ResultFields.comment) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
@@ -36,7 +37,8 @@ public class UniProtEntryFilters {
                 } else if (component == UniProtField.ResultFields.xref) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
                     Predicate<UniProtDBCrossReference> filter = createDbReferenceFilter(values);
-                    List<UniProtDBCrossReference> crossReferences = entry.getDatabaseCrossReferences();
+                    List<UniProtDBCrossReference> crossReferences =
+                            entry.getDatabaseCrossReferences();
                     crossReferences.removeIf(xref -> !filter.test(xref));
                     builder.databaseCrossReferences(crossReferences);
                 }
@@ -46,7 +48,6 @@ public class UniProtEntryFilters {
             return entry;
         }
     }
-
 
     public static Predicate<UniProtDBCrossReference> createDbReferenceFilter(List<String> values) {
         return v -> createXrefPredicate(v, values);
@@ -81,7 +82,8 @@ public class UniProtEntryFilters {
         return values.contains(v.getCommentType().name().toLowerCase());
     }
 
-    private static void remove(UniProtEntryBuilder.ActiveEntryBuilder builder, UniProtField.ResultFields type) {
+    private static void remove(
+            UniProtEntryBuilder.ActiveEntryBuilder builder, UniProtField.ResultFields type) {
         switch (type) {
             case protein_existence:
                 builder.proteinExistence(null);
@@ -126,5 +128,4 @@ public class UniProtEntryFilters {
                 break;
         }
     }
-
 }

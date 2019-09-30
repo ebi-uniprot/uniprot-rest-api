@@ -1,10 +1,11 @@
 package org.uniprot.api.uniprotkb.repository.search.impl;
 
+import java.util.List;
+
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * Created 13/06/19
@@ -17,4 +18,3 @@ import java.util.List;
 public class UniProtTermsConfig {
     private List<String> fields;
 }
-

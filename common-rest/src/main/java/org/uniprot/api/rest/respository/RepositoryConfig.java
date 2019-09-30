@@ -1,5 +1,9 @@
 package org.uniprot.api.rest.respository;
 
+import static java.util.Arrays.asList;
+
+import java.util.Optional;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -12,10 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-
-import java.util.Optional;
-
-import static java.util.Arrays.asList;
 
 /**
  * Configure spring-data-solr repository beans, that are used to retrieve data from a solr instance.
@@ -33,7 +33,8 @@ public class RepositoryConfig {
     @Bean
     @Profile("live")
     public HttpClient httpClient(RepositoryConfigProperties config) {
-        // I am creating HttpClient exactly in the same way it is created inside CloudSolrClient.Builder,
+        // I am creating HttpClient exactly in the same way it is created inside
+        // CloudSolrClient.Builder,
         // but here I am just adding Credentials
         ModifiableSolrParams param = null;
         if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
@@ -56,10 +57,13 @@ public class RepositoryConfig {
                     .withSocketTimeout(config.getSocketTimeout())
                     .build();
         } else if (!config.getHttphost().isEmpty()) {
-            return new HttpSolrClient.Builder().withHttpClient(httpClient).withBaseSolrUrl(config.getHttphost())
+            return new HttpSolrClient.Builder()
+                    .withHttpClient(httpClient)
+                    .withBaseSolrUrl(config.getHttphost())
                     .build();
         } else {
-            throw new BeanCreationException("make sure your application.properties has eight solr zookeeperhost or httphost properties");
+            throw new BeanCreationException(
+                    "make sure your application.properties has eight solr zookeeperhost or httphost properties");
         }
     }
 

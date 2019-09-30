@@ -1,9 +1,9 @@
 package org.uniprot.api.literature.request;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+
+import lombok.Data;
 
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -19,8 +19,9 @@ public class LiteratureRequestDTO implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-
-    @ValidSolrQueryFields(fieldValidatorClazz = LiteratureField.Search.class, messagePrefix = "search.literature")
+    @ValidSolrQueryFields(
+            fieldValidatorClazz = LiteratureField.Search.class,
+            messagePrefix = "search.literature")
     private String query;
 
     @ValidSolrSortFields(sortFieldEnumClazz = LiteratureField.Sort.class)

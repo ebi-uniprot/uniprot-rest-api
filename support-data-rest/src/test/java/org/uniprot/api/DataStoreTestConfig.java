@@ -1,5 +1,7 @@
 package org.uniprot.api;
 
+import static org.mockito.Mockito.mock;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -8,8 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-
-import static org.mockito.Mockito.mock;
 
 @TestConfiguration
 public class DataStoreTestConfig {
@@ -42,5 +42,4 @@ public class DataStoreTestConfig {
             }
         };
     }
-  
 }

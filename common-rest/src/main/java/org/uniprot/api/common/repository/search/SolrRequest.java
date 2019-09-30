@@ -1,14 +1,15 @@
 package org.uniprot.api.common.repository.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.
@@ -28,12 +29,9 @@ public class SolrRequest {
     private QueryBoosts queryBoosts;
     private String defaultField;
 
-    @Singular
-    private List<String> termFields = new ArrayList<>();
-    @Singular
-    private List<String> filterQueries = new ArrayList<>();
-    @Singular
-    private List<String> facets = new ArrayList<>();
+    @Singular private List<String> termFields = new ArrayList<>();
+    @Singular private List<String> filterQueries = new ArrayList<>();
+    @Singular private List<String> facets = new ArrayList<>();
 
     // setting default field values in a builder following instructions here:
     // https://www.baeldung.com/lombok-builder-default-value

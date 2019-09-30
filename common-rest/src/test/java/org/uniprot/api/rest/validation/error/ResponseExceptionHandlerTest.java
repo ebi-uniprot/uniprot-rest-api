@@ -1,5 +1,17 @@
 package org.uniprot.api.rest.validation.error;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,23 +26,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.rest.validation.error.ResponseExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 class ResponseExceptionHandlerTest {
     private static final String REQUEST_URL = "http://localhost/test";
     private static ResponseExceptionHandler errorHandler;
@@ -44,17 +41,17 @@ class ResponseExceptionHandlerTest {
 
     @Test
     void handleInternalServerErrorWithDebug() {
-        //when
+        // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
         Mockito.when(request.getParameter("debugError")).thenReturn("true");
         NullPointerException causedBy = new NullPointerException("Null Pointer");
         Throwable error = new Throwable("Throwable error message", causedBy);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
-                .handleInternalServerError(error, request);
+        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+                errorHandler.handleInternalServerError(error, request);
 
-        //then
+        // then
         assertNotNull(responseEntity);
 
         assertNotNull(responseEntity.getHeaders());
@@ -78,7 +75,7 @@ class ResponseExceptionHandlerTest {
 
     @Test
     void handleBindExceptionBadRequest() {
-        //when
+        // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
@@ -87,11 +84,10 @@ class ResponseExceptionHandlerTest {
         error.addError(new FieldError("objectName2", "field2", "Error With field 2"));
         error.addError(new FieldError("objectName3", "field3", "Error With field 3"));
 
+        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+                errorHandler.handleBindExceptionBadRequest(error, request);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
-                .handleBindExceptionBadRequest(error, request);
-
-        //then
+        // then
         assertNotNull(responseEntity);
         assertNotNull(responseEntity.getStatusCode());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -115,17 +111,18 @@ class ResponseExceptionHandlerTest {
 
     @Test
     void handleMissingServletRequestParameterExceptionBadRequest() {
-        //when
+        // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
         String param = "param";
-        MissingServletRequestParameterException error = new MissingServletRequestParameterException(param, "paramType");
+        MissingServletRequestParameterException error =
+                new MissingServletRequestParameterException(param, "paramType");
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
-                .handleMissingServletRequestParameter(error, request);
+        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+                errorHandler.handleMissingServletRequestParameter(error, request);
 
-        //then
+        // then
         assertNotNull(responseEntity);
         assertNotNull(responseEntity.getStatusCode());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -146,17 +143,17 @@ class ResponseExceptionHandlerTest {
 
     @Test
     void handleInvalidRequestExceptionBadRequest() {
-        //when
+        // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
         String message = "message describing error";
         InvalidRequestException error = new InvalidRequestException(message, null);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
-                .handleInvalidRequestExceptionBadRequest(error, request);
+        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+                errorHandler.handleInvalidRequestExceptionBadRequest(error, request);
 
-        //then
+        // then
         assertNotNull(responseEntity);
         assertNotNull(responseEntity.getStatusCode());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -177,21 +174,33 @@ class ResponseExceptionHandlerTest {
 
     @Test
     void constraintViolationException() {
-        //when
+        // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
-        Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.APPLICATION_XML_VALUE);
+        Mockito.when(request.getHeader(HttpHeaders.ACCEPT))
+                .thenReturn(MediaType.APPLICATION_XML_VALUE);
 
         Set<ConstraintViolation<?>> constraintViolations = new HashSet<>();
-        constraintViolations.add(ConstraintViolationImpl.forBeanValidation("", null,
-                                                                           null, "Field Error Message", null, null, null, null, null, null, null, null));
+        constraintViolations.add(
+                ConstraintViolationImpl.forBeanValidation(
+                        "",
+                        null,
+                        null,
+                        "Field Error Message",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null));
         ConstraintViolationException error = new ConstraintViolationException(constraintViolations);
 
+        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+                errorHandler.constraintViolationException(error, request);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
-                .constraintViolationException(error, request);
-
-        //then
+        // then
         assertNotNull(responseEntity);
         assertNotNull(responseEntity.getStatusCode());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -213,16 +222,17 @@ class ResponseExceptionHandlerTest {
 
     @Test
     void noHandlerFoundExceptionForXMLContentType() {
-        //when
+        // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
-        Mockito.when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(MediaType.APPLICATION_XML_VALUE);
+        Mockito.when(request.getHeader(HttpHeaders.ACCEPT))
+                .thenReturn(MediaType.APPLICATION_XML_VALUE);
         ResourceNotFoundException error = new ResourceNotFoundException("Error Message");
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity = errorHandler
-                .noHandlerFoundException(error, request);
+        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+                errorHandler.noHandlerFoundException(error, request);
 
-        //then
+        // then
         assertNotNull(responseEntity);
 
         assertNotNull(responseEntity.getHeaders());
@@ -242,5 +252,4 @@ class ResponseExceptionHandlerTest {
 
         assertEquals("Resource not found", errorMessage.getMessages().get(0));
     }
-
 }

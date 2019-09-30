@@ -8,16 +8,20 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
 /**
- *
  * @author jluo
  * @date: 20 Aug 2019
- *
-*/
+ */
 @Repository
 public class UniRefQueryRepository extends SolrQueryRepository<UniRefDocument> {
-    public UniRefQueryRepository(SolrTemplate solrTemplate, UniRefFacetConfig facetConfig, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.uniref, UniRefDocument.class, facetConfig, requestConverter);
+    public UniRefQueryRepository(
+            SolrTemplate solrTemplate,
+            UniRefFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.uniref,
+                UniRefDocument.class,
+                facetConfig,
+                requestConverter);
     }
-
 }
-

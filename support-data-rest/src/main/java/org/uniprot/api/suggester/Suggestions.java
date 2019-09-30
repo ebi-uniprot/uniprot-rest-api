@@ -1,9 +1,9 @@
 package org.uniprot.api.suggester;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 /**
  * Created 18/07/18

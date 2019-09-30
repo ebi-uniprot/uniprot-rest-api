@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+
 import sun.net.www.http.HttpClient;
 
 /**
@@ -45,6 +46,4 @@ public class DataStoreTestConfig {
             }
         };
     }
-
 }
-

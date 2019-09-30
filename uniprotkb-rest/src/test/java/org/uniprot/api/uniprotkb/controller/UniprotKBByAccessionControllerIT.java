@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
+import java.util.HashMap;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,36 +49,24 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.HashMap;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
-
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniprotKBController.class)
-@ExtendWith(value = {SpringExtension.class, UniprotKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
-        UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class})
+@ExtendWith(
+        value = {
+            SpringExtension.class,
+            UniprotKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
+            UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
+        })
 class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
 
     private static final String ACCESSION_ID = "Q8DIA7";
 
-    @Autowired
-    private UniprotQueryRepository repository;
-
+    @Autowired private UniprotQueryRepository repository;
 
     private UniProtKBStoreClient storeClient;
 
@@ -99,20 +98,24 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     @BeforeAll
     void initUniprotKbDataStore() {
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(TaxonomyRepoMocker.getTaxonomyRepo(),
-                GoRelationsRepoMocker.getGoRelationRepo(),
-                PathwayRepoMocker.getPathwayRepo(),
-                Mockito.mock(ChebiRepo.class),
-                Mockito.mock(ECRepo.class),
-                new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter =
+                new UniProtEntryConverter(
+                        TaxonomyRepoMocker.getTaxonomyRepo(),
+                        GoRelationsRepoMocker.getGoRelationRepo(),
+                        PathwayRepoMocker.getPathwayRepo(),
+                        Mockito.mock(ChebiRepo.class),
+                        Mockito.mock(ECRepo.class),
+                        new HashMap<>());
 
         DataStoreManager dsm = getStoreManager();
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
-        dsm.addDocConverter(DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
+        dsm.addDocConverter(
+                DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
 
-        storeClient = new UniProtKBStoreClient(VoldemortInMemoryUniprotEntryStore
-                .getInstance("avro-uniprot"));
+        storeClient =
+                new UniProtKBStoreClient(
+                        VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
     }
 
@@ -127,18 +130,23 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         saveEntry();
 
         // when
-        ResultActions response = getMockMvc().perform(
-                get(ACCESSION_RESOURCE + ACCESSION_ID)
-                        .param("fields", "invalid, organism, invalid2")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE + ACCESSION_ID)
+                                        .param("fields", "invalid, organism, invalid2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE,APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*",
-                        containsInAnyOrder("Invalid fields parameter value 'invalid'",
-                                "Invalid fields parameter value 'invalid2'")));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'invalid'",
+                                        "Invalid fields parameter value 'invalid2'")));
     }
 
     @Test
@@ -153,10 +161,12 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
         // when
-        ResultActions response = getMockMvc().perform(
-                get(ACCESSION_RESOURCE + "P21802-2")
-                        .param("fields", "organism")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE + "P21802-2")
+                                        .param("fields", "organism")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -180,10 +190,12 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
         // when
-        ResultActions response = getMockMvc().perform(
-                get(ACCESSION_RESOURCE + "P21802-1")
-                        .param("fields", "organism")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE + "P21802-1")
+                                        .param("fields", "organism")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -201,13 +213,17 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        List<InactiveUniProtEntry> mergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
+        List<InactiveUniProtEntry> mergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
 
         // when
-        ResultActions response = getMockMvc().perform(
-                get(ACCESSION_RESOURCE + "B4DFC2")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE + "B4DFC2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -226,13 +242,17 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        List<InactiveUniProtEntry> demergedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
+        List<InactiveUniProtEntry> demergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
 
         // when
-        ResultActions response = getMockMvc().perform(
-                get(ACCESSION_RESOURCE + "Q00007")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE + "Q00007")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -242,7 +262,8 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.primaryAccession", is("Q00007")))
                 .andExpect(jsonPath("$.entryType", is("Inactive")))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DEMERGED")))
-                .andExpect(jsonPath("$.inactiveReason.mergeDemergeTo", contains("P63150","P63151")));
+                .andExpect(
+                        jsonPath("$.inactiveReason.mergeDemergeTo", contains("P63150", "P63151")));
     }
 
     @Test
@@ -251,13 +272,17 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
-        List<InactiveUniProtEntry> deletedList = InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
+        List<InactiveUniProtEntry> deletedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
 
         // when
-        ResultActions response = getMockMvc().perform(
-                get(ACCESSION_RESOURCE + "I8FBX2")
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE + "I8FBX2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
@@ -273,7 +298,8 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
         @Override
         public GetIdParameter validIdParameter() {
-            return GetIdParameter.builder().id(ACCESSION_ID)
+            return GetIdParameter.builder()
+                    .id(ACCESSION_ID)
                     .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
                     .build();
         }
@@ -283,14 +309,18 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id("invalid")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*",
-                            contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                     .build();
         }
 
         @Override
         public GetIdParameter nonExistentIdParameter() {
-            return GetIdParameter.builder().id(ACCESSION_ID)
+            return GetIdParameter.builder()
+                    .id(ACCESSION_ID)
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
@@ -314,59 +344,96 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                     .id(ACCESSION_ID)
                     .fields("invalid")
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Invalid fields parameter value 'invalid'")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
     }
 
-    static class UniprotKBGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+    static class UniprotKBGetIdContentTypeParamResolver
+            extends AbstractGetIdContentTypeParamResolver {
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id(ACCESSION_ID)
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
-                            .resultMatcher(jsonPath("$.entryType", is("Swiss-Prot")))
-                            .resultMatcher(jsonPath("$.uniProtId", is("PURL_THEEB")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("<accession>Q8DIA7</accession>")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FF_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("ID   PURL_THEEB              Reviewed;         761 AA.\n" +
-                                    "AC   Q8DIA7;\n" +
-                                    "DT   07-JUN-2005, integrated into UniProtKB/Swiss-Prot.\n" +
-                                    "DT   01-MAR-2003, sequence version 1.\n" +
-                                    "DT   05-DEC-2018, entry version 101.")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(">sp|Q8DIA7|" +
-                                    "PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL " +
-                                    "OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("##gff-version 3\n" +
-                                    "##sequence-region Q8DIA7 1 761\n" +
-                                    "Q8DIA7\tUniProtKB\tChain\t1\t761\t.\t.\t.\tID=PRO_0000100496;Note=Phosphoribosylformylglycinamidine synthase subunit PurL")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString(ACCESSION_ID)))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(containsString("Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
-                            .resultMatcher(content().string(containsString("Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL, FGAM synthase")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
+                                    .resultMatcher(jsonPath("$.entryType", is("Swiss-Prot")))
+                                    .resultMatcher(jsonPath("$.uniProtId", is("PURL_THEEB")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<accession>Q8DIA7</accession>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "ID   PURL_THEEB              Reviewed;         761 AA.\n"
+                                                                            + "AC   Q8DIA7;\n"
+                                                                            + "DT   07-JUN-2005, integrated into UniProtKB/Swiss-Prot.\n"
+                                                                            + "DT   01-MAR-2003, sequence version 1.\n"
+                                                                            + "DT   05-DEC-2018, entry version 101.")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    ">sp|Q8DIA7|"
+                                                                            + "PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL "
+                                                                            + "OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "##gff-version 3\n"
+                                                                            + "##sequence-region Q8DIA7 1 761\n"
+                                                                            + "Q8DIA7\tUniProtKB\tChain\t1\t761\t.\t.\t.\tID=PRO_0000100496;Note=Phosphoribosylformylglycinamidine synthase subunit PurL")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString(ACCESSION_ID)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL, FGAM synthase")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -374,41 +441,56 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
                     .id("INVALID")
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                            .resultMatcher(jsonPath("$.messages.*", contains("The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(MediaType.APPLICATION_XML)
-                            .resultMatcher(content().string(containsString("<messages>The 'accession' value has invalid format. It should be a valid UniProtKB accession</messages>")))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FF_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
-                    .contentTypeParam(ContentTypeParam.builder()
-                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                            .resultMatcher(content().string(isEmptyString()))
-                            .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.messages.*",
+                                                    contains(
+                                                            "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<messages>The 'accession' value has invalid format. It should be a valid UniProtKB accession</messages>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(isEmptyString()))
+                                    .build())
                     .build();
         }
     }
-
 }

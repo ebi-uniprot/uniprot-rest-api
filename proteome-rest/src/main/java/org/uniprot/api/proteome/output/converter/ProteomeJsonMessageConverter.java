@@ -11,20 +11,21 @@ import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.field.ProteomeField;
 
 /**
- *
  * @author jluo
  * @date: 29 Apr 2019
- *
  */
-
 public class ProteomeJsonMessageConverter extends JsonMessageConverter<ProteomeEntry> {
 
-	public ProteomeJsonMessageConverter() {
-		super(ProteomeJsonConfig.getInstance().getFullObjectMapper(), ProteomeEntry.class, Arrays.asList(ProteomeField.ResultFields.values()));
-	}
+    public ProteomeJsonMessageConverter() {
+        super(
+                ProteomeJsonConfig.getInstance().getFullObjectMapper(),
+                ProteomeEntry.class,
+                Arrays.asList(ProteomeField.ResultFields.values()));
+    }
 
-	@Override
-	protected Map<String, List<String>> getFilterFieldMap(String fields) {
-		return new HashMap<>(); //TODO: Filters are not being applied for proteome entry in JSON FORMAT.....
-	}
+    @Override
+    protected Map<String, List<String>> getFilterFieldMap(String fields) {
+        return new HashMap<>(); // TODO: Filters are not being applied for proteome entry in JSON
+                                // FORMAT.....
+    }
 }

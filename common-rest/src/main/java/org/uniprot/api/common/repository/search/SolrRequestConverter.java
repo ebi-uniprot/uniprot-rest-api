@@ -1,6 +1,15 @@
 package org.uniprot.api.common.repository.search;
 
+import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
+import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
+import static org.uniprot.core.util.Utils.*;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.FacetOptions;
@@ -11,14 +20,6 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.core.util.Utils;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.*;
 
 /**
  * Created 14/06/19
@@ -55,14 +56,14 @@ public class SolrRequestConverter {
         }
 
         log.debug("Solr Query: " + solrQuery);
-        
+
         return solrQuery;
     }
 
     /**
-     * Creates a Spring {@link Query} from a {@link SolrRequest}. Note that this does not
-     * handle term queries, which are not supported by Spring's standard Query API.
-     * And it also does not support Interval Facets.
+     * Creates a Spring {@link Query} from a {@link SolrRequest}. Note that this does not handle
+     * term queries, which are not supported by Spring's standard Query API. And it also does not
+     * support Interval Facets.
      *
      * @param request the request that specifies the query
      * @return the query
@@ -74,7 +75,9 @@ public class SolrRequestConverter {
             simpleQuery = getSimpleFacetQuery(simpleQuery, request);
         }
 
-        request.getFilterQueries().stream().map(SimpleQuery::new).forEach(simpleQuery::addFilterQuery);
+        request.getFilterQueries().stream()
+                .map(SimpleQuery::new)
+                .forEach(simpleQuery::addFilterQuery);
 
         simpleQuery.addSort(request.getSort());
         simpleQuery.setDefaultOperator(request.getDefaultQueryOperator());
@@ -87,12 +90,15 @@ public class SolrRequestConverter {
             SimpleFacetQuery simpleFacetQuery = new SimpleFacetQuery(simpleQuery.getCriteria());
 
             for (String facetName : request.getFacets()) {
-                FacetProperty facetProperty = request.getFacetConfig().getFacetPropertyMap().get(facetName);
+                FacetProperty facetProperty =
+                        request.getFacetConfig().getFacetPropertyMap().get(facetName);
                 if (Utils.notEmpty(facetProperty.getInterval())) {
-                    throw new UnsupportedOperationException("Interval facets are not supported by Spring Data Solr");
+                    throw new UnsupportedOperationException(
+                            "Interval facets are not supported by Spring Data Solr");
                 }
                 if (facetProperty.getLimit() != 0) {
-                    throw new UnsupportedOperationException("Define a limit for a specific facet is not supported by Spring Data Solr");
+                    throw new UnsupportedOperationException(
+                            "Define a limit for a specific facet is not supported by Spring Data Solr");
                 }
             }
             FacetOptions facetOptions = new FacetOptions();
@@ -124,7 +130,8 @@ public class SolrRequestConverter {
             if (isSingleTerm(termQuery)) {
                 solrQuery.setParam(TERMS_LIST, termQuery.toLowerCase());
             } else {
-                throw new InvalidRequestException("Term information will only be returned for single value searches that do not specify a field.");
+                throw new InvalidRequestException(
+                        "Term information will only be returned for single value searches that do not specify a field.");
             }
 
             solrQuery.setParam(TERMS, "true");
@@ -146,14 +153,16 @@ public class SolrRequestConverter {
             for (String facetName : facets) {
                 FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facetName);
                 if (Utils.notEmpty(facetProperty.getInterval())) {
-                    String[] facetIntervals = facetProperty.getInterval().values().toArray(new String[0]);
+                    String[] facetIntervals =
+                            facetProperty.getInterval().values().toArray(new String[0]);
                     solrQuery.addIntervalFacets(facetName, facetIntervals);
                 } else {
                     solrQuery.addFacetField(facetName);
                 }
                 if (facetProperty.getLimit() != 0) {
-                    solrQuery.add(String.format("f.%s.facet.limit", facetName), String
-                            .valueOf(facetProperty.getLimit()));
+                    solrQuery.add(
+                            String.format("f.%s.facet.limit", facetName),
+                            String.valueOf(facetProperty.getLimit()));
                 }
             }
             solrQuery.setFacetLimit(facetConfig.getLimit());
@@ -173,9 +182,9 @@ public class SolrRequestConverter {
         static void setSort(SolrQuery solrQuery, Sort sort) {
             if (nonNull(sort)) {
                 for (Sort.Order order : sort) {
-                    solrQuery
-                            .addSort(order.getProperty(), order
-                                    .isAscending() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+                    solrQuery.addSort(
+                            order.getProperty(),
+                            order.isAscending() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
                 }
             }
         }

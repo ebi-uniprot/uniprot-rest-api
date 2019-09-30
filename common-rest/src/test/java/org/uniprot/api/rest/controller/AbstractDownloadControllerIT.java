@@ -1,4 +1,3 @@
 package org.uniprot.api.rest.controller;
 
-abstract class AbstractDownloadControllerIT {
-}
+abstract class AbstractDownloadControllerIT {}

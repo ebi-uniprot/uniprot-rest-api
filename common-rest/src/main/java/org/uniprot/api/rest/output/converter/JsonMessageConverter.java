@@ -1,16 +1,17 @@
 package org.uniprot.api.rest.output.converter;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.ReturnField;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @param <T> instance of the object that is being written.
@@ -25,7 +26,10 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     private List<ReturnField> allFields;
     private JsonResponseFieldProjector fieldProjector;
 
-    public JsonMessageConverter(ObjectMapper objectMapper, Class<T> messageConverterEntryClass, List<ReturnField> allFields) {
+    public JsonMessageConverter(
+            ObjectMapper objectMapper,
+            Class<T> messageConverterEntryClass,
+            List<ReturnField> allFields) {
         super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
         this.allFields = allFields;
@@ -33,10 +37,12 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     @Override
-    protected void before(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
+    protected void before(MessageConverterContext<T> context, OutputStream outputStream)
+            throws IOException {
         tlFilters.set(getFilterFieldMap(context.getFields()));
 
-        JsonGenerator generator = objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
+        JsonGenerator generator =
+                objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
 
         if (!context.isEntityOnly()) {
             generator.writeStartObject();
@@ -59,7 +65,6 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 generator.writeEndArray();
             }
 
-
             generator.writeFieldName("results");
             generator.writeStartArray();
         }
@@ -74,7 +79,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     @Override
-    protected void after(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
+    protected void after(MessageConverterContext<T> context, OutputStream outputStream)
+            throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
 
         if (!context.isEntityOnly()) {
@@ -94,7 +100,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
         Map<String, List<String>> filterFieldMap = getThreadLocalFilterMap();
 
-        Map<String, Object> result = this.fieldProjector.project(entity, filterFieldMap, this.allFields);
+        Map<String, Object> result =
+                this.fieldProjector.project(entity, filterFieldMap, this.allFields);
         return result;
     }
 
@@ -117,5 +124,4 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             throw new StopStreamException("Failed to write Facet JSON object", e);
         }
     }
-
 }

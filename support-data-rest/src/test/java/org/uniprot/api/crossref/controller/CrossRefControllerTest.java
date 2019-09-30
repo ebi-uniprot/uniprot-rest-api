@@ -1,5 +1,10 @@
 package org.uniprot.api.crossref.controller;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -13,25 +18,17 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.crossref.controller.CrossRefController;
 import org.uniprot.api.crossref.service.CrossRefService;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.crossref.CrossRefEntryBuilder;
 
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={DataStoreTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @WebMvcTest(CrossRefController.class)
 class CrossRefControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private CrossRefService crossRefService;
+    @Autowired private MockMvc mockMvc;
+    @MockBean private CrossRefService crossRefService;
 
     @Test
     void testGetCrossRefByAccession() throws Exception {
@@ -39,11 +36,10 @@ class CrossRefControllerTest {
         CrossRefEntry crossRef = createDBXRef();
         Mockito.when(this.crossRefService.findByAccession(accession)).thenReturn(crossRef);
 
-        ResultActions response = this.mockMvc.perform(
-                MockMvcRequestBuilders
-                        .get("/xref/" + accession)
-                        .param("accessionId", accession)
-        );
+        ResultActions response =
+                this.mockMvc.perform(
+                        MockMvcRequestBuilders.get("/xref/" + accession)
+                                .param("accessionId", accession));
 
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))
@@ -55,11 +51,21 @@ class CrossRefControllerTest {
                 .andExpect(jsonPath("$.server", equalTo(crossRef.getServer())))
                 .andExpect(jsonPath("$.dbUrl", equalTo(crossRef.getDbUrl())))
                 .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
-                .andExpect(jsonPath("$.reviewedProteinCount", equalTo(Integer.valueOf(crossRef.getReviewedProteinCount().toString()))))
-                .andExpect(jsonPath("$.unreviewedProteinCount", equalTo(Integer.valueOf(crossRef.getUnreviewedProteinCount().toString()))));
+                .andExpect(
+                        jsonPath(
+                                "$.reviewedProteinCount",
+                                equalTo(
+                                        Integer.valueOf(
+                                                crossRef.getReviewedProteinCount().toString()))))
+                .andExpect(
+                        jsonPath(
+                                "$.unreviewedProteinCount",
+                                equalTo(
+                                        Integer.valueOf(
+                                                crossRef.getUnreviewedProteinCount().toString()))));
     }
 
-    private CrossRefEntry createDBXRef(){
+    private CrossRefEntry createDBXRef() {
         String random = UUID.randomUUID().toString();
         String ac = random + "-AC-";
         String ab = random + "-AB-";

@@ -7,13 +7,18 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 @Repository
 public class TaxonomyRepository extends SolrQueryRepository<TaxonomyDocument> {
-    protected TaxonomyRepository(SolrTemplate solrTemplate, TaxonomyFacetConfig facetConfig, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.taxonomy, TaxonomyDocument.class, facetConfig, requestConverter);
+    protected TaxonomyRepository(
+            SolrTemplate solrTemplate,
+            TaxonomyFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.taxonomy,
+                TaxonomyDocument.class,
+                facetConfig,
+                requestConverter);
     }
 }

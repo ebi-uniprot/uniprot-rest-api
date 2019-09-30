@@ -1,62 +1,57 @@
 package org.uniprot.api.rest.request;
 
-import org.springframework.data.solr.core.query.SimpleQuery;
-import org.uniprot.core.util.Utils;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.uniprot.core.util.Utils;
+
 /**
- *
  * @author jluo
  * @date: 26 Apr 2019
- *
-*/
-
+ */
 public interface SearchRequest {
 
     static final int DEFAULT_RESULTS_SIZE = 25;
 
-	String getQuery();
+    String getQuery();
 
-	String getFields();
+    String getFields();
 
-	String getSort();
+    String getSort();
 
-	String getCursor();
+    String getCursor();
 
-	String getFacets();
+    String getFacets();
 
-	int getSize();
+    int getSize();
 
-	default boolean hasFields() {
-		return Utils.notEmpty(getFields());
-	}
+    default boolean hasFields() {
+        return Utils.notEmpty(getFields());
+    }
 
-	default boolean hasSort() {
-		return Utils.notEmpty(getSort());
-	}
+    default boolean hasSort() {
+        return Utils.notEmpty(getSort());
+    }
 
-	default boolean hasCursor() {
-		return Utils.notEmpty(getCursor());
-	}
+    default boolean hasCursor() {
+        return Utils.notEmpty(getCursor());
+    }
 
-	default boolean hasFacets() {
-		return Utils.notEmpty(getFacets());
-	}
+    default boolean hasFacets() {
+        return Utils.notEmpty(getFacets());
+    }
 
-	default SimpleQuery getSimpleQuery(){
-		return new SimpleQuery(getQuery());
-	}
+    default SimpleQuery getSimpleQuery() {
+        return new SimpleQuery(getQuery());
+    }
 
-	default List<String> getFacetList(){
-		if(hasFacets()) {
-			return Arrays.asList(getFacets().split(("\\s*,\\s*")));
-		} else {
-			return Collections.emptyList();
-		}
-	}
-
+    default List<String> getFacetList() {
+        if (hasFacets()) {
+            return Arrays.asList(getFacets().split(("\\s*,\\s*")));
+        } else {
+            return Collections.emptyList();
+        }
+    }
 }
-

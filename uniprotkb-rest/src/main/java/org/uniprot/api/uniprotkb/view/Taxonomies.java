@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class Taxonomies {
-	  private List<TaxonomyNode> taxonomies;
+    private List<TaxonomyNode> taxonomies;
 
-	    private PageInformation pageInfo;
+    private PageInformation pageInfo;
 }

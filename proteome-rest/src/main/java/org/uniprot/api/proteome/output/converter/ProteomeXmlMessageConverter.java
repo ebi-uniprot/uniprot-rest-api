@@ -8,45 +8,43 @@ import org.uniprot.core.xml.jaxb.proteome.Proteome;
 import org.uniprot.core.xml.proteome.ProteomeConverter;
 
 /**
- *
  * @author jluo
  * @date: 29 Apr 2019
- *
  */
+public class ProteomeXmlMessageConverter
+        extends AbstractXmlMessageConverter<ProteomeEntry, Proteome> {
+    private final ProteomeConverter converter;
+    private final Marshaller marshaller;
+    private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
+    private static final String HEADER =
+            "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
 
-public class ProteomeXmlMessageConverter extends AbstractXmlMessageConverter<ProteomeEntry, Proteome> {
-	private final ProteomeConverter converter;
-	private final Marshaller marshaller;
-	private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
-	private static final String HEADER = "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
+    private static final String FOOTER = "\n</proteomes>";
 
-	private static final String FOOTER = "\n</proteomes>";
-	public ProteomeXmlMessageConverter() {
-		super(ProteomeEntry.class);
-		converter = new ProteomeConverter();
-		marshaller = createMarshaller(XML_CONTEXT);
-	}
+    public ProteomeXmlMessageConverter() {
+        super(ProteomeEntry.class);
+        converter = new ProteomeConverter();
+        marshaller = createMarshaller(XML_CONTEXT);
+    }
 
-	@Override
-	protected String getHeader() {
-		return HEADER;
-	}
+    @Override
+    protected String getHeader() {
+        return HEADER;
+    }
 
-	@Override
-	protected Proteome toXml(ProteomeEntry entity) {
-		
-			return converter.toXml( entity);
+    @Override
+    protected Proteome toXml(ProteomeEntry entity) {
 
-	}
+        return converter.toXml(entity);
+    }
 
-	@Override
-	protected Marshaller getMarshaller() {
-		return marshaller;
-	}
+    @Override
+    protected Marshaller getMarshaller() {
+        return marshaller;
+    }
 
-	@Override
-	protected String getFooter() {
-		return FOOTER;
-	}
-
+    @Override
+    protected String getFooter() {
+        return FOOTER;
+    }
 }

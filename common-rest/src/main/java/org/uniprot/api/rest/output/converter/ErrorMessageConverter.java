@@ -1,5 +1,8 @@
 package org.uniprot.api.rest.output.converter;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
@@ -8,18 +11,17 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ResponseExceptionHandler;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 /**
  * This class is responsible to write error message body for http status BAD REQUESTS (400)
  *
  * @author lgonzales
  */
-public class ErrorMessageConverter extends AbstractGenericHttpMessageConverter<ResponseExceptionHandler.ErrorInfo> {
+public class ErrorMessageConverter
+        extends AbstractGenericHttpMessageConverter<ResponseExceptionHandler.ErrorInfo> {
 
-    public ErrorMessageConverter(){
-        super(UniProtMediaType.FF_MEDIA_TYPE,
+    public ErrorMessageConverter() {
+        super(
+                UniProtMediaType.FF_MEDIA_TYPE,
                 UniProtMediaType.FASTA_MEDIA_TYPE,
                 UniProtMediaType.GFF_MEDIA_TYPE,
                 UniProtMediaType.LIST_MEDIA_TYPE,
@@ -34,17 +36,26 @@ public class ErrorMessageConverter extends AbstractGenericHttpMessageConverter<R
     }
 
     @Override
-    protected void writeInternal(ResponseExceptionHandler.ErrorInfo errorInfo, Type type, HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(
+            ResponseExceptionHandler.ErrorInfo errorInfo,
+            Type type,
+            HttpOutputMessage httpOutputMessage)
+            throws IOException, HttpMessageNotWritableException {
         // we write nothing in the response body.
     }
 
     @Override
-    protected ResponseExceptionHandler.ErrorInfo readInternal(Class<? extends ResponseExceptionHandler.ErrorInfo> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
-        throw new UnsupportedOperationException("") ;
+    protected ResponseExceptionHandler.ErrorInfo readInternal(
+            Class<? extends ResponseExceptionHandler.ErrorInfo> aClass,
+            HttpInputMessage httpInputMessage)
+            throws IOException, HttpMessageNotReadableException {
+        throw new UnsupportedOperationException("");
     }
 
     @Override
-    public ResponseExceptionHandler.ErrorInfo read(Type type, Class<?> aClass, HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
-        throw new UnsupportedOperationException("") ;
+    public ResponseExceptionHandler.ErrorInfo read(
+            Type type, Class<?> aClass, HttpInputMessage httpInputMessage)
+            throws IOException, HttpMessageNotReadableException {
+        throw new UnsupportedOperationException("");
     }
 }

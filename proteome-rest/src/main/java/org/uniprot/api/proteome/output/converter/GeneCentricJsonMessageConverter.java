@@ -11,21 +11,20 @@ import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
 
 /**
- *
  * @author jluo
  * @date: 21 Jun 2019
- *
-*/
-
+ */
 public class GeneCentricJsonMessageConverter extends JsonMessageConverter<CanonicalProtein> {
 
-	public GeneCentricJsonMessageConverter() {
-		super(ProteomeJsonConfig.getInstance().getFullObjectMapper(), CanonicalProtein.class, Arrays.asList(GeneCentricField.ResultFields.values()));
-	}
+    public GeneCentricJsonMessageConverter() {
+        super(
+                ProteomeJsonConfig.getInstance().getFullObjectMapper(),
+                CanonicalProtein.class,
+                Arrays.asList(GeneCentricField.ResultFields.values()));
+    }
 
-	@Override
-	protected Map<String, List<String>> getFilterFieldMap(String fields) {
-		return new HashMap<>();
-	}
+    @Override
+    protected Map<String, List<String>> getFilterFieldMap(String fields) {
+        return new HashMap<>();
+    }
 }
-

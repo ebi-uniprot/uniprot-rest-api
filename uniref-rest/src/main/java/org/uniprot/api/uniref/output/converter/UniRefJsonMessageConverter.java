@@ -11,22 +11,19 @@ import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.field.UniRefField;
 
 /**
- *
  * @author jluo
  * @date: 22 Aug 2019
- *
-*/
-
+ */
 public class UniRefJsonMessageConverter extends JsonMessageConverter<UniRefEntry> {
-	public UniRefJsonMessageConverter() {
-		super(UniRefEntryJsonConfig.getInstance().getSimpleObjectMapper(), UniRefEntry.class, 
-				Arrays.asList(UniRefField.ResultFields.values()));
-	}
+    public UniRefJsonMessageConverter() {
+        super(
+                UniRefEntryJsonConfig.getInstance().getSimpleObjectMapper(),
+                UniRefEntry.class,
+                Arrays.asList(UniRefField.ResultFields.values()));
+    }
 
-	@Override
-	protected Map<String, List<String>> getFilterFieldMap(String fields) {		
-		return UniRefFieldsParser.parseForFilters(fields);
-	}
-
+    @Override
+    protected Map<String, List<String>> getFilterFieldMap(String fields) {
+        return UniRefFieldsParser.parseForFilters(fields);
+    }
 }
-

@@ -1,5 +1,7 @@
 package org.uniprot.api.disease.response.converter;
 
+import java.util.*;
+
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
@@ -8,8 +10,6 @@ import org.uniprot.api.rest.output.converter.AbstractOBOMessagerConverter;
 import org.uniprot.core.cv.disease.CrossReference;
 import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.core.util.Utils;
-
-import java.util.*;
 
 public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Disease> {
     private static final String DISEASE_NAMESPACE = "uniprot:diseases";
@@ -47,7 +47,6 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
         return DISEASE_NAMESPACE;
     }
 
-
     public Clause getSynonymClause(String synonym) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_SYNONYM, synonym);
         Xref xref = new Xref("UniProt");
@@ -56,10 +55,10 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
     }
 
     public Clause getDefClause(Disease diseaseEntry) {
-        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_DEF, diseaseEntry.getDefinition());
+        Clause clause =
+                new Clause(OBOFormatConstants.OboFormatTag.TAG_DEF, diseaseEntry.getDefinition());
         return clause;
     }
-
 
     public Clause getIdClause(Disease disease) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, disease.getAccession());

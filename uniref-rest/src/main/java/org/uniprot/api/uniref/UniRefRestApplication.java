@@ -7,18 +7,13 @@ import org.springframework.context.annotation.Import;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-/**
- * 
- * @author jluo
- *
- */
+
+/** @author jluo */
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
-@ComponentScan(basePackages = {"org.uniprot.api.uniref","org.uniprot.api.rest"})
-public class UniRefRestApplication 
-{
-	public static void main( String[] args )
-    {
-    	SpringApplication.run(UniRefRestApplication.class, args);
+@ComponentScan(basePackages = {"org.uniprot.api.uniref", "org.uniprot.api.rest"})
+public class UniRefRestApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UniRefRestApplication.class, args);
     }
 }

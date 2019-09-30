@@ -1,25 +1,22 @@
 package org.uniprot.api.uniref.controller;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
 import org.uniprot.core.util.Crc64;
 import org.uniprot.core.xml.jaxb.uniref.*;
 import org.uniprot.core.xml.jaxb.uniref.MemberType.Sequence;
 import org.uniprot.core.xml.uniprot.XmlConverterHelper;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author jluo
  * @date: 23 Aug 2019
  */
-
 class TestUtils {
     private static final ObjectFactory xmlFactory = new ObjectFactory();
 
-    private TestUtils() {
-
-    }
+    private TestUtils() {}
 
     public static Entry createSkeletonEntry(String id, String name) {
         Entry entry = xmlFactory.createEntry();
@@ -27,7 +24,9 @@ class TestUtils {
         entry.setName(name);
         entry.setUpdated(XmlConverterHelper.dateToXml(LocalDate.now()));
         String sequence = "MPLIYMNIMLAFTISLLGMLVYRSHLMSSLLCLEGMMLSLFIMATLMTLNTHSLLANIVP";
-        MemberType reMember = createRepresentativeMember("UniProtKB ID", "P12345_HUMAN", Collections.emptyList(), sequence);
+        MemberType reMember =
+                createRepresentativeMember(
+                        "UniProtKB ID", "P12345_HUMAN", Collections.emptyList(), sequence);
         entry.setRepresentativeMember(reMember);
         return entry;
     }
@@ -50,7 +49,8 @@ class TestUtils {
         return member;
     }
 
-    private static MemberType createRepresentativeMember(String type, String id, List<PropertyType> properties, String sequence) {
+    private static MemberType createRepresentativeMember(
+            String type, String id, List<PropertyType> properties, String sequence) {
         MemberType member = createMember(type, id, properties);
         member.setSequence(createSequence(sequence));
         return member;
@@ -63,4 +63,3 @@ class TestUtils {
         return property;
     }
 }
-

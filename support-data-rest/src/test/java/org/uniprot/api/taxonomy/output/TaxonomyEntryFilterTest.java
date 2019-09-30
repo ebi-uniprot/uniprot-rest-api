@@ -1,7 +1,13 @@
 package org.uniprot.api.taxonomy.output;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.taxonomy.output.TaxonomyEntryFilter;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
 import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
@@ -12,17 +18,7 @@ import org.uniprot.core.uniprot.taxonomy.Taxonomy;
 import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
 import org.uniprot.store.search.field.TaxonomyField;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-/**
- *
- * @author lgonzales
- */
+/** @author lgonzales */
 class TaxonomyEntryFilterTest {
 
     @Test
@@ -30,7 +26,7 @@ class TaxonomyEntryFilterTest {
         List<String> fieldList = TaxonomyEntryFilter.parse(null);
         assertNotNull(fieldList);
         assertFalse(fieldList.isEmpty());
-        assertEquals(fieldList.size(),10);
+        assertEquals(fieldList.size(), 10);
 
         assertTrue(fieldList.contains("id"));
         assertTrue(fieldList.contains("mnemonic"));
@@ -49,7 +45,7 @@ class TaxonomyEntryFilterTest {
         List<String> fieldList = TaxonomyEntryFilter.parse("id,mnemonic");
         assertNotNull(fieldList);
         assertFalse(fieldList.isEmpty());
-        assertEquals(fieldList.size(),2);
+        assertEquals(fieldList.size(), 2);
 
         assertTrue(fieldList.contains("id"));
         assertTrue(fieldList.contains("mnemonic"));
@@ -58,33 +54,34 @@ class TaxonomyEntryFilterTest {
     @Test
     void filterWithoutFieldsEntry() {
         TaxonomyEntry entry = getCompleteTaxonomyEntry();
-        TaxonomyEntry filterEntry = TaxonomyEntryFilter.filterEntry(entry,null);
+        TaxonomyEntry filterEntry = TaxonomyEntryFilter.filterEntry(entry, null);
         assertNotNull(filterEntry);
-        assertEquals(entry,filterEntry);
+        assertEquals(entry, filterEntry);
     }
 
     @Test
     void filterWithAllFieldsEntry() {
         TaxonomyEntry entry = getCompleteTaxonomyEntry();
-        List<String> allFields = Arrays.stream(TaxonomyField.ResultFields.values())
-                .map(TaxonomyField.ResultFields::name)
-                .collect(Collectors.toList());
+        List<String> allFields =
+                Arrays.stream(TaxonomyField.ResultFields.values())
+                        .map(TaxonomyField.ResultFields::name)
+                        .collect(Collectors.toList());
 
-        TaxonomyEntry filterEntry = TaxonomyEntryFilter.filterEntry(entry,allFields);
+        TaxonomyEntry filterEntry = TaxonomyEntryFilter.filterEntry(entry, allFields);
         assertNotNull(filterEntry);
-        assertEquals(entry.getTaxonId(),filterEntry.getTaxonId());
-        assertEquals(entry.getParentId(),filterEntry.getParentId());
-        assertEquals(entry.getMnemonic(),filterEntry.getMnemonic());
-        assertEquals(entry.getScientificName(),filterEntry.getScientificName());
-        assertEquals(entry.getCommonName(),filterEntry.getCommonName());
-        assertEquals(entry.getSynonyms(),filterEntry.getSynonyms());
-        assertEquals(entry.getOtherNames(),filterEntry.getOtherNames());
-        assertEquals(entry.getRank(),filterEntry.getRank());
-        assertEquals(entry.getLineage(),filterEntry.getLineage());
-        assertEquals(entry.getStrains(),filterEntry.getStrains());
-        assertEquals(entry.getHosts(),filterEntry.getHosts());
-        assertEquals(entry.getLinks(),filterEntry.getLinks());
-        assertEquals(entry.getStatistics(),filterEntry.getStatistics());
+        assertEquals(entry.getTaxonId(), filterEntry.getTaxonId());
+        assertEquals(entry.getParentId(), filterEntry.getParentId());
+        assertEquals(entry.getMnemonic(), filterEntry.getMnemonic());
+        assertEquals(entry.getScientificName(), filterEntry.getScientificName());
+        assertEquals(entry.getCommonName(), filterEntry.getCommonName());
+        assertEquals(entry.getSynonyms(), filterEntry.getSynonyms());
+        assertEquals(entry.getOtherNames(), filterEntry.getOtherNames());
+        assertEquals(entry.getRank(), filterEntry.getRank());
+        assertEquals(entry.getLineage(), filterEntry.getLineage());
+        assertEquals(entry.getStrains(), filterEntry.getStrains());
+        assertEquals(entry.getHosts(), filterEntry.getHosts());
+        assertEquals(entry.getLinks(), filterEntry.getLinks());
+        assertEquals(entry.getStatistics(), filterEntry.getStatistics());
         assertFalse(filterEntry.isHidden());
         assertFalse(filterEntry.isActive());
     }
@@ -92,14 +89,14 @@ class TaxonomyEntryFilterTest {
     @Test
     void filterWithIdAndScientificNameFieldEntry() {
         TaxonomyEntry entry = getCompleteTaxonomyEntry();
-        List<String> allFields = Arrays.asList("id","scientific_name");
+        List<String> allFields = Arrays.asList("id", "scientific_name");
 
-        TaxonomyEntry filterEntry = TaxonomyEntryFilter.filterEntry(entry,allFields);
+        TaxonomyEntry filterEntry = TaxonomyEntryFilter.filterEntry(entry, allFields);
         assertNotNull(filterEntry);
-        assertEquals(entry.getTaxonId(),filterEntry.getTaxonId());
+        assertEquals(entry.getTaxonId(), filterEntry.getTaxonId());
         assertNull(filterEntry.getParentId());
         assertNull(filterEntry.getMnemonic());
-        assertEquals(entry.getScientificName(),filterEntry.getScientificName());
+        assertEquals(entry.getScientificName(), filterEntry.getScientificName());
         assertTrue(filterEntry.getCommonName().isEmpty());
         assertTrue(filterEntry.getSynonyms().isEmpty());
         assertTrue(filterEntry.getOtherNames().isEmpty());
@@ -111,10 +108,9 @@ class TaxonomyEntryFilterTest {
         assertNull(filterEntry.getStatistics());
         assertFalse(filterEntry.isHidden());
         assertFalse(filterEntry.isActive());
-
     }
 
-    private TaxonomyEntry getCompleteTaxonomyEntry(){
+    private TaxonomyEntry getCompleteTaxonomyEntry() {
         TaxonomyEntryBuilder builder = new TaxonomyEntryBuilder();
         builder.taxonId(9606L);
         builder.scientificName("scientificName");
@@ -137,10 +133,12 @@ class TaxonomyEntryFilterTest {
     }
 
     private Taxonomy getCompleteTaxonomy() {
-        return TaxonomyBuilder.newInstance().taxonId(9606)
+        return TaxonomyBuilder.newInstance()
+                .taxonId(9606)
                 .scientificName("Homo sapiens")
                 .commonName("Human")
                 .synonyms(Collections.singletonList("Some name"))
-                .mnemonic("HUMAN").build();
+                .mnemonic("HUMAN")
+                .build();
     }
 }

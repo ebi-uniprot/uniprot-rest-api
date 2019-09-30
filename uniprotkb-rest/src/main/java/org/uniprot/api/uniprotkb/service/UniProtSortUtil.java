@@ -1,12 +1,14 @@
 package org.uniprot.api.uniprotkb.service;
 
-import com.google.common.base.Strings;
 import org.springframework.data.domain.Sort;
 import org.uniprot.store.search.field.UniProtField;
 
+import com.google.common.base.Strings;
+
 class UniProtSortUtil {
 
-    private static Sort addSort(Sort initialSort, Sort.Direction direction, UniProtField.Sort fields) {
+    private static Sort addSort(
+            Sort initialSort, Sort.Direction direction, UniProtField.Sort fields) {
         Sort newSort = new Sort(direction, fields.getSolrFieldName());
         if (initialSort != null) {
             return initialSort.and(newSort);
@@ -24,10 +26,13 @@ class UniProtSortUtil {
         String[] tokens = sortFields.split("\\s*,\\s*");
         for (String token : tokens) {
             String[] sortedField = token.split("\\s+");
-            if (sortedField[0].equals(UniProtField.Sort.accession.name()))
-                hasAccession = true;
+            if (sortedField[0].equals(UniProtField.Sort.accession.name())) hasAccession = true;
             if (isDescendentSort(sortedField)) {
-                sort = addSort(sort, Sort.Direction.DESC, UniProtField.Sort.valueOf(sortedField[0]));
+                sort =
+                        addSort(
+                                sort,
+                                Sort.Direction.DESC,
+                                UniProtField.Sort.valueOf(sortedField[0]));
             } else {
                 sort = addSort(sort, Sort.Direction.ASC, UniProtField.Sort.valueOf(sortedField[0]));
             }
@@ -39,12 +44,19 @@ class UniProtSortUtil {
     }
 
     private static boolean isDescendentSort(String[] sortedField) {
-        return (sortedField.length == 2) && sortedField[1].equalsIgnoreCase(Sort.Direction.DESC.name());
+        return (sortedField.length == 2)
+                && sortedField[1].equalsIgnoreCase(Sort.Direction.DESC.name());
     }
 
     static Sort createDefaultSort() {
         return new Sort(Sort.Direction.DESC, "score")
-                .and(new Sort(Sort.Direction.DESC, UniProtField.Sort.annotation_score.getSolrFieldName())
-                             .and(new Sort(Sort.Direction.ASC, UniProtField.Sort.accession.getSolrFieldName())));
+                .and(
+                        new Sort(
+                                        Sort.Direction.DESC,
+                                        UniProtField.Sort.annotation_score.getSolrFieldName())
+                                .and(
+                                        new Sort(
+                                                Sort.Direction.ASC,
+                                                UniProtField.Sort.accession.getSolrFieldName())));
     }
 }

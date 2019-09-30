@@ -1,24 +1,25 @@
 package org.uniprot.api.common.repository.store;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import org.apache.solr.client.solrj.io.Tuple;
-import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.apache.solr.client.solrj.io.Tuple;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.slf4j.Logger;
 
 /**
- * This class wraps an existing {@link TupleStream}, originating from a streaming result set from Solr, and creates
- * an {@link Iterable} of its contents. This simplifies iterating through all results in a {@link TupleStream}.
+ * This class wraps an existing {@link TupleStream}, originating from a streaming result set from
+ * Solr, and creates an {@link Iterable} of its contents. This simplifies iterating through all
+ * results in a {@link TupleStream}.
  *
- * Created 21/08/18
+ * <p>Created 21/08/18
  *
  * @author Edd
  */
@@ -36,12 +37,12 @@ class TupleStreamIterable implements Iterable<String> {
     TupleStreamIterable(TupleStream tupleStream, String id) {
         this.tupleStream = tupleStream;
         this.id = id;
-        retryPolicy = new RetryPolicy<>()
-                .handle(IOException.class)          
-                .withDelay(Duration.ofMillis(DELAY))
-         //      .withDelay(500,TimeUnit.MILLISECONDS)
-               .withMaxRetries(5);
-        
+        retryPolicy =
+                new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(Duration.ofMillis(DELAY))
+                        //      .withDelay(500,TimeUnit.MILLISECONDS)
+                        .withMaxRetries(5);
     }
 
     @Override
@@ -49,7 +50,8 @@ class TupleStreamIterable implements Iterable<String> {
         return new Iterator<String>() {
             @Override
             public boolean hasNext() {
-                if (!atEnd && next == current) {   // using ==, since we're interested in the reference
+                if (!atEnd
+                        && next == current) { // using ==, since we're interested in the reference
                     next = nextTupleFromStream();
                     if (next.EOF) {
                         closeTupleStream();
@@ -61,11 +63,14 @@ class TupleStreamIterable implements Iterable<String> {
 
             @Override
             public String next() {
-                if (!atEnd && next != current) { // hasNext has already retrieved the next element, to see if it exists
+                if (!atEnd
+                        && next
+                                != current) { // hasNext has already retrieved the next element, to
+                                              // see if it exists
                     current = next;
                 } else {
                     current = nextTupleFromStream();
-                    if(current == null){
+                    if (current == null) {
                         throw new NoSuchElementException();
                     }
                 }

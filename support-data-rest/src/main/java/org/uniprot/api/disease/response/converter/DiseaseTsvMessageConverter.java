@@ -38,8 +38,11 @@ public class DiseaseTsvMessageConverter extends AbstractTsvMessagerConverter<Dis
 
     @Override
     protected void initBefore(MessageConverterContext<Disease> context) {
-        if(Utils.nullOrEmpty(context.getFields())){
-            this.tlFields.set(Arrays.asList(DiseaseField.ResultFields.getDefaultFields().split(SupportingDataUtils.COMMA)));
+        if (Utils.nullOrEmpty(context.getFields())) {
+            this.tlFields.set(
+                    Arrays.asList(
+                            DiseaseField.ResultFields.getDefaultFields()
+                                    .split(SupportingDataUtils.COMMA)));
         } else {
             this.tlFields.set(Arrays.asList(context.getFields().split(SupportingDataUtils.COMMA)));
         }
@@ -49,7 +52,7 @@ public class DiseaseTsvMessageConverter extends AbstractTsvMessagerConverter<Dis
         List<String> fields = this.tlFields.get();
 
         return fields.stream()
-                .map(field -> mappedField.getOrDefault(field,""))
+                .map(field -> mappedField.getOrDefault(field, ""))
                 .collect(Collectors.toList());
     }
 }

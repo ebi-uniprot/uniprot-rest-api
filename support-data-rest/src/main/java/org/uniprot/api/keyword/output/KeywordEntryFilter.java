@@ -9,9 +9,7 @@ import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.KeywordField;
 
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 public class KeywordEntryFilter {
 
     private static String DEFAULT_FIELDS = "id,name,description,category";

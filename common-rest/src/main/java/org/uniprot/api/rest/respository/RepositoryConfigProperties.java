@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.respository;
 
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

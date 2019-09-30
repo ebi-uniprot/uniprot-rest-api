@@ -1,5 +1,8 @@
 package org.uniprot.api.common.repository.search;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -19,14 +22,11 @@ import org.uniprot.api.common.repository.search.term.TermInfoConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 /**
- * Solr Basic Repository class to enable the execution of dynamically build queries in a solr collections.
- * <p>
- * It was defined a common QueryResult object in order to be able to
+ * Solr Basic Repository class to enable the execution of dynamically build queries in a solr
+ * collections.
+ *
+ * <p>It was defined a common QueryResult object in order to be able to
  *
  * @param <T> Returned Solr entity
  * @author lgonzales
@@ -42,7 +42,12 @@ public abstract class SolrQueryRepository<T> {
     private Class<T> tClass;
     private FacetResponseConverter facetConverter;
 
-    protected SolrQueryRepository(SolrTemplate solrTemplate, SolrCollection collection, Class<T> tClass, FacetConfig facetConfig, SolrRequestConverter requestConverter) {
+    protected SolrQueryRepository(
+            SolrTemplate solrTemplate,
+            SolrCollection collection,
+            Class<T> tClass,
+            FacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
         this.solrTemplate = solrTemplate;
         this.collection = collection;
         this.tClass = tClass;
@@ -57,8 +62,9 @@ public abstract class SolrQueryRepository<T> {
         }
         try {
             CursorPage page = CursorPage.of(cursor, pageSize);
-            QueryResponse solrResponse = solrTemplate
-                    .execute(getSolrCursorCallback(request, page.getCursor(), pageSize));
+            QueryResponse solrResponse =
+                    solrTemplate.execute(
+                            getSolrCursorCallback(request, page.getCursor(), pageSize));
 
             List<T> resultList = solrTemplate.convertQueryResponseToBeans(solrResponse, tClass);
             page.setNextCursor(solrResponse.getNextCursorMark());
@@ -73,9 +79,10 @@ public abstract class SolrQueryRepository<T> {
             return QueryResult.of(resultList, page, facets, termInfos);
         } catch (Throwable e) {
             if (e.getCause() instanceof InvalidRequestException) {
-                throw (InvalidRequestException)e.getCause();
+                throw (InvalidRequestException) e.getCause();
             }
-            throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
+            throw new QueryRetrievalException(
+                    "Unexpected error retrieving data from our Repository", e);
         } finally {
             logSolrQuery(request);
         }
@@ -84,7 +91,8 @@ public abstract class SolrQueryRepository<T> {
     public Optional<T> getEntry(SolrRequest request) {
         try {
             // TODO: 04/09/19 can we just create a Solr query and not a SimpleQuery?
-            return solrTemplate.queryForObject(collection.toString(), requestConverter.toQuery(request), tClass);
+            return solrTemplate.queryForObject(
+                    collection.toString(), requestConverter.toQuery(request), tClass);
         } catch (Throwable e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
@@ -94,7 +102,8 @@ public abstract class SolrQueryRepository<T> {
 
     public Cursor<T> getAll(SolrRequest request) {
         try {
-            return solrTemplate.queryForCursor(collection.toString(), requestConverter.toQuery(request), tClass);
+            return solrTemplate.queryForCursor(
+                    collection.toString(), requestConverter.toQuery(request), tClass);
         } catch (Throwable e) {
             throw new RuntimeException("Error executing solr query", e);
         } finally {
@@ -102,13 +111,15 @@ public abstract class SolrQueryRepository<T> {
         }
     }
 
-    private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest request, String cursor, Integer pageSize) {
+    private SolrCallback<QueryResponse> getSolrCursorCallback(
+            SolrRequest request, String cursor, Integer pageSize) {
         return solrClient -> {
             SolrQuery solrQuery = requestConverter.toSolrQuery(request);
             if (cursor != null && !cursor.isEmpty()) {
                 solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
             } else {
-                solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+                solrQuery.set(
+                        CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
             }
             solrQuery.setRows(pageSize);
 

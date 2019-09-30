@@ -5,7 +5,8 @@ import lombok.Data;
 /**
  * Records properties that can be used to configure a {@code TaskExecutor}.
  *
- * Created 23/01/17
+ * <p>Created 23/01/17
+ *
  * @author Edd
  */
 @Data

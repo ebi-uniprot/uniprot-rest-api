@@ -13,8 +13,16 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  * @author lgonzales
  */
 @Repository
-public class UniprotQueryRepository  extends SolrQueryRepository<UniProtDocument> {
-    public UniprotQueryRepository(SolrTemplate solrTemplate, UniprotFacetConfig facetConfig, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.uniprot, UniProtDocument.class, facetConfig, requestConverter);
+public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument> {
+    public UniprotQueryRepository(
+            SolrTemplate solrTemplate,
+            UniprotFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.uniprot,
+                UniProtDocument.class,
+                facetConfig,
+                requestConverter);
     }
 }

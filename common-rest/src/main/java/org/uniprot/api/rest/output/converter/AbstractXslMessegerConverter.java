@@ -1,5 +1,12 @@
 package org.uniprot.api.rest.output.converter;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -8,23 +15,13 @@ import org.slf4j.Logger;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.slf4j.LoggerFactory.getLogger;
-
-
 /**
- *
  * @author jluo
  * @date: 1 May 2019
- *
-*/
-
-public abstract class AbstractXslMessegerConverter<T> extends AbstractEntityHttpMessageConverter<T> {
-	 private static final Logger LOGGER = getLogger(AbstractXslMessegerConverter.class);
+ */
+public abstract class AbstractXslMessegerConverter<T>
+        extends AbstractEntityHttpMessageConverter<T> {
+    private static final Logger LOGGER = getLogger(AbstractXslMessegerConverter.class);
     private ThreadLocal<SXSSFWorkbook> tlWorkBook = new ThreadLocal<>();
     private ThreadLocal<SXSSFSheet> tlSheet = new ThreadLocal<>();
     private ThreadLocal<AtomicInteger> tlCounter = new ThreadLocal<>();
@@ -32,15 +29,16 @@ public abstract class AbstractXslMessegerConverter<T> extends AbstractEntityHttp
     public AbstractXslMessegerConverter(Class<T> messageConverterEntryClass) {
         super(UniProtMediaType.XLS_MEDIA_TYPE, messageConverterEntryClass);
     }
-    
-	abstract protected List<String> entry2TsvStrings(T entity);
-	abstract protected List<String> getHeader();
-	abstract protected void initBefore(MessageConverterContext<T> context);
-	
+
+    protected abstract List<String> entry2TsvStrings(T entity);
+
+    protected abstract List<String> getHeader();
+
+    protected abstract void initBefore(MessageConverterContext<T> context);
 
     @Override
     protected void before(MessageConverterContext<T> context, OutputStream outputStream) {
-    	initBefore(context);
+        initBefore(context);
         SXSSFWorkbook workbook = new SXSSFWorkbook(500);
         tlWorkBook.set(workbook);
         tlSheet.set(workbook.createSheet());
@@ -51,7 +49,8 @@ public abstract class AbstractXslMessegerConverter<T> extends AbstractEntityHttp
     }
 
     @Override
-    protected void after(MessageConverterContext<T> context, OutputStream outputStream) throws IOException {
+    protected void after(MessageConverterContext<T> context, OutputStream outputStream)
+            throws IOException {
         tlWorkBook.get().write(outputStream);
         tlWorkBook.get().dispose();
     }
@@ -79,7 +78,4 @@ public abstract class AbstractXslMessegerConverter<T> extends AbstractEntityHttp
             cell.setCellValue(result.get(cellnum));
         }
     }
-
-
 }
-

@@ -22,5 +22,4 @@ public class TaxonomySortClause extends AbstractSolrSortClause {
     protected String getSolrSortFieldName(String name) {
         return TaxonomyField.Sort.valueOf(name).getSolrFieldName();
     }
-
 }

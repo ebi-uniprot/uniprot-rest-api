@@ -1,22 +1,23 @@
 package org.uniprot.api.rest.validation;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.uniprot.api.rest.validation.ValidContentTypes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 /**
- * Unit Test class to validate the behaviour of {@link ValidContentTypes}
+ * Unit Test class to validate the behaviour of {@link
+ * org.uniprot.api.rest.validation.ValidContentTypes}
  *
  * @author Edd
  */
@@ -32,7 +33,8 @@ class ContentTypeValidatorTest {
     void isValidWithCorrectContentType() {
         HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
         String contentType = "application/json";
-        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString())).thenReturn(contentType);
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
 
         FakeContentTypeValidator validator = new FakeContentTypeValidator();
         validator.mockedRequest = mockedServletWebRequest;
@@ -45,7 +47,8 @@ class ContentTypeValidatorTest {
     void isNotValidWithOneContentType() {
         HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
         String contentType = "application/json";
-        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString())).thenReturn(contentType);
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
 
         FakeContentTypeValidator validator = new FakeContentTypeValidator();
         validator.mockedRequest = mockedServletWebRequest;
@@ -59,7 +62,8 @@ class ContentTypeValidatorTest {
     void isValidWithMultipleContentTypes() {
         HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
         String contentType = "application/json";
-        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString())).thenReturn(contentType);
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
 
         FakeContentTypeValidator validator = new FakeContentTypeValidator();
         validator.mockedRequest = mockedServletWebRequest;
@@ -74,7 +78,8 @@ class ContentTypeValidatorTest {
     void isNotValidWithMultipleContentTypes() {
         HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
         String contentType = "application/json";
-        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString())).thenReturn(contentType);
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
 
         FakeContentTypeValidator validator = new FakeContentTypeValidator();
         validator.mockedRequest = mockedServletWebRequest;
@@ -94,7 +99,8 @@ class ContentTypeValidatorTest {
         final Collection<String> mockedValidContentTypes = new ArrayList<>();
 
         @Override
-        void buildUnsupportedContentTypeErrorMessage(String contentType, ConstraintValidatorContextImpl contextImpl) {
+        void buildUnsupportedContentTypeErrorMessage(
+                String contentType, ConstraintValidatorContextImpl contextImpl) {
             errorFields.add(contentType);
         }
 

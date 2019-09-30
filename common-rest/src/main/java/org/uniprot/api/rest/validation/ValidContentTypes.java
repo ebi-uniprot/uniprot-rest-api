@@ -1,17 +1,8 @@
 package org.uniprot.api.rest.validation;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.uniprot.core.util.Utils;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -19,8 +10,18 @@ import java.lang.annotation.Target;
 import java.util.Collection;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.uniprot.core.util.Utils;
 
 /**
  * Created 17/06/19
@@ -40,10 +41,10 @@ public @interface ValidContentTypes {
     Class<? extends Payload>[] payload() default {};
 
     class ContentTypesValidator implements ConstraintValidator<ValidContentTypes, String> {
-        private static final Logger LOGGER = LoggerFactory.getLogger(ValidFacets.ValidIncludeFacetsValidator.class);
+        private static final Logger LOGGER =
+                LoggerFactory.getLogger(ValidFacets.ValidIncludeFacetsValidator.class);
 
-        @Autowired
-        private HttpServletRequest request;
+        @Autowired private HttpServletRequest request;
 
         private List<String> contentTypes;
         private String contentTypesAsString;
@@ -67,7 +68,8 @@ public @interface ValidContentTypes {
             boolean isValid = true;
             if (Utils.notEmpty(value)) {
                 // validate if the accept is for application/json
-                ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
+                ConstraintValidatorContextImpl contextImpl =
+                        (ConstraintValidatorContextImpl) context;
                 String accept = getRequest().getHeader("Accept");
                 if (accept == null || !getContentTypes().contains(accept)) {
                     buildUnsupportedContentTypeErrorMessage(accept, contextImpl);
@@ -90,7 +92,8 @@ public @interface ValidContentTypes {
             return contentTypes;
         }
 
-        void buildUnsupportedContentTypeErrorMessage(String contentType, ConstraintValidatorContextImpl contextImpl) {
+        void buildUnsupportedContentTypeErrorMessage(
+                String contentType, ConstraintValidatorContextImpl contextImpl) {
             contextImpl.addMessageParameter("0", contentType);
             contextImpl.addMessageParameter("1", contentTypesAsString);
             contextImpl.buildConstraintViolationWithTemplate(message).addConstraintViolation();

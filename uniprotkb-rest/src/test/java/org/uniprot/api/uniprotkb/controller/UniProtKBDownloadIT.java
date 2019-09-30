@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,19 +40,6 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
-
 /**
  * Created 21/09/18
  *
@@ -47,27 +47,31 @@ import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB
  */
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({UniprotKBController.class})
-@Import({DataStoreTestConfig.class, RepositoryConfig.class, UniprotFacetConfig.class, UniProtEntryService.class, UniprotQueryRepository.class,
-         UniProtStoreConfig.class, ResultsConfig.class,
-         MessageConverterConfig.class, UniprotKBConfig.class})
+@Import({
+    DataStoreTestConfig.class,
+    RepositoryConfig.class,
+    UniprotFacetConfig.class,
+    UniProtEntryService.class,
+    UniprotQueryRepository.class,
+    UniProtStoreConfig.class,
+    ResultsConfig.class,
+    MessageConverterConfig.class,
+    UniprotKBConfig.class
+})
 @AutoConfigureWebClient
 class UniProtKBDownloadIT {
     private static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download/";
     private static final String QUERY = "query";
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
+    @MockBean private TupleStreamTemplate tupleStreamTemplate;
 
-    @MockBean
-    private TupleStreamTemplate tupleStreamTemplate;
-
-    @MockBean
-    private StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer;
+    @MockBean private StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer;
 
     @BeforeEach
     void setUp() {
-        when(tupleStreamTemplate.create(any(),any())).thenReturn(mock(TupleStream.class));
+        when(tupleStreamTemplate.create(any(), any())).thenReturn(mock(TupleStream.class));
     }
 
     @Test
@@ -77,13 +81,13 @@ class UniProtKBDownloadIT {
 
         mockStreamerResponseOf(entry);
 
-        ResultActions response = mockMvc.perform(
-                get(DOWNLOAD_RESOURCE)
-                        .header(ACCEPT, FF_MEDIA_TYPE)
-                        .param(QUERY, accessionQuery(acc)));
+        ResultActions response =
+                mockMvc.perform(
+                        get(DOWNLOAD_RESOURCE)
+                                .header(ACCEPT, FF_MEDIA_TYPE)
+                                .param(QUERY, accessionQuery(acc)));
 
-        response.andExpect(
-                request().asyncStarted())
+        response.andExpect(request().asyncStarted())
                 .andDo(MvcResult::getAsyncResult)
                 .andDo(print())
                 .andExpect(content().contentType(FF_MEDIA_TYPE))
@@ -97,7 +101,6 @@ class UniProtKBDownloadIT {
     }
 
     private void mockStreamerResponseOf(UniProtEntry... entries) {
-        when(uniProtEntryStoreStreamer.idsToStoreStream(any()))
-                .thenReturn(Stream.of(entries));
+        when(uniProtEntryStoreStreamer.idsToStoreStream(any())).thenReturn(Stream.of(entries));
     }
 }

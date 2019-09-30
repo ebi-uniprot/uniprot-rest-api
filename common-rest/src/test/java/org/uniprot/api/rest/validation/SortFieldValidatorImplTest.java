@@ -1,15 +1,14 @@
 package org.uniprot.api.rest.validation;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour
@@ -54,7 +53,9 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("accession desc,mnemonic DESC, name DesC , annotation_score dESc", null);
+        boolean result =
+                validator.isValid(
+                        "accession desc,mnemonic DESC, name DesC , annotation_score dESc", null);
         assertTrue(result);
     }
 
@@ -144,33 +145,34 @@ class SortFieldValidatorImplTest {
         ValidSolrSortFields validSolrSortFields = Mockito.mock(ValidSolrSortFields.class);
 
         Class<? extends Enum> returnFieldValidator = FakeSort.class;
-        OngoingStubbing<Class<?>> ongoingStubbing = Mockito.when(validSolrSortFields.sortFieldEnumClazz());
+        OngoingStubbing<Class<?>> ongoingStubbing =
+                Mockito.when(validSolrSortFields.sortFieldEnumClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
         return validSolrSortFields;
     }
 
-    /**
-     * this class is responsible to fake buildErrorMessage to help tests
-     */
+    /** this class is responsible to fake buildErrorMessage to help tests */
     static class FakeSortFieldValidatorImpl extends ValidSolrSortFields.SortFieldValidatorImpl {
 
         final List<String> errorFields = new ArrayList<>();
 
         @Override
-        public void addInvalidSortFormatErrorMessage(ConstraintValidatorContextImpl contextImpl, String value) {
+        public void addInvalidSortFormatErrorMessage(
+                ConstraintValidatorContextImpl contextImpl, String value) {
             errorFields.add(value);
         }
 
         @Override
-        public void addInvalidSortOrderErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortOrder) {
+        public void addInvalidSortOrderErrorMessage(
+                ConstraintValidatorContextImpl contextImpl, String sortOrder) {
             errorFields.add(sortOrder);
         }
 
         @Override
-        public void addInvalidSortFieldErrorMessage(ConstraintValidatorContextImpl contextImpl, String sortField) {
+        public void addInvalidSortFieldErrorMessage(
+                ConstraintValidatorContextImpl contextImpl, String sortField) {
             errorFields.add(sortField);
         }
-
     }
 
     private enum FakeSort {
@@ -185,7 +187,7 @@ class SortFieldValidatorImplTest {
 
         private final String solrFieldName;
 
-        FakeSort(String solrFieldName){
+        FakeSort(String solrFieldName) {
             this.solrFieldName = solrFieldName;
         }
 

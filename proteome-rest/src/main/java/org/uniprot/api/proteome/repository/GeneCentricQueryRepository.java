@@ -8,17 +8,21 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 
 /**
- *
  * @author jluo
  * @date: 17 May 2019
- *
-*/
+ */
 @Repository
-public class GeneCentricQueryRepository  extends SolrQueryRepository<GeneCentricDocument> {
+public class GeneCentricQueryRepository extends SolrQueryRepository<GeneCentricDocument> {
 
-	public GeneCentricQueryRepository(SolrTemplate solrTemplate, GeneCentricFacetConfig facetConfig, SolrRequestConverter requestConverter) {
-		super(solrTemplate, SolrCollection.genecentric, GeneCentricDocument.class, facetConfig, requestConverter);
-	    }
+    public GeneCentricQueryRepository(
+            SolrTemplate solrTemplate,
+            GeneCentricFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrTemplate,
+                SolrCollection.genecentric,
+                GeneCentricDocument.class,
+                facetConfig,
+                requestConverter);
+    }
 }
-
-

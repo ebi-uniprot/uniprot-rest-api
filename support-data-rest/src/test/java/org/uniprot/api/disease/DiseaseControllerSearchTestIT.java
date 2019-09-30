@@ -1,7 +1,14 @@
 package org.uniprot.api.disease;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
@@ -34,14 +41,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
@@ -49,27 +50,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DiseaseControllerSearchTestIT {
     // accession
-    private final ObjectMapper diseaseObjectMapper = DiseaseJsonConfig.getInstance().getFullObjectMapper();
+    private final ObjectMapper diseaseObjectMapper =
+            DiseaseJsonConfig.getInstance().getFullObjectMapper();
 
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    @Autowired
-    private DiseaseRepository repository;
+    @Autowired private DiseaseRepository repository;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     @BeforeAll
     void setUp() throws IOException, SolrServerException {
         storeManager.addSolrClient(DataStoreManager.StoreType.DISEASE, SolrCollection.disease);
-        SolrTemplate solrTemplate = new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.DISEASE));
+        SolrTemplate solrTemplate =
+                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.DISEASE));
         solrTemplate.afterPropertiesSet();
         ReflectionTestUtils.setField(repository, "solrTemplate", solrTemplate);
 
-
         DiseaseFileReader diseaseFileReader = new DiseaseFileReader();
-        List<Disease> diseases = diseaseFileReader.parse("src/test/resources/sample-humdisease.txt");
+        List<Disease> diseases =
+                diseaseFileReader.parse("src/test/resources/sample-humdisease.txt");
         // convert the disease to disease document
         List<DiseaseDocument> docs = convertToDocs(diseases);
         solrTemplate.getSolrClient().addBeans(SolrCollection.disease.name(), docs);
@@ -83,10 +83,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "reductase";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -98,7 +99,6 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].id", Matchers.containsString(searchString)));
-
     }
 
     // search by acronym
@@ -109,11 +109,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "AMOXAD";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .param("query", searchString)
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        );
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .param("query", searchString)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -125,9 +125,7 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].acronym", Matchers.equalTo(searchString)));
-
     }
-
 
     @Test
     @DisplayName("Search disease with the keyword in its definition")
@@ -136,10 +134,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "and in some cases sudden death";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -150,11 +149,12 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].definition", Matchers.containsString(searchString)));
-
+                .andExpect(
+                        jsonPath("$.results[0].definition", Matchers.containsString(searchString)));
     }
 
-    // all the fields which are there in content (id, acronym, definition, synonyms, keywords, accession)
+    // all the fields which are there in content (id, acronym, definition, synonyms, keywords,
+    // accession)
 
     @Test
     @DisplayName("Search disease with the keyword in its synonym")
@@ -163,10 +163,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "SCHAD deficiency";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -177,8 +178,10 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].alternativeNames[2]", Matchers.equalTo(searchString)));
-
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].alternativeNames[2]",
+                                Matchers.equalTo(searchString)));
     }
 
     // search by KW
@@ -189,10 +192,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "Cataract";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -204,7 +208,6 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].keywords[1].id", Matchers.equalTo(searchString)));
-
     }
 
     // search by accession
@@ -215,10 +218,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "DI-03495";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -230,7 +234,6 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].accession", Matchers.equalTo(searchString)));
-
     }
     // search by cross reference
     @Test
@@ -240,10 +243,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "D020167";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -251,8 +255,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(0, results.length());
     }
 
-
-    //2. search by name = id, acronym, definition, synonyms, keywords
+    // 2. search by name = id, acronym, definition, synonyms, keywords
     @Test
     @DisplayName("Search disease by name with the keyword in its ID")
     void testSearchDiseaseByNameWithIDMatch() throws Exception {
@@ -260,10 +263,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "reductase";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "name:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "name:" + searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -275,7 +279,6 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].id", Matchers.containsString(searchString)));
-
     }
 
     @Test
@@ -285,10 +288,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "AMOXAD";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "name:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "name:" + searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -300,7 +304,6 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].acronym", Matchers.equalTo(searchString)));
-
     }
 
     @Test
@@ -310,10 +313,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "and in some cases sudden death";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "name:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "name:" + searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -324,8 +328,8 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].definition", Matchers.containsString(searchString)));
-
+                .andExpect(
+                        jsonPath("$.results[0].definition", Matchers.containsString(searchString)));
     }
 
     @Test
@@ -335,10 +339,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "HAD deficiency";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "name:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "name:" + searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -349,8 +354,10 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].alternativeNames[0]", Matchers.containsString(searchString)));
-
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].alternativeNames[0]",
+                                Matchers.containsString(searchString)));
     }
 
     @Test
@@ -360,10 +367,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "Cataract";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "name:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "name:" + searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -374,8 +382,10 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].keywords[1].id", Matchers.containsString(searchString)));
-
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].keywords[1].id",
+                                Matchers.containsString(searchString)));
     }
 
     // search by accession
@@ -386,10 +396,11 @@ class DiseaseControllerSearchTestIT {
         String searchString = "DI-03495";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "name:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "name:" + searchString));
 
         // then
         JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
@@ -405,15 +416,19 @@ class DiseaseControllerSearchTestIT {
         String searchString = "DI-03495";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "acronym:" + searchString));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "acronym:" + searchString));
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.messages[0]", Matchers.equalTo("'acronym' is not a valid search field")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                Matchers.equalTo("'acronym' is not a valid search field")));
     }
 
     @Test
@@ -422,10 +437,11 @@ class DiseaseControllerSearchTestIT {
         String accession = "DI-04240";
 
         // when
-        ResultActions response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/disease/search/")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                        .param("query", "accession:" + accession));
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/disease/search/")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", "accession:" + accession));
 
         // then
         response.andDo(MockMvcResultHandlers.print())
@@ -440,7 +456,10 @@ class DiseaseControllerSearchTestIT {
         for (Disease disease : diseases) {
             List<String> kwIds = new ArrayList<>();
             if (disease.getKeywords() != null) {
-                kwIds = disease.getKeywords().stream().map(Keyword::getId).collect(Collectors.toList());
+                kwIds =
+                        disease.getKeywords().stream()
+                                .map(Keyword::getId)
+                                .collect(Collectors.toList());
             }
             // name is a combination of id, acronym, definition, synonyms, keywords
             List<String> name = new ArrayList<>();
@@ -467,7 +486,6 @@ class DiseaseControllerSearchTestIT {
 
         return docs;
     }
-
 
     private byte[] getDiseaseObjectBinary(Disease disease) {
         try {
