@@ -1,15 +1,14 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.google.common.base.Strings;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.GoRelation;
 import org.uniprot.api.uniprotkb.view.GoTerm;
 import org.uniprot.api.uniprotkb.view.GoTermResult;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class GoService {
     private final RestTemplate restTemplate;
@@ -20,8 +19,7 @@ public class GoService {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<GoTerm> getChildren(String goId) {
-
+    Optional<GoTerm> getChildren(String goId) {
         if (Strings.isNullOrEmpty(goId)) {
             return rootChildren();
         }
