@@ -8,5 +8,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "solr")
 public class ConfigProperties {
     private String uniprotCollection;
-    // private String ecCollection;
 }

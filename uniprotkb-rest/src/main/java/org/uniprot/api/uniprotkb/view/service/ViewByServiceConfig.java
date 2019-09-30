@@ -14,6 +14,8 @@ import org.uniprot.core.cv.pathway.impl.UniPathwayServiceImpl;
 
 @Configuration
 public class ViewByServiceConfig {
+    private static final String UNIPATHWAY_TXT = "unipathway.txt";
+
     @Bean
     public ConfigProperties configProperties() {
         return new ConfigProperties();
@@ -31,14 +33,7 @@ public class ViewByServiceConfig {
 
     @Bean
     public UniPathwayService pathwayService() {
-        String filepath = "unipathway.txt";
-        //        InputStream inputStream =
-        // ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
-        //        if (inputStream != null) {
-        //            filepath =
-        // ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
-        //        }
-        return new UniPathwayServiceImpl(filepath);
+        return new UniPathwayServiceImpl(UNIPATHWAY_TXT);
     }
 
     @Bean
