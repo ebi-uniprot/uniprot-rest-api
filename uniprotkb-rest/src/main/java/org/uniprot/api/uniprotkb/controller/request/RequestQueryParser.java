@@ -472,8 +472,7 @@ public class RequestQueryParser {
                         .map(UniProtXDbTypeDetail::getName)
                         .anyMatch(
                                 databaseType ->
-                                        databaseType.equalsIgnoreCase(value)
-                                                || databaseType.equalsIgnoreCase(value));
+                                        databaseType.equalsIgnoreCase(value));
 
         return isFieldNameType && isValueAValidDatabase;
     }
