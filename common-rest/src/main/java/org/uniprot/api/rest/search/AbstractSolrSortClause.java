@@ -1,13 +1,12 @@
 package org.uniprot.api.rest.search;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A class to handle solr sort clause, like parsing, providing default sort order
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Sort;
  * @author sahmad
  */
 public abstract class AbstractSolrSortClause {
-
     public Sort getSort(String sortClause, boolean hasScore) {
         Sort result;
         if (StringUtils.isEmpty(sortClause)) {
@@ -23,8 +21,9 @@ public abstract class AbstractSolrSortClause {
         } else {
             result = createSort(sortClause);
         }
+
         String documentIdFieldName = getSolrDocumentIdFieldName();
-        if (result.getOrderFor(documentIdFieldName) == null) {
+        if (result != null && result.getOrderFor(documentIdFieldName) == null) {
             result = result.and(new Sort(Sort.Direction.ASC, documentIdFieldName));
         }
         return result;
@@ -36,18 +35,7 @@ public abstract class AbstractSolrSortClause {
 
     protected abstract String getSolrSortFieldName(String name);
 
-    private Sort createSort(String sortClause) {
-        List<Pair<String, Sort.Direction>> fieldSortPairs = parseSortClause(sortClause);
-        Sort sort = convertToSolrSort(fieldSortPairs);
-        return sort;
-    }
-
     protected List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
-
-        if (StringUtils.isEmpty(sortClause)) {
-            return Collections.emptyList();
-        }
-
         List<Pair<String, Sort.Direction>> fieldSortPairs = new ArrayList<>();
 
         String[] tokenizedSortClause =
@@ -71,6 +59,10 @@ public abstract class AbstractSolrSortClause {
                     new ImmutablePair<>(getSolrDocumentIdFieldName(), Sort.Direction.ASC));
         }
         return fieldSortPairs;
+    }
+
+    private Sort createSort(String sortClause) {
+        return convertToSolrSort(parseSortClause(sortClause));
     }
 
     private Sort convertToSolrSort(List<Pair<String, Sort.Direction>> fieldSortPairs) {
