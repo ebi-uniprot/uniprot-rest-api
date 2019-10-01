@@ -60,9 +60,7 @@ class AbstractSolrSortClauseTest {
     void multipleSortClausesWithIDProduceMultipleSorts() {
         String name = "name";
         String age = "age";
-        Sort sort =
-                fakeSolrSortClause.getSort(
-                        name + " asc, " + age + " desc, id desc", false);
+        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc, id desc", false);
 
         List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
