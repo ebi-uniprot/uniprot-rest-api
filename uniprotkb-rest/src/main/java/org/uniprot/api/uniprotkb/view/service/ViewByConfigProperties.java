@@ -10,4 +10,5 @@ public class ViewByConfigProperties {
     private String uniprotCollection;
     private String ecDir;
     private String uniPathWayFile;
+    private String keywordFile;
 }

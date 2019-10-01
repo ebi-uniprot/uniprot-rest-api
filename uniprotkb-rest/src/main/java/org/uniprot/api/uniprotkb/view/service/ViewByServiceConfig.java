@@ -20,8 +20,8 @@ public class ViewByServiceConfig {
     }
 
     @Bean
-    public KeywordService keywordService() {
-        return new KeywordServiceImpl();
+    public KeywordService keywordService(ViewByConfigProperties configProperties) {
+        return new KeywordServiceImpl(configProperties.getKeywordFile());
     }
 
     @Bean
