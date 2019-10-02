@@ -111,11 +111,11 @@ class UniProtEntryQueryResultsConverter {
 
     private Optional<UniProtEntry> getEntryFromStore(
             UniProtDocument doc, Map<String, List<String>> filters) {
-        if (FieldsParser.isDefaultFilters(filters) && (doc.avro_binary != null)) {
+        if (FieldsParser.isDefaultFilters(filters) && (doc.avroBinary != null)) {
             UniProtEntry uniProtEntry = null;
 
             try {
-                byte[] decodeEntry = Base64.getDecoder().decode(doc.avro_binary);
+                byte[] decodeEntry = Base64.getDecoder().decode(doc.avroBinary);
                 ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getFullObjectMapper();
                 uniProtEntry = jsonMapper.readValue(decodeEntry, UniProtEntry.class);
             } catch (IOException e) {

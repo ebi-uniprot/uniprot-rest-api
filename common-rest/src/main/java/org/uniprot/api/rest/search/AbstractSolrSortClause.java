@@ -1,12 +1,12 @@
 package org.uniprot.api.rest.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A class to handle solr sort clause, like parsing, providing default sort order

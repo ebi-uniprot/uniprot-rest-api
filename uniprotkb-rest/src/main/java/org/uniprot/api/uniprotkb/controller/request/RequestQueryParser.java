@@ -470,9 +470,7 @@ public class RequestQueryParser {
         boolean isValueAValidDatabase =
                 dbxrefs.stream()
                         .map(UniProtXDbTypeDetail::getName)
-                        .anyMatch(
-                                databaseType ->
-                                        databaseType.equalsIgnoreCase(value));
+                        .anyMatch(databaseType -> databaseType.equalsIgnoreCase(value));
 
         return isFieldNameType && isValueAValidDatabase;
     }
