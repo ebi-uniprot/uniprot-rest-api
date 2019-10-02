@@ -12,7 +12,10 @@ import org.uniprot.store.search.field.UniParcResultFields;
  */
 @Service
 public class UniParcConfigureService {
+    // By loading the enum at startup, there is no pause on first request
+    private static final UniParcResultFields UNIPARC_RESULT_FIELDS = UniParcResultFields.INSTANCE;
+
     public List<FieldGroup> getResultFields() {
-        return UniParcResultFields.INSTANCE.getResultFieldGroups();
+        return UNIPARC_RESULT_FIELDS.getResultFieldGroups();
     }
 }

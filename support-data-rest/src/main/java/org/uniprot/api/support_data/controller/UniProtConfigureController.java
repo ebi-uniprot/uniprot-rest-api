@@ -14,7 +14,6 @@ import org.uniprot.store.search.domain.SearchItem;
 @RestController
 @RequestMapping("/configure/uniprotkb")
 public class UniProtConfigureController {
-
     private UniProtConfigureService service;
 
     public UniProtConfigureController(UniProtConfigureService service) {
