@@ -12,7 +12,10 @@ import org.uniprot.store.search.field.UniRefResultFields;
  */
 @Service
 public class UniRefConfigureService {
+    // By loading the enum at startup, there is no pause on first request
+    private static final UniRefResultFields UNIREF_RESULT_FIELDS = UniRefResultFields.INSTANCE;
+
     public List<FieldGroup> getResultFields() {
-        return UniRefResultFields.INSTANCE.getResultFieldGroups();
+        return UNIREF_RESULT_FIELDS.getResultFieldGroups();
     }
 }

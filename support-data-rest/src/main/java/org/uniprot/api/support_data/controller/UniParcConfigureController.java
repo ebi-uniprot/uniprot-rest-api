@@ -23,7 +23,6 @@ public class UniParcConfigureController {
 
     @GetMapping("/resultfields")
     public List<FieldGroup> getResultFields() {
-        List<FieldGroup> resultFields = service.getResultFields();
-        return resultFields;
+        return service.getResultFields();
     }
 }
