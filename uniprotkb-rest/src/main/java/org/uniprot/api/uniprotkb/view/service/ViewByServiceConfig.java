@@ -15,30 +15,23 @@ import org.uniprot.core.cv.pathway.impl.UniPathwayServiceImpl;
 @Configuration
 public class ViewByServiceConfig {
     @Bean
-    public ConfigProperties configProperties() {
-        return new ConfigProperties();
+    public ViewByConfigProperties configProperties() {
+        return new ViewByConfigProperties();
     }
 
     @Bean
-    public KeywordService keywordService() {
-        return new KeywordServiceImpl();
+    public KeywordService keywordService(ViewByConfigProperties configProperties) {
+        return new KeywordServiceImpl(configProperties.getKeywordFile());
     }
 
     @Bean
-    public ECRepo ecService() {
-        return ECRepoFactory.get("");
+    public ECRepo ecService(ViewByConfigProperties configProperties) {
+        return ECRepoFactory.get(configProperties.getEcDir());
     }
 
     @Bean
-    public UniPathwayService pathwayService() {
-        String filepath = "unipathway.txt";
-        //        InputStream inputStream =
-        // ViewByServiceConfig.class.getClassLoader().getResourceAsStream(filepath);
-        //        if (inputStream != null) {
-        //            filepath =
-        // ViewByServiceConfig.class.getClassLoader().getResource(filepath).getFile();
-        //        }
-        return new UniPathwayServiceImpl(filepath);
+    public UniPathwayService pathwayService(ViewByConfigProperties configProperties) {
+        return new UniPathwayServiceImpl(configProperties.getUniPathWayFile());
     }
 
     @Bean
@@ -53,7 +46,7 @@ public class ViewByServiceConfig {
 
     @Bean
     public UniProtViewByECService uniprotViewByECService(
-            SolrClient solrClient, ConfigProperties configProperties, ECRepo ecRepo) {
+            SolrClient solrClient, ViewByConfigProperties configProperties, ECRepo ecRepo) {
         return new UniProtViewByECService(
                 solrClient, configProperties.getUniprotCollection(), ecRepo);
     }
@@ -61,7 +54,7 @@ public class ViewByServiceConfig {
     @Bean
     public UniProtViewByKeywordService uniprotViewByKeywordService(
             SolrClient solrClient,
-            ConfigProperties configProperties,
+            ViewByConfigProperties configProperties,
             KeywordService keywordService) {
         return new UniProtViewByKeywordService(
                 solrClient, configProperties.getUniprotCollection(), keywordService);
@@ -70,7 +63,7 @@ public class ViewByServiceConfig {
     @Bean
     public UniProtViewByPathwayService uniprotViewByPathwayService(
             SolrClient solrClient,
-            ConfigProperties configProperties,
+            ViewByConfigProperties configProperties,
             UniPathwayService unipathwayService) {
         return new UniProtViewByPathwayService(
                 solrClient, configProperties.getUniprotCollection(), unipathwayService);
@@ -78,7 +71,7 @@ public class ViewByServiceConfig {
 
     @Bean
     public UniProtViewByGoService uniprotViewByGoService(
-            SolrClient solrClient, ConfigProperties configProperties, GoService goService) {
+            SolrClient solrClient, ViewByConfigProperties configProperties, GoService goService) {
         return new UniProtViewByGoService(
                 solrClient, configProperties.getUniprotCollection(), goService);
     }
@@ -91,7 +84,7 @@ public class ViewByServiceConfig {
     @Bean
     public UniProtViewByTaxonomyService uniProtViewByTaxonomyService(
             SolrClient solrClient,
-            ConfigProperties configProperties,
+            ViewByConfigProperties configProperties,
             TaxonomyService taxonomyService) {
         return new UniProtViewByTaxonomyService(
                 solrClient, configProperties.getUniprotCollection(), taxonomyService);
