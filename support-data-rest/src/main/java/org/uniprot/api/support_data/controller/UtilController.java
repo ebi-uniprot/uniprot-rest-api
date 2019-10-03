@@ -14,7 +14,6 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 @RequestMapping("/util")
 @Validated
 public class UtilController {
-
     private UtilService service;
 
     public UtilController(UtilService service) {

@@ -12,7 +12,11 @@ import org.uniprot.store.search.field.ProteomeResultFields;
  */
 @Service
 public class ProteomeConfigureService {
+    // By loading the enum at startup, there is no pause on first request
+    private static final ProteomeResultFields PROTEOME_RESULT_FIELDS =
+            ProteomeResultFields.INSTANCE;
+
     public List<FieldGroup> getResultFields() {
-        return ProteomeResultFields.INSTANCE.getResultFieldGroups();
+        return PROTEOME_RESULT_FIELDS.getResultFieldGroups();
     }
 }

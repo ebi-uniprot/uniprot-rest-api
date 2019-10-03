@@ -1,12 +1,12 @@
 package org.uniprot.api.support_data.controller;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.configure.service.ProteomeConfigureService;
 import org.uniprot.store.search.domain.FieldGroup;
+
+import java.util.List;
 
 /**
  * @author jluo
@@ -23,7 +23,6 @@ public class ProteomeConfigureController {
 
     @GetMapping("/resultfields")
     public List<FieldGroup> getResultFields() {
-        List<FieldGroup> resultFields = service.getResultFields();
-        return resultFields;
+        return service.getResultFields();
     }
 }

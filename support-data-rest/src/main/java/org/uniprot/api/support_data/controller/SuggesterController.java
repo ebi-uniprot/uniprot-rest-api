@@ -1,15 +1,15 @@
 package org.uniprot.api.support_data.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.suggester.Suggestions;
 import org.uniprot.api.suggester.service.SuggesterService;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Controller for the suggestion service.
@@ -27,7 +27,7 @@ public class SuggesterController {
         this.suggesterService = suggesterService;
     }
 
-    @RequestMapping(
+    @GetMapping(
             value = "/suggester",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<Suggestions> suggester(
