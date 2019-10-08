@@ -19,7 +19,8 @@ public class StreamerConfigProperties {
 
     @Data
     static class StreamerProperties {
-        private int batchSize;
+        private int searchBatchSize;
+        private int storeBatchSize;
         private String valueId;
         private String defaultsField;
     }
