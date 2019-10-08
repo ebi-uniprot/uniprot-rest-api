@@ -8,8 +8,6 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
-import java.io.IOException;
-import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -34,6 +32,7 @@ public class StoreStreamer<D, T> {
     private Function<D, String> documentToId;
     private int searchBatchSize;
     private int storeBatchSize;
+    private RetryPolicy<Object> storeFetchRetryPolicy;
 
     public Stream<T> idsToStoreStream(SolrRequest origRequest) {
         SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
@@ -46,7 +45,7 @@ public class StoreStreamer<D, T> {
 
         StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
                 new StoreStreamer.BatchStoreIterable<>(
-                        idsStream::iterator, storeClient, storeBatchSize);
+                        idsStream::iterator, storeClient, storeFetchRetryPolicy, storeBatchSize);
         return stream(batchStoreIterable.spliterator(), false)
                 .flatMap(Collection::stream)
                 .onClose(
@@ -71,14 +70,18 @@ public class StoreStreamer<D, T> {
         private RetryPolicy<Object> retryPolicy;
 
         BatchStoreIterable(
-                Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
+                Iterable<String> sourceIterable,
+                UniProtStoreClient<T> storeClient,
+                RetryPolicy<Object> retryPolicy,
+                int batchSize) {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
-            retryPolicy =
-                    new RetryPolicy<>()
-                            .handle(IOException.class)
-                            .withDelay(Duration.ofMillis(500))
-                            .withMaxRetries(5);
+            this.retryPolicy = retryPolicy;
+            //            retryPolicy =
+            //                    new RetryPolicy<>()
+            //                            .handle(IOException.class)
+            //                            .withDelay(Duration.ofMillis(500))
+            //                            .withMaxRetries(5);
         }
 
         @Override

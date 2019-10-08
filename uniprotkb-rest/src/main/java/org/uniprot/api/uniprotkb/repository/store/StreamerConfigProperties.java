@@ -21,7 +21,7 @@ public class StreamerConfigProperties {
     static class StreamerProperties {
         private int searchBatchSize;
         private int storeBatchSize;
-        private String valueId;
-        private String defaultsField;
+        private int storeFetchMaxRetries;
+        private int storeFetchRetryDelayMillis;
     }
 }
