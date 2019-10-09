@@ -96,8 +96,8 @@ public class UniProtViewByGoService implements UniProtViewByService {
         viewBy.setLink(URL_PREFIX + goId);
         if (goRelation != null) {
             viewBy.setLabel(goRelation.getName());
+            viewBy.setExpand(goRelation.isHasChildren());
         }
-        viewBy.setExpand(goRelation.isHasChildren());
         return viewBy;
     }
 }

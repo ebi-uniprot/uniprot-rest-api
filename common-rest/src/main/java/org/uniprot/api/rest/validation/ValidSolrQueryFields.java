@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.validation.Constraint;
@@ -186,14 +187,15 @@ public @interface ValidSolrQueryFields {
             if (searchField == null && !fieldName.equals(DEFAULT_FIELD_NAME)) {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
-            } else if (!searchField.getSearchFieldType().equals(type)) {
-                addFieldTypeErrorMessage(fieldName, type, contextImpl);
-                validField = false;
-            } else if (!searchField.hasValidValue(value)) {
-                addFieldValueErrorMessage(fieldName, value, contextImpl);
-                validField = false;
+            } else if (searchField != null) {
+                if (!Objects.equals(type, searchField.getSearchFieldType())) {
+                    addFieldTypeErrorMessage(fieldName, type, contextImpl);
+                    validField = false;
+                } else if (!searchField.hasValidValue(value)) {
+                    addFieldValueErrorMessage(fieldName, value, contextImpl);
+                    validField = false;
+                }
             }
-
             return validField;
         }
 
