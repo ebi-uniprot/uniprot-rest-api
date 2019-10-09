@@ -1,18 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -35,7 +23,17 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 /**
  * Controller for uniprot advanced search service.
@@ -64,9 +62,8 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
         this.converterContextFactory = converterContextFactory;
     }
 
-    @RequestMapping(
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
                         APPLICATION_XML_VALUE,
@@ -87,9 +84,8 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                 result, searchRequest.getFields(), contentType, request, response);
     }
 
-    @RequestMapping(
+    @GetMapping(
             value = "/accession/{accession}",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
                         APPLICATION_XML_VALUE,
@@ -119,9 +115,8 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
      *   - for GZIPPED results, add -H "Accept-Encoding:gzip"
      *   - omit '-OJ' option to curl, to just see it print to standard output
      */
-    @RequestMapping(
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
                         APPLICATION_XML_VALUE,
@@ -142,7 +137,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(entryService.streamIds(searchRequest));
         } else {
-            context.setEntities(entryService.stream(searchRequest, contentType));
+            context.setEntities(entryService.stream(searchRequest));
         }
 
         return super.getResponseBodyEmitterResponseEntity(request, context);
