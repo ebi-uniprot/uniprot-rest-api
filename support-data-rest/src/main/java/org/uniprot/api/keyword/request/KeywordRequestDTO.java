@@ -3,8 +3,8 @@ package org.uniprot.api.keyword.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
-import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
@@ -12,7 +12,8 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.search.field.KeywordField;
 
-import lombok.Data;
+import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
 public class KeywordRequestDTO implements SearchRequest {
@@ -21,7 +22,9 @@ public class KeywordRequestDTO implements SearchRequest {
     @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_query_param_meta.json")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = KeywordField.Search.class, messagePrefix = "search.keyword")
+    @ValidSolrQueryFields(
+            fieldValidatorClazz = KeywordField.Search.class,
+            messagePrefix = "search.keyword")
     private String query;
 
     @Parameter(description = "Name of the field to be sorted on")

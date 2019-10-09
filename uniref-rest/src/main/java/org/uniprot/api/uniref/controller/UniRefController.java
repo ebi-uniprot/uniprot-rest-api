@@ -42,10 +42,8 @@ import org.uniprot.store.search.field.UniRefResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
 /**
- *
  * @author jluo
  * @date: 22 Aug 2019
- *
  */
 @RestController
 @Validated

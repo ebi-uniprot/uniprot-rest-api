@@ -1,14 +1,15 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.GoRelation;
 import org.uniprot.api.uniprotkb.view.GoTerm;
 import org.uniprot.api.uniprotkb.view.GoTermResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.google.common.base.Strings;
 
 public class GoService {
     private final RestTemplate restTemplate;

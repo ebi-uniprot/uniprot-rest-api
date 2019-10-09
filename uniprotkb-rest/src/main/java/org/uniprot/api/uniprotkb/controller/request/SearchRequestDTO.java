@@ -1,12 +1,14 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+
+import lombok.Data;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.validation.*;
@@ -15,18 +17,16 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.UniProtField;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Search cursor request Entity
- * <p>
- * Important: How to query isoforms:
- * CANONICAL ONLY: it is the default behavior, you do not need to do anything.
- * Implementation note: in the service layer we add a filter query(fq): is_isoform:false
- * ALL: add request parameter includeIsoform=true
- * ISOFORMS ONLY: Add in the request query parameter: is_isoform:true and also request parameter includeIsoform=true
+ *
+ * <p>Important: How to query isoforms: CANONICAL ONLY: it is the default behavior, you do not need
+ * to do anything. Implementation note: in the service layer we add a filter query(fq):
+ * is_isoform:false ALL: add request parameter includeIsoform=true ISOFORMS ONLY: Add in the request
+ * query parameter: is_isoform:true and also request parameter includeIsoform=true
  *
  * @author lgonzales
  */
@@ -39,7 +39,9 @@ public class SearchRequestDTO {
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(fieldValidatorClazz = UniProtField.Search.class, messagePrefix = "search.uniprot")
+    @ValidSolrQueryFields(
+            fieldValidatorClazz = UniProtField.Search.class,
+            messagePrefix = "search.uniprot")
     private String query;
 
     @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
@@ -55,8 +57,10 @@ public class SearchRequestDTO {
     private String cursor;
 
     @Parameter(description = "Flag to include Isoform or not")
-    @Pattern(regexp = "true|false", flags = {
-            Pattern.Flag.CASE_INSENSITIVE}, message = "{search.invalid.includeIsoform}")
+    @Pattern(
+            regexp = "true|false",
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
+            message = "{search.invalid.includeIsoform}")
     private String includeIsoform;
 
     @Parameter(description = "Name of the facet search")
@@ -69,7 +73,10 @@ public class SearchRequestDTO {
     private Integer size = DEFAULT_RESULTS_SIZE;
 
     @Parameter(hidden = true)
-    @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}, message = "{search.invalid.matchedFields}")
+    @Pattern(
+            regexp = "true|false",
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
+            message = "{search.invalid.matchedFields}")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String showMatchedFields;
 
@@ -90,7 +97,6 @@ public class SearchRequestDTO {
     }
 
     public boolean hasFacets() {
-        return Utils.notEmpty(facets);
+        return Utils.notNullOrEmpty(facets);
     }
-
 }
