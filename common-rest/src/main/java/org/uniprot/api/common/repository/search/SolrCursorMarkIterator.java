@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.Document;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -14,13 +15,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static java.util.Collections.emptyList;
+
 /**
  * Created 09/10/2019
  *
  * @author Edd
  */
 @Slf4j
-public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
+public class SolrCursorMarkIterator<T extends Document> implements Iterator<List<T>>, Closeable {
     private SolrClient solrClient;
     private SolrCollection collection;
     private Class<T> documentType;
@@ -28,6 +31,7 @@ public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
     private boolean finished;
     private String currentCursorMark;
     private List<T> batch;
+    private boolean currentBatchHasBeenRetrieved;
 
     public SolrCursorMarkIterator(
             SolrClient solrClient,
@@ -40,16 +44,21 @@ public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
         this.query = query;
         this.finished = false;
         this.documentType = documentType;
-        this.batch = null;
+        this.batch = emptyList();
+        this.currentBatchHasBeenRetrieved = true;
     }
 
     @Override
     public boolean hasNext() {
-        if (!finished) {
-            load();
-            return !batch.isEmpty();
+        if (currentBatchHasBeenRetrieved) {
+            if (finished) {
+                return false;
+            } else {
+                loadMoreResults();
+                return !batch.isEmpty();
+            }
         } else {
-            return false;
+            return true;
         }
     }
 
@@ -58,7 +67,10 @@ public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
         if (!hasNext()) {
             throw new NoSuchElementException("No more elements available for this Iterator.");
         } else {
-            return batch;
+            currentBatchHasBeenRetrieved = true;
+            List<T> toReturn = batch;
+            batch = null;
+            return toReturn;
         }
     }
 
@@ -72,7 +84,7 @@ public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
         finished();
     }
 
-    private void load() {
+    private void loadMoreResults() {
         try {
             this.query.set(CursorMarkParams.CURSOR_MARK_PARAM, currentCursorMark);
             QueryResponse response = solrClient.query(collection.toString(), this.query);
@@ -80,6 +92,7 @@ public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
                 finished();
             } else {
                 batch = response.getBeans(documentType);
+                currentBatchHasBeenRetrieved = false;
                 String nextCursorMark = response.getNextCursorMark();
                 if (currentCursorMark.equals(nextCursorMark)) {
                     finished();
@@ -96,11 +109,34 @@ public class SolrCursorMarkIterator<T> implements Iterator<List<T>>, Closeable {
 
     private void finished() {
         this.finished = true;
-        this.batch = null;
         this.solrClient = null;
         this.currentCursorMark = null;
         this.query = null;
         this.documentType = null;
         this.collection = null;
+    }
+
+    SolrClient getSolrClient() {
+        return solrClient;
+    }
+
+    SolrCollection getCollection() {
+        return collection;
+    }
+
+    Class<T> getDocumentType() {
+        return documentType;
+    }
+
+    SolrQuery getQuery() {
+        return query;
+    }
+
+    boolean isFinished() {
+        return finished;
+    }
+
+    String getCurrentCursorMark() {
+        return currentCursorMark;
     }
 }
