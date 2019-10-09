@@ -1,9 +1,5 @@
 package org.uniprot.api.common.repository.search;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
@@ -21,6 +17,10 @@ import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.common.repository.search.term.TermInfoConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Solr Basic Repository class to enable the execution of dynamically build queries in a solr
@@ -102,6 +102,14 @@ public abstract class SolrQueryRepository<T> {
 
     public Cursor<T> getAll(SolrRequest request) {
         try {
+            SolrCursorMarkIterator<T> cm = new SolrCursorMarkIterator<>(
+                solrTemplate.getSolrClient(),
+                collection,
+                requestConverter.toSolrQuery(request),
+                tClass);
+
+            return cm;
+
             return solrTemplate.queryForCursor(
                     collection.toString(), requestConverter.toQuery(request), tClass);
         } catch (Throwable e) {
