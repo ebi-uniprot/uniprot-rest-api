@@ -96,6 +96,7 @@ public class UniProtEntryService {
 
     private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
+        requestBuilder.rows(request.getSize());
         requestBuilder.queryBoosts(queryBoosts);
 
         String requestedQuery = request.getQuery();

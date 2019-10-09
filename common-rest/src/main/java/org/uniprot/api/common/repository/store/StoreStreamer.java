@@ -35,13 +35,15 @@ public class StoreStreamer<D, T> {
     private RetryPolicy<Object> storeFetchRetryPolicy;
 
     public Stream<T> idsToStoreStream(SolrRequest origRequest) {
+        int limit = origRequest.getRows();
         SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
         Stream<String> idsStream =
                 stream(
                                 spliteratorUnknownSize(
                                         repository.getAll(request), Spliterator.ORDERED),
                                 false)
-                        .map(documentToId);
+                        .map(documentToId)
+                        .limit(limit);
 
         StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
                 new StoreStreamer.BatchStoreIterable<>(
@@ -54,15 +56,18 @@ public class StoreStreamer<D, T> {
                                         "Finished streaming over search results and fetching from key/value store."));
     }
 
-    private SolrRequest setSolrBatchSize(SolrRequest origRequest, int searchBatchSize) {
-        return origRequest.toBuilder().rows(searchBatchSize).build();
-    }
-
-    public Stream<String> idsStream(SolrRequest request) {
+    public Stream<String> idsStream(SolrRequest origRequest) {
+        int limit = origRequest.getRows();
+        SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
         return stream(
                         spliteratorUnknownSize(repository.getAll(request), Spliterator.ORDERED),
                         false)
-                .map(documentToId);
+                .map(documentToId)
+                .limit(limit);
+    }
+
+    private SolrRequest setSolrBatchSize(SolrRequest origRequest, int searchBatchSize) {
+        return origRequest.toBuilder().rows(searchBatchSize).build();
     }
 
     private static class BatchStoreIterable<T> extends BatchIterable<T> {
@@ -77,11 +82,6 @@ public class StoreStreamer<D, T> {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
             this.retryPolicy = retryPolicy;
-            //            retryPolicy =
-            //                    new RetryPolicy<>()
-            //                            .handle(IOException.class)
-            //                            .withDelay(Duration.ofMillis(500))
-            //                            .withMaxRetries(5);
         }
 
         @Override
