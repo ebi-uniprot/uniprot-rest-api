@@ -116,8 +116,7 @@ public abstract class SolrQueryRepository<T extends Document> {
                         requestConverter.toSolrQuery(request),
                         tClass);
         return StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(
-                                resultsIterator, Spliterator.ORDERED),
+                        Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
                         false)
                 .flatMap(Collection::stream);
     }

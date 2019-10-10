@@ -1,13 +1,6 @@
 package org.uniprot.api.common.repository.search;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.params.CursorMarkParams;
-import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.Document;
+import static java.util.Collections.emptyList;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -15,7 +8,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static java.util.Collections.emptyList;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.CursorMarkParams;
+import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.Document;
 
 /**
  * Created 09/10/2019

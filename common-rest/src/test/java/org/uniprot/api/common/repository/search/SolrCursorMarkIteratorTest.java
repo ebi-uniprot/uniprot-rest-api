@@ -57,9 +57,7 @@ class SolrCursorMarkIteratorTest {
     void removeNotSupported() {
         assertThrows(
                 UnsupportedOperationException.class,
-                () ->
-                        new SolrResultsIterator<>(client, collection, query, docTypeClass)
-                                .remove());
+                () -> new SolrResultsIterator<>(client, collection, query, docTypeClass).remove());
     }
 
     @Test
