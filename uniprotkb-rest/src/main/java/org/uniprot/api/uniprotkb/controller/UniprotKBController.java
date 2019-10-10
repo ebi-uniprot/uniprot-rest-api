@@ -76,7 +76,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @Tag(
             name = "uniprotkb",
             description =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dolor sed viverra ipsum nunc aliquet bibendum enim. In massa tempor nec feugiat. Nunc aliquet bibendum enim facilisis gravida. Nisl nunc mi ipsum faucibus vitae aliquet nec ullamcorper. Amet luctus venenatis lectus magna fringilla. Volutpat maecenas volutpat blandit aliquam etiam erat velit scelerisque in. Egestas egestas fringilla phasellus faucibus scelerisque eleifend. Sagittis orci a scelerisque purus semper eget duis. Nulla pharetra diam sit amet nisl suscipit. Sed adipiscing diam donec adipiscing tristique risus nec feugiat in. Fusce ut placerat orci nulla. Pharetra vel turpis nunc eget lorem dolor. Tristique senectus et netus et malesuada.")
+                    "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.")
     @RequestMapping(
             value = "/search",
             method = RequestMethod.GET,
@@ -91,8 +91,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+            summary = "Search for a UniProtKB protein entry (or entries) by a SOLR query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -150,8 +149,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+            summary = "Search for a UniProtKB protein entry by accession.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -215,8 +213,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+            summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",
             responses = {
                 @ApiResponse(
                         content = {
