@@ -94,6 +94,21 @@ class SolrRequestConverterTest {
         }
 
         @Test
+        void entryRequestDoesNotSetDefaults() {
+            // given
+            String queryString = "query";
+            SolrRequest request = SolrRequest.builder().query(queryString).build();
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request, true);
+
+            // then
+            assertThat(solrQuery.getQuery(), is(queryString));
+            assertThat(solrQuery.get("df"), is(nullValue()));
+            assertThat(solrQuery.get("defType"), is(nullValue()));
+        }
+
+        @Test
         void requestingTermFieldsWithoutTermQueryCausesException() {
             SolrRequest request =
                     SolrRequest.builder().query("too long").termField("field 1").build();

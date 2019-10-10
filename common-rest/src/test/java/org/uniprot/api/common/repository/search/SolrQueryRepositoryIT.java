@@ -1,14 +1,5 @@
 package org.uniprot.api.common.repository.search;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -29,6 +20,18 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** @author lgonzales */
 class SolrQueryRepositoryIT {
@@ -175,8 +178,27 @@ class SolrQueryRepositoryIT {
 
         // then
         assertNotNull(queryResult.getMatchedFields());
-        //        assertThat(queryResult.getMatchedFields(), is(not(emptyList())));
-        // TODO: 14/06/19 fix this
+    }
+
+    @Test
+    void getAllReturnsAllResultsInCorrectOrder() {
+        // given
+        int docCount = 52;
+        List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
+        List<String> savedAccs =
+                docs.stream()
+                        .map(doc -> doc.accession)
+                        .sorted(Comparator.reverseOrder())
+                        .collect(Collectors.toList());
+
+        // when
+        Stream<UniProtDocument> docStream = queryRepo.getAll(queryAllReverseOrderedByAccession());
+
+        // then
+        List<String> retrievedAccs =
+                docStream.map(doc -> doc.accession).collect(Collectors.toList());
+        assertThat(savedAccs, is(retrievedAccs));
     }
 
     @Test
@@ -306,6 +328,13 @@ class SolrQueryRepositoryIT {
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(2)));
+    }
+
+    private SolrRequest queryAllReverseOrderedByAccession() {
+        return SolrRequest.builder()
+                .query("*:*")
+                .sort(new Sort(Sort.Direction.DESC, "accession_id"))
+                .build();
     }
 
     private SolrRequest queryWithFacets(String query, List<String> facets) {

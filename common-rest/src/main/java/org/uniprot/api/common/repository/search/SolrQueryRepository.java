@@ -109,23 +109,17 @@ public abstract class SolrQueryRepository<T extends Document> {
     }
 
     public Stream<T> getAll(SolrRequest request) {
-        try (SolrCursorMarkIterator<T> cursorMarkIterator =
+        SolrCursorMarkIterator<T> cursorMarkIterator =
                 new SolrCursorMarkIterator<>(
                         solrTemplate.getSolrClient(),
                         collection,
                         requestConverter.toSolrQuery(request),
-                        tClass)) {
-
-            return StreamSupport.stream(
-                            Spliterators.spliteratorUnknownSize(
-                                    cursorMarkIterator, Spliterator.ORDERED),
-                            false)
-                    .flatMap(Collection::stream);
-        } catch (Throwable e) {
-            throw new RuntimeException("Error executing solr query", e);
-        } finally {
-            logSolrQuery(request);
-        }
+                        tClass);
+        return StreamSupport.stream(
+                        Spliterators.spliteratorUnknownSize(
+                                cursorMarkIterator, Spliterator.ORDERED),
+                        false)
+                .flatMap(Collection::stream);
     }
 
     private SolrCallback<QueryResponse> getSolrCursorCallback(
@@ -146,7 +140,8 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     private SolrCallback<QueryResponse> getSolrEntryCallback(SolrRequest request) {
         return solrClient ->
-                solrClient.query(collection.toString(), requestConverter.toSolrQuery(request));
+                solrClient.query(
+                        collection.toString(), requestConverter.toSolrQuery(request, true));
     }
 
     private void logSolrQuery(SolrRequest request) {
