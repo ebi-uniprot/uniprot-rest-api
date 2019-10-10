@@ -49,7 +49,7 @@ class SolrCursorMarkIteratorTest {
     @Test
     void canCreateSolrCursorarkIterator() {
         assertThat(
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass),
+                new SolrResultsIterator<>(client, collection, query, docTypeClass),
                 is(notNullValue()));
     }
 
@@ -58,14 +58,14 @@ class SolrCursorMarkIteratorTest {
         assertThrows(
                 UnsupportedOperationException.class,
                 () ->
-                        new SolrCursorMarkIterator<>(client, collection, query, docTypeClass)
+                        new SolrResultsIterator<>(client, collection, query, docTypeClass)
                                 .remove());
     }
 
     @Test
     void closeSetsVariablesToNull() {
-        SolrCursorMarkIterator<FakeDocument> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass);
+        SolrResultsIterator<FakeDocument> cursorMarkIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
         cursorMarkIterator.close();
         assertThat(cursorMarkIterator.getSolrClient(), is(nullValue()));
         assertThat(cursorMarkIterator.getCollection(), is(nullValue()));
@@ -77,8 +77,8 @@ class SolrCursorMarkIteratorTest {
 
     @Test
     void initialCursorMarkIsSetCorrectly() {
-        SolrCursorMarkIterator<FakeDocument> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass);
+        SolrResultsIterator<FakeDocument> cursorMarkIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
         assertThat(
                 cursorMarkIterator.getCurrentCursorMark(), is(CursorMarkParams.CURSOR_MARK_START));
 
@@ -91,8 +91,8 @@ class SolrCursorMarkIteratorTest {
     void nullSolrResponseCausesNoNext() throws IOException, SolrServerException {
         when(client.query(collection.toString(), query)).thenReturn(null);
 
-        SolrCursorMarkIterator<FakeDocument> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass);
+        SolrResultsIterator<FakeDocument> cursorMarkIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
 
         assertThat(cursorMarkIterator.hasNext(), is(false));
     }
@@ -106,8 +106,8 @@ class SolrCursorMarkIteratorTest {
                 .thenReturn(firstQueryResponse)
                 .thenReturn(secondQueryResponse);
 
-        SolrCursorMarkIterator<FakeDocument> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass);
+        SolrResultsIterator<FakeDocument> cursorMarkIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
 
         assertThat(cursorMarkIterator.hasNext(), is(true));
         assertThat(cursorMarkIterator.next(), is(FIRST_NEXT));
@@ -124,8 +124,8 @@ class SolrCursorMarkIteratorTest {
                 .thenReturn(firstQueryResponse)
                 .thenReturn(secondQueryResponse);
 
-        SolrCursorMarkIterator<FakeDocument> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass);
+        SolrResultsIterator<FakeDocument> cursorMarkIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
 
         assertThat(cursorMarkIterator.next(), is(FIRST_NEXT));
         assertThat(cursorMarkIterator.next(), is(SECOND_NEXT));
@@ -136,8 +136,8 @@ class SolrCursorMarkIteratorTest {
     void serverErrorCausesException() throws IOException, SolrServerException {
         doThrow(SolrServerException.class).when(client).query(collection.toString(), query);
 
-        SolrCursorMarkIterator<FakeDocument> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(client, collection, query, docTypeClass);
+        SolrResultsIterator<FakeDocument> cursorMarkIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
 
         assertThrows(QueryRetrievalException.class, cursorMarkIterator::next);
     }

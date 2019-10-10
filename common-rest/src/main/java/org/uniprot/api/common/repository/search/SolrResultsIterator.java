@@ -23,7 +23,7 @@ import static java.util.Collections.emptyList;
  * @author Edd
  */
 @Slf4j
-public class SolrCursorMarkIterator<T extends Document> implements Iterator<List<T>>, Closeable {
+public class SolrResultsIterator<T extends Document> implements Iterator<List<T>>, Closeable {
     private SolrClient solrClient;
     private SolrCollection collection;
     private Class<T> documentType;
@@ -33,7 +33,7 @@ public class SolrCursorMarkIterator<T extends Document> implements Iterator<List
     private List<T> batch;
     private boolean currentBatchHasBeenRetrieved;
 
-    public SolrCursorMarkIterator(
+    public SolrResultsIterator(
             SolrClient solrClient,
             SolrCollection collection,
             SolrQuery query,

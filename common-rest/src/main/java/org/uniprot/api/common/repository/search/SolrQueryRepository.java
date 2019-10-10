@@ -109,15 +109,15 @@ public abstract class SolrQueryRepository<T extends Document> {
     }
 
     public Stream<T> getAll(SolrRequest request) {
-        SolrCursorMarkIterator<T> cursorMarkIterator =
-                new SolrCursorMarkIterator<>(
+        SolrResultsIterator<T> resultsIterator =
+                new SolrResultsIterator<>(
                         solrTemplate.getSolrClient(),
                         collection,
                         requestConverter.toSolrQuery(request),
                         tClass);
         return StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(
-                                cursorMarkIterator, Spliterator.ORDERED),
+                                resultsIterator, Spliterator.ORDERED),
                         false)
                 .flatMap(Collection::stream);
     }
