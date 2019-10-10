@@ -7,12 +7,15 @@ import net.jodah.failsafe.RetryPolicy;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.search.document.Document;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.StreamSupport.stream;
 
 /**
@@ -26,7 +29,7 @@ import static java.util.stream.StreamSupport.stream;
  */
 @Builder
 @Slf4j
-public class StoreStreamer<D, T> {
+public class StoreStreamer<D extends Document, T> {
     private UniProtStoreClient<T> storeClient;
     private SolrQueryRepository<D> repository;
     private Function<D, String> documentToId;
@@ -37,13 +40,10 @@ public class StoreStreamer<D, T> {
     public Stream<T> idsToStoreStream(SolrRequest origRequest) {
         int limit = origRequest.getRows();
         SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
-        Stream<String> idsStream =
-                stream(
-                                spliteratorUnknownSize(
-                                        repository.getAll(request), Spliterator.ORDERED),
-                                false)
-                        .map(documentToId)
-                        .limit(limit);
+        Stream<String> idsStream = repository.getAll(request).map(documentToId);
+        if (limit >= 0) {
+            idsStream = idsStream.limit(limit);
+        }
 
         StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
                 new StoreStreamer.BatchStoreIterable<>(
@@ -52,18 +52,19 @@ public class StoreStreamer<D, T> {
                 .flatMap(Collection::stream)
                 .onClose(
                         () ->
-                                log.info(
+                                log.debug(
                                         "Finished streaming over search results and fetching from key/value store."));
     }
 
     public Stream<String> idsStream(SolrRequest origRequest) {
         int limit = origRequest.getRows();
         SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
-        return stream(
-                        spliteratorUnknownSize(repository.getAll(request), Spliterator.ORDERED),
-                        false)
-                .map(documentToId)
-                .limit(limit);
+
+        Stream<String> idsStream = repository.getAll(request).map(documentToId);
+        if (limit >= 0) {
+            idsStream = idsStream.limit(limit);
+        }
+        return idsStream;
     }
 
     private SolrRequest setSolrBatchSize(SolrRequest origRequest, int searchBatchSize) {

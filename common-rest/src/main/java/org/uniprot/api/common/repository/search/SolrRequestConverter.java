@@ -1,31 +1,17 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.*;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.FacetOptions;
 import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.core.query.SimpleFacetQuery;
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
-import org.uniprot.core.util.Utils;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
 import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
 import static org.uniprot.core.util.Utils.*;
 
@@ -53,6 +39,7 @@ public class SolrRequestConverter {
             setDefaults(solrQuery, request.getDefaultField());
         }
 
+        solrQuery.setRows(request.getRows());
         setFilterQueries(solrQuery, request.getFilterQueries());
         setSort(solrQuery, request.getSort());
         setQueryOperator(solrQuery, request.getDefaultQueryOperator());
@@ -116,7 +103,7 @@ public class SolrRequestConverter {
 
             for (String facetName : facets) {
                 FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facetName);
-                if (Utils.notNullOrEmpty(facetProperty.getInterval())) {
+                if (notNullOrEmpty(facetProperty.getInterval())) {
                     String[] facetIntervals =
                             facetProperty.getInterval().values().toArray(new String[0]);
                     solrQuery.addIntervalFacets(facetName, facetIntervals);
