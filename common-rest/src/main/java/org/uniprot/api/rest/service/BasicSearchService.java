@@ -1,17 +1,7 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.core.query.result.Cursor;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -22,6 +12,12 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @param <T>
@@ -74,11 +70,7 @@ public class BasicSearchService<T, R extends Document> {
     }
 
     public Stream<T> download(SolrRequest request) {
-        Cursor<R> results = repository.getAll(request);
-        return StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(results, Spliterator.ORDERED), false)
-                .map(entryConverter)
-                .filter(Objects::nonNull);
+        return repository.getAll(request).map(entryConverter).filter(Objects::nonNull);
     }
 
     public SolrRequest createSolrRequest(
