@@ -31,7 +31,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.search.field.KeywordField;
 
-import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

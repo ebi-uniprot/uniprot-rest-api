@@ -17,7 +17,7 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.UniProtField;
 
-import ebi.ac.uk.uniprot.openapi.extension.ModelFieldMeta;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
