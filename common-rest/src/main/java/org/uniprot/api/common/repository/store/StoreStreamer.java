@@ -31,6 +31,7 @@ import org.uniprot.store.search.document.Document;
 @Builder
 @Slf4j
 public class StoreStreamer<D extends Document, T> {
+    private static final int IDS_BATCH_SIZE = 100_000;
     private UniProtStoreClient<T> storeClient;
     private SolrQueryRepository<D> repository;
     private Function<D, String> documentToId;
@@ -39,12 +40,7 @@ public class StoreStreamer<D extends Document, T> {
     private RetryPolicy<Object> storeFetchRetryPolicy;
 
     public Stream<T> idsToStoreStream(SolrRequest origRequest) {
-        int limit = origRequest.getRows();
-        SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
-        Stream<String> idsStream = repository.getAll(request).map(documentToId);
-        if (limit >= 0) {
-            idsStream = idsStream.limit(limit);
-        }
+        Stream<String> idsStream = fetchIds(origRequest, searchBatchSize);
 
         StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
                 new StoreStreamer.BatchStoreIterable<>(
@@ -58,8 +54,16 @@ public class StoreStreamer<D extends Document, T> {
     }
 
     public Stream<String> idsStream(SolrRequest origRequest) {
+        return fetchIds(origRequest, IDS_BATCH_SIZE);
+    }
+
+    private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
         int limit = origRequest.getRows();
-        SolrRequest request = setSolrBatchSize(origRequest, searchBatchSize);
+        int fetchSize = searchBatchSize;
+        if (limit < searchBatchSize) {
+            fetchSize = limit;
+        }
+        SolrRequest request = setSolrBatchSize(origRequest, fetchSize);
 
         Stream<String> idsStream = repository.getAll(request).map(documentToId);
         if (limit >= 0) {

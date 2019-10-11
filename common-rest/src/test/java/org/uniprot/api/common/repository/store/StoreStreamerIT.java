@@ -1,6 +1,19 @@
 package org.uniprot.api.common.repository.store;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,18 +23,6 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.document.Document;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
 
 /**
  * Created 22/08/18
@@ -71,8 +72,7 @@ class StoreStreamerIT {
         List<FakeDocument> returnedDocs = asList(doc(1), doc(2), doc(3));
         int limit = 2;
         SolrRequest actualRequest = SolrRequest.builder().query("anything").rows(limit).build();
-        SolrRequest modifiedRequest =
-                SolrRequest.builder().query("anything").rows(SEARCH_BATCH_SIZE).build();
+        SolrRequest modifiedRequest = SolrRequest.builder().query("anything").rows(limit).build();
 
         when(fakeRepository.getAll(modifiedRequest)).thenReturn(returnedDocs.stream());
 
