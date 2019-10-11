@@ -1,6 +1,10 @@
 package org.uniprot.api.uniprotkb.service;
 
-import com.google.common.base.Strings;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,10 +26,7 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.UniProtField;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.google.common.base.Strings;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)

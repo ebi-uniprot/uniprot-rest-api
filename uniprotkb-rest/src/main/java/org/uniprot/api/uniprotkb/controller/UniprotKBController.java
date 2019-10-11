@@ -1,6 +1,18 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import io.swagger.annotations.Api;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -23,17 +35,7 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import io.swagger.annotations.Api;
 
 /**
  * Controller for uniprot advanced search service.

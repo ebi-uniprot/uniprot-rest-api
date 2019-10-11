@@ -1,14 +1,15 @@
 package org.uniprot.api.common.repository.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.

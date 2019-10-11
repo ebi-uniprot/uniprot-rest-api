@@ -1,13 +1,6 @@
 package org.uniprot.api.common.repository.store;
 
-import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.search.document.Document;
+import static java.util.stream.StreamSupport.stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +9,15 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.util.stream.StreamSupport.stream;
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.search.document.Document;
 
 /**
  * The purpose of this class is to stream results from a data-store, e.g., Voldemort. Clients of

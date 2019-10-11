@@ -17,9 +17,9 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
@@ -39,26 +39,29 @@ class StoreStreamerIT {
 
     @BeforeEach
     void setUp() {
-        streamer = StoreStreamer.<FakeDocument, String>builder()
-            .documentToId(doc -> doc.id)
-            .repository(fakeRepository)
-            .storeClient(fakeStore)
-            .searchBatchSize(SEARCH_BATCH_SIZE)
-            .storeBatchSize(STORE_BATCH_SIZE)
-            .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
-            .build();
+        streamer =
+                StoreStreamer.<FakeDocument, String>builder()
+                        .documentToId(doc -> doc.id)
+                        .repository(fakeRepository)
+                        .storeClient(fakeStore)
+                        .searchBatchSize(SEARCH_BATCH_SIZE)
+                        .storeBatchSize(STORE_BATCH_SIZE)
+                        .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
+                        .build();
     }
 
     @Test
     void canStreamFromStore() {
         SolrRequest actualRequest = SolrRequest.builder().query("anything").rows(3).build();
-        SolrRequest modifiedRequest = SolrRequest.builder().query("anything").rows(SEARCH_BATCH_SIZE).build();
+        SolrRequest modifiedRequest =
+                SolrRequest.builder().query("anything").rows(SEARCH_BATCH_SIZE).build();
         when(fakeRepository.getAll(modifiedRequest)).thenReturn(Stream.of(doc(1), doc(2), doc(3)));
         when(fakeStore.getEntries(anyList()))
                 .thenReturn(asList("entry1", "entry2"))
                 .thenReturn(singletonList("entry3"));
 
-        List<String> results = streamer.idsToStoreStream(actualRequest).collect(Collectors.toList());
+        List<String> results =
+                streamer.idsToStoreStream(actualRequest).collect(Collectors.toList());
 
         assertThat(results, contains("entry1", "entry2", "entry3"));
     }
@@ -68,16 +71,23 @@ class StoreStreamerIT {
         List<FakeDocument> returnedDocs = asList(doc(1), doc(2), doc(3));
         int limit = 2;
         SolrRequest actualRequest = SolrRequest.builder().query("anything").rows(limit).build();
-        SolrRequest modifiedRequest = SolrRequest.builder().query("anything").rows(SEARCH_BATCH_SIZE).build();
+        SolrRequest modifiedRequest =
+                SolrRequest.builder().query("anything").rows(SEARCH_BATCH_SIZE).build();
 
         when(fakeRepository.getAll(modifiedRequest)).thenReturn(returnedDocs.stream());
 
         List<String> results = streamer.idsStream(actualRequest).collect(Collectors.toList());
 
-        assertThat(results, is(returnedDocs.stream().map(doc -> doc.id).limit(limit).collect(Collectors.toList())));
+        assertThat(
+                results,
+                is(
+                        returnedDocs.stream()
+                                .map(doc -> doc.id)
+                                .limit(limit)
+                                .collect(Collectors.toList())));
     }
 
-    private FakeDocument doc(int id){
+    private FakeDocument doc(int id) {
         FakeDocument document = new FakeDocument();
         document.id = "id-" + id;
         return document;

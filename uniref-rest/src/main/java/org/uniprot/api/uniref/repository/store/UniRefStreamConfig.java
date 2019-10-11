@@ -1,51 +1,51 @@
 package org.uniprot.api.uniref.repository.store;
 
-import org.apache.http.client.HttpClient;
+import java.io.IOException;
+import java.time.Duration;
+
+import net.jodah.failsafe.RetryPolicy;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.common.repository.store.StoreStreamer;
-import org.uniprot.api.common.repository.store.TupleStreamTemplate;
+import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.UniRefField;
+import org.uniprot.store.search.document.uniref.UniRefDocument;
 
-/**
- * @author jluo
- * @date: 21 Aug 2019
- */
+/** @author jluo date: 21 Aug 2019 */
 @Configuration
 @Import(RepositoryConfig.class)
 public class UniRefStreamConfig {
 
     @Bean
-    public TupleStreamTemplate cloudSolrStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
-        return TupleStreamTemplate.builder()
-                .collection(SolrCollection.uniref.name())
-                .key(UniRefField.Search.id.name())
-                .requestHandler("/export")
-                .zookeeperHost(configProperties.getZkHost())
-                .httpClient(httpClient)
-                .build();
-    }
+    public StoreStreamer<UniRefDocument, UniRefEntry> unirefEntryStoreStreamer(
+            UniRefStoreClient unirefClient, UniRefQueryRepository uniRefQueryRepository) {
 
-    @Bean
-    public StoreStreamer<UniRefEntry> unirefEntryStoreStreamer(
-            UniRefStoreClient unirefClient, TupleStreamTemplate tupleStreamTemplate) {
-        return StoreStreamer.<UniRefEntry>builder()
-                .id(streamconfigProperties().getValueId())
-                //   .defaultsField(streamconfigProperties().getDefaultsField())
-                .streamerBatchSize(streamconfigProperties().getBatchSize())
+        RetryPolicy<Object> storeRetryPolicy =
+                new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(
+                                Duration.ofMillis(
+                                        resultsConfigProperties().getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(resultsConfigProperties().getStoreFetchMaxRetries());
+
+        return StoreStreamer.<UniRefDocument, UniRefEntry>builder()
+                .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
+                .searchBatchSize(resultsConfigProperties().getSearchBatchSize())
                 .storeClient(unirefClient)
-                .tupleStreamTemplate(tupleStreamTemplate)
+                .documentToId(UniRefDocument::getId)
+                .repository(uniRefQueryRepository)
+                .storeFetchRetryPolicy(storeRetryPolicy)
                 .build();
     }
 
     @Bean
-    public UniRefStreamConfigProperties streamconfigProperties() {
-        return new UniRefStreamConfigProperties();
+    @ConfigurationProperties(prefix = "streamer.uniref")
+    public StreamerConfigProperties resultsConfigProperties() {
+        return new StreamerConfigProperties();
     }
 }
