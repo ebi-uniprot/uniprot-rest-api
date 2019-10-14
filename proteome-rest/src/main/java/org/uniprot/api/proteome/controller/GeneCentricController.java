@@ -34,14 +34,11 @@ import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author jluo
  * @date: 30 Apr 2019
  */
 @RestController
-@Api(tags = {"genecentric"})
 @Validated
 @RequestMapping("/genecentric")
 public class GeneCentricController extends BasicSearchController<CanonicalProtein> {

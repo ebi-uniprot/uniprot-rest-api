@@ -22,6 +22,7 @@
 		<logback.version>1.2.3</logback.version>
 		<commons-codec.version>1.11</commons-codec.version>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
+		<openapi-maven-plugin.version>master</openapi-maven-plugin.version>
 	</properties>
 
 	<repositories>
@@ -33,6 +34,17 @@
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>openapi-maven-plugin</artifactId>
+			<version>${openapi-maven-plugin.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -239,4 +251,35 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>openapi</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>uk.ac.ebi.uniprot</groupId>
+						<artifactId>openapi-maven-plugin</artifactId>
+						<version>${openapi-maven-plugin.version}</version>
+						<configuration>
+							<packageLocations>
+								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
+								<packageLocation>org.uniprot.api.keyword</packageLocation>
+							</packageLocations>
+							<openApiDirectory>generated/swagger</openApiDirectory>
+							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
+							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<goals>
+									<goal>oas-generate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

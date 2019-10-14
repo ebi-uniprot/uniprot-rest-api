@@ -32,10 +32,18 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.InactiveReasonType;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.util.Utils;
+import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Controller for uniprot advanced search service.
@@ -43,15 +51,16 @@ import io.swagger.annotations.Api;
  * @author lgonzales
  */
 @RestController
-@Api(tags = {"uniprotkb"})
 @Validated
-@RequestMapping(UNIPROTKB_RESOURCE)
+@RequestMapping(value = UNIPROTKB_RESOURCE)
 public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
 
     private final UniProtEntryService entryService;
     private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
+
+    @Autowired private HttpServletRequest request;
 
     @Autowired
     public UniprotKBController(
@@ -64,50 +73,122 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
         this.converterContextFactory = converterContextFactory;
     }
 
-    @GetMapping(
+    @Tag(
+            name = "uniprotkb",
+            description =
+                    "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.")
+    @RequestMapping(
             value = "/search",
+            method = RequestMethod.GET,
             produces = {
-                TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Search for a UniProtKB protein entry (or entries) by a SOLR query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniProtEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(
-            @Valid SearchRequestDTO searchRequest,
-            @RequestParam(value = "preview", required = false, defaultValue = "false")
+            @Valid @ModelAttribute SearchRequestDTO searchRequest,
+            @Parameter(hidden = true)
+                    @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+
         setPreviewInfo(searchRequest, preview);
+        MediaType contentType = getAcceptHeader(this.request);
         QueryResult<UniProtEntry> result = entryService.search(searchRequest);
         return super.getSearchResponse(
                 result, searchRequest.getFields(), contentType, request, response);
     }
 
-    @GetMapping(
+    @Tag(name = "uniprotkb")
+    @RequestMapping(
             value = "/accession/{accession}",
+            method = RequestMethod.GET,
             produces = {
-                TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Search for a UniProtKB protein entry by accession.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniProtEntry.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(
-            @PathVariable("accession")
+            @Parameter(description = "Unique identifier for the UniProt entry")
+                    @PathVariable("accession")
                     @Pattern(
                             regexp = FieldValueValidator.ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+            @ModelFieldMeta(
+                            path =
+                                    "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
+                    @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+                    @Parameter(
+                            description =
+                                    "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
-                    String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+                    String fields) {
 
         UniProtEntry entry = entryService.getByAccession(accession, fields);
+
+        MediaType contentType = getAcceptHeader(this.request);
+
         return super.getEntityResponse(entry, fields, contentType);
     }
 
@@ -117,21 +198,55 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
      *   - for GZIPPED results, add -H "Accept-Encoding:gzip"
      *   - omit '-OJ' option to curl, to just see it print to standard output
      */
-    @GetMapping(
+    @Tag(name = "uniprotkb")
+    @RequestMapping(
             value = "/download",
+            method = RequestMethod.GET,
             produces = {
-                TSV_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniProtEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<ResponseBodyEmitter> download(
-            @Valid SearchRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = FF_MEDIA_TYPE_VALUE)
-                    MediaType contentType,
+            @Valid @ModelAttribute SearchRequestDTO searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
+        MediaType contentType = getAcceptHeader(this.request);
         MessageConverterContext<UniProtEntry> context =
                 converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));

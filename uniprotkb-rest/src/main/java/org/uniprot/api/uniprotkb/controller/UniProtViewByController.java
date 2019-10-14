@@ -18,10 +18,15 @@ import org.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService;
 import org.uniprot.api.uniprotkb.view.service.UniProtViewByPathwayService;
 import org.uniprot.api.uniprotkb.view.service.UniProtViewByTaxonomyService;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Api(tags = {"uniprotkb/view"})
 @RequestMapping("/uniprotkb/view")
 public class UniProtViewByController {
 
@@ -45,49 +50,117 @@ public class UniProtViewByController {
         this.viewByTaxonomyService = viewByTaxonomyService;
     }
 
+    @Tag(
+            name = "uniprotkbview",
+            description =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
     @GetMapping(
             value = "/ec",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+    @ApiResponse(
+            content =
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getEC(
-            @RequestParam(value = "query", required = true) String query,
-            @RequestParam(value = "parent", required = false) String parent) {
+            @Parameter(
+                            description =
+                                    "Criteria to search the views. It can take any valid solr query.")
+                    @RequestParam(value = "query", required = true)
+                    String query,
+            @Parameter(description = "Name of the parent")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         List<ViewBy> viewBys = viewByECService.get(query, parent);
         return new ResponseEntity<>(viewBys, HttpStatus.OK);
     }
 
+    @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/keyword",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+    @ApiResponse(
+            content =
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getKeyword(
-            @RequestParam(value = "query", required = true) String query,
-            @RequestParam(value = "parent", required = false) String parent) {
+            @Parameter(
+                            description =
+                                    "Criteria to search the views. It can take any valid solr query.")
+                    @RequestParam(value = "query", required = true)
+                    String query,
+            @Parameter(description = "Name of the parent")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return new ResponseEntity<>(viewByKeywordService.get(query, parent), HttpStatus.OK);
     }
 
+    @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/pathway",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+    @ApiResponse(
+            content =
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getPathway(
-            @RequestParam(value = "query", required = true) String query,
-            @RequestParam(value = "parent", required = false) String parent) {
+            @Parameter(
+                            description =
+                                    "Criteria to search the views. It can take any valid solr query.")
+                    @RequestParam(value = "query", required = true)
+                    String query,
+            @Parameter(description = "Name of the parent")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return new ResponseEntity<>(viewByPathwayService.get(query, parent), HttpStatus.OK);
     }
 
+    @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/go",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+    @ApiResponse(
+            content =
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getGo(
-            @RequestParam(value = "query", required = true) String query,
-            @RequestParam(value = "parent", required = false) String parent) {
+            @Parameter(
+                            description =
+                                    "Criteria to search the views. It can take any valid solr query.")
+                    @RequestParam(value = "query", required = true)
+                    String query,
+            @Parameter(description = "Name of the parent")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return new ResponseEntity<>(viewByGoService.get(query, parent), HttpStatus.OK);
     }
 
+    @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/taxonomy",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+    @ApiResponse(
+            content =
+                    @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
     public ResponseEntity<List<ViewBy>> getTaxonomy(
-            @RequestParam(value = "query", required = true) String query,
-            @RequestParam(value = "parent", required = false) String parent) {
+            @Parameter(
+                            description =
+                                    "Criteria to search the views. It can take any valid solr query.")
+                    @RequestParam(value = "query", required = true)
+                    String query,
+            @Parameter(description = "Name of the parent")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return new ResponseEntity<>(viewByTaxonomyService.get(query, parent), HttpStatus.OK);
     }
 }

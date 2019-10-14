@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -143,5 +146,14 @@ public abstract class BasicSearchController<T> {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
         return path;
+    }
+
+    protected MediaType getAcceptHeader(HttpServletRequest request) {
+        String acceptHeader = request.getHeader("Accept");
+        if (StringUtils.isEmpty(acceptHeader) || "*/*".equals(acceptHeader)) {
+            return UniProtMediaType.valueOf(APPLICATION_JSON_VALUE);
+        } else {
+            return UniProtMediaType.valueOf(acceptHeader);
+        }
     }
 }

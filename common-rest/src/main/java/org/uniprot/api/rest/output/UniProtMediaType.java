@@ -28,7 +28,7 @@ public class UniProtMediaType {
         MEDIATYPE_EXTENSION_MAP.put(XLS_MEDIA_TYPE, "xlsx");
     };
 
-    private static MediaType valueOf(String typeValue) {
+    public static MediaType valueOf(String typeValue) {
         return MediaType.valueOf(typeValue);
     }
 

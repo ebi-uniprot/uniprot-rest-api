@@ -33,14 +33,11 @@ import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.field.ProteomeResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author jluo
  * @date: 24 Apr 2019
  */
 @RestController
-@Api(tags = {"proteome"})
 @Validated
 @RequestMapping("/proteome")
 public class ProteomeController extends BasicSearchController<ProteomeEntry> {

@@ -41,14 +41,11 @@ import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.field.UniRefResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author jluo
  * @date: 22 Aug 2019
  */
 @RestController
-@Api(tags = {"uniref"})
 @Validated
 @RequestMapping("/uniref")
 public class UniRefController extends BasicSearchController<UniRefEntry> {
