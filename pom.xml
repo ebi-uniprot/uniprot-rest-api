@@ -33,7 +33,7 @@
 		<http-uniprot-private-url>http://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
 		<failsafe.version>2.0.1</failsafe.version>
 		<solr.core>7.5.0</solr.core>
-		<solrj.version>7.5.0</solrj.version>
+		<solrj.version>8.2.0</solrj.version>
 		<hamcrest-all.version>1.3</hamcrest-all.version>
 		<mockito.jupiter.version>2.17.0</mockito.jupiter.version>
 		<junit-platform.version>1.1.0</junit-platform.version>
