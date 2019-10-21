@@ -194,7 +194,7 @@ class JsonResponseFieldProjectorTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(
-                12, result.size(), "total number of expected fields does not match");
+                11, result.size(), "total number of expected fields does not match");
         Assertions.assertNotNull(result.get("genes"));
         Assertions.assertNotNull(result.get("organism"));
         Assertions.assertNotNull(result.get("features"));
