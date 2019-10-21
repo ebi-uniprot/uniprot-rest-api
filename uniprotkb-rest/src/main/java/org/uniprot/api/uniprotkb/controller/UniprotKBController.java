@@ -210,7 +210,8 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE
+                GFF_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",

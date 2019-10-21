@@ -20,6 +20,8 @@ public class UniProtMediaType {
     public static final MediaType GFF_MEDIA_TYPE = valueOf(GFF_MEDIA_TYPE_VALUE);
     public static final String OBO_MEDIA_TYPE_VALUE = "text/obo";
     public static final MediaType OBO_MEDIA_TYPE = valueOf(OBO_MEDIA_TYPE_VALUE);
+    public static final String RDF_MEDIA_TYPE_VALUE = "rdf/xml";
+    public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
 
     private static Map<MediaType, String> MEDIATYPE_EXTENSION_MAP = new HashMap<>();
 
