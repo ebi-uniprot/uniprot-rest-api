@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 */
 @Slf4j
 @Service
+
 public class TaxonomyServiceImpl implements TaxonomyService {
   private final BasicSearchService<TaxonomyEntry, TaxonomyDocument> basicService;
   @Autowired	
@@ -31,9 +32,15 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 	  this.basicService = new BasicSearchService<>(taxRepo, new TaxonomyEntryConverter());
   }
  	
-  @Cacheable("taxonomys")
+  @Cacheable("taxonomyCache")
   public TaxonomyEntry findById(long taxId) {
-    return basicService.getEntity(TaxonomyField.Search.id.name(), String.valueOf(taxId));
+	  log.info("Taxonomy Service, findById=" + taxId);
+	  try {
+		  return basicService.getEntity(TaxonomyField.Search.id.name(), String.valueOf(taxId));
+	  }catch(Exception e) {
+		  log.info("Error in fetching taxonomy: ", e);
+	  }
+	  return null;
   }
   static class TaxonomyEntryConverter implements Function<TaxonomyDocument, TaxonomyEntry> {
 
@@ -45,6 +52,7 @@ public class TaxonomyServiceImpl implements TaxonomyService {
 
 	    @Override
 	    public TaxonomyEntry apply(TaxonomyDocument taxonomyDocument) {
+	    	log.info("fetch taxonomy=" +taxonomyDocument.getTaxId());
 	        try {
 	            return objectMapper.readValue(
 	                    taxonomyDocument.getTaxonomyObj().array(), TaxonomyEntry.class);
