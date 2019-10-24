@@ -1,5 +1,6 @@
 package org.uniprot.api.configure.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,12 +55,16 @@ public class UniProtConfigureService {
         return databases;
     }
 
-    public List<FieldGroup> getDatabaseFields() {
-        return UniProtResultFields.INSTANCE.getDatabaseFields();
-    }
+//    public List<FieldGroup> getDatabaseFields() {
+//        return UniProtResultFields.INSTANCE.getDatabaseFields();
+//    }
 
     public List<FieldGroup> getResultFields() {
-        return UniProtResultFields.INSTANCE.getResultFields();
+    	List<FieldGroup> results = new ArrayList<>();
+    	results.addAll(UniProtResultFields.INSTANCE.getResultFields());
+    	results.addAll(UniProtResultFields.INSTANCE.getDatabaseFields());
+    	return results;
+       
     }
 
     private Tuple convertToTuple(UniProtXDbTypeDetail dbType) {
