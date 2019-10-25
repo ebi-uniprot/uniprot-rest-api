@@ -8,12 +8,9 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 /**
- *
  * @author jluo
  * @date: 16 Oct 2019
- *
-*/
-
+ */
 @Repository
 public class TaxonomyRepository extends SolrQueryRepository<TaxonomyDocument> {
     protected TaxonomyRepository(
@@ -28,4 +25,3 @@ public class TaxonomyRepository extends SolrQueryRepository<TaxonomyDocument> {
                 requestConverter);
     }
 }
-
