@@ -1,16 +1,16 @@
 package org.uniprot.api.configure.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.core.cv.xdb.UniProtXDbTypes;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UniProtConfigureService {
@@ -55,16 +55,15 @@ public class UniProtConfigureService {
         return databases;
     }
 
-//    public List<FieldGroup> getDatabaseFields() {
-//        return UniProtResultFields.INSTANCE.getDatabaseFields();
-//    }
+    //    public List<FieldGroup> getDatabaseFields() {
+    //        return UniProtResultFields.INSTANCE.getDatabaseFields();
+    //    }
 
     public List<FieldGroup> getResultFields() {
-    	List<FieldGroup> results = new ArrayList<>();
-    	results.addAll(UniProtResultFields.INSTANCE.getResultFields());
-    	results.addAll(UniProtResultFields.INSTANCE.getDatabaseFields());
-    	return results;
-       
+        List<FieldGroup> results = new ArrayList<>();
+        results.addAll(UniProtResultFields.INSTANCE.getResultFields());
+        results.addAll(UniProtResultFields.INSTANCE.getDatabaseFields());
+        return results;
     }
 
     private Tuple convertToTuple(UniProtXDbTypeDetail dbType) {

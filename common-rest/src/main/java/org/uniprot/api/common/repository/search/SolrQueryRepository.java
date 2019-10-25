@@ -1,5 +1,9 @@
 package org.uniprot.api.common.repository.search;
 
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
@@ -17,10 +21,6 @@ import org.uniprot.api.common.repository.search.term.TermInfoConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
-
-import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Solr Basic Repository class to enable the execution of dynamically build queries in a solr

@@ -1,9 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,7 +7,6 @@ import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
@@ -37,13 +32,12 @@ import com.google.common.base.Strings;
 @Import(UniProtQueryBoostsConfig.class)
 public class UniProtEntryService {
     private static final String ACCESSION = "accession_id";
-    private final StoreStreamer<UniProtEntry> storeStreamer;
+    private final StoreStreamer<UniProtDocument, UniProtEntry> storeStreamer;
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final QueryBoosts queryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
     private UniprotFacetConfig uniprotFacetConfig;
-    
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -51,7 +45,7 @@ public class UniProtEntryService {
             UniProtTermsConfig uniProtTermsConfig,
             QueryBoosts uniProtKBQueryBoosts,
             UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtEntry> uniProtEntryStoreStreamer,
+            StoreStreamer<UniProtDocument, UniProtEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService) {
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
@@ -92,18 +86,9 @@ public class UniProtEntryService {
         }
     }
 
-    public Stream<UniProtEntry> stream(SearchRequestDTO request, MediaType contentType) {
+    public Stream<UniProtEntry> stream(SearchRequestDTO request) {
         SolrRequest solrRequest = createSolrRequest(request, false);
-        boolean defaultFieldsOnly =
-                FieldsParser.isDefaultFilters(FieldsParser.parseForFilters(request.getFields()));
-        if (defaultFieldsOnly
-                && (contentType.equals(APPLICATION_JSON)
-                        || contentType.equals(TSV_MEDIA_TYPE)
-                        || contentType.equals(XLS_MEDIA_TYPE))) {
-            return storeStreamer.defaultFieldStream(solrRequest);
-        } else {
-            return storeStreamer.idsToStoreStream(solrRequest);
-        }
+        return storeStreamer.idsToStoreStream(solrRequest);
     }
 
     public Stream<String> streamIds(SearchRequestDTO request) {
@@ -113,6 +98,7 @@ public class UniProtEntryService {
 
     private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
+        requestBuilder.rows(request.getSize());
         requestBuilder.queryBoosts(queryBoosts);
 
         String requestedQuery = request.getQuery();

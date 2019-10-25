@@ -34,6 +34,7 @@ class SolrRequestConverterTest {
         void canCreateSolrQueryWithFacetsAndTermFields() {
             // given
             String queryString = "query";
+            int rows = 25;
             String facet1 = "fragment";
             String facet2 = "length";
             FakeFacetConfig facetConfig = new FakeFacetConfig();
@@ -52,6 +53,7 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query(queryString)
+                            .rows(rows)
                             .facet(facet1)
                             .facet(facet2)
                             .termQuery(queryString)
@@ -71,6 +73,7 @@ class SolrRequestConverterTest {
 
             // then
             assertThat(solrQuery.getQuery(), is(queryString));
+            assertThat(solrQuery.getRows(), is(rows));
             assertThat(solrQuery.getFacetFields(), arrayContainingInAnyOrder(facet1));
             assertThat(solrQuery.getParams("facet.interval"), arrayContainingInAnyOrder(facet2));
             assertThat(

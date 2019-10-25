@@ -1,9 +1,5 @@
 package org.uniprot.api.uniref.service;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -22,6 +18,10 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefField.Search;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 /**
  * @author jluo
  * @date: 20 Aug 2019
@@ -33,7 +33,7 @@ public class UniRefQueryService {
     private final BasicSearchService<UniRefEntry, UniRefDocument> basicService;
     private final DefaultSearchHandler defaultSearchHandler;
 
-    private final StoreStreamer<UniRefEntry> storeStreamer;
+    private final StoreStreamer<UniRefDocument, UniRefEntry> storeStreamer;
 
     private final UniRefQueryRepository repository;
 
@@ -45,7 +45,7 @@ public class UniRefQueryService {
             UniRefFacetConfig facetConfig,
             UniRefSortClause solrSortClause,
             UniRefStoreClient entryStore,
-            StoreStreamer<UniRefEntry> storeStreamer) {
+            StoreStreamer<UniRefDocument, UniRefEntry> storeStreamer) {
         basicService = new BasicSearchService<>(repository, new UniRefEntryConverter(entryStore));
         this.facetConfig = facetConfig;
         this.solrSortClause = solrSortClause;

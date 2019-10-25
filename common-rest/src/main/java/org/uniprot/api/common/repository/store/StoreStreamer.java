@@ -1,110 +1,79 @@
 package org.uniprot.api.common.repository.store;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static java.util.stream.StreamSupport.stream;
 
-import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.slf4j.Logger;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.search.document.Document;
 
 /**
- * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored
- * fields). Clients of this class need not know what store they need to access. They need only
- * provide the query that needs answering, in addition to the sortable fields.
+ * The purpose of this class is to stream results from a data-store, e.g., Voldemort. Clients of
+ * this class need not know what store they need to access. They need only provide the request that
+ * needs answering.
  *
  * <p>Created 22/08/18
  *
  * @author Edd
  */
 @Builder
-public class StoreStreamer<T> {
-    private static final Logger LOGGER = getLogger(StoreStreamer.class);
+@Slf4j
+public class StoreStreamer<D extends Document, T> {
+    private static final int IDS_BATCH_SIZE = 100_000;
     private UniProtStoreClient<T> storeClient;
-    private int streamerBatchSize;
-    private String id;
-    private String defaultsField;
-    private Function<String, T> defaultsConverter;
-    private TupleStreamTemplate tupleStreamTemplate;
+    private SolrQueryRepository<D> repository;
+    private Function<D, String> documentToId;
+    private int searchBatchSize;
+    private int storeBatchSize;
+    private RetryPolicy<Object> storeFetchRetryPolicy;
 
-    public Stream<T> idsToStoreStream(SolrRequest request) {
-        try {
-            TupleStream tupleStream = tupleStreamTemplate.create(request, id);
-            tupleStream.open();
+    public Stream<T> idsToStoreStream(SolrRequest origRequest) {
+        Stream<String> idsStream = fetchIds(origRequest, searchBatchSize);
 
-            BatchStoreIterable<T> batchStoreIterable =
-                    new BatchStoreIterable<>(
-                            new TupleStreamIterable(tupleStream, id),
-                            storeClient,
-                            streamerBatchSize);
-            return StreamSupport.stream(batchStoreIterable.spliterator(), false)
-                    .flatMap(Collection::stream)
-                    .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
+                new StoreStreamer.BatchStoreIterable<>(
+                        idsStream::iterator, storeClient, storeFetchRetryPolicy, storeBatchSize);
+        return stream(batchStoreIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .onClose(
+                        () ->
+                                log.debug(
+                                        "Finished streaming over search results and fetching from key/value store."));
     }
 
-    public Stream<String> idsStream(SolrRequest request) {
-        try {
-            TupleStream tupleStream = tupleStreamTemplate.create(request, id);
-            tupleStream.open();
-            return StreamSupport.stream(
-                            new TupleStreamIterable(tupleStream, id).spliterator(), false)
-                    .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public Stream<String> idsStream(SolrRequest origRequest) {
+        return fetchIds(origRequest, IDS_BATCH_SIZE);
     }
 
-    public Stream<T> defaultFieldStream(SolrRequest request) {
-        try {
-            TupleStream tupleStream = tupleStreamTemplate.create(request, defaultsField);
-            tupleStream.open();
-
-            TupleStreamIterable sourceIterable =
-                    new TupleStreamIterable(tupleStream, defaultsField);
-            BatchIterable<T> batchIterable =
-                    new BatchIterable<T>(sourceIterable, streamerBatchSize) {
-                        @Override
-                        List<T> convertBatch(List<String> batch) {
-                            return batch.stream()
-                                    .map(defaultsConverter)
-                                    .collect(Collectors.toList());
-                        }
-                    };
-
-            return StreamSupport.stream(batchIterable.spliterator(), false)
-                    .flatMap(Collection::stream)
-                    .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+    private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
+        int limit = origRequest.getRows();
+        int fetchSize = searchBatchSize;
+        if (limit < searchBatchSize) {
+            fetchSize = limit;
         }
+        SolrRequest request = setSolrBatchSize(origRequest, fetchSize);
+
+        Stream<String> idsStream = repository.getAll(request).map(documentToId);
+        if (limit >= 0) {
+            idsStream = idsStream.limit(limit);
+        }
+        return idsStream;
     }
 
-    private void closeTupleStream(TupleStream tupleStream) {
-        try {
-            tupleStream.close();
-            LOGGER.info("TupleStream closed: {}", tupleStream.getStreamNodeId());
-        } catch (IOException e) {
-            String message = "Error when closing TupleStream";
-            LOGGER.error(message, e);
-            throw new IllegalStateException(message, e);
-        }
+    private SolrRequest setSolrBatchSize(SolrRequest origRequest, int searchBatchSize) {
+        return origRequest.toBuilder().rows(searchBatchSize).build();
     }
 
     private static class BatchStoreIterable<T> extends BatchIterable<T> {
@@ -112,15 +81,13 @@ public class StoreStreamer<T> {
         private RetryPolicy<Object> retryPolicy;
 
         BatchStoreIterable(
-                Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
+                Iterable<String> sourceIterable,
+                UniProtStoreClient<T> storeClient,
+                RetryPolicy<Object> retryPolicy,
+                int batchSize) {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
-            retryPolicy =
-                    new RetryPolicy<>()
-                            .handle(IOException.class)
-                            .withDelay(Duration.ofMillis(500))
-                            //      .withDelay(500,TimeUnit.MILLISECONDS)
-                            .withMaxRetries(5);
+            this.retryPolicy = retryPolicy;
         }
 
         @Override

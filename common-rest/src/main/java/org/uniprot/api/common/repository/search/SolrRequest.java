@@ -17,8 +17,9 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
  * @author Edd
  */
 @Data
-@Builder(builderClassName = "SolrRequestBuilder")
+@Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
 public class SolrRequest {
+    private static final int DEFAULT_ROWS = 25;
     private static final Query.Operator DEFAULT_OPERATOR = Query.Operator.AND;
 
     private String query;
@@ -28,6 +29,7 @@ public class SolrRequest {
     private String termQuery;
     private QueryBoosts queryBoosts;
     private String defaultField;
+    private int rows;
 
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();
@@ -37,6 +39,7 @@ public class SolrRequest {
     // https://www.baeldung.com/lombok-builder-default-value
     public static class SolrRequestBuilder {
         private Query.Operator defaultQueryOperator = DEFAULT_OPERATOR;
+        private int rows = DEFAULT_ROWS;
         private Sort sort;
 
         public SolrRequestBuilder addSort(Sort sort) {

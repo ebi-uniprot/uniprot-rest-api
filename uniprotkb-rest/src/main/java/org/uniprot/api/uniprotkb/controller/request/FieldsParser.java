@@ -1,10 +1,9 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import java.util.*;
-
+import com.google.common.base.Strings;
 import org.uniprot.store.search.domain.impl.FieldMaps;
 
-import com.google.common.base.Strings;
+import java.util.*;
 
 public class FieldsParser {
     private static final String COLON = ":";
@@ -77,12 +76,12 @@ public class FieldsParser {
             Map<String, List<String>> filters, String type, String abbr, String token) {
         if (token.equals(type)) {
             putMap(filters, token, ALL);
-//        } else if (token.startsWith(abbr + COLON)) {
-//            String value = token.substring(token.indexOf(COLON) + 1);
-//            putMap(filters, type, value);
-//        } else if (token.startsWith(type + COLON)) {
-//            String value = token.substring(token.indexOf(COLON) + 1);
-//            putMap(filters, type, value);
+            //        } else if (token.startsWith(abbr + COLON)) {
+            //            String value = token.substring(token.indexOf(COLON) + 1);
+            //            putMap(filters, type, value);
+            //        } else if (token.startsWith(type + COLON)) {
+            //            String value = token.substring(token.indexOf(COLON) + 1);
+            //            putMap(filters, type, value);
         } else if (token.startsWith(abbr + UNDERSCORE)) {
             String value = token.substring(token.indexOf(UNDERSCORE) + 1);
             putMap(filters, type, value);

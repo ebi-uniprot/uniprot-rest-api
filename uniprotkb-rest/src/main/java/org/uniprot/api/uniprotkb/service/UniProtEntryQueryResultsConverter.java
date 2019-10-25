@@ -1,19 +1,8 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -22,11 +11,7 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.builder.SequenceBuilder;
 import org.uniprot.core.json.parser.uniprot.UniprotJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.uniprot.EntryInactiveReason;
-import org.uniprot.core.uniprot.InactiveReasonType;
-import org.uniprot.core.uniprot.UniProtAccession;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.UniProtId;
+import org.uniprot.core.uniprot.*;
 import org.uniprot.core.uniprot.builder.EntryInactiveReasonBuilder;
 import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
@@ -34,7 +19,10 @@ import org.uniprot.core.uniprot.builder.UniProtIdBuilder;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.UniProtField;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>}
@@ -60,7 +48,9 @@ class UniProtEntryQueryResultsConverter {
                     //      .withDelay(500,TimeUnit.MILLISECONDS)
                     .withMaxRetries(5);
     private final TaxonomyService taxonomyService;
-    UniProtEntryQueryResultsConverter(UniProtKBStoreClient entryStore, TaxonomyService taxonomyService) {
+
+    UniProtEntryQueryResultsConverter(
+            UniProtKBStoreClient entryStore, TaxonomyService taxonomyService) {
         this.entryStore = entryStore;
         this.taxonomyService = taxonomyService;
     }
@@ -79,34 +69,31 @@ class UniProtEntryQueryResultsConverter {
 
     Optional<UniProtEntry> convertDoc(UniProtDocument doc, Map<String, List<String>> filters) {
         if (doc.active) {
-        	 Optional<UniProtEntry> opEntry= getEntryFromStore(doc, filters);
-        	 if(hasLineage(filters)) {
-        		 return addLineage(opEntry);
-        	 }else
-        		 return opEntry;
+            Optional<UniProtEntry> opEntry = getEntryFromStore(doc, filters);
+            if (hasLineage(filters)) {
+                return addLineage(opEntry);
+            } else return opEntry;
         } else {
             return getInactiveUniProtEntry(doc);
         }
     }
-    
-    private boolean hasLineage( Map<String, List<String>> filters) {
-    	return filters.containsKey("lineage");
+
+    private boolean hasLineage(Map<String, List<String>> filters) {
+        return filters.containsKey("lineage");
     }
-    private Optional<UniProtEntry>  addLineage(Optional<UniProtEntry> opEntry){
-    	if(opEntry.isPresent()) {
-    		TaxonomyEntry taxEntry = taxonomyService.findById(opEntry.get().getOrganism().getTaxonId());
-    		if(taxEntry ==null) {
-    			return opEntry;
-    		}
-    		UniProtEntryBuilder.ActiveEntryBuilder builder =new UniProtEntryBuilder().from(opEntry.get());
-    		return Optional.of(
-    				builder.lineages(taxEntry.getLineage())
-    				.build());
-    	}else
-    		return opEntry;
+
+    private Optional<UniProtEntry> addLineage(Optional<UniProtEntry> opEntry) {
+        if (opEntry.isPresent()) {
+            TaxonomyEntry taxEntry =
+                    taxonomyService.findById(opEntry.get().getOrganism().getTaxonId());
+            if (taxEntry == null) {
+                return opEntry;
+            }
+            UniProtEntryBuilder.ActiveEntryBuilder builder =
+                    new UniProtEntryBuilder().from(opEntry.get());
+            return Optional.of(builder.lineages(taxEntry.getLineage()).build());
+        } else return opEntry;
     }
-    
-  
 
     private Optional<UniProtEntry> getInactiveUniProtEntry(UniProtDocument doc) {
         UniProtAccession accession = new UniProtAccessionBuilder(doc.accession).build();

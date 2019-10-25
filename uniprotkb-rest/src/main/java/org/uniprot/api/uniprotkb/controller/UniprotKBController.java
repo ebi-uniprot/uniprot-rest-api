@@ -254,7 +254,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(entryService.streamIds(searchRequest));
         } else {
-            context.setEntities(entryService.stream(searchRequest, contentType));
+            context.setEntities(entryService.stream(searchRequest));
         }
 
         return super.getResponseBodyEmitterResponseEntity(request, context);
