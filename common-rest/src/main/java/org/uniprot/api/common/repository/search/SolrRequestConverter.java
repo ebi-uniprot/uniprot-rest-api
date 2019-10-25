@@ -1,25 +1,20 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.QueryConverter.getSimpleFacetQuery;
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.solr.core.query.Query;
+import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.core.util.Utils;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.solr.client.solrj.SolrQuery;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.FacetOptions;
-import org.springframework.data.solr.core.query.Query;
-import org.springframework.data.solr.core.query.SimpleFacetQuery;
-import org.springframework.data.solr.core.query.SimpleQuery;
-import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetProperty;
-import org.uniprot.core.util.Utils;
+import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
+import static org.uniprot.core.util.Utils.*;
 
 /**
  * Created 14/06/19
@@ -35,8 +30,15 @@ public class SolrRequestConverter {
      * @return the solr query
      */
     public SolrQuery toSolrQuery(SolrRequest request) {
+        return toSolrQuery(request, false);
+    }
+
+    public SolrQuery toSolrQuery(SolrRequest request, boolean isEntry) {
         SolrQuery solrQuery = new SolrQuery(request.getQuery());
-        setDefaults(solrQuery, request.getDefaultField());
+
+        if (!isEntry) {
+            setDefaults(solrQuery, request.getDefaultField());
+        }
 
         setFilterQueries(solrQuery, request.getFilterQueries());
         setSort(solrQuery, request.getSort());
@@ -58,57 +60,6 @@ public class SolrRequestConverter {
         log.debug("Solr Query: " + solrQuery);
 
         return solrQuery;
-    }
-
-    /**
-     * Creates a Spring {@link Query} from a {@link SolrRequest}. Note that this does not handle
-     * term queries, which are not supported by Spring's standard Query API. And it also does not
-     * support Interval Facets.
-     *
-     * @param request the request that specifies the query
-     * @return the query
-     */
-    public Query toQuery(SolrRequest request) {
-        SimpleQuery simpleQuery = new SimpleQuery(request.getQuery());
-
-        if (!request.getFacets().isEmpty()) {
-            simpleQuery = getSimpleFacetQuery(simpleQuery, request);
-        }
-
-        request.getFilterQueries().stream()
-                .map(SimpleQuery::new)
-                .forEach(simpleQuery::addFilterQuery);
-
-        simpleQuery.addSort(request.getSort());
-        simpleQuery.setDefaultOperator(request.getDefaultQueryOperator());
-
-        return simpleQuery;
-    }
-
-    static class QueryConverter {
-        static SimpleFacetQuery getSimpleFacetQuery(SimpleQuery simpleQuery, SolrRequest request) {
-            SimpleFacetQuery simpleFacetQuery = new SimpleFacetQuery(simpleQuery.getCriteria());
-
-            for (String facetName : request.getFacets()) {
-                FacetProperty facetProperty =
-                        request.getFacetConfig().getFacetPropertyMap().get(facetName);
-                if (Utils.notNullOrEmpty(facetProperty.getInterval())) {
-                    throw new UnsupportedOperationException(
-                            "Interval facets are not supported by Spring Data Solr");
-                }
-                if (facetProperty.getLimit() != 0) {
-                    throw new UnsupportedOperationException(
-                            "Define a limit for a specific facet is not supported by Spring Data Solr");
-                }
-            }
-            FacetOptions facetOptions = new FacetOptions();
-            facetOptions.addFacetOnFlieldnames(request.getFacets());
-            facetOptions.setFacetMinCount(request.getFacetConfig().getMincount());
-            facetOptions.setFacetLimit(request.getFacetConfig().getLimit());
-            simpleFacetQuery.setFacetOptions(facetOptions);
-
-            return simpleFacetQuery;
-        }
     }
 
     static class SolrQueryConverter {
