@@ -42,8 +42,7 @@ public class UniProtConfigureController {
 
     @GetMapping("/resultfields")
     public List<FieldGroup> getResultFields() {
-        List<FieldGroup> resultFields = service.getResultFields();
-        resultFields.addAll(service.getDatabaseFields());
-        return resultFields;
+        return service.getResultFields();
+        
     }
 }

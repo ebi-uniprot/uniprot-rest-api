@@ -2,10 +2,12 @@ package org.uniprot.api.uniprotkb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
+import org.uniprot.api.uniprotkb.configuration.UniProtKBCacheConfig;
 import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
 
 /**
@@ -15,7 +17,7 @@ import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
  */
 @SpringBootApplication
 // @EnableSolrRepositories(basePackages = {"org.uniprot.api.uniprotkb.repository.search.impl"})
-@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ViewByServiceConfig.class})
+@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ViewByServiceConfig.class, UniProtKBCacheConfig.class})
 @ComponentScan(basePackages = {"org.uniprot.api.uniprotkb", "org.uniprot.api.rest"})
 public class UniProtKBREST {
     public static void main(String[] args) {

@@ -103,7 +103,7 @@ public class UniProtEntryFilters {
             case organism_host:
                 builder.organismHosts(null);
                 break;
-            case gene_location:
+            case organelle:
                 builder.geneLocations(null);
                 break;
             case comment:

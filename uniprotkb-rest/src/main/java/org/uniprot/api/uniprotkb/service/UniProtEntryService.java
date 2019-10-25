@@ -45,13 +45,14 @@ public class UniProtEntryService {
             UniProtTermsConfig uniProtTermsConfig,
             QueryBoosts uniProtKBQueryBoosts,
             UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtDocument, UniProtEntry> uniProtEntryStoreStreamer) {
+            StoreStreamer<UniProtDocument, UniProtEntry> uniProtEntryStoreStreamer,
+            TaxonomyService taxService) {
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
         this.queryBoosts = uniProtKBQueryBoosts;
         this.uniprotFacetConfig = uniprotFacetConfig;
         this.storeStreamer = uniProtEntryStoreStreamer;
-        this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore);
+        this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
     }
 
     public QueryResult<UniProtEntry> search(SearchRequestDTO request) {
