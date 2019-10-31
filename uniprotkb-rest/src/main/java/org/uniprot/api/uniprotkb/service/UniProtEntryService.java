@@ -96,6 +96,11 @@ public class UniProtEntryService {
         return storeStreamer.idsStream(solrRequest);
     }
 
+    public Stream<String> streamRDF(SearchRequestDTO searchRequest) {
+        SolrRequest solrRequest = createSolrRequest(searchRequest, false);
+        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+    }
+
     private SolrRequest createSolrRequest(SearchRequestDTO request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
         requestBuilder.rows(request.getSize());

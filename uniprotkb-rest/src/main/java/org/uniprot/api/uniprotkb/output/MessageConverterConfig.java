@@ -23,6 +23,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.RDFMessageConverter;
 import org.uniprot.api.uniprotkb.output.converter.*;
 import org.uniprot.core.uniprot.UniProtEntry;
 
@@ -68,6 +69,7 @@ public class MessageConverterConfig {
                 converters.add(new UniProtKBFlatFileMessageConverter());
                 converters.add(new UniProtKBFastaMessageConverter());
                 converters.add(new ListMessageConverter());
+                converters.add(new RDFMessageConverter());
                 converters.add(new UniProtKBGffMessageConverter());
                 converters.add(new UniProtKBTsvMessageConverter());
                 converters.add(new UniProtKBXslMessageConverter());
@@ -86,6 +88,7 @@ public class MessageConverterConfig {
 
         asList(
                         context(LIST_MEDIA_TYPE),
+                        context(RDF_MEDIA_TYPE),
                         context(FF_MEDIA_TYPE),
                         context(APPLICATION_XML),
                         context(APPLICATION_JSON),

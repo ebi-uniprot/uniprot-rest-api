@@ -1,68 +1,63 @@
 package org.uniprot.api.rest.service;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.RDFDataMgr;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.ByteArrayInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-public class RDFService {
-  private static final int BATCH_SIZE = 3;
-  private static final String QUERY_STR = "query";
-  private static final String FORMAT_STR = "format";
-  private static final String RDF_STR = "rdf";
-  private static final String ID_COLON_STR = "id:";
-  private static final String OR_DELIMITER_STR = " or ";
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.*;
+import org.uniprot.store.datastore.common.StoreService;
 
-  private static final String URI = "https://www.uniprot.org/uniprot/?";
-  public Model getEntriesByAccessions(List<String> accessions) throws IOException {
-    // split the list of accessions in batch of size BATCH_SIZE
-    List<List<String>> lolAccession = IntStream
-            .range(0, accessions.size())
-            .filter(i -> i % BATCH_SIZE == 0)
-            .mapToObj(nb -> accessions.subList(nb, Math.min(nb + BATCH_SIZE, accessions.size())))
-            .collect(Collectors.toList());
+public class RDFService<T> implements StoreService<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RDFService.class);
+    private static final String QUERY_STR = "query";
+    private static final String FORMAT_STR = "format";
+    private static final String RDF_STR = "rdf";
+    private static final String ID_COLON_STR = "id:";
+    private static final String OR_DELIMITER_STR = " or ";
+    private Class<T> clazz;
+    private RestTemplate restTemplate;
 
-    Model result = null;
-    for(List<String> lAccession : lolAccession){ // get the RDF for each batch and then union it
-      // create query like id:P12345 or id:P54321 or ....
-      String idQuery = lAccession
-              .stream()
-              .map(acc -> new StringBuilder(ID_COLON_STR).append(acc))
-              .collect(Collectors.joining(OR_DELIMITER_STR));
-
-      UriComponents uriBuilder =
-              UriComponentsBuilder.fromHttpUrl(URI)
-                      .queryParam(QUERY_STR, idQuery)
-                      .queryParam(FORMAT_STR, RDF_STR)
-                      .build();
-
-      RestTemplate restTemplate = new RestTemplate(); // FIXME move this creation to @Configuration class
-      String rdfStr = restTemplate.getForObject(uriBuilder.toString(), String.class);
-      Model model = ModelFactory.createDefaultModel();
-      model.read(new ByteArrayInputStream(rdfStr.getBytes()), null);
-      if(result == null){
-        result = model;
-      } else {
-        result = result.union(model);
-      }
+    public RDFService(RestTemplate restTemplate, Class<T> clazz) {
+        this.restTemplate = restTemplate;
+        this.clazz = clazz;
     }
 
-    result.write(new FileWriter("chunk.rdf"), "N-TRIPLE");
+    @Override
+    public List<T> getEntries(Iterable<String> accessions) {
+        List<String> allAccessions = new ArrayList<>();
+        accessions.forEach(acc -> allAccessions.add(acc));
+        LOGGER.debug("RDF call for accessions : {}", allAccessions);
+        T rdfXml = getEntriesByAccessions(allAccessions);
+        return Arrays.asList(rdfXml);
+    }
 
-    return result;
-  }
+    @Override
+    public String getStoreName() {
+        return "RDF Store";
+    }
 
-  public static void main(String[] args) throws IOException {
-    new RDFService().getEntriesByAccessions(Arrays.asList("P05067", "P00750", "P12345"));
-  }
+    @Override
+    public Optional<T> getEntry(String id) {
+        return Optional.of(getEntriesByAccessions(Arrays.asList(id)));
+    }
+
+    private T getEntriesByAccessions(List<String> accessions) {
+        // create query like id:P12345 or id:P54321 or ....
+        String idQuery =
+                accessions.stream()
+                        .map(acc -> new StringBuilder(ID_COLON_STR).append(acc))
+                        .collect(Collectors.joining(OR_DELIMITER_STR));
+
+        DefaultUriBuilderFactory handler =
+                (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
+
+        UriBuilder uriBuilder =
+                handler.builder().queryParam(QUERY_STR, idQuery).queryParam(FORMAT_STR, RDF_STR);
+
+        T rdfResponse = restTemplate.getForObject(uriBuilder.build(), this.clazz);
+
+        return rdfResponse;
+    }
 }
