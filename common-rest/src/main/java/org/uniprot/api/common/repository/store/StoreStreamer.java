@@ -2,9 +2,7 @@ package org.uniprot.api.common.repository.store;
 
 import static java.util.stream.StreamSupport.stream;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -16,6 +14,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.document.Document;
 
@@ -33,11 +32,14 @@ import org.uniprot.store.search.document.Document;
 public class StoreStreamer<D extends Document, T> {
     private static final int IDS_BATCH_SIZE = 100_000;
     private UniProtStoreClient<T> storeClient;
+    private RDFService<String> rdfStoreClient;
     private SolrQueryRepository<D> repository;
     private Function<D, String> documentToId;
     private int searchBatchSize;
     private int storeBatchSize;
+    private int rdfBatchSize; // number of accession in rdf rest request
     private RetryPolicy<Object> storeFetchRetryPolicy;
+    private RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
 
     public Stream<T> idsToStoreStream(SolrRequest origRequest) {
         Stream<String> idsStream = fetchIds(origRequest, searchBatchSize);
@@ -55,6 +57,21 @@ public class StoreStreamer<D extends Document, T> {
 
     public Stream<String> idsStream(SolrRequest origRequest) {
         return fetchIds(origRequest, IDS_BATCH_SIZE);
+    }
+
+    public Stream<String> idsToRDFStoreStream(SolrRequest origRequest) {
+        Stream<String> idsStream = fetchIds(origRequest, searchBatchSize);
+
+        BatchRDFStoreIterable<String> batchRDFStoreIterable =
+                new BatchRDFStoreIterable(
+                        idsStream::iterator, rdfStoreClient, rdfFetchRetryPolicy, rdfBatchSize);
+
+        return stream(batchRDFStoreIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .onClose(
+                        () ->
+                                log.debug(
+                                        "Finished streaming over search results and fetching from RDF server."));
     }
 
     private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
@@ -96,39 +113,24 @@ public class StoreStreamer<D extends Document, T> {
         }
     }
 
-    private abstract static class BatchIterable<T> implements Iterable<Collection<T>> {
-        private final Iterator<String> sourceIterator;
-        private final int batchSize;
+    // iterable for RDF streaming
+    private static class BatchRDFStoreIterable<T> extends BatchIterable<T> {
+        private RDFService<T> storeClient;
+        private RetryPolicy<Object> retryPolicy;
 
-        BatchIterable(Iterable<String> sourceIterable, int batchSize) {
-            this.batchSize = batchSize;
-            this.sourceIterator = sourceIterable.iterator();
+        BatchRDFStoreIterable(
+                Iterable<String> sourceIterable,
+                RDFService<T> storeClient,
+                RetryPolicy<Object> retryPolicy,
+                int batchSize) {
+            super(sourceIterable, batchSize);
+            this.storeClient = storeClient;
+            this.retryPolicy = retryPolicy;
         }
 
         @Override
-        public Iterator<Collection<T>> iterator() {
-            return new Iterator<Collection<T>>() {
-                @Override
-                public boolean hasNext() {
-                    return sourceIterator.hasNext();
-                }
-
-                @Override
-                public List<T> next() {
-                    List<String> batch = new ArrayList<>(batchSize);
-                    for (int i = 0; i < batchSize; i++) {
-                        if (sourceIterator.hasNext()) {
-                            batch.add(sourceIterator.next());
-                        } else {
-                            break;
-                        }
-                    }
-
-                    return convertBatch(batch);
-                }
-            };
+        List<T> convertBatch(List<String> batch) {
+            return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(batch));
         }
-
-        abstract List<T> convertBatch(List<String> batch);
     }
 }
