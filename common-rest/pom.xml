@@ -21,13 +21,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs -->
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>apache-jena-libs</artifactId>
-			<version>3.12.0</version>
-			<type>pom</type>
-		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-search</artifactId>

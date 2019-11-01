@@ -1,11 +1,10 @@
 package org.uniprot.api.common.repository.store;
 
-import static java.util.stream.StreamSupport.stream;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +46,7 @@ public class StoreStreamer<D extends Document, T> {
         StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
                 new StoreStreamer.BatchStoreIterable<>(
                         idsStream::iterator, storeClient, storeFetchRetryPolicy, storeBatchSize);
-        return stream(batchStoreIterable.spliterator(), false)
+        return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .flatMap(Collection::stream)
                 .onClose(
                         () ->
@@ -66,12 +65,17 @@ public class StoreStreamer<D extends Document, T> {
                 new BatchRDFStoreIterable(
                         idsStream::iterator, rdfStoreClient, rdfFetchRetryPolicy, rdfBatchSize);
 
-        return stream(batchRDFStoreIterable.spliterator(), false)
-                .flatMap(Collection::stream)
-                .onClose(
-                        () ->
-                                log.debug(
-                                        "Finished streaming over search results and fetching from RDF server."));
+        Stream<String> rdfStringStream =
+                StreamSupport.stream(batchRDFStoreIterable.spliterator(), false)
+                        .flatMap(Collection::stream)
+                        .onClose(
+                                () ->
+                                        log.debug(
+                                                "Finished streaming over search results and fetching from RDF server."));
+
+        return Stream.concat(
+                rdfStringStream,
+                Stream.of(RDFService.RDF_CLOSE_TAG)); // add closing tag ("</rdf:RDF>") in the end of the stream
     }
 
     private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
