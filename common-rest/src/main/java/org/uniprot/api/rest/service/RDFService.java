@@ -66,20 +66,24 @@ public class RDFService<T> implements StoreService<T> {
     }
 
     /**
-     * Start XML Tag Begin
-     * <?xml version='1.0' encoding='UTF-8'?>
-     * <rdf:RDF xml:base="http://purl.uniprot.org/uniprot/" xmlns="http://purl.uniprot.org/core/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:void="http://rdfs.org/ns/void#" xmlns:sd="http://www.w3.org/ns/sparql-service-description#" xmlns:faldo="http://biohackathon.org/resource/faldo#">
-     * <owl:Ontology rdf:about="http://purl.uniprot.org/uniprot/">
-     * <owl:imports rdf:resource="http://purl.uniprot.org/core/"/>
-     * </owl:Ontology>
-     * Start Tag End
+     * Start XML Tag Begin <?xml version='1.0' encoding='UTF-8'?> <rdf:RDF
+     * xml:base="http://purl.uniprot.org/uniprot/" xmlns="http://purl.uniprot.org/core/"
+     * xmlns:dcterms="http://purl.org/dc/terms/"
+     * xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     * xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:owl="http://www.w3.org/2002/07/owl#"
+     * xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:bibo="http://purl.org/ontology/bibo/"
+     * xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:void="http://rdfs.org/ns/void#"
+     * xmlns:sd="http://www.w3.org/ns/sparql-service-description#"
+     * xmlns:faldo="http://biohackathon.org/resource/faldo#"> <owl:Ontology
+     * rdf:about="http://purl.uniprot.org/uniprot/"> <owl:imports
+     * rdf:resource="http://purl.uniprot.org/core/"/> </owl:Ontology> Start Tag End
      *
-     * End Tag </rdf:RDF>
-     * Logic-
-     * Convert RDF/XML response for streaming so that it is transmitted as one big xml string
-     * In the first batch, pass everything including the start xml tag not end tag. In the remaining batches, do not pass the start tag.
-     * Do not pass end tag ("</rdf:RDF>") in any of the responses . The end tag will be added only
-     * once in the end of the stream. see Stream.concat in StoreStreamer
+     * <p>End Tag </rdf:RDF> Logic- Convert RDF/XML response for streaming so that it is transmitted
+     * as one big xml string In the first batch, pass everything including the start xml tag not end
+     * tag. In the remaining batches, do not pass the start tag. Do not pass end tag ("</rdf:RDF>")
+     * in any of the responses . The end tag will be added only once in the end of the stream. see
+     * Stream.concat in StoreStreamer
+     *
      * @param rdfXML
      * @return
      */

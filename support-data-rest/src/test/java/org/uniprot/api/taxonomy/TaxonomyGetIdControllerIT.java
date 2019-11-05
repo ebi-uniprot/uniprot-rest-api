@@ -6,9 +6,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collections;
+import java.util.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,10 @@ import org.uniprot.core.taxonomy.builder.TaxonomyInactiveReasonBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+import org.uniprot.store.search.field.TaxonomyField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -78,6 +82,22 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected String getIdRequestPath() {
         return "/taxonomy/";
+    }
+
+    @Override
+    protected void initExpectedFieldsOrder() {
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                TaxonomyField.ResultFields.taxonId.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                TaxonomyField.ResultFields.parent.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                TaxonomyField.ResultFields.mnemonic.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                TaxonomyField.ResultFields.scientific_name.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                TaxonomyField.ResultFields.common_name.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                TaxonomyField.ResultFields.link.getJavaFieldName());
     }
 
     @Override
@@ -225,6 +245,31 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(TAX_ID)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    Assertions.assertEquals(
+                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
+                                            actualList.size());
+                                    Assertions.assertEquals(
+                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
                     .build();
         }
     }

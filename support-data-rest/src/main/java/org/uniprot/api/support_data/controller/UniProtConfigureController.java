@@ -1,5 +1,7 @@
 package org.uniprot.api.support_data.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,8 +10,6 @@ import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
 import org.uniprot.store.search.domain.SearchItem;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/configure/uniprotkb")

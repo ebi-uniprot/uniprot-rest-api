@@ -1,7 +1,9 @@
 package org.uniprot.api.uniprotkb.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.function.Function;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,7 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.field.TaxonomyField;
 
-import java.util.function.Function;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo

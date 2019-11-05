@@ -4,9 +4,15 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +47,9 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.field.UniRefField;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(
         classes = {
@@ -82,6 +91,28 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected String getIdRequestPath() {
         return "/uniref/";
+    }
+
+    @Override
+    protected void initExpectedFieldsOrder() {
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(UniRefField.ResultFields.id.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.name.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.common_taxon.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.common_taxonid.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.count.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.member.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.identity.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.sequence.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniRefField.ResultFields.created.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(UniRefField.ResultFields.go.getJavaFieldName());
     }
 
     @BeforeAll
@@ -228,6 +259,31 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(ID)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    Assertions.assertEquals(
+                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
+                                            actualList.size());
+                                    Assertions.assertEquals(
+                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
                     .build();
         }
     }
