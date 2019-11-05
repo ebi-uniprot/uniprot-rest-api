@@ -1,12 +1,12 @@
 package org.uniprot.api.uniprotkb.repository.search.impl;
 
-import org.springframework.stereotype.Component;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetProperty;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.stereotype.Component;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
 
 /**
  * @author jluo

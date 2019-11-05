@@ -75,7 +75,9 @@ public class StoreStreamer<D extends Document, T> {
 
         return Stream.concat(
                 rdfStringStream,
-                Stream.of(RDFService.RDF_CLOSE_TAG)); // add closing tag ("</rdf:RDF>") in the end of the stream
+                Stream.of(
+                        RDFService.RDF_CLOSE_TAG)); // add closing tag ("</rdf:RDF>") in the end of
+        // the stream
     }
 
     private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {

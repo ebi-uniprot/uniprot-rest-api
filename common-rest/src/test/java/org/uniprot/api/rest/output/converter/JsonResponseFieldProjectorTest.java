@@ -81,12 +81,43 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertNotNull(returnMap.get("reviewedProteinCount"));
         Assertions.assertTrue(returnMap.containsKey("unreviewedProteinCount"));
         Assertions.assertNotNull(returnMap.get("unreviewedProteinCount"));
+
+        // test the return map in order of fields defined in DiseaseField.ResultFields
+        Object[] orderedEntry = returnMap.entrySet().toArray();
+        Assertions.assertEquals(DiseaseField.ResultFields.values().length, orderedEntry.length);
+        String idKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
+        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), idKey);
+        String accessionKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.accession.getJavaFieldName(), accessionKey);
+        String acronymKey = (String) ((Map.Entry) orderedEntry[2]).getKey();
+        Assertions.assertEquals(DiseaseField.ResultFields.acronym.getJavaFieldName(), acronymKey);
+        String definitionKey = (String) ((Map.Entry) orderedEntry[3]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.definition.getJavaFieldName(), definitionKey);
+        String alternativeNamesKey = (String) ((Map.Entry) orderedEntry[4]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.alternative_names.getJavaFieldName(),
+                alternativeNamesKey);
+        String crossReferencesKey = (String) ((Map.Entry) orderedEntry[5]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.cross_references.getJavaFieldName(), crossReferencesKey);
+        String keywordsKey = (String) ((Map.Entry) orderedEntry[6]).getKey();
+        Assertions.assertEquals(DiseaseField.ResultFields.keywords.getJavaFieldName(), keywordsKey);
+        String reviewedProteinCountKey = (String) ((Map.Entry) orderedEntry[7]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.reviewed_protein_count.getJavaFieldName(),
+                reviewedProteinCountKey);
+        String unreviewedProteinCountKey = (String) ((Map.Entry) orderedEntry[8]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName(),
+                unreviewedProteinCountKey);
     }
 
     @Test
     void testProjectFewValidFields() {
         List<String> returnFields =
-                Stream.of("id", "alternative_names", "keywords").collect(Collectors.toList());
+                Stream.of("keywords", "alternative_names", "id").collect(Collectors.toList());
         Map<String, List<String>> filterFieldMap =
                 returnFields.stream()
                         .collect(Collectors.toMap(f -> f, f -> Collections.emptyList()));
@@ -105,15 +136,27 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertNotNull(returnMap.get("alternativeNames"));
         Assertions.assertTrue(returnMap.containsKey("keywords"));
         Assertions.assertNotNull(returnMap.get("keywords"));
-
         Assertions.assertFalse(returnMap.containsKey("accession"));
+
+        // test the return map in order of fields defined in DiseaseField.ResultFields even
+        // filterFieldMap is passed
+        Object[] orderedEntry = returnMap.entrySet().toArray();
+        Assertions.assertEquals(returnFields.size(), orderedEntry.length);
+        String idKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
+        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), idKey);
+        String alternativeNamesKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.alternative_names.getJavaFieldName(),
+                alternativeNamesKey);
+        String keywordsKey = (String) ((Map.Entry) orderedEntry[2]).getKey();
+        Assertions.assertEquals(DiseaseField.ResultFields.keywords.getJavaFieldName(), keywordsKey);
     }
 
     @Test
     void testProjectFewValidOneInvalidFields() { // it should ignore invalid fields and return
         // only valid fields
         List<String> returnFields =
-                Stream.of("id", "invalid_field_name", "unreviewed_protein_count")
+                Stream.of("unreviewed_protein_count", "invalid_field_name", "id")
                         .collect(Collectors.toList());
         Map<String, List<String>> filterFieldMap =
                 returnFields.stream()
@@ -132,6 +175,17 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertTrue(returnMap.containsKey("unreviewedProteinCount"));
         Assertions.assertNotNull(returnMap.get("unreviewedProteinCount"));
         Assertions.assertFalse(returnMap.containsKey("invalid_field_name"));
+
+        // test the return map in order of fields defined in DiseaseField.ResultFields even
+        // filterFieldMap is passed with one wrong field
+        Object[] orderedEntry = returnMap.entrySet().toArray();
+        Assertions.assertEquals(2, orderedEntry.length);
+        String idKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
+        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), idKey);
+        String unreviewedProteinCountKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
+        Assertions.assertEquals(
+                DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName(),
+                unreviewedProteinCountKey);
     }
 
     @Test
@@ -195,6 +249,11 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(
                 11, result.size(), "total number of expected fields does not match");
+        Assertions.assertNotNull(result.get("entryType"));
+        Assertions.assertNotNull(result.get("primaryAccession"));
+        Assertions.assertNotNull(result.get("uniProtId"));
+        Assertions.assertNotNull(result.get("entryAudit"));
+        Assertions.assertNotNull(result.get("annotationScore"));
         Assertions.assertNotNull(result.get("genes"));
         Assertions.assertNotNull(result.get("organism"));
         Assertions.assertNotNull(result.get("features"));
@@ -204,5 +263,38 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertEquals(cTypes.size(), ((List<?>) result.get("comments")).size());
         Assertions.assertEquals(entry.getEntryType(), result.get("entryType"));
         Assertions.assertEquals(entry.getPrimaryAccession(), result.get("primaryAccession"));
+
+        // check the order of key in the map, the order should be same as definition in
+        // UniProtField.ResultField
+        Object[] orderedEntry = result.entrySet().toArray();
+        Assertions.assertEquals(11, orderedEntry.length);
+        String entryTypeKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
+        Assertions.assertEquals(
+                UniProtField.ResultFields.entryType.getJavaFieldName(), entryTypeKey);
+        String primaryAccessionKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
+        Assertions.assertEquals(
+                UniProtField.ResultFields.primaryAccession.getJavaFieldName(), primaryAccessionKey);
+        String uniProtIdKey = (String) ((Map.Entry) orderedEntry[2]).getKey();
+        Assertions.assertEquals(
+                UniProtField.ResultFields.uniProtId.getJavaFieldName(), uniProtIdKey);
+        String entryAuditKey = (String) ((Map.Entry) orderedEntry[3]).getKey();
+        Assertions.assertEquals(
+                UniProtField.ResultFields.entryAudit.getJavaFieldName(), entryAuditKey);
+        String annotationScoreKey = (String) ((Map.Entry) orderedEntry[4]).getKey();
+        Assertions.assertEquals(
+                UniProtField.ResultFields.annotationScore.getJavaFieldName(), annotationScoreKey);
+        String organismKey = (String) ((Map.Entry) orderedEntry[5]).getKey();
+        Assertions.assertEquals(UniProtField.ResultFields.organism.getJavaFieldName(), organismKey);
+        String genesKey = (String) ((Map.Entry) orderedEntry[6]).getKey();
+        Assertions.assertEquals(UniProtField.ResultFields.gene.getJavaFieldName(), genesKey);
+        String commentsKey = (String) ((Map.Entry) orderedEntry[7]).getKey();
+        Assertions.assertEquals(UniProtField.ResultFields.comment.getJavaFieldName(), commentsKey);
+        String featuresKey = (String) ((Map.Entry) orderedEntry[8]).getKey();
+        Assertions.assertEquals(UniProtField.ResultFields.feature.getJavaFieldName(), featuresKey);
+        String keywordsKey = (String) ((Map.Entry) orderedEntry[9]).getKey();
+        Assertions.assertEquals(UniProtField.ResultFields.keyword.getJavaFieldName(), keywordsKey);
+        String databaseCrossReferencesKey = (String) ((Map.Entry) orderedEntry[10]).getKey();
+        Assertions.assertEquals(
+                UniProtField.ResultFields.xref.getJavaFieldName(), databaseCrossReferencesKey);
     }
 }

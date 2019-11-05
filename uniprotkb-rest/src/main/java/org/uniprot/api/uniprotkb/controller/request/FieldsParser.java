@@ -1,9 +1,10 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import com.google.common.base.Strings;
+import java.util.*;
+
 import org.uniprot.store.search.domain.impl.FieldMaps;
 
-import java.util.*;
+import com.google.common.base.Strings;
 
 public class FieldsParser {
     private static final String COLON = ":";

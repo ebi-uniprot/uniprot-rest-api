@@ -8,10 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +49,9 @@ import org.uniprot.store.indexer.uniprot.mockers.*;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.field.UniProtField;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author lgonzales */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -61,6 +65,7 @@ import org.uniprot.store.search.SolrCollection;
             UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
         })
 class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
+    @Autowired private ObjectMapper objectMapper;
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
 
@@ -94,6 +99,41 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected String getIdRequestPath() {
         return ACCESSION_RESOURCE;
+    }
+
+    @Override
+    public void initExpectedFieldsOrder() {
+        // init the expected list of json response fields order
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.entryType.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.primaryAccession.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.uniProtId.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.entryAudit.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.annotationScore.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.organism.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.protein_existence.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.protein_name.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.gene.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.comment.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.feature.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.keyword.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.reference.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.xref.getJavaFieldName());
+        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
+                UniProtField.ResultFields.sequence.getJavaFieldName());
     }
 
     @BeforeAll
@@ -348,6 +388,31 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
+                    .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(ACCESSION_ID)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    Assertions.assertEquals(
+                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
+                                            actualList.size());
+                                    Assertions.assertEquals(
+                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
                     .build();
         }
     }

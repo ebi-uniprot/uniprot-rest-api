@@ -1,5 +1,11 @@
 package org.uniprot.api.rest.service;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -12,12 +18,6 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @param <T>

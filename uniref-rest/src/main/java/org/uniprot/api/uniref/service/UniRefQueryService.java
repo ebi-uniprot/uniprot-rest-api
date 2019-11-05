@@ -1,5 +1,9 @@
 package org.uniprot.api.uniref.service;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -17,10 +21,6 @@ import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefField.Search;
-
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author jluo

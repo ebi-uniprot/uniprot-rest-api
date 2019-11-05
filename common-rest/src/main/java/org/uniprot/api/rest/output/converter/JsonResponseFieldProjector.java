@@ -25,22 +25,35 @@ public class JsonResponseFieldProjector {
     public Map<String, Object> project(
             Object entry, Map<String, List<String>> filterFieldMap, List<ReturnField> allFields) {
 
-        Map<String, List<String>>
-                camelCaseFieldNameValuesMap; // map to keep java field name with its values if any
+        // get map of java field name with its filter value as list
+        Map<String, List<String>> javaFieldNameValuesMap =
+                getJavaFieldNameFilterValuesMap(filterFieldMap, allFields);
 
-        if (!Utils.notNullOrEmpty(
+        // create the Map instance to be returned with root fields populated
+        Map<String, Object> projectedMap = buildMapWithFields(entry, javaFieldNameValuesMap);
+
+        return projectedMap;
+    }
+
+    private Map<String, List<String>> getJavaFieldNameFilterValuesMap(
+            Map<String, List<String>> filterFieldMap, List<ReturnField> allFields) {
+        Map<String, List<String>>
+                javaFieldNameValuesMap; // map to keep java field name with its values if any
+
+        if (Utils.nullOrEmpty(
                 filterFieldMap)) { // if the filter field map is empty return all fields from
             // allFields
-            camelCaseFieldNameValuesMap =
+            javaFieldNameValuesMap =
                     allFields.stream()
                             .filter(f -> f.getJavaFieldName() != null)
                             .collect(
                                     Collectors.toMap(
                                             ReturnField::getJavaFieldName,
                                             f -> Collections.emptyList(),
-                                            (oldKey, newKey) -> oldKey));
+                                            (oldKey, newKey) -> oldKey,
+                                            LinkedHashMap::new));
         } else {
-            camelCaseFieldNameValuesMap =
+            javaFieldNameValuesMap =
                     allFields.stream()
                             .filter(f -> isResponseField(f, filterFieldMap))
                             .collect(
@@ -49,13 +62,11 @@ public class JsonResponseFieldProjector {
                                             f ->
                                                     filterFieldMap.getOrDefault(
                                                             f.toString(), Collections.emptyList()),
-                                            (oldKey, newKey) -> oldKey));
+                                            (oldKey, newKey) -> oldKey,
+                                            LinkedHashMap::new));
         }
 
-        // create the Map instance to be returned with root fields populated
-        Map<String, Object> projectedMap = buildMapWithFields(entry, camelCaseFieldNameValuesMap);
-
-        return projectedMap;
+        return javaFieldNameValuesMap;
     }
 
     // whether this field will be returned in json response or not.
@@ -73,7 +84,7 @@ public class JsonResponseFieldProjector {
     private Map<String, Object> buildMapWithFields(
             Object source, Map<String, List<String>> camelCaseFieldNameValuesMap) {
 
-        Map<String, Object> target = new HashMap<>();
+        Map<String, Object> target = new LinkedHashMap<>();
 
         for (Map.Entry<String, List<String>> entry : camelCaseFieldNameValuesMap.entrySet()) {
             String javaFieldName = entry.getKey();
