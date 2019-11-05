@@ -6,10 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,24 +106,6 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/literature/";
     }
 
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.title.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.author.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.publication.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.lit_abstract.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.first_page.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                LiteratureField.ResultFields.completeAuthorList.getJavaFieldName());
-    }
-
     private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
         try {
             return ByteBuffer.wrap(
@@ -210,16 +189,26 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(LiteratureField.ResultFields.id.getJavaFieldName());
+            fields.add(LiteratureField.ResultFields.title.getJavaFieldName());
+            fields.add(LiteratureField.ResultFields.author.getJavaFieldName());
+            fields.add(LiteratureField.ResultFields.publication.getJavaFieldName());
+            fields.add(LiteratureField.ResultFields.lit_abstract.getJavaFieldName());
+            fields.add(LiteratureField.ResultFields.first_page.getJavaFieldName());
+            fields.add(LiteratureField.ResultFields.completeAuthorList.getJavaFieldName());
+            return fields;
         }
     }
 

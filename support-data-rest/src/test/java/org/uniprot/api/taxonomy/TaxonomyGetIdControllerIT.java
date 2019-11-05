@@ -85,22 +85,6 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                TaxonomyField.ResultFields.taxonId.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                TaxonomyField.ResultFields.parent.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                TaxonomyField.ResultFields.mnemonic.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                TaxonomyField.ResultFields.scientific_name.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                TaxonomyField.ResultFields.common_name.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                TaxonomyField.ResultFields.link.getJavaFieldName());
-    }
-
-    @Override
     protected void saveEntry() {
         long taxId = Long.parseLong(TAX_ID);
 
@@ -261,16 +245,25 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(TaxonomyField.ResultFields.taxonId.getJavaFieldName());
+            fields.add(TaxonomyField.ResultFields.parent.getJavaFieldName());
+            fields.add(TaxonomyField.ResultFields.mnemonic.getJavaFieldName());
+            fields.add(TaxonomyField.ResultFields.scientific_name.getJavaFieldName());
+            fields.add(TaxonomyField.ResultFields.common_name.getJavaFieldName());
+            fields.add(TaxonomyField.ResultFields.link.getJavaFieldName());
+            return fields;
         }
     }
 

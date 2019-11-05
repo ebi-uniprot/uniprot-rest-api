@@ -7,10 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -171,30 +168,6 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/proteome/";
     }
 
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.description.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.taxonomy.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.modified.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.proteomeType.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.dbXReferences.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.components.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.annotationScore.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.superkingdom.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                ProteomeField.ResultFields.geneCount.getJavaFieldName());
-    }
-
     static class ProteomeGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
@@ -272,16 +245,29 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(ProteomeField.ResultFields.id.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.description.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.taxonomy.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.modified.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.proteomeType.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.dbXReferences.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.components.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.annotationScore.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.superkingdom.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.geneCount.getJavaFieldName());
+            return fields;
         }
     }
 

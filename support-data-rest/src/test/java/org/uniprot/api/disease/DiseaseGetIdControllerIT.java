@@ -78,27 +78,6 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(DiseaseField.ResultFields.id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.accession.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.acronym.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.definition.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.alternative_names.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.cross_references.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.keywords.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.reviewed_protein_count.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName());
-    }
-
-    @Override
     protected void saveEntry() {
 
         DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
@@ -259,16 +238,28 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(DiseaseField.ResultFields.id.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.accession.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.acronym.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.definition.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.alternative_names.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.cross_references.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.keywords.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.reviewed_protein_count.getJavaFieldName());
+            fields.add(DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName());
+            return fields;
         }
     }
 

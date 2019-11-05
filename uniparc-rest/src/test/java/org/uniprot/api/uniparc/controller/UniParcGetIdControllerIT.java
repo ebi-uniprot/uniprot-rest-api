@@ -157,20 +157,6 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/uniparc/";
     }
 
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniParcField.ResultFields.uniParcId.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniParcField.ResultFields.databaseCrossReferences.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniParcField.ResultFields.sequence.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniParcField.ResultFields.sequenceFeatures.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniParcField.ResultFields.taxonomies.getJavaFieldName());
-    }
-
     private UniParcEntry create() {
         String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
         Sequence sequence = new SequenceBuilder(seq).build();
@@ -324,16 +310,24 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        protected List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(UniParcField.ResultFields.uniParcId.getJavaFieldName());
+            fields.add(UniParcField.ResultFields.databaseCrossReferences.getJavaFieldName());
+            fields.add(UniParcField.ResultFields.sequence.getJavaFieldName());
+            fields.add(UniParcField.ResultFields.sequenceFeatures.getJavaFieldName());
+            fields.add(UniParcField.ResultFields.taxonomies.getJavaFieldName());
+            return fields;
         }
     }
 

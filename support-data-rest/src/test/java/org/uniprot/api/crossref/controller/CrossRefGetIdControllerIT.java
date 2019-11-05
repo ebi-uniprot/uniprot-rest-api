@@ -4,10 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,32 +51,6 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected String getIdRequestPath() {
         return "/xref/";
-    }
-
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.name.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.accession.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.abbrev.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.pub_med_id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.doi_id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.link_type.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.server.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.db_url.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.category.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.reviewed_protein_count.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                CrossRefField.ResultFields.unreviewed_protein_count.getJavaFieldName());
     }
 
     @Override
@@ -220,16 +191,33 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getExpectedFieldsOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getExpectedFieldsOrder() {
+            List<String> jsonFieldsOrder = new LinkedList<>();
+            jsonFieldsOrder.add(CrossRefField.ResultFields.name.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.accession.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.abbrev.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.pub_med_id.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.doi_id.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.link_type.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.server.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.db_url.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.category.getJavaFieldName());
+            jsonFieldsOrder.add(
+                    CrossRefField.ResultFields.reviewed_protein_count.getJavaFieldName());
+            jsonFieldsOrder.add(
+                    CrossRefField.ResultFields.unreviewed_protein_count.getJavaFieldName());
+
+            return jsonFieldsOrder;
         }
     }
 
