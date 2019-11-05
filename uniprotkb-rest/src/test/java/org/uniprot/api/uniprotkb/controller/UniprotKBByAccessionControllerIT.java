@@ -101,41 +101,6 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         return ACCESSION_RESOURCE;
     }
 
-    @Override
-    public void initExpectedFieldsOrder() {
-        // init the expected list of json response fields order
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.entryType.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.primaryAccession.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.uniProtId.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.entryAudit.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.annotationScore.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.organism.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.protein_existence.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.protein_name.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.gene.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.comment.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.feature.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.keyword.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.reference.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.xref.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniProtField.ResultFields.sequence.getJavaFieldName());
-    }
-
     @BeforeAll
     void initUniprotKbDataStore() {
         UniProtEntryConverter uniProtEntryConverter =
@@ -404,16 +369,35 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            // init the expected list of json response fields order
+            List<String> fields = new LinkedList<>();
+            fields.add(UniProtField.ResultFields.entryType.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.primaryAccession.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.uniProtId.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.entryAudit.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.annotationScore.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.organism.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.protein_existence.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.protein_name.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.gene.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.comment.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.feature.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.keyword.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.reference.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.xref.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.sequence.getJavaFieldName());
+            return fields;
         }
     }
 

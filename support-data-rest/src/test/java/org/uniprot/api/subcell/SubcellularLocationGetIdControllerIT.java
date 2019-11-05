@@ -6,10 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,18 +90,6 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
     @Override
     protected String getIdRequestPath() {
         return "/subcellularlocation/";
-    }
-
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                SubcellularLocationField.ResultFields.id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                SubcellularLocationField.ResultFields.accession.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                SubcellularLocationField.ResultFields.definition.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                SubcellularLocationField.ResultFields.category.getJavaFieldName());
     }
 
     private ByteBuffer getSubcellularLocationBinary(SubcellularLocationEntry entry) {
@@ -192,16 +177,23 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(SubcellularLocationField.ResultFields.id.getJavaFieldName());
+            fields.add(SubcellularLocationField.ResultFields.accession.getJavaFieldName());
+            fields.add(SubcellularLocationField.ResultFields.definition.getJavaFieldName());
+            fields.add(SubcellularLocationField.ResultFields.category.getJavaFieldName());
+            return fields;
         }
     }
 

@@ -141,14 +141,6 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/genecentric/";
     }
 
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                GeneCentricField.ResultFields.accession_id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                GeneCentricField.ResultFields.related_accession.getJavaFieldName());
-    }
-
     static class GeneCentricGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
@@ -226,16 +218,21 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(GeneCentricField.ResultFields.accession_id.getJavaFieldName());
+            fields.add(GeneCentricField.ResultFields.related_accession.getJavaFieldName());
+            return fields;
         }
     }
 

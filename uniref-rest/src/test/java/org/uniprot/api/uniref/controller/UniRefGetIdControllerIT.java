@@ -6,10 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -91,28 +88,6 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected String getIdRequestPath() {
         return "/uniref/";
-    }
-
-    @Override
-    protected void initExpectedFieldsOrder() {
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(UniRefField.ResultFields.id.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.name.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.common_taxon.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.common_taxonid.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.count.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.member.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.identity.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.sequence.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(
-                UniRefField.ResultFields.created.getJavaFieldName());
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.add(UniRefField.ResultFields.go.getJavaFieldName());
     }
 
     @BeforeAll
@@ -275,16 +250,29 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     .readValue(
                                                             contentAsString, LinkedHashMap.class);
                                     List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER.size(),
-                                            actualList.size());
-                                    Assertions.assertEquals(
-                                            JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER, actualList);
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
                                 } catch (IOException e) {
                                     Assertions.fail(e.getMessage());
                                 }
                             })
                     .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(UniRefField.ResultFields.id.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.name.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.common_taxon.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.common_taxonid.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.count.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.member.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.identity.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.sequence.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.created.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.go.getJavaFieldName());
+            return fields;
         }
     }
 

@@ -8,9 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -40,11 +37,6 @@ import org.uniprot.store.search.SolrCollection;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractGetByIdControllerIT {
-    // initialize this field in each child class to verify the order of fields in json response. see
-    // method initExpectedFieldsOrder
-    // this field is static because needs to be accessed from static context
-    protected static List<String> JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER;
-
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     @BeforeAll
@@ -53,8 +45,6 @@ public abstract class AbstractGetByIdControllerIT {
         SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(getStoreType()));
         template.afterPropertiesSet();
         ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
-        JSON_RESPONSE_FIELDS_IN_EXPECTED_ORDER = new LinkedList<>();
-        initExpectedFieldsOrder();
     }
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
@@ -283,8 +273,6 @@ public abstract class AbstractGetByIdControllerIT {
     protected abstract void saveEntry();
 
     protected abstract String getIdRequestPath();
-
-    protected abstract void initExpectedFieldsOrder();
 
     private void checkParameterInput(GetIdParameter idParameter) {
         assertThat(idParameter, notNullValue());
