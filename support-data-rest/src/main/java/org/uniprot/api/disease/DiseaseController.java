@@ -68,7 +68,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
 
-        Disease disease = this.diseaseService.findByAccession(accession);
+        Disease disease = this.diseaseService.findByUniqueId(accession);
         return super.getEntityResponse(disease, fields, contentType);
     }
 

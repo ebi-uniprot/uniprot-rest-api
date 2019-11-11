@@ -1,11 +1,8 @@
 package org.uniprot.api.disease;
 
-import java.util.stream.Stream;
+import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.store.search.DefaultSearchHandler;
@@ -13,48 +10,30 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.field.DiseaseField;
 
 @Service
-public class DiseaseService {
-    private BasicSearchService<Disease, DiseaseDocument> basicService;
-    private DefaultSearchHandler defaultSearchHandler;
+public class DiseaseService extends BasicSearchService<Disease, DiseaseDocument> {
 
-    @Autowired private DiseaseSolrSortClause solrSortClause;
+    private static Supplier<DefaultSearchHandler> handlerSupplier =
+            () ->
+                    new DefaultSearchHandler(
+                            DiseaseField.Search.content,
+                            DiseaseField.Search.accession,
+                            DiseaseField.Search.getBoostFields());
 
-    @Autowired
-    public void setDefaultSearchHandler() {
-        this.defaultSearchHandler =
-                new DefaultSearchHandler(
-                        DiseaseField.Search.content,
-                        DiseaseField.Search.accession,
-                        DiseaseField.Search.getBoostFields());
-    }
-
-    @Autowired
-    public void setBasicService(
+    public DiseaseService(
             DiseaseRepository diseaseRepository,
-            DiseaseDocumentToDiseaseConverter toDiseaseConverter) {
-        this.basicService = new BasicSearchService<>(diseaseRepository, toDiseaseConverter);
+            DiseaseDocumentToDiseaseConverter toDiseaseConverter,
+            DiseaseSolrSortClause diseaseSolrSortClause) {
+
+        super(
+                diseaseRepository,
+                toDiseaseConverter,
+                diseaseSolrSortClause,
+                handlerSupplier.get(),
+                null);
     }
 
-    public Disease findByAccession(final String accession) {
-
-        return this.basicService.getEntity(DiseaseField.Search.accession.name(), accession);
-    }
-
-    public QueryResult<Disease> search(DiseaseSearchRequest request) {
-
-        SolrRequest solrRequest =
-                this.basicService.createSolrRequest(
-                        request, null, this.solrSortClause, this.defaultSearchHandler);
-
-        return this.basicService.search(solrRequest, request.getCursor(), request.getSize());
-    }
-
-    public Stream<Disease> download(DiseaseSearchRequest request) {
-
-        SolrRequest query =
-                this.basicService.createSolrRequest(
-                        request, null, this.solrSortClause, this.defaultSearchHandler);
-
-        return this.basicService.download(query);
+    @Override
+    public Disease findByUniqueId(final String uniqueId) {
+        return getEntity(DiseaseField.Search.accession.name(), uniqueId);
     }
 }

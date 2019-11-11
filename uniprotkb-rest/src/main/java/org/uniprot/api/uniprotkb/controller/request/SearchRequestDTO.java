@@ -11,6 +11,7 @@ import javax.validation.constraints.Positive;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.core.util.Utils;
@@ -31,10 +32,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @author lgonzales
  */
 @Data
-public class SearchRequestDTO {
-    @Parameter(hidden = true)
-    private static final int DEFAULT_RESULTS_SIZE = 25;
-
+public class SearchRequestDTO implements SearchRequest {
     @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_query_param_meta.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
@@ -70,7 +68,7 @@ public class SearchRequestDTO {
 
     @Parameter(description = "Size of the result. Defaults to 25")
     @Positive(message = "{search.positive}")
-    private Integer size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     @Parameter(hidden = true)
     @Pattern(

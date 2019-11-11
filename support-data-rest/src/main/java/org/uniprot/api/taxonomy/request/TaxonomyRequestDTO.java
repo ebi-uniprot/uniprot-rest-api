@@ -32,5 +32,5 @@ public class TaxonomyRequestDTO implements SearchRequest {
     private String facets;
 
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 }

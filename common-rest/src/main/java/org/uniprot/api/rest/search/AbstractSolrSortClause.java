@@ -29,6 +29,10 @@ public abstract class AbstractSolrSortClause {
         return result;
     }
 
+    public Sort createSort(String sortClause) {
+        return convertToSolrSort(parseSortClause(sortClause));
+    }
+
     protected abstract Sort createDefaultSort(boolean hasScore);
 
     protected abstract String getSolrDocumentIdFieldName();
@@ -59,10 +63,6 @@ public abstract class AbstractSolrSortClause {
                     new ImmutablePair<>(getSolrDocumentIdFieldName(), Sort.Direction.ASC));
         }
         return fieldSortPairs;
-    }
-
-    private Sort createSort(String sortClause) {
-        return convertToSolrSort(parseSortClause(sortClause));
     }
 
     private Sort convertToSolrSort(List<Pair<String, Sort.Direction>> fieldSortPairs) {

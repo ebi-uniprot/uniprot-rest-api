@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.stereotype.Service;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author lgonzales */
 @Slf4j
+@Service
 public class KeywordEntryConverter implements Function<KeywordDocument, KeywordEntry> {
 
     private final ObjectMapper objectMapper;

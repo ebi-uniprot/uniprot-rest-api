@@ -13,11 +13,11 @@ import org.uniprot.store.search.field.UniProtField;
  *
  * @author lgonzales
  */
-class UniProtSortUtilTest {
+class UniProtSolrSortClauseTest {
 
     @Test
     void testCreateSingleAccessionSortAsc() {
-        Sort sort = UniProtSortUtil.createSort("accession asc");
+        Sort sort = new UniProtSolrSortClause().createSort("accession asc");
         assertNotNull(sort);
 
         Iterator<Sort.Order> sortIterator = sort.iterator();
@@ -33,7 +33,7 @@ class UniProtSortUtilTest {
 
     @Test
     void testCreateSingleMnemonicSortDescAlsoAddAccessionAsc() {
-        Sort sort = UniProtSortUtil.createSort("mnemonic desc");
+        Sort sort = new UniProtSolrSortClause().createSort("mnemonic desc");
         assertNotNull(sort);
 
         Iterator<Sort.Order> sortIterator = sort.iterator();
@@ -54,7 +54,7 @@ class UniProtSortUtilTest {
 
     @Test
     void testCreateCompositeAccessionSortAscAndGeneDesc() {
-        Sort sort = UniProtSortUtil.createSort("accession desc,gene asc");
+        Sort sort = new UniProtSolrSortClause().createSort("accession desc,gene asc");
         assertNotNull(sort);
 
         Iterator<Sort.Order> sortIterator = sort.iterator();
@@ -75,7 +75,8 @@ class UniProtSortUtilTest {
 
     @Test
     void testCreateCompositeMnemonicSortDescAlsoAddAccessionAsc() {
-        Sort sort = UniProtSortUtil.createSort("organism asc,mass desc , accession asc");
+        Sort sort =
+                new UniProtSolrSortClause().createSort("organism asc,mass desc , accession asc");
         assertNotNull(sort);
 
         Iterator<Sort.Order> sortIterator = sort.iterator();
@@ -101,7 +102,7 @@ class UniProtSortUtilTest {
 
     @Test
     void testCreateDefaultSortWithScore() {
-        Sort defaultSort = UniProtSortUtil.createDefaultSort();
+        Sort defaultSort = new UniProtSolrSortClause().createDefaultSort(true);
         assertNotNull(defaultSort);
 
         Iterator<Sort.Order> sortIterator = defaultSort.iterator();

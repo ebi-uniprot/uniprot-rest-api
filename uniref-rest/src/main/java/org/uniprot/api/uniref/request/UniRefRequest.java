@@ -23,9 +23,6 @@ import com.google.common.base.Strings;
  */
 @Data
 public class UniRefRequest implements SearchRequest {
-
-    private static final int DEFAULT_RESULTS_SIZE = 25;
-
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -45,7 +42,7 @@ public class UniRefRequest implements SearchRequest {
     private String facets;
 
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     public static final String DEFAULT_FIELDS = "id,name,common_taxon,count,created";
 

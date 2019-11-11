@@ -1,16 +1,16 @@
 package org.uniprot.api.literature.service;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.literature.request.LiteratureMappedRequestDTO;
-import org.uniprot.api.literature.request.LiteratureRequestDTO;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
@@ -22,44 +22,25 @@ import org.uniprot.store.search.field.LiteratureField;
  * @since 2019-07-04
  */
 @Service
-public class LiteratureService {
+public class LiteratureService extends BasicSearchService<LiteratureEntry, LiteratureDocument> {
 
-    private final BasicSearchService<LiteratureEntry, LiteratureDocument> basicService;
-    private final DefaultSearchHandler defaultSearchHandler;
-    private final LiteratureSortClause literatureSortClause;
-    private final LiteratureFacetConfig facetConfig;
-    private final LiteratureRepository repository;
-    private final LiteratureEntryConverter entryConverter;
+    private static final Supplier<DefaultSearchHandler> handlerSupplier =
+            () ->
+                    new DefaultSearchHandler(
+                            LiteratureField.Search.content,
+                            LiteratureField.Search.id,
+                            LiteratureField.Search.getBoostFields());
 
-    public LiteratureService(LiteratureRepository repository, LiteratureFacetConfig facetConfig) {
-        this.entryConverter = new LiteratureEntryConverter();
-        this.basicService = new BasicSearchService<>(repository, entryConverter);
-        this.defaultSearchHandler =
-                new DefaultSearchHandler(
-                        LiteratureField.Search.content,
-                        LiteratureField.Search.id,
-                        LiteratureField.Search.getBoostFields());
-        this.literatureSortClause = new LiteratureSortClause();
-        this.facetConfig = facetConfig;
-        this.repository = repository;
-    }
+    @Autowired private LiteratureSortClause literatureSortClause;
+    @Autowired private LiteratureRepository repository;
+    @Autowired private LiteratureEntryConverter entryConverter;
 
-    public LiteratureEntry findById(final String literatureId) {
-        return basicService.getEntity(LiteratureField.Search.id.name(), literatureId);
-    }
-
-    public QueryResult<LiteratureEntry> search(LiteratureRequestDTO request) {
-        SolrRequest solrRequest =
-                basicService.createSolrRequest(
-                        request, facetConfig, literatureSortClause, defaultSearchHandler);
-        return basicService.search(solrRequest, request.getCursor(), request.getSize());
-    }
-
-    public Stream<LiteratureEntry> download(LiteratureRequestDTO request) {
-        SolrRequest solrRequest =
-                basicService.createSolrRequest(
-                        request, facetConfig, literatureSortClause, defaultSearchHandler);
-        return basicService.download(solrRequest);
+    public LiteratureService(
+            LiteratureRepository repository,
+            LiteratureEntryConverter entryConverter,
+            LiteratureFacetConfig facetConfig,
+            LiteratureSortClause literatureSortClause) {
+        super(repository, entryConverter, literatureSortClause, handlerSupplier.get(), facetConfig);
     }
 
     public QueryResult<LiteratureEntry> getMappedLiteratureByUniprotAccession(
@@ -93,5 +74,10 @@ public class LiteratureService {
                                         .getValue()
                                         .equalsIgnoreCase(accession));
         return entry;
+    }
+
+    @Override
+    public LiteratureEntry findByUniqueId(String uniqueId) {
+        return getEntity(LiteratureField.Search.id.name(), uniqueId);
     }
 }

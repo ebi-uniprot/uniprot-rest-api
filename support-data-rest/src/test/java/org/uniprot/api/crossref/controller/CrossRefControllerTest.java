@@ -34,7 +34,7 @@ class CrossRefControllerTest {
     void testGetCrossRefByAccession() throws Exception {
         String accession = "DB-1234";
         CrossRefEntry crossRef = createDBXRef();
-        Mockito.when(this.crossRefService.findByAccession(accession)).thenReturn(crossRef);
+        Mockito.when(this.crossRefService.findByUniqueId(accession)).thenReturn(crossRef);
 
         ResultActions response =
                 this.mockMvc.perform(

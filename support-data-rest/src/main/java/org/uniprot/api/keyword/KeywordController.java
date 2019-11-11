@@ -103,7 +103,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields) {
 
-        KeywordEntry keywordEntry = this.keywordService.findById(keywordId);
+        KeywordEntry keywordEntry = this.keywordService.findByUniqueId(keywordId);
 
         MediaType acceptHeader = getAcceptHeader(this.request);
 

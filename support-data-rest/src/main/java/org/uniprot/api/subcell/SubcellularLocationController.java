@@ -80,7 +80,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                     MediaType contentType) {
 
         SubcellularLocationEntry subcellularLocationEntry =
-                this.subcellularLocationService.findById(subcellularLocationId);
+                this.subcellularLocationService.findByUniqueId(subcellularLocationId);
         return super.getEntityResponse(subcellularLocationEntry, fields, contentType);
     }
 

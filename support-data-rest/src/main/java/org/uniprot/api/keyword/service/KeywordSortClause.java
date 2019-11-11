@@ -1,10 +1,12 @@
 package org.uniprot.api.keyword.service;
 
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.field.KeywordField;
 
 /** @author lgonzales */
+@Service
 public class KeywordSortClause extends AbstractSolrSortClause {
 
     @Override

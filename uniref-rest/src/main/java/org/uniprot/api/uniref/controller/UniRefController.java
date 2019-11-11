@@ -89,7 +89,7 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
-        UniRefEntry entry = queryService.getById(id);
+        UniRefEntry entry = queryService.findByUniqueId(id);
         return super.getEntityResponse(entry, fields, contentType);
     }
 

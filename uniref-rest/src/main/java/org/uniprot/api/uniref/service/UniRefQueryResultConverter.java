@@ -5,11 +5,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
+import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -19,7 +21,8 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  * @author jluo
  * @date: 20 Aug 2019
  */
-public class UniRefQueryResultConverter {
+@Service
+public class UniRefQueryResultConverter implements Function<UniRefDocument, UniRefEntry> {
 
     private final UniRefStoreClient entryStore;
     private final RetryPolicy<Object> retryPolicy =
@@ -28,7 +31,7 @@ public class UniRefQueryResultConverter {
                     .withDelay(Duration.ofMillis(100))
                     .withMaxRetries(5);
 
-    UniRefQueryResultConverter(UniRefStoreClient entryStore) {
+    public UniRefQueryResultConverter(UniRefStoreClient entryStore) {
         this.entryStore = entryStore;
     }
 
@@ -46,5 +49,10 @@ public class UniRefQueryResultConverter {
 
     Optional<UniRefEntry> convertDoc(UniRefDocument doc, Map<String, List<String>> filters) {
         return Failsafe.with(retryPolicy).get(() -> entryStore.getEntry(doc.getId()));
+    }
+
+    @Override
+    public UniRefEntry apply(UniRefDocument doc) {
+        return Failsafe.with(retryPolicy).get(() -> entryStore.getEntry(doc.getId()).orElse(null));
     }
 }

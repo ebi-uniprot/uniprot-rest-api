@@ -25,14 +25,31 @@ import org.uniprot.store.search.document.Document;
  * @author lgonzales
  */
 @PropertySource("classpath:common-message.properties")
-public class BasicSearchService<T, R extends Document> {
+public abstract class BasicSearchService<T, R extends Document> {
     private final SolrQueryRepository<R> repository;
     private final Function<R, T> entryConverter;
+    private AbstractSolrSortClause solrSortClause;
+    private DefaultSearchHandler defaultSearchHandler;
+    private FacetConfig facetConfig;
 
     public BasicSearchService(SolrQueryRepository<R> repository, Function<R, T> entryConverter) {
+        this(repository, entryConverter, null, null, null);
+    }
+
+    public BasicSearchService(
+            SolrQueryRepository<R> repository,
+            Function<R, T> entryConverter,
+            AbstractSolrSortClause solrSortClause,
+            DefaultSearchHandler defaultSearchHandler,
+            FacetConfig facetConfig) {
         this.repository = repository;
         this.entryConverter = entryConverter;
+        this.solrSortClause = solrSortClause;
+        this.defaultSearchHandler = defaultSearchHandler;
+        this.facetConfig = facetConfig;
     }
+
+    public abstract T findByUniqueId(final String uniqueId);
 
     public T getEntity(String idField, String value) {
         try {
@@ -59,7 +76,38 @@ public class BasicSearchService<T, R extends Document> {
         }
     }
 
-    public QueryResult<T> search(SolrRequest request, String cursor, int pageSize) {
+    public QueryResult<T> search(SearchRequest request) {
+        if (request.getSize() == null) { // set the default search size
+            request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
+        }
+        SolrRequest solrRequest = createSolrRequest(request);
+        return search(solrRequest, request.getCursor(), request.getSize());
+    }
+
+    public Stream<T> download(SearchRequest request) {
+        if (request.getSize() == null) { // set -1 to download all
+            request.setSize(-1);
+        }
+
+        SolrRequest solrRequest = createSolrRequest(request);
+
+        return download(solrRequest);
+    }
+
+    protected SolrRequest createSolrRequest(SearchRequest request) {
+        return createSolrRequest(request, true);
+    }
+
+    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
+        return createSolrRequest(
+                request,
+                this.facetConfig,
+                this.solrSortClause,
+                this.defaultSearchHandler,
+                includeFacets);
+    }
+
+    private QueryResult<T> search(SolrRequest request, String cursor, int pageSize) {
         QueryResult<R> results = repository.searchPage(request, cursor, pageSize);
         List<T> converted =
                 results.getContent().stream()
@@ -69,18 +117,23 @@ public class BasicSearchService<T, R extends Document> {
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
-    public Stream<T> download(SolrRequest request) {
-        return repository.getAll(request).map(entryConverter).filter(Objects::nonNull);
+    private Stream<T> download(SolrRequest request) {
+        return repository
+                .getAll(request)
+                .map(entryConverter)
+                .filter(Objects::nonNull)
+                .limit(request.getTotalRows());
     }
 
-    public SolrRequest createSolrRequest(
+    private SolrRequest createSolrRequest(
             SearchRequest request,
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler) {
+            DefaultSearchHandler defaultSearchHandler,
+            boolean includeFacets) {
         SolrRequest.SolrRequestBuilder builder =
                 createSolrRequestBuilder(
-                        request, facetConfig, solrSortClause, defaultSearchHandler);
+                        request, facetConfig, solrSortClause, defaultSearchHandler, includeFacets);
         return builder.build();
     }
 
@@ -88,7 +141,9 @@ public class BasicSearchService<T, R extends Document> {
             SearchRequest request,
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler) {
+            DefaultSearchHandler defaultSearchHandler,
+            boolean includeFacets) {
+
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
         String requestedQuery = request.getQuery();
 
@@ -100,11 +155,23 @@ public class BasicSearchService<T, R extends Document> {
         }
         requestBuilder.query(requestedQuery);
 
-        requestBuilder.addSort(solrSortClause.getSort(request.getSort(), hasScore));
+        if (solrSortClause != null) {
+            requestBuilder.addSort(solrSortClause.getSort(request.getSort(), hasScore));
+        }
 
-        if (request.hasFacets()) {
+        if (includeFacets && request.hasFacets()) {
             requestBuilder.facets(request.getFacetList());
             requestBuilder.facetConfig(facetConfig);
+        }
+        // if the requested size is less than batch size(25), set the batch size as requested size
+        if (request.getSize() > 0 && request.getSize() < requestBuilder.build().getRows()) {
+            requestBuilder.rows(request.getSize()); // add the batch size for the solr query
+        }
+
+        if (request.getSize() == -1) { // special case for download, -1 to get everything
+            requestBuilder.totalRows(Integer.MAX_VALUE);
+        } else { // total number of rows requested by the client
+            requestBuilder.totalRows(request.getSize());
         }
 
         return requestBuilder;
