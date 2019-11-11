@@ -16,7 +16,7 @@ import org.uniprot.store.search.field.ProteomeField.Search;
  * @date: 26 Apr 2019
  */
 @Service
-public class ProteomeQueryService extends BasicSearchService<ProteomeEntry, ProteomeDocument> {
+public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () -> new DefaultSearchHandler(Search.content, Search.upid, Search.getBoostFields());
 

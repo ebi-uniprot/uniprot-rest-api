@@ -13,7 +13,7 @@ import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 @Service
-public class TaxonomyService extends BasicSearchService<TaxonomyEntry, TaxonomyDocument> {
+public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () -> new DefaultSearchHandler(Search.content, Search.id, Search.getBoostFields());
 

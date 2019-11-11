@@ -17,7 +17,7 @@ import org.uniprot.store.search.field.UniParcField.Search;
  * @date: 21 Jun 2019
  */
 @Service
-public class UniParcQueryService extends BasicSearchService<UniParcEntry, UniParcDocument> {
+public class UniParcQueryService extends BasicSearchService<UniParcDocument, UniParcEntry> {
 
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () -> new DefaultSearchHandler(Search.content, Search.upi, Search.getBoostFields());

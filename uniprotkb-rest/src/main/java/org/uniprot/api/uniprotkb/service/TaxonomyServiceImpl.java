@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Slf4j
 @Service
-public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyEntry, TaxonomyDocument>
+public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, TaxonomyEntry>
         implements TaxonomyService {
     @Autowired
     public TaxonomyServiceImpl(TaxonomyRepository taxRepo) {

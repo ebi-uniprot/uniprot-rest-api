@@ -11,7 +11,7 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.field.KeywordField;
 
 @Service
-public class KeywordService extends BasicSearchService<KeywordEntry, KeywordDocument> {
+public class KeywordService extends BasicSearchService<KeywordDocument, KeywordEntry> {
 
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->

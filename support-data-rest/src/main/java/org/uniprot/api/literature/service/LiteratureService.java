@@ -22,7 +22,7 @@ import org.uniprot.store.search.field.LiteratureField;
  * @since 2019-07-04
  */
 @Service
-public class LiteratureService extends BasicSearchService<LiteratureEntry, LiteratureDocument> {
+public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
 
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
@@ -41,6 +41,11 @@ public class LiteratureService extends BasicSearchService<LiteratureEntry, Liter
             LiteratureFacetConfig facetConfig,
             LiteratureSortClause literatureSortClause) {
         super(repository, entryConverter, literatureSortClause, handlerSupplier.get(), facetConfig);
+    }
+
+    @Override
+    public LiteratureEntry findByUniqueId(String uniqueId) {
+        return getEntity(LiteratureField.Search.id.name(), uniqueId);
     }
 
     public QueryResult<LiteratureEntry> getMappedLiteratureByUniprotAccession(
@@ -74,10 +79,5 @@ public class LiteratureService extends BasicSearchService<LiteratureEntry, Liter
                                         .getValue()
                                         .equalsIgnoreCase(accession));
         return entry;
-    }
-
-    @Override
-    public LiteratureEntry findByUniqueId(String uniqueId) {
-        return getEntity(LiteratureField.Search.id.name(), uniqueId);
     }
 }
