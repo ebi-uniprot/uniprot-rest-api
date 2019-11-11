@@ -10,7 +10,7 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.field.DiseaseField;
 
 @Service
-public class DiseaseService extends BasicSearchService<Disease, DiseaseDocument> {
+public class DiseaseService extends BasicSearchService<DiseaseDocument, Disease> {
 
     private static Supplier<DefaultSearchHandler> handlerSupplier =
             () ->

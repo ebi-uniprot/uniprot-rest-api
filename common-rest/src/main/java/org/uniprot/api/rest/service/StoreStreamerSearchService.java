@@ -12,33 +12,34 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
 
-public abstract class StoreStreamerSearchService<T, R extends Document>
-        extends BasicSearchService<T, R> {
-    private final StoreStreamer<R, T> storeStreamer;
+public abstract class StoreStreamerSearchService<D extends Document, R>
+        extends BasicSearchService<D, R> {
+    private final StoreStreamer<D, R> storeStreamer;
 
     public StoreStreamerSearchService(
-            SolrQueryRepository<R> repository,
+            SolrQueryRepository<D> repository,
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
-            StoreStreamer<R, T> storeStreamer) {
+            StoreStreamer<D, R> storeStreamer) {
 
         this(repository, null, solrSortClause, null, facetConfig, storeStreamer);
     }
 
     public StoreStreamerSearchService(
-            SolrQueryRepository<R> repository,
-            Function<R, T> entryConverter,
+            SolrQueryRepository<D> repository,
+            Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
             DefaultSearchHandler defaultSearchHandler,
             FacetConfig facetConfig,
-            StoreStreamer<R, T> storeStreamer) {
+            StoreStreamer<D, R> storeStreamer) {
+
         super(repository, entryConverter, solrSortClause, defaultSearchHandler, facetConfig);
         this.storeStreamer = storeStreamer;
     }
 
-    public abstract T findByUniqueId(final String uniqueId, final String filters);
+    public abstract R findByUniqueId(final String uniqueId, final String filters);
 
-    public Stream<T> stream(SearchRequest request) {
+    public Stream<R> stream(SearchRequest request) {
         SolrRequest query = createSolrRequest(request);
         return this.storeStreamer.idsToStoreStream(query);
     }

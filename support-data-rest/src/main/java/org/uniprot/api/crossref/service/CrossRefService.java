@@ -13,7 +13,7 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 import org.uniprot.store.search.field.CrossRefField;
 
 @Service
-public class CrossRefService extends BasicSearchService<CrossRefEntry, CrossRefDocument> {
+public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
     private static Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
                     new DefaultSearchHandler(

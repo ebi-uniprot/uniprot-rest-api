@@ -16,7 +16,7 @@ import org.uniprot.store.search.field.SubcellularLocationField;
  */
 @Service
 public class SubcellularLocationService
-        extends BasicSearchService<SubcellularLocationEntry, SubcellularLocationDocument> {
+        extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
 
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->

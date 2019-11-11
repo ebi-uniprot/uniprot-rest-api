@@ -20,25 +20,25 @@ import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
 
 /**
- * @param <T>
- * @param <R>
+ * @param <D> the type of the input to the class. a type of Document
+ * @param <R> the type of the result of the class
  * @author lgonzales
  */
 @PropertySource("classpath:common-message.properties")
-public abstract class BasicSearchService<T, R extends Document> {
-    private final SolrQueryRepository<R> repository;
-    private final Function<R, T> entryConverter;
+public abstract class BasicSearchService<D extends Document, R> {
+    private final SolrQueryRepository<D> repository;
+    private final Function<D, R> entryConverter;
     private AbstractSolrSortClause solrSortClause;
     private DefaultSearchHandler defaultSearchHandler;
     private FacetConfig facetConfig;
 
-    public BasicSearchService(SolrQueryRepository<R> repository, Function<R, T> entryConverter) {
+    public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
         this(repository, entryConverter, null, null, null);
     }
 
     public BasicSearchService(
-            SolrQueryRepository<R> repository,
-            Function<R, T> entryConverter,
+            SolrQueryRepository<D> repository,
+            Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
             DefaultSearchHandler defaultSearchHandler,
             FacetConfig facetConfig) {
@@ -49,18 +49,18 @@ public abstract class BasicSearchService<T, R extends Document> {
         this.facetConfig = facetConfig;
     }
 
-    public abstract T findByUniqueId(final String uniqueId);
+    public abstract R findByUniqueId(final String uniqueId);
 
-    public T getEntity(String idField, String value) {
+    public R getEntity(String idField, String value) {
         try {
             String query = idField + ":" + value;
             SolrRequest solrRequest = SolrRequest.builder().query(query).build();
-            R document =
+            D document =
                     repository
                             .getEntry(solrRequest)
                             .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
 
-            T entry = entryConverter.apply(document);
+            R entry = entryConverter.apply(document);
             if (entry == null) {
                 String message =
                         entryConverter.getClass() + " can not convert object for: [" + value + "]";
@@ -76,7 +76,7 @@ public abstract class BasicSearchService<T, R extends Document> {
         }
     }
 
-    public QueryResult<T> search(SearchRequest request) {
+    public QueryResult<R> search(SearchRequest request) {
         if (request.getSize() == null) { // set the default search size
             request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
         }
@@ -84,7 +84,7 @@ public abstract class BasicSearchService<T, R extends Document> {
         return search(solrRequest, request.getCursor(), request.getSize());
     }
 
-    public Stream<T> download(SearchRequest request) {
+    public Stream<R> download(SearchRequest request) {
         if (request.getSize() == null) { // set -1 to download all
             request.setSize(-1);
         }
@@ -107,9 +107,9 @@ public abstract class BasicSearchService<T, R extends Document> {
                 includeFacets);
     }
 
-    private QueryResult<T> search(SolrRequest request, String cursor, int pageSize) {
-        QueryResult<R> results = repository.searchPage(request, cursor, pageSize);
-        List<T> converted =
+    private QueryResult<R> search(SolrRequest request, String cursor, int pageSize) {
+        QueryResult<D> results = repository.searchPage(request, cursor, pageSize);
+        List<R> converted =
                 results.getContent().stream()
                         .map(entryConverter)
                         .filter(Objects::nonNull)
@@ -117,7 +117,7 @@ public abstract class BasicSearchService<T, R extends Document> {
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
-    private Stream<T> download(SolrRequest request) {
+    private Stream<R> download(SolrRequest request) {
         return repository
                 .getAll(request)
                 .map(entryConverter)

@@ -17,7 +17,7 @@ import org.uniprot.store.search.field.GeneCentricField.Search;
  * @date: 30 Apr 2019
  */
 @Service
-public class GeneCentricService extends BasicSearchService<CanonicalProtein, GeneCentricDocument> {
+public class GeneCentricService extends BasicSearchService<GeneCentricDocument, CanonicalProtein> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
                     new DefaultSearchHandler(

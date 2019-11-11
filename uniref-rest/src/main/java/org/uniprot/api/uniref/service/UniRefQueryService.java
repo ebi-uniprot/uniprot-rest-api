@@ -20,8 +20,7 @@ import org.uniprot.store.search.field.UniRefField.Search;
  * @date: 20 Aug 2019
  */
 @Service
-public class UniRefQueryService
-        extends StoreStreamerSearchService<UniRefEntry, UniRefDocument> {
+public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocument, UniRefEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () -> new DefaultSearchHandler(Search.content, Search.upi, Search.getBoostFields());
 

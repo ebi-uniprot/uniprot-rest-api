@@ -26,8 +26,7 @@ import org.uniprot.store.search.field.UniProtField;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
-public class UniProtEntryService
-        extends StoreStreamerSearchService<UniProtEntry, UniProtDocument> {
+public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocument, UniProtEntry> {
     private static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final QueryBoosts queryBoosts;
