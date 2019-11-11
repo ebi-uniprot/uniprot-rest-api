@@ -86,12 +86,10 @@ public class StoreStreamer<D extends Document, T> {
         if (limit < searchBatchSize) {
             fetchSize = limit;
         }
-        SolrRequest request = setSolrBatchSize(origRequest, fetchSize);
 
-        Stream<String> idsStream = repository.getAll(request).map(documentToId);
-        if (limit >= 0) {
-            idsStream = idsStream.limit(limit);
-        }
+        SolrRequest request = setSolrBatchSize(origRequest, fetchSize);
+        Stream<String> idsStream = repository.getAll(request).map(documentToId).limit(origRequest.getTotalRows());
+
         return idsStream;
     }
 

@@ -40,17 +40,14 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     public abstract R findByUniqueId(final String uniqueId, final String filters);
 
     public Stream<R> stream(SearchRequest request) {
+        setSizeForDownload(request);
         SolrRequest query = createSolrRequest(request);
         return this.storeStreamer.idsToStoreStream(query);
     }
 
     public Stream<String> streamIds(SearchRequest request) {
+        setSizeForDownload(request);
         SolrRequest solrRequest = createSolrRequest(request);
         return this.storeStreamer.idsStream(solrRequest);
-    }
-
-    public Stream<String> streamRDF(SearchRequest searchRequest) {
-        SolrRequest solrRequest = createSolrRequest(searchRequest);
-        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 }

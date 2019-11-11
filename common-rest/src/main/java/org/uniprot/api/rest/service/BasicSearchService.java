@@ -85,9 +85,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public Stream<R> download(SearchRequest request) {
-        if (request.getSize() == null) { // set -1 to download all
-            request.setSize(-1);
-        }
+        setSizeForDownload(request);
 
         SolrRequest solrRequest = createSolrRequest(request);
 
@@ -105,6 +103,12 @@ public abstract class BasicSearchService<D extends Document, R> {
                 this.solrSortClause,
                 this.defaultSearchHandler,
                 includeFacets);
+    }
+
+    protected void setSizeForDownload(SearchRequest request){
+        if (request.getSize() == null) { // set -1 to download all if not passed
+            request.setSize(-1);
+        }
     }
 
     private QueryResult<R> search(SolrRequest request, String cursor, int pageSize) {
