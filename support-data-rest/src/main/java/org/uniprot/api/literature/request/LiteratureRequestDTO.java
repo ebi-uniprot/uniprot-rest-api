@@ -33,7 +33,7 @@ public class LiteratureRequestDTO implements SearchRequest {
     private String fields;
 
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     @ValidFacets(facetConfig = LiteratureFacetConfig.class)
     private String facets;

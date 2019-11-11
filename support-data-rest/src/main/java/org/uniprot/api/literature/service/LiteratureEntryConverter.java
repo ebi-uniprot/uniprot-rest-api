@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.stereotype.Service;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @since 2019-07-04
  */
 @Slf4j
+@Service
 public class LiteratureEntryConverter implements Function<LiteratureDocument, LiteratureEntry> {
 
     private final ObjectMapper objectMapper;

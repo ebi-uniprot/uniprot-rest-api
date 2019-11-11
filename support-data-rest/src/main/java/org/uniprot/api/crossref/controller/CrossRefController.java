@@ -31,7 +31,6 @@ import org.uniprot.store.search.field.CrossRefField;
 @Validated
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     @Autowired private CrossRefService crossRefService;
-    @Autowired private ApplicationEventPublisher eventPublisher;
     private static final String ACCESSION_REGEX = "DB-(\\d{4})";
 
     public CrossRefController(
@@ -56,7 +55,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
 
-        CrossRefEntry crossRefEntry = this.crossRefService.findByAccession(accession);
+        CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(accession);
 
         return super.getEntityResponse(crossRefEntry, fields, contentType);
     }

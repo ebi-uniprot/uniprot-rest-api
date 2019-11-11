@@ -42,7 +42,7 @@ public class KeywordRequestDTO implements SearchRequest {
 
     @Parameter(description = "Size of the result. Defaults to 25")
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     @Override
     public String getFacets() {

@@ -100,7 +100,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
-        ProteomeEntry entry = queryService.getByUPId(upid);
+        ProteomeEntry entry = queryService.findByUniqueId(upid);
         return super.getEntityResponse(entry, fields, contentType);
     }
 

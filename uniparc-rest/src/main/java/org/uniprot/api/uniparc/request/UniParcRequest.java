@@ -23,8 +23,6 @@ import com.google.common.base.Strings;
  */
 @Data
 public class UniParcRequest implements SearchRequest {
-    private static final int DEFAULT_RESULTS_SIZE = 25;
-
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -44,7 +42,7 @@ public class UniParcRequest implements SearchRequest {
     private String facets;
 
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     public static final String DEFAULT_FIELDS =
             "upi,organism,accession,first_seen,last_seen,length";

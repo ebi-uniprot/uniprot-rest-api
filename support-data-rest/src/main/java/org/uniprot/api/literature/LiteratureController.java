@@ -84,7 +84,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
         String updatedFields = updateFieldsWithoutMappedReferences(fields, contentType);
-        LiteratureEntry literatureEntry = this.literatureService.findById(literatureId);
+        LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
         return super.getEntityResponse(literatureEntry, updatedFields, contentType);
     }
 

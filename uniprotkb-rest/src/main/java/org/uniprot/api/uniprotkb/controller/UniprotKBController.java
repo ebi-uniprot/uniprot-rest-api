@@ -185,7 +185,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields) {
 
-        UniProtEntry entry = entryService.getByAccession(accession, fields);
+        UniProtEntry entry = entryService.findByUniqueId(accession, fields);
 
         MediaType contentType = getAcceptHeader(this.request);
 

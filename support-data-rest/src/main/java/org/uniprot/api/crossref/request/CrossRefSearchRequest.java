@@ -31,5 +31,5 @@ public class CrossRefSearchRequest implements SearchRequest {
     private String fields;
 
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 }

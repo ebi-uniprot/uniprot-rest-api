@@ -22,23 +22,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Slf4j
 @Service
-public class TaxonomyServiceImpl implements TaxonomyService {
-    private final BasicSearchService<TaxonomyEntry, TaxonomyDocument> basicService;
-
+public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyEntry, TaxonomyDocument>
+        implements TaxonomyService {
     @Autowired
     public TaxonomyServiceImpl(TaxonomyRepository taxRepo) {
-        this.basicService = new BasicSearchService<>(taxRepo, new TaxonomyEntryConverter());
+        super(taxRepo, new TaxonomyEntryConverter());
     }
 
     @Cacheable("taxonomyCache")
+    @Override
+    public TaxonomyEntry findByUniqueId(String uniqueId) {
+        return getEntity(TaxonomyField.Search.id.name(), uniqueId);
+    }
+
+    @Override
     public TaxonomyEntry findById(long taxId) {
-        log.info("Taxonomy Service, findById=" + taxId);
-        try {
-            return basicService.getEntity(TaxonomyField.Search.id.name(), String.valueOf(taxId));
-        } catch (Exception e) {
-            log.info("Error in fetching taxonomy: ", e);
-        }
-        return null;
+        return findByUniqueId(String.valueOf(taxId));
     }
 
     static class TaxonomyEntryConverter implements Function<TaxonomyDocument, TaxonomyEntry> {

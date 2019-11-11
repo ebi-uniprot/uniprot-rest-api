@@ -42,7 +42,7 @@ class DiseaseControllerTest {
     void testGetDiseaseByAccession() throws Exception {
         String accession = "DI-12345";
         Disease disease = createDisease();
-        Mockito.when(this.diseaseService.findByAccession(accession)).thenReturn(disease);
+        Mockito.when(this.diseaseService.findByUniqueId(accession)).thenReturn(disease);
 
         ResultActions response =
                 this.mockMvc.perform(
@@ -105,7 +105,7 @@ class DiseaseControllerTest {
     @Test
     void nonExistingAccession() throws Exception {
         String accession = "DI-00000";
-        Mockito.when(this.diseaseService.findByAccession(accession))
+        Mockito.when(this.diseaseService.findByUniqueId(accession))
                 .thenThrow(new ResourceNotFoundException("{search.not.found}"));
         // when
         ResultActions response =
