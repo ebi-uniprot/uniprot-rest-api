@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     private final QueryBoosts queryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
-
+    private StoreStreamer<UniProtDocument, UniProtEntry> storeStreamer;
     public UniProtEntryService(
             UniprotQueryRepository repository,
             UniprotFacetConfig uniprotFacetConfig,
@@ -47,6 +48,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         this.uniProtTermsConfig = uniProtTermsConfig;
         this.queryBoosts = uniProtKBQueryBoosts;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
+        this.storeStreamer = uniProtEntryStoreStreamer;
     }
 
     public QueryResult<UniProtEntry> search(SearchRequestDTO request) {
@@ -89,6 +91,12 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
             String message = "Could not get accession for: [" + accession + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    public Stream<String> streamRDF(SearchRequest searchRequest) {
+        setSizeForDownload(searchRequest);
+        SolrRequest solrRequest = createSolrRequest(searchRequest);
+        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override
