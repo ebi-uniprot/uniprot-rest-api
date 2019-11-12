@@ -35,7 +35,6 @@ public class UniRefStreamConfig {
 
         return StoreStreamer.<UniRefDocument, UniRefEntry>builder()
                 .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
-                .searchBatchSize(resultsConfigProperties().getSearchBatchSize())
                 .storeClient(unirefClient)
                 .documentToId(UniRefDocument::getId)
                 .repository(uniRefQueryRepository)

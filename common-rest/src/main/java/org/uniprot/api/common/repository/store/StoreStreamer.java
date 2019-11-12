@@ -29,19 +29,17 @@ import org.uniprot.store.search.document.Document;
 @Builder
 @Slf4j
 public class StoreStreamer<D extends Document, T> {
-    private static final int IDS_BATCH_SIZE = 100_000;
     private UniProtStoreClient<T> storeClient;
     private RDFService<String> rdfStoreClient;
     private SolrQueryRepository<D> repository;
     private Function<D, String> documentToId;
-    private int searchBatchSize;
     private int storeBatchSize;
     private int rdfBatchSize; // number of accession in rdf rest request
     private RetryPolicy<Object> storeFetchRetryPolicy;
     private RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
 
-    public Stream<T> idsToStoreStream(SolrRequest origRequest) {
-        Stream<String> idsStream = fetchIds(origRequest, searchBatchSize);
+    public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
+        Stream<String> idsStream = fetchIds(solrRequest);
 
         StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
                 new StoreStreamer.BatchStoreIterable<>(
@@ -54,12 +52,12 @@ public class StoreStreamer<D extends Document, T> {
                                         "Finished streaming over search results and fetching from key/value store."));
     }
 
-    public Stream<String> idsStream(SolrRequest origRequest) {
-        return fetchIds(origRequest, IDS_BATCH_SIZE); // FIXME make it configurable
+    public Stream<String> idsStream(SolrRequest solrRequest) {
+        return fetchIds(solrRequest);
     }
 
-    public Stream<String> idsToRDFStoreStream(SolrRequest origRequest) {
-        Stream<String> idsStream = fetchIds(origRequest, searchBatchSize);
+    public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
+        Stream<String> idsStream = fetchIds(solrRequest);
 
         BatchRDFStoreIterable<String> batchRDFStoreIterable =
                 new BatchRDFStoreIterable(
@@ -79,21 +77,12 @@ public class StoreStreamer<D extends Document, T> {
                 Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
     }
 
-    private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
-        int limit = origRequest.getTotalRows();
-        int fetchSize = searchBatchSize;
-        if (limit < searchBatchSize) {
-            fetchSize = limit;
-        }
+    private Stream<String> fetchIds(SolrRequest solrRequest) {
 
-        SolrRequest request = setSolrBatchSize(origRequest, fetchSize);
-        Stream<String> idsStream = repository.getAll(request).map(documentToId).limit(limit);
+        Stream<String> idsStream =
+                repository.getAll(solrRequest).map(documentToId).limit(solrRequest.getTotalRows());
 
         return idsStream;
-    }
-
-    private SolrRequest setSolrBatchSize(SolrRequest origRequest, int searchBatchSize) {
-        return origRequest.toBuilder().rows(searchBatchSize).build();
     }
 
     private static class BatchStoreIterable<T> extends BatchIterable<T> {

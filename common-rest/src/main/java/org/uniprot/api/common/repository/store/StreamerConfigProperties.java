@@ -11,7 +11,6 @@ import lombok.Data;
  */
 @Data
 public class StreamerConfigProperties {
-    private int searchBatchSize;
     private int storeBatchSize;
     private int storeFetchMaxRetries;
     private int storeFetchRetryDelayMillis;

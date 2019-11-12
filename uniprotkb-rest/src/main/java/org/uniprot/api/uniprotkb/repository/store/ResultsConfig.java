@@ -51,7 +51,6 @@ public class ResultsConfig {
         return StoreStreamer.<UniProtDocument, UniProtEntry>builder()
                 .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
                 .rdfBatchSize(rdfConfigProperties().getBatchSize())
-                .searchBatchSize(resultsConfigProperties().getSearchBatchSize())
                 .storeClient(uniProtClient)
                 .documentToId(doc -> doc.accession)
                 .repository(uniprotQueryRepository)
