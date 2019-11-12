@@ -93,39 +93,11 @@ public abstract class BasicSearchService<D extends Document, R> {
         if (request.getSize() == null) { // set the default result size
             request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
         }
-        SolrRequest solrRequest = createSolrRequest(request);
-        return search(solrRequest, request.getCursor(), request.getSize());
-    }
-
-    public Stream<R> download(SearchRequest request) {
-        setSizeForDownloadAllIfNeeded(request);
 
         SolrRequest solrRequest = createSolrRequest(request);
 
-        return download(solrRequest);
-    }
-
-    protected SolrRequest createSolrRequest(SearchRequest request) {
-        return createSolrRequest(request, true);
-    }
-
-    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
-        return createSolrRequest(
-                request,
-                this.facetConfig,
-                this.solrSortClause,
-                this.defaultSearchHandler,
-                includeFacets);
-    }
-
-    protected void setSizeForDownloadAllIfNeeded(SearchRequest request) {
-        if (request.getSize() == null) { // set -1 to download all if not passed
-            request.setSize(NumberUtils.INTEGER_MINUS_ONE);
-        }
-    }
-
-    private QueryResult<R> search(SolrRequest request, String cursor, int pageSize) {
-        QueryResult<D> results = repository.searchPage(request, cursor, pageSize);
+        QueryResult<D> results =
+                repository.searchPage(solrRequest, request.getCursor(), request.getSize());
         List<R> converted =
                 results.getContent().stream()
                         .map(entryConverter)
@@ -134,24 +106,39 @@ public abstract class BasicSearchService<D extends Document, R> {
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
-    private Stream<R> download(SolrRequest request) {
+    public Stream<R> download(SearchRequest request) {
+        setSizeForDownloadAllIfNeeded(request);
+
+        SolrRequest solrRequest = createSolrRequest(request);
+
         return repository
-                .getAll(request)
+                .getAll(solrRequest)
                 .map(entryConverter)
                 .filter(Objects::nonNull)
-                .limit(request.getTotalRows());
+                .limit(solrRequest.getTotalRows());
     }
 
-    private SolrRequest createSolrRequest(
-            SearchRequest request,
-            FacetConfig facetConfig,
-            AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler,
-            boolean includeFacets) {
+    protected SolrRequest createSolrRequest(SearchRequest request) {
+        return createSolrRequest(request, true);
+    }
+
+    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
+
         SolrRequest.SolrRequestBuilder builder =
                 createSolrRequestBuilder(
-                        request, facetConfig, solrSortClause, defaultSearchHandler, includeFacets);
+                        request,
+                        this.facetConfig,
+                        this.solrSortClause,
+                        this.defaultSearchHandler,
+                        includeFacets);
+
         return builder.build();
+    }
+
+    protected void setSizeForDownloadAllIfNeeded(SearchRequest request) {
+        if (request.getSize() == null) { // set -1 to download all if not passed
+            request.setSize(NumberUtils.INTEGER_MINUS_ONE);
+        }
     }
 
     private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
