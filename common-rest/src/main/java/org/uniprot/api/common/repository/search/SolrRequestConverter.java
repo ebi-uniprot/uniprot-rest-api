@@ -58,7 +58,7 @@ public class SolrRequestConverter {
             setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
         }
 
-        log.debug("Solr Query: " + solrQuery);
+        log.info("Solr Query: " + solrQuery);
 
         return solrQuery;
     }

@@ -28,6 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -334,6 +335,7 @@ class SolrQueryRepositoryIT {
         return SolrRequest.builder()
                 .query("*:*")
                 .sort(new Sort(Sort.Direction.DESC, "accession_id"))
+                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
                 .build();
     }
 
@@ -345,6 +347,7 @@ class SolrQueryRepositoryIT {
                 .facetConfig(new FakeFacetConfig())
                 .facets(facets)
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
                 .build();
     }
 
@@ -352,6 +355,7 @@ class SolrQueryRepositoryIT {
         return SolrRequest.builder()
                 .query(query)
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
                 .build();
     }
 
@@ -362,6 +366,7 @@ class SolrQueryRepositoryIT {
                 .termField("keyword")
                 .termField("name")
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
                 .build();
     }
 

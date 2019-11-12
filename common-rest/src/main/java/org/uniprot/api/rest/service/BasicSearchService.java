@@ -2,10 +2,13 @@ package org.uniprot.api.rest.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -26,11 +29,15 @@ import org.uniprot.store.search.document.Document;
  */
 @PropertySource("classpath:common-message.properties")
 public abstract class BasicSearchService<D extends Document, R> {
+    public static final Integer DEFAULT_SOLR_BATCH_SIZE = 25;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     private AbstractSolrSortClause solrSortClause;
     private DefaultSearchHandler defaultSearchHandler;
     private FacetConfig facetConfig;
+
+    @Value("${solr.query.batchSize:#{null}}")
+    private Optional<Integer> solrBatchSize;
 
     public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
         this(repository, entryConverter, null, null, null);
@@ -54,7 +61,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     public R getEntity(String idField, String value) {
         try {
             String query = idField + ":" + value;
-            SolrRequest solrRequest = SolrRequest.builder().query(query).build();
+            SolrRequest solrRequest =
+                    SolrRequest.builder().query(query).rows(NumberUtils.INTEGER_ONE).build();
             D document =
                     repository
                             .getEntry(solrRequest)
@@ -77,7 +85,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public QueryResult<R> search(SearchRequest request) {
-        if (request.getSize() == null) { // set the default search size
+        if (request.getSize() == null) { // set the default result size
             request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
         }
         SolrRequest solrRequest = createSolrRequest(request);
@@ -85,7 +93,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public Stream<R> download(SearchRequest request) {
-        setSizeForDownload(request);
+        setSizeForDownloadAllIfNeeded(request);
 
         SolrRequest solrRequest = createSolrRequest(request);
 
@@ -105,9 +113,9 @@ public abstract class BasicSearchService<D extends Document, R> {
                 includeFacets);
     }
 
-    protected void setSizeForDownload(SearchRequest request){
+    protected void setSizeForDownloadAllIfNeeded(SearchRequest request) {
         if (request.getSize() == null) { // set -1 to download all if not passed
-            request.setSize(-1);
+            request.setSize(NumberUtils.INTEGER_MINUS_ONE);
         }
     }
 
@@ -149,6 +157,7 @@ public abstract class BasicSearchService<D extends Document, R> {
             boolean includeFacets) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
+
         String requestedQuery = request.getQuery();
 
         boolean hasScore = false;
@@ -167,12 +176,17 @@ public abstract class BasicSearchService<D extends Document, R> {
             requestBuilder.facets(request.getFacetList());
             requestBuilder.facetConfig(facetConfig);
         }
-        // if the requested size is less than batch size(25), set the batch size as requested size
-        if (request.getSize() > 0 && request.getSize() < requestBuilder.build().getRows()) {
+
+        // set the solr batch size if passed else use DEFAULT_SOLR_BATCH_SIZE(25)
+        requestBuilder.rows(this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE));
+
+        // if the requested size is less than batch size, set the batch size as requested size
+        if (request.getSize() > NumberUtils.INTEGER_ZERO
+                && request.getSize() <= this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE)) {
             requestBuilder.rows(request.getSize()); // add the batch size for the solr query
         }
 
-        if (request.getSize() == -1) { // special case for download, -1 to get everything
+        if (request.getSize() == NumberUtils.INTEGER_MINUS_ONE) { // special case for download, -1 to get everything
             requestBuilder.totalRows(Integer.MAX_VALUE);
         } else { // total number of rows requested by the client
             requestBuilder.totalRows(request.getSize());

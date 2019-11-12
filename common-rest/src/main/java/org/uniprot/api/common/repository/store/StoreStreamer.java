@@ -55,7 +55,7 @@ public class StoreStreamer<D extends Document, T> {
     }
 
     public Stream<String> idsStream(SolrRequest origRequest) {
-        return fetchIds(origRequest, IDS_BATCH_SIZE);
+        return fetchIds(origRequest, IDS_BATCH_SIZE); // FIXME make it configurable
     }
 
     public Stream<String> idsToRDFStoreStream(SolrRequest origRequest) {
@@ -80,14 +80,14 @@ public class StoreStreamer<D extends Document, T> {
     }
 
     private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
-        int limit = origRequest.getRows();
+        int limit = origRequest.getTotalRows();
         int fetchSize = searchBatchSize;
         if (limit < searchBatchSize) {
             fetchSize = limit;
         }
 
         SolrRequest request = setSolrBatchSize(origRequest, fetchSize);
-        Stream<String> idsStream = repository.getAll(request).map(documentToId).limit(origRequest.getTotalRows());
+        Stream<String> idsStream = repository.getAll(request).map(documentToId).limit(limit);
 
         return idsStream;
     }
