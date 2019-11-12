@@ -1,11 +1,11 @@
 package org.uniprot.api.uniprotkb.service;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.field.UniProtField;
 
-@Service
+@Component
 public class UniProtSolrSortClause extends AbstractSolrSortClause {
 
     @Override

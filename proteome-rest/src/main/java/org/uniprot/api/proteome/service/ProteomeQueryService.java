@@ -33,7 +33,7 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
     }
 
     @Override
-    public ProteomeEntry findByUniqueId(String uniqueId) {
-        return getEntity(Search.upid.name(), uniqueId.toUpperCase());
+    protected String getIdField() {
+        return Search.upid.name();
     }
 }

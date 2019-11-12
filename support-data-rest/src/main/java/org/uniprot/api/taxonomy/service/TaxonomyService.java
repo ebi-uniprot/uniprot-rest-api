@@ -31,7 +31,7 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
     }
 
     @Override
-    public TaxonomyEntry findByUniqueId(String uniqueId) {
-        return getEntity(Search.id.name(), uniqueId);
+    protected String getIdField() {
+        return Search.id.name();
     }
 }

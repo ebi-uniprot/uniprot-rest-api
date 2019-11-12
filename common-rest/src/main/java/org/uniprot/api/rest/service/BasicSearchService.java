@@ -36,8 +36,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     private DefaultSearchHandler defaultSearchHandler;
     private FacetConfig facetConfig;
 
-    @Value("${solr.query.batchSize:#{null}}")
-    private Optional<Integer> solrBatchSize;
+    @Value("${solr.query.batchSize:#{null}}") // if this property is not set then
+    private Optional<Integer>
+            solrBatchSize; // it is set to empty and later it is set to DEFAULT_SOLR_BATCH_SIZE
 
     public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
         this(repository, entryConverter, null, null, null);
@@ -56,7 +57,11 @@ public abstract class BasicSearchService<D extends Document, R> {
         this.facetConfig = facetConfig;
     }
 
-    public abstract R findByUniqueId(final String uniqueId);
+    public R findByUniqueId(final String uniqueId) {
+        return getEntity(getIdField(), uniqueId);
+    }
+
+    protected abstract String getIdField();
 
     public R getEntity(String idField, String value) {
         try {
@@ -181,19 +186,24 @@ public abstract class BasicSearchService<D extends Document, R> {
         requestBuilder.rows(this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE));
 
         // if the requested size is less than batch size, set the batch size as requested size
-        if (request.getSize() > NumberUtils.INTEGER_ZERO
-                && request.getSize() <= this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE)) {
-            requestBuilder.rows(request.getSize()); // add the batch size for the solr query
+        Integer requestedSize = request.getSize();
+        if (isSizeLessOrEqualToSolrBatchSize(requestedSize)) {
+            requestBuilder.rows(requestedSize); // add the batch size for the solr query
         }
 
-        if (request.getSize()
+        if (requestedSize
                 == NumberUtils
                         .INTEGER_MINUS_ONE) { // special case for download, -1 to get everything
             requestBuilder.totalRows(Integer.MAX_VALUE);
         } else { // total number of rows requested by the client
-            requestBuilder.totalRows(request.getSize());
+            requestBuilder.totalRows(requestedSize);
         }
 
         return requestBuilder;
+    }
+
+    private boolean isSizeLessOrEqualToSolrBatchSize(Integer requestedSize) {
+        return requestedSize > NumberUtils.INTEGER_ZERO
+                && requestedSize <= this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE);
     }
 }

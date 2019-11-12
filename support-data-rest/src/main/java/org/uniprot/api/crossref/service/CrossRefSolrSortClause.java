@@ -1,11 +1,11 @@
 package org.uniprot.api.crossref.service;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.field.CrossRefField;
 
-@Service
+@Component
 public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override

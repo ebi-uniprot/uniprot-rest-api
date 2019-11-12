@@ -32,7 +32,12 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
     @Cacheable("taxonomyCache")
     @Override
     public TaxonomyEntry findByUniqueId(String uniqueId) {
-        return getEntity(TaxonomyField.Search.id.name(), uniqueId);
+        return super.findByUniqueId(uniqueId);
+    }
+
+    @Override
+    protected String getIdField() {
+        return TaxonomyField.Search.id.name();
     }
 
     @Override

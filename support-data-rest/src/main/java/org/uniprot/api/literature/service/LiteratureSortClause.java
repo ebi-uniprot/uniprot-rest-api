@@ -1,7 +1,7 @@
 package org.uniprot.api.literature.service;
 
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.field.LiteratureField;
 
@@ -9,7 +9,7 @@ import org.uniprot.store.search.field.LiteratureField;
  * @author lgonzales
  * @since 2019-07-04
  */
-@Service
+@Component
 public class LiteratureSortClause extends AbstractSolrSortClause {
 
     @Override

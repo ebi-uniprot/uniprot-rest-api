@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -12,7 +12,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Service
+@Component
 public class TaxonomyEntryConverter implements Function<TaxonomyDocument, TaxonomyEntry> {
 
     private final ObjectMapper objectMapper;

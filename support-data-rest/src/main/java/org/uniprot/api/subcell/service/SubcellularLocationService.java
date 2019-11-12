@@ -38,7 +38,7 @@ public class SubcellularLocationService
     }
 
     @Override
-    public SubcellularLocationEntry findByUniqueId(String uniqueId) {
-        return getEntity(SubcellularLocationField.Search.id.name(), uniqueId);
+    protected String getIdField() {
+        return SubcellularLocationField.Search.id.name();
     }
 }

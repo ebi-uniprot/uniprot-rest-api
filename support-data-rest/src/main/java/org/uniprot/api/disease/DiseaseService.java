@@ -33,7 +33,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, Disease>
     }
 
     @Override
-    public Disease findByUniqueId(final String uniqueId) {
-        return getEntity(DiseaseField.Search.accession.name(), uniqueId);
+    protected String getIdField() {
+        return DiseaseField.Search.accession.name();
     }
 }

@@ -35,7 +35,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     }
 
     @Override
-    public CrossRefEntry findByUniqueId(final String uniqueId) {
-        return getEntity(CrossRefField.Search.accession.name(), uniqueId);
+    protected String getIdField() {
+        return CrossRefField.Search.accession.name();
     }
 }

@@ -28,7 +28,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     }
 
     @Override
-    public KeywordEntry findByUniqueId(String uniqueId) {
-        return getEntity(KeywordField.Search.keyword_id.name(), uniqueId);
+    protected String getIdField() {
+        return KeywordField.Search.keyword_id.name();
     }
 }
