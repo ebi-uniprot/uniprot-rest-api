@@ -29,7 +29,7 @@ import org.uniprot.store.search.document.Document;
  */
 @PropertySource("classpath:common-message.properties")
 public abstract class BasicSearchService<D extends Document, R> {
-    public static final Integer DEFAULT_SOLR_BATCH_SIZE = 25;
+    public static final Integer DEFAULT_SOLR_BATCH_SIZE = 100;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     private AbstractSolrSortClause solrSortClause;
@@ -90,14 +90,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public QueryResult<R> search(SearchRequest request) {
-        if (request.getSize() == null) { // set the default result size
-            request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
-        }
+        SolrRequest solrRequest = createSearchSolrRequest(request);
 
-        SolrRequest solrRequest = createSolrRequest(request);
-
-        QueryResult<D> results =
-                repository.searchPage(solrRequest, request.getCursor(), request.getSize());
+        QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
         List<R> converted =
                 results.getContent().stream()
                         .map(entryConverter)
@@ -116,6 +111,30 @@ public abstract class BasicSearchService<D extends Document, R> {
                 .map(entryConverter)
                 .filter(Objects::nonNull)
                 .limit(solrRequest.getTotalRows());
+    }
+
+    /*
+    to create request for search api.
+    */
+    protected SolrRequest createSearchSolrRequest(SearchRequest request) {
+        return createSearchSolrRequest(request, true);
+    }
+
+    /*
+     // case 1. size is not passed, use  DEFAULT_RESULTS_SIZE(25) then set rows and totalCount as DEFAULT_RESULTS_SIZE
+    // case 2. size is less than solrBatchSize(10,000 or 100) then set SolrRequest's rows, totalCount value to size
+    // case 3. size is greater than solrBatchSize(10,000 or 100) then then set SolrRequest's rows, totalCount value to solrBatchSize
+    // for the search rows, size and total rows should be same. We should restrict size value less than solrBatchSize
+     */
+
+    protected SolrRequest createSearchSolrRequest(SearchRequest request, boolean includeFacets) {
+        if (request.getSize() == null) { // set the default result size
+            request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
+        } else if (request.getSize() > this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE)) {
+            request.setSize(this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE));
+        }
+
+        return createSolrRequest(request, includeFacets);
     }
 
     protected SolrRequest createSolrRequest(SearchRequest request) {

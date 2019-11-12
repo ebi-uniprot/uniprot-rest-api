@@ -32,7 +32,6 @@ import org.uniprot.store.search.document.Document;
  * @author lgonzales
  */
 public abstract class SolrQueryRepository<T extends Document> {
-    private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrQueryRepository.class);
     private final TermInfoConverter termInfoConverter;
     private final SolrRequestConverter requestConverter;
@@ -56,15 +55,11 @@ public abstract class SolrQueryRepository<T extends Document> {
         this.termInfoConverter = new TermInfoConverter();
     }
 
-    public QueryResult<T> searchPage(SolrRequest request, String cursor, Integer pageSize) {
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = DEFAULT_PAGE_SIZE;
-        }
+    public QueryResult<T> searchPage(SolrRequest request, String cursor) {
         try {
-            CursorPage page = CursorPage.of(cursor, pageSize);
+            CursorPage page = CursorPage.of(cursor, request.getRows());
             QueryResponse solrResponse =
-                    solrTemplate.execute(
-                            getSolrCursorCallback(request, page.getCursor(), pageSize));
+                    solrTemplate.execute(getSolrCursorCallback(request, page.getCursor()));
 
             List<T> resultList = solrTemplate.convertQueryResponseToBeans(solrResponse, tClass);
             page.setNextCursor(solrResponse.getNextCursorMark());
@@ -121,8 +116,7 @@ public abstract class SolrQueryRepository<T extends Document> {
                 .flatMap(Collection::stream);
     }
 
-    private SolrCallback<QueryResponse> getSolrCursorCallback(
-            SolrRequest request, String cursor, Integer pageSize) {
+    private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest request, String cursor) {
         return solrClient -> {
             SolrQuery solrQuery = requestConverter.toSolrQuery(request);
             if (cursor != null && !cursor.isEmpty()) {
@@ -131,7 +125,6 @@ public abstract class SolrQueryRepository<T extends Document> {
                 solrQuery.set(
                         CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
             }
-            solrQuery.setRows(pageSize);
 
             return solrClient.query(collection.toString(), solrQuery);
         };

@@ -15,7 +15,6 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
-import org.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
@@ -53,16 +52,13 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         this.storeStreamer = uniProtEntryStoreStreamer;
     }
 
-    public QueryResult<UniProtEntry> search(SearchRequestDTO request) {
+    @Override
+    public QueryResult<UniProtEntry> search(SearchRequest request) {
 
-        if (request.getSize() == null) { // set the default result size
-            request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
-        }
-
-        SolrRequest solrRequest = createSolrRequest(request, true);
+        SolrRequest solrRequest = createSearchSolrRequest(request, true);
 
         QueryResult<UniProtDocument> results =
-                repository.searchPage(solrRequest, request.getCursor(), request.getSize());
+                repository.searchPage(solrRequest, request.getCursor());
 
         return resultsConverter.convertQueryResult(
                 results, FieldsParser.parseForFilters(request.getFields()));
@@ -116,6 +112,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
 
     @Override
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
+        // fill the common params from the base class
         SolrRequest solrRequest = super.createSolrRequest(request, includeFacets);
 
         // uniprotkb related stuff

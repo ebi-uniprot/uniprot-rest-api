@@ -14,16 +14,23 @@ import org.uniprot.store.search.field.LiteratureField;
  * @since 2019-07-09
  */
 @Data
-public class LiteratureMappedRequestDTO {
+public class LiteratureMappedRequestDTO implements SearchRequest {
 
     @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
     private String fields;
 
     @Positive(message = "{search.positive}")
-    private int size = SearchRequest.DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     private String cursor;
 
     @ValidSolrSortFields(sortFieldEnumClazz = LiteratureField.Sort.class)
     private String sort;
+
+    private String query; // it will be hidden
+
+    @Override
+    public String getFacets() {
+        return "";
+    }
 }

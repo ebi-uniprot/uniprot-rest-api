@@ -28,7 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
-import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -117,7 +117,7 @@ class SolrQueryRepositoryIT {
         String accQuery = "accession:*";
         CursorPage page = CursorPage.of(null, 2);
         QueryResult<UniProtDocument> queryResult =
-                queryRepo.searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
+                queryRepo.searchPage(queryWithoutFacets(accQuery, 2), page.getCursor());
         List<String> page1Accs =
                 queryResult.getContent().stream()
                         .map(doc -> doc.accession)
@@ -146,7 +146,7 @@ class SolrQueryRepositoryIT {
         // when attempt to fetch page 1
         String accQuery = "default value";
         QueryResult<UniProtDocument> queryResult =
-                queryRepo.searchPage(queryWithoutFacets(accQuery), null, null);
+                queryRepo.searchPage(queryWithoutFacets(accQuery), null);
 
         // then
         assertNotNull(queryResult.getPage());
@@ -175,7 +175,7 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         QueryResult<UniProtDocument> queryResult =
-                queryRepo.searchPage(queryWithMatchedFields(findMe), null, null);
+                queryRepo.searchPage(queryWithMatchedFields(findMe), null);
 
         // then
         assertNotNull(queryResult.getMatchedFields());
@@ -216,9 +216,7 @@ class SolrQueryRepositoryIT {
         // when attempt to fetch then error occurs
         assertThrows(
                 InvalidRequestException.class,
-                () ->
-                        queryRepo.searchPage(
-                                queryWithMatchedFields("accession:" + findMe), null, null));
+                () -> queryRepo.searchPage(queryWithMatchedFields("accession:" + findMe), null));
     }
 
     @Test
@@ -236,9 +234,10 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch page 1
         String accQuery = "accession:*";
-        CursorPage page = CursorPage.of(null, 2);
+        int size = 2;
+        CursorPage page = CursorPage.of(null, size);
         QueryResult<UniProtDocument> queryResult =
-                queryRepo.searchPage(queryWithoutFacets(accQuery), page.getCursor(), 2);
+                queryRepo.searchPage(queryWithoutFacets(accQuery, size), page.getCursor());
         List<String> page1Accs =
                 queryResult.getContent().stream()
                         .map(doc -> doc.accession)
@@ -252,7 +251,7 @@ class SolrQueryRepositoryIT {
         String nextCursor = page.getEncryptedNextCursor();
 
         // ... and attempt to fetch page 2
-        queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), nextCursor, 2);
+        queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery, size), nextCursor);
         List<String> page2Accs =
                 queryResult.getContent().stream()
                         .map(doc -> doc.accession)
@@ -266,7 +265,7 @@ class SolrQueryRepositoryIT {
         nextCursor = page.getEncryptedNextCursor();
 
         // ... and attempt to fetch last page 3
-        queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery), nextCursor, 2);
+        queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery, size), nextCursor);
         List<String> page3Accs =
                 queryResult.getContent().stream()
                         .map(doc -> doc.accession)
@@ -293,7 +292,7 @@ class SolrQueryRepositoryIT {
         // when attempt to fetch results with no facets
         String accQuery = "accession:*";
         QueryResult<UniProtDocument> queryResult =
-                queryRepo.searchPage(queryWithoutFacets(accQuery), null, 2);
+                queryRepo.searchPage(queryWithoutFacets(accQuery), null);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(0));
@@ -308,8 +307,8 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("reviewed"));
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
+        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("reviewed"), 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(1)));
@@ -324,8 +323,8 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "fragment"));
-        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null, 2);
+        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "fragment"), 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
         assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(2)));
@@ -335,11 +334,15 @@ class SolrQueryRepositoryIT {
         return SolrRequest.builder()
                 .query("*:*")
                 .sort(new Sort(Sort.Direction.DESC, "accession_id"))
-                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
+                .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
                 .build();
     }
 
     private SolrRequest queryWithFacets(String query, List<String> facets) {
+        return queryWithFacets(query, facets, SearchRequest.DEFAULT_RESULTS_SIZE);
+    }
+
+    private SolrRequest queryWithFacets(String query, List<String> facets, int size) {
         return SolrRequest.builder()
                 .query(query)
                 .defaultQueryOperator(Query.Operator.AND)
@@ -347,15 +350,19 @@ class SolrQueryRepositoryIT {
                 .facetConfig(new FakeFacetConfig())
                 .facets(facets)
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
-                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
+                .rows(size)
                 .build();
     }
 
     private SolrRequest queryWithoutFacets(String query) {
+        return queryWithoutFacets(query, SearchRequest.DEFAULT_RESULTS_SIZE);
+    }
+
+    private SolrRequest queryWithoutFacets(String query, int size) {
         return SolrRequest.builder()
                 .query(query)
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
-                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
+                .rows(size)
                 .build();
     }
 
@@ -366,7 +373,7 @@ class SolrQueryRepositoryIT {
                 .termField("keyword")
                 .termField("name")
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
-                .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
+                .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
                 .build();
     }
 
