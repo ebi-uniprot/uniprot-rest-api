@@ -38,7 +38,7 @@ public class UniParcQueryService extends BasicSearchService<UniParcDocument, Uni
     }
 
     @Override
-    public UniParcEntry findByUniqueId(String uniqueId) {
-        return getEntity(Search.upi.name(), uniqueId.toUpperCase());
+    protected String getIdField() {
+        return Search.upi.name();
     }
 }

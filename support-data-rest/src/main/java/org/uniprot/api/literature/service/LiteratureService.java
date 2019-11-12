@@ -44,8 +44,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     }
 
     @Override
-    public LiteratureEntry findByUniqueId(String uniqueId) {
-        return getEntity(LiteratureField.Search.id.name(), uniqueId);
+    protected String getIdField() {
+        return LiteratureField.Search.id.name();
     }
 
     public QueryResult<LiteratureEntry> getMappedLiteratureByUniprotAccession(

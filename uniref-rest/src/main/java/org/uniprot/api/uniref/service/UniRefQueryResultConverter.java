@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -21,7 +21,7 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  * @author jluo
  * @date: 20 Aug 2019
  */
-@Service
+@Component
 public class UniRefQueryResultConverter implements Function<UniRefDocument, UniRefEntry> {
 
     private final UniRefStoreClient entryStore;

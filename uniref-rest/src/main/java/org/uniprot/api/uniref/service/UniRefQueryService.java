@@ -42,12 +42,12 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
     }
 
     @Override
-    public UniRefEntry findByUniqueId(String uniqueId) {
-        return findByUniqueId(uniqueId, null);
+    public UniRefEntry findByUniqueId(String uniqueId, String fields) {
+        return findByUniqueId(uniqueId);
     }
 
     @Override
-    public UniRefEntry findByUniqueId(String uniqueId, String fields) {
-        return getEntity(UniRefField.Search.id.name(), uniqueId);
+    protected String getIdField() {
+        return UniRefField.Search.id.name();
     }
 }

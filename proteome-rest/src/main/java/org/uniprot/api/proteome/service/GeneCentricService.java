@@ -37,7 +37,7 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
     }
 
     @Override
-    public CanonicalProtein findByUniqueId(String uniqueId) {
-        return getEntity(Search.accession_id.name(), uniqueId.toUpperCase());
+    protected String getIdField() {
+        return Search.accession_id.name();
     }
 }

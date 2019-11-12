@@ -69,8 +69,13 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     }
 
     @Override
-    public UniProtEntry findByUniqueId(String uniqueId) {
-        return findByUniqueId(uniqueId, null);
+    public UniProtEntry findByUniqueId(String accession) {
+        return findByUniqueId(accession, null);
+    }
+
+    @Override
+    protected String getIdField() {
+        return UniProtField.Search.accession_id.name();
     }
 
     @Override
