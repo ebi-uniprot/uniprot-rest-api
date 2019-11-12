@@ -54,6 +54,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                 SolrRequest.builder()
                         .query("mapped_protein:" + accession)
                         .addSort(literatureSortClause.getSort(requestDTO.getSort(), false))
+                        .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
                         .build();
         QueryResult<LiteratureDocument> results =
                 repository.searchPage(solrRequest, requestDTO.getCursor(), requestDTO.getSize());

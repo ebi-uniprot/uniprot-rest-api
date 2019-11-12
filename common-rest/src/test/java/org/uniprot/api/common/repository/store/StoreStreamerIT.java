@@ -53,9 +53,14 @@ class StoreStreamerIT {
 
     @Test
     void canStreamFromStore() {
-        SolrRequest actualRequest = SolrRequest.builder().query("anything").rows(3).build();
+        SolrRequest actualRequest =
+                SolrRequest.builder().query("anything").rows(3).totalRows(3).build();
         SolrRequest modifiedRequest =
-                SolrRequest.builder().query("anything").rows(SEARCH_BATCH_SIZE).build();
+                SolrRequest.builder()
+                        .query("anything")
+                        .rows(SEARCH_BATCH_SIZE)
+                        .totalRows(3)
+                        .build();
         when(fakeRepository.getAll(modifiedRequest)).thenReturn(Stream.of(doc(1), doc(2), doc(3)));
         when(fakeStore.getEntries(anyList()))
                 .thenReturn(asList("entry1", "entry2"))
@@ -71,8 +76,10 @@ class StoreStreamerIT {
     void canStreamIdsOnly() {
         List<FakeDocument> returnedDocs = asList(doc(1), doc(2), doc(3));
         int limit = 2;
-        SolrRequest actualRequest = SolrRequest.builder().query("anything").rows(limit).build();
-        SolrRequest modifiedRequest = SolrRequest.builder().query("anything").rows(limit).build();
+        SolrRequest actualRequest =
+                SolrRequest.builder().query("anything").rows(limit).totalRows(limit).build();
+        SolrRequest modifiedRequest =
+                SolrRequest.builder().query("anything").rows(limit).totalRows(limit).build();
 
         when(fakeRepository.getAll(modifiedRequest)).thenReturn(returnedDocs.stream());
 

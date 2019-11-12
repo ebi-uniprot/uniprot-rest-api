@@ -3,6 +3,7 @@ package org.uniprot.api.uniprotkb.service;
 import java.util.*;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -34,6 +35,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
     private StoreStreamer<UniProtDocument, UniProtEntry> storeStreamer;
+
     public UniProtEntryService(
             UniprotQueryRepository repository,
             UniprotFacetConfig uniprotFacetConfig,
@@ -53,7 +55,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
 
     public QueryResult<UniProtEntry> search(SearchRequestDTO request) {
 
-        if (request.getSize() == null) { // set the default search size
+        if (request.getSize() == null) { // set the default result size
             request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
         }
 
@@ -76,7 +78,10 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         try {
             Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
             SolrRequest solrRequest =
-                    SolrRequest.builder().query(ACCESSION + ":" + accession.toUpperCase()).build();
+                    SolrRequest.builder()
+                            .query(ACCESSION + ":" + accession.toUpperCase())
+                            .rows(NumberUtils.INTEGER_ONE)
+                            .build();
             Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
             Optional<UniProtEntry> optionalUniProtEntry =
                     optionalDoc
@@ -94,7 +99,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     }
 
     public Stream<String> streamRDF(SearchRequest searchRequest) {
-        setSizeForDownload(searchRequest);
+        setSizeForDownloadAllIfNeeded(searchRequest);
         SolrRequest solrRequest = createSolrRequest(searchRequest);
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
