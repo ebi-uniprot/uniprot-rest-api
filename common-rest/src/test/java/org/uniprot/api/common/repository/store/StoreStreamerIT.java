@@ -45,7 +45,6 @@ class StoreStreamerIT {
                         .documentToId(doc -> doc.id)
                         .repository(fakeRepository)
                         .storeClient(fakeStore)
-                        .searchBatchSize(SEARCH_BATCH_SIZE)
                         .storeBatchSize(STORE_BATCH_SIZE)
                         .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
                         .build();
@@ -53,21 +52,18 @@ class StoreStreamerIT {
 
     @Test
     void canStreamFromStore() {
-        SolrRequest actualRequest =
-                SolrRequest.builder().query("anything").rows(3).totalRows(3).build();
-        SolrRequest modifiedRequest =
+        SolrRequest solrRequest =
                 SolrRequest.builder()
                         .query("anything")
                         .rows(SEARCH_BATCH_SIZE)
                         .totalRows(3)
                         .build();
-        when(fakeRepository.getAll(modifiedRequest)).thenReturn(Stream.of(doc(1), doc(2), doc(3)));
+        when(fakeRepository.getAll(solrRequest)).thenReturn(Stream.of(doc(1), doc(2), doc(3)));
         when(fakeStore.getEntries(anyList()))
                 .thenReturn(asList("entry1", "entry2"))
                 .thenReturn(singletonList("entry3"));
 
-        List<String> results =
-                streamer.idsToStoreStream(actualRequest).collect(Collectors.toList());
+        List<String> results = streamer.idsToStoreStream(solrRequest).collect(Collectors.toList());
 
         assertThat(results, contains("entry1", "entry2", "entry3"));
     }
@@ -76,14 +72,16 @@ class StoreStreamerIT {
     void canStreamIdsOnly() {
         List<FakeDocument> returnedDocs = asList(doc(1), doc(2), doc(3));
         int limit = 2;
-        SolrRequest actualRequest =
-                SolrRequest.builder().query("anything").rows(limit).totalRows(limit).build();
-        SolrRequest modifiedRequest =
-                SolrRequest.builder().query("anything").rows(limit).totalRows(limit).build();
+        SolrRequest solrRequest =
+                SolrRequest.builder()
+                        .query("anything")
+                        .rows(SEARCH_BATCH_SIZE)
+                        .totalRows(limit)
+                        .build();
 
-        when(fakeRepository.getAll(modifiedRequest)).thenReturn(returnedDocs.stream());
+        when(fakeRepository.getAll(solrRequest)).thenReturn(returnedDocs.stream());
 
-        List<String> results = streamer.idsStream(actualRequest).collect(Collectors.toList());
+        List<String> results = streamer.idsStream(solrRequest).collect(Collectors.toList());
 
         assertThat(
                 results,

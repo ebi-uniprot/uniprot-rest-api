@@ -186,7 +186,9 @@ public abstract class BasicSearchService<D extends Document, R> {
             requestBuilder.rows(request.getSize()); // add the batch size for the solr query
         }
 
-        if (request.getSize() == NumberUtils.INTEGER_MINUS_ONE) { // special case for download, -1 to get everything
+        if (request.getSize()
+                == NumberUtils
+                        .INTEGER_MINUS_ONE) { // special case for download, -1 to get everything
             requestBuilder.totalRows(Integer.MAX_VALUE);
         } else { // total number of rows requested by the client
             requestBuilder.totalRows(request.getSize());
