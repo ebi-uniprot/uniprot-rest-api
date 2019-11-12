@@ -50,14 +50,10 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
 
     public QueryResult<LiteratureEntry> getMappedLiteratureByUniprotAccession(
             final String accession, LiteratureMappedRequestDTO requestDTO) {
-        SolrRequest solrRequest =
-                SolrRequest.builder()
-                        .query("mapped_protein:" + accession)
-                        .addSort(literatureSortClause.getSort(requestDTO.getSort(), false))
-                        .rows(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)
-                        .build();
+        requestDTO.setQuery("mapped_protein:" + accession);
+        SolrRequest solrRequest = createSearchSolrRequest(requestDTO);
         QueryResult<LiteratureDocument> results =
-                repository.searchPage(solrRequest, requestDTO.getCursor(), requestDTO.getSize());
+                repository.searchPage(solrRequest, requestDTO.getCursor());
 
         List<LiteratureEntry> converted =
                 results.getContent().stream()
