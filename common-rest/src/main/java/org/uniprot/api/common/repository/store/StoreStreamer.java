@@ -73,11 +73,9 @@ public class StoreStreamer<D extends Document, T> {
                                         log.debug(
                                                 "Finished streaming over search results and fetching from RDF server."));
 
-        return Stream.concat(
-                rdfStringStream,
-                Stream.of(
-                        RDFService.RDF_CLOSE_TAG)); // add closing tag ("</rdf:RDF>") in the end of
-        // the stream
+        // prepend rdf prolog then rdf data and then append closing rdf tag
+        return Stream.concat(Stream.of(RDFService.RDF_PROLOG), Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
+
     }
 
     private Stream<String> fetchIds(SolrRequest origRequest, int searchBatchSize) {
