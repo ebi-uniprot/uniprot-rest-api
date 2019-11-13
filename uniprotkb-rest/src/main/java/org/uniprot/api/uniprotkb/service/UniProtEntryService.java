@@ -100,19 +100,13 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     }
 
     public Stream<String> streamRDF(SearchRequest searchRequest) {
-        setSizeForDownloadAllIfNeeded(searchRequest);
-        SolrRequest solrRequest = createSolrRequest(searchRequest);
+        SolrRequest solrRequest = createDownloadSolrRequest(searchRequest);
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override
-    protected SolrRequest createSolrRequest(SearchRequest request) {
-        return createSolrRequest(request, false);
-    }
-
-    @Override
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
-        // fill the common params from the base class
+        // fill the common params from the basic service class
         SolrRequest solrRequest = super.createSolrRequest(request, includeFacets);
 
         // uniprotkb related stuff
