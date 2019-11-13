@@ -95,11 +95,11 @@ public class RDFService<T> implements StoreService<T> {
         T rdfResponse = rdfXML;
         if (this.clazz == String.class) {
             int indexOfCloseTag = ((String) rdfXML).indexOf(RDF_CLOSE_TAG);
-             // get everything between "</owl:Ontology>" and "</rdf:RDF>"
-                int endIndexOfOwlOntology =
-                        ((String) rdfXML).indexOf(OWL_CLOSE_TAG) + OWL_CLOSE_TAG.length();
-                rdfResponse =
-                        (T) ((String) rdfXML).substring(endIndexOfOwlOntology, indexOfCloseTag);
+            int endIndexOfOwlOntology =
+                    ((String) rdfXML).indexOf(OWL_CLOSE_TAG) + OWL_CLOSE_TAG.length();
+            // get everything between "</owl:Ontology>" and "</rdf:RDF>"
+            rdfResponse =
+                    (T) ((String) rdfXML).substring(endIndexOfOwlOntology, indexOfCloseTag);
         }
         return rdfResponse;
     }
