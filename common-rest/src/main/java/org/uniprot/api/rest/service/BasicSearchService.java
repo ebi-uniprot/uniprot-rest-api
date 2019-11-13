@@ -102,9 +102,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public Stream<R> download(SearchRequest request) {
-        setSizeForDownloadAllIfNeeded(request);
-
-        SolrRequest solrRequest = createSolrRequest(request);
+        SolrRequest solrRequest = createDownloadSolrRequest(request);
 
         return repository
                 .getAll(solrRequest)
@@ -116,13 +114,13 @@ public abstract class BasicSearchService<D extends Document, R> {
     /*
     to create request for search api.
     */
-    protected SolrRequest createSearchSolrRequest(SearchRequest request) {
+    public SolrRequest createSearchSolrRequest(SearchRequest request) {
         return createSearchSolrRequest(request, true);
     }
 
     /*
      // case 1. size is not passed, use  DEFAULT_RESULTS_SIZE(25) then set rows and totalCount as DEFAULT_RESULTS_SIZE
-    // case 2. size is less than solrBatchSize(10,000 or 100) then set SolrRequest's rows, totalCount value to size
+    // case 2. size is less than or equal solrBatchSize(10,000 or 100) then set SolrRequest's rows, totalCount value to size
     // case 3. size is greater than solrBatchSize(10,000 or 100) then then set SolrRequest's rows, totalCount value to solrBatchSize
     // for the search rows, size and total rows should be same. We should restrict size value less than solrBatchSize
      */
@@ -130,15 +128,20 @@ public abstract class BasicSearchService<D extends Document, R> {
     protected SolrRequest createSearchSolrRequest(SearchRequest request, boolean includeFacets) {
         if (request.getSize() == null) { // set the default result size
             request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
-        } else if (request.getSize() > this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE)) {
+        } else if (request.getSize()
+                > this.solrBatchSize.orElse(
+                        DEFAULT_SOLR_BATCH_SIZE)) { // set to batch size if requested for more
             request.setSize(this.solrBatchSize.orElse(DEFAULT_SOLR_BATCH_SIZE));
         }
 
         return createSolrRequest(request, includeFacets);
     }
 
-    protected SolrRequest createSolrRequest(SearchRequest request) {
-        return createSolrRequest(request, true);
+    public SolrRequest createDownloadSolrRequest(SearchRequest request) {
+        if (request.getSize() == null) { // set -1 to download all if not passed
+            request.setSize(NumberUtils.INTEGER_MINUS_ONE);
+        }
+        return createSolrRequest(request, false);
     }
 
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
@@ -152,12 +155,6 @@ public abstract class BasicSearchService<D extends Document, R> {
                         includeFacets);
 
         return builder.build();
-    }
-
-    protected void setSizeForDownloadAllIfNeeded(SearchRequest request) {
-        if (request.getSize() == null) { // set -1 to download all if not passed
-            request.setSize(NumberUtils.INTEGER_MINUS_ONE);
-        }
     }
 
     private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
