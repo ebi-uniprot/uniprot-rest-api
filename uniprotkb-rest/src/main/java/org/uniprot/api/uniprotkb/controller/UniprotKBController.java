@@ -27,7 +27,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.SearchRequestDTO;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.InactiveReasonType;
 import org.uniprot.core.uniprot.UniProtEntry;
@@ -120,7 +120,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(
-            @Valid @ModelAttribute SearchRequestDTO searchRequest,
+            @Valid @ModelAttribute UniProtKBRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
@@ -243,7 +243,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                         })
             })
     public ResponseEntity<ResponseBodyEmitter> download(
-            @Valid @ModelAttribute SearchRequestDTO searchRequest,
+            @Valid @ModelAttribute UniProtKBRequest searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
@@ -288,7 +288,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                 && Utils.notNullOrEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
     }
 
-    private void setPreviewInfo(SearchRequestDTO searchRequest, boolean preview) {
+    private void setPreviewInfo(UniProtKBRequest searchRequest, boolean preview) {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }

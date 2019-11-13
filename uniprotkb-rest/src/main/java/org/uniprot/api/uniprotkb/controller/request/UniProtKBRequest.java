@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @author lgonzales
  */
 @Data
-public class SearchRequestDTO implements SearchRequest {
+public class UniProtKBRequest implements SearchRequest {
     @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_query_param_meta.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
