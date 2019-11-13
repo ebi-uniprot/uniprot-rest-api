@@ -163,7 +163,10 @@ public class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsGreaterThanDefaultResultSize_ButLessThanBatchSize() {
         // when
-        Mockito.when(request.getSize()).thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - SearchRequest.DEFAULT_RESULTS_SIZE);
+        Mockito.when(request.getSize())
+                .thenReturn(
+                        BasicSearchService.DEFAULT_SOLR_BATCH_SIZE
+                                - SearchRequest.DEFAULT_RESULTS_SIZE);
         SolrRequest solrRequest = mockService.createSearchSolrRequest(request);
         // then
         Assertions.assertNotNull(solrRequest);

@@ -107,7 +107,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
-        CanonicalProtein entry = service.findByUniqueId(accession);
+        CanonicalProtein entry = service.findByUniqueId(accession.toUpperCase());
         return super.getEntityResponse(entry, fields, contentType);
     }
 

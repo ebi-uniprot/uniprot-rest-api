@@ -31,7 +31,6 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                             LiteratureField.Search.id,
                             LiteratureField.Search.getBoostFields());
 
-    @Autowired private LiteratureSortClause literatureSortClause;
     @Autowired private LiteratureRepository repository;
     @Autowired private LiteratureEntryConverter entryConverter;
 

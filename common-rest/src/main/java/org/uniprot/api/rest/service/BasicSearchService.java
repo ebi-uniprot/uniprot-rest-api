@@ -113,6 +113,7 @@ public abstract class BasicSearchService<D extends Document, R> {
 
     /*
     to create request for search api.
+    include facets true for search api
     */
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
         return createSearchSolrRequest(request, true);

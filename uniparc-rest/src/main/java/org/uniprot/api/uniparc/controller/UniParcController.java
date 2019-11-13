@@ -110,7 +110,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
-        UniParcEntry entry = queryService.findByUniqueId(upi);
+        UniParcEntry entry = queryService.findByUniqueId(upi.toUpperCase());
         return super.getEntityResponse(entry, fields, contentType);
     }
 
