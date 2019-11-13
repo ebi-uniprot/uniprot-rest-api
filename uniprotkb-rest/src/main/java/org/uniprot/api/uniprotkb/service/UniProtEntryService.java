@@ -15,6 +15,7 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
@@ -106,19 +107,21 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
 
     @Override
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
+
+        UniProtKBRequest uniProtRequest = (UniProtKBRequest) request;
         // fill the common params from the basic service class
-        SolrRequest solrRequest = super.createSolrRequest(request, includeFacets);
+        SolrRequest solrRequest = super.createSolrRequest(uniProtRequest, includeFacets);
 
         // uniprotkb related stuff
         solrRequest.setQueryBoosts(queryBoosts);
 
-        if (needsToFilterIsoform(request)) {
+        if (needsToFilterIsoform(uniProtRequest)) {
             solrRequest.setFilterQueries(
                     Arrays.asList(UniProtField.Search.is_isoform.name() + ":" + false));
         }
 
-        if (request.isShowMatchedFields()) {
-            solrRequest.setTermQuery(request.getQuery());
+        if (uniProtRequest.isShowMatchedFields()) {
+            solrRequest.setTermQuery(uniProtRequest.getQuery());
             List<String> termFields = new ArrayList<>();
             uniProtTermsConfig.getFields().forEach(t -> termFields.add(t));
             solrRequest.setTermFields(termFields);
@@ -137,7 +140,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
      *
      * @return true if we need to add isoform filter query
      */
-    private boolean needsToFilterIsoform(SearchRequest request) {
+    private boolean needsToFilterIsoform(UniProtKBRequest request) {
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
                         request.getQuery(),

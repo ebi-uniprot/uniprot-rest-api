@@ -29,14 +29,6 @@ public interface SearchRequest {
 
     void setSize(Integer size);
 
-    default boolean isIncludeIsoform() {
-        return false;
-    }
-
-    default boolean isShowMatchedFields() {
-        return false;
-    }
-
     default boolean hasFields() {
         return Utils.notNullOrEmpty(getFields());
     }
