@@ -17,7 +17,7 @@
 
 	<properties>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-		<openapi-maven-plugin.version>master</openapi-maven-plugin.version>
+		<openapi-maven-plugin.version>0.2</openapi-maven-plugin.version>
 	</properties>
 
 	<dependencies>
