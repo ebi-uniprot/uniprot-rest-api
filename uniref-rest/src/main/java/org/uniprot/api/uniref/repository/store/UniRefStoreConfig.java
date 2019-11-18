@@ -20,7 +20,7 @@ public class UniRefStoreConfig {
 
     @Bean
     @Profile("live")
-    public UniRefStoreClient uniProtStoreClient(
+    public UniRefStoreClient uniRefStoreClient(
             UniRefStoreConfigProperties unirefStoreConfigProperties) {
         VoldemortClient<UniRefEntry> client =
                 new VoldemortRemoteUniRefEntryStore(
