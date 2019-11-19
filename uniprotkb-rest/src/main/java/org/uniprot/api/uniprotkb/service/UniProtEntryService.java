@@ -116,13 +116,14 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         solrRequest.setQueryBoosts(queryBoosts);
 
         if (needsToFilterIsoform(uniProtRequest)) {
-            solrRequest.getFilterQueries().add(UniProtField.Search.is_isoform.name() + ":" + false);
+            List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
+            queries.add(UniProtField.Search.is_isoform.name() + ":" + false);
+            solrRequest.setFilterQueries(queries);
         }
 
         if (uniProtRequest.isShowMatchedFields()) {
             solrRequest.setTermQuery(uniProtRequest.getQuery());
-            List<String> termFields = new ArrayList<>();
-            uniProtTermsConfig.getFields().forEach(t -> termFields.add(t));
+            List<String> termFields = new ArrayList<>(uniProtTermsConfig.getFields());
             solrRequest.setTermFields(termFields);
         }
 
