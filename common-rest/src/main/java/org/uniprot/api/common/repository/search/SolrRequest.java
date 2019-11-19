@@ -27,9 +27,11 @@ public class SolrRequest {
     private String termQuery;
     private QueryBoosts queryBoosts;
     private String defaultField;
-    private int rows; // batch size of rows in solr request. in case of search api request rows ==
-    // totalRows
-    private int totalRows; // total rows requested by user
+    // Batch size of rows in solr request. In case of search api request rows and totalRows will be
+    // same.
+    private int rows;
+    // Total rows requested by user
+    private int totalRows;
 
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();

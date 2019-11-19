@@ -1,7 +1,5 @@
 package org.uniprot.api;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +20,7 @@ public class BasicSearchServiceTest {
         ReflectionTestUtils.setField(
                 mockService,
                 "solrBatchSize",
-                Optional.of(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE)); // default batch size
+                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE); // default batch size
     }
 
     @BeforeEach
