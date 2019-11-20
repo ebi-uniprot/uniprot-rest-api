@@ -88,6 +88,10 @@ public class SolrResultsIterator<T extends Document> implements Iterator<List<T>
     private void loadMoreResults() {
         try {
             this.query.set(CursorMarkParams.CURSOR_MARK_PARAM, currentCursorMark);
+            log.info(
+                    "########################### Calling solr server with query {} {}",
+                    "\n",
+                    this.query.toString());
             QueryResponse response = solrClient.query(collection.toString(), this.query);
             if (response == null) {
                 finished();
