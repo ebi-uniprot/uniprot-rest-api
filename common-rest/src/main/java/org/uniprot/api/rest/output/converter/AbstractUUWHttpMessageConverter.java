@@ -52,6 +52,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         this.messageConverterEntryClass = messageConverterEntryClass;
     }
 
+    @Override
     public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
         boolean result = false;
         if (this.canWrite(mediaType)

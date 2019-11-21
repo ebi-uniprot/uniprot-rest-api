@@ -37,6 +37,7 @@ public class KeywordMessageConverterConfig {
         return MessageConverterContext.<KeywordEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.KEYWORD)
                 .contentType(contentType)
+                .clazz(KeywordEntry.class)
                 .build();
     }
 }

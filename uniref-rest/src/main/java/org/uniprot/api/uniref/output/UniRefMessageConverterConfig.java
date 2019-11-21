@@ -101,6 +101,7 @@ public class UniRefMessageConverterConfig {
         return MessageConverterContext.<UniRefEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIREF)
                 .contentType(contentType)
+                .clazz(UniRefEntry.class)
                 .build();
     }
 }

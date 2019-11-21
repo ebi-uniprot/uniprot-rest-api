@@ -101,6 +101,7 @@ public class MessageConverterConfig {
         return MessageConverterContext.<UniParcEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPARC)
                 .contentType(contentType)
+                .clazz(UniParcEntry.class)
                 .build();
     }
 }

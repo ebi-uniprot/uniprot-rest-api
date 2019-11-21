@@ -28,6 +28,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.CustomResponseBodyEmitter;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 
 /**
@@ -35,7 +36,6 @@ import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
  * @author lgonzales
  */
 public abstract class BasicSearchController<T> {
-
     private final ApplicationEventPublisher eventPublisher;
     private final MessageConverterContextFactory<T> converterContextFactory;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
@@ -120,7 +120,7 @@ public abstract class BasicSearchController<T> {
 
     protected ResponseEntity<ResponseBodyEmitter> getResponseBodyEmitterResponseEntity(
             HttpServletRequest request, MessageConverterContext<T> context) {
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+        ResponseBodyEmitter emitter = new CustomResponseBodyEmitter();
         downloadTaskExecutor.execute(
                 () -> {
                     try {

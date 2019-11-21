@@ -36,6 +36,7 @@ public class DiseaseMessageConverterConfig {
         return MessageConverterContext.<Disease>builder()
                 .resource(MessageConverterContextFactory.Resource.DISEASE)
                 .contentType(contentType)
+                .clazz(Disease.class)
                 .build();
     }
 }
