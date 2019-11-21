@@ -28,6 +28,7 @@ public class MessageConverterContext<T> {
     private Collection<Facet> facets;
     private Collection<TermInfo> matchedFields;
     private boolean entityOnly;
+    private Class<T> clazz;
 
     MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
@@ -40,6 +41,7 @@ public class MessageConverterContext<T> {
                 .facets(this.facets)
                 .matchedFields(this.matchedFields)
                 .entityOnly(this.entityOnly)
+                .clazz(this.clazz)
                 .build();
     }
 }
