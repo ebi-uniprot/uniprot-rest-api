@@ -434,7 +434,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                                                             + "AC   Q8DIA7;\n"
                                                                             + "DT   07-JUN-2005, integrated into UniProtKB/Swiss-Prot.\n"
                                                                             + "DT   01-MAR-2003, sequence version 1.\n"
-                                                                            + "DT   05-DEC-2018, entry version 101.")))
+                                                                            + "DT   11-DEC-2019, entry version 106.")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

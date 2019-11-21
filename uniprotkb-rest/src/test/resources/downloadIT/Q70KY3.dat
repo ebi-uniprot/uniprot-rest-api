@@ -2,7 +2,7 @@ ID   LAC1_MELAO              Reviewed;         623 AA.
 AC   Q70KY3; Q7SIE6;
 DT   16-MAY-2006, integrated into UniProtKB/Swiss-Prot.
 DT   05-JUL-2004, sequence version 1.
-DT   05-DEC-2018, entry version 74.
+DT   11-DEC-2019, entry version 77.
 DE   RecName: Full=Laccase-1;
 DE            EC=1.10.3.2;
 DE   AltName: Full=Benzenediol:oxygen oxidoreductase 1;
@@ -12,16 +12,15 @@ DE   AltName: Full=Urishiol oxidase 1;
 DE   Flags: Precursor;
 GN   Name=LAC1;
 OS   Melanocarpus albomyces.
-OC   Eukaryota; Fungi; Dikarya; Ascomycota; Pezizomycotina;
-OC   Sordariomycetes; Sordariomycetidae; Sordariales; Chaetomiaceae;
-OC   Melanocarpus.
+OC   Eukaryota; Fungi; Dikarya; Ascomycota; Pezizomycotina; Sordariomycetes;
+OC   Sordariomycetidae; Sordariales; Chaetomiaceae; Melanocarpus.
 OX   NCBI_TaxID=204285;
 RN   [1] {ECO:0000312|EMBL:CAE00180.1}
 RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
 RX   PubMed=14711635; DOI=10.1128/AEM.70.1.137-144.2004;
 RA   Kiiskinen L.-L., Saloheimo M.;
-RT   "Molecular cloning and expression in Saccharomyces cerevisiae of a
-RT   laccase gene from the ascomycete Melanocarpus albomyces.";
+RT   "Molecular cloning and expression in Saccharomyces cerevisiae of a laccase
+RT   gene from the ascomycete Melanocarpus albomyces.";
 RL   Appl. Environ. Microbiol. 70:137-144(2004).
 RN   [2] {ECO:0000305}
 RP   PROTEIN SEQUENCE OF 51-78; 214-228 AND 507-517, CATALYTIC ACTIVITY,
@@ -29,25 +28,25 @@ RP   COFACTOR, BIOPHYSICOCHEMICAL PROPERTIES, AND TISSUE SPECIFICITY.
 RC   STRAIN=VTT D-96490 {ECO:0000269|PubMed:12111146};
 RX   PubMed=12111146; DOI=10.1007/s00253-002-1012-x;
 RA   Kiiskinen L.-L., Viikari L., Kruus K.;
-RT   "Purification and characterisation of a novel laccase from the
-RT   ascomycete Melanocarpus albomyces.";
+RT   "Purification and characterisation of a novel laccase from the ascomycete
+RT   Melanocarpus albomyces.";
 RL   Appl. Microbiol. Biotechnol. 59:198-204(2002).
-RN   [3] {ECO:0000305}
+RN   [3]
 RP   PROBABLE FUNCTION.
 RX   PubMed=15474046; DOI=10.1016/j.febslet.2004.08.040;
 RA   Kiiskinen L.-L., Palonen H., Linder M., Viikari L., Kruus K.;
 RT   "Laccase from Melanocarpus albomyces binds effectively to cellulose.";
 RL   FEBS Lett. 576:251-255(2004).
 RN   [4] {ECO:0000305, ECO:0000312|EMBL:CAE00180.1}
-RP   X-RAY CRYSTALLOGRAPHY (2.4 ANGSTROMS) OF 51-609 IN COMPLEX WITH
-RP   COFACTOR AND OXYGEN, BIOPHYSICOCHEMICAL PROPERTIES, SUBUNIT,
-RP   GLYCOSYLATION AT ASN-89; ASN-138; ASN-251; ASN-266; ASN-294; ASN-339;
-RP   ASN-426 AND ASN-446, AND DISULFIDE BONDS.
+RP   X-RAY CRYSTALLOGRAPHY (2.4 ANGSTROMS) OF 51-609 IN COMPLEX WITH COFACTOR
+RP   AND OXYGEN, BIOPHYSICOCHEMICAL PROPERTIES, SUBUNIT, GLYCOSYLATION AT
+RP   ASN-89; ASN-138; ASN-251; ASN-266; ASN-294; ASN-339; ASN-426 AND ASN-446,
+RP   AND DISULFIDE BONDS.
 RX   PubMed=12118243; DOI=10.1038/nsb823;
 RA   Hakulinen N., Kiiskinen L.-L., Kruus K., Saloheimo M., Paananen A.,
 RA   Koivula A., Rouvinen J.;
-RT   "Crystal structure of a laccase from Melanocarpus albomyces with an
-RT   intact trinuclear copper site.";
+RT   "Crystal structure of a laccase from Melanocarpus albomyces with an intact
+RT   trinuclear copper site.";
 RL   Nat. Struct. Biol. 9:601-605(2002).
 CC   -!- FUNCTION: Lignin degradation and detoxification of lignin-derived
 CC       products. {ECO:0000269|PubMed:15474046, ECO:0000305}.
@@ -58,52 +57,33 @@ CC         ChEBI:CHEBI:17594, ChEBI:CHEBI:17977; EC=1.10.3.2;
 CC         Evidence={ECO:0000269|PubMed:12111146};
 CC   -!- COFACTOR:
 CC       Name=Cu cation; Xref=ChEBI:CHEBI:23378;
-CC         Evidence={ECO:0000269|PubMed:12111146,
-CC         ECO:0000269|PubMed:12118243};
+CC         Evidence={ECO:0000269|PubMed:12111146, ECO:0000269|PubMed:12118243};
 CC       Note=Binds 4 Cu cations per monomer. {ECO:0000269|PubMed:12111146,
 CC       ECO:0000269|PubMed:12118243};
 CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
 CC       Absorption:
 CC         Abs(max)=280 nm {ECO:0000269|PubMed:12111146,
 CC         ECO:0000269|PubMed:12118243};
-CC         Note=Exhibits a shoulder at 360 nm, a smaller absorption peak at
-CC         450 nm, and a second, larger peak at 590 nm.
+CC         Note=Exhibits a shoulder at 360 nm, a smaller absorption peak at 450
+CC         nm, and a second, larger peak at 590 nm.
 CC         {ECO:0000269|PubMed:12118243};
 CC       pH dependence:
-CC         Optimum pH is 3.5 with 2,2'-azinobis-(3-ethylbenzthiazoline-6-
-CC         sulphonate) as substrate, 5.0-7.5 with guiacol as substrate, and
-CC         6.0-7.0 with syringaldazine as substrate.
-CC         {ECO:0000269|PubMed:12111146, ECO:0000269|PubMed:12118243};
+CC         Optimum pH is 3.5 with
+CC         2,2'-azinobis-(3-ethylbenzthiazoline-6-sulphonate) as substrate,
+CC         5.0-7.5 with guiacol as substrate, and 6.0-7.0 with syringaldazine as
+CC         substrate. {ECO:0000269|PubMed:12111146,
+CC         ECO:0000269|PubMed:12118243};
 CC       Temperature dependence:
 CC         Optimum temperature is 60-70 degrees Celsius.
 CC         {ECO:0000269|PubMed:12111146, ECO:0000269|PubMed:12118243};
-CC   -!- BIOPHYSICOCHEMICAL PROPERTIES:
-CC       Kinetic parameters:
-CC         KM=5.61 mM for ethanol {ECO:0000269|PubMed:10320337,
-CC         ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276};
-CC         KM=0.105 mM for butane-1-ol {ECO:0000269|PubMed:10320337,
-CC         ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276};
-CC         Vmax=45.5 umol/min/mg enzyme toward potassium ferricyanide (in
-CC         the presence of 30 mM Tris-HCl pH 8.0)
-CC         {ECO:0000269|PubMed:10320337, ECO:0000269|PubMed:16061256,
-CC         ECO:0000269|PubMed:7730276};
-CC       pH dependence:
-CC         Optimum pH is 8.0. {ECO:0000269|PubMed:10320337,
-CC         ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276};
-CC       Redox potential:
-CC         E(0) is +185 mV for heme c at pH 7.0, +188 mV for heme c at pH
-CC         8.0, +172 mV for heme c at pH 8.0 and 0.3 M KCl and +189 mV for
-CC         ADH IIB-Azurin complex. {ECO:0000269|PubMed:10320337,
-CC         ECO:0000269|PubMed:16061256, ECO:0000269|PubMed:7730276};
 CC   -!- SUBUNIT: Monomer. {ECO:0000269|PubMed:12118243}.
 CC   -!- TISSUE SPECIFICITY: Secreted protein; extracellular space.
 CC       {ECO:0000269|PubMed:12111146}.
-CC   -!- SIMILARITY: Belongs to the multicopper oxidase family.
-CC       {ECO:0000255}.
-CC   -----------------------------------------------------------------------
+CC   -!- SIMILARITY: Belongs to the multicopper oxidase family. {ECO:0000255}.
+CC   ---------------------------------------------------------------------------
 CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
 CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
-CC   -----------------------------------------------------------------------
+CC   ---------------------------------------------------------------------------
 DR   EMBL; AJ571698; CAE00180.1; -; Genomic_DNA.
 DR   PDB; 1GW0; X-ray; 2.40 A; A/B=51-609.
 DR   PDB; 2IH8; X-ray; 2.00 A; A/B=51-609.
@@ -123,7 +103,6 @@ DR   PDBsum; 3FU7; -.
 DR   PDBsum; 3FU8; -.
 DR   PDBsum; 3FU9; -.
 DR   PDBsum; 3QPK; -.
-DR   ProteinModelPortal; Q70KY3; -.
 DR   SMR; Q70KY3; -.
 DR   CAZy; AA1; Auxiliary Activities 1.
 DR   iPTMnet; Q70KY3; -.
@@ -149,100 +128,190 @@ DR   PROSITE; PS00079; MULTICOPPER_OXIDASE1; 1.
 DR   PROSITE; PS00080; MULTICOPPER_OXIDASE2; 1.
 PE   1: Evidence at protein level;
 KW   3D-structure; Copper; Direct protein sequencing; Disulfide bond;
-KW   Glycoprotein; Lignin degradation; Metal-binding; Oxidoreductase;
-KW   Signal.
-FT   SIGNAL        1     22       {ECO:0000255}.
-FT   PROPEP       23     50       {ECO:0000255,
-FT                                ECO:0000269|PubMed:12111146}.
-FT                                /FTId=PRO_0000235826.
-FT   CHAIN        51    609       Laccase-1. {ECO:0000269|PubMed:12118243}.
-FT                                /FTId=PRO_0000235827.
-FT   PROPEP      610    623       {ECO:0000269|PubMed:12118243}.
-FT                                /FTId=PRO_0000235828.
-FT   METAL       143    143       Copper 1. {ECO:0000269|PubMed:12118243}.
-FT   METAL       145    145       Copper 2. {ECO:0000269|PubMed:12118243}.
-FT   METAL       188    188       Copper 2. {ECO:0000269|PubMed:12118243}.
-FT   METAL       190    190       Copper 3. {ECO:0000269|PubMed:12118243}.
-FT   METAL       481    481       Copper 4. {ECO:0000269|PubMed:12118243}.
-FT   METAL       484    484       Copper 1. {ECO:0000269|PubMed:12118243}.
-FT   METAL       486    486       Copper 3. {ECO:0000269|PubMed:12118243}.
-FT   METAL       552    552       Copper 3. {ECO:0000269|PubMed:12118243}.
-FT   METAL       553    553       Copper 4. {ECO:0000269|PubMed:12118243}.
-FT   METAL       554    554       Copper 2. {ECO:0000269|PubMed:12118243}.
-FT   METAL       558    558       Copper 4. {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD     89     89       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    138    138       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    251    251       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    266    266       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    294    294       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    339    339       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    426    426       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   CARBOHYD    446    446       N-linked (GlcNAc...) asparagine.
-FT                                {ECO:0000269|PubMed:12118243}.
-FT   DISULFID     54     62       {ECO:0000269|PubMed:12118243}.
-FT   DISULFID    164    590       {ECO:0000269|PubMed:12118243}.
-FT   DISULFID    348    382       {ECO:0000269|PubMed:12118243}.
-FT   STRAND       61     64       {ECO:0000244|PDB:2Q9O}.
-FT   TURN         73     75       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND       83     97       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      103    110       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      113    115       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      119    122       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      126    134       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      142    145       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       153    155       {ECO:0000244|PDB:2Q9O}.
-FT   TURN        159    161       {ECO:0000244|PDB:2Q9O}.
-FT   TURN        168    170       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      171    178       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      183    189       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       194    197       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      200    206       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      214    225       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       230    237       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      245    250       {ECO:0000244|PDB:2Q9O}.
-FT   TURN        257    259       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      266    269       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      274    281       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      288    292       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      297    302       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      305    313       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      315    317       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      322    328       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      333    341       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       344    346       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      351    354       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      357    362       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      390    392       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      398    400       {ECO:0000244|PDB:3FU9}.
-FT   HELIX       405    407       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      408    414       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      416    420       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      422    425       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      434    436       {ECO:0000244|PDB:3DKH}.
-FT   HELIX       438    444       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       451    453       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      455    458       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      464    471       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      481    488       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      490    496       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       511    514       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       515    517       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      525    531       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      535    542       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      547    553       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       556    560       {ECO:0000244|PDB:2Q9O}.
-FT   STRAND      564    569       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       571    574       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       575    577       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       580    596       {ECO:0000244|PDB:2Q9O}.
-FT   HELIX       597    599       {ECO:0000244|PDB:2Q9O}.
+KW   Glycoprotein; Lignin degradation; Metal-binding; Oxidoreductase; Signal.
+FT   SIGNAL          1..22
+FT                   /evidence="ECO:0000255"
+FT   PROPEP          23..50
+FT                   /evidence="ECO:0000255, ECO:0000269|PubMed:12111146"
+FT                   /id="PRO_0000235826"
+FT   CHAIN           51..609
+FT                   /note="Laccase-1"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT                   /id="PRO_0000235827"
+FT   PROPEP          610..623
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT                   /id="PRO_0000235828"
+FT   METAL           143
+FT                   /note="Copper 1"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           145
+FT                   /note="Copper 2"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           188
+FT                   /note="Copper 2"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           190
+FT                   /note="Copper 3"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           481
+FT                   /note="Copper 4"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           484
+FT                   /note="Copper 1"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           486
+FT                   /note="Copper 3"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           552
+FT                   /note="Copper 3"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           553
+FT                   /note="Copper 4"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           554
+FT                   /note="Copper 2"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   METAL           558
+FT                   /note="Copper 4"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        89
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        138
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        251
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        266
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        294
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        339
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        426
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   CARBOHYD        446
+FT                   /note="N-linked (GlcNAc...) asparagine"
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   DISULFID        54..62
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   DISULFID        164..590
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   DISULFID        348..382
+FT                   /evidence="ECO:0000269|PubMed:12118243"
+FT   STRAND          61..64
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   TURN            73..75
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          83..97
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          103..110
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          113..115
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          119..122
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          126..134
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          142..145
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           153..155
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   TURN            159..161
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   TURN            168..170
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          171..178
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          183..189
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           194..197
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          200..206
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          214..225
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           230..237
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          245..250
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   TURN            257..259
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          266..269
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          274..281
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          288..292
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          297..302
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          305..313
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          315..317
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          322..328
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          333..341
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           344..346
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          351..354
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          357..362
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          390..392
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          398..400
+FT                   /evidence="ECO:0000244|PDB:3FU9"
+FT   HELIX           405..407
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          408..414
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          416..420
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          422..425
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          434..436
+FT                   /evidence="ECO:0000244|PDB:3DKH"
+FT   HELIX           438..444
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           451..453
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          455..458
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          464..471
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          481..488
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          490..496
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           511..514
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           515..517
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          525..531
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          535..542
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          547..553
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           556..560
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   STRAND          564..569
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           571..574
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           575..577
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           580..596
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
+FT   HELIX           597..599
+FT                   /evidence="ECO:0000244|PDB:2Q9O"
 SQ   SEQUENCE   623 AA;  68958 MW;  A322F89B438784E1 CRC64;
      MKTFTSALAL VVGMLAPGAV VAAPPSTPAQ RDLVELREAR QEGGKDLRPR EPTCNTPSNR
      ACWSDGFDIN TDYEVSTPDT GVTQSYVFNL TEVDNWMGPD GVVKEKVMLI NGNIMGPNIV
