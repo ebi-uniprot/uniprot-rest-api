@@ -103,7 +103,6 @@ public class MessageConverterConfig {
         return MessageConverterContext.<ProteomeEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.PROTEOME)
                 .contentType(contentType)
-                .clazz(ProteomeEntry.class)
                 .build();
     }
 
@@ -125,7 +124,6 @@ public class MessageConverterConfig {
         return MessageConverterContext.<CanonicalProtein>builder()
                 .resource(MessageConverterContextFactory.Resource.GENECENTRIC)
                 .contentType(contentType)
-                .clazz(CanonicalProtein.class)
                 .build();
     }
 }

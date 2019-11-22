@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.keyword.request.KeywordRequestDTO;
 import org.uniprot.api.keyword.service.KeywordService;
@@ -172,7 +172,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                         })
             })
-    public ResponseEntity<ResponseBodyEmitter> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> download(
             @Valid @ModelAttribute KeywordRequestDTO searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {

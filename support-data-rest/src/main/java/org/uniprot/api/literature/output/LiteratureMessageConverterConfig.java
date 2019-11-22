@@ -38,7 +38,6 @@ public class LiteratureMessageConverterConfig {
         return MessageConverterContext.<LiteratureEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.LITERATURE)
                 .contentType(contentType)
-                .clazz(LiteratureEntry.class)
                 .build();
     }
 }

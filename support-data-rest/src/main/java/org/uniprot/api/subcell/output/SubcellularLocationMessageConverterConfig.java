@@ -39,7 +39,6 @@ public class SubcellularLocationMessageConverterConfig {
         return MessageConverterContext.<SubcellularLocationEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.SUBCELLULAR_LOCATION)
                 .contentType(contentType)
-                .clazz(SubcellularLocationEntry.class)
                 .build();
     }
 }

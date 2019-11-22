@@ -12,11 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByECService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByGoService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByPathwayService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByTaxonomyService;
+import org.uniprot.api.uniprotkb.view.service.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

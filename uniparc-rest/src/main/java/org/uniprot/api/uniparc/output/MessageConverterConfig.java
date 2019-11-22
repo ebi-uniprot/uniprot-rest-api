@@ -3,10 +3,7 @@ package org.uniprot.api.uniparc.output;
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
@@ -26,11 +23,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.uniparc.output.converter.UniParcFastaMessageConverter;
-import org.uniprot.api.uniparc.output.converter.UniParcJsonMessageConverter;
-import org.uniprot.api.uniparc.output.converter.UniParcTsvMessageConverter;
-import org.uniprot.api.uniparc.output.converter.UniParcXmlMessageConverter;
-import org.uniprot.api.uniparc.output.converter.UniParcXslMessageConverter;
+import org.uniprot.api.uniparc.output.converter.*;
 import org.uniprot.core.uniparc.UniParcEntry;
 
 /**
@@ -101,7 +94,6 @@ public class MessageConverterConfig {
         return MessageConverterContext.<UniParcEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPARC)
                 .contentType(contentType)
-                .clazz(UniParcEntry.class)
                 .build();
     }
 }

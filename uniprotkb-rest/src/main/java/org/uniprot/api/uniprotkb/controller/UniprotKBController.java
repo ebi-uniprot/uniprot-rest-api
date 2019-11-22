@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.FileType;
@@ -242,7 +242,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<ResponseBodyEmitter> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtEntry>>> download(
             @Valid @ModelAttribute UniProtKBRequest searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
@@ -260,7 +260,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             context.setEntities(entryService.stream(searchRequest));
         }
 
-        return super.getResponseBodyEmitterResponseEntity(request, context);
+        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override
