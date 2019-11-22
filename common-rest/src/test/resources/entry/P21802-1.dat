@@ -2,10 +2,10 @@ ID   FGFR2-1_HUMAN           Reviewed;         821 AA.
 AC   P21802-1;
 DT   01-MAY-1991, integrated into UniProtKB/Swiss-Prot.
 DT   01-MAY-1991, sequence version 1.
-DT   05-DEC-2018, entry version 241.
+DT   11-DEC-2019, entry version 251.
 DE   RecName: Full=Isoform 1 of Fibroblast growth factor receptor 2;
 DE            Short=FGFR-2;
-DE            EC=2.7.10.1 {ECO:0000269|PubMed:16844695, ECO:0000269|PubMed:18056630, ECO:0000269|PubMed:19410646, ECO:0000269|PubMed:21454610};
+DE            EC=2.7.10.1 {ECO:0000269|PubMed:16844695, ECO:0000269|PubMed:18056630, ECO:0000269|PubMed:19410646};
 DE   AltName: Full=K-sam;
 DE            Short=KGFR;
 DE   AltName: Full=Keratinocyte growth factor receptor;
@@ -13,20 +13,29 @@ DE   AltName: CD_antigen=CD332;
 DE   Flags: Precursor;
 GN   Name=FGFR2; Synonyms=BEK, KGFR, KSAM;
 OS   Homo sapiens (Human).
-OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
-OC   Mammalia; Eutheria; Euarchontoglires; Primates; Haplorrhini;
-OC   Catarrhini; Hominidae; Homo.
+OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi; Mammalia;
+OC   Eutheria; Euarchontoglires; Primates; Haplorrhini; Catarrhini; Hominidae;
+OC   Homo.
 OX   NCBI_TaxID=9606;
 RN   [1]
 RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1).
 RC   TISSUE=Neonatal brain stem;
 RX   PubMed=1697263;
-RA   Dionne C.A., Crumley G.R., Bellot F., Kaplow J.M., Searfoss G.,
-RA   Ruta M., Burgess W.H., Jaye M., Schlessinger J.;
+RA   Dionne C.A., Crumley G.R., Bellot F., Kaplow J.M., Searfoss G., Ruta M.,
+RA   Burgess W.H., Jaye M., Schlessinger J.;
 RT   "Cloning and expression of two distinct high-affinity receptors cross-
 RT   reacting with acidic and basic fibroblast growth factors.";
 RL   EMBO J. 9:2685-2692(1990).
 RN   [2]
+RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 4).
+RC   TISSUE=Stomach cancer;
+RX   PubMed=2377625; DOI=10.1073/pnas.87.15.5983;
+RA   Hattori Y., Odagiri H., Nakatani H., Miyagawa K., Naito K., Sakamoto H.,
+RA   Katoh O., Yoshida T., Sugimura T., Terada M.;
+RT   "K-sam, an amplified gene in stomach cancer, is a member of the heparin-
+RT   binding growth factor receptor genes.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 87:5983-5987(1990).
+RN   [3]
 RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 16).
 RX   PubMed=2172978; DOI=10.1073/pnas.87.20.8180;
 RA   Houssaint E., Blanquet P.R., Champion-Arnaud P., Gesnel M.-C.,
@@ -34,491 +43,59 @@ RA   Torriglia A., Courtois Y., Breathnach R.;
 RT   "Related fibroblast growth factor receptor genes exist in the human
 RT   genome.";
 RL   Proc. Natl. Acad. Sci. U.S.A. 87:8180-8184(1990).
-RN   [3]
+RN   [4]
 RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 17).
 RX   PubMed=1647213; DOI=10.1016/0167-4781(91)90015-E;
 RA   Seno M., Sasada R., Watanabe T., Ishimaru K., Igarashi K.;
 RT   "Two cDNAs encoding novel human FGF receptor.";
 RL   Biochim. Biophys. Acta 1089:244-246(1991).
-RN   [4]
-RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 4).
-RC   TISSUE=Stomach cancer;
-RX   PubMed=2377625; DOI=10.1073/pnas.87.15.5983;
-RA   Hattori Y., Odagiri H., Nakatani H., Miyagawa K., Naito K.,
-RA   Sakamoto H., Katoh O., Yoshida T., Sugimura T., Terada M.;
-RT   "K-sam, an amplified gene in stomach cancer, is a member of the
-RT   heparin-binding growth factor receptor genes.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 87:5983-5987(1990).
 RN   [5]
-RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORMS 5; 14 AND 15).
-RX   PubMed=1313574; DOI=10.1073/pnas.89.7.2960;
-RA   Katoh M., Hattori Y., Sasaki H., Tanaka M., Sugano K., Yazaki Y.,
-RA   Sugimura T., Terada M.;
-RT   "K-sam gene encodes secreted as well as transmembrane receptor
-RT   tyrosine kinase.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 89:2960-2964(1992).
-RN   [6]
 RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 3), DOMAIN, AND SUBUNIT.
 RC   TISSUE=Placenta;
 RX   PubMed=1400433;
 RA   Dell K.R., Williams L.T.;
-RT   "A novel form of fibroblast growth factor receptor 2. Alternative
-RT   splicing of the third immunoglobulin-like domain confers ligand
-RT   binding specificity.";
+RT   "A novel form of fibroblast growth factor receptor 2. Alternative splicing
+RT   of the third immunoglobulin-like domain confers ligand binding
+RT   specificity.";
 RL   J. Biol. Chem. 267:21225-21229(1992).
-RN   [7]
+RN   [6]
 RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORMS 3 AND 19), SUBUNIT, DOMAIN, AND
 RP   VARIANT ARG-613.
 RC   TISSUE=Mammary gland;
 RX   PubMed=1309608; DOI=10.1073/pnas.89.1.246;
 RA   Miki T., Bottaro D.P., Fleming T.P., Smith C.L., Burgess W.H.,
 RA   Chan A.M.-L., Aaronson S.A.;
-RT   "Determination of ligand-binding specificity by alternative splicing:
-RT   two distinct growth factor receptors encoded by a single gene.";
+RT   "Determination of ligand-binding specificity by alternative splicing: two
+RT   distinct growth factor receptors encoded by a single gene.";
 RL   Proc. Natl. Acad. Sci. U.S.A. 89:246-250(1992).
+RN   [7]
+RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORMS 5; 14 AND 15).
+RX   PubMed=1313574; DOI=10.1073/pnas.89.7.2960;
+RA   Katoh M., Hattori Y., Sasaki H., Tanaka M., Sugano K., Yazaki Y.,
+RA   Sugimura T., Terada M.;
+RT   "K-sam gene encodes secreted as well as transmembrane receptor tyrosine
+RT   kinase.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 89:2960-2964(1992).
 RN   [8]
 RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 19).
 RC   TISSUE=Cornea, and Mammary gland;
 RX   PubMed=7866434;
-RA   Wilson S.E., Weng J., Chwang E.L., Gollahon L., Leitch A.M.,
-RA   Shay J.W.;
+RA   Wilson S.E., Weng J., Chwang E.L., Gollahon L., Leitch A.M., Shay J.W.;
 RT   "Hepatocyte growth factor (HGF), keratinocyte growth factor (KGF), and
-RT   their receptors in human breast cells and tissues: alternative
-RT   receptors.";
+RT   their receptors in human breast cells and tissues: alternative receptors.";
 RL   Cell. Mol. Biol. Res. 40:337-350(1994).
 RN   [9]
 RP   ERRATUM.
-RA   Wilson S.E., Weng J., Chwang E.L., Gollahon L., Leitch A.M.,
-RA   Shay J.W.;
+RA   Wilson S.E., Weng J., Chwang E.L., Gollahon L., Leitch A.M., Shay J.W.;
 RL   Cell. Mol. Biol. Res. 40:707-707(1994).
 RN   [10]
-RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1), AND VARIANT CS SER-342.
-RC   TISSUE=Blood;
-RA   Steinberger D., Mueller U.;
-RL   Submitted (APR-1996) to the EMBL/GenBank/DDBJ databases.
-RN   [11]
-RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORMS 7; 9; 10; 11; 12 AND 13), AND
-RP   VARIANT ARG-613.
-RX   PubMed=10626794;
-RA   Ueda T., Sasaki H., Kuwahara Y., Nezu M., Shibuya T., Sakamoto H.,
-RA   Ishii H., Yanagihara K., Mafune K., Makuuchi M., Terada M.;
-RT   "Deletion of the carboxyl-terminal exons of K-sam/FGFR2 by short
-RT   homology-mediated recombination, generating preferential expression of
-RT   specific messenger RNAs.";
-RL   Cancer Res. 59:6080-6086(1999).
-RN   [12]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] (ISOFORMS 5; 6; 8; 14 AND 18).
-RX   PubMed=11856867;
-RA   Ingersoll R.G., Paznekas W.A., Tran A.K., Scott A.F., Jiang G.,
-RA   Jabs E.W.;
-RT   "Fibroblast growth factor receptor 2 (FGFR2): genomic sequence and
-RT   variations.";
-RL   Cytogenet. Cell Genet. 94:121-126(2001).
-RN   [13]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] (ISOFORM 3).
-RA   Lind D.L., Cox D.R.;
-RT   "Sequence and polymorphisms in fibroblast growth factor receptor 2
-RT   (FGFR2) gene in humans.";
-RL   Submitted (FEB-2002) to the EMBL/GenBank/DDBJ databases.
-RN   [14]
-RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 23).
-RA   Jang J.;
-RT   "Identification of a novel variant of FGFR2.";
-RL   Submitted (APR-2002) to the EMBL/GenBank/DDBJ databases.
-RN   [15]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA], AND VARIANTS PRO-6 AND THR-186.
-RG   NIEHS SNPs program;
-RL   Submitted (APR-2006) to the EMBL/GenBank/DDBJ databases.
-RN   [16]
-RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORM 21).
-RC   TISSUE=Cerebellum;
-RX   PubMed=14702039; DOI=10.1038/ng1285;
-RA   Ota T., Suzuki Y., Nishikawa T., Otsuki T., Sugiyama T., Irie R.,
-RA   Wakamatsu A., Hayashi K., Sato H., Nagai K., Kimura K., Makita H.,
-RA   Sekine M., Obayashi M., Nishi T., Shibahara T., Tanaka T., Ishii S.,
-RA   Yamamoto J., Saito K., Kawai Y., Isono Y., Nakamura Y., Nagahari K.,
-RA   Murakami K., Yasuda T., Iwayanagi T., Wagatsuma M., Shiratori A.,
-RA   Sudo H., Hosoiri T., Kaku Y., Kodaira H., Kondo H., Sugawara M.,
-RA   Takahashi M., Kanda K., Yokoi T., Furuya T., Kikkawa E., Omura Y.,
-RA   Abe K., Kamihara K., Katsuta N., Sato K., Tanikawa M., Yamazaki M.,
-RA   Ninomiya K., Ishibashi T., Yamashita H., Murakawa K., Fujimori K.,
-RA   Tanai H., Kimata M., Watanabe M., Hiraoka S., Chiba Y., Ishida S.,
-RA   Ono Y., Takiguchi S., Watanabe S., Yosida M., Hotuta T., Kusano J.,
-RA   Kanehori K., Takahashi-Fujii A., Hara H., Tanase T.-O., Nomura Y.,
-RA   Togiya S., Komai F., Hara R., Takeuchi K., Arita M., Imose N.,
-RA   Musashino K., Yuuki H., Oshima A., Sasaki N., Aotsuka S.,
-RA   Yoshikawa Y., Matsunawa H., Ichihara T., Shiohata N., Sano S.,
-RA   Moriya S., Momiyama H., Satoh N., Takami S., Terashima Y., Suzuki O.,
-RA   Nakagawa S., Senoh A., Mizoguchi H., Goto Y., Shimizu F., Wakebe H.,
-RA   Hishigaki H., Watanabe T., Sugiyama A., Takemoto M., Kawakami B.,
-RA   Yamazaki M., Watanabe K., Kumagai A., Itakura S., Fukuzumi Y.,
-RA   Fujimori Y., Komiyama M., Tashiro H., Tanigami A., Fujiwara T.,
-RA   Ono T., Yamada K., Fujii Y., Ozaki K., Hirao M., Ohmori Y.,
-RA   Kawabata A., Hikiji T., Kobatake N., Inagaki H., Ikema Y., Okamoto S.,
-RA   Okitani R., Kawakami T., Noguchi S., Itoh T., Shigeta K., Senba T.,
-RA   Matsumura K., Nakajima Y., Mizuno T., Morinaga M., Sasaki M.,
-RA   Togashi T., Oyama M., Hata H., Watanabe M., Komatsu T.,
-RA   Mizushima-Sugano J., Satoh T., Shirai Y., Takahashi Y., Nakagawa K.,
-RA   Okumura K., Nagase T., Nomura N., Kikuchi H., Masuho Y., Yamashita R.,
-RA   Nakai K., Yada T., Nakamura Y., Ohara O., Isogai T., Sugano S.;
-RT   "Complete sequencing and characterization of 21,243 full-length human
-RT   cDNAs.";
-RL   Nat. Genet. 36:40-45(2004).
-RN   [17]
-RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
-RX   PubMed=15164054; DOI=10.1038/nature02462;
-RA   Deloukas P., Earthrowl M.E., Grafham D.V., Rubenfield M., French L.,
-RA   Steward C.A., Sims S.K., Jones M.C., Searle S., Scott C., Howe K.,
-RA   Hunt S.E., Andrews T.D., Gilbert J.G.R., Swarbreck D., Ashurst J.L.,
-RA   Taylor A., Battles J., Bird C.P., Ainscough R., Almeida J.P.,
-RA   Ashwell R.I.S., Ambrose K.D., Babbage A.K., Bagguley C.L., Bailey J.,
-RA   Banerjee R., Bates K., Beasley H., Bray-Allen S., Brown A.J.,
-RA   Brown J.Y., Burford D.C., Burrill W., Burton J., Cahill P., Camire D.,
-RA   Carter N.P., Chapman J.C., Clark S.Y., Clarke G., Clee C.M., Clegg S.,
-RA   Corby N., Coulson A., Dhami P., Dutta I., Dunn M., Faulkner L.,
-RA   Frankish A., Frankland J.A., Garner P., Garnett J., Gribble S.,
-RA   Griffiths C., Grocock R., Gustafson E., Hammond S., Harley J.L.,
-RA   Hart E., Heath P.D., Ho T.P., Hopkins B., Horne J., Howden P.J.,
-RA   Huckle E., Hynds C., Johnson C., Johnson D., Kana A., Kay M.,
-RA   Kimberley A.M., Kershaw J.K., Kokkinaki M., Laird G.K., Lawlor S.,
-RA   Lee H.M., Leongamornlert D.A., Laird G., Lloyd C., Lloyd D.M.,
-RA   Loveland J., Lovell J., McLaren S., McLay K.E., McMurray A.,
-RA   Mashreghi-Mohammadi M., Matthews L., Milne S., Nickerson T.,
-RA   Nguyen M., Overton-Larty E., Palmer S.A., Pearce A.V., Peck A.I.,
-RA   Pelan S., Phillimore B., Porter K., Rice C.M., Rogosin A., Ross M.T.,
-RA   Sarafidou T., Sehra H.K., Shownkeen R., Skuce C.D., Smith M.,
-RA   Standring L., Sycamore N., Tester J., Thorpe A., Torcasso W.,
-RA   Tracey A., Tromans A., Tsolas J., Wall M., Walsh J., Wang H.,
-RA   Weinstock K., West A.P., Willey D.L., Whitehead S.L., Wilming L.,
-RA   Wray P.W., Young L., Chen Y., Lovering R.C., Moschonas N.K.,
-RA   Siebert R., Fechtel K., Bentley D., Durbin R.M., Hubbard T.,
-RA   Doucette-Stamm L., Beck S., Smith D.R., Rogers J.;
-RT   "The DNA sequence and comparative analysis of human chromosome 10.";
-RL   Nature 429:375-381(2004).
-RN   [18]
-RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORM 20).
-RC   TISSUE=Brain;
-RX   PubMed=15489334; DOI=10.1101/gr.2596504;
-RG   The MGC Project Team;
-RT   "The status, quality, and expansion of the NIH full-length cDNA
-RT   project: the Mammalian Gene Collection (MGC).";
-RL   Genome Res. 14:2121-2127(2004).
-RN   [19]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 314-427.
-RX   PubMed=10712195; DOI=10.1086/302831;
-RA   Glaser R.L., Jiang W., Boyadjiev S.A., Tran A.K., Zachary A.A.,
-RA   Van Maldergem L., Johnson D., Walsh S., Oldridge M., Wall S.A.,
-RA   Wilkie A.O.M., Jabs E.W.;
-RT   "Paternal origin of FGFR2 mutations in sporadic cases of Crouzon
-RT   syndrome and Pfeiffer syndrome.";
-RL   Am. J. Hum. Genet. 66:768-777(2000).
-RN   [20]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-209; 212-767 AND 771-821
-RP   (ISOFORMS 5; 14 AND 18).
-RX   PubMed=10196476; DOI=10.1016/S0378-1119(99)00047-5;
-RA   Zhang Y., Gorry M.C., Post J.C., Ehrlich G.D.;
-RT   "Genomic organization of the human fibroblast growth factor receptor 2
-RT   (FGFR2) gene and comparative analysis of the human FGFR gene family.";
-RL   Gene 230:69-79(1999).
-RN   [21]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 249-313, AND VARIANTS APRS
-RP   TRP-252 AND ARG-253.
-RX   PubMed=7668257;
-RA   Park W.-J., Theda C., Maestri N.E., Meyers G.A., Fryburg J.S.,
-RA   Dufresne C., Cohen M.M. Jr., Jabs E.W.;
-RT   "Analysis of phenotypic features and FGFR2 mutations in Apert
-RT   syndrome.";
-RL   Am. J. Hum. Genet. 57:321-328(1995).
-RN   [22]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 251-259.
-RX   PubMed=8676562;
-RA   Wada C., Ishigaki M., Toyo-oka Y., Yamabe H., Ohnuki Y., Takada F.,
-RA   Yamazaki Y., Ohtani H.;
-RT   "Nucleotide sequences at intron 6 and exon 7 junction of fibroblast
-RT   growth factor receptor 2 and rapid mutational analysis in Apert
-RT   syndrome.";
-RL   Rinsho Byori 44:435-438(1996).
-RN   [23]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 251-318.
-RX   PubMed=8673103; DOI=10.1038/ng0596-48;
-RA   Moloney D.M., Slaney S.F., Oldridge M., Wall S.A., Sahlin P.,
-RA   Stenman G., Wilkie A.O.M.;
-RT   "Exclusive paternal origin of new mutations in Apert syndrome.";
-RL   Nat. Genet. 13:48-53(1996).
-RN   [24]
-RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 263-361, AND VARIANTS CS PRO-289;
-RP   ARG-338; SER-342; TYR-342; GLY-344 AND CYS-354.
-RX   PubMed=7581378; DOI=10.1093/hmg/4.8.1387;
-RA   Gorry M.C., Preston R.A., White G.J., Zhang Y., Singhal V.K.,
-RA   Losken H.W., Parker M.G., Nwokoro N.A., Post J.C., Ehrlich G.D.;
-RT   "Crouzon syndrome: mutations in two spliceoforms of FGFR2 and a common
-RT   point mutation shared with Jackson-Weiss syndrome.";
-RL   Hum. Mol. Genet. 4:1387-1390(1995).
-RN   [25]
-RP   FUNCTION (ISOFORM 3), SUBUNIT, AND DOMAIN.
-RX   PubMed=8961926; DOI=10.1021/bi961942c;
-RA   Gray T.E., Eisenstein M., Yayon A., Givol D.;
-RT   "Asparagine-344 is a key residue for ligand binding in keratinocyte
-RT   growth factor receptor.";
-RL   Biochemistry 35:15640-15645(1996).
-RN   [26]
-RP   INTERACTION WITH FGF1; FGF2; FGF3; FGF4; FGF6; FGF7 AND FGF9, AND
-RP   FUNCTION IN CELL PROLIFERATION.
-RX   PubMed=8663044; DOI=10.1074/jbc.271.25.15292;
-RA   Ornitz D.M., Xu J., Colvin J.S., McEwen D.G., MacArthur C.A.,
-RA   Coulier F., Gao G., Goldfarb M.;
-RT   "Receptor specificity of the fibroblast growth factor family.";
-RL   J. Biol. Chem. 271:15292-15297(1996).
-RN   [27]
-RP   INVOLVEMENT IN SCS, AND VARIANT SCS 269-VAL-VAL-270 DEL.
-RX   PubMed=9585583; DOI=10.1086/301855;
-RA   Paznekas W.A., Cunningham M.L., Howard T.D., Korf B.R., Lipson M.H.,
-RA   Grix A.W., Feingold M., Goldberg R., Borochowitz Z., Aleck K.,
-RA   Mulliken J., Yin M., Jabs E.W.;
-RT   "Genetic heterogeneity of Saethre-Chotzen syndrome, due to TWIST and
-RT   FGFR mutations.";
-RL   Am. J. Hum. Genet. 62:1370-1380(1998).
-RN   [28]
-RP   FUNCTION IN PHOSPHORYLATION OF PAK4; REGULATION OF CELL PROLIFERATION
-RP   AND APOPTOSIS, AND INTERACTION WITH GRB2 AND PAK4.
-RX   PubMed=12529371; DOI=10.1074/jbc.M205875200;
-RA   Lu Y., Pan Z.-Z., Devaux Y., Ray P.;
-RT   "p21-activated protein kinase 4 (PAK4) interacts with the keratinocyte
-RT   growth factor receptor and participates in keratinocyte growth factor-
-RT   mediated inhibition of oxidant-induced cell death.";
-RL   J. Biol. Chem. 278:10374-10380(2003).
-RN   [29]
-RP   FUNCTION IN OSTEOBLAST DIFFERENTIATION AND IN PHOSPHORYLATION OF CBL,
-RP   INTERACTION WITH CBL, UBIQUITINATION, AND CHARACTERIZATION OF VARIANT
-RP   APRS TRP-252.
-RX   PubMed=15190072; DOI=10.1074/jbc.M402469200;
-RA   Kaabeche K., Lemonnier J., Le Mee S., Caverzasio J., Marie P.J.;
-RT   "Cbl-mediated degradation of Lyn and Fyn induced by constitutive
-RT   fibroblast growth factor receptor-2 activation supports osteoblast
-RT   differentiation.";
-RL   J. Biol. Chem. 279:36259-36267(2004).
-RN   [30]
-RP   FUNCTION IN CELL PROLIFERATION AND ACTIVATION OF SIGNALING PATHWAYS,
-RP   MUTAGENESIS OF TYR-769, PHOSPHORYLATION AT TYR-769, AND INTERACTION
-RP   WITH PLCG1.
-RX   PubMed=15629145; DOI=10.1016/j.bbrc.2004.12.031;
-RA   Ceridono M., Belleudi F., Ceccarelli S., Torrisi M.R.;
-RT   "Tyrosine 769 of the keratinocyte growth factor receptor is required
-RT   for receptor signaling but not endocytosis.";
-RL   Biochem. Biophys. Res. Commun. 327:523-532(2005).
-RN   [31]
-RP   INTERACTION WITH FGF1; FGF7; FGF8; FGF9; FGF10; FGF19; FGF21; FGF22
-RP   AND FGF23, AND FUNCTION IN STIMULATION OF CELL PROLIFERATION.
-RX   PubMed=16597617; DOI=10.1074/jbc.M601252200;
-RA   Zhang X., Ibrahimi O.A., Olsen S.K., Umemori H., Mohammadi M.,
-RA   Ornitz D.M.;
-RT   "Receptor specificity of the fibroblast growth factor family. The
-RT   complete mammalian FGF family.";
-RL   J. Biol. Chem. 281:15694-15700(2006).
-RN   [32]
-RP   FUNCTION IN PHOSPHORYLATION OF PLCG1 (ISOFORM 1), CATALYTIC ACTIVITY,
-RP   AUTOPHOSPHORYLATION, GLYCOSYLATION, INTERACTION WITH PLCG1,
-RP   SUBCELLULAR LOCATION, MUTAGENESIS OF ASN-265 AND 656-TYR-TYR-657,
-RP   UBIQUITINATION, AND CHARACTERIZATION OF VARIANT PS PHE-278.
-RX   PubMed=16844695; DOI=10.1074/jbc.M600448200;
-RA   Hatch N.E., Hudson M., Seto M.L., Cunningham M.L., Bothwell M.;
-RT   "Intracellular retention, degradation, and signaling of glycosylation-
-RT   deficient FGFR2 and craniosynostosis syndrome-associated FGFR2C278F.";
-RL   J. Biol. Chem. 281:27292-27305(2006).
-RN   [33]
-RP   INTERACTION WITH FGF19; FGF21 AND KLB, AND FUNCTION IN PHOSPHORYLATION
-RP   OF FRS2 AND ACTIVATION OF MAP KINASES.
-RX   PubMed=17623664; DOI=10.1074/jbc.M704165200;
-RA   Kurosu H., Choi M., Ogawa Y., Dickson A.S., Goetz R.,
-RA   Eliseenkova A.V., Mohammadi M., Rosenblatt K.P., Kliewer S.A.,
-RA   Kuro-o M.;
-RT   "Tissue-specific expression of betaKlotho and fibroblast growth factor
-RT   (FGF) receptor isoforms determines metabolic activity of FGF19 and
-RT   FGF21.";
-RL   J. Biol. Chem. 282:26687-26695(2007).
-RN   [34]
-RP   FUNCTION IN STAT1 PHOSPHORYLATION, GLYCOSYLATION, SUBCELLULAR
-RP   LOCATION, AND PHOSPHORYLATION.
-RX   PubMed=17311277; DOI=10.1002/jcp.21014;
-RA   Citores L., Bai L., Sorensen V., Olsnes S.;
-RT   "Fibroblast growth factor receptor-induced phosphorylation of STAT1 at
-RT   the Golgi apparatus without translocation to the nucleus.";
-RL   J. Cell. Physiol. 212:148-156(2007).
-RN   [35]
-RP   FUNCTION, AND SUBCELLULAR LOCATION.
-RX   PubMed=18374639; DOI=10.1016/j.bone.2008.02.009;
-RA   Dufour C., Guenou H., Kaabeche K., Bouvard D., Sanjay A., Marie P.J.;
-RT   "FGFR2-Cbl interaction in lipid rafts triggers attenuation of PI3K/Akt
-RT   signaling and osteoblast survival.";
-RL   Bone 42:1032-1039(2008).
-RN   [36]
-RP   FUNCTION AS FGF7 RECEPTOR AND IN PHOSPHORYLATION OF PLCG1 AND FRS2,
-RP   CATALYTIC ACTIVITY, PHOSPHORYLATION AT TYR-466; TYR-586; TYR-588;
-RP   TYR-656 AND TYR-657, AND IDENTIFICATION BY MASS SPECTROMETRY.
-RX   PubMed=19410646; DOI=10.1016/j.cellsig.2009.04.004;
-RA   Luo Y., Yang C., Jin C., Xie R., Wang F., McKeehan W.L.;
-RT   "Novel phosphotyrosine targets of FGFR2IIIb signaling.";
-RL   Cell. Signal. 21:1370-1378(2009).
-RN   [37]
-RP   FUNCTION IN FIBROBLAST PROLIFERATION; ACTIVATION OF MAP KINASES AND
-RP   PHOSPHORYLATION OF PLCG1 AND FRS2, INTERACTION WITH PLCG1 AND FRS2,
-RP   SUBCELLULAR LOCATION, AND MUTAGENESIS OF TYR-769.
-RX   PubMed=19103595; DOI=10.1074/jbc.M803998200;
-RA   Cha J.Y., Maddileti S., Mitin N., Harden T.K., Der C.J.;
-RT   "Aberrant receptor internalization and enhanced FRS2-dependent
-RT   signaling contribute to the transforming activity of the fibroblast
-RT   growth factor receptor 2 IIIb C3 isoform.";
-RL   J. Biol. Chem. 284:6227-6240(2009).
-RN   [38]
-RP   IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS].
-RX   PubMed=19369195; DOI=10.1074/mcp.M800588-MCP200;
-RA   Oppermann F.S., Gnad F., Olsen J.V., Hornberger R., Greff Z., Keri G.,
-RA   Mann M., Daub H.;
-RT   "Large-scale proteomics analysis of the human kinome.";
-RL   Mol. Cell. Proteomics 8:1751-1764(2009).
-RN   [39]
-RP   FUNCTION, AND UBIQUITINATION.
-RX   PubMed=21596750; DOI=10.1074/jbc.M110.197525;
-RA   Severe N., Miraoui H., Marie P.J.;
-RT   "The Casitas B lineage lymphoma (Cbl) mutant G306E enhances osteogenic
-RT   differentiation in human mesenchymal stromal cells in part by
-RT   decreased Cbl-mediated platelet-derived growth factor receptor alpha
-RT   and fibroblast growth factor receptor 2 ubiquitination.";
-RL   J. Biol. Chem. 286:24443-24450(2011).
-RN   [40]
-RP   REVIEW ON LIGAND SPECIFICITY, ALTERNATIVE SPLICING, AND SIGNALING.
-RX   PubMed=15863030; DOI=10.1016/j.cytogfr.2005.01.001;
-RA   Eswarakumar V.P., Lax I., Schlessinger J.;
-RT   "Cellular signaling by fibroblast growth factor receptors.";
-RL   Cytokine Growth Factor Rev. 16:139-149(2005).
-RN   [41]
-RP   REVIEW ON LIGAND SPECIFICITY, ALTERNATIVE SPLICING, SIGNALING, AND
-RP   ROLE IN DISEASE.
-RX   PubMed=19387476; DOI=10.1038/jid.2009.97;
-RA   Katoh M.;
-RT   "FGFR2 abnormalities underlie a spectrum of bone, skin, and cancer
-RT   pathologies.";
-RL   J. Invest. Dermatol. 129:1861-1867(2009).
-RN   [42]
-RP   REVIEW ON FUNCTION IN FGF SIGNALING.
-RX   PubMed=20094046; DOI=10.1038/nrc2780;
-RA   Turner N., Grose R.;
-RT   "Fibroblast growth factor signalling: from development to cancer.";
-RL   Nat. Rev. Cancer 10:116-129(2010).
-RN   [43]
-RP   PHOSPHORYLATION [LARGE SCALE ANALYSIS] AT SER-780, AND IDENTIFICATION
-RP   BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS].
-RC   TISSUE=Liver;
-RX   PubMed=24275569; DOI=10.1016/j.jprot.2013.11.014;
-RA   Bian Y., Song C., Cheng K., Dong M., Wang F., Huang J., Sun D.,
-RA   Wang L., Ye M., Zou H.;
-RT   "An enzyme assisted RP-RPLC approach for in-depth analysis of human
-RT   liver phosphoproteome.";
-RL   J. Proteomics 96:253-262(2014).
-RN   [44]
-RP   X-RAY CRYSTALLOGRAPHY (2.8 ANGSTROMS) OF 147-366 IN COMPLEX WITH FGF2.
-RX   PubMed=10830168; DOI=10.1016/S0092-8674(00)80851-X;
-RA   Plotnikov A.N., Hubbard S.R., Schlessinger J., Mohammadi M.;
-RT   "Crystal structures of two FGF-FGFR complexes reveal the determinants
-RT   of ligand-receptor specificity.";
-RL   Cell 101:413-424(2000).
-RN   [45]
-RP   X-RAY CRYSTALLOGRAPHY (2.4 ANGSTROMS) OF 148-366 IN COMPLEX WITH FGF1
-RP   AND HEPARIN, AND INTERACTION WITH FGF1 AND HEPARIN.
-RX   PubMed=11069186; DOI=10.1038/35039551;
-RA   Pellegrini L., Burke D.F., von Delft F., Mulloy B., Blundell T.L.;
-RT   "Crystal structure of fibroblast growth factor receptor ectodomain
-RT   bound to ligand and heparin.";
-RL   Nature 407:1029-1034(2000).
-RN   [46]
-RP   X-RAY CRYSTALLOGRAPHY (2.4 ANGSTROMS) OF 147-362 IN COMPLEX WITH FGF1.
-RX   PubMed=10618369; DOI=10.1073/pnas.97.1.49;
-RA   Stauber D.J., DiGabriele A.D., Hendrickson W.A.;
-RT   "Structural interactions of fibroblast growth factor receptor with its
-RT   ligands.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 97:49-54(2000).
-RN   [47]
-RP   X-RAY CRYSTALLOGRAPHY (2.7 ANGSTROMS) OF 147-366 OF VARIANTS APRS
-RP   TRP-252 AND ARG-253 IN COMPLEX WITH FGF2.
-RX   PubMed=11390973; DOI=10.1073/pnas.121183798;
-RA   Ibrahimi O.A., Eliseenkova A.V., Plotnikov A.N., Yu K., Ornitz D.M.,
-RA   Mohammadi M.;
-RT   "Structural basis for fibroblast growth factor receptor 2 activation
-RT   in Apert syndrome.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 98:7182-7187(2001).
-RN   [48]
-RP   X-RAY CRYSTALLOGRAPHY (2.9 ANGSTROMS) OF 140-371 IN COMPLEX WITH
-RP   FGF10.
-RX   PubMed=12591959; DOI=10.1073/pnas.0436500100;
-RA   Yeh B.K., Igarashi M., Eliseenkova A.V., Plotnikov A.N., Sher I.,
-RA   Ron D., Aaronson S.A., Mohammadi M.;
-RT   "Structural basis by which alternative splicing confers specificity in
-RT   fibroblast growth factor receptors.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 100:2266-2271(2003).
-RN   [49]
-RP   X-RAY CRYSTALLOGRAPHY (2.28 ANGSTROMS) OF 149-368 IN COMPLEX WITH
-RP   FGF8, FUNCTION AS FGF8 RECEPTOR, INTERACTION WITH FGF8, AND DISULFIDE
-RP   BONDS.
-RX   PubMed=16384934; DOI=10.1101/gad.1365406;
-RA   Olsen S.K., Li J.Y.H., Bromleigh C., Eliseenkova A.V., Ibrahimi O.A.,
-RA   Lao Z., Zhang F., Linhardt R.J., Joyner A.L., Mohammadi M.;
-RT   "Structural basis by which alternative splicing modulates the
-RT   organizer activity of FGF8 in the brain.";
-RL   Genes Dev. 20:185-198(2006).
-RN   [50]
-RP   X-RAY CRYSTALLOGRAPHY (1.80 ANGSTROMS) OF 458-778 IN COMPLEX WITH ATP
-RP   ANALOG; PEPTIDE SUBSTRATE AND MAGNESIUM, ACTIVITY REGULATION,
-RP   PHOSPHORYLATION AT TYR-586; TYR-656 AND TYR-657, MUTAGENESIS OF
-RP   ASN-549 AND GLU-565, CHARACTERIZATION OF VARIANT FSPC GLU-526,
-RP   CHARACTERIZATION OF VARIANT CS HIS-549, CHARACTERIZATION OF VARIANTS
-RP   PS GLY-565 AND ARG-641, AND CHARACTERIZATION OF VARIANT
-RP   CRANIOSYNOSTOSIS ASN-659.
-RX   PubMed=17803937; DOI=10.1016/j.molcel.2007.06.028;
-RA   Chen H., Ma J., Li W., Eliseenkova A.V., Xu C., Neubert T.A.,
-RA   Miller W.T., Mohammadi M.;
-RT   "A molecular brake in the kinase hinge region regulates the activity
-RT   of receptor tyrosine kinases.";
-RL   Mol. Cell 27:717-730(2007).
-RN   [51]
-RP   X-RAY CRYSTALLOGRAPHY (1.80 ANGSTROMS) OF 458-766 OF VARIANT LADDS
-RP   THR-628 IN COMPLEX WITH ATP ANALOG, CATALYTIC ACTIVITY, SUBUNIT, AND
-RP   AUTOPHOSPHORYLATION.
-RX   PubMed=18056630; DOI=10.1073/pnas.0709905104;
-RA   Lew E.D., Bae J.H., Rohmann E., Wollnik B., Schlessinger J.;
-RT   "Structural basis for reduced FGFR2 activity in LADD syndrome:
-RT   Implications for FGFR autoinhibition and activation.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 104:19802-19807(2007).
-RN   [52]
-RP   X-RAY CRYSTALLOGRAPHY (2.00 ANGSTROMS) OF 458-778 IN COMPLEX WITH ATP,
-RP   ACTIVE SITE, IDENTIFICATION BY MASS SPECTROMETRY, AUTOPHOSPHORYLATION,
-RP   AND PHOSPHORYLATION AT TYR-466; TYR-586; TYR-588; TYR-656; TYR-657 AND
-RP   TYR-769.
-RX   PubMed=19060208; DOI=10.1073/pnas.0807752105;
-RA   Chen H., Xu C.F., Ma J., Eliseenkova A.V., Li W., Pollock P.M.,
-RA   Pitteloud N., Miller W.T., Neubert T.A., Mohammadi M.;
-RT   "A crystallographic snapshot of tyrosine trans-phosphorylation in
-RT   action.";
-RL   Proc. Natl. Acad. Sci. U.S.A. 105:19660-19665(2008).
-RN   [53]
-RP   X-RAY CRYSTALLOGRAPHY (2.10 ANGSTROMS) OF 458-768 IN COMPLEX WITH
-RP   INHIBITOR, CATALYTIC ACTIVITY, AUTOPHOSPHORYLATION, AND ACTIVITY
-RP   REGULATION.
-RX   PubMed=21454610; DOI=10.1074/jbc.M110.213736;
-RA   Eathiraj S., Palma R., Hirschi M., Volckova E., Nakuci E., Castro J.,
-RA   Chen C.R., Chan T.C., France D.S., Ashwell M.A.;
-RT   "A novel mode of protein kinase inhibition exploiting hydrophobic
-RT   motifs of autoinhibited kinases: discovery of ATP-independent
-RT   inhibitors of fibroblast growth factor receptor.";
-RL   J. Biol. Chem. 286:20677-20687(2011).
-RN   [54]
 RP   VARIANTS CS HIS-340; ARG-342; SER-342; TYR-342 AND CYS-354.
 RX   PubMed=7987400; DOI=10.1038/ng0994-98;
-RA   Reardon W., Winter R.M., Rutland P., Pulleyn L.J., Jones B.M.,
-RA   Malcolm S.;
-RT   "Mutations in the fibroblast growth factor receptor 2 gene cause
-RT   Crouzon syndrome.";
+RA   Reardon W., Winter R.M., Rutland P., Pulleyn L.J., Jones B.M., Malcolm S.;
+RT   "Mutations in the fibroblast growth factor receptor 2 gene cause Crouzon
+RT   syndrome.";
 RL   Nat. Genet. 8:98-103(1994).
-RN   [55]
+RN   [11]
 RP   VARIANTS CS CYS-328 AND CYS-347, AND VARIANT JWS GLY-344.
 RX   PubMed=7874170; DOI=10.1038/ng1194-275;
 RA   Jabs E.W., Li X., Scott A.F., Meyers G.A., Chen W., Eccles M., Mao J.,
@@ -526,7 +103,15 @@ RA   Charnas L.R., Jackson C.E., Jaye M.;
 RT   "Jackson-Weiss and Crouzon syndromes are allelic with mutations in
 RT   fibroblast growth factor receptor 2.";
 RL   Nat. Genet. 8:275-279(1994).
-RN   [56]
+RN   [12]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 249-313, AND VARIANTS APRS TRP-252 AND
+RP   ARG-253.
+RX   PubMed=7668257;
+RA   Park W.-J., Theda C., Maestri N.E., Meyers G.A., Fryburg J.S., Dufresne C.,
+RA   Cohen M.M. Jr., Jabs E.W.;
+RT   "Analysis of phenotypic features and FGFR2 mutations in Apert syndrome.";
+RL   Am. J. Hum. Genet. 57:321-328(1995).
+RN   [13]
 RP   VARIANTS CS.
 RX   PubMed=7655462; DOI=10.1093/hmg/4.6.1077;
 RA   Oldridge M., Wilkie A.O.M., Slaney S.F., Poole M.D., Pulleyn L.J.,
@@ -535,189 +120,269 @@ RA   Reardon W., Malcolm S.;
 RT   "Mutations in the third immunoglobulin domain of the fibroblast growth
 RT   factor receptor-2 gene in Crouzon syndrome.";
 RL   Hum. Mol. Genet. 4:1077-1082(1995).
-RN   [57]
+RN   [14]
 RP   VARIANTS CS GLY-290; TRP-342 AND CYS-354, AND VARIANT JWS ARG-342.
 RX   PubMed=8528214; DOI=10.1093/hmg/4.7.1229;
-RA   Park W.-J., Meyers G.A., Li X., Theda C., Day D., Orlow S.J.,
-RA   Jones M.C., Jabs E.W.;
-RT   "Novel FGFR2 mutations in Crouzon and Jackson-Weiss syndromes show
-RT   allelic heterogeneity and phenotypic variability.";
+RA   Park W.-J., Meyers G.A., Li X., Theda C., Day D., Orlow S.J., Jones M.C.,
+RA   Jabs E.W.;
+RT   "Novel FGFR2 mutations in Crouzon and Jackson-Weiss syndromes show allelic
+RT   heterogeneity and phenotypic variability.";
 RL   Hum. Mol. Genet. 4:1229-1233(1995).
-RN   [58]
+RN   [15]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 263-361, AND VARIANTS CS PRO-289;
+RP   ARG-338; SER-342; TYR-342; GLY-344 AND CYS-354.
+RX   PubMed=7581378; DOI=10.1093/hmg/4.8.1387;
+RA   Gorry M.C., Preston R.A., White G.J., Zhang Y., Singhal V.K., Losken H.W.,
+RA   Parker M.G., Nwokoro N.A., Post J.C., Ehrlich G.D.;
+RT   "Crouzon syndrome: mutations in two spliceoforms of FGFR2 and a common
+RT   point mutation shared with Jackson-Weiss syndrome.";
+RL   Hum. Mol. Genet. 4:1387-1390(1995).
+RN   [16]
 RP   VARIANT PS ALA-321.
 RX   PubMed=7719333; DOI=10.1038/ng0295-108;
-RA   Lajeunie E., Wei M.H., Bonaventure J., Munnich A., le Merrer M.,
-RA   Renier D.;
+RA   Lajeunie E., Wei M.H., Bonaventure J., Munnich A., le Merrer M., Renier D.;
 RT   "FGFR2 mutations in Pfeiffer syndrome.";
 RL   Nat. Genet. 9:108-108(1995).
-RN   [59]
+RN   [17]
 RP   VARIANTS APRS TRP-252 AND ARG-253.
 RX   PubMed=7719344; DOI=10.1038/ng0295-165;
 RA   Wilkie A.O.M., Slaney S.F., Oldridge M., Poole M.D., Ashworth G.J.,
 RA   Hockley A.D., Hayward R.D., David D.J., Pulleyn L.J., Rutland P.,
 RA   Malcolm S., Winter R.M., Reardon W.;
-RT   "Apert syndrome results from localized mutations of FGFR2 and is
-RT   allelic with Crouzon syndrome.";
+RT   "Apert syndrome results from localized mutations of FGFR2 and is allelic
+RT   with Crouzon syndrome.";
 RL   Nat. Genet. 9:165-172(1995).
-RN   [60]
+RN   [18]
 RP   VARIANTS PS PRO-341; ARG-342 AND TYR-342.
 RX   PubMed=7719345; DOI=10.1038/ng0295-173;
-RA   Rutland P., Pulleyn L.J., Reardon W., Baraister M., Hayward R.,
-RA   Jones B.M., Malcolm S., Winter R.M., Oldridge M., Slaney S.F.,
-RA   Poole M.D., Wilkie A.O.M.;
+RA   Rutland P., Pulleyn L.J., Reardon W., Baraister M., Hayward R., Jones B.M.,
+RA   Malcolm S., Winter R.M., Oldridge M., Slaney S.F., Poole M.D.,
+RA   Wilkie A.O.M.;
 RT   "Identical mutations in the FGFR2 gene cause both Pfeiffer and Crouzon
 RT   syndrome phenotypes.";
 RL   Nat. Genet. 9:173-176(1995).
-RN   [61]
-RP   VARIANTS CS GLY-268 INS; PHE-342 AND TYR-342, VARIANTS PS PHE-278;
-RP   ARG-342; SER-342; PRO-344 AND PHE-359, AND VARIANT JWS PRO-289.
+RN   [19]
+RP   VARIANTS CS GLY-268 INS; PHE-342 AND TYR-342, VARIANTS PS PHE-278; ARG-342;
+RP   SER-342; PRO-344 AND PHE-359, AND VARIANT JWS PRO-289.
 RX   PubMed=8644708;
-RA   Meyers G.A., Day D., Goldberg R., Daentl D.L., Przylepa K.A.,
-RA   Abrams L.J., Graham J.M. Jr., Feingold M., Moeschler J.B.,
-RA   Rawnsley E., Scott A.F., Jabs E.W.;
-RT   "FGFR2 exon IIIa and IIIc mutations in Crouzon, Jackson-Weiss, and
-RT   Pfeiffer syndromes: evidence for missense changes, insertions, and a
-RT   deletion due to alternative RNA splicing.";
+RA   Meyers G.A., Day D., Goldberg R., Daentl D.L., Przylepa K.A., Abrams L.J.,
+RA   Graham J.M. Jr., Feingold M., Moeschler J.B., Rawnsley E., Scott A.F.,
+RA   Jabs E.W.;
+RT   "FGFR2 exon IIIa and IIIc mutations in Crouzon, Jackson-Weiss, and Pfeiffer
+RT   syndromes: evidence for missense changes, insertions, and a deletion due to
+RT   alternative RNA splicing.";
 RL   Am. J. Hum. Genet. 58:491-498(1996).
-RN   [62]
+RN   [20]
+RP   FUNCTION (ISOFORM 3), SUBUNIT, AND DOMAIN.
+RX   PubMed=8961926; DOI=10.1021/bi961942c;
+RA   Gray T.E., Eisenstein M., Yayon A., Givol D.;
+RT   "Asparagine-344 is a key residue for ligand binding in keratinocyte growth
+RT   factor receptor.";
+RL   Biochemistry 35:15640-15645(1996).
+RN   [21]
 RP   VARIANTS CS CYS-105; GLU-338; CYS-351 AND ARG-384.
 RX   PubMed=8946174;
-RA   Pulleyn L.J., Reardon W., Wilkes D., Rutland P., Jones B.M.,
-RA   Hayward R., Hall C.M., Brueton L., Chun N., Lammer E., Malcolm S.,
-RA   Winter R.M.;
-RT   "Spectrum of craniosynostosis phenotypes associated with novel
-RT   mutations at the fibroblast growth factor receptor 2 locus.";
+RA   Pulleyn L.J., Reardon W., Wilkes D., Rutland P., Jones B.M., Hayward R.,
+RA   Hall C.M., Brueton L., Chun N., Lammer E., Malcolm S., Winter R.M.;
+RT   "Spectrum of craniosynostosis phenotypes associated with novel mutations at
+RT   the fibroblast growth factor receptor 2 locus.";
 RL   Eur. J. Hum. Genet. 4:283-291(1996).
-RN   [63]
+RN   [22]
 RP   VARIANTS CS ILE-331; ASN-ALA-337 INS AND 356-TRP--THR-358 DEL.
 RX   PubMed=8956050;
 RX   DOI=10.1002/(SICI)1098-1004(1996)8:4<386::AID-HUMU18>3.3.CO;2-A;
 RA   Steinberger D., Mulliken J.B., Mueller U.;
-RT   "Crouzon syndrome: previously unrecognized deletion, duplication, and
-RT   point mutation within FGFR2 gene.";
+RT   "Crouzon syndrome: previously unrecognized deletion, duplication, and point
+RT   mutation within FGFR2 gene.";
 RL   Hum. Mutat. 8:386-390(1996).
-RN   [64]
+RN   [23]
+RP   INTERACTION WITH FGF1; FGF2; FGF3; FGF4; FGF6; FGF7 AND FGF9, AND FUNCTION
+RP   IN CELL PROLIFERATION.
+RX   PubMed=8663044; DOI=10.1074/jbc.271.25.15292;
+RA   Ornitz D.M., Xu J., Colvin J.S., McEwen D.G., MacArthur C.A., Coulier F.,
+RA   Gao G., Goldfarb M.;
+RT   "Receptor specificity of the fibroblast growth factor family.";
+RL   J. Biol. Chem. 271:15292-15297(1996).
+RN   [24]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 251-318.
+RX   PubMed=8673103; DOI=10.1038/ng0596-48;
+RA   Moloney D.M., Slaney S.F., Oldridge M., Wall S.A., Sahlin P., Stenman G.,
+RA   Wilkie A.O.M.;
+RT   "Exclusive paternal origin of new mutations in Apert syndrome.";
+RL   Nat. Genet. 13:48-53(1996).
+RN   [25]
 RP   VARIANTS BSTVS CYS-372 AND CYS-375.
 RX   PubMed=8696350; DOI=10.1038/ng0896-492;
-RA   Przylepa K.A., Paznekas W.A., Zhang M., Golabi M., Bias W.,
-RA   Bamshad M.J., Carey J.C., Hall B.D., Stevenson R., Orlow S.J.,
-RA   Cohen M.M. Jr., Jabs E.W.;
-RT   "Fibroblast growth factor receptor 2 mutations in Beare-Stevenson
-RT   cutis gyrata syndrome.";
+RA   Przylepa K.A., Paznekas W.A., Zhang M., Golabi M., Bias W., Bamshad M.J.,
+RA   Carey J.C., Hall B.D., Stevenson R., Orlow S.J., Cohen M.M. Jr., Jabs E.W.;
+RT   "Fibroblast growth factor receptor 2 mutations in Beare-Stevenson cutis
+RT   gyrata syndrome.";
 RL   Nat. Genet. 13:492-494(1996).
-RN   [65]
+RN   [26]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 251-259.
+RX   PubMed=8676562;
+RA   Wada C., Ishigaki M., Toyo-oka Y., Yamabe H., Ohnuki Y., Takada F.,
+RA   Yamazaki Y., Ohtani H.;
+RT   "Nucleotide sequences at intron 6 and exon 7 junction of fibroblast growth
+RT   factor receptor 2 and rapid mutational analysis in Apert syndrome.";
+RL   Rinsho Byori 44:435-438(1996).
+RN   [27]
+RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 1), AND VARIANT CS SER-342.
+RC   TISSUE=Blood;
+RA   Steinberger D., Mueller U.;
+RL   Submitted (APR-1996) to the EMBL/GenBank/DDBJ databases.
+RN   [28]
 RP   VARIANT PS CYS-290.
 RX   PubMed=9150725; DOI=10.1007/s004390050413;
 RA   Tartaglia M., Valeri S., Velardi F., di Rocco C., Battaglia P.A.;
-RT   "Trp290Cys mutation in exon IIIa of the fibroblast growth factor
-RT   receptor 2 (FGFR2) gene is associated with Pfeiffer syndrome.";
+RT   "Trp290Cys mutation in exon IIIa of the fibroblast growth factor receptor 2
+RT   (FGFR2) gene is associated with Pfeiffer syndrome.";
 RL   Hum. Genet. 99:602-606(1997).
-RN   [66]
+RN   [29]
 RP   VARIANT JWS SER-342.
 RX   PubMed=9385368; DOI=10.1007/s004390050584;
 RA   Tartaglia M., Di Rocco C., Lajeunie E., Valeri S., Velardi F.,
 RA   Battaglia P.A.;
 RT   "Jackson-Weiss syndrome: identification of two novel FGFR2 missense
-RT   mutations shared with Crouzon and Pfeiffer craniosynostotic
-RT   disorders.";
+RT   mutations shared with Crouzon and Pfeiffer craniosynostotic disorders.";
 RL   Hum. Genet. 101:47-50(1997).
-RN   [67]
+RN   [30]
 RP   VARIANT LEU-252, VARIANT APRS PHE-252, AND VARIANT PS 252-PHE-SER-253.
 RX   PubMed=9002682; DOI=10.1093/hmg/6.1.137;
 RA   Oldridge M., Lunt P.W., Zackai E.H., McDonald-Mcginn D.M., Muenke M.,
 RA   Moloney D.M., Twigg S.R.F., Heath J.K., Howard T.D., Hoganson G.,
 RA   Gagnon D.M., Jabs E.W., Wilkie A.O.M.;
-RT   "Genotype-phenotype correlation for nucleotide substitutions in the
-RT   IgII-IgIII linker of FGFR2.";
+RT   "Genotype-phenotype correlation for nucleotide substitutions in the IgII-
+RT   IgIII linker of FGFR2.";
 RL   Hum. Mol. Genet. 6:137-143(1997).
-RN   [68]
+RN   [31]
 RP   VARIANT CS GLU-292.
-RX   PubMed=9152842; DOI=10.1136/jmg.34.5.420;
+RX   PubMed=9152842;
 RA   Steinberger D., Collmann H., Schmalenberger B., Mueller U.;
-RT   "A novel mutation (a886g) in exon 5 of FGFR2 in members of a family
-RT   with Crouzon phenotype and plagiocephaly.";
+RT   "A novel mutation (a886g) in exon 5 of FGFR2 in members of a family with
+RT   Crouzon phenotype and plagiocephaly.";
 RL   J. Med. Genet. 34:420-422(1997).
-RN   [69]
+RN   [32]
+RP   INVOLVEMENT IN SCS, AND VARIANT SCS 269-VAL-VAL-270 DEL.
+RX   PubMed=9585583; DOI=10.1086/301855;
+RA   Paznekas W.A., Cunningham M.L., Howard T.D., Korf B.R., Lipson M.H.,
+RA   Grix A.W., Feingold M., Goldberg R., Borochowitz Z., Aleck K., Mulliken J.,
+RA   Yin M., Jabs E.W.;
+RT   "Genetic heterogeneity of Saethre-Chotzen syndrome, due to TWIST and FGFR
+RT   mutations.";
+RL   Am. J. Hum. Genet. 62:1370-1380(1998).
+RN   [33]
 RP   VARIANTS CS PHE-278; PRO-337; ARG-338; ARG-342; PHE-342 AND TYR-342,
 RP   VARIANTS APRS TRP-252 AND ARG-253, AND VARIANT JWS PHE-278.
 RX   PubMed=9677057;
 RX   DOI=10.1002/(SICI)1096-8628(19980707)78:3<237::AID-AJMG5>3.3.CO;2-5;
-RA   Passos-Bueno M.R., Sertie A.L., Richieri-Costa A., Alonso L.G.,
-RA   Zatz M., Alonso N., Brunoni D., Ribeiro S.F.M.;
-RT   "Description of a new mutation and characterization of FGFR1, FGFR2,
-RT   and FGFR3 mutations among Brazilian patients with syndromic
-RT   craniosynostoses.";
+RA   Passos-Bueno M.R., Sertie A.L., Richieri-Costa A., Alonso L.G., Zatz M.,
+RA   Alonso N., Brunoni D., Ribeiro S.F.M.;
+RT   "Description of a new mutation and characterization of FGFR1, FGFR2, and
+RT   FGFR3 mutations among Brazilian patients with syndromic craniosynostoses.";
 RL   Am. J. Med. Genet. 78:237-241(1998).
-RN   [70]
+RN   [34]
 RP   VARIANTS CS VAL-276 AND CYS-301, AND VARIANT CRANIOSYNOSTOSIS SER-314.
 RX   PubMed=9521581; DOI=10.1007/s004390050668;
 RA   Steinberger D., Vriend G., Mulliken J.B., Mueller U.;
-RT   "The mutations in FGFR2-associated craniosynostoses are clustered in
-RT   five structural elements of immunoglobulin-like domain III of the
-RT   receptor.";
+RT   "The mutations in FGFR2-associated craniosynostoses are clustered in five
+RT   structural elements of immunoglobulin-like domain III of the receptor.";
 RL   Hum. Genet. 102:145-150(1998).
-RN   [71]
+RN   [35]
 RP   VARIANTS APRS TRP-252 AND ARG-253.
 RX   PubMed=9452027;
 RA   Tsai F.-J., Hwu W.-L., Lin S.-P., Chang J.-G., Wang T.-R., Tsai C.-H.;
-RT   "Two common mutations 934C to G and 937C to G of fibroblast growth
-RT   factor receptor 2 (FGFR2) gene in Chinese patients with Apert
-RT   syndrome.";
+RT   "Two common mutations 934C to G and 937C to G of fibroblast growth factor
+RT   receptor 2 (FGFR2) gene in Chinese patients with Apert syndrome.";
 RL   Hum. Mutat. Suppl. 1:S18-S19(1998).
-RN   [72]
+RN   [36]
 RP   VARIANT PS CYS-351.
 RX   PubMed=9693549;
-RA   Mathijssen I.M., Vaandrager J.M., Hoogeboom A.J.,
-RA   Hesseling-Janssen A.L.W., van den Ouweland A.M.W.;
-RT   "Pfeiffer's syndrome resulting from an S351C mutation in the
-RT   fibroblast growth factor receptor-2 gene.";
+RA   Mathijssen I.M., Vaandrager J.M., Hoogeboom A.J., Hesseling-Janssen A.L.W.,
+RA   van den Ouweland A.M.W.;
+RT   "Pfeiffer's syndrome resulting from an S351C mutation in the fibroblast
+RT   growth factor receptor-2 gene.";
 RL   J. Craniofac. Surg. 9:207-209(1998).
-RN   [73]
+RN   [37]
 RP   VARIANT PS TRP-252.
-RX   PubMed=9719378; DOI=10.1136/jmg.35.8.677;
+RX   PubMed=9719378;
 RA   Passos-Bueno M.R., Richieri-Costa A., Sertie A.L., Kneppers A.;
-RT   "Presence of the Apert canonical S252W FGFR2 mutation in a patient
-RT   without severe syndactyly.";
+RT   "Presence of the Apert canonical S252W FGFR2 mutation in a patient without
+RT   severe syndactyly.";
 RL   J. Med. Genet. 35:677-679(1998).
-RN   [74]
+RN   [38]
+RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORMS 7; 9; 10; 11; 12 AND 13), AND VARIANT
+RP   ARG-613.
+RX   PubMed=10626794;
+RA   Ueda T., Sasaki H., Kuwahara Y., Nezu M., Shibuya T., Sakamoto H.,
+RA   Ishii H., Yanagihara K., Mafune K., Makuuchi M., Terada M.;
+RT   "Deletion of the carboxyl-terminal exons of K-sam/FGFR2 by short homology-
+RT   mediated recombination, generating preferential expression of specific
+RT   messenger RNAs.";
+RL   Cancer Res. 59:6080-6086(1999).
+RN   [39]
 RP   VARIANT CS SER-362.
-RX   PubMed=10574673; DOI=10.1597/1545-1569(1999)036<0533:ANFGMI>2.3.CO;2;
+RX   PubMed=10574673;
 RA   Everett E.T., Britto D.A., Ward R.E., Hartsfield J.K. Jr.;
-RT   "A novel FGFR2 gene mutation in Crouzon syndrome associated with
-RT   apparent nonpenetrance.";
+RT   "A novel FGFR2 gene mutation in Crouzon syndrome associated with apparent
+RT   nonpenetrance.";
 RL   Cleft Palate Craniofac. J. 36:533-541(1999).
-RN   [75]
+RN   [40]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 1-209; 212-767 AND 771-821 (ISOFORMS
+RP   5; 14 AND 18).
+RX   PubMed=10196476; DOI=10.1016/S0378-1119(99)00047-5;
+RA   Zhang Y., Gorry M.C., Post J.C., Ehrlich G.D.;
+RT   "Genomic organization of the human fibroblast growth factor receptor 2
+RT   (FGFR2) gene and comparative analysis of the human FGFR gene family.";
+RL   Gene 230:69-79(1999).
+RN   [41]
 RP   VARIANTS PS CYS-340 AND GLY-342.
 RX   PubMed=10394936; DOI=10.1007/s004390050979;
 RA   Cornejo-Roldan L.R., Roessler E., Muenke M.;
 RT   "Analysis of the mutational spectrum of the FGFR2 gene in Pfeiffer
 RT   syndrome.";
 RL   Hum. Genet. 104:425-431(1999).
-RN   [76]
+RN   [42]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] OF 314-427.
+RX   PubMed=10712195; DOI=10.1086/302831;
+RA   Glaser R.L., Jiang W., Boyadjiev S.A., Tran A.K., Zachary A.A.,
+RA   Van Maldergem L., Johnson D., Walsh S., Oldridge M., Wall S.A.,
+RA   Wilkie A.O.M., Jabs E.W.;
+RT   "Paternal origin of FGFR2 mutations in sporadic cases of Crouzon syndrome
+RT   and Pfeiffer syndrome.";
+RL   Am. J. Hum. Genet. 66:768-777(2000).
+RN   [43]
+RP   X-RAY CRYSTALLOGRAPHY (2.8 ANGSTROMS) OF 147-366 IN COMPLEX WITH FGF2.
+RX   PubMed=10830168; DOI=10.1016/S0092-8674(00)80851-X;
+RA   Plotnikov A.N., Hubbard S.R., Schlessinger J., Mohammadi M.;
+RT   "Crystal structures of two FGF-FGFR complexes reveal the determinants of
+RT   ligand-receptor specificity.";
+RL   Cell 101:413-424(2000).
+RN   [44]
 RP   VARIANT PS ASP-273 DEL.
 RX   PubMed=10945669; DOI=10.1034/j.1399-0004.2000.580116.x;
 RA   Priolo M., Lerone M., Baffico M., Baldi M., Ravazzolo R., Cama A.,
 RA   Capra V., Silengo M.;
-RT   "Pfeiffer syndrome type 2 associated with a single amino acid deletion
-RT   in the FGFR2 gene.";
+RT   "Pfeiffer syndrome type 2 associated with a single amino acid deletion in
+RT   the FGFR2 gene.";
 RL   Clin. Genet. 58:81-83(2000).
-RN   [77]
-RP   VARIANTS CS/PS ARG-342 AND TYR-342, VARIANTS CS LEU-263; VAL-276;
-RP   PHE-278; TYR-278; SER-288; PRO-289; PRO-341; TRP-342; CYS-354; TYR-354
-RP   AND PHE-359, AND VARIANT PS SER-342.
+RN   [45]
+RP   VARIANTS CS/PS ARG-342 AND TYR-342, VARIANTS CS LEU-263; VAL-276; PHE-278;
+RP   TYR-278; SER-288; PRO-289; PRO-341; TRP-342; CYS-354; TYR-354 AND PHE-359,
+RP   AND VARIANT PS SER-342.
 RX   PubMed=11173845;
 RA   Kress W., Collmann H., Buesse M., Halliger-Keller B., Mueller C.R.;
-RT   "Clustering of FGFR2 gene mutations in patients with Pfeiffer and
-RT   Crouzon syndromes (FGFR2-associated craniosynostoses).";
+RT   "Clustering of FGFR2 gene mutations in patients with Pfeiffer and Crouzon
+RT   syndromes (FGFR2-associated craniosynostoses).";
 RL   Cytogenet. Cell Genet. 91:134-137(2000).
-RN   [78]
+RN   [46]
 RP   VARIANT SER-315.
 RX   PubMed=10951518; DOI=10.1038/sj.ejhg.5200499;
 RA   Johnson D., Wall S.A., Mann S., Wilkie A.O.M.;
 RT   "A novel mutation, Ala315Ser, in FGFR2: a gene-environment interaction
 RT   leading to craniosynostosis?";
 RL   Eur. J. Hum. Genet. 8:571-577(2000).
-RN   [79]
+RN   [47]
 RP   VARIANTS ABS2 ARG-342; SER-342 AND CYS-351.
 RX   PubMed=10633130; DOI=10.1136/jmg.37.1.26;
 RA   Reardon W., Smith A., Honour J.W., Hindmarsh P., Das D., Rumsby G.,
@@ -727,181 +392,504 @@ RA   Winter R.M.;
 RT   "Evidence for digenic inheritance in some cases of Antley-Bixler
 RT   syndrome?";
 RL   J. Med. Genet. 37:26-32(2000).
-RN   [80]
+RN   [48]
+RP   X-RAY CRYSTALLOGRAPHY (2.4 ANGSTROMS) OF 148-366 IN COMPLEX WITH FGF1 AND
+RP   HEPARIN, AND INTERACTION WITH FGF1 AND HEPARIN.
+RX   PubMed=11069186; DOI=10.1038/35039551;
+RA   Pellegrini L., Burke D.F., von Delft F., Mulloy B., Blundell T.L.;
+RT   "Crystal structure of fibroblast growth factor receptor ectodomain bound to
+RT   ligand and heparin.";
+RL   Nature 407:1029-1034(2000).
+RN   [49]
+RP   X-RAY CRYSTALLOGRAPHY (2.4 ANGSTROMS) OF 147-362 IN COMPLEX WITH FGF1.
+RX   PubMed=10618369; DOI=10.1073/pnas.97.1.49;
+RA   Stauber D.J., DiGabriele A.D., Hendrickson W.A.;
+RT   "Structural interactions of fibroblast growth factor receptor with its
+RT   ligands.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 97:49-54(2000).
+RN   [50]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] (ISOFORMS 5; 6; 8; 14 AND 18).
+RX   PubMed=11856867;
+RA   Ingersoll R.G., Paznekas W.A., Tran A.K., Scott A.F., Jiang G., Jabs E.W.;
+RT   "Fibroblast growth factor receptor 2 (FGFR2): genomic sequence and
+RT   variations.";
+RL   Cytogenet. Cell Genet. 94:121-126(2001).
+RN   [51]
 RP   VARIANTS CS CYS-281; PRO-289; ARG-342 AND TYR-342.
 RX   PubMed=11380921; DOI=10.1046/j.1442-200x.2001.01392.x;
 RA   Tsai F.-J., Yang C.-F., Wu J.-Y., Tsai C.-H., Lee C.-C.;
 RT   "Mutation analysis of Crouzon syndrome and identification of one novel
 RT   mutation in Taiwanese patients.";
 RL   Pediatr. Int. 43:263-266(2001).
-RN   [81]
-RP   VARIANTS CS CYS-105; PRO-267; VAL-276; CYS-281; PRO-289; ARG-338;
-RP   HIS-340; PHE-342; TRP-342; CYS-347; CYS-354; HIS-549 AND GLY-678,
-RP   VARIANTS PS PHE-172; 252-PHE-SER-253; CYS-290; CYS-340; PRO-341;
-RP   ARG-342; SER-342; CYS-375; GLY-565; ARG-641 AND GLU-663, VARIANTS APRS
-RP   TRP-252 AND ARG-253, VARIANTS CS/PS PHE-278 AND TYR-342, VARIANT
-RP   CRANIOSYNOSTOSIS ASN-659, AND VARIANTS THR-186 AND SER-315.
+RN   [52]
+RP   X-RAY CRYSTALLOGRAPHY (2.7 ANGSTROMS) OF 147-366 OF VARIANTS APRS TRP-252
+RP   AND ARG-253 IN COMPLEX WITH FGF2.
+RX   PubMed=11390973; DOI=10.1073/pnas.121183798;
+RA   Ibrahimi O.A., Eliseenkova A.V., Plotnikov A.N., Yu K., Ornitz D.M.,
+RA   Mohammadi M.;
+RT   "Structural basis for fibroblast growth factor receptor 2 activation in
+RT   Apert syndrome.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 98:7182-7187(2001).
+RN   [53]
+RP   VARIANTS CS CYS-105; PRO-267; VAL-276; CYS-281; PRO-289; ARG-338; HIS-340;
+RP   PHE-342; TRP-342; CYS-347; CYS-354; HIS-549 AND GLY-678, VARIANTS PS
+RP   PHE-172; 252-PHE-SER-253; CYS-290; CYS-340; PRO-341; ARG-342; SER-342;
+RP   CYS-375; GLY-565; ARG-641 AND GLU-663, VARIANTS APRS TRP-252 AND ARG-253,
+RP   VARIANTS CS/PS PHE-278 AND TYR-342, VARIANT CRANIOSYNOSTOSIS ASN-659, AND
+RP   VARIANTS THR-186 AND SER-315.
 RX   PubMed=11781872; DOI=10.1086/338758;
-RA   Kan S.-H., Elanko N., Johnson D., Cornejo-Roldan L.R., Cook J.,
-RA   Reich E.W., Tomkins S., Verloes A., Twigg S.R.F., Rannan-Eliya S.,
-RA   McDonald-McGinn D.M., Zackai E.H., Wall S.A., Muenke M.,
-RA   Wilkie A.O.M.;
-RT   "Genomic screening of fibroblast growth-factor receptor 2 reveals a
-RT   wide spectrum of mutations in patients with syndromic
-RT   craniosynostosis.";
+RA   Kan S.-H., Elanko N., Johnson D., Cornejo-Roldan L.R., Cook J., Reich E.W.,
+RA   Tomkins S., Verloes A., Twigg S.R.F., Rannan-Eliya S.,
+RA   McDonald-McGinn D.M., Zackai E.H., Wall S.A., Muenke M., Wilkie A.O.M.;
+RT   "Genomic screening of fibroblast growth-factor receptor 2 reveals a wide
+RT   spectrum of mutations in patients with syndromic craniosynostosis.";
 RL   Am. J. Hum. Genet. 70:472-486(2002).
-RN   [82]
+RN   [54]
 RP   VARIANT BSTVS CYS-375.
 RX   PubMed=12000365; DOI=10.1034/j.1399-0004.2002.610309.x;
 RA   Wang T.-J., Huang C.-B., Tsai F.-J., Wu J.-Y., Lai R.-B., Hsiao M.;
-RT   "Mutation in the FGFR2 gene in a Taiwanese patient with Beare-
-RT   Stevenson cutis gyrata syndrome.";
+RT   "Mutation in the FGFR2 gene in a Taiwanese patient with Beare-Stevenson
+RT   cutis gyrata syndrome.";
 RL   Clin. Genet. 61:218-221(2002).
-RN   [83]
+RN   [55]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA] (ISOFORM 3).
+RA   Lind D.L., Cox D.R.;
+RT   "Sequence and polymorphisms in fibroblast growth factor receptor 2 (FGFR2)
+RT   gene in humans.";
+RL   Submitted (FEB-2002) to the EMBL/GenBank/DDBJ databases.
+RN   [56]
+RP   NUCLEOTIDE SEQUENCE [MRNA] (ISOFORM 23).
+RA   Jang J.;
+RT   "Identification of a novel variant of FGFR2.";
+RL   Submitted (APR-2002) to the EMBL/GenBank/DDBJ databases.
+RN   [57]
+RP   FUNCTION IN PHOSPHORYLATION OF PAK4; REGULATION OF CELL PROLIFERATION AND
+RP   APOPTOSIS, AND INTERACTION WITH GRB2 AND PAK4.
+RX   PubMed=12529371; DOI=10.1074/jbc.M205875200;
+RA   Lu Y., Pan Z.-Z., Devaux Y., Ray P.;
+RT   "p21-activated protein kinase 4 (PAK4) interacts with the keratinocyte
+RT   growth factor receptor and participates in keratinocyte growth factor-
+RT   mediated inhibition of oxidant-induced cell death.";
+RL   J. Biol. Chem. 278:10374-10380(2003).
+RN   [58]
+RP   X-RAY CRYSTALLOGRAPHY (2.9 ANGSTROMS) OF 140-371 IN COMPLEX WITH FGF10.
+RX   PubMed=12591959; DOI=10.1073/pnas.0436500100;
+RA   Yeh B.K., Igarashi M., Eliseenkova A.V., Plotnikov A.N., Sher I., Ron D.,
+RA   Aaronson S.A., Mohammadi M.;
+RT   "Structural basis by which alternative splicing confers specificity in
+RT   fibroblast growth factor receptors.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 100:2266-2271(2003).
+RN   [59]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORM 20).
+RC   TISSUE=Brain;
+RX   PubMed=15489334; DOI=10.1101/gr.2596504;
+RG   The MGC Project Team;
+RA   Gerhard D.S., Wagner L., Feingold E.A., Shenmen C.M., Grouse L.H.,
+RA   Schuler G., Klein S.L., Old S., Rasooly R., Good P., Guyer M., Peck A.M.,
+RA   Derge J.G., Lipman D., Collins F.S., Jang W., Sherry S., Feolo M.,
+RA   Misquitta L., Lee E., Rotmistrovsky K., Greenhut S.F., Schaefer C.F.,
+RA   Buetow K., Bonner T.I., Haussler D., Kent J., Kiekhaus M., Furey T.,
+RA   Brent M., Prange C., Schreiber K., Shapiro N., Bhat N.K., Hopkins R.F.,
+RA   Hsie F., Driscoll T., Soares M.B., Casavant T.L., Scheetz T.E.,
+RA   Brown-stein M.J., Usdin T.B., Toshiyuki S., Carninci P., Piao Y.,
+RA   Dudekula D.B., Ko M.S., Kawakami K., Suzuki Y., Sugano S., Gruber C.E.,
+RA   Smith M.R., Simmons B., Moore T., Waterman R., Johnson S.L., Ruan Y.,
+RA   Wei C.L., Mathavan S., Gunaratne P.H., Wu J., Garcia A.M., Hulyk S.W.,
+RA   Fuh E., Yuan Y., Sneed A., Kowis C., Hodgson A., Muzny D.M., McPherson J.,
+RA   Gibbs R.A., Fahey J., Helton E., Ketteman M., Madan A., Rodrigues S.,
+RA   Sanchez A., Whiting M., Madari A., Young A.C., Wetherby K.D., Granite S.J.,
+RA   Kwong P.N., Brinkley C.P., Pearson R.L., Bouffard G.G., Blakesly R.W.,
+RA   Green E.D., Dickson M.C., Rodriguez A.C., Grimwood J., Schmutz J.,
+RA   Myers R.M., Butterfield Y.S., Griffith M., Griffith O.L., Krzywinski M.I.,
+RA   Liao N., Morin R., Morrin R., Palmquist D., Petrescu A.S., Skalska U.,
+RA   Smailus D.E., Stott J.M., Schnerch A., Schein J.E., Jones S.J., Holt R.A.,
+RA   Baross A., Marra M.A., Clifton S., Makowski K.A., Bosak S., Malek J.;
+RT   "The status, quality, and expansion of the NIH full-length cDNA project:
+RT   the Mammalian Gene Collection (MGC).";
+RL   Genome Res. 14:2121-2127(2004).
+RN   [60]
+RP   FUNCTION IN OSTEOBLAST DIFFERENTIATION AND IN PHOSPHORYLATION OF CBL,
+RP   INTERACTION WITH CBL, UBIQUITINATION, AND CHARACTERIZATION OF VARIANT APRS
+RP   TRP-252.
+RX   PubMed=15190072; DOI=10.1074/jbc.M402469200;
+RA   Kaabeche K., Lemonnier J., Le Mee S., Caverzasio J., Marie P.J.;
+RT   "Cbl-mediated degradation of Lyn and Fyn induced by constitutive fibroblast
+RT   growth factor receptor-2 activation supports osteoblast differentiation.";
+RL   J. Biol. Chem. 279:36259-36267(2004).
+RN   [61]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE MRNA] (ISOFORM 21).
+RC   TISSUE=Cerebellum;
+RX   PubMed=14702039; DOI=10.1038/ng1285;
+RA   Ota T., Suzuki Y., Nishikawa T., Otsuki T., Sugiyama T., Irie R.,
+RA   Wakamatsu A., Hayashi K., Sato H., Nagai K., Kimura K., Makita H.,
+RA   Sekine M., Obayashi M., Nishi T., Shibahara T., Tanaka T., Ishii S.,
+RA   Yamamoto J., Saito K., Kawai Y., Isono Y., Nakamura Y., Nagahari K.,
+RA   Murakami K., Yasuda T., Iwayanagi T., Wagatsuma M., Shiratori A., Sudo H.,
+RA   Hosoiri T., Kaku Y., Kodaira H., Kondo H., Sugawara M., Takahashi M.,
+RA   Kanda K., Yokoi T., Furuya T., Kikkawa E., Omura Y., Abe K., Kamihara K.,
+RA   Katsuta N., Sato K., Tanikawa M., Yamazaki M., Ninomiya K., Ishibashi T.,
+RA   Yamashita H., Murakawa K., Fujimori K., Tanai H., Kimata M., Watanabe M.,
+RA   Hiraoka S., Chiba Y., Ishida S., Ono Y., Takiguchi S., Watanabe S.,
+RA   Yosida M., Hotuta T., Kusano J., Kanehori K., Takahashi-Fujii A., Hara H.,
+RA   Tanase T., Nomura Y., Togiya S., Komai F., Hara R., Takeuchi K., Arita M.,
+RA   Imose N., Musashino K., Yuuki H., Oshima A., Sasaki N., Aotsuka S.,
+RA   Yoshikawa Y., Matsunawa H., Ichihara T., Shiohata N., Sano S., Moriya S.,
+RA   Momiyama H., Satoh N., Takami S., Terashima Y., Suzuki O., Nakagawa S.,
+RA   Senoh A., Mizoguchi H., Goto Y., Shimizu F., Wakebe H., Hishigaki H.,
+RA   Watanabe T., Sugiyama A., Takemoto M., Kawakami B., Yamazaki M.,
+RA   Watanabe K., Kumagai A., Itakura S., Fukuzumi Y., Fujimori Y., Komiyama M.,
+RA   Tashiro H., Tanigami A., Fujiwara T., Ono T., Yamada K., Fujii Y.,
+RA   Ozaki K., Hirao M., Ohmori Y., Kawabata A., Hikiji T., Kobatake N.,
+RA   Inagaki H., Ikema Y., Okamoto S., Okitani R., Kawakami T., Noguchi S.,
+RA   Itoh T., Shigeta K., Senba T., Matsumura K., Nakajima Y., Mizuno T.,
+RA   Morinaga M., Sasaki M., Togashi T., Oyama M., Hata H., Watanabe M.,
+RA   Komatsu T., Mizushima-Sugano J., Satoh T., Shirai Y., Takahashi Y.,
+RA   Nakagawa K., Okumura K., Nagase T., Nomura N., Kikuchi H., Masuho Y.,
+RA   Yamashita R., Nakai K., Yada T., Nakamura Y., Ohara O., Isogai T.,
+RA   Sugano S.;
+RT   "Complete sequencing and characterization of 21,243 full-length human
+RT   cDNAs.";
+RL   Nat. Genet. 36:40-45(2004).
+RN   [62]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+RX   PubMed=15164054; DOI=10.1038/nature02462;
+RA   Deloukas P., Earthrowl M.E., Grafham D.V., Rubenfield M., French L.,
+RA   Steward C.A., Sims S.K., Jones M.C., Searle S., Scott C., Howe K.,
+RA   Hunt S.E., Andrews T.D., Gilbert J.G.R., Swarbreck D., Ashurst J.L.,
+RA   Taylor A., Battles J., Bird C.P., Ainscough R., Almeida J.P.,
+RA   Ashwell R.I.S., Ambrose K.D., Babbage A.K., Bagguley C.L., Bailey J.,
+RA   Banerjee R., Bates K., Beasley H., Bray-Allen S., Brown A.J., Brown J.Y.,
+RA   Burford D.C., Burrill W., Burton J., Cahill P., Camire D., Carter N.P.,
+RA   Chapman J.C., Clark S.Y., Clarke G., Clee C.M., Clegg S., Corby N.,
+RA   Coulson A., Dhami P., Dutta I., Dunn M., Faulkner L., Frankish A.,
+RA   Frankland J.A., Garner P., Garnett J., Gribble S., Griffiths C.,
+RA   Grocock R., Gustafson E., Hammond S., Harley J.L., Hart E., Heath P.D.,
+RA   Ho T.P., Hopkins B., Horne J., Howden P.J., Huckle E., Hynds C.,
+RA   Johnson C., Johnson D., Kana A., Kay M., Kimberley A.M., Kershaw J.K.,
+RA   Kokkinaki M., Laird G.K., Lawlor S., Lee H.M., Leongamornlert D.A.,
+RA   Laird G., Lloyd C., Lloyd D.M., Loveland J., Lovell J., McLaren S.,
+RA   McLay K.E., McMurray A., Mashreghi-Mohammadi M., Matthews L., Milne S.,
+RA   Nickerson T., Nguyen M., Overton-Larty E., Palmer S.A., Pearce A.V.,
+RA   Peck A.I., Pelan S., Phillimore B., Porter K., Rice C.M., Rogosin A.,
+RA   Ross M.T., Sarafidou T., Sehra H.K., Shownkeen R., Skuce C.D., Smith M.,
+RA   Standring L., Sycamore N., Tester J., Thorpe A., Torcasso W., Tracey A.,
+RA   Tromans A., Tsolas J., Wall M., Walsh J., Wang H., Weinstock K., West A.P.,
+RA   Willey D.L., Whitehead S.L., Wilming L., Wray P.W., Young L., Chen Y.,
+RA   Lovering R.C., Moschonas N.K., Siebert R., Fechtel K., Bentley D.,
+RA   Durbin R., Hubbard T., Doucette-Stamm L., Beck S., Smith D.R., Rogers J.;
+RT   "The DNA sequence and comparative analysis of human chromosome 10.";
+RL   Nature 429:375-381(2004).
+RN   [63]
+RP   FUNCTION IN CELL PROLIFERATION AND ACTIVATION OF SIGNALING PATHWAYS,
+RP   MUTAGENESIS OF TYR-769, PHOSPHORYLATION AT TYR-769, AND INTERACTION WITH
+RP   PLCG1.
+RX   PubMed=15629145; DOI=10.1016/j.bbrc.2004.12.031;
+RA   Ceridono M., Belleudi F., Ceccarelli S., Torrisi M.R.;
+RT   "Tyrosine 769 of the keratinocyte growth factor receptor is required for
+RT   receptor signaling but not endocytosis.";
+RL   Biochem. Biophys. Res. Commun. 327:523-532(2005).
+RN   [64]
+RP   REVIEW ON LIGAND SPECIFICITY, ALTERNATIVE SPLICING, AND SIGNALING.
+RX   PubMed=15863030; DOI=10.1016/j.cytogfr.2005.01.001;
+RA   Eswarakumar V.P., Lax I., Schlessinger J.;
+RT   "Cellular signaling by fibroblast growth factor receptors.";
+RL   Cytokine Growth Factor Rev. 16:139-149(2005).
+RN   [65]
 RP   VARIANT FSPC GLU-526.
 RX   PubMed=16061565; DOI=10.1136/jmg.2004.027888;
 RA   McGillivray G., Savarirayan R., Cox T.C., Stojkoski C., McNeil R.,
 RA   Bankier A., Bateman J.F., Roscioli T., Gardner R.J.M., Lamande S.R.;
-RT   "Familial scaphocephaly syndrome caused by a novel mutation in the
-RT   FGFR2 tyrosine kinase domain.";
+RT   "Familial scaphocephaly syndrome caused by a novel mutation in the FGFR2
+RT   tyrosine kinase domain.";
 RL   J. Med. Genet. 42:656-662(2005).
-RN   [84]
+RN   [66]
+RP   X-RAY CRYSTALLOGRAPHY (2.28 ANGSTROMS) OF 149-368 IN COMPLEX WITH FGF8,
+RP   FUNCTION AS FGF8 RECEPTOR, INTERACTION WITH FGF8, AND DISULFIDE BONDS.
+RX   PubMed=16384934; DOI=10.1101/gad.1365406;
+RA   Olsen S.K., Li J.Y.H., Bromleigh C., Eliseenkova A.V., Ibrahimi O.A.,
+RA   Lao Z., Zhang F., Linhardt R.J., Joyner A.L., Mohammadi M.;
+RT   "Structural basis by which alternative splicing modulates the organizer
+RT   activity of FGF8 in the brain.";
+RL   Genes Dev. 20:185-198(2006).
+RN   [67]
+RP   INTERACTION WITH FGF1; FGF7; FGF8; FGF9; FGF10; FGF19; FGF21; FGF22 AND
+RP   FGF23, AND FUNCTION IN STIMULATION OF CELL PROLIFERATION.
+RX   PubMed=16597617; DOI=10.1074/jbc.M601252200;
+RA   Zhang X., Ibrahimi O.A., Olsen S.K., Umemori H., Mohammadi M., Ornitz D.M.;
+RT   "Receptor specificity of the fibroblast growth factor family. The complete
+RT   mammalian FGF family.";
+RL   J. Biol. Chem. 281:15694-15700(2006).
+RN   [68]
+RP   FUNCTION IN PHOSPHORYLATION OF PLCG1 (ISOFORM 1), CATALYTIC ACTIVITY,
+RP   AUTOPHOSPHORYLATION, GLYCOSYLATION, INTERACTION WITH PLCG1, SUBCELLULAR
+RP   LOCATION, MUTAGENESIS OF ASN-265 AND 656-TYR-TYR-657, UBIQUITINATION, AND
+RP   CHARACTERIZATION OF VARIANT PS PHE-278.
+RX   PubMed=16844695; DOI=10.1074/jbc.M600448200;
+RA   Hatch N.E., Hudson M., Seto M.L., Cunningham M.L., Bothwell M.;
+RT   "Intracellular retention, degradation, and signaling of glycosylation-
+RT   deficient FGFR2 and craniosynostosis syndrome-associated FGFR2C278F.";
+RL   J. Biol. Chem. 281:27292-27305(2006).
+RN   [69]
 RP   VARIANTS LADDS THR-628; THR-648 AND 649-ARG-ASP-650 DELINS SER.
 RX   PubMed=16501574; DOI=10.1038/ng1757;
-RA   Rohmann E., Brunner H.G., Kayserili H., Uyguner O., Nuernberg G.,
-RA   Lew E.D., Dobbie A., Eswarakumar V.P., Uzumcu A., Ulubil-Emeroglu M.,
-RA   Leroy J.G., Li Y., Becker C., Lehnerdt K., Cremers C.W.R.J.,
-RA   Yueksel-Apak M., Nuernberg P., Kubisch C., Schlessinger J.,
-RA   van Bokhoven H., Wollnik B.;
-RT   "Mutations in different components of FGF signaling in LADD
-RT   syndrome.";
+RA   Rohmann E., Brunner H.G., Kayserili H., Uyguner O., Nuernberg G., Lew E.D.,
+RA   Dobbie A., Eswarakumar V.P., Uzumcu A., Ulubil-Emeroglu M., Leroy J.G.,
+RA   Li Y., Becker C., Lehnerdt K., Cremers C.W.R.J., Yueksel-Apak M.,
+RA   Nuernberg P., Kubisch C., Schlessinger J., van Bokhoven H., Wollnik B.;
+RT   "Mutations in different components of FGF signaling in LADD syndrome.";
 RL   Nat. Genet. 38:414-417(2006).
-RN   [85]
+RN   [70]
 RP   VARIANT [LARGE SCALE ANALYSIS] CYS-203.
 RX   PubMed=16959974; DOI=10.1126/science.1133427;
 RA   Sjoeblom T., Jones S., Wood L.D., Parsons D.W., Lin J., Barber T.D.,
-RA   Mandelker D., Leary R.J., Ptak J., Silliman N., Szabo S.,
-RA   Buckhaults P., Farrell C., Meeh P., Markowitz S.D., Willis J.,
-RA   Dawson D., Willson J.K.V., Gazdar A.F., Hartigan J., Wu L., Liu C.,
-RA   Parmigiani G., Park B.H., Bachman K.E., Papadopoulos N.,
-RA   Vogelstein B., Kinzler K.W., Velculescu V.E.;
-RT   "The consensus coding sequences of human breast and colorectal
-RT   cancers.";
+RA   Mandelker D., Leary R.J., Ptak J., Silliman N., Szabo S., Buckhaults P.,
+RA   Farrell C., Meeh P., Markowitz S.D., Willis J., Dawson D., Willson J.K.V.,
+RA   Gazdar A.F., Hartigan J., Wu L., Liu C., Parmigiani G., Park B.H.,
+RA   Bachman K.E., Papadopoulos N., Vogelstein B., Kinzler K.W.,
+RA   Velculescu V.E.;
+RT   "The consensus coding sequences of human breast and colorectal cancers.";
 RL   Science 314:268-274(2006).
-RN   [86]
-RP   VARIANTS [LARGE SCALE ANALYSIS] LEU-57; THR-186; CYS-203; VAL-272;
-RP   ASN-283; CYS-290 AND THR-612.
+RN   [71]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA], AND VARIANTS PRO-6 AND THR-186.
+RG   NIEHS SNPs program;
+RL   Submitted (APR-2006) to the EMBL/GenBank/DDBJ databases.
+RN   [72]
+RP   INTERACTION WITH FGF19; FGF21 AND KLB, AND FUNCTION IN PHOSPHORYLATION OF
+RP   FRS2 AND ACTIVATION OF MAP KINASES.
+RX   PubMed=17623664; DOI=10.1074/jbc.M704165200;
+RA   Kurosu H., Choi M., Ogawa Y., Dickson A.S., Goetz R., Eliseenkova A.V.,
+RA   Mohammadi M., Rosenblatt K.P., Kliewer S.A., Kuro-o M.;
+RT   "Tissue-specific expression of betaKlotho and fibroblast growth factor
+RT   (FGF) receptor isoforms determines metabolic activity of FGF19 and FGF21.";
+RL   J. Biol. Chem. 282:26687-26695(2007).
+RN   [73]
+RP   FUNCTION IN STAT1 PHOSPHORYLATION, GLYCOSYLATION, SUBCELLULAR LOCATION, AND
+RP   PHOSPHORYLATION.
+RX   PubMed=17311277; DOI=10.1002/jcp.21014;
+RA   Citores L., Bai L., Sorensen V., Olsnes S.;
+RT   "Fibroblast growth factor receptor-induced phosphorylation of STAT1 at the
+RT   Golgi apparatus without translocation to the nucleus.";
+RL   J. Cell. Physiol. 212:148-156(2007).
+RN   [74]
+RP   X-RAY CRYSTALLOGRAPHY (1.80 ANGSTROMS) OF 458-778 IN COMPLEX WITH ATP
+RP   ANALOG; PEPTIDE SUBSTRATE AND MAGNESIUM, ACTIVITY REGULATION,
+RP   PHOSPHORYLATION AT TYR-586; TYR-656 AND TYR-657, MUTAGENESIS OF ASN-549 AND
+RP   GLU-565, CHARACTERIZATION OF VARIANT FSPC GLU-526, CHARACTERIZATION OF
+RP   VARIANT CS HIS-549, CHARACTERIZATION OF VARIANTS PS GLY-565 AND ARG-641,
+RP   AND CHARACTERIZATION OF VARIANT CRANIOSYNOSTOSIS ASN-659.
+RX   PubMed=17803937; DOI=10.1016/j.molcel.2007.06.028;
+RA   Chen H., Ma J., Li W., Eliseenkova A.V., Xu C., Neubert T.A., Miller W.T.,
+RA   Mohammadi M.;
+RT   "A molecular brake in the kinase hinge region regulates the activity of
+RT   receptor tyrosine kinases.";
+RL   Mol. Cell 27:717-730(2007).
+RN   [75]
+RP   VARIANTS [LARGE SCALE ANALYSIS] LEU-57; THR-186; CYS-203; VAL-272; ASN-283;
+RP   CYS-290 AND THR-612.
 RX   PubMed=17344846; DOI=10.1038/nature05610;
-RA   Greenman C., Stephens P., Smith R., Dalgliesh G.L., Hunter C.,
-RA   Bignell G., Davies H., Teague J., Butler A., Stevens C., Edkins S.,
-RA   O'Meara S., Vastrik I., Schmidt E.E., Avis T., Barthorpe S.,
-RA   Bhamra G., Buck G., Choudhury B., Clements J., Cole J., Dicks E.,
-RA   Forbes S., Gray K., Halliday K., Harrison R., Hills K., Hinton J.,
-RA   Jenkinson A., Jones D., Menzies A., Mironenko T., Perry J., Raine K.,
-RA   Richardson D., Shepherd R., Small A., Tofts C., Varian J., Webb T.,
-RA   West S., Widaa S., Yates A., Cahill D.P., Louis D.N., Goldstraw P.,
-RA   Nicholson A.G., Brasseur F., Looijenga L., Weber B.L., Chiew Y.-E.,
-RA   DeFazio A., Greaves M.F., Green A.R., Campbell P., Birney E.,
-RA   Easton D.F., Chenevix-Trench G., Tan M.-H., Khoo S.K., Teh B.T.,
-RA   Yuen S.T., Leung S.Y., Wooster R., Futreal P.A., Stratton M.R.;
+RA   Greenman C., Stephens P., Smith R., Dalgliesh G.L., Hunter C., Bignell G.,
+RA   Davies H., Teague J., Butler A., Stevens C., Edkins S., O'Meara S.,
+RA   Vastrik I., Schmidt E.E., Avis T., Barthorpe S., Bhamra G., Buck G.,
+RA   Choudhury B., Clements J., Cole J., Dicks E., Forbes S., Gray K.,
+RA   Halliday K., Harrison R., Hills K., Hinton J., Jenkinson A., Jones D.,
+RA   Menzies A., Mironenko T., Perry J., Raine K., Richardson D., Shepherd R.,
+RA   Small A., Tofts C., Varian J., Webb T., West S., Widaa S., Yates A.,
+RA   Cahill D.P., Louis D.N., Goldstraw P., Nicholson A.G., Brasseur F.,
+RA   Looijenga L., Weber B.L., Chiew Y.-E., DeFazio A., Greaves M.F.,
+RA   Green A.R., Campbell P., Birney E., Easton D.F., Chenevix-Trench G.,
+RA   Tan M.-H., Khoo S.K., Teh B.T., Yuen S.T., Leung S.Y., Wooster R.,
+RA   Futreal P.A., Stratton M.R.;
 RT   "Patterns of somatic mutation in human cancer genomes.";
 RL   Nature 446:153-158(2007).
-RN   [87]
-RP   VARIANTS BBDS ASP-381 AND ARG-391, AND CHARACTERIZATION OF VARIANT
-RP   BBDS ARG-391.
+RN   [76]
+RP   X-RAY CRYSTALLOGRAPHY (1.80 ANGSTROMS) OF 458-766 OF VARIANT LADDS THR-628
+RP   IN COMPLEX WITH ATP ANALOG, CATALYTIC ACTIVITY, SUBUNIT, AND
+RP   AUTOPHOSPHORYLATION.
+RX   PubMed=18056630; DOI=10.1073/pnas.0709905104;
+RA   Lew E.D., Bae J.H., Rohmann E., Wollnik B., Schlessinger J.;
+RT   "Structural basis for reduced FGFR2 activity in LADD syndrome: Implications
+RT   for FGFR autoinhibition and activation.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 104:19802-19807(2007).
+RN   [77]
+RP   FUNCTION, AND SUBCELLULAR LOCATION.
+RX   PubMed=18374639; DOI=10.1016/j.bone.2008.02.009;
+RA   Dufour C., Guenou H., Kaabeche K., Bouvard D., Sanjay A., Marie P.J.;
+RT   "FGFR2-Cbl interaction in lipid rafts triggers attenuation of PI3K/Akt
+RT   signaling and osteoblast survival.";
+RL   Bone 42:1032-1039(2008).
+RN   [78]
+RP   X-RAY CRYSTALLOGRAPHY (2.00 ANGSTROMS) OF 458-778 IN COMPLEX WITH ATP,
+RP   ACTIVE SITE, IDENTIFICATION BY MASS SPECTROMETRY, AUTOPHOSPHORYLATION, AND
+RP   PHOSPHORYLATION AT TYR-466; TYR-586; TYR-588; TYR-656; TYR-657 AND TYR-769.
+RX   PubMed=19060208; DOI=10.1073/pnas.0807752105;
+RA   Chen H., Xu C.F., Ma J., Eliseenkova A.V., Li W., Pollock P.M.,
+RA   Pitteloud N., Miller W.T., Neubert T.A., Mohammadi M.;
+RT   "A crystallographic snapshot of tyrosine trans-phosphorylation in action.";
+RL   Proc. Natl. Acad. Sci. U.S.A. 105:19660-19665(2008).
+RN   [79]
+RP   FUNCTION AS FGF7 RECEPTOR AND IN PHOSPHORYLATION OF PLCG1 AND FRS2,
+RP   CATALYTIC ACTIVITY, PHOSPHORYLATION AT TYR-466; TYR-586; TYR-588; TYR-656
+RP   AND TYR-657, AND IDENTIFICATION BY MASS SPECTROMETRY.
+RX   PubMed=19410646; DOI=10.1016/j.cellsig.2009.04.004;
+RA   Luo Y., Yang C., Jin C., Xie R., Wang F., McKeehan W.L.;
+RT   "Novel phosphotyrosine targets of FGFR2IIIb signaling.";
+RL   Cell. Signal. 21:1370-1378(2009).
+RN   [80]
+RP   FUNCTION IN FIBROBLAST PROLIFERATION; ACTIVATION OF MAP KINASES AND
+RP   PHOSPHORYLATION OF PLCG1 AND FRS2, INTERACTION WITH PLCG1 AND FRS2,
+RP   SUBCELLULAR LOCATION, AND MUTAGENESIS OF TYR-769.
+RX   PubMed=19103595; DOI=10.1074/jbc.M803998200;
+RA   Cha J.Y., Maddileti S., Mitin N., Harden T.K., Der C.J.;
+RT   "Aberrant receptor internalization and enhanced FRS2-dependent signaling
+RT   contribute to the transforming activity of the fibroblast growth factor
+RT   receptor 2 IIIb C3 isoform.";
+RL   J. Biol. Chem. 284:6227-6240(2009).
+RN   [81]
+RP   REVIEW ON LIGAND SPECIFICITY, ALTERNATIVE SPLICING, SIGNALING, AND ROLE IN
+RP   DISEASE.
+RX   PubMed=19387476; DOI=10.1038/jid.2009.97;
+RA   Katoh M.;
+RT   "FGFR2 abnormalities underlie a spectrum of bone, skin, and cancer
+RT   pathologies.";
+RL   J. Invest. Dermatol. 129:1861-1867(2009).
+RN   [82]
+RP   IDENTIFICATION BY MASS SPECTROMETRY [LARGE SCALE ANALYSIS].
+RX   PubMed=19369195; DOI=10.1074/mcp.M800588-MCP200;
+RA   Oppermann F.S., Gnad F., Olsen J.V., Hornberger R., Greff Z., Keri G.,
+RA   Mann M., Daub H.;
+RT   "Large-scale proteomics analysis of the human kinome.";
+RL   Mol. Cell. Proteomics 8:1751-1764(2009).
+RN   [83]
+RP   REVIEW ON FUNCTION IN FGF SIGNALING.
+RX   PubMed=20094046; DOI=10.1038/nrc2780;
+RA   Turner N., Grose R.;
+RT   "Fibroblast growth factor signalling: from development to cancer.";
+RL   Nat. Rev. Cancer 10:116-129(2010).
+RN   [84]
+RP   X-RAY CRYSTALLOGRAPHY (2.10 ANGSTROMS) OF 458-768 IN COMPLEX WITH
+RP   INHIBITOR, CATALYTIC ACTIVITY, AUTOPHOSPHORYLATION, AND ACTIVITY
+RP   REGULATION.
+RX   PubMed=21454610; DOI=10.1074/jbc.M110.213736;
+RA   Eathiraj S., Palma R., Hirschi M., Volckova E., Nakuci E., Castro J.,
+RA   Chen C.R., Chan T.C., France D.S., Ashwell M.A.;
+RT   "A novel mode of protein kinase inhibition exploiting hydrophobic motifs of
+RT   autoinhibited kinases: discovery of ATP-independent inhibitors of
+RT   fibroblast growth factor receptor.";
+RL   J. Biol. Chem. 286:20677-20687(2011).
+RN   [85]
+RP   FUNCTION, AND UBIQUITINATION.
+RX   PubMed=21596750; DOI=10.1074/jbc.M110.197525;
+RA   Severe N., Miraoui H., Marie P.J.;
+RT   "The Casitas B lineage lymphoma (Cbl) mutant G306E enhances osteogenic
+RT   differentiation in human mesenchymal stromal cells in part by decreased
+RT   Cbl-mediated platelet-derived growth factor receptor alpha and fibroblast
+RT   growth factor receptor 2 ubiquitination.";
+RL   J. Biol. Chem. 286:24443-24450(2011).
+RN   [86]
+RP   VARIANTS BBDS ASP-381 AND ARG-391, AND CHARACTERIZATION OF VARIANT BBDS
+RP   ARG-391.
 RX   PubMed=22387015; DOI=10.1016/j.ajhg.2012.02.005;
-RA   Merrill A.E., Sarukhanov A., Krejci P., Idoni B., Camacho N.,
-RA   Estrada K.D., Lyons K.M., Deixler H., Robinson H., Chitayat D.,
-RA   Curry C.J., Lachman R.S., Wilcox W.R., Krakow D.;
+RA   Merrill A.E., Sarukhanov A., Krejci P., Idoni B., Camacho N., Estrada K.D.,
+RA   Lyons K.M., Deixler H., Robinson H., Chitayat D., Curry C.J., Lachman R.S.,
+RA   Wilcox W.R., Krakow D.;
 RT   "Bent bone dysplasia-FGFR2 type, a distinct skeletal disorder, has
 RT   deficient canonical FGF signaling.";
 RL   Am. J. Hum. Genet. 90:550-557(2012).
+RN   [87]
+RP   PHOSPHORYLATION [LARGE SCALE ANALYSIS] AT SER-780, AND IDENTIFICATION BY
+RP   MASS SPECTROMETRY [LARGE SCALE ANALYSIS].
+RC   TISSUE=Liver;
+RX   PubMed=24275569; DOI=10.1016/j.jprot.2013.11.014;
+RA   Bian Y., Song C., Cheng K., Dong M., Wang F., Huang J., Sun D., Wang L.,
+RA   Ye M., Zou H.;
+RT   "An enzyme assisted RP-RPLC approach for in-depth analysis of human liver
+RT   phosphoproteome.";
+RL   J. Proteomics 96:253-262(2014).
 RN   [88]
 RP   VARIANT LEU-57.
 RX   PubMed=26429889; DOI=10.1136/jmedgenet-2015-103336;
-RA   Perles Z., Moon S., Ta-Shma A., Yaacov B., Francescatto L.,
-RA   Edvardson S., Rein A.J., Elpeleg O., Katsanis N.;
-RT   "A human laterality disorder caused by a homozygous deleterious
-RT   mutation in MMP21.";
+RA   Perles Z., Moon S., Ta-Shma A., Yaacov B., Francescatto L., Edvardson S.,
+RA   Rein A.J., Elpeleg O., Katsanis N.;
+RT   "A human laterality disorder caused by a homozygous deleterious mutation in
+RT   MMP21.";
 RL   J. Med. Genet. 52:840-847(2015).
 CC   -!- INTERACTION:
 CC       P19174:PLCG1; NbExp=9; IntAct=EBI-15489960, EBI-79387;
 CC       P05230-1:FGF1; NbExp=2; IntAct=EBI-15489960, EBI-15489950;
-CC   -!- SUBCELLULAR LOCATION: Isoform 1: Cell membrane; Single-pass type I
-CC       membrane protein. Note=After ligand binding, the activated
-CC       receptor is rapidly internalized and degraded.
+CC   -!- SUBCELLULAR LOCATION: [Isoform 1]: Cell membrane; Single-pass type I
+CC       membrane protein. Note=After ligand binding, the activated receptor is
+CC       rapidly internalized and degraded.
 CC   -!- ALTERNATIVE PRODUCTS:
 CC       Event=Alternative splicing; Named isoforms=23;
-CC       Name=1; Synonyms=BEK, FGFR2IIIc;
-CC         IsoId=P21802-1; Sequence=Displayed;
-CC       Name=2; Synonyms=Short;
-CC         IsoId=P21802-2; Sequence=VSP_002978;
-CC       Name=3; Synonyms=BFR-1, FGFR2IIIb, KGFR;
-CC         IsoId=P21802-3; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                  VSP_002972;
-CC       Name=4; Synonyms=K-sam;
-CC         IsoId=P21802-4; Sequence=VSP_002964, VSP_002969, VSP_002970,
-CC                                  VSP_002971, VSP_002972, VSP_002975,
-CC                                  VSP_002976;
-CC       Name=5; Synonyms=K-sam-I, BEK, IgIIIc;
-CC         IsoId=P21802-5; Sequence=VSP_002975;
-CC       Name=6; Synonyms=K-sam-IIC2;
-CC         IsoId=P21802-6; Sequence=VSP_002975, VSP_002984;
-CC       Name=7; Synonyms=K-sam-IIO2;
-CC         IsoId=P21802-7; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                  VSP_002972, VSP_002979;
-CC       Name=8; Synonyms=K-sam-IIC3;
-CC         IsoId=P21802-8; Sequence=VSP_002975, VSP_002978;
-CC       Name=9; Synonyms=K-sam-IIH1;
-CC         IsoId=P21802-9; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                  VSP_002972, VSP_002980;
-CC       Name=10; Synonyms=K-sam-IIH2;
-CC         IsoId=P21802-10; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002981;
-CC       Name=11; Synonyms=K-sam-IIH3, K-sam-IIO4;
-CC         IsoId=P21802-11; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002982;
+CC       Name=14; Synonyms=Soluble KGFR, K-sam-IV;
+CC         IsoId=P21802-14; Sequence=VSP_002966, VSP_002965;
 CC       Name=12; Synonyms=K-sam-IIO1;
-CC         IsoId=P21802-12; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002983;
-CC       Name=13; Synonyms=K-sam-IIO3;
-CC         IsoId=P21802-13; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002977;
-CC       Name=14; Synonyms=K-sam-IV, Soluble KGFR;
-CC         IsoId=P21802-14; Sequence=VSP_002965, VSP_002966;
-CC       Name=15; Synonyms=K-sam-III;
-CC         IsoId=P21802-15; Sequence=VSP_002968;
-CC       Name=16; Synonyms=TK14;
-CC         IsoId=P21802-16; Sequence=VSP_002967, VSP_002975;
-CC         Note=Ref.2 (AAA61188) sequence is in conflict in position:
-CC         315:T->L. {ECO:0000305};
-CC       Name=17;
-CC         IsoId=P21802-17; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002978;
-CC       Name=18; Synonyms=K-sam-IIC1, KGFR, IgIIIb;
-CC         IsoId=P21802-18; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002975;
-CC       Name=19; Synonyms=Soluble KGFR;
-CC         IsoId=P21802-19; Sequence=VSP_002969, VSP_002970, VSP_002971,
-CC                                   VSP_002972, VSP_002973, VSP_002974;
-CC       Name=20;
-CC         IsoId=P21802-20; Sequence=VSP_019608, VSP_019609;
-CC       Name=21;
-CC         IsoId=P21802-21; Sequence=VSP_002964, VSP_041915;
+CC         IsoId=P21802-12; Sequence=VSP_002970, VSP_002971, VSP_002969,
+CC                                   VSP_002983, VSP_002972;
+CC       Name=7; Synonyms=K-sam-IIO2;
+CC         IsoId=P21802-7; Sequence=VSP_002971, VSP_002979, VSP_002972,
+CC                                  VSP_002969, VSP_002970;
+CC       Name=18; Synonyms=KGFR, IgIIIb, K-sam-IIC1;
+CC         IsoId=P21802-18; Sequence=VSP_002970, VSP_002972, VSP_002969,
+CC                                   VSP_002975, VSP_002971;
+CC       Name=11; Synonyms=K-sam-IIH3, K-sam-IIO4;
+CC         IsoId=P21802-11; Sequence=VSP_002969, VSP_002982, VSP_002972,
+CC                                   VSP_002971, VSP_002970;
 CC       Name=22;
 CC         IsoId=P21802-22; Sequence=VSP_002964, VSP_002969, VSP_002970,
 CC                                   VSP_002971, VSP_002972, VSP_002978;
+CC       Name=8; Synonyms=K-sam-IIC3;
+CC         IsoId=P21802-8; Sequence=VSP_002978, VSP_002975;
+CC       Name=1; Synonyms=BEK, FGFR2IIIc;
+CC         IsoId=P21802-1; Sequence=Displayed;
+CC       Name=10; Synonyms=K-sam-IIH2;
+CC         IsoId=P21802-10; Sequence=VSP_002970, VSP_002971, VSP_002981,
+CC                                   VSP_002969, VSP_002972;
+CC       Name=16; Synonyms=TK14;
+CC         IsoId=P21802-16; Sequence=VSP_002967, VSP_002975;
+CC       Name=3; Synonyms=FGFR2IIIb, BFR-1, KGFR;
+CC         IsoId=P21802-3; Sequence=VSP_002970, VSP_002972, VSP_002971,
+CC                                  VSP_002969;
+CC       Name=19; Synonyms=Soluble KGFR;
+CC         IsoId=P21802-19; Sequence=VSP_002972, VSP_002973, VSP_002974,
+CC                                   VSP_002970, VSP_002971, VSP_002969;
+CC       Name=15; Synonyms=K-sam-III;
+CC         IsoId=P21802-15; Sequence=VSP_002968;
+CC       Name=17;
+CC         IsoId=P21802-17; Sequence=VSP_002972, VSP_002978, VSP_002970,
+CC                                   VSP_002971, VSP_002969;
 CC       Name=23;
 CC         IsoId=P21802-23; Sequence=VSP_041914;
-CC   -----------------------------------------------------------------------
+CC       Name=6; Synonyms=K-sam-IIC2;
+CC         IsoId=P21802-6; Sequence=VSP_002984, VSP_002975;
+CC       Name=4; Synonyms=K-sam;
+CC         IsoId=P21802-4; Sequence=VSP_002975, VSP_002971, VSP_002970,
+CC                                  VSP_002972, VSP_002976, VSP_002964,
+CC                                  VSP_002969;
+CC       Name=20;
+CC         IsoId=P21802-20; Sequence=VSP_019609, VSP_019608;
+CC       Name=13; Synonyms=K-sam-IIO3;
+CC         IsoId=P21802-13; Sequence=VSP_002972, VSP_002977, VSP_002970,
+CC                                   VSP_002969, VSP_002971;
+CC       Name=21;
+CC         IsoId=P21802-21; Sequence=VSP_041915, VSP_002964;
+CC       Name=9; Synonyms=K-sam-IIH1;
+CC         IsoId=P21802-9; Sequence=VSP_002969, VSP_002972, VSP_002980,
+CC                                  VSP_002970, VSP_002971;
+CC       Name=2; Synonyms=Short;
+CC         IsoId=P21802-2; Sequence=VSP_002978;
+CC       Name=5; Synonyms=BEK, IgIIIc, K-sam-I;
+CC         IsoId=P21802-5; Sequence=VSP_002975;
+CC   ---------------------------------------------------------------------------
 CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
 CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
-CC   -----------------------------------------------------------------------
-DR   EMBL; Z71929; CAA96492.1; -; mRNA. [P21802-1]
+CC   ---------------------------------------------------------------------------
 DR   EMBL; M87770; AAA59470.1; -; mRNA. [P21802-1]
 DR   EMBL; X52832; CAA37014.1; -; mRNA. [P21802-1]
+DR   EMBL; Z71929; CAA96492.1; -; mRNA. [P21802-1]
 DR   CCDS; CCDS31298.1; -. [P21802-1]
 DR   RefSeq; NP_000132.3; NM_000141.4. [P21802-1]
+DR   ProteomicsDB; 53905; -. [P21802-1]
 DR   Ensembl; ENST00000358487; ENSP00000351276; ENSG00000066468. [P21802-1]
 DR   UCSC; uc010qtl.3; human. [P21802-1]
 PE   1: Evidence at protein level;
