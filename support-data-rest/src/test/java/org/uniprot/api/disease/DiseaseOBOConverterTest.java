@@ -9,7 +9,8 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.obolibrary.oboformat.model.*;
+import org.obolibrary.oboformat.model.FrameMergeException;
+import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;

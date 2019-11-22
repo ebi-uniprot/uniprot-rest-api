@@ -1,12 +1,16 @@
 package org.uniprot.api.rest.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.*;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 import org.uniprot.store.datastore.common.StoreService;
 
 public class RDFService<T> implements StoreService<T> {
@@ -36,7 +40,7 @@ public class RDFService<T> implements StoreService<T> {
     public List<T> getEntries(Iterable<String> accessions) {
         List<String> allAccessions = new ArrayList<>();
         accessions.forEach(acc -> allAccessions.add(acc));
-        LOGGER.debug("RDF call for accessions : {}", allAccessions);
+        LOGGER.info("RDF call for accessions : {}", allAccessions);
         T rdfXML = getEntriesByAccessions(allAccessions);
         T rdfResponse = convertRDFForStreaming(rdfXML);
         return Arrays.asList(rdfResponse);

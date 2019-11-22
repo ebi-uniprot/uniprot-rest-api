@@ -6,7 +6,10 @@ import javax.validation.constraints.Positive;
 import lombok.Data;
 
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.search.field.DiseaseField;
 
 @Data

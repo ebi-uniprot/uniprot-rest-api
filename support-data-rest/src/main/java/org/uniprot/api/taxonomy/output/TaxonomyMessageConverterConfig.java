@@ -37,7 +37,6 @@ public class TaxonomyMessageConverterConfig {
         return MessageConverterContext.<TaxonomyEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.TAXONOMY)
                 .contentType(contentType)
-                .clazz(TaxonomyEntry.class)
                 .build();
     }
 }

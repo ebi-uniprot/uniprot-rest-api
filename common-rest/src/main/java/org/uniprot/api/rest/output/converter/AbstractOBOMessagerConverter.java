@@ -1,6 +1,9 @@
 package org.uniprot.api.rest.output.converter;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 
 import org.obolibrary.oboformat.model.Clause;

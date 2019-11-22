@@ -30,7 +30,6 @@ public class CrossRefMessageConverterConfig {
         return MessageConverterContext.<CrossRefEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.CROSSREF)
                 .contentType(contentType)
-                .clazz(CrossRefEntry.class)
                 .build();
     }
 }
