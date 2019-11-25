@@ -46,6 +46,12 @@ public class DiseaseSolrDocumentHelper {
         }
     }
 
+    public static void createDiseaseDocuments(
+            DataStoreManager storeManager, String accession, long suffix) {
+        DiseaseDocument diseaseDoc = createDiseaseDocument(accession, suffix);
+        storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, diseaseDoc);
+    }
+
     private static String getNextUniqueAccession(Set<String> accessionBag) {
         String accPrefix = "DI-";
         long num = ThreadLocalRandom.current().nextLong(10000, 99999);

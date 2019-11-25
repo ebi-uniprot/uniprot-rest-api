@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 
-/** @author lgonzales */
 public abstract class AbstractDownloadParameterResolver implements ParameterResolver {
 
     @Override
@@ -31,25 +30,25 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
                                         new RuntimeException(
                                                 "AbstractDownloadParameterResolver: Unable to find test method"));
         switch (method.getName()) {
-            case "downloadAll":
+            case "testDownloadAll":
                 result = downloadAllParameter();
                 break;
-            case "downloadLessThanDefaultBatchSize":
+            case "testDownloadLessThanDefaultBatchSize":
                 result = downloadLessThanDefaultBatchSizeParameter();
                 break;
-            case "downloadDefaultBatchSize":
+            case "testDownloadDefaultBatchSize":
                 result = downloadDefaultBatchSizeParameter();
                 break;
-            case "downloadMoreThanBatchSize":
+            case "testDownloadMoreThanBatchSize":
                 result = downloadMoreThanBatchSizeParameter();
                 break;
-            case "downloadSizeLessThanZero":
+            case "testDownloadSizeLessThanZero":
                 result = downloadSizeLessThanZeroParameter();
                 break;
-            case "downloadWithoutQuery":
+            case "testDownloadWithoutQuery":
                 result = downloadWithoutQueryParameter();
                 break;
-            case "downloadWithBadQuery":
+            case "testDownloadWithBadQuery":
                 result = downloadWithBadQueryParameter();
                 break;
         }
