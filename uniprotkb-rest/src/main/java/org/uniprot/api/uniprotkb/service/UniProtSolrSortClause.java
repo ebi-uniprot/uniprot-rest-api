@@ -7,26 +7,28 @@ import org.uniprot.store.search.domain2.UniProtKBSearchFields;
 
 @Component
 public class UniProtSolrSortClause extends AbstractSolrSortClause {
-  @Override
-  protected Sort createDefaultSort(boolean hasScore) {
-    return new Sort(Sort.Direction.DESC, SCORE)
-        .and(
-            new Sort(
-                    Sort.Direction.DESC,
-                    UniProtKBSearchFields.INSTANCE.getSortFieldFor("annotation_score"))
+    @Override
+    protected Sort createDefaultSort(boolean hasScore) {
+        return new Sort(Sort.Direction.DESC, SCORE)
                 .and(
-                    new Sort(
-                        Sort.Direction.ASC,
-                        UniProtKBSearchFields.INSTANCE.getSortFieldFor("accession"))));
-  }
+                        new Sort(
+                                        Sort.Direction.DESC,
+                                        UniProtKBSearchFields.INSTANCE.getSortFieldFor(
+                                                "annotation_score"))
+                                .and(
+                                        new Sort(
+                                                Sort.Direction.ASC,
+                                                UniProtKBSearchFields.INSTANCE.getSortFieldFor(
+                                                        "accession"))));
+    }
 
-  @Override
-  protected String getSolrDocumentIdFieldName() {
-    return UniProtKBSearchFields.INSTANCE.getSortFieldFor("accession");
-  }
+    @Override
+    protected String getSolrDocumentIdFieldName() {
+        return UniProtKBSearchFields.INSTANCE.getSortFieldFor("accession");
+    }
 
-  @Override
-  protected String getSolrSortFieldName(String name) {
-    return UniProtKBSearchFields.INSTANCE.getSortFieldFor(name);
-  }
+    @Override
+    protected String getSolrSortFieldName(String name) {
+        return UniProtKBSearchFields.INSTANCE.getSortFieldFor(name);
+    }
 }

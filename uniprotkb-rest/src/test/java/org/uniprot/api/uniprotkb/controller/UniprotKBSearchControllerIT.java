@@ -71,8 +71,8 @@ import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
-import org.uniprot.store.search.field.SearchField;
-import org.uniprot.store.search.field.UniProtField;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.UniProtKBSearchFields;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -564,39 +564,45 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(UniProtField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        Set<String> allFields =
+                UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+                        .map(SearchField::getName)
+                        .collect(Collectors.toSet());
+
+        allFields.addAll(UniProtKBSearchFields.INSTANCE.getSorts());
+
+        return allFields;
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
-        UniProtField.Search search = UniProtField.Search.valueOf(searchField.getName());
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if (searchField.getName().startsWith("ftlen_")) {
+        if (searchField.startsWith("ftlen_")) {
             value = "[* TO *]";
         } else {
-            switch (search) {
-                case accession:
-                case accession_id:
+            switch (searchField) {
+                case "accession":
+                case "accession_id":
                     value = "P21802";
                     break;
-                case organism_id:
-                case host_id:
-                case taxonomy_id:
+                case "organism_id":
+                case "host_id":
+                case "taxonomy_id":
                     value = "9606";
                     break;
-                case modified:
-                case created:
-                case sequence_modified:
-                case lit_pubdate:
-                case length:
-                case mass:
+                case "modified":
+                case "created":
+                case "sequence_modified":
+                case "lit_pubdate":
+                case "length":
+                case "mass":
                     value = "[* TO *]";
                     break;
-                case proteome:
+                case "proteome":
                     value = "UP000000000";
                     break;
-                case annotation_score:
+                case "annotation_score":
                     value = "5";
                     break;
             }
@@ -605,10 +611,13 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return Arrays.stream(UniProtField.Sort.values())
-                .map(UniProtField.Sort::name)
-                .collect(Collectors.toList());
+    protected boolean fieldValueIsValid(String field, String value) {
+        return UniProtKBSearchFields.INSTANCE.fieldValueIsValid(field, value);
+    }
+
+    @Override
+    protected Collection<String> getAllSortFields() {
+        return UniProtKBSearchFields.INSTANCE.getSorts();
     }
 
     @Override

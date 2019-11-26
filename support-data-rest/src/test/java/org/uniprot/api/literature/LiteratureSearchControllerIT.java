@@ -5,10 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -44,7 +41,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.field.LiteratureField;
-import org.uniprot.store.search.field.SearchField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -93,14 +89,16 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(LiteratureField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(LiteratureField.Search.values())
+                .map(LiteratureField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        switch (searchField.getName()) {
+        switch (searchField) {
             case "id":
                 value = "10";
                 break;
@@ -125,6 +123,11 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         return Arrays.stream(LiteratureField.ResultFields.values())
                 .map(LiteratureField.ResultFields::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean fieldValueIsValid(String field, String value) {
+        return LiteratureField.Search.valueOf(field).hasValidValue(value);
     }
 
     @Override
