@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.uniprot.api.rest.controller.param.SearchParameter;
+import org.springframework.http.MediaType;
+import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
+import org.uniprot.api.rest.output.UniProtMediaType;
 
 public abstract class AbstractDownloadParameterResolver implements ParameterResolver {
 
@@ -14,14 +16,14 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
     public boolean supportsParameter(
             ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(SearchParameter.class);
+        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class);
     }
 
     @Override
     public Object resolveParameter(
             ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        SearchParameter result = null;
+        DownloadParamAndResult result = null;
         Method method =
                 extensionContext
                         .getTestMethod()
@@ -30,42 +32,54 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
                                         new RuntimeException(
                                                 "AbstractDownloadParameterResolver: Unable to find test method"));
         switch (method.getName()) {
-            case "testDownloadAll":
-                result = downloadAllParameter();
+            case "testDownloadAllJson":
+                result = getDownloadAllParamAndResult(MediaType.APPLICATION_JSON);
+                break;
+            case "testDownloadAllTSV":
+                result = getDownloadAllParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE);
+                break;
+            case "testDownloadAllList":
+                result = getDownloadAllParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE);
+                break;
+            case "testDownloadAllOBO":
+                result = getDownloadAllParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE);
+                break;
+            case "testDownloadAllXLS":
+                result = getDownloadAllParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
             case "testDownloadLessThanDefaultBatchSize":
-                result = downloadLessThanDefaultBatchSizeParameter();
+                result = getDownloadLessThanDefaultBatchSizeParamAndResult();
                 break;
             case "testDownloadDefaultBatchSize":
-                result = downloadDefaultBatchSizeParameter();
+                result = getDownloadDefaultBatchSizeParamAndResult();
                 break;
             case "testDownloadMoreThanBatchSize":
-                result = downloadMoreThanBatchSizeParameter();
+                result = getDownloadMoreThanBatchSizeParamAndResult();
                 break;
             case "testDownloadSizeLessThanZero":
-                result = downloadSizeLessThanZeroParameter();
+                result = getDownloadSizeLessThanZeroParamAndResult();
                 break;
             case "testDownloadWithoutQuery":
-                result = downloadWithoutQueryParameter();
+                result = getDownloadWithoutQueryParamAndResult();
                 break;
             case "testDownloadWithBadQuery":
-                result = downloadWithBadQueryParameter();
+                result = getDownloadWithBadQueryParamAndResult();
                 break;
         }
         return result;
     }
 
-    protected abstract SearchParameter downloadAllParameter();
+    protected abstract DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType);
 
-    protected abstract SearchParameter downloadLessThanDefaultBatchSizeParameter();
+    protected abstract DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult();
 
-    protected abstract SearchParameter downloadDefaultBatchSizeParameter();
+    protected abstract DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult();
 
-    protected abstract SearchParameter downloadMoreThanBatchSizeParameter();
+    protected abstract DownloadParamAndResult getDownloadMoreThanBatchSizeParamAndResult();
 
-    protected abstract SearchParameter downloadSizeLessThanZeroParameter();
+    protected abstract DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult();
 
-    protected abstract SearchParameter downloadWithoutQueryParameter();
+    protected abstract DownloadParamAndResult getDownloadWithoutQueryParamAndResult();
 
-    protected abstract SearchParameter downloadWithBadQueryParameter();
+    protected abstract DownloadParamAndResult getDownloadWithBadQueryParamAndResult();
 }

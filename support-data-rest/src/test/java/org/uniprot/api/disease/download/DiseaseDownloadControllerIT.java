@@ -13,8 +13,8 @@ import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.DiseaseRepository;
 import org.uniprot.api.disease.DiseaseSolrDocumentHelper;
 import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
+import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
-import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -33,45 +33,74 @@ public class DiseaseDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Test
     @Override
-    protected void testDownloadAll(SearchParameter queryParameter) throws Exception {
-        super.testDownloadAll(queryParameter);
+    protected void testDownloadAllJson(DownloadParamAndResult parameterAndResult) throws Exception {
+        super.testDownloadAllJson(parameterAndResult);
     }
 
     @Test
     @Override
-    protected void testDownloadLessThanDefaultBatchSize(SearchParameter queryParameter)
+    protected void testDownloadAllTSV(DownloadParamAndResult parameterAndResult) throws Exception {
+        super.testDownloadAllTSV(parameterAndResult);
+    }
+
+    @Test
+    @Override
+    protected void testDownloadAllList(DownloadParamAndResult parameterAndResult) throws Exception {
+        super.testDownloadAllList(parameterAndResult);
+    }
+
+    @Test
+    @Override
+    protected void testDownloadAllOBO(DownloadParamAndResult parameterAndResult) throws Exception {
+        super.testDownloadAllOBO(parameterAndResult);
+    }
+
+    @Test
+    @Override
+    protected void testDownloadAllXLS(DownloadParamAndResult parameterAndResult) throws Exception {
+        super.testDownloadAllXLS(parameterAndResult);
+    }
+
+    @Test
+    @Override
+    protected void testDownloadLessThanDefaultBatchSize(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadLessThanDefaultBatchSize(queryParameter);
+        super.testDownloadLessThanDefaultBatchSize(parameterAndResult);
     }
 
     @Test
     @Override
-    protected void testDownloadDefaultBatchSize(SearchParameter queryParameter) throws Exception {
-        super.testDownloadDefaultBatchSize(queryParameter);
+    protected void testDownloadDefaultBatchSize(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        super.testDownloadDefaultBatchSize(parameterAndResult);
     }
 
     @Test
     @Override
-    protected void testDownloadMoreThanBatchSize(SearchParameter queryParameter) throws Exception {
-        super.testDownloadMoreThanBatchSize(queryParameter);
+    protected void testDownloadMoreThanBatchSize(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        super.testDownloadMoreThanBatchSize(parameterAndResult);
     }
 
     @Test
     @Override
-    protected void testDownloadSizeLessThanZero(SearchParameter queryParameter) throws Exception {
-        super.testDownloadSizeLessThanZero(queryParameter);
+    protected void testDownloadSizeLessThanZero(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        super.testDownloadSizeLessThanZero(parameterAndResult);
     }
 
     @Test
     @Override
-    protected void testDownloadWithoutQuery(SearchParameter queryParameter) throws Exception {
-        super.testDownloadWithoutQuery(queryParameter);
+    protected void testDownloadWithoutQuery(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        super.testDownloadWithoutQuery(parameterAndResult);
     }
 
     @Test
     @Override
-    protected void testDownloadWithBadQuery(SearchParameter queryParameter) throws Exception {
-        super.testDownloadWithBadQuery(queryParameter);
+    protected void testDownloadWithBadQuery(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        super.testDownloadWithBadQuery(parameterAndResult);
     }
 
     @Test
