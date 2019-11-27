@@ -1,14 +1,14 @@
 package org.uniprot.api.uniprotkb.service;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
-
-import java.util.Iterator;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Iterator;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Sort;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 
 /**
  * Unit Test class to validate UniProtSortUtil class behaviour

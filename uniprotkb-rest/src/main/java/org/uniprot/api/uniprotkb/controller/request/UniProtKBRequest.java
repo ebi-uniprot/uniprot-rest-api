@@ -1,7 +1,15 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
@@ -11,14 +19,9 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.domain2.UniProtKBSearchFields;
 import org.uniprot.store.search.field.UniProtField;
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Search cursor request Entity

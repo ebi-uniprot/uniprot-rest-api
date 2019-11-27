@@ -14,21 +14,21 @@ public class UniProtSolrSortClause extends AbstractSolrSortClause {
                         new Sort(
                                         Sort.Direction.DESC,
                                         UniProtKBSearchFields.INSTANCE.getSortFieldFor(
-                                                "annotation_score"))
+                                                "annotation_score").getName())
                                 .and(
                                         new Sort(
                                                 Sort.Direction.ASC,
                                                 UniProtKBSearchFields.INSTANCE.getSortFieldFor(
-                                                        "accession"))));
+                                                        "accession").getName())));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtKBSearchFields.INSTANCE.getSortFieldFor("accession");
+        return UniProtKBSearchFields.INSTANCE.getSortFieldFor("accession").getName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
-        return UniProtKBSearchFields.INSTANCE.getSortFieldFor(name);
+        return UniProtKBSearchFields.INSTANCE.getSortFieldFor(name).getName();
     }
 }

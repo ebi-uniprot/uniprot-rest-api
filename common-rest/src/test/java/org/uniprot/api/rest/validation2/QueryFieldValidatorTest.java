@@ -23,8 +23,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidDefaultSearchQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -34,8 +33,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidSimpleAccessionQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -45,8 +43,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidSimpleWildcardQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -56,8 +53,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidSimpleMiddleWildcardQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -67,8 +63,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidSimplePrefixQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -78,8 +73,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanAndQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -89,8 +83,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanOrQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -100,8 +93,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanSubQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -116,8 +108,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidBooleanMultiSubQueryReturnTrue() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -132,8 +123,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidUnsuportedBoostQueryTypeReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -147,8 +137,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidOrganismNameRangeQueryFilterTypeReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -160,8 +149,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidFieldNameReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -173,8 +161,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidAccessionReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -186,8 +173,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidProteomeReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -200,8 +186,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidBooleanFieldReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -213,8 +198,7 @@ class QueryFieldValidatorTest {
 
     @Test
     void isValidInvalidIntegerFieldReturnFalse() {
-        ValidSolrQueryFields validSolrQueryFields =
-                getMockedValidSolrQueryFields();
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
@@ -225,8 +209,7 @@ class QueryFieldValidatorTest {
     }
 
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
-        ValidSolrQueryFields validReturnFields =
-                Mockito.mock(ValidSolrQueryFields.class);
+        ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
 
         Class<? extends SearchFields> returnFieldValidator = UniProtKBSearchFields.class;
         OngoingStubbing<Class<?>> ongoingStubbing =

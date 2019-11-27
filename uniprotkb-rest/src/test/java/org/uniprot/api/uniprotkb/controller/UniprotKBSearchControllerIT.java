@@ -34,6 +34,7 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.cv.chebi.ChebiRepo;
 import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
+import org.uniprot.core.cv.xdb.UniProtXDbTypes;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
@@ -564,20 +565,15 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        Set<String> allFields =
-                UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
-                        .map(SearchField::getName)
-                        .collect(Collectors.toSet());
-
-        allFields.addAll(UniProtKBSearchFields.INSTANCE.getSorts());
-
-        return allFields;
+        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if (searchField.startsWith("ftlen_")) {
+        if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
             switch (searchField) {
@@ -616,8 +612,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected Collection<String> getAllSortFields() {
-        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
-                .filter(field -> field.getSortName().isPresent())
+        return UniProtKBSearchFields.INSTANCE.getSortFields().stream()
                 .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
@@ -700,6 +695,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMisc.add("Search All");
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
+
+            UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
+                    .map(db -> db.getName().toLowerCase())
+                    .forEach(dbName -> doc.xrefCountMap.put("xref_count_" + dbName, 0L));
 
             Arrays.stream(FeatureType.values())
                     .map(type -> type.getName().toLowerCase())
