@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.controller.param;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +20,5 @@ public class DownloadParamAndResult {
 
     private MediaType contentType;
 
-    @Singular private List<ResultMatcher> resultMatchers;
+    @Singular private List<ResultMatcher> resultMatchers = new ArrayList<>();
 }

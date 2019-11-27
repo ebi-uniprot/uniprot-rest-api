@@ -23,7 +23,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.disease.download.DiseaseSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.SearchParameter;

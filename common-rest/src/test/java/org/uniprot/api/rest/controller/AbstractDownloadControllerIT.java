@@ -28,9 +28,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 
@@ -43,6 +41,7 @@ public abstract class AbstractDownloadControllerIT {
             "DI-" + ThreadLocalRandom.current().nextLong(10000, 99999);
     public static List<String> SORTED_ACCESSIONS =
             new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
+    public static final Integer ENTRY_COUNT = 500;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
@@ -56,7 +55,7 @@ public abstract class AbstractDownloadControllerIT {
 
     @BeforeEach
     void setUpData() {
-        saveEntries(500);
+        saveEntries(ENTRY_COUNT);
     }
 
     @AfterEach
@@ -104,52 +103,94 @@ public abstract class AbstractDownloadControllerIT {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadLessThanDefaultBatchSize(DownloadParamAndResult paramAndResult)
+    protected void testDownloadLessThanDefaultBatchSizeJson(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadDefaultBatchSize(DownloadParamAndResult paramAndResult)
+    protected void testDownloadLessThanDefaultBatchSizeTSV(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadMoreThanBatchSize(DownloadParamAndResult paramAndResult)
+    protected void testDownloadLessThanDefaultBatchSizeList(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadSizeLessThanZero(DownloadParamAndResult paramAndResult)
+    protected void testDownloadLessThanDefaultBatchSizeOBO(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
+    protected void testDownloadLessThanDefaultBatchSizeXLS(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
+    protected void testDownloadDefaultBatchSizeJson(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
+    protected void testDownloadMoreThanBatchSizeJson(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
+    protected void testDownloadSizeLessThanZeroJson(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
-    protected void testDownloadWithoutQuery(DownloadParamAndResult paramAndResult)
+    protected void testDownloadWithoutQueryJson(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
-    protected void testDownloadWithBadQuery(DownloadParamAndResult paramAndResult)
+    protected void testDownloadWithoutQueryTSV(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
-    protected void searchSuccessContentTypes(SearchContentTypeParam contentTypeParam)
+    protected void testDownloadWithoutQueryList(DownloadParamAndResult paramAndResult)
             throws Exception {
-        // given
-        saveEntry(SEARCH_ACCESSION1, 10L);
-        saveEntry(SEARCH_ACCESSION2, 20L);
-        for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
-            sendAndVerify(contentTypeParam, HttpStatus.OK, contentType);
-        }
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
-    protected void searchBadRequestContentTypes(SearchContentTypeParam contentTypeParam)
+    protected void testDownloadWithoutQueryXLS(DownloadParamAndResult paramAndResult)
             throws Exception {
-        // when
-        for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
-            sendAndVerify(contentTypeParam, HttpStatus.BAD_REQUEST, contentType);
-        }
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadWithoutQueryOBO(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadWithBadQueryJson(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadWithBadQueryList(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadWithBadQueryTSV(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadWithBadQueryOBO(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadWithBadQueryXLS(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
     private ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
@@ -187,33 +228,6 @@ public abstract class AbstractDownloadControllerIT {
                                                 paramAndResult.getContentType().toString()));
 
         for (ResultMatcher resultMatcher : paramAndResult.getResultMatchers()) {
-            resultActions.andExpect(resultMatcher);
-        }
-    }
-
-    private void sendAndVerify(
-            SearchContentTypeParam contentTypeParam,
-            HttpStatus httpStatus,
-            ContentTypeParam contentType)
-            throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(getDownloadRequestPath())
-                        .param("query", contentTypeParam.getQuery())
-                        .header(ACCEPT, contentType.getContentType());
-
-        ResultActions response = perform(requestBuilder);
-
-        // then
-        ResultActions resultActions =
-                response.andDo(print())
-                        .andExpect(status().is(httpStatus.value()))
-                        .andExpect(
-                                header().string(
-                                                HttpHeaders.CONTENT_TYPE,
-                                                contentType.getContentType().toString()));
-
-        for (ResultMatcher resultMatcher : contentType.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
     }
