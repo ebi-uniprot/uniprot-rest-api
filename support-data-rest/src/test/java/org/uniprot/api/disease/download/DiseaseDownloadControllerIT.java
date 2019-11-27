@@ -27,163 +27,170 @@ public class DiseaseDownloadControllerIT extends AbstractDownloadControllerIT {
     @Autowired private DiseaseRepository repository;
 
     @Test
-    @Override
-    protected void testDownloadAllJson(DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadAllJson(parameterAndResult);
+    protected void testDownloadAllJSON(DownloadParamAndResult parameterAndResult) throws Exception {
+        testDownloadAll(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadAllTSV(DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadAllTSV(parameterAndResult);
+        testDownloadAll(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadAllList(DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadAllList(parameterAndResult);
+        testDownloadAll(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadAllOBO(DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadAllOBO(parameterAndResult);
+        testDownloadAll(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadAllXLS(DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadAllXLS(parameterAndResult);
+        testDownloadAll(parameterAndResult);
     }
 
     @Test
-    @Override
-    protected void testDownloadLessThanDefaultBatchSizeJson(
+    protected void testDownloadLessThanDefaultBatchSizeJSON(
             DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadLessThanDefaultBatchSizeJson(parameterAndResult);
+        testDownloadLessThanDefaultBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadLessThanDefaultBatchSizeTSV(
             DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadLessThanDefaultBatchSizeTSV(parameterAndResult);
+        testDownloadLessThanDefaultBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadLessThanDefaultBatchSizeList(
             DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadLessThanDefaultBatchSizeList(parameterAndResult);
+        testDownloadLessThanDefaultBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadLessThanDefaultBatchSizeOBO(
             DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadLessThanDefaultBatchSizeOBO(parameterAndResult);
+        testDownloadLessThanDefaultBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadLessThanDefaultBatchSizeXLS(
             DownloadParamAndResult parameterAndResult) throws Exception {
-        super.testDownloadLessThanDefaultBatchSizeXLS(parameterAndResult);
+        testDownloadLessThanDefaultBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
-    protected void testDownloadDefaultBatchSizeJson(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadDefaultBatchSizeJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadDefaultBatchSizeJson(parameterAndResult);
+        testDownloadDefaultBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
-    protected void testDownloadMoreThanBatchSizeJson(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadMoreThanBatchSizeJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadMoreThanBatchSizeJson(parameterAndResult);
+        testDownloadMoreThanBatchSize(parameterAndResult);
     }
 
     @Test
-    @Override
-    protected void testDownloadSizeLessThanZeroJson(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadSizeLessThanZeroJson(parameterAndResult);
+        testDownloadWithSort(parameterAndResult);
     }
 
     @Test
-    @Override
-    protected void testDownloadWithoutQueryJson(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortList(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithoutQueryJson(parameterAndResult);
+        testDownloadWithSort(parameterAndResult);
     }
 
     @Test
-    @Override
+    protected void testDownloadWithSortTSV(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadWithSort(parameterAndResult);
+    }
+
+    @Test
+    protected void testDownloadWithSortXLS(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadWithSort(parameterAndResult);
+    }
+
+    @Test
+    protected void testDownloadWithSortOBO(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadWithSort(parameterAndResult);
+    }
+
+    @Test
+    protected void testDownloadSizeLessThanZeroJSON(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadSizeLessThanZero(parameterAndResult);
+    }
+
+    @Test
+    protected void testDownloadWithoutQueryJSON(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadWithoutQuery(parameterAndResult);
+    }
+
+    @Test
     protected void testDownloadWithoutQueryList(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithoutQueryList(parameterAndResult);
+        testDownloadWithoutQuery(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadWithoutQueryTSV(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithoutQueryTSV(parameterAndResult);
+        testDownloadWithoutQuery(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadWithoutQueryOBO(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithoutQueryOBO(parameterAndResult);
+        testDownloadWithoutQuery(parameterAndResult);
     }
 
     @Test
-    @Override
     protected void testDownloadWithoutQueryXLS(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithoutQueryXLS(parameterAndResult);
+        testDownloadWithoutQuery(parameterAndResult);
     }
 
     @Test
-    @Override
-    protected void testDownloadWithBadQueryJson(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithBadQueryJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithBadQueryJson(parameterAndResult);
+        testDownloadWithBadQuery(parameterAndResult);
     }
 
     @Disabled // see https://www.ebi.ac.uk/panda/jira/browse/TRM-23243
     @Test
-    @Override
     protected void testDownloadWithBadQueryList(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithBadQueryList(parameterAndResult);
+        testDownloadWithBadQuery(parameterAndResult);
     }
 
     @Disabled // see https://www.ebi.ac.uk/panda/jira/browse/TRM-23243
     @Test
-    @Override
     protected void testDownloadWithBadQueryTSV(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithBadQueryTSV(parameterAndResult);
+        testDownloadWithBadQuery(parameterAndResult);
     }
 
     @Disabled // see https://www.ebi.ac.uk/panda/jira/browse/TRM-23243
     @Test
-    @Override
     protected void testDownloadWithBadQueryOBO(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithBadQueryOBO(parameterAndResult);
+        testDownloadWithBadQuery(parameterAndResult);
     }
 
     @Disabled // see https://www.ebi.ac.uk/panda/jira/browse/TRM-23243
     @Test
-    @Override
     protected void testDownloadWithBadQueryXLS(DownloadParamAndResult parameterAndResult)
             throws Exception {
-        super.testDownloadWithBadQueryXLS(parameterAndResult);
+        testDownloadWithBadQuery(parameterAndResult);
     }
 
     @Override

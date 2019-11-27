@@ -3,7 +3,7 @@ package org.uniprot.api.disease.download;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractDownloadControllerIT.ENTRY_COUNT;
+import static org.uniprot.api.rest.controller.AbstractDownloadControllerIT.*;
 
 import java.util.*;
 
@@ -85,6 +85,66 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
     }
 
     @Override
+    protected DownloadParamAndResult getDownloadWithSortParamAndResult(MediaType contentType) {
+        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
+        // add result matcher to match sorter accession
+        List<String> sortedAccessions = Arrays.asList(ACC1, ACC2, ACC3);
+        Collections.sort(sortedAccessions);
+        Collections.sort(sortedAccessions, Collections.reverseOrder());
+
+        // add sorting/order related matching
+        ResultMatcher sortResultMatcher = null;
+        if (MediaType.APPLICATION_JSON.equals(contentType)) {
+            sortResultMatcher = jsonPath("$.results[*].accession", equalTo(sortedAccessions));
+        } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
+            sortResultMatcher =
+                    result ->
+                            assertThat(
+                                    "Disease TSV accession not in order",
+                                    getAccessionsFromTSV(result.getResponse().getContentAsString()),
+                                    equalTo(sortedAccessions));
+        } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
+            sortResultMatcher =
+                    result ->
+                            assertThat(
+                                    "Disease List accession not in order",
+                                    Arrays.asList(
+                                            result.getResponse().getContentAsString().split("\n")),
+                                    equalTo(sortedAccessions));
+        } else if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {
+            sortResultMatcher =
+                    result ->
+                            assertThat(
+                                    "Disease OBO accession not in order",
+                                    getAccessionsFromOBO(result.getResponse().getContentAsString()),
+                                    equalTo(sortedAccessions));
+        } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
+            sortResultMatcher =
+                    result ->
+                            assertThat(
+                                    "Disease Excel accession not in order",
+                                    XLS_ACCESSIONS,
+                                    equalTo(sortedAccessions));
+        }
+
+        if (sortResultMatcher != null) {
+            List<ResultMatcher> resultMatchers =
+                    new ArrayList<>(paramAndResult.getResultMatchers());
+            resultMatchers.add(sortResultMatcher);
+            paramAndResult.setResultMatchers(resultMatchers);
+        }
+        // add param
+        Map<String, List<String>> updatedQueryParams =
+                addQueryParam(
+                        paramAndResult.getQueryParams(),
+                        "sort",
+                        Collections.singletonList("accession desc"));
+
+        paramAndResult.setQueryParams(updatedQueryParams);
+        return paramAndResult;
+    }
+
+    @Override
     protected DownloadParamAndResult getDownloadWithoutQueryParamAndResult(MediaType contentType) {
 
         DownloadParamAndResult.DownloadParamAndResultBuilder builder =
@@ -112,8 +172,11 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
                 .build();
     }
 
+    static List<String> XLS_ACCESSIONS = new ArrayList<>();
+
     @Override
     protected void verifyExcelData(Sheet sheet) {
+        XLS_ACCESSIONS = new ArrayList<>();
         List<String> headerList = new ArrayList<>();
         boolean headerRead = false;
         for (Row row : sheet) {
@@ -124,6 +187,9 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
                 } else {
                     assertThat(
                             headerList.get(i) + " is null", !cell.getStringCellValue().isEmpty());
+                    if (i == 1) {
+                        XLS_ACCESSIONS.add(cell.getStringCellValue());
+                    }
                     i++;
                 }
             }
@@ -266,5 +332,27 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
                                 "The excel rows count doesn't match",
                                 getExcelRowCountAndVerifyContent(result),
                                 is(expectedEntryCount + 1))); // with header
+    }
+
+    private List<String> getAccessionsFromTSV(String contentAsString) {
+        String[] rows = contentAsString.split("\n");
+        List<String> accessions = new ArrayList<>();
+        // ignore the header and get accession from second tab
+        for (String row : Arrays.copyOfRange(rows, 1, rows.length)) {
+            String acc = row.split("\t")[1];
+            accessions.add(acc);
+        }
+        return accessions;
+    }
+
+    private List<String> getAccessionsFromOBO(String rsp) {
+        String[] rows = rsp.split("\\[Term\\]");
+        List<String> accessions = new ArrayList<>();
+        // ignore the header and get accession from second tab
+        for (String row : Arrays.copyOfRange(rows, 1, rows.length)) {
+            String acc = row.substring(5, 13);
+            accessions.add(acc);
+        }
+        return accessions;
     }
 }

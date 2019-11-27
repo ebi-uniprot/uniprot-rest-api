@@ -36,12 +36,16 @@ import org.uniprot.store.search.SolrCollection;
 public abstract class AbstractDownloadControllerIT {
     // FIXME move it to common class
     public static String SEARCH_ACCESSION1 =
-            "DI-" + ThreadLocalRandom.current().nextLong(10000, 99999);
+            "DI-" + ThreadLocalRandom.current().nextLong(10000, 50000);
     public static String SEARCH_ACCESSION2 =
-            "DI-" + ThreadLocalRandom.current().nextLong(10000, 99999);
+            "DI-" + ThreadLocalRandom.current().nextLong(50001, 99999);
     public static List<String> SORTED_ACCESSIONS =
             new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
     public static final Integer ENTRY_COUNT = 500;
+
+    public static final String ACC1 = "DI-12345";
+    public static final String ACC2 = "DI-11111";
+    public static final String ACC3 = "DI-54321";
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
@@ -83,112 +87,49 @@ public abstract class AbstractDownloadControllerIT {
         return storeManager;
     }
 
-    protected void testDownloadAllJson(DownloadParamAndResult paramAndResult) throws Exception {
+    protected void testDownloadAll(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadAllTSV(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadAllList(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadAllOBO(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadAllXLS(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadLessThanDefaultBatchSizeJson(DownloadParamAndResult paramAndResult)
+    protected void testDownloadLessThanDefaultBatchSize(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadLessThanDefaultBatchSizeTSV(DownloadParamAndResult paramAndResult)
+    protected void testDownloadDefaultBatchSize(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadLessThanDefaultBatchSizeList(DownloadParamAndResult paramAndResult)
+    protected void testDownloadMoreThanBatchSize(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadLessThanDefaultBatchSizeOBO(DownloadParamAndResult paramAndResult)
-            throws Exception {
+    protected void testDownloadWithSort(DownloadParamAndResult paramAndResult) throws Exception {
+        // clear the collection
+        cleanData();
+        // when
+        saveEntry(ACC1, 1);
+        saveEntry(ACC2, 2);
+        saveEntry(ACC3, 3);
+        // then
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    protected void testDownloadLessThanDefaultBatchSizeXLS(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
+    // negative test cases
 
-    protected void testDownloadDefaultBatchSizeJson(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadMoreThanBatchSizeJson(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadSizeLessThanZeroJson(DownloadParamAndResult paramAndResult)
+    protected void testDownloadSizeLessThanZero(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
-    protected void testDownloadWithoutQueryJson(DownloadParamAndResult paramAndResult)
+    protected void testDownloadWithoutQuery(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
-    protected void testDownloadWithoutQueryTSV(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithoutQueryList(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithoutQueryXLS(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithoutQueryOBO(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithBadQueryJson(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithBadQueryList(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithBadQueryTSV(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithBadQueryOBO(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithBadQueryXLS(DownloadParamAndResult paramAndResult)
+    protected void testDownloadWithBadQuery(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }

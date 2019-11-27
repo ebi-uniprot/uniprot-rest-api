@@ -43,7 +43,7 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
                                         new RuntimeException(
                                                 "AbstractDownloadParameterResolver: Unable to find test method"));
         switch (method.getName()) {
-            case "testDownloadAllJson":
+            case "testDownloadAllJSON":
                 result = getDownloadAllParamAndResult(MediaType.APPLICATION_JSON);
                 break;
             case "testDownloadAllTSV":
@@ -58,7 +58,7 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
             case "testDownloadAllXLS":
                 result = getDownloadAllParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
-            case "testDownloadLessThanDefaultBatchSizeJson":
+            case "testDownloadLessThanDefaultBatchSizeJSON":
                 result =
                         getDownloadLessThanDefaultBatchSizeParamAndResult(
                                 MediaType.APPLICATION_JSON);
@@ -83,16 +83,16 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
                         getDownloadLessThanDefaultBatchSizeParamAndResult(
                                 UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
-            case "testDownloadDefaultBatchSizeJson":
+            case "testDownloadDefaultBatchSizeJSON":
                 result = getDownloadDefaultBatchSizeParamAndResult(MediaType.APPLICATION_JSON);
                 break;
-            case "testDownloadMoreThanBatchSizeJson":
+            case "testDownloadMoreThanBatchSizeJSON":
                 result = getDownloadMoreThanBatchSizeParamAndResult(MediaType.APPLICATION_JSON);
                 break;
-            case "testDownloadSizeLessThanZeroJson":
+            case "testDownloadSizeLessThanZeroJSON":
                 result = getDownloadSizeLessThanZeroParamAndResult(MediaType.APPLICATION_JSON);
                 break;
-            case "testDownloadWithoutQueryJson":
+            case "testDownloadWithoutQueryJSON":
                 result = getDownloadWithoutQueryParamAndResult(MediaType.APPLICATION_JSON);
                 break;
             case "testDownloadWithoutQueryTSV":
@@ -107,7 +107,7 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
             case "testDownloadWithoutQueryXLS":
                 result = getDownloadWithoutQueryParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
-            case "testDownloadWithBadQueryJson":
+            case "testDownloadWithBadQueryJSON":
                 result = getDownloadWithBadQueryParamAndResult(MediaType.APPLICATION_JSON);
                 break;
             case "testDownloadWithBadQueryList":
@@ -121,6 +121,21 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
                 break;
             case "testDownloadWithBadQueryXLS":
                 result = getDownloadWithBadQueryParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
+                break;
+            case "testDownloadWithSortJSON":
+                result = getDownloadWithSortParamAndResult(MediaType.APPLICATION_JSON);
+                break;
+            case "testDownloadWithSortList":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE);
+                break;
+            case "testDownloadWithSortTSV":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE);
+                break;
+            case "testDownloadWithSortOBO":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE);
+                break;
+            case "testDownloadWithSortXLS":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
         }
         return result;
@@ -141,6 +156,9 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
 
     protected abstract DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(
             MediaType contentType);
+
+    protected abstract DownloadParamAndResult getDownloadWithSortParamAndResult(
+            MediaType applicationJson);
 
     // negative test cases
     protected abstract DownloadParamAndResult getDownloadWithoutQueryParamAndResult(

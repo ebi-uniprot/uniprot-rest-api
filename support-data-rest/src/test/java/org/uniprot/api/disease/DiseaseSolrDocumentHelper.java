@@ -22,7 +22,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Slf4j
 public class DiseaseSolrDocumentHelper {
-
     public static void createDiseaseDocuments(DataStoreManager storeManager, int documentCount) {
         Set<String> accessionBag = new HashSet<>();
         int batchSize = 100;
