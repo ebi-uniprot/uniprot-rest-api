@@ -38,7 +38,7 @@ import org.uniprot.api.common.repository.search.QueryRetrievalException;
  *
  * @author lgonzales
  */
-@ControllerAdvice
+//@ControllerAdvice
 public class ResponseExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ResponseExceptionHandler.class);
     private static final String NOT_FOUND_MESSAGE = "search.not.found";

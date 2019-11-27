@@ -193,6 +193,7 @@ public @interface ValidSolrQueryFields {
             return validField;
         }
 
+        // TODO: 27/11/2019 ensure accession_id works in uniprotkbcontrollerit
         private SearchField getFieldByName(String fieldName) {
             return searchFields.getField(fieldName);
         }
