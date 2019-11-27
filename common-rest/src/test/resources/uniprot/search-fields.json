@@ -1,0 +1,60 @@
+[
+  {
+    "field": "annotation_score",
+    "sortField": "annotation_score"
+  },
+  {
+    "field": "mnemonic_default"
+  },
+  {
+    "field": "accession",
+    "sortField": "accession_id",
+    "fieldValidRegex": "([O,P,Q][0-9][A-Z|0-9]{3}[0-9]|[A-N,R-Z]([0-9][A-Z][A-Z|0-9]{2}){1,2}[0-9])(-\\d+)*",
+    "label": "ACCESSION",
+    "itemType": "single",
+    "dataType": "string",
+    "description": "Accession description",
+    "example": "P12345"
+  },
+  {
+    "label": "FUNCTION",
+    "itemType": "group",
+    "items": [
+      {
+        "label": "EC",
+        "field": "ec",
+        "dataType": "string",
+        "autoComplete": "/uniprot/api/suggester?dict=ec&query=?",
+        "idField": "ec",
+        "description": "Search by Enzyme EC number",
+        "example": "1.1.2.3"
+      },
+      {
+        "label": "COFACTORS",
+        "itemType": "group",
+        "items": [
+          {
+            "label": "CHEBI",
+            "field": "cc_cofactor_chebi",
+            "evidenceField": "ccev_cofactor_chebi",
+            "rangeField": "pretend_range_field",
+            "dataType": "string",
+            "autoComplete": "/uniprot/api/suggester?dict=chebi&query=?",
+            "idField": "cc_cofactor_chebi",
+            "description": "Search by cofactor chebi",
+            "example": "29105"
+          },
+          {
+            "label": "NOTE",
+            "field": "cc_cofactor_note",
+            "evidenceField": "ccev_cofactor_note",
+            "rangeField" : "pretend_range_field",
+            "dataType": "string",
+            "description": "Search by cofactor note",
+            "example": "subunit"
+          }
+        ]
+      }
+    ]
+  }
+]
