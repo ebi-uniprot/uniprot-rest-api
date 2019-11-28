@@ -117,6 +117,39 @@ public abstract class AbstractDownloadControllerIT {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
+    protected void testDownloadNonDefaultFields(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        // clear the collection
+        cleanData();
+        // when
+        saveEntry(ACC1, 1);
+        saveEntry(ACC2, 2);
+        saveEntry(ACC3, 3);
+        // then
+        sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
+    protected void testDownloadInvalidFields(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        // clear the collection
+        cleanData();
+        // when
+        saveEntry(ACC1, 1);
+        // then
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    protected void testDownloadByAccession(DownloadParamAndResult paramAndResult) throws Exception {
+        // clear the collection
+        cleanData();
+        // when
+        saveEntry(ACC1, 1);
+        saveEntry(ACC2, 2);
+        saveEntry(ACC3, 3);
+        // then
+        sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
     // negative test cases
 
     protected void testDownloadSizeLessThanZero(DownloadParamAndResult paramAndResult)

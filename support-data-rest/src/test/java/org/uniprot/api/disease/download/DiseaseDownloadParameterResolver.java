@@ -89,7 +89,6 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
         DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
         // add result matcher to match sorter accession
         List<String> sortedAccessions = Arrays.asList(ACC1, ACC2, ACC3);
-        Collections.sort(sortedAccessions);
         Collections.sort(sortedAccessions, Collections.reverseOrder());
 
         // add sorting/order related matching
@@ -145,6 +144,68 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
     }
 
     @Override
+    protected DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(
+            MediaType contentType) {
+        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
+        // request extra fields than the default ones
+        Map<String, List<String>> queryParams =
+                addQueryParam(
+                        paramAndResult.getQueryParams(),
+                        "fields",
+                        Collections.singletonList("embl,ebi,cross_references,reviewed_protein_count"));
+        paramAndResult.setQueryParams(queryParams);
+        // match response
+        ResultMatcher fieldM1 = jsonPath("$.url", notNullValue());
+        ResultMatcher fieldM2 = jsonPath("$.messages").exists();
+        ResultMatcher fieldM3 = jsonPath("$.messages.*", containsInAnyOrder("Invalid fields parameter value 'embl'","Invalid fields parameter value 'ebi'"));
+        List<ResultMatcher> fieldMatchers = Arrays.asList(fieldM1, fieldM2, fieldM3);
+        List<ResultMatcher> matchers = new ArrayList<>(fieldMatchers);
+        paramAndResult.setResultMatchers(matchers);
+        return paramAndResult;
+    }
+
+    @Override
+    protected DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
+            MediaType contentType) {
+        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
+        // request extra fields than the default ones
+        Map<String, List<String>> queryParams =
+                addQueryParam(
+                        paramAndResult.getQueryParams(),
+                        "fields",
+                        Collections.singletonList("cross_references,reviewed_protein_count"));
+        paramAndResult.setQueryParams(queryParams);
+        // match response
+        ResultMatcher fieldM1 = jsonPath("$.results[*].crossReferences").exists();
+        ResultMatcher fieldM2 = jsonPath("$.results[*].reviewedProteinCount").exists();
+        // FIXME accession should be returned and exist.  See
+        // https://www.ebi.ac.uk/panda/jira/browse/TRM-23245
+        ResultMatcher fieldM3 = jsonPath("$.results[*].accession").doesNotExist();
+        List<ResultMatcher> fieldMatchers = Arrays.asList(fieldM1, fieldM2, fieldM3);
+        List<ResultMatcher> matchers = new ArrayList<>(paramAndResult.getResultMatchers());
+        matchers.addAll(fieldMatchers);
+        paramAndResult.setResultMatchers(matchers);
+        return paramAndResult;
+    }
+
+    @Override
+    protected DownloadParamAndResult getDownloadByAccessionParamAndResult(MediaType contentType) {
+        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 1);
+        // request extra fields than the default ones
+        Map<String, List<String>> queryParams =
+                addQueryParam(
+                        paramAndResult.getQueryParams(),
+                        "query",
+                        Collections.singletonList("accession:" + ACC2));
+        paramAndResult.setQueryParams(queryParams);
+        ResultMatcher fieldM1 = jsonPath("$.results[0].accession", is(ACC2));
+        List<ResultMatcher> matchers = new ArrayList<>(paramAndResult.getResultMatchers());
+        matchers.add(fieldM1);
+        paramAndResult.setResultMatchers(matchers);
+        return paramAndResult;
+    }
+
+    @Override
     protected DownloadParamAndResult getDownloadWithoutQueryParamAndResult(MediaType contentType) {
 
         DownloadParamAndResult.DownloadParamAndResultBuilder builder =
@@ -184,10 +245,11 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
             for (Cell cell : row) {
                 if (!headerRead) {
                     headerList.add(cell.getStringCellValue());
+
                 } else {
                     assertThat(
                             headerList.get(i) + " is null", !cell.getStringCellValue().isEmpty());
-                    if (i == 1) {
+                    if (i == headerList.indexOf("Disease ID")) { // Disease ID field
                         XLS_ACCESSIONS.add(cell.getStringCellValue());
                     }
                     i++;
@@ -217,7 +279,7 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
             List<ResultMatcher> oldResultMatchers,
             Integer expectedEntryCount) {
         List<ResultMatcher> resultMatchers = new ArrayList<>(oldResultMatchers);
-        if (MediaType.APPLICATION_JSON.equals(contentType)) {
+        if (MediaType.APPLICATION_JSON.equals(contentType)) { // TODO add exists
             resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
         } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
             addTSVResultMatcher(resultMatchers, expectedEntryCount);

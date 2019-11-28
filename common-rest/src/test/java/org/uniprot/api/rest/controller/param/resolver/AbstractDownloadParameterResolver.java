@@ -137,6 +137,15 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
             case "testDownloadWithSortXLS":
                 result = getDownloadWithSortParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
+            case "testDownloadNonDefaultFieldsJSON":
+                result = getDownloadNonDefaultFieldsParamAndResult(MediaType.APPLICATION_JSON);
+                break;
+            case "testDownloadInvalidFieldsJSON":
+                result = getDownloadInvalidFieldsParamAndResult(MediaType.APPLICATION_JSON);
+                break;
+            case "testDownloadByAccessionJSON":
+                result = getDownloadByAccessionParamAndResult(MediaType.APPLICATION_JSON);
+                break;
         }
         return result;
     }
@@ -158,7 +167,15 @@ public abstract class AbstractDownloadParameterResolver implements ParameterReso
             MediaType contentType);
 
     protected abstract DownloadParamAndResult getDownloadWithSortParamAndResult(
-            MediaType applicationJson);
+            MediaType contentType);
+
+    protected abstract DownloadParamAndResult getDownloadByAccessionParamAndResult(
+            MediaType contentType);
+
+    // test for fields
+    protected abstract DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(MediaType contentType);
+
+    protected abstract DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(MediaType contentType);
 
     // negative test cases
     protected abstract DownloadParamAndResult getDownloadWithoutQueryParamAndResult(

@@ -124,6 +124,25 @@ public class DiseaseDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Test
+    protected void testDownloadNonDefaultFieldsJSON(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadNonDefaultFields(parameterAndResult);
+    }
+
+
+    @Test
+    protected void testDownloadInvalidFieldsJSON(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadInvalidFields(parameterAndResult);
+    }
+
+    @Test
+    protected void testDownloadByAccessionJSON(DownloadParamAndResult parameterAndResult)
+            throws Exception {
+        testDownloadByAccession(parameterAndResult);
+    }
+
+    @Test
     protected void testDownloadSizeLessThanZeroJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
         testDownloadSizeLessThanZero(parameterAndResult);
