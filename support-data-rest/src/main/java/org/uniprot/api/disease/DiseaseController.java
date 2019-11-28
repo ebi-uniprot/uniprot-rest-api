@@ -117,7 +117,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
 
     @Override
     protected String getEntityId(Disease entity) {
-        return entity.getId();
+        return entity.getAccession();
     }
 
     @Override
