@@ -13,7 +13,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,8 +41,8 @@ public @interface ValidSolrSortFields {
 
     class SortFieldValidatorImpl implements ConstraintValidator<ValidSolrSortFields, String> {
 
-        private static final String SORT_FORMAT =
-                "^([\\w]+)\\s([\\w]+)(\\s*,\\s*([\\w]+)\\s([\\w]+))*$";
+        private static final Pattern SORT_FORMAT_PATTERN =
+                Pattern.compile("^\\w+\\s+\\w+\\s*(,\\s*\\w+\\s+\\w+\\s*)*$");
         private static final String SORT_ORDER = "^asc|desc$";
         private List<String> valueList;
 
@@ -60,40 +62,44 @@ public @interface ValidSolrSortFields {
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            boolean result = true;
+            final AtomicBoolean result = new AtomicBoolean(true);
             if (value != null) {
                 value = value.toLowerCase();
-                if (value.matches(SORT_FORMAT)) {
-                    Pattern pattern = Pattern.compile(SORT_FORMAT);
-                    Matcher matcher = pattern.matcher(value);
-                    // TODO: 28/11/2019 use regex to validate format, then split string on , to get parts.
-                    if (matcher.matches()) {
-                        int index = 0;
-                        List<String> groups = getMatchGroupList(matcher);
-                        while (groups.size() > index) {
-                            String sortField = groups.get(++index);
-                            if (!valueList.contains(sortField)) {
-                                addInvalidSortFieldErrorMessage(contextImpl, sortField);
-                                result = false;
-                            }
+                if (SORT_FORMAT_PATTERN.matcher(value).matches()) {
 
-                            String sortOrder = groups.get(++index);
-                            if (!sortOrder.matches(SORT_ORDER)) {
-                                addInvalidSortOrderErrorMessage(contextImpl, sortOrder);
-                                result = false;
-                            }
-                            index++; // the comma is another group
-                        }
-                        if (!result && contextImpl != null) {
-                            contextImpl.disableDefaultConstraintViolation();
-                        }
+                    Arrays.stream(value.split(","))
+                            .map(String::trim)
+                            .forEach(
+                                    sortClause ->
+                                            handleSortClause(sortClause, contextImpl, result));
+                    if (!result.get() && contextImpl != null) {
+                        contextImpl.disableDefaultConstraintViolation();
                     }
                 } else {
                     addInvalidSortFormatErrorMessage(contextImpl, value);
-                    result = false;
+                    result.getAndSet(false);
                 }
             }
-            return result;
+            return result.get();
+        }
+
+        private void handleSortClause(
+                String sortClause,
+                ConstraintValidatorContextImpl contextImpl,
+                AtomicBoolean result) {
+            String[] sortClauseItems = sortClause.split(" ");
+
+            String sortField = sortClauseItems[0];
+            if (!valueList.contains(sortField)) {
+                addInvalidSortFieldErrorMessage(contextImpl, sortField);
+                result.getAndSet(false);
+            }
+
+            String sortOrder = sortClauseItems[1];
+            if (!sortOrder.matches(SORT_ORDER)) {
+                addInvalidSortOrderErrorMessage(contextImpl, sortOrder);
+                result.getAndSet(false);
+            }
         }
 
         public void addInvalidSortFormatErrorMessage(

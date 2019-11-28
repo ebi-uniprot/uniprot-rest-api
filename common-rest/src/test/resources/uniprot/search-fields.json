@@ -7,6 +7,22 @@
     "field": "mnemonic_default"
   },
   {
+    "label": "Entry Name [ID]",
+    "field": "mnemonic",
+    "sortField": "mnemonic_sort",
+    "dataType": "string",
+    "description": "Search by UniProtKB entry name",
+    "example": "P53_HUMAN"
+  },
+  {
+    "label": "Protein Name [DE]",
+    "field": "name",
+    "sortField": "name_sort",
+    "dataType": "string",
+    "description": "Search by UniProtKB Protein name",
+    "example": "mas5"
+  },
+  {
     "label": "Active",
     "field": "active",
     "fieldValidRegex": "^true|false$",
@@ -71,6 +87,14 @@
     "dataType": "string",
     "description": "Search by UniProtKB gene name",
     "example": "ydj1"
+  },
+  {
+    "label": "Sequence length",
+    "sortField": "length",
+    "dataType": "integer",
+    "rangeField": "length",
+    "description": "Search by Sequence length",
+    "example": "[441 TO 450]"
   },
   {
     "label": "Proteome ID",

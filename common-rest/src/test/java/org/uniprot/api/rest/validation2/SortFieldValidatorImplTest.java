@@ -66,7 +66,7 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene asc,length asc ,mass AsC , organism aSc", null);
+        boolean result = validator.isValid("gene asc,length asc ,mass AsC , organism_name aSc", null);
         assertTrue(result);
     }
 
@@ -76,7 +76,7 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene asc,TYPO asc ,mass AsC , organism aSc", null);
+        boolean result = validator.isValid("gene asc,TYPO asc ,mass AsC , organism_name aSc", null);
         assertFalse(result);
     }
 
@@ -108,7 +108,7 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene asc organism desc", null);
+        boolean result = validator.isValid("gene asc organism_name desc", null);
         assertFalse(result);
         assertEquals(1, validator.errorFields.size());
     }
@@ -119,7 +119,7 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene invalid , organism invalid2", null);
+        boolean result = validator.isValid("gene invalid , organism_name invalid2", null);
         assertFalse(result);
         assertEquals(2, validator.errorFields.size());
         assertEquals("invalid", validator.errorFields.get(0));
@@ -183,32 +183,6 @@ class SortFieldValidatorImplTest {
         public void addInvalidSortFieldErrorMessage(
                 ConstraintValidatorContextImpl contextImpl, String sortField) {
             errorFields.add(sortField);
-        }
-    }
-
-    private enum FakeSort {
-        accession("accession_id"),
-        mnemonic("mnemonic_sort"),
-        name("name_sort"),
-        annotation_score("annotation_score"),
-        gene("gene_sort"),
-        length("length"),
-        mass("mass"),
-        organism("organism_sort");
-
-        private final String solrFieldName;
-
-        FakeSort(String solrFieldName) {
-            this.solrFieldName = solrFieldName;
-        }
-
-        public String getSolrFieldName() {
-            return solrFieldName;
-        }
-
-        @Override
-        public String toString() {
-            return this.solrFieldName;
         }
     }
 }
