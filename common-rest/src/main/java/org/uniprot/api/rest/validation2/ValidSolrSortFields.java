@@ -1,6 +1,8 @@
 package org.uniprot.api.rest.validation2;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.SearchFields;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This is the solr query solr validator is responsible to verify if the sort field parameter has
@@ -46,11 +49,12 @@ public @interface ValidSolrSortFields {
             valueList = new ArrayList<>();
             Class<? extends Enum<?>> enumClass = constraintAnnotation.sortFieldEnumClazz();
 
-            Enum[] enumValArr = enumClass.getEnumConstants();
-
-            for (Enum enumVal : enumValArr) {
-                valueList.add(enumVal.name().toLowerCase());
-            }
+            SearchFields searchFields = (SearchFields) enumClass.getEnumConstants()[0];
+            valueList =
+                    searchFields.getSearchFields().stream()
+                            .filter(field -> field.getSortField().isPresent())
+                            .map(SearchField::getName)
+                            .collect(Collectors.toList());
         }
 
         @Override

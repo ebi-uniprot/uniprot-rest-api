@@ -14,11 +14,11 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.rest.validation2.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation2.ValidSolrSortFields;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.domain2.UniProtKBSearchFields;
-import org.uniprot.store.search.field.UniProtField;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,7 +50,7 @@ public class UniProtKBRequest implements SearchRequest {
     private String fields;
 
     @Parameter(description = "Name of the field to be sorted on")
-    @ValidSolrSortFields(sortFieldEnumClazz = UniProtField.Sort.class)
+    @ValidSolrSortFields(sortFieldEnumClazz = UniProtKBSearchFields.class)
     private String sort;
 
     @Parameter(hidden = true)

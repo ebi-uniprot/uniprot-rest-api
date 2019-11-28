@@ -567,6 +567,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     protected Collection<String> getAllSearchFields() {
         return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
                 .map(SearchField::getName)
+                //                .filter(n -> !n.startsWith("xref_count_"))
                 .collect(Collectors.toSet());
     }
 
@@ -612,7 +613,8 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected Collection<String> getAllSortFields() {
-        return UniProtKBSearchFields.INSTANCE.getSortFields().stream()
+        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
                 .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
@@ -844,7 +846,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'gene' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'gene' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

@@ -11,6 +11,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -36,7 +37,7 @@ import static org.uniprot.core.util.Utils.notNullOrEmpty;
  *
  * @author lgonzales
  */
-// @ControllerAdvice
+@ControllerAdvice
 public class ResponseExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ResponseExceptionHandler.class);
     private static final String NOT_FOUND_MESSAGE = "search.not.found";

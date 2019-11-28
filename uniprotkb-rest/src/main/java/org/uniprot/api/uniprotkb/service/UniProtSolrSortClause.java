@@ -13,13 +13,15 @@ public class UniProtSolrSortClause extends AbstractSolrSortClause {
                 .and(
                         new Sort(
                                         Sort.Direction.DESC,
-                                        UniProtKBSearchFields.INSTANCE.getSortFieldFor(
-                                                "annotation_score").getName())
+                                        UniProtKBSearchFields.INSTANCE
+                                                .getSortFieldFor("annotation_score")
+                                                .getName())
                                 .and(
                                         new Sort(
                                                 Sort.Direction.ASC,
-                                                UniProtKBSearchFields.INSTANCE.getSortFieldFor(
-                                                        "accession").getName())));
+                                                UniProtKBSearchFields.INSTANCE
+                                                        .getSortFieldFor("accession")
+                                                        .getName())));
     }
 
     @Override
