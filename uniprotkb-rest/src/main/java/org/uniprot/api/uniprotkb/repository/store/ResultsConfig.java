@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.repository.store;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import net.jodah.failsafe.RetryPolicy;
 
@@ -37,15 +38,15 @@ public class ResultsConfig {
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(
-                                Duration.ofMillis(
-                                        resultsConfigProperties().getStoreFetchRetryDelayMillis()))
+                        .withDelay(Duration.ofMillis(resultsConfigProperties().getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(resultsConfigProperties().getStoreFetchMaxRetries());
 
+        int rdfRetryDelay = rdfConfigProperties().getRetryDelayMillis();
+        int maxRdfRetryDelay = rdfRetryDelay * 8;
         RetryPolicy<Object> rdfRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(rdfConfigProperties().getRetryDelayMillis()))
+                        .withBackoff(rdfRetryDelay, maxRdfRetryDelay, ChronoUnit.MILLIS)
                         .withMaxRetries(rdfConfigProperties().getMaxRetries());
 
         return StoreStreamer.<UniProtDocument, UniProtEntry>builder()
