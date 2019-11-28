@@ -87,5 +87,13 @@
     "dataType": "string",
     "description": "Search by biophysicochemical properties: kinetic parameters",
     "example": "aspartate"
+  },
+  {
+    "label": "Mass(Da)",
+    "sortField": "mass",
+    "dataType": "integer",
+    "rangeField": "mass",
+    "description": "Search by Sequence mass",
+    "example": "[441126 TO 441126]"
   }
 ]

@@ -66,6 +66,7 @@ public @interface ValidSolrSortFields {
                 if (value.matches(SORT_FORMAT)) {
                     Pattern pattern = Pattern.compile(SORT_FORMAT);
                     Matcher matcher = pattern.matcher(value);
+                    // TODO: 28/11/2019 use regex to validate format, then split string on , to get parts.
                     if (matcher.matches()) {
                         int index = 0;
                         List<String> groups = getMatchGroupList(matcher);

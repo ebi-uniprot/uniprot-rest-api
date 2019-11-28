@@ -1,9 +1,10 @@
-package org.uniprot.api.rest.validation;
+package org.uniprot.api.rest.validation2;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
+import org.uniprot.store.search.domain2.UniProtKBSearchFields;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +66,18 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene asc,legth asc ,mass AsC , organism aSc", null);
+        boolean result = validator.isValid("gene asc,length asc ,mass AsC , organism aSc", null);
         assertTrue(result);
+    }
+
+    @Test
+    void isInvalidMultipleFieldMultiplesCommaSpacesAscSortReturnTrue() {
+        ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
+        FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
+        validator.initialize(validSolrSortFields);
+
+        boolean result = validator.isValid("gene asc,TYPO asc ,mass AsC , organism aSc", null);
+        assertFalse(result);
     }
 
     @Test
@@ -144,7 +155,7 @@ class SortFieldValidatorImplTest {
     private ValidSolrSortFields getMockedValidSolrQueryFields() {
         ValidSolrSortFields validSolrSortFields = Mockito.mock(ValidSolrSortFields.class);
 
-        Class<? extends Enum> returnFieldValidator = FakeSort.class;
+        Class<? extends Enum> returnFieldValidator = UniProtKBSearchFields.class;
         OngoingStubbing<Class<?>> ongoingStubbing =
                 Mockito.when(validSolrSortFields.sortFieldEnumClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
