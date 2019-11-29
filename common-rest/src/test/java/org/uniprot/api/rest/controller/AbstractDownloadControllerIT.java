@@ -7,11 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,18 +29,7 @@ import org.uniprot.store.search.SolrCollection;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT {
-    // FIXME move it to common class
-    public static String SEARCH_ACCESSION1 =
-            "DI-" + ThreadLocalRandom.current().nextLong(10000, 50000);
-    public static String SEARCH_ACCESSION2 =
-            "DI-" + ThreadLocalRandom.current().nextLong(50001, 99999);
-    public static List<String> SORTED_ACCESSIONS =
-            new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
     public static final Integer ENTRY_COUNT = 500;
-
-    public static final String ACC1 = "DI-12345";
-    public static final String ACC2 = "DI-11111";
-    public static final String ACC3 = "DI-54321";
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
@@ -58,12 +42,12 @@ public abstract class AbstractDownloadControllerIT {
     }
 
     @BeforeEach
-    void setUpData() {
+    public void setUpData() {
         saveEntries(ENTRY_COUNT);
     }
 
     @AfterEach
-    void cleanData() {
+    public void cleanData() {
         storeManager.cleanSolr(getStoreType());
     }
 
@@ -87,86 +71,6 @@ public abstract class AbstractDownloadControllerIT {
         return storeManager;
     }
 
-    protected void testDownloadAll(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadLessThanDefaultBatchSize(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadDefaultBatchSize(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadMoreThanBatchSize(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadWithSort(DownloadParamAndResult paramAndResult) throws Exception {
-        // clear the collection
-        cleanData();
-        // when
-        saveEntry(ACC1, 1);
-        saveEntry(ACC2, 2);
-        saveEntry(ACC3, 3);
-        // then
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadNonDefaultFields(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        // clear the collection
-        cleanData();
-        // when
-        saveEntry(ACC1, 1);
-        saveEntry(ACC2, 2);
-        saveEntry(ACC3, 3);
-        // then
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    protected void testDownloadInvalidFields(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        // clear the collection
-        cleanData();
-        // when
-        saveEntry(ACC1, 1);
-        // then
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadByAccession(DownloadParamAndResult paramAndResult) throws Exception {
-        // clear the collection
-        cleanData();
-        // when
-        saveEntry(ACC1, 1);
-        saveEntry(ACC2, 2);
-        saveEntry(ACC3, 3);
-        // then
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    // negative test cases
-
-    protected void testDownloadSizeLessThanZero(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithoutQuery(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
-    protected void testDownloadWithBadQuery(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
     private ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
         ResultActions resultActions = mockMvc.perform(builder);
         if (resultActions.andReturn().getRequest().isAsyncStarted()) {
@@ -180,7 +84,7 @@ public abstract class AbstractDownloadControllerIT {
         }
     }
 
-    private void sendAndVerify(DownloadParamAndResult paramAndResult, HttpStatus httpStatus)
+    protected void sendAndVerify(DownloadParamAndResult paramAndResult, HttpStatus httpStatus)
             throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =

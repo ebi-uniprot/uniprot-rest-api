@@ -3,8 +3,8 @@ package org.uniprot.api.disease;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractDownloadControllerIT.SEARCH_ACCESSION1;
-import static org.uniprot.api.rest.controller.AbstractDownloadControllerIT.SEARCH_ACCESSION2;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.SEARCH_ACCESSION1;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.SEARCH_ACCESSION2;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;

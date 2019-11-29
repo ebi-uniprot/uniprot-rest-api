@@ -2,7 +2,7 @@ package org.uniprot.api.disease;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractDownloadControllerIT.*;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

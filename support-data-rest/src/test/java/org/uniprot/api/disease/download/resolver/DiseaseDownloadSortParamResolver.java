@@ -1,9 +1,10 @@
-package org.uniprot.api.disease.download;
+package org.uniprot.api.disease.download.resolver;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractDownloadControllerIT.*;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
 
 import java.util.*;
 
@@ -13,76 +14,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadParameterResolver;
+import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadSortParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.BasicSearchService;
 
-public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterResolver {
-
-    @Override
-    protected DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType) {
-        return getDownloadDefaultParamAndResult(contentType, ENTRY_COUNT);
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult(
-            MediaType contentType) {
-        Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
-        DownloadParamAndResult paramAndResult =
-                getDownloadDefaultParamAndResult(contentType, downloadSize);
-        // add param
-        Map<String, List<String>> updatedQueryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "size",
-                        Collections.singletonList(String.valueOf(downloadSize)));
-        paramAndResult.setQueryParams(updatedQueryParams);
-        return paramAndResult;
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult(
-            MediaType contentType) {
-        Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE;
-        DownloadParamAndResult paramAndResult =
-                getDownloadDefaultParamAndResult(contentType, downloadSize);
-        // add param
-        Map<String, List<String>> updatedQueryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "size",
-                        Collections.singletonList(String.valueOf(downloadSize)));
-        paramAndResult.setQueryParams(updatedQueryParams);
-        return paramAndResult;
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadMoreThanBatchSizeParamAndResult(
-            MediaType contentType) {
-        Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
-        DownloadParamAndResult paramAndResult =
-                getDownloadDefaultParamAndResult(contentType, downloadSize);
-        // add param
-        Map<String, List<String>> updatedQueryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "size",
-                        Collections.singletonList(String.valueOf(downloadSize)));
-        paramAndResult.setQueryParams(updatedQueryParams);
-        return paramAndResult;
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(
-            MediaType contentType) {
-        return DownloadParamAndResult.builder()
-                .queryParam("query", Collections.singletonList("*"))
-                .queryParam("size", Collections.singletonList(String.valueOf(-1)))
-                .contentType(contentType)
-                .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                .resultMatcher(jsonPath("$.messages.*", contains("'size' must be greater than 0")))
-                .build();
-    }
+public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamResolver {
 
     @Override
     protected DownloadParamAndResult getDownloadWithSortParamAndResult(MediaType contentType) {
@@ -143,101 +78,6 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
         return paramAndResult;
     }
 
-    @Override
-    protected DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(MediaType contentType) {
-        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
-        // request extra fields than the default ones
-        Map<String, List<String>> queryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "fields",
-                        Collections.singletonList(
-                                "embl,ebi,cross_references,reviewed_protein_count"));
-        paramAndResult.setQueryParams(queryParams);
-        // match response
-        ResultMatcher fieldM1 = jsonPath("$.url", notNullValue());
-        ResultMatcher fieldM2 = jsonPath("$.messages").exists();
-        ResultMatcher fieldM3 =
-                jsonPath(
-                        "$.messages.*",
-                        containsInAnyOrder(
-                                "Invalid fields parameter value 'embl'",
-                                "Invalid fields parameter value 'ebi'"));
-        List<ResultMatcher> fieldMatchers = Arrays.asList(fieldM1, fieldM2, fieldM3);
-        List<ResultMatcher> matchers = new ArrayList<>(fieldMatchers);
-        paramAndResult.setResultMatchers(matchers);
-        return paramAndResult;
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
-            MediaType contentType) {
-        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
-        // request extra fields than the default ones
-        Map<String, List<String>> queryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "fields",
-                        Collections.singletonList("cross_references,reviewed_protein_count"));
-        paramAndResult.setQueryParams(queryParams);
-        // match response
-        ResultMatcher fieldM1 = jsonPath("$.results[*].crossReferences").exists();
-        ResultMatcher fieldM2 = jsonPath("$.results[*].reviewedProteinCount").exists();
-        // FIXME accession should be returned and exist.  See
-        // https://www.ebi.ac.uk/panda/jira/browse/TRM-23245
-        ResultMatcher fieldM3 = jsonPath("$.results[*].accession").doesNotExist();
-        List<ResultMatcher> fieldMatchers = Arrays.asList(fieldM1, fieldM2, fieldM3);
-        List<ResultMatcher> matchers = new ArrayList<>(paramAndResult.getResultMatchers());
-        matchers.addAll(fieldMatchers);
-        paramAndResult.setResultMatchers(matchers);
-        return paramAndResult;
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadByAccessionParamAndResult(MediaType contentType) {
-        DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 1);
-        // request extra fields than the default ones
-        Map<String, List<String>> queryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "query",
-                        Collections.singletonList("accession:" + ACC2));
-        paramAndResult.setQueryParams(queryParams);
-        ResultMatcher fieldM1 = jsonPath("$.results[0].accession", is(ACC2));
-        List<ResultMatcher> matchers = new ArrayList<>(paramAndResult.getResultMatchers());
-        matchers.add(fieldM1);
-        paramAndResult.setResultMatchers(matchers);
-        return paramAndResult;
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadWithoutQueryParamAndResult(MediaType contentType) {
-
-        DownloadParamAndResult.DownloadParamAndResultBuilder builder =
-                DownloadParamAndResult.builder().contentType(contentType);
-
-        if (MediaType.APPLICATION_JSON.equals(contentType)) {
-            builder.resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                    .resultMatcher(
-                            jsonPath("$.messages.*", contains("'query' is a required parameter")));
-        }
-
-        return builder.build();
-    }
-
-    @Override
-    protected DownloadParamAndResult getDownloadWithBadQueryParamAndResult(MediaType contentType) {
-        return DownloadParamAndResult.builder()
-                .queryParam("query", Collections.singletonList("random_field:protein"))
-                .contentType(contentType)
-                .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                .resultMatcher(
-                        jsonPath(
-                                "$.messages.*",
-                                contains("'random_field' is not a valid search field")))
-                .build();
-    }
-
     static List<String> XLS_ACCESSIONS = new ArrayList<>();
 
     @Override
@@ -270,7 +110,7 @@ public class DiseaseDownloadParameterResolver extends AbstractDownloadParameterR
     private DownloadParamAndResult getDownloadDefaultParamAndResult(
             MediaType contentType, Integer entryCount) {
         // add the common param and result matcher
-        DownloadParamAndResult paramAndResult = super.getDownloadAllParamAndResult(contentType);
+        DownloadParamAndResult paramAndResult = getCommonDownloadParamAndResult(contentType);
         // add disease specific result matcher
         List<ResultMatcher> resultMatchers =
                 getDiseaseSpecificResultMatcher(

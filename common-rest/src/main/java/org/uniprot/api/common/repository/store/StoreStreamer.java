@@ -123,8 +123,20 @@ public class StoreStreamer<D extends Document, T> {
         @Override
         List<T> convertBatch(List<String> batch) {
             return Failsafe.with(retryPolicy)
-                    .onFailure(throwable -> log.error("http call to RDF server failed. Retrying..."))
-                    .get(() -> storeClient.getEntries(batch));
+                    .onFailure(
+                            throwable -> log.error("http call to RDF server failed. Retrying..."))
+                    .get(
+                            () -> {
+                                try {
+                                    return storeClient.getEntries(batch);
+                                } catch (Exception e) {
+                                    log.error(
+                                            "RDF get call failed for accessions {} with error {}",
+                                            batch,
+                                            e.getMessage());
+                                    throw e;
+                                }
+                            });
         }
     }
 }

@@ -38,7 +38,9 @@ public class ResultsConfig {
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(resultsConfigProperties().getStoreFetchRetryDelayMillis()))
+                        .withDelay(
+                                Duration.ofMillis(
+                                        resultsConfigProperties().getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(resultsConfigProperties().getStoreFetchMaxRetries());
 
         int rdfRetryDelay = rdfConfigProperties().getRetryDelayMillis();
