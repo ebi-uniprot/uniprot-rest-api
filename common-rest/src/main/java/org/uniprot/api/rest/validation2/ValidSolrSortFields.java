@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -121,16 +120,6 @@ public @interface ValidSolrSortFields {
             String errorMessage = "{search.invalid.sort.field}";
             contextImpl.addMessageParameter("0", sortField);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
-        }
-
-        private List<String> getMatchGroupList(Matcher matcher) {
-            List<String> groups = new ArrayList<>();
-            for (int i = 0; i <= matcher.groupCount(); i++) {
-                if (matcher.group(i) != null) {
-                    groups.add(matcher.group(i));
-                }
-            }
-            return groups;
         }
     }
 }
