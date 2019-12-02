@@ -65,7 +65,7 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene asc,legth asc ,mass AsC , organism aSc", null);
+        boolean result = validator.isValid("gene asc,length asc ,mass AsC , organism aSc", null);
         assertTrue(result);
     }
 
