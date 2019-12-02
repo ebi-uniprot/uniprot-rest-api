@@ -66,12 +66,13 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("gene asc,length asc ,mass AsC , organism_name aSc", null);
+        boolean result =
+                validator.isValid("gene asc,length asc ,mass AsC , organism_name aSc", null);
         assertTrue(result);
     }
 
     @Test
-    void isInvalidMultipleFieldMultiplesCommaSpacesAscSortReturnTrue() {
+    void isInvalidMultipleFieldMultiplesCommaSpacesAscSortReturnFalse() {
         ValidSolrSortFields validSolrSortFields = getMockedValidSolrQueryFields();
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
