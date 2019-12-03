@@ -100,12 +100,7 @@ class UniProtEntryQueryResultsConverter {
                         .mergeDemergeTo(mergeDemergeList)
                         .build();
 
-        UniProtEntryBuilder.InactiveEntryBuilder entryBuilder =
-                new UniProtEntryBuilder()
-                        .primaryAccession(accession)
-                        .uniProtId(uniProtId)
-                        .inactive()
-                        .inactiveReason(inactiveReason);
+        UniProtEntryBuilder entryBuilder = new UniProtEntryBuilder(accession, uniProtId, inactiveReason);
         return Optional.of(entryBuilder.build());
     }
 
@@ -131,8 +126,7 @@ class UniProtEntryQueryResultsConverter {
                 SequenceBuilder seq =
                         new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
                 // seq.molWeight(doc.seqMass); //TODO: TRM-22339 assigned to Jie
-                UniProtEntryBuilder.ActiveEntryBuilder entryBuilder =
-                        new UniProtEntryBuilder().from(uniProtEntry);
+                UniProtEntryBuilder entryBuilder = UniProtEntryBuilder.fromInstance(uniProtEntry);
                 entryBuilder.sequence(seq.build());
                 uniProtEntry = entryBuilder.build();
             }

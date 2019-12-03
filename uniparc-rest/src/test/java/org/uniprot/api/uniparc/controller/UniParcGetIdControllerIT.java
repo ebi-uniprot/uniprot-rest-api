@@ -180,7 +180,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private List<SequenceFeature> getSeqFeatures() {
         List<Location> locations = Arrays.asList(new Location(12, 23), new Location(45, 89));
-        InterproGroup domain = new InterProGroupBuilder().name("name1").id("id1").build();
+        InterProGroup domain = new InterProGroupBuilder().name("name1").id("id1").build();
         SequenceFeature sf =
                 new SequenceFeatureBuilder()
                         .interproGroup(domain)
