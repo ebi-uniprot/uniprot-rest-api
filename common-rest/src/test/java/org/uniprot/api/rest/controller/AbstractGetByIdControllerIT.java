@@ -37,7 +37,6 @@ import org.uniprot.store.search.SolrCollection;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractGetByIdControllerIT {
-
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     @BeforeAll
@@ -77,6 +76,11 @@ public abstract class AbstractGetByIdControllerIT {
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
+    }
+
+    @Test
+    void withValidResponseFieldsOrder(GetIdParameter idParameter) throws Exception {
+        validIdReturnSuccess(idParameter);
     }
 
     @Test

@@ -21,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.ProteomeRequest;
 import org.uniprot.api.proteome.service.ProteomeQueryService;
@@ -33,14 +33,11 @@ import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.field.ProteomeResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author jluo
  * @date: 24 Apr 2019
  */
 @RestController
-@Api(tags = {"proteome"})
 @Validated
 @RequestMapping("/proteome")
 public class ProteomeController extends BasicSearchController<ProteomeEntry> {
@@ -103,7 +100,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
-        ProteomeEntry entry = queryService.getByUPId(upid);
+        ProteomeEntry entry = queryService.findByUniqueId(upid.toUpperCase());
         return super.getEntityResponse(entry, fields, contentType);
     }
 
@@ -117,7 +114,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
-    public ResponseEntity<ResponseBodyEmitter> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> download(
             @Valid ProteomeRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,

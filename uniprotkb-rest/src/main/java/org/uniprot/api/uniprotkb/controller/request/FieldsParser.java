@@ -8,6 +8,7 @@ import com.google.common.base.Strings;
 
 public class FieldsParser {
     private static final String COLON = ":";
+    private static final String UNDERSCORE = "_";
     private static final String ALL = "all";
     private static final String XREF = "xref";
     private static final String FEATURE = "feature";
@@ -76,10 +77,16 @@ public class FieldsParser {
             Map<String, List<String>> filters, String type, String abbr, String token) {
         if (token.equals(type)) {
             putMap(filters, token, ALL);
-        } else if (token.startsWith(abbr + COLON)) {
-            String value = token.substring(token.indexOf(COLON) + 1);
+            //        } else if (token.startsWith(abbr + COLON)) {
+            //            String value = token.substring(token.indexOf(COLON) + 1);
+            //            putMap(filters, type, value);
+            //        } else if (token.startsWith(type + COLON)) {
+            //            String value = token.substring(token.indexOf(COLON) + 1);
+            //            putMap(filters, type, value);
+        } else if (token.startsWith(abbr + UNDERSCORE)) {
+            String value = token.substring(token.indexOf(UNDERSCORE) + 1);
             putMap(filters, type, value);
-        } else if (token.startsWith(type + COLON)) {
+        } else if (token.startsWith(type + UNDERSCORE)) {
             String value = token.substring(token.indexOf(COLON) + 1);
             putMap(filters, type, value);
 

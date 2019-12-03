@@ -4,8 +4,11 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,8 +33,10 @@ import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
+import org.uniprot.store.search.field.KeywordField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -150,6 +155,37 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(KEYWORD_ACCESSION)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
+                    .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(KeywordField.ResultFields.keyword.getJavaFieldName());
+            fields.add(KeywordField.ResultFields.description.getJavaFieldName());
+            fields.add(KeywordField.ResultFields.category.getJavaFieldName());
+            return fields;
         }
     }
 

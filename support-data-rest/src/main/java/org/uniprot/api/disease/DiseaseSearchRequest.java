@@ -14,8 +14,6 @@ import org.uniprot.store.search.field.DiseaseField;
 
 @Data
 public class DiseaseSearchRequest implements SearchRequest {
-    private static final int DEFAULT_RESULTS_SIZE = 25;
-
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -29,7 +27,7 @@ public class DiseaseSearchRequest implements SearchRequest {
     private String cursor;
 
     @Positive(message = "{search.positive}")
-    private int size = DEFAULT_RESULTS_SIZE;
+    private Integer size;
 
     @ValidReturnFields(fieldValidatorClazz = DiseaseField.ResultFields.class)
     private String fields;

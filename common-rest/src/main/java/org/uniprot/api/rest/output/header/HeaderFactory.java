@@ -1,8 +1,6 @@
 package org.uniprot.api.rest.output.header;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
-import static org.springframework.http.HttpHeaders.VARY;
+import static org.springframework.http.HttpHeaders.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

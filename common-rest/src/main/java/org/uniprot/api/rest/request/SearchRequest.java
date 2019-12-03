@@ -13,7 +13,7 @@ import org.uniprot.core.util.Utils;
  */
 public interface SearchRequest {
 
-    static final int DEFAULT_RESULTS_SIZE = 25;
+    Integer DEFAULT_RESULTS_SIZE = 25;
 
     String getQuery();
 
@@ -25,7 +25,9 @@ public interface SearchRequest {
 
     String getFacets();
 
-    int getSize();
+    Integer getSize();
+
+    void setSize(Integer size);
 
     default boolean hasFields() {
         return Utils.notNullOrEmpty(getFields());

@@ -4,13 +4,13 @@ import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.crossref.CrossRefEntryBuilder;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
 @Slf4j
-@Service
+@Component
 public class CrossRefEntryConverter implements Function<CrossRefDocument, CrossRefEntry> {
     @Override
     public CrossRefEntry apply(CrossRefDocument crossRefDocument) {

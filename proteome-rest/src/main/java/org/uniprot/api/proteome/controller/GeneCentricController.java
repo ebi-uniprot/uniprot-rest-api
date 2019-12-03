@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.GeneCentricRequest;
 import org.uniprot.api.proteome.service.GeneCentricService;
@@ -34,14 +34,11 @@ import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author jluo
  * @date: 30 Apr 2019
  */
 @RestController
-@Api(tags = {"genecentric"})
 @Validated
 @RequestMapping("/genecentric")
 public class GeneCentricController extends BasicSearchController<CanonicalProtein> {
@@ -110,7 +107,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
-        CanonicalProtein entry = service.getByAccession(accession);
+        CanonicalProtein entry = service.findByUniqueId(accession.toUpperCase());
         return super.getEntityResponse(entry, fields, contentType);
     }
 
@@ -118,7 +115,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             value = "/download",
             method = RequestMethod.GET,
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
-    public ResponseEntity<ResponseBodyEmitter> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<CanonicalProtein>>> download(
             @Valid GeneCentricRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,

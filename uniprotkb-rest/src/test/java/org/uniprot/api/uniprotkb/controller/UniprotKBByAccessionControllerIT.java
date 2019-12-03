@@ -8,10 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +49,9 @@ import org.uniprot.store.indexer.uniprot.mockers.*;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.field.UniProtField;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author lgonzales */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -61,6 +65,7 @@ import org.uniprot.store.search.SolrCollection;
             UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
         })
 class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
+    @Autowired private ObjectMapper objectMapper;
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
 
@@ -350,6 +355,50 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(ACCESSION_ID)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
+                    .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            // init the expected list of json response fields order
+            List<String> fields = new LinkedList<>();
+            fields.add(UniProtField.ResultFields.entryType.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.primaryAccession.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.uniProtId.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.entryAudit.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.annotationScore.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.organism.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.protein_existence.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.protein_name.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.gene.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.comment.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.feature.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.keyword.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.reference.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.xref.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.sequence.getJavaFieldName());
+            return fields;
+        }
     }
 
     static class UniprotKBGetIdContentTypeParamResolver
@@ -385,7 +434,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                                                             + "AC   Q8DIA7;\n"
                                                                             + "DT   07-JUN-2005, integrated into UniProtKB/Swiss-Prot.\n"
                                                                             + "DT   01-MAR-2003, sequence version 1.\n"
-                                                                            + "DT   05-DEC-2018, entry version 101.")))
+                                                                            + "DT   11-DEC-2019, entry version 106.")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

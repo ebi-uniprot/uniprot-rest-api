@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.literature.request.LiteratureMappedRequestDTO;
 import org.uniprot.api.literature.request.LiteratureRequestDTO;
@@ -84,7 +84,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
         String updatedFields = updateFieldsWithoutMappedReferences(fields, contentType);
-        LiteratureEntry literatureEntry = this.literatureService.findById(literatureId);
+        LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
         return super.getEntityResponse(literatureEntry, updatedFields, contentType);
     }
 
@@ -118,7 +118,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
-    public ResponseEntity<ResponseBodyEmitter> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> download(
             @Valid LiteratureRequestDTO searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,

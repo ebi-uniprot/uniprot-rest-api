@@ -1,10 +1,10 @@
 package org.uniprot.api.rest.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,15 +13,19 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -31,8 +35,8 @@ import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
  * @param <T>
  * @author lgonzales
  */
+@Slf4j
 public abstract class BasicSearchController<T> {
-
     private final ApplicationEventPublisher eventPublisher;
     private final MessageConverterContextFactory<T> converterContextFactory;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
@@ -97,7 +101,7 @@ public abstract class BasicSearchController<T> {
         return ResponseEntity.ok().headers(createHttpSearchHeader(contentType)).body(context);
     }
 
-    protected ResponseEntity<ResponseBodyEmitter> download(
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
             Stream<T> result,
             String fields,
             MediaType contentType,
@@ -111,26 +115,35 @@ public abstract class BasicSearchController<T> {
         } else {
             context.setEntities(result);
         }
-
-        return getResponseBodyEmitterResponseEntity(request, context);
+        return getDeferredResultResponseEntity(request, context);
     }
 
-    protected ResponseEntity<ResponseBodyEmitter> getResponseBodyEmitterResponseEntity(
-            HttpServletRequest request, MessageConverterContext<T> context) {
-        ResponseBodyEmitter emitter = new ResponseBodyEmitter();
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>>
+            getDeferredResultResponseEntity(
+                    HttpServletRequest request, MessageConverterContext<T> context) {
+
+        // timeout in millis
+        Long timeoutInMillis = Long.valueOf(downloadTaskExecutor.getKeepAliveSeconds()) * 1000;
+
+        DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult =
+                new DeferredResult<>(timeoutInMillis);
+
+        deferredResult.onTimeout(() -> log.error("Request timeout occurred."));
+
         downloadTaskExecutor.execute(
                 () -> {
                     try {
-                        emitter.send(context, context.getContentType());
-                    } catch (IOException e) {
-                        emitter.completeWithError(e);
+                        deferredResult.setResult(
+                                ResponseEntity.ok()
+                                        .headers(createHttpDownloadHeader(context, request))
+                                        .body(context));
+                    } catch (Exception e) {
+                        log.error("Error occurred during processing.");
+                        deferredResult.setErrorResult(e);
                     }
-                    emitter.complete();
                 });
 
-        return ResponseEntity.ok()
-                .headers(createHttpDownloadHeader(context, request))
-                .body(emitter);
+        return deferredResult;
     }
 
     protected abstract String getEntityId(T entity);
@@ -143,5 +156,14 @@ public abstract class BasicSearchController<T> {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
         return path;
+    }
+
+    protected MediaType getAcceptHeader(HttpServletRequest request) {
+        String acceptHeader = request.getHeader("Accept");
+        if (StringUtils.isEmpty(acceptHeader) || "*/*".equals(acceptHeader)) {
+            return UniProtMediaType.valueOf(APPLICATION_JSON_VALUE);
+        } else {
+            return UniProtMediaType.valueOf(acceptHeader);
+        }
     }
 }

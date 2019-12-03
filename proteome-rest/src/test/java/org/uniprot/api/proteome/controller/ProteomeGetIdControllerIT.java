@@ -4,11 +4,12 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -41,8 +42,10 @@ import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
+import org.uniprot.store.search.field.ProteomeField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo
@@ -227,6 +230,44 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(UPID)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
+                    .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(ProteomeField.ResultFields.id.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.description.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.taxonomy.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.modified.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.proteomeType.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.dbXReferences.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.components.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.annotationScore.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.superkingdom.getJavaFieldName());
+            fields.add(ProteomeField.ResultFields.geneCount.getJavaFieldName());
+            return fields;
         }
     }
 

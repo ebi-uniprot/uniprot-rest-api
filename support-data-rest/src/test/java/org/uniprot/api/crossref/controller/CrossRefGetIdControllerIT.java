@@ -3,6 +3,10 @@ package org.uniprot.api.crossref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.io.IOException;
+import java.util.*;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,6 +29,9 @@ import org.uniprot.core.crossref.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
+import org.uniprot.store.search.field.CrossRefField;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -169,6 +176,48 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(ACCESSION)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    List<String> expectedList = getExpectedFieldsOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
+                    .build();
+        }
+
+        private List<String> getExpectedFieldsOrder() {
+            List<String> jsonFieldsOrder = new LinkedList<>();
+            jsonFieldsOrder.add(CrossRefField.ResultFields.name.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.accession.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.abbrev.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.pub_med_id.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.doi_id.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.link_type.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.server.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.db_url.getJavaFieldName());
+            jsonFieldsOrder.add(CrossRefField.ResultFields.category.getJavaFieldName());
+            jsonFieldsOrder.add(
+                    CrossRefField.ResultFields.reviewed_protein_count.getJavaFieldName());
+            jsonFieldsOrder.add(
+                    CrossRefField.ResultFields.unreviewed_protein_count.getJavaFieldName());
+
+            return jsonFieldsOrder;
         }
     }
 

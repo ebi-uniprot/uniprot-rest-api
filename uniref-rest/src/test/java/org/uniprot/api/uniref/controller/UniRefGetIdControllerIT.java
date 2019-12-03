@@ -4,9 +4,12 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,9 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.field.UniRefField;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(
         classes = {
@@ -146,7 +152,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
-                .accession(new UniProtAccessionBuilder("P12345").build())
+                .addAccession(new UniProtAccessionBuilder("P12345").build())
                 .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
                 .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
                 .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
@@ -171,7 +177,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
-                .accession(new UniProtAccessionBuilder("P12345").build())
+                .addAccession(new UniProtAccessionBuilder("P12345").build())
                 .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
                 .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
                 .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
@@ -229,6 +235,44 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
+        }
+
+        @Override
+        public GetIdParameter withValidResponseFieldsOrderParameter() {
+            return GetIdParameter.builder()
+                    .id(ID)
+                    .resultMatcher(
+                            result -> {
+                                String contentAsString = result.getResponse().getContentAsString();
+                                try {
+                                    Map<String, Object> responseMap =
+                                            new ObjectMapper()
+                                                    .readValue(
+                                                            contentAsString, LinkedHashMap.class);
+                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
+                                    List<String> expectedList = getFieldsInOrder();
+                                    Assertions.assertEquals(expectedList.size(), actualList.size());
+                                    Assertions.assertEquals(expectedList, actualList);
+                                } catch (IOException e) {
+                                    Assertions.fail(e.getMessage());
+                                }
+                            })
+                    .build();
+        }
+
+        private List<String> getFieldsInOrder() {
+            List<String> fields = new LinkedList<>();
+            fields.add(UniRefField.ResultFields.id.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.name.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.common_taxon.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.common_taxonid.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.count.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.member.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.identity.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.sequence.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.created.getJavaFieldName());
+            fields.add(UniRefField.ResultFields.go.getJavaFieldName());
+            return fields;
         }
     }
 

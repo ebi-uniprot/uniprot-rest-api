@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -68,7 +68,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType) {
 
-        Disease disease = this.diseaseService.findByAccession(accession);
+        Disease disease = this.diseaseService.findByUniqueId(accession);
         return super.getEntityResponse(disease, fields, contentType);
     }
 
@@ -103,7 +103,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public ResponseEntity<ResponseBodyEmitter> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<Disease>>> download(
             @Valid DiseaseSearchRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
@@ -117,7 +117,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
 
     @Override
     protected String getEntityId(Disease entity) {
-        return entity.getId();
+        return entity.getAccession();
     }
 
     @Override

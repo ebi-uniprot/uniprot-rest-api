@@ -17,10 +17,9 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
  * @author Edd
  */
 @Data
-@Builder(builderClassName = "SolrRequestBuilder")
+@Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
 public class SolrRequest {
     private static final Query.Operator DEFAULT_OPERATOR = Query.Operator.AND;
-
     private String query;
     private Query.Operator defaultQueryOperator;
     private Sort sort;
@@ -28,6 +27,11 @@ public class SolrRequest {
     private String termQuery;
     private QueryBoosts queryBoosts;
     private String defaultField;
+    // Batch size of rows in solr request. In case of search api request rows and totalRows will be
+    // same.
+    private int rows;
+    // Total rows requested by user
+    private int totalRows;
 
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();

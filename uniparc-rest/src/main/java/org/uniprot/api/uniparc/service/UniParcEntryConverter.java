@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jluo
  * @date: 21 Jun 2019
  */
+@Component
 public class UniParcEntryConverter implements Function<UniParcDocument, UniParcEntry> {
     private static final Logger LOGGER = LoggerFactory.getLogger(UniParcEntryConverter.class);
 

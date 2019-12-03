@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -80,7 +80,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                     MediaType contentType) {
 
         SubcellularLocationEntry subcellularLocationEntry =
-                this.subcellularLocationService.findById(subcellularLocationId);
+                this.subcellularLocationService.findByUniqueId(subcellularLocationId);
         return super.getEntityResponse(subcellularLocationEntry, fields, contentType);
     }
 
@@ -116,12 +116,13 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public ResponseEntity<ResponseBodyEmitter> download(
-            @Valid SubcellularLocationRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-            HttpServletRequest request) {
+    public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>>
+            download(
+                    @Valid SubcellularLocationRequestDTO searchRequest,
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                            MediaType contentType,
+                    @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
+                    HttpServletRequest request) {
         Stream<SubcellularLocationEntry> result =
                 subcellularLocationService.download(searchRequest);
         return super.download(result, searchRequest.getFields(), contentType, request, encoding);

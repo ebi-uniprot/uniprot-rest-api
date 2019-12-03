@@ -1,110 +1,88 @@
 package org.uniprot.api.common.repository.store;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.slf4j.Logger;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.search.document.Document;
 
 /**
- * The purpose of this class is to stream results from a data-store (e.g., Voldemort / Solr's stored
- * fields). Clients of this class need not know what store they need to access. They need only
- * provide the query that needs answering, in addition to the sortable fields.
+ * The purpose of this class is to stream results from a data-store, e.g., Voldemort. Clients of
+ * this class need not know what store they need to access. They need only provide the request that
+ * needs answering.
  *
  * <p>Created 22/08/18
  *
  * @author Edd
  */
 @Builder
-public class StoreStreamer<T> {
-    private static final Logger LOGGER = getLogger(StoreStreamer.class);
+@Slf4j
+public class StoreStreamer<D extends Document, T> {
     private UniProtStoreClient<T> storeClient;
-    private int streamerBatchSize;
-    private String id;
-    private String defaultsField;
-    private Function<String, T> defaultsConverter;
-    private TupleStreamTemplate tupleStreamTemplate;
+    private RDFService<String> rdfStoreClient;
+    private SolrQueryRepository<D> repository;
+    private Function<D, String> documentToId;
+    private int storeBatchSize;
+    private int rdfBatchSize; // number of accession in rdf rest request
+    private RetryPolicy<Object> storeFetchRetryPolicy;
+    private RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
 
-    public Stream<T> idsToStoreStream(SolrRequest request) {
-        try {
-            TupleStream tupleStream = tupleStreamTemplate.create(request, id);
-            tupleStream.open();
+    public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
+        Stream<String> idsStream = fetchIds(solrRequest);
 
-            BatchStoreIterable<T> batchStoreIterable =
-                    new BatchStoreIterable<>(
-                            new TupleStreamIterable(tupleStream, id),
-                            storeClient,
-                            streamerBatchSize);
-            return StreamSupport.stream(batchStoreIterable.spliterator(), false)
-                    .flatMap(Collection::stream)
-                    .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        StoreStreamer.BatchStoreIterable<T> batchStoreIterable =
+                new StoreStreamer.BatchStoreIterable<>(
+                        idsStream::iterator, storeClient, storeFetchRetryPolicy, storeBatchSize);
+        return StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .onClose(
+                        () ->
+                                log.debug(
+                                        "Finished streaming over search results and fetching from key/value store."));
     }
 
-    public Stream<String> idsStream(SolrRequest request) {
-        try {
-            TupleStream tupleStream = tupleStreamTemplate.create(request, id);
-            tupleStream.open();
-            return StreamSupport.stream(
-                            new TupleStreamIterable(tupleStream, id).spliterator(), false)
-                    .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+    public Stream<String> idsStream(SolrRequest solrRequest) {
+        return fetchIds(solrRequest);
     }
 
-    public Stream<T> defaultFieldStream(SolrRequest request) {
-        try {
-            TupleStream tupleStream = tupleStreamTemplate.create(request, defaultsField);
-            tupleStream.open();
+    public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
+        Stream<String> idsStream = fetchIds(solrRequest);
 
-            TupleStreamIterable sourceIterable =
-                    new TupleStreamIterable(tupleStream, defaultsField);
-            BatchIterable<T> batchIterable =
-                    new BatchIterable<T>(sourceIterable, streamerBatchSize) {
-                        @Override
-                        List<T> convertBatch(List<String> batch) {
-                            return batch.stream()
-                                    .map(defaultsConverter)
-                                    .collect(Collectors.toList());
-                        }
-                    };
+        BatchRDFStoreIterable<String> batchRDFStoreIterable =
+                new BatchRDFStoreIterable(
+                        idsStream::iterator, rdfStoreClient, rdfFetchRetryPolicy, rdfBatchSize);
 
-            return StreamSupport.stream(batchIterable.spliterator(), false)
-                    .flatMap(Collection::stream)
-                    .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        Stream<String> rdfStringStream =
+                StreamSupport.stream(batchRDFStoreIterable.spliterator(), false)
+                        .flatMap(Collection::stream)
+                        .onClose(
+                                () ->
+                                        log.debug(
+                                                "Finished streaming over search results and fetching from RDF server."));
+
+        // prepend rdf prolog then rdf data and then append closing rdf tag
+        return Stream.concat(
+                Stream.of(RDFService.RDF_PROLOG),
+                Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
     }
 
-    private void closeTupleStream(TupleStream tupleStream) {
-        try {
-            tupleStream.close();
-            LOGGER.info("TupleStream closed: {}", tupleStream.getStreamNodeId());
-        } catch (IOException e) {
-            String message = "Error when closing TupleStream";
-            LOGGER.error(message, e);
-            throw new IllegalStateException(message, e);
-        }
+    private Stream<String> fetchIds(SolrRequest solrRequest) {
+
+        Stream<String> idsStream =
+                repository.getAll(solrRequest).map(documentToId).limit(solrRequest.getTotalRows());
+
+        return idsStream;
     }
 
     private static class BatchStoreIterable<T> extends BatchIterable<T> {
@@ -112,15 +90,13 @@ public class StoreStreamer<T> {
         private RetryPolicy<Object> retryPolicy;
 
         BatchStoreIterable(
-                Iterable<String> sourceIterable, UniProtStoreClient<T> storeClient, int batchSize) {
+                Iterable<String> sourceIterable,
+                UniProtStoreClient<T> storeClient,
+                RetryPolicy<Object> retryPolicy,
+                int batchSize) {
             super(sourceIterable, batchSize);
             this.storeClient = storeClient;
-            retryPolicy =
-                    new RetryPolicy<>()
-                            .handle(IOException.class)
-                            .withDelay(Duration.ofMillis(500))
-                            //      .withDelay(500,TimeUnit.MILLISECONDS)
-                            .withMaxRetries(5);
+            this.retryPolicy = retryPolicy;
         }
 
         @Override
@@ -129,39 +105,38 @@ public class StoreStreamer<T> {
         }
     }
 
-    private abstract static class BatchIterable<T> implements Iterable<Collection<T>> {
-        private final Iterator<String> sourceIterator;
-        private final int batchSize;
+    // iterable for RDF streaming
+    private static class BatchRDFStoreIterable<T> extends BatchIterable<T> {
+        private RDFService<T> storeClient;
+        private RetryPolicy<Object> retryPolicy;
 
-        BatchIterable(Iterable<String> sourceIterable, int batchSize) {
-            this.batchSize = batchSize;
-            this.sourceIterator = sourceIterable.iterator();
+        BatchRDFStoreIterable(
+                Iterable<String> sourceIterable,
+                RDFService<T> storeClient,
+                RetryPolicy<Object> retryPolicy,
+                int batchSize) {
+            super(sourceIterable, batchSize);
+            this.storeClient = storeClient;
+            this.retryPolicy = retryPolicy;
         }
 
         @Override
-        public Iterator<Collection<T>> iterator() {
-            return new Iterator<Collection<T>>() {
-                @Override
-                public boolean hasNext() {
-                    return sourceIterator.hasNext();
-                }
-
-                @Override
-                public List<T> next() {
-                    List<String> batch = new ArrayList<>(batchSize);
-                    for (int i = 0; i < batchSize; i++) {
-                        if (sourceIterator.hasNext()) {
-                            batch.add(sourceIterator.next());
-                        } else {
-                            break;
-                        }
-                    }
-
-                    return convertBatch(batch);
-                }
-            };
+        List<T> convertBatch(List<String> batch) {
+            return Failsafe.with(retryPolicy)
+                    .onFailure(
+                            throwable -> log.error("http call to RDF server failed. Retrying..."))
+                    .get(
+                            () -> {
+                                try {
+                                    return storeClient.getEntries(batch);
+                                } catch (Exception e) {
+                                    log.error(
+                                            "RDF get call failed for accessions {} with error {}",
+                                            batch,
+                                            e.getMessage());
+                                    throw e;
+                                }
+                            });
         }
-
-        abstract List<T> convertBatch(List<String> batch);
     }
 }

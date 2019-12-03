@@ -1,15 +1,14 @@
 ID   F1Q0X3_CANLF            Unreviewed;      3446 AA.
 AC   F1Q0X3;
 DT   03-MAY-2011, integrated into UniProtKB/TrEMBL.
-DT   03-MAY-2011, sequence version 1.
-DT   05-DEC-2018, entry version 61.
-DE   SubName: Full=BRCA2, DNA repair associated {ECO:0000313|Ensembl:ENSCAFP00000009557};
+DT   11-DEC-2019, sequence version 2.
+DT   11-DEC-2019, entry version 69.
+DE   SubName: Full=BRCA2 DNA repair associated {ECO:0000313|Ensembl:ENSCAFP00000009557};
 GN   Name=BRCA2 {ECO:0000313|Ensembl:ENSCAFP00000009557,
 GN   ECO:0000313|VGNC:VGNC:38517};
 OS   Canis lupus familiaris (Dog) (Canis familiaris).
-OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
-OC   Mammalia; Eutheria; Laurasiatheria; Carnivora; Caniformia; Canidae;
-OC   Canis.
+OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi; Mammalia;
+OC   Eutheria; Laurasiatheria; Carnivora; Caniformia; Canidae; Canis.
 OX   NCBI_TaxID=9615 {ECO:0000313|Ensembl:ENSCAFP00000009557, ECO:0000313|Proteomes:UP000002254};
 RN   [1] {ECO:0000313|Ensembl:ENSCAFP00000009557, ECO:0000313|Proteomes:UP000002254}
 RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
@@ -18,47 +17,44 @@ RC   ECO:0000313|Proteomes:UP000002254};
 RX   PubMed=16341006; DOI=10.1038/nature04338;
 RG   Broad Sequencing Platform;
 RA   Lindblad-Toh K., Wade C.M., Mikkelsen T.S., Karlsson E.K., Jaffe D.B.,
-RA   Kamal M., Clamp M., Chang J.L., Kulbokas E.J. III, Zody M.C.,
-RA   Mauceli E., Xie X., Breen M., Wayne R.K., Ostrander E.A.,
-RA   Ponting C.P., Galibert F., Smith D.R., deJong P.J., Kirkness E.F.,
-RA   Alvarez P., Biagi T., Brockman W., Butler J., Chin C.-W., Cook A.,
-RA   Cuff J., Daly M.J., DeCaprio D., Gnerre S., Grabherr M., Kellis M.,
-RA   Kleber M., Bardeleben C., Goodstadt L., Heger A., Hitte C., Kim L.,
-RA   Koepfli K.-P., Parker H.G., Pollinger J.P., Searle S.M.J.,
-RA   Sutter N.B., Thomas R., Webber C., Baldwin J., Abebe A.,
+RA   Kamal M., Clamp M., Chang J.L., Kulbokas E.J. III, Zody M.C., Mauceli E.,
+RA   Xie X., Breen M., Wayne R.K., Ostrander E.A., Ponting C.P., Galibert F.,
+RA   Smith D.R., deJong P.J., Kirkness E.F., Alvarez P., Biagi T., Brockman W.,
+RA   Butler J., Chin C.-W., Cook A., Cuff J., Daly M.J., DeCaprio D., Gnerre S.,
+RA   Grabherr M., Kellis M., Kleber M., Bardeleben C., Goodstadt L., Heger A.,
+RA   Hitte C., Kim L., Koepfli K.-P., Parker H.G., Pollinger J.P.,
+RA   Searle S.M.J., Sutter N.B., Thomas R., Webber C., Baldwin J., Abebe A.,
 RA   Abouelleil A., Aftuck L., Ait-Zahra M., Aldredge T., Allen N., An P.,
-RA   Anderson S., Antoine C., Arachchi H., Aslam A., Ayotte L.,
-RA   Bachantsang P., Barry A., Bayul T., Benamara M., Berlin A.,
-RA   Bessette D., Blitshteyn B., Bloom T., Blye J., Boguslavskiy L.,
-RA   Bonnet C., Boukhgalter B., Brown A., Cahill P., Calixte N.,
-RA   Camarata J., Cheshatsang Y., Chu J., Citroen M., Collymore A.,
-RA   Cooke P., Dawoe T., Daza R., Decktor K., DeGray S., Dhargay N.,
-RA   Dooley K., Dooley K., Dorje P., Dorjee K., Dorris L., Duffey N.,
-RA   Dupes A., Egbiremolen O., Elong R., Falk J., Farina A., Faro S.,
-RA   Ferguson D., Ferreira P., Fisher S., FitzGerald M., Foley K.,
-RA   Foley C., Franke A., Friedrich D., Gage D., Garber M., Gearin G.,
-RA   Giannoukos G., Goode T., Goyette A., Graham J., Grandbois E.,
-RA   Gyaltsen K., Hafez N., Hagopian D., Hagos B., Hall J., Healy C.,
-RA   Hegarty R., Honan T., Horn A., Houde N., Hughes L., Hunnicutt L.,
-RA   Husby M., Jester B., Jones C., Kamat A., Kanga B., Kells C.,
-RA   Khazanovich D., Kieu A.C., Kisner P., Kumar M., Lance K., Landers T.,
-RA   Lara M., Lee W., Leger J.-P., Lennon N., Leuper L., LeVine S., Liu J.,
-RA   Liu X., Lokyitsang Y., Lokyitsang T., Lui A., Macdonald J., Major J.,
-RA   Marabella R., Maru K., Matthews C., McDonough S., Mehta T.,
-RA   Meldrim J., Melnikov A., Meneus L., Mihalev A., Mihova T., Miller K.,
-RA   Mittelman R., Mlenga V., Mulrain L., Munson G., Navidi A., Naylor J.,
-RA   Nguyen T., Nguyen N., Nguyen C., Nguyen T., Nicol R., Norbu N.,
-RA   Norbu C., Novod N., Nyima T., Olandt P., O'Neill B., O'Neill K.,
-RA   Osman S., Oyono L., Patti C., Perrin D., Phunkhang P., Pierre F.,
-RA   Priest M., Rachupka A., Raghuraman S., Rameau R., Ray V., Raymond C.,
-RA   Rege F., Rise C., Rogers J., Rogov P., Sahalie J., Settipalli S.,
-RA   Sharpe T., Shea T., Sheehan M., Sherpa N., Shi J., Shih D., Sloan J.,
-RA   Smith C., Sparrow T., Stalker J., Stange-Thomann N., Stavropoulos S.,
-RA   Stone C., Stone S., Sykes S., Tchuinga P., Tenzing P., Tesfaye S.,
-RA   Thoulutsang D., Thoulutsang Y., Topham K., Topping I., Tsamla T.,
-RA   Vassiliev H., Venkataraman V., Vo A., Wangchuk T., Wangdi T.,
-RA   Weiand M., Wilkinson J., Wilson A., Yadav S., Yang S., Yang X.,
-RA   Young G., Yu Q., Zainoun J., Zembek L., Zimmer A., Lander E.S.;
+RA   Anderson S., Antoine C., Arachchi H., Aslam A., Ayotte L., Bachantsang P.,
+RA   Barry A., Bayul T., Benamara M., Berlin A., Bessette D., Blitshteyn B.,
+RA   Bloom T., Blye J., Boguslavskiy L., Bonnet C., Boukhgalter B., Brown A.,
+RA   Cahill P., Calixte N., Camarata J., Cheshatsang Y., Chu J., Citroen M.,
+RA   Collymore A., Cooke P., Dawoe T., Daza R., Decktor K., DeGray S.,
+RA   Dhargay N., Dooley K., Dooley K., Dorje P., Dorjee K., Dorris L.,
+RA   Duffey N., Dupes A., Egbiremolen O., Elong R., Falk J., Farina A., Faro S.,
+RA   Ferguson D., Ferreira P., Fisher S., FitzGerald M., Foley K., Foley C.,
+RA   Franke A., Friedrich D., Gage D., Garber M., Gearin G., Giannoukos G.,
+RA   Goode T., Goyette A., Graham J., Grandbois E., Gyaltsen K., Hafez N.,
+RA   Hagopian D., Hagos B., Hall J., Healy C., Hegarty R., Honan T., Horn A.,
+RA   Houde N., Hughes L., Hunnicutt L., Husby M., Jester B., Jones C., Kamat A.,
+RA   Kanga B., Kells C., Khazanovich D., Kieu A.C., Kisner P., Kumar M.,
+RA   Lance K., Landers T., Lara M., Lee W., Leger J.-P., Lennon N., Leuper L.,
+RA   LeVine S., Liu J., Liu X., Lokyitsang Y., Lokyitsang T., Lui A.,
+RA   Macdonald J., Major J., Marabella R., Maru K., Matthews C., McDonough S.,
+RA   Mehta T., Meldrim J., Melnikov A., Meneus L., Mihalev A., Mihova T.,
+RA   Miller K., Mittelman R., Mlenga V., Mulrain L., Munson G., Navidi A.,
+RA   Naylor J., Nguyen T., Nguyen N., Nguyen C., Nguyen T., Nicol R., Norbu N.,
+RA   Norbu C., Novod N., Nyima T., Olandt P., O'Neill B., O'Neill K., Osman S.,
+RA   Oyono L., Patti C., Perrin D., Phunkhang P., Pierre F., Priest M.,
+RA   Rachupka A., Raghuraman S., Rameau R., Ray V., Raymond C., Rege F.,
+RA   Rise C., Rogers J., Rogov P., Sahalie J., Settipalli S., Sharpe T.,
+RA   Shea T., Sheehan M., Sherpa N., Shi J., Shih D., Sloan J., Smith C.,
+RA   Sparrow T., Stalker J., Stange-Thomann N., Stavropoulos S., Stone C.,
+RA   Stone S., Sykes S., Tchuinga P., Tenzing P., Tesfaye S., Thoulutsang D.,
+RA   Thoulutsang Y., Topham K., Topping I., Tsamla T., Vassiliev H.,
+RA   Venkataraman V., Vo A., Wangchuk T., Wangdi T., Weiand M., Wilkinson J.,
+RA   Wilson A., Yadav S., Yang S., Yang X., Young G., Yu Q., Zainoun J.,
+RA   Zembek L., Zimmer A., Lander E.S.;
 RT   "Genome sequence, comparative analysis and haplotype structure of the
 RT   domestic dog.";
 RL   Nature 438:803-819(2005).
@@ -67,13 +63,13 @@ RP   IDENTIFICATION.
 RC   STRAIN=Boxer {ECO:0000313|Ensembl:ENSCAFP00000009557};
 RG   Ensembl;
 RL   Submitted (JUL-2011) to UniProtKB.
-CC   -----------------------------------------------------------------------
+CC   ---------------------------------------------------------------------------
 CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
 CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
-CC   -----------------------------------------------------------------------
+CC   ---------------------------------------------------------------------------
 DR   EMBL; AAEX03014218; -; NOT_ANNOTATED_CDS; Genomic_DNA.
 DR   SMR; F1Q0X3; -.
-DR   STRING; 9615.ENSCAFP00000009557; -.
+DR   STRING; 9612.ENSCAFP00000009557; -.
 DR   PaxDb; F1Q0X3; -.
 DR   Ensembl; ENSCAFT00000010309; ENSCAFP00000009557; ENSCAFG00000006383.
 DR   VGNC; VGNC:38517; BRCA2.
@@ -81,11 +77,9 @@ DR   eggNOG; KOG4751; Eukaryota.
 DR   eggNOG; ENOG410Y06W; LUCA.
 DR   GeneTree; ENSGT00390000003602; -.
 DR   InParanoid; F1Q0X3; -.
-DR   OMA; KAFMEDG; -.
-DR   OrthoDB; EOG091G0C79; -.
+DR   OMA; HIFPQPG; -.
 DR   TreeFam; TF105041; -.
 DR   Reactome; R-CFA-5685942; HDR through Homologous Recombination (HRR).
-DR   Reactome; R-CFA-5693554; Resolution of D-loop Structures through Synthesis-Dependent Strand Annealing (SDSA).
 DR   Reactome; R-CFA-5693568; Resolution of D-loop Structures through Holliday Junction Intermediates.
 DR   Reactome; R-CFA-5693579; Homologous DNA Pairing and Strand Exchange.
 DR   Reactome; R-CFA-5693616; Presynaptic phase of homologous DNA pairing and strand exchange.
@@ -105,19 +99,18 @@ DR   GO; GO:0010485; F:H4 histone acetyltransferase activity; IEA:Ensembl.
 DR   GO; GO:0042802; F:identical protein binding; IEA:Ensembl.
 DR   GO; GO:0002020; F:protease binding; IEA:Ensembl.
 DR   GO; GO:0008022; F:protein C-terminus binding; IEA:Ensembl.
-DR   GO; GO:0003697; F:single-stranded DNA binding; IBA:GO_Central.
+DR   GO; GO:0003697; F:single-stranded DNA binding; IEA:Ensembl.
 DR   GO; GO:0007420; P:brain development; IEA:Ensembl.
 DR   GO; GO:0007569; P:cell aging; IEA:Ensembl.
 DR   GO; GO:0051298; P:centrosome duplication; IEA:Ensembl.
 DR   GO; GO:0006978; P:DNA damage response, signal transduction by p53 class mediator resulting in transcription of p21 class mediator; IEA:Ensembl.
 DR   GO; GO:0000724; P:double-strand break repair via homologous recombination; IBA:GO_Central.
-DR   GO; GO:0070200; P:establishment of protein localization to telomere; IBA:GO_Central.
-DR   GO; GO:0008585; P:female gonad development; IBA:GO_Central.
+DR   GO; GO:0070200; P:establishment of protein localization to telomere; IEA:Ensembl.
+DR   GO; GO:0008585; P:female gonad development; IEA:Ensembl.
 DR   GO; GO:0030097; P:hemopoiesis; IEA:Ensembl.
 DR   GO; GO:0001833; P:inner cell mass cell proliferation; IEA:Ensembl.
 DR   GO; GO:0042771; P:intrinsic apoptotic signaling pathway in response to DNA damage by p53 class mediator; IEA:Ensembl.
 DR   GO; GO:0007141; P:male meiosis I; IEA:Ensembl.
-DR   GO; GO:0000281; P:mitotic cytokinesis; IEA:Ensembl.
 DR   GO; GO:1990426; P:mitotic recombination-dependent replication fork processing; IEA:Ensembl.
 DR   GO; GO:0033600; P:negative regulation of mammary gland epithelial cell proliferation; IEA:Ensembl.
 DR   GO; GO:0006289; P:nucleotide-excision repair; IEA:Ensembl.
@@ -129,7 +122,7 @@ DR   GO; GO:0048478; P:replication fork protection; IEA:Ensembl.
 DR   GO; GO:0010332; P:response to gamma radiation; IEA:Ensembl.
 DR   GO; GO:0010225; P:response to UV-C; IEA:Ensembl.
 DR   GO; GO:0010165; P:response to X-ray; IEA:Ensembl.
-DR   GO; GO:0007283; P:spermatogenesis; IBA:GO_Central.
+DR   GO; GO:0007283; P:spermatogenesis; IEA:Ensembl.
 DR   GO; GO:0000722; P:telomere maintenance via recombination; IEA:Ensembl.
 DR   CDD; cd04493; BRCA2DBD_OB1; 1.
 DR   CDD; cd04495; BRCA2DBD_OB3; 1.
@@ -141,7 +134,7 @@ DR   InterPro; IPR015188; BRCA2_OB_3.
 DR   InterPro; IPR002093; BRCA2_repeat.
 DR   InterPro; IPR012340; NA-bd_OB-fold.
 DR   InterPro; IPR015205; Tower_dom.
-DR   PANTHER; PTHR11289; PTHR11289; 2.
+DR   PANTHER; PTHR11289; PTHR11289; 4.
 DR   Pfam; PF09169; BRCA-2_helical; 1.
 DR   Pfam; PF09103; BRCA-2_OB1; 1.
 DR   Pfam; PF09104; BRCA-2_OB3; 1.
@@ -154,28 +147,10 @@ DR   SUPFAM; SSF81872; SSF81872; 1.
 DR   PROSITE; PS50138; BRCA2_REPEAT; 7.
 PE   4: Predicted;
 KW   Coiled coil {ECO:0000256|SAM:Coils};
-KW   Complete proteome {ECO:0000313|Proteomes:UP000002254};
 KW   Reference proteome {ECO:0000313|Proteomes:UP000002254}.
-FT   REPEAT      996   1030       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   REPEAT     1210   1244       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   REPEAT     1416   1450       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   REPEAT     1519   1553       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   REPEAT     1666   1700       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   REPEAT     1996   2030       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   REPEAT     2066   2100       BRCA2. {ECO:0000256|PROSITE-
-FT                                ProRule:PRU00032}.
-FT   DOMAIN     2850   2891       Tower. {ECO:0000259|SMART:SM01341}.
-FT   COILED     1232   1252       {ECO:0000256|SAM:Coils}.
-FT   COILED     1534   1554       {ECO:0000256|SAM:Coils}.
-SQ   SEQUENCE   3446 AA;  386614 MW;  6B009D1F174B1BF4 CRC64;
+SQ   SEQUENCE   3446 AA;  386630 MW;  57D2BEBD3264C966 CRC64;
      MPVGCKERPT FFEIFKTRCN QADLGPISLN WFEELSLEAP PYNSEPTEES GYKISYEPNL
-     FKTPQRKPYN QLASTPIVFR EPIYQQSPLK ELDKYRLVSG KDITDSKHKS CCTMKSKMDR
+     FKTPQRKPYN QLASTPIVFR EPIYQQSPLK ELDKYRLDSG KDITDSKHKS CCTMKSKMDR
      ANDVTSPPLN SYLSESPVLR CTHVTPQREK SVVCGSLFHT PKLMKGQTPK RISESLGAEV
      DSDMSWSSSL ATPPTLSSTV LIVRDEEVSA AVFPNDTTAI FKSCFSNHDE SLKKNDRFIP
      CGPGKENKNQ REAKSQSLGN SFGKVNSTKD HFVKSTPNVL EDEVHEKVLD VSEEEDSFSL
