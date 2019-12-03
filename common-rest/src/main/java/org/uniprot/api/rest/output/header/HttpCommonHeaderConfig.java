@@ -1,18 +1,19 @@
 package org.uniprot.api.rest.output.header;
 
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
-
-import java.io.IOException;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.OncePerRequestFilter;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
@@ -42,9 +43,13 @@ public class HttpCommonHeaderConfig {
             protected void doFilterInternal(
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
+                MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
+                mutableRequest = HttpServletRequestContentTypeMutator.handle(mutableRequest, response);
+
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords");
-                chain.doFilter(request, response);
+
+                chain.doFilter(mutableRequest, response);
             }
         };
     }
