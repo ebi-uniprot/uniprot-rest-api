@@ -91,9 +91,8 @@ class UniProtEntryQueryResultsConverter {
             if (taxEntry == null) {
                 return opEntry;
             }
-            UniProtEntryBuilder.ActiveEntryBuilder builder =
-                    new UniProtEntryBuilder().from(opEntry.get());
-            return Optional.of(builder.lineages(taxEntry.getLineage()).build());
+            UniProtEntryBuilder builder = UniProtEntryBuilder.fromInstance(opEntry.get());
+            return Optional.of(builder.lineagesSet(taxEntry.getLineage()).build());
         } else return opEntry;
     }
 
@@ -114,7 +113,8 @@ class UniProtEntryQueryResultsConverter {
                         .mergeDemergeTo(mergeDemergeList)
                         .build();
 
-        UniProtEntryBuilder entryBuilder = new UniProtEntryBuilder(accession, uniProtId, inactiveReason);
+        UniProtEntryBuilder entryBuilder =
+                new UniProtEntryBuilder(accession, uniProtId, inactiveReason);
         return Optional.of(entryBuilder.build());
     }
 

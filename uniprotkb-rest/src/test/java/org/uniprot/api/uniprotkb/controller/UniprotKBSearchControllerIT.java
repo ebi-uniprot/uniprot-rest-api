@@ -774,7 +774,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.isIsoform = false;
 
                             UniProtEntry entry =
-                                    new UniProtEntryBuilder("P0000" + i, "P12345_ID", UniProtEntryType.TREMBL)
+                                    new UniProtEntryBuilder(
+                                                    "P0000" + i,
+                                                    "P12345_ID",
+                                                    UniProtEntryType.TREMBL)
                                             .build();
 
                             getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
