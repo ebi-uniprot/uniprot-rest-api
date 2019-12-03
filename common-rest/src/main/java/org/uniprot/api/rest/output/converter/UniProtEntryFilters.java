@@ -17,7 +17,7 @@ public class UniProtEntryFilters {
     public static UniProtEntry filterEntry(
             UniProtEntry entry, Map<String, List<String>> filterParams) {
         if ((filterParams != null) && !filterParams.isEmpty()) {
-            UniProtEntryBuilder.ActiveEntryBuilder builder = new UniProtEntryBuilder().from(entry);
+            UniProtEntryBuilder builder = UniProtEntryBuilder.fromInstance(entry);
             for (UniProtField.ResultFields component : UniProtField.ResultFields.values()) {
                 if (component.isMandatoryJsonField() == false
                         && !filterParams.containsKey(component.name())) {
@@ -27,20 +27,20 @@ public class UniProtEntryFilters {
                     Predicate<Comment> filter = createCommentFilter(values);
                     List<Comment> comments = entry.getComments();
                     comments.removeIf(comment -> !filter.test(comment));
-                    builder.comments(comments);
+                    builder.commentsSet(comments);
                 } else if (component == UniProtField.ResultFields.feature) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
                     Predicate<Feature> filter = createFeatureFilter(values);
                     List<Feature> features = entry.getFeatures();
                     features.removeIf(feature -> !filter.test(feature));
-                    builder.features(features);
+                    builder.featuresSet(features);
                 } else if (component == UniProtField.ResultFields.xref) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
                     Predicate<UniProtDBCrossReference> filter = createDbReferenceFilter(values);
                     List<UniProtDBCrossReference> crossReferences =
                             entry.getDatabaseCrossReferences();
                     crossReferences.removeIf(xref -> !filter.test(xref));
-                    builder.databaseCrossReferences(crossReferences);
+                    builder.databaseCrossReferencesSet(crossReferences);
                 }
             }
             return builder.build();
@@ -82,47 +82,46 @@ public class UniProtEntryFilters {
         return values.contains(v.getCommentType().name().toLowerCase());
     }
 
-    private static void remove(
-            UniProtEntryBuilder.ActiveEntryBuilder builder, UniProtField.ResultFields type) {
+    private static void remove(UniProtEntryBuilder builder, UniProtField.ResultFields type) {
         switch (type) {
             case protein_existence:
                 builder.proteinExistence(null);
                 break;
             case secondary_accession:
-                builder.secondaryAccessions(null);
+                builder.secondaryAccessionsSet(null);
                 break;
             case protein_name:
                 builder.proteinDescription(null);
                 break;
             case gene:
-                builder.genes(null);
+                builder.genesSet(null);
                 break;
             case organism:
                 builder.organism(null);
                 break;
             case organism_host:
-                builder.organismHosts(null);
+                builder.organismHostsSet(null);
                 break;
             case organelle:
-                builder.geneLocations(null);
+                builder.geneLocationsSet(null);
                 break;
             case comment:
-                builder.comments(null);
+                builder.commentsSet(null);
                 break;
             case keyword:
-                builder.keywords(null);
+                builder.keywordsSet(null);
                 break;
             case feature:
-                builder.features(null);
+                builder.featuresSet(null);
                 break;
             case sequence:
                 builder.sequence(null);
                 break;
             case xref:
-                builder.databaseCrossReferences(null);
+                builder.databaseCrossReferencesSet(null);
                 break;
             case reference:
-                builder.references(null);
+                builder.referencesSet(null);
                 break;
             default:
                 break;

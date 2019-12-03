@@ -205,39 +205,35 @@ class JsonResponseFieldProjectorTest {
         comments.add(WebResourceCommentTest.getWebResourceComment());
 
         UniProtId uniProtId = new UniProtIdBuilder("uniprot id").build();
-        UniProtEntryBuilder builder = new UniProtEntryBuilder();
+        UniProtEntryBuilder builder = new UniProtEntryBuilder(UniProtAccessionTest.getUniProtAccession(), uniProtId, UniProtEntryType.SWISSPROT);
         UniProtEntry entry =
-                builder.primaryAccession(UniProtAccessionTest.getUniProtAccession())
-                        .uniProtId(uniProtId)
-                        .active()
-                        .entryType(UniProtEntryType.SWISSPROT)
-                        .addSecondaryAccession(UniProtAccessionTest.getUniProtAccession())
+                builder.secondaryAccessionAdd(UniProtAccessionTest.getUniProtAccession())
                         .entryAudit(EntryAuditTest.getEntryAudit())
                         .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
                         .proteinDescription(ProteinDescriptionTest.getProteinDescription())
-                        .genes(Collections.singletonList(GeneTest.createCompleteGene()))
+                        .genesSet(Collections.singletonList(GeneTest.createCompleteGene()))
                         .annotationScore(2)
                         .organism(OrganimsTest.getOrganism())
-                        .organismHosts(Collections.singletonList(OrganimHostTest.getOrganismHost()))
-                        .comments(comments)
-                        .features(Collections.singletonList(FeatureTest.getFeature()))
+                        .organismHostsSet(Collections.singletonList(OrganimHostTest.getOrganismHost()))
+                        .commentsSet(comments)
+                        .featuresSet(Collections.singletonList(FeatureTest.getFeature()))
                         .internalSection(InternalSectionTest.getInternalSection())
-                        .keywords(Collections.singletonList(KeywordTest.getKeyword()))
-                        .geneLocations(
+                        .keywordsSet(Collections.singletonList(KeywordTest.getKeyword()))
+                        .geneLocationsSet(
                                 Collections.singletonList(GeneLocationTest.getGeneLocation()))
-                        .references(UniProtReferenceTest.getUniProtReferences())
-                        .databaseCrossReferences(
+                        .referencesSet(UniProtReferenceTest.getUniProtReferences())
+                        .databaseCrossReferencesSet(
                                 Collections.singletonList(
                                         UniProtDBCrossReferenceTest.getUniProtDBCrossReference()))
                         .sequence(SequenceTest.getSequence())
                         .build();
 
         Map<String, List<String>> filterFieldMap = new HashMap<>();
-        filterFieldMap.put("gene", Collections.EMPTY_LIST);
-        filterFieldMap.put("organism", Collections.EMPTY_LIST);
-        filterFieldMap.put("feature", Collections.EMPTY_LIST);
-        filterFieldMap.put("xref", Collections.EMPTY_LIST);
-        filterFieldMap.put("keyword", Collections.EMPTY_LIST);
+        filterFieldMap.put("gene", Collections.emptyList());
+        filterFieldMap.put("organism", Collections.emptyList());
+        filterFieldMap.put("feature", Collections.emptyList());
+        filterFieldMap.put("xref", Collections.emptyList());
+        filterFieldMap.put("keyword", Collections.emptyList());
         List<String> cTypes = new ArrayList<>();
         cTypes.add("disease");
         cTypes.add("webresource");
