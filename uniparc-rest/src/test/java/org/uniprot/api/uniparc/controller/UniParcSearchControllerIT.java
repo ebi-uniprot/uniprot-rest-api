@@ -259,7 +259,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     private List<SequenceFeature> getSeqFeatures(int i) {
         List<Location> locations = Arrays.asList(new Location(12, 23), new Location(45, 89));
-        InterproGroup domain =
+        InterProGroup domain =
                 new InterProGroupBuilder()
                         .name(getName("Inter Pro Name", i))
                         .id(getName("IP0000", i))
