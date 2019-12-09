@@ -7,7 +7,10 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.*;
 
 /**
- * Created 03/12/2019
+ * Represents a mutable {@link HttpServletRequest}. Override methods of super class {@link
+ * HttpServletRequestWrapper} here to get your chosen behaviour.
+ *
+ * <p>Created 03/12/2019
  *
  * @author Edd
  */

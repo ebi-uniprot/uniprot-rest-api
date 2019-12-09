@@ -7,13 +7,17 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.util.Utils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created 03/12/2019
+ * A helper class that mutates an {@link HttpServletRequest} based on its values, and if necessary
+ * sets the request's content type in the 'Accept' header.
+ *
+ * <p>Created 03/12/2019
  *
  * @author Edd
  */
