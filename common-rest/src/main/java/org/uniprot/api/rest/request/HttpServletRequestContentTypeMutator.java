@@ -3,12 +3,14 @@ package org.uniprot.api.rest.request;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.servlet.HandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.util.Utils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,12 +24,13 @@ public class HttpServletRequestContentTypeMutator {
     private static final String FORMAT = "format";
     private static final String SEARCH = "/search";
     private static final String DOWNLOAD = "/download";
-    private static final Pattern ENTRY_CONTEXT_PATH_MATCHER = Pattern.compile("^.*/(.*)\\.(\\w+)$");
+    private static final Pattern ENTRY_CONTEXT_PATH_MATCHER =
+            Pattern.compile("^(.*/(.*)/(.*))\\.(\\w+)$");
 
     public static MutableHttpServletRequest handle(
             MutableHttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        handleEntryRequest(request, response);
+        handleEntryRequest(request);
         handleSearchOrDownloadRequest(request);
 
         return request;
@@ -84,15 +87,21 @@ public class HttpServletRequestContentTypeMutator {
         }
     }
 
-    private static void handleEntryRequest(
-            MutableHttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Matcher entryContextMatcher = ENTRY_CONTEXT_PATH_MATCHER.matcher(request.getRequestURI());
+    private static void handleEntryRequest(MutableHttpServletRequest request) {
+        Matcher entryContextMatcher = ENTRY_CONTEXT_PATH_MATCHER.matcher(request.getRequestURL());
         if (entryContextMatcher.matches()) {
-            String uriNoExtension = entryContextMatcher.group(1);
-            //            request.setRequestURI(uriNoExtension);
+            String entryPathVariable = entryContextMatcher.group(2);
+            String entryId = entryContextMatcher.group(3);
+            String extension = entryContextMatcher.group(4);
 
-            String extension = entryContextMatcher.group(2);
+            setRealEntryId(request, entryPathVariable, entryId);
+
+            request.setRequestURI(
+                    request.getRequestURI()
+                            .substring(0, request.getRequestURI().length() - (extension.length()+1)));
+            request.setRequestURL(
+                    request.getRequestURL()
+                            .substring(0, request.getRequestURL().length() - (extension.length()+1)));
 
             if (!extension.isEmpty()) {
                 switch (extension) {
@@ -132,10 +141,18 @@ public class HttpServletRequestContentTypeMutator {
                     default:
                         log.warn("Unknown extension requested: " + extension);
                 }
-
-//                request.getRequestDispatcher(uriNoExtension).forward(request, response);
-                request.getRequestDispatcher("/accession/P12345").forward(request, response);
             }
         }
+    }
+
+    private static void setRealEntryId(
+            MutableHttpServletRequest request, String entryPathVariable, String entryId) {
+        request.setAttribute(
+                HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
+                new HashMap() {
+                    {
+                        put(entryPathVariable, entryId);
+                    }
+                });
     }
 }
