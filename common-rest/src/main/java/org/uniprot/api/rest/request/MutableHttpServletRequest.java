@@ -23,10 +23,6 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         this.url = request.getRequestURL();
     }
 
-    public void setRequestURI(String uri) {
-        this.uri = uri;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void setAttribute(String x, Object o) {
@@ -50,13 +46,17 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         return uri;
     }
 
-    public void setRequestURL(String url) {
-        this.url = new StringBuffer(url);
+    public void setRequestURI(String uri) {
+        this.uri = uri;
     }
 
     @Override
     public StringBuffer getRequestURL() {
         return url;
+    }
+
+    public void setRequestURL(String url) {
+        this.url = new StringBuffer(url);
     }
 
     public void addHeader(String name, String value) {
