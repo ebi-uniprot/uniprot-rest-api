@@ -32,7 +32,9 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     public void setAttribute(String x, Object o) {
         if (x.equals(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)) {
             Map<String, String> newUriVariables = (Map<String, String>) o;
-            Map<String, String> uriVariables = (Map<String, String>)super.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            Map<String, String> uriVariables =
+                    (Map<String, String>)
+                            super.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             if (uriVariables == null) {
                 super.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, o);
             } else {
