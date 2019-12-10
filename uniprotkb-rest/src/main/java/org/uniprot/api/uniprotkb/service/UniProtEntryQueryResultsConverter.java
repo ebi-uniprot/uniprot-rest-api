@@ -91,9 +91,8 @@ class UniProtEntryQueryResultsConverter {
             if (taxEntry == null) {
                 return opEntry;
             }
-            UniProtEntryBuilder.ActiveEntryBuilder builder =
-                    new UniProtEntryBuilder().from(opEntry.get());
-            return Optional.of(builder.lineages(taxEntry.getLineage()).build());
+            UniProtEntryBuilder builder = UniProtEntryBuilder.fromInstance(opEntry.get());
+            return Optional.of(builder.lineagesSet(taxEntry.getLineage()).build());
         } else return opEntry;
     }
 
@@ -114,12 +113,8 @@ class UniProtEntryQueryResultsConverter {
                         .mergeDemergeTo(mergeDemergeList)
                         .build();
 
-        UniProtEntryBuilder.InactiveEntryBuilder entryBuilder =
-                new UniProtEntryBuilder()
-                        .primaryAccession(accession)
-                        .uniProtId(uniProtId)
-                        .inactive()
-                        .inactiveReason(inactiveReason);
+        UniProtEntryBuilder entryBuilder =
+                new UniProtEntryBuilder(accession, uniProtId, inactiveReason);
         return Optional.of(entryBuilder.build());
     }
 
@@ -145,8 +140,7 @@ class UniProtEntryQueryResultsConverter {
                 SequenceBuilder seq =
                         new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
                 // seq.molWeight(doc.seqMass); //TODO: TRM-22339 assigned to Jie
-                UniProtEntryBuilder.ActiveEntryBuilder entryBuilder =
-                        new UniProtEntryBuilder().from(uniProtEntry);
+                UniProtEntryBuilder entryBuilder = UniProtEntryBuilder.fromInstance(uniProtEntry);
                 entryBuilder.sequence(seq.build());
                 uniProtEntry = entryBuilder.build();
             }

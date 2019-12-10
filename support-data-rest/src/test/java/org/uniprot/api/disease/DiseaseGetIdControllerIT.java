@@ -302,8 +302,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().string(containsString("ZTTK syndrome")))
+                                    .resultMatcher(content().string(containsString(ACCESSION)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

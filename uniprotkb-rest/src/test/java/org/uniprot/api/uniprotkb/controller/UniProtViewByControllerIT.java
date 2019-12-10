@@ -19,12 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.MockServiceHelper;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByECService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByGoService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByPathwayService;
-import org.uniprot.api.uniprotkb.view.service.UniProtViewByTaxonomyService;
+import org.uniprot.api.uniprotkb.view.service.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtViewByController.class)

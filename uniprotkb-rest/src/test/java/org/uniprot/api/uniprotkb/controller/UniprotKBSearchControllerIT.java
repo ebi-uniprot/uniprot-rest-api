@@ -50,9 +50,8 @@ import org.uniprot.core.cv.chebi.ChebiRepo;
 import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
 import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
+import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.builder.UniProtIdBuilder;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
@@ -741,11 +740,8 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     "go_" + code, Collections.singleton("Search All")));
 
             entry =
-                    new UniProtEntryBuilder()
-                            .primaryAccession(new UniProtAccessionBuilder("P00001").build())
-                            .uniProtId(new UniProtIdBuilder("ID_P00001").build())
-                            .active()
-                            .addDatabaseCrossReference(
+                    new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
+                            .databaseCrossReferenceAdd(
                                     new UniProtDBCrossReferenceBuilder()
                                             .databaseType(new UniProtXDbType("Proteomes"))
                                             .id("UP000000000")
@@ -778,12 +774,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.isIsoform = false;
 
                             UniProtEntry entry =
-                                    new UniProtEntryBuilder()
-                                            .primaryAccession(
-                                                    new UniProtAccessionBuilder("P0000" + i)
-                                                            .build())
-                                            .uniProtId(new UniProtIdBuilder("P12345_ID").build())
-                                            .active()
+                                    new UniProtEntryBuilder(
+                                                    "P0000" + i,
+                                                    "P12345_ID",
+                                                    UniProtEntryType.TREMBL)
                                             .build();
 
                             getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);

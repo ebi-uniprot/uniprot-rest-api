@@ -1,6 +1,6 @@
 package org.uniprot.api.disease.response.converter;
 
-import java.util.*;
+import java.util.Collections;
 
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
