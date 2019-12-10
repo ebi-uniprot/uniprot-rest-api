@@ -44,7 +44,7 @@ public class HttpCommonHeaderConfig {
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
                 MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-                mutableRequest = HttpServletRequestContentTypeMutator.handle(mutableRequest);
+                HttpServletRequestContentTypeMutator.mutate(mutableRequest);
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords");

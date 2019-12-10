@@ -2,16 +2,17 @@ package org.uniprot.api.rest.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.core.util.Utils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A helper class that mutates an {@link HttpServletRequest} based on its values, and if necessary
@@ -29,61 +30,35 @@ public class HttpServletRequestContentTypeMutator {
     private static final Pattern ENTRY_CONTEXT_PATH_MATCHER =
             Pattern.compile("^(.*/(.*)/(.*))\\.(\\w+)$");
 
+    private static Collection<String> allFileExtensions;
+
+    static {
+        allFileExtensions =
+                UniProtMediaType.ALL_TYPES.stream()
+                        .map(UniProtMediaType::getFileExtension)
+                        .collect(Collectors.toList());
+    }
+
     private HttpServletRequestContentTypeMutator() {}
 
-    public static MutableHttpServletRequest handle(MutableHttpServletRequest request) {
+    public static void mutate(MutableHttpServletRequest request) {
         handleEntryRequest(request);
         handleSearchOrDownloadRequest(request);
-
-        return request;
     }
 
     private static void handleSearchOrDownloadRequest(MutableHttpServletRequest request) {
-        if (request.getRequestURI().endsWith(DOWNLOAD)
-                || request.getRequestURI().endsWith(SEARCH)) {
-            String format = request.getParameter(FORMAT);
+        String format = request.getParameter(FORMAT);
+        if ((request.getRequestURI().endsWith(DOWNLOAD) || request.getRequestURI().endsWith(SEARCH))
+                && Objects.nonNull(format)) {
             addContentTypeHeaderForFormat(request, format);
         }
     }
 
     private static void addContentTypeHeaderForFormat(
             MutableHttpServletRequest request, String format) {
-        if (Utils.notNullOrEmpty(format)) {
-            switch (format) {
-                case "json":
-                    request.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-                    break;
-                case "xml":
-                    request.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE);
-                    break;
-                case "fasta":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE);
-                    break;
-                case "obo":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.OBO_MEDIA_TYPE_VALUE);
-                    break;
-                case "rdf":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE_VALUE);
-                    break;
-                case "gff":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.GFF_MEDIA_TYPE_VALUE);
-                    break;
-                case "xls":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.XLS_MEDIA_TYPE_VALUE);
-                    break;
-                case "tsv":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE_VALUE);
-                    break;
-                case "txt":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.FF_MEDIA_TYPE_VALUE);
-                    break;
-                case "list":
-                    request.addHeader(HttpHeaders.ACCEPT, UniProtMediaType.LIST_MEDIA_TYPE_VALUE);
-                    break;
-                default:
-                    log.warn("Unknown format: " + format);
-            }
-        }
+        request.addHeader(
+                HttpHeaders.ACCEPT,
+                UniProtMediaType.getMediaTypeForFileExtension(format).toString());
     }
 
     private static void handleEntryRequest(MutableHttpServletRequest request) {
@@ -116,7 +91,6 @@ public class HttpServletRequestContentTypeMutator {
 
     private static void setRealEntryId(
             MutableHttpServletRequest request, String entryPathVariable, String entryId) {
-
         Map<String, String> uriVariablesMap = new HashMap<>();
         uriVariablesMap.put(entryPathVariable, entryId);
 

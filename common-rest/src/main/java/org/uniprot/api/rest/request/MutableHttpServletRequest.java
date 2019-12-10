@@ -1,10 +1,11 @@
 package org.uniprot.api.rest.request;
 
-import org.springframework.web.servlet.HandlerMapping;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.util.*;
+
+import org.springframework.web.servlet.HandlerMapping;
 
 /**
  * Represents a mutable {@link HttpServletRequest}. Override methods of super class {@link
@@ -28,19 +29,21 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void setAttribute(String x, Object o) {
-        if (x.equals(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)) {
-            Map<String, String> newUriVariables = (Map<String, String>) o;
+    public void setAttribute(String name, Object value) {
+        if (name.equals(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE)) {
+            Map<String, String> newUriVariables = (Map<String, String>) value;
             Map<String, String> uriVariables =
                     (Map<String, String>)
                             super.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             if (uriVariables == null) {
-                super.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, o);
+                super.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, value);
             } else {
                 for (Map.Entry<String, String> newUriVariable : newUriVariables.entrySet()) {
                     uriVariables.putIfAbsent(newUriVariable.getKey(), newUriVariable.getValue());
                 }
             }
+        } else {
+            super.setAttribute(name, value);
         }
     }
 
@@ -78,13 +81,13 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         return ((HttpServletRequest) getRequest()).getHeader(name);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Enumeration<String> getHeaderNames() {
         // create a set of the custom header names
         Set<String> set = new HashSet<>(customHeaders.keySet());
 
         // now add the headers from the wrapped request object
-        @SuppressWarnings("unchecked")
         Enumeration<String> e = ((HttpServletRequest) getRequest()).getHeaderNames();
         while (e.hasMoreElements()) {
             // add the names of the request headers into the list

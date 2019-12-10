@@ -1,9 +1,13 @@
 package org.uniprot.api.rest.output;
 
-import java.util.HashMap;
-import java.util.Map;
+import static java.util.Arrays.asList;
+
+import java.util.Collection;
+import java.util.Objects;
 
 import org.springframework.http.MediaType;
+
+import com.google.common.collect.HashBiMap;
 
 public class UniProtMediaType {
     public static final String FF_MEDIA_TYPE_VALUE = "text/flatfile";
@@ -23,18 +27,43 @@ public class UniProtMediaType {
     public static final String RDF_MEDIA_TYPE_VALUE = "application/rdf+xml";
     public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
 
-    private static Map<MediaType, String> MEDIATYPE_EXTENSION_MAP = new HashMap<>();
+    public static final Collection<MediaType> ALL_TYPES =
+            asList(
+                    FF_MEDIA_TYPE,
+                    LIST_MEDIA_TYPE,
+                    TSV_MEDIA_TYPE,
+                    XLS_MEDIA_TYPE,
+                    FASTA_MEDIA_TYPE,
+                    GFF_MEDIA_TYPE,
+                    OBO_MEDIA_TYPE,
+                    RDF_MEDIA_TYPE);
+
+    private static HashBiMap<MediaType, String> mediaTypeExtensionMap = HashBiMap.create();
 
     static {
-        MEDIATYPE_EXTENSION_MAP.put(FF_MEDIA_TYPE, "txt");
-        MEDIATYPE_EXTENSION_MAP.put(XLS_MEDIA_TYPE, "xlsx");
-    };
+        mediaTypeExtensionMap.put(FF_MEDIA_TYPE, "txt");
+        mediaTypeExtensionMap.put(XLS_MEDIA_TYPE, "xlsx");
+        mediaTypeExtensionMap.put(RDF_MEDIA_TYPE, "rdf");
+
+        ALL_TYPES.forEach(
+                mediaType -> mediaTypeExtensionMap.putIfAbsent(mediaType, mediaType.getSubtype()));
+    }
 
     public static MediaType valueOf(String typeValue) {
         return MediaType.valueOf(typeValue);
     }
 
     public static String getFileExtension(MediaType type) {
-        return MEDIATYPE_EXTENSION_MAP.getOrDefault(type, type.getSubtype());
+        return mediaTypeExtensionMap.getOrDefault(type, type.getSubtype());
+    }
+
+    public static MediaType getMediaTypeForFileExtension(String extension) {
+        MediaType mediaType = mediaTypeExtensionMap.inverse().get(extension);
+        if (Objects.nonNull(mediaType)) {
+            return mediaType;
+        } else {
+            throw new IllegalArgumentException(
+                    "Invalid extension or format supplied: " + extension);
+        }
     }
 }
