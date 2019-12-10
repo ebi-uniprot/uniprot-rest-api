@@ -6,13 +6,11 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * A helper class that mutates an {@link HttpServletRequest} based on its values, and if necessary
@@ -29,15 +27,6 @@ public class HttpServletRequestContentTypeMutator {
     private static final String DOWNLOAD = "/download";
     private static final Pattern ENTRY_CONTEXT_PATH_MATCHER =
             Pattern.compile("^(.*/(.*)/(.*))\\.(\\w+)$");
-
-    private static Collection<String> allFileExtensions;
-
-    static {
-        allFileExtensions =
-                UniProtMediaType.ALL_TYPES.stream()
-                        .map(UniProtMediaType::getFileExtension)
-                        .collect(Collectors.toList());
-    }
 
     private HttpServletRequestContentTypeMutator() {}
 
