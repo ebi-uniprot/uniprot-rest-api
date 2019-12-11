@@ -1,13 +1,12 @@
 package org.uniprot.api.rest.output;
 
-import static java.util.Arrays.asList;
+import com.google.common.collect.HashBiMap;
+import org.springframework.http.MediaType;
 
 import java.util.Collection;
 import java.util.Objects;
 
-import org.springframework.http.MediaType;
-
-import com.google.common.collect.HashBiMap;
+import static java.util.Arrays.asList;
 
 public class UniProtMediaType {
     public static final String FF_MEDIA_TYPE_VALUE = "text/flatfile";
@@ -36,7 +35,9 @@ public class UniProtMediaType {
                     FASTA_MEDIA_TYPE,
                     GFF_MEDIA_TYPE,
                     OBO_MEDIA_TYPE,
-                    RDF_MEDIA_TYPE);
+                    RDF_MEDIA_TYPE,
+                    MediaType.APPLICATION_JSON,
+                    MediaType.APPLICATION_XML);
 
     private static HashBiMap<MediaType, String> mediaTypeExtensionMap = HashBiMap.create();
 
