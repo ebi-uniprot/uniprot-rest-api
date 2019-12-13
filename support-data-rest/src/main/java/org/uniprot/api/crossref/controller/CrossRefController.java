@@ -52,12 +52,13 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             @ValidReturnFields(fieldValidatorClazz = CrossRefField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
+
+        MediaType contentType = getAcceptHeader(request);
 
         CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(accession);
 
-        return super.getEntityResponse(crossRefEntry, fields, contentType);
+        return super.getEntityResponse(crossRefEntry, fields, contentType, request);
     }
 
     @RequestMapping(
@@ -66,10 +67,9 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> search(
             @Valid CrossRefSearchRequest searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
 
         QueryResult<CrossRefEntry> results = this.crossRefService.search(searchRequest);
 

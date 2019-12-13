@@ -1,19 +1,5 @@
 package org.uniprot.api.proteome.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,6 +19,19 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
 
 /**
  * @author jluo
@@ -62,10 +61,9 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> searchCursor(
             @Valid GeneCentricRequest searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
         return super.getSearchResponse(
                 results, searchRequest.getFields(), contentType, request, response);
@@ -81,10 +79,9 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
         GeneCentricRequest searchRequest = new GeneCentricRequest();
         searchRequest.setQuery(GeneCentricField.Search.upid.name() + ":" + upid);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
@@ -106,9 +103,10 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                     @RequestParam(value = "fields", required = false)
                     String fields,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+                    MediaType contentType,
+            HttpServletRequest request) {
         CanonicalProtein entry = service.findByUniqueId(accession.toUpperCase());
-        return super.getEntityResponse(entry, fields, contentType);
+        return super.getEntityResponse(entry, fields, contentType, request);
     }
 
     @RequestMapping(

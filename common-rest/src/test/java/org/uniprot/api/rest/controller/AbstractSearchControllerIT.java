@@ -1,6 +1,18 @@
 package org.uniprot.api.rest.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +34,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.field.SearchField;
-
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 /** @author lgonzales */
 @Slf4j
@@ -595,7 +596,9 @@ public abstract class AbstractSearchControllerIT {
         String extension = "json";
         ResultActions response =
                 mockMvc.perform(
-                        get(getSearchRequestPath()).param("query", "*:*").param("format", extension));
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .param("format", extension));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -623,7 +626,8 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.messages.*",
-                                contains("Invalid request received. Invalid format requested: 'xxxx'")));
+                                contains(
+                                        "Invalid request received. Invalid format requested: 'xxxx'")));
     }
 
     // ----------------------------------------- TEST PAGINATION

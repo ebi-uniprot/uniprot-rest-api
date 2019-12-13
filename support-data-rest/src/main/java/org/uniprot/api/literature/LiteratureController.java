@@ -81,11 +81,11 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
         String updatedFields = updateFieldsWithoutMappedReferences(fields, contentType);
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
-        return super.getEntityResponse(literatureEntry, updatedFields, contentType);
+        return super.getEntityResponse(literatureEntry, updatedFields, contentType, request);
     }
 
     @RequestMapping(
@@ -99,10 +99,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> search(
             @Valid LiteratureRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
         String updatedFields =
                 updateFieldsWithoutMappedReferences(searchRequest.getFields(), contentType);
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
@@ -145,10 +144,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                                     message = "{search.literature.invalid.accession}")
                             String accession,
                     @Valid LiteratureMappedRequestDTO requestDTO,
-                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                            MediaType contentType,
                     HttpServletRequest request,
                     HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
         QueryResult<LiteratureEntry> literatureEntry =
                 this.literatureService.getMappedLiteratureByUniprotAccession(accession, requestDTO);
         return super.getSearchResponse(

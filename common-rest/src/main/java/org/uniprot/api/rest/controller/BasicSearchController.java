@@ -52,7 +52,7 @@ public abstract class BasicSearchController<T> {
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
-            T entity, String fields, MediaType contentType) {
+            T entity, String fields, MediaType contentType, HttpServletRequest request) {
         handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
@@ -160,7 +160,7 @@ public abstract class BasicSearchController<T> {
         if (contentType.getType().equals(UNKNOWN_MEDIA_TYPE_TYPE)) {
             request.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
             throw new InvalidRequestException(
-                    "Invalid format requested: '" + contentType.getSubtype()+"'");
+                    "Invalid format requested: '" + contentType.getSubtype() + "'");
         }
     }
 

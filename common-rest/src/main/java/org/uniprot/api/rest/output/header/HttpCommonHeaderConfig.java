@@ -1,19 +1,20 @@
 package org.uniprot.api.rest.output.header;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
-import org.uniprot.api.rest.request.MutableHttpServletRequest;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
+
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.

@@ -1,13 +1,14 @@
 package org.uniprot.api.rest.output;
 
-import com.google.common.collect.HashBiMap;
-import org.springframework.http.MediaType;
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.Collection;
 import java.util.Objects;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import org.springframework.http.MediaType;
+
+import com.google.common.collect.HashBiMap;
 
 public class UniProtMediaType {
     public static final String DEFAULT_MEDIA_TYPE_VALUE = APPLICATION_JSON_VALUE;

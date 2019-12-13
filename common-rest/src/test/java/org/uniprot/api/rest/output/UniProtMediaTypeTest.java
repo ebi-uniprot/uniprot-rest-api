@@ -1,12 +1,12 @@
 package org.uniprot.api.rest.output;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 /**
  * Ensure file extensions associated with media types are as expected, so that downloads produce
