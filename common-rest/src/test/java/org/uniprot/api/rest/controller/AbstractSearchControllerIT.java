@@ -567,9 +567,10 @@ public abstract class AbstractSearchControllerIT {
                 contentTypeParam.getContentTypeParams());
     }
 
-    // ----------------------------------------- TEST DEFAULT CONTENT TYPE, FORMAT AND ENTRY
-    // EXTENSION
     // -----------------------------------------------
+    // TEST DEFAULT CONTENT TYPE AND FORMAT
+    // -----------------------------------------------
+
     // if no content type is provided, use json
     @Test
     void searchWithoutContentTypeMeansUseDefaultContentType() throws Exception {
@@ -591,16 +592,17 @@ public abstract class AbstractSearchControllerIT {
         saveEntry(SaveScenario.SEARCH_SUCCESS);
 
         // when
+        String extension = "json";
         ResultActions response =
                 mockMvc.perform(
-                        get(getSearchRequestPath()).param("query", "*:*").param("format", "txt"));
+                        get(getSearchRequestPath()).param("query", "*:*").param("format", extension));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
-                                        UniProtMediaType.getMediaTypeForFileExtension("txt")
+                                        UniProtMediaType.getMediaTypeForFileExtension(extension)
                                                 .toString()));
     }
 
@@ -613,7 +615,7 @@ public abstract class AbstractSearchControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(getSearchRequestPath()).param("query", "*:*").param("format", "XXXX"));
+                        get(getSearchRequestPath()).param("query", "*:*").param("format", "xxxx"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -622,11 +624,7 @@ public abstract class AbstractSearchControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains("Invalid request received. Invalid format requested: 'xxxx'")));
-
     }
-    // if format parameter specifying content type present for entry, use it
-    // if format parameter specifying content type present for entry, but is invalid, show error in
-    // json
 
     // ----------------------------------------- TEST PAGINATION
     // -----------------------------------------------

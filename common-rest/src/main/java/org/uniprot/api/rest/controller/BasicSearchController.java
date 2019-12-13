@@ -53,6 +53,7 @@ public abstract class BasicSearchController<T> {
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
             T entity, String fields, MediaType contentType) {
+        handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setEntityOnly(true);
@@ -107,6 +108,7 @@ public abstract class BasicSearchController<T> {
             MediaType contentType,
             HttpServletRequest request,
             String encoding) {
+        handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
