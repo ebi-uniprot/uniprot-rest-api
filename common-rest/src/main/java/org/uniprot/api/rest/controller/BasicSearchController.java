@@ -1,21 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,12 +9,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
 /**
  * @param <T>
@@ -83,7 +81,9 @@ public abstract class BasicSearchController<T> {
             MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+        handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
+
         context.setFields(fields);
         context.setFacets(result.getFacets());
         context.setMatchedFields(result.getMatchedFields());
@@ -123,7 +123,7 @@ public abstract class BasicSearchController<T> {
                     HttpServletRequest request, MessageConverterContext<T> context) {
 
         // timeout in millis
-        Long timeoutInMillis = Long.valueOf(downloadTaskExecutor.getKeepAliveSeconds()) * 1000;
+        Long timeoutInMillis = (long) downloadTaskExecutor.getKeepAliveSeconds() * 1000;
 
         DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult =
                 new DeferredResult<>(timeoutInMillis);
@@ -150,20 +150,23 @@ public abstract class BasicSearchController<T> {
 
     protected abstract Optional<String> getEntityRedirectId(T entity);
 
+    protected MediaType getAcceptHeader(HttpServletRequest request) {
+        return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));
+    }
+
+    private void handleUnknownMediaType(MediaType contentType, MutableHttpServletRequest request) {
+        if (contentType.getType().equals(UNKNOWN_MEDIA_TYPE_TYPE)) {
+            request.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
+            throw new InvalidRequestException(
+                    "Invalid format requested: '" + contentType.getSubtype()+"'");
+        }
+    }
+
     private String getLocationURLForId(String redirectId) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         if (path != null) {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
         return path;
-    }
-
-    protected MediaType getAcceptHeader(HttpServletRequest request) {
-        String acceptHeader = request.getHeader("Accept");
-        if (StringUtils.isEmpty(acceptHeader) || "*/*".equals(acceptHeader)) {
-            return UniProtMediaType.valueOf(APPLICATION_JSON_VALUE);
-        } else {
-            return UniProtMediaType.valueOf(acceptHeader);
-        }
     }
 }

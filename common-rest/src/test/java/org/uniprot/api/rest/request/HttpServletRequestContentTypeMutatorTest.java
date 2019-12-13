@@ -1,17 +1,5 @@
 package org.uniprot.api.rest.request;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,6 +8,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.createUnknownMediaTypeForFileExtension;
 
 /**
  * Created 10/12/19
@@ -35,14 +35,29 @@ class HttpServletRequestContentTypeMutatorTest {
         when(mockRequest.getRequestURI()).thenReturn(resource);
         when(mockRequest.getRequestURL())
                 .thenReturn(new StringBuffer("http://www.uniprot.org/" + resource));
+        when(mockRequest.getHeader(HttpHeaders.ACCEPT)).thenReturn("");
 
         MutableHttpServletRequest request = new MutableHttpServletRequest(mockRequest);
 
-        assertThat(request.getHeader(HttpHeaders.ACCEPT), is(nullValue()));
+        HttpServletRequestContentTypeMutator.mutate(request);
+
+        assertThat(request.getHeader(HttpHeaders.ACCEPT), is(DEFAULT_MEDIA_TYPE_VALUE));
+    }
+
+    @Test
+    void searchRequestWithoutExtensionOrFormatParameter_isNotChanged() {
+        String resource = "uniprot/another/search";
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        when(mockRequest.getRequestURI()).thenReturn(resource);
+        when(mockRequest.getRequestURL())
+            .thenReturn(new StringBuffer("http://www.uniprot.org/" + resource));
+        when(mockRequest.getHeader(HttpHeaders.ACCEPT)).thenReturn("");
+
+        MutableHttpServletRequest request = new MutableHttpServletRequest(mockRequest);
 
         HttpServletRequestContentTypeMutator.mutate(request);
 
-        assertThat(request.getHeader(HttpHeaders.ACCEPT), is(nullValue()));
+        assertThat(request.getHeader(HttpHeaders.ACCEPT), is(DEFAULT_MEDIA_TYPE_VALUE));
     }
 
     @Test
@@ -58,9 +73,11 @@ class HttpServletRequestContentTypeMutatorTest {
 
         assertThat(request.getHeader(HttpHeaders.ACCEPT), is(nullValue()));
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> HttpServletRequestContentTypeMutator.mutate(request));
+        HttpServletRequestContentTypeMutator.mutate(request);
+
+        assertThat(
+                request.getHeader(HttpHeaders.ACCEPT),
+                is(createUnknownMediaTypeForFileExtension("XXXX").toString()));
     }
 
     @SuppressWarnings("unchecked")

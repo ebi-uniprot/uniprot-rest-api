@@ -109,4 +109,12 @@ class UniProtMediaTypeTest {
                 IllegalArgumentException.class,
                 () -> UniProtMediaType.getMediaTypeForFileExtension("UNKNOWN"));
     }
+
+    @Test
+    void canCreateUnknownMediaTypeForFileExtension() {
+        String fileExtension = "xxxx";
+        MediaType mediaType = createUnknownMediaTypeForFileExtension(fileExtension);
+        assertThat(mediaType.getType(), is(UNKNOWN_MEDIA_TYPE_TYPE));
+        assertThat(mediaType.getSubtype(), is(fileExtension));
+    }
 }

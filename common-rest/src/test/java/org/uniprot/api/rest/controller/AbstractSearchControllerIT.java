@@ -1,17 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +18,21 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.field.SearchField;
+
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 /** @author lgonzales */
 @Slf4j
@@ -565,6 +566,67 @@ public abstract class AbstractSearchControllerIT {
                 requestMappingHandlerMapping,
                 contentTypeParam.getContentTypeParams());
     }
+
+    // ----------------------------------------- TEST DEFAULT CONTENT TYPE, FORMAT AND ENTRY
+    // EXTENSION
+    // -----------------------------------------------
+    // if no content type is provided, use json
+    @Test
+    void searchWithoutContentTypeMeansUseDefaultContentType() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response = mockMvc.perform(get(getSearchRequestPath()).param("query", "*:*"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE));
+    }
+
+    // if format parameter for content type present for search, use it
+    @Test
+    void searchWithFormatParameterMeansUseThatContentType() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath()).param("query", "*:*").param("format", "txt"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.getMediaTypeForFileExtension("txt")
+                                                .toString()));
+    }
+
+    // if format parameter for content type present for search, but is invalid, show error in json
+    @Test
+    void searchWithInvalidFormatParameterMeansBadRequestInDefaultContentType() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath()).param("query", "*:*").param("format", "XXXX"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains("Invalid request received. Invalid format requested: 'xxxx'")));
+
+    }
+    // if format parameter specifying content type present for entry, use it
+    // if format parameter specifying content type present for entry, but is invalid, show error in
+    // json
 
     // ----------------------------------------- TEST PAGINATION
     // -----------------------------------------------

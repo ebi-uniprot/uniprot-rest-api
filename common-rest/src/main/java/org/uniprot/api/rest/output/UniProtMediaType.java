@@ -7,8 +7,11 @@ import java.util.Collection;
 import java.util.Objects;
 
 import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class UniProtMediaType {
+    public static final String DEFAULT_MEDIA_TYPE_VALUE = APPLICATION_JSON_VALUE;
+    public static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON;
     public static final String FF_MEDIA_TYPE_VALUE = "text/flatfile";
     public static final MediaType FF_MEDIA_TYPE = valueOf(FF_MEDIA_TYPE_VALUE);
     public static final String LIST_MEDIA_TYPE_VALUE = "text/list";
@@ -38,6 +41,7 @@ public class UniProtMediaType {
                     RDF_MEDIA_TYPE,
                     MediaType.APPLICATION_JSON,
                     MediaType.APPLICATION_XML);
+    public static final String UNKNOWN_MEDIA_TYPE_TYPE = "unknown";
 
     private static HashBiMap<MediaType, String> mediaTypeExtensionMap = HashBiMap.create();
 
@@ -66,5 +70,9 @@ public class UniProtMediaType {
             throw new IllegalArgumentException(
                     "Invalid extension or format supplied: " + extension);
         }
+    }
+
+    public static MediaType createUnknownMediaTypeForFileExtension(String extension) {
+        return new MediaType(UNKNOWN_MEDIA_TYPE_TYPE, extension);
     }
 }
