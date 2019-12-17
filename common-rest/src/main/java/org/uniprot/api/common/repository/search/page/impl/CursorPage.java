@@ -95,6 +95,14 @@ public class CursorPage implements Page {
         return totalElements;
     }
 
+    public Long getOffset() {
+        return this.offset;
+    }
+
+    public Integer getPageSize() {
+        return this.pageSize;
+    }
+
     /**
      * Check if should have next page link
      *

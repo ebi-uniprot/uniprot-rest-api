@@ -24,6 +24,7 @@ import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.RDFMessageConverter;
+import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.output.converter.*;
 import org.uniprot.core.uniprot.UniProtEntry;
 
@@ -77,11 +78,12 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(0, new UniProtKBXmlMessageConverter());
                 converters.add(1, new UniProtKBJsonMessageConverter());
+                converters.add(2, new PublicationJsonMessageConverter());
             }
         };
     }
 
-    @Bean
+    @Bean("uniprotMessageConverterContextFactory")
     public MessageConverterContextFactory<UniProtEntry> messageConverterContextFactory() {
         MessageConverterContextFactory<UniProtEntry> contextFactory =
                 new MessageConverterContextFactory<>();
@@ -97,6 +99,22 @@ public class MessageConverterConfig {
                         context(XLS_MEDIA_TYPE),
                         context(GFF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    @Bean("publicationMessageConverterContextFactory")
+    public MessageConverterContextFactory<PublicationEntry>
+            publicationMessageConverterContextFactory() {
+        MessageConverterContextFactory<PublicationEntry> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        MessageConverterContext<PublicationEntry> jsonContext =
+                MessageConverterContext.<PublicationEntry>builder()
+                        .resource(MessageConverterContextFactory.Resource.UNIPROT_PUBLICATION)
+                        .contentType(APPLICATION_JSON)
+                        .build();
+        contextFactory.addMessageConverterContext(jsonContext);
 
         return contextFactory;
     }
