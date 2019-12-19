@@ -74,14 +74,13 @@ public class UniProtConfigureService {
         List<UniProtXDbTypeDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
         List<Tuple> databaseTypes =
                 dbTypes.stream()
-                .filter(val ->val.getLinkTp().equals("Explicit"))
-                .map(this::convertToTuple).collect(Collectors.toList());
+                        .filter(val -> val.getLinkTp().equals("Explicit"))
+                        .map(this::convertToTuple)
+                        .collect(Collectors.toList());
         return new DatabaseGroupImpl(dbCategory.getDisplayName(), databaseTypes);
     }
 
-  public List<UniProtXDbTypeDetail> getAllDatabases() {
-	  return DBX_TYPES.getAllDBXRefTypes();
-  }
-    
-    
+    public List<UniProtXDbTypeDetail> getAllDatabases() {
+        return DBX_TYPES.getAllDBXRefTypes();
+    }
 }

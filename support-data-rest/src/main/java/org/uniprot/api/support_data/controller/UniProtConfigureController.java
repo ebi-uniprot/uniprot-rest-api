@@ -45,7 +45,7 @@ public class UniProtConfigureController {
     public List<FieldGroup> getResultFields() {
         return service.getResultFields();
     }
-    
+
     @GetMapping("/allDatabases")
     public List<UniProtXDbTypeDetail> getUniProtAllDatabase() {
         return service.getAllDatabases();
