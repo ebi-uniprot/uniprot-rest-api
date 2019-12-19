@@ -1,16 +1,10 @@
 package org.uniprot.api.literature.service;
 
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.literature.repository.LiteratureRepository;
-import org.uniprot.api.literature.request.LiteratureMappedRequestDTO;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
@@ -31,9 +25,6 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                             LiteratureField.Search.id,
                             LiteratureField.Search.getBoostFields());
 
-    @Autowired private LiteratureRepository repository;
-    @Autowired private LiteratureEntryConverter entryConverter;
-
     public LiteratureService(
             LiteratureRepository repository,
             LiteratureEntryConverter entryConverter,
@@ -45,35 +36,5 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     @Override
     protected String getIdField() {
         return LiteratureField.Search.id.name();
-    }
-
-    public QueryResult<LiteratureEntry> getMappedLiteratureByUniprotAccession(
-            final String accession, LiteratureMappedRequestDTO requestDTO) {
-        requestDTO.setQuery("mapped_protein:" + accession);
-        SolrRequest solrRequest = createSearchSolrRequest(requestDTO);
-        QueryResult<LiteratureDocument> results =
-                repository.searchPage(solrRequest, requestDTO.getCursor());
-
-        List<LiteratureEntry> converted =
-                results.getContent().stream()
-                        .map(
-                                literatureDocument ->
-                                        convertDocumentToEntryAndFilterMappedAccession(
-                                                literatureDocument, accession))
-                        .collect(Collectors.toList());
-        return QueryResult.of(converted, results.getPage(), results.getFacets());
-    }
-
-    private LiteratureEntry convertDocumentToEntryAndFilterMappedAccession(
-            LiteratureDocument literatureDocument, String accession) {
-        LiteratureEntry entry = entryConverter.apply(literatureDocument);
-        entry.getLiteratureMappedReferences()
-                .removeIf(
-                        mappedReference ->
-                                !mappedReference
-                                        .getUniprotAccession()
-                                        .getValue()
-                                        .equalsIgnoreCase(accession));
-        return entry;
     }
 }
