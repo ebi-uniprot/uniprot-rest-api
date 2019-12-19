@@ -37,39 +37,41 @@ public class PublicationFacetConfig extends FacetConfig {
         }
     }
 
-    static Collection<Facet> getFacets(List<PublicationEntry> publications, String requestFacets) {
+    static List<Facet> getFacets(List<PublicationEntry> publications, String requestFacets) {
         List<Facet> facets = new ArrayList<>();
-        if (requestFacets.contains(PUBLICATION_FACETS.source.name())) {
-            Facet source =
-                    Facet.builder()
-                            .label(PUBLICATION_FACETS.source.getLabel())
-                            .name(PUBLICATION_FACETS.source.name())
-                            .allowMultipleSelection(false)
-                            .values(getSourceFacetValues(publications))
-                            .build();
-            facets.add(source);
-        }
+        if (Utils.notNullOrEmpty(requestFacets)) {
+            if (requestFacets.contains(PUBLICATION_FACETS.source.name())) {
+                Facet source =
+                        Facet.builder()
+                                .label(PUBLICATION_FACETS.source.getLabel())
+                                .name(PUBLICATION_FACETS.source.name())
+                                .allowMultipleSelection(false)
+                                .values(getSourceFacetValues(publications))
+                                .build();
+                facets.add(source);
+            }
 
-        if (requestFacets.contains(PUBLICATION_FACETS.category.name())) {
-            Facet category =
-                    Facet.builder()
-                            .label(PUBLICATION_FACETS.category.getLabel())
-                            .name(PUBLICATION_FACETS.category.name())
-                            .allowMultipleSelection(false)
-                            .values(getCategoryFacetValues(publications))
-                            .build();
-            facets.add(category);
-        }
+            if (requestFacets.contains(PUBLICATION_FACETS.category.name())) {
+                Facet category =
+                        Facet.builder()
+                                .label(PUBLICATION_FACETS.category.getLabel())
+                                .name(PUBLICATION_FACETS.category.name())
+                                .allowMultipleSelection(false)
+                                .values(getCategoryFacetValues(publications))
+                                .build();
+                facets.add(category);
+            }
 
-        if (requestFacets.contains(PUBLICATION_FACETS.scale.name())) {
-            Facet scale =
-                    Facet.builder()
-                            .label(PUBLICATION_FACETS.scale.getLabel())
-                            .name(PUBLICATION_FACETS.scale.name())
-                            .allowMultipleSelection(false)
-                            .values(getScaleFacetValues(publications))
-                            .build();
-            facets.add(scale);
+            if (requestFacets.contains(PUBLICATION_FACETS.scale.name())) {
+                Facet scale =
+                        Facet.builder()
+                                .label(PUBLICATION_FACETS.scale.getLabel())
+                                .name(PUBLICATION_FACETS.scale.name())
+                                .allowMultipleSelection(false)
+                                .values(getScaleFacetValues(publications))
+                                .build();
+                facets.add(scale);
+            }
         }
         return facets;
     }
@@ -120,6 +122,7 @@ public class PublicationFacetConfig extends FacetConfig {
     private static List<FacetItem> getCategoryFacetValues(List<PublicationEntry> publications) {
         Map<String, Long> categoryCountMap =
                 publications.stream()
+                        .filter(PublicationEntry::hasCategories)
                         .flatMap((publicationEntry) -> publicationEntry.getCategories().stream())
                         .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
 
@@ -129,6 +132,7 @@ public class PublicationFacetConfig extends FacetConfig {
     private static List<FacetItem> getSourceFacetValues(List<PublicationEntry> publications) {
         Map<String, Long> sourceCountMap =
                 publications.stream()
+                        .filter(PublicationEntry::hasPublicationSource)
                         .map(PublicationEntry::getPublicationSource)
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 

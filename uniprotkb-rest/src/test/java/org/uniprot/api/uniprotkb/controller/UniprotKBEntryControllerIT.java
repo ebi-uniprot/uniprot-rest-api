@@ -8,11 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,35 +31,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
+import org.uniprot.api.uniprotkb.UniprotKbObjectsForTests;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
-import org.uniprot.core.citation.Author;
-import org.uniprot.core.citation.CitationXrefType;
-import org.uniprot.core.citation.SubmissionDatabase;
-import org.uniprot.core.citation.builder.JournalArticleBuilder;
-import org.uniprot.core.citation.builder.SubmissionBuilder;
-import org.uniprot.core.citation.impl.AuthorImpl;
-import org.uniprot.core.citation.impl.PublicationDateImpl;
-import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
-import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureMappedReference;
-import org.uniprot.core.literature.LiteratureStoreEntry;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
-import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
-import org.uniprot.core.uniprot.UniProtAccession;
-import org.uniprot.core.uniprot.UniProtEntryType;
-import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
-import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -337,111 +310,15 @@ class UniprotKBEntryControllerIT {
     }
 
     private void saveEntry(long pubMedId, String... accessions) {
-        LiteratureEntry entry =
-                new LiteratureEntryBuilder()
-                        .pubmedId(pubMedId)
-                        .doiId("doi " + pubMedId)
-                        .title("title " + pubMedId)
-                        .addAuthor(new AuthorImpl("author " + pubMedId))
-                        .journal("journal " + pubMedId)
-                        .publicationDate(new PublicationDateImpl("2019"))
-                        .build();
-        LiteratureStoreEntry storeEntry =
-                new LiteratureStoreEntryBuilder()
-                        .literatureEntry(entry)
-                        .literatureMappedReference(getLiteratureReference(accessions))
-                        .build();
-
         System.out.println("Document for PUBMED_ID: " + pubMedId);
         LiteratureDocument document =
-                LiteratureDocument.builder()
-                        .id(String.valueOf(pubMedId))
-                        .doi(entry.getDoiId())
-                        .title(entry.getTitle())
-                        .author(
-                                entry.getAuthors().stream()
-                                        .map(Author::getValue)
-                                        .collect(Collectors.toSet()))
-                        .journal(entry.getJournal().getName())
-                        .published(entry.getPublicationDate().getValue())
-                        .content(Collections.singleton(String.valueOf(pubMedId)))
-                        .mappedProteins(
-                                storeEntry.getLiteratureMappedReferences().stream()
-                                        .map(LiteratureMappedReference::getUniprotAccession)
-                                        .map(UniProtAccession::getValue)
-                                        .collect(Collectors.toSet()))
-                        .literatureObj(getLiteratureBinary(storeEntry))
-                        .build();
+                UniprotKbObjectsForTests.getLiteratureDocument(pubMedId, accessions);
 
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
     private void saveUniprotEntryInStore(String accession, String... pubmedIds) {
-        List<UniProtReference> references =
-                Arrays.stream(pubmedIds)
-                        .map(
-                                pubmedId -> {
-                                    return new UniProtReferenceBuilder()
-                                            .addPositions("Position MUTAGENESIS pathol " + pubmedId)
-                                            .addPositions("Position INTERACTION " + pubmedId)
-                                            .citation(
-                                                    new JournalArticleBuilder()
-                                                            .addCitationXrefs(
-                                                                    new DBCrossReferenceBuilder<
-                                                                                    CitationXrefType>()
-                                                                            .databaseType(
-                                                                                    CitationXrefType
-                                                                                            .PUBMED)
-                                                                            .id(pubmedId)
-                                                                            .build())
-                                                            .build())
-                                            .build();
-                                })
-                        .collect(Collectors.toList());
-
-        references.add(
-                new UniProtReferenceBuilder()
-                        .addPositions("Position INTERACTION ")
-                        .citation(
-                                new SubmissionBuilder()
-                                        .title("Submission tittle")
-                                        .addAuthor("Submission Author")
-                                        .submittedToDatabase(SubmissionDatabase.PDB)
-                                        .build())
-                        .build());
-
         storeClient.saveEntry(
-                new UniProtEntryBuilder()
-                        .primaryAccession(new UniProtAccessionBuilder(accession).build())
-                        .uniProtId(null)
-                        .active()
-                        .entryType(UniProtEntryType.SWISSPROT)
-                        .references(references)
-                        .build());
-    }
-
-    private List<LiteratureMappedReference> getLiteratureReference(String... accessions) {
-        return Arrays.stream(accessions)
-                .map(
-                        accession ->
-                                new LiteratureMappedReferenceBuilder()
-                                        .uniprotAccession(accession)
-                                        .source("source " + accession)
-                                        .sourceId("source id " + accession)
-                                        .addSourceCategory("function")
-                                        .annotation("annotation " + accession)
-                                        .build())
-                .collect(Collectors.toList());
-    }
-
-    private ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {
-        try {
-            return ByteBuffer.wrap(
-                    LiteratureJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
-        }
+                UniprotKbObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
     }
 }

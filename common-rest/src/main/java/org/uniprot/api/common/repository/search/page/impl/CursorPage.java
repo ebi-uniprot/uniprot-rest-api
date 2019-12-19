@@ -108,7 +108,7 @@ public class CursorPage implements Page {
      *
      * @return true if (offset + pageSize) < totalElements
      */
-    private boolean hasNextPage() {
+    public boolean hasNextPage() {
         return (offset + pageSize) < totalElements;
     }
 }
