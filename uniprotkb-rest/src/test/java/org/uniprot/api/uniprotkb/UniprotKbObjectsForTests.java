@@ -25,7 +25,6 @@ import org.uniprot.core.uniprot.UniProtAccession;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
@@ -40,12 +39,8 @@ public class UniprotKbObjectsForTests {
 
     public static UniProtEntry getUniprotEntryForPublication(
             String accession, String... pubmedIds) {
-        return new UniProtEntryBuilder()
-                .primaryAccession(new UniProtAccessionBuilder(accession).build())
-                .uniProtId(null)
-                .active()
-                .entryType(UniProtEntryType.SWISSPROT)
-                .references(getUniProtReferencesForPublication(pubmedIds))
+        return new UniProtEntryBuilder(accession, "ID_" + accession, UniProtEntryType.SWISSPROT)
+                .referencesSet(getUniProtReferencesForPublication(pubmedIds))
                 .build();
     }
 
