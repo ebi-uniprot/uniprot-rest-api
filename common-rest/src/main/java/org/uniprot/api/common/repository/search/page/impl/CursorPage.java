@@ -95,12 +95,20 @@ public class CursorPage implements Page {
         return totalElements;
     }
 
+    public Long getOffset() {
+        return this.offset;
+    }
+
+    public Integer getPageSize() {
+        return this.pageSize;
+    }
+
     /**
      * Check if should have next page link
      *
      * @return true if (offset + pageSize) < totalElements
      */
-    private boolean hasNextPage() {
+    public boolean hasNextPage() {
         return (offset + pageSize) < totalElements;
     }
 }

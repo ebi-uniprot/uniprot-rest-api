@@ -10,12 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
 import org.uniprot.core.literature.builder.LiteratureStatisticsBuilder;
-import org.uniprot.core.uniprot.impl.UniProtAccessionImpl;
 import org.uniprot.store.search.field.LiteratureField;
 
 /**
@@ -87,7 +84,6 @@ class LiteratureEntryFilterTest {
         assertNull(filterEntry.getJournal());
         assertTrue(filterEntry.getAuthors().isEmpty());
         assertTrue(filterEntry.getAuthoringGroup().isEmpty());
-        assertTrue(filterEntry.getLiteratureMappedReferences().isEmpty());
     }
 
     private LiteratureEntry getCompleteLiteratureEntry() {
@@ -103,7 +99,6 @@ class LiteratureEntryFilterTest {
                 .statistics(createCompleteLiteratureStatistics())
                 .addAuthor(new AuthorImpl("author name"))
                 .addAuthoringGroup("authoring group")
-                .addLiteratureMappedReference(createCompleteLiteratureMappedReference())
                 .title("title")
                 .completeAuthorList(false)
                 .build();
@@ -114,16 +109,6 @@ class LiteratureEntryFilterTest {
                 .reviewedProteinCount(10)
                 .unreviewedProteinCount(20)
                 .mappedProteinCount(30)
-                .build();
-    }
-
-    private LiteratureMappedReference createCompleteLiteratureMappedReference() {
-        return new LiteratureMappedReferenceBuilder()
-                .annotation("annotation value")
-                .source("source value")
-                .sourceId("source Id")
-                .addSourceCategory("source category")
-                .uniprotAccession(new UniProtAccessionImpl("P12345"))
                 .build();
     }
 }

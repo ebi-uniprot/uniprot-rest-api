@@ -31,9 +31,9 @@ import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureMappedReference;
+import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
+import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
@@ -78,8 +78,6 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        LiteratureMappedReference mappedReference =
-                new LiteratureMappedReferenceBuilder().source("source").build();
 
         LiteratureEntry literatureEntry =
                 new LiteratureEntryBuilder()
@@ -88,14 +86,16 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .addAuthor(new AuthorImpl("The Author"))
                         .literatureAbstract("literature abstract")
                         .publicationDate(new PublicationDateImpl("2019"))
-                        .addLiteratureMappedReference(mappedReference)
                         .firstPage("10")
                         .build();
+
+        LiteratureStoreEntry storeEntry =
+                new LiteratureStoreEntryBuilder().literatureEntry(literatureEntry).build();
 
         LiteratureDocument document =
                 LiteratureDocument.builder()
                         .id(String.valueOf(PUBMED_ID))
-                        .literatureObj(getLiteratureBinary(literatureEntry))
+                        .literatureObj(getLiteratureBinary(storeEntry))
                         .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
@@ -106,7 +106,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/literature/";
     }
 
-    private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
+    private ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {
         try {
             return ByteBuffer.wrap(
                     LiteratureJsonConfig.getInstance()
@@ -126,7 +126,6 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.pubmedId", is(100)))
                     .resultMatcher(jsonPath("$.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.title", is("The Title")))
-                    .resultMatcher(jsonPath("$.literatureMappedReferences").doesNotExist())
                     .build();
         }
 
@@ -155,11 +154,10 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
-                    .fields("id,title,mapped_references")
+                    .fields("id,title")
                     .resultMatcher(jsonPath("$.pubmedId", is(100)))
                     .resultMatcher(jsonPath("$.title", is("The Title")))
                     .resultMatcher(jsonPath("$.authors").doesNotExist())
-                    .resultMatcher(jsonPath("$.literatureMappedReferences").exists())
                     .build();
         }
 

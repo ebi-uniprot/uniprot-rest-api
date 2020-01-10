@@ -155,7 +155,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                         .rank("rank")
                         .strain(Collections.singletonList("strain"))
                         .host(Collections.singletonList(10L))
-                        .complete(facet)
+                        .proteome(facet)
                         .reference(facet)
                         .reviewed(facet)
                         .annotated(facet)
@@ -232,7 +232,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             "query",
                             Collections.singletonList(
                                     "tax_id:INVALID OR id:INVALID "
-                                            + "OR host:INVALID OR linked:invalid OR active:invalid OR complete:invalid "
+                                            + "OR host:INVALID OR linked:invalid OR active:invalid OR proteome:invalid "
                                             + "OR reference:invalid OR reviewed:invalid OR annotated:invalid"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
@@ -240,7 +240,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                     "$.messages.*",
                                     containsInAnyOrder(
                                             "The taxonomy active filter value should be a boolean",
-                                            "The taxonomy complete filter value should be a boolean",
+                                            "The taxonomy proteome filter value should be a boolean",
                                             "The taxonomy reference filter value should be a boolean",
                                             "The taxonomy id filter value should be a number",
                                             "The taxonomy linked filter value should be a boolean",

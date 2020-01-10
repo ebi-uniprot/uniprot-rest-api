@@ -37,9 +37,9 @@ import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureMappedReference;
+import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
+import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
@@ -139,8 +139,6 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
     }
 
     private void saveEntry(long pubMedId, boolean facet) {
-        LiteratureMappedReference mappedReference =
-                new LiteratureMappedReferenceBuilder().source("source").build();
 
         LiteratureEntry entry =
                 new LiteratureEntryBuilder()
@@ -150,8 +148,10 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                         .addAuthor(new AuthorImpl("author " + pubMedId))
                         .journal("journal " + pubMedId)
                         .publicationDate(new PublicationDateImpl("2019"))
-                        .addLiteratureMappedReference(mappedReference)
                         .build();
+
+        LiteratureStoreEntry storeEntry =
+                new LiteratureStoreEntryBuilder().literatureEntry(entry).build();
 
         LiteratureDocument document =
                 LiteratureDocument.builder()
@@ -167,13 +167,13 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                         .citedin(facet)
                         .mappedin(facet)
                         .content(Collections.singleton(String.valueOf(pubMedId)))
-                        .literatureObj(getLiteratureBinary(entry))
+                        .literatureObj(getLiteratureBinary(storeEntry))
                         .build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
-    private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
+    private ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {
         try {
             return ByteBuffer.wrap(
                     LiteratureJsonConfig.getInstance()
@@ -193,8 +193,6 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10)))
                     .resultMatcher(jsonPath("$.results.*.title", contains("title 10")))
                     .resultMatcher(jsonPath("$.results.*.publicationDate", contains("2019")))
-                    .resultMatcher(
-                            jsonPath("$.results.*.literatureMappedReferences").doesNotExist())
                     .build();
         }
 
@@ -267,10 +265,9 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,title,mapped_references"))
+                    .queryParam("fields", Collections.singletonList("id,title"))
                     .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10, 20)))
                     .resultMatcher(jsonPath("$.results.*.title", contains("title 10", "title 20")))
-                    .resultMatcher(jsonPath("$.results.*.literatureMappedReferences").exists())
                     .resultMatcher(jsonPath("$.results.*.authors").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.journal").doesNotExist())
                     .build();

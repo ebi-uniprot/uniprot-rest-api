@@ -85,7 +85,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
         MediaType contentType = getAcceptHeader(request);
         String updatedFields = updateFieldsWithoutMappedReferences(fields, contentType);
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
-        return super.getEntityResponse(literatureEntry, updatedFields, contentType, request);
+        return super.getEntityResponse(literatureEntry, updatedFields, contentType);
     }
 
     @RequestMapping(
@@ -127,32 +127,6 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
         return super.download(result, searchRequest.getFields(), contentType, request, encoding);
     }
 
-    @GetMapping(
-            value = "/mapped/proteins/{accession}",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
-            })
-    public ResponseEntity<MessageConverterContext<LiteratureEntry>>
-            getMappedLiteratureByUniprotAccession(
-                    @PathVariable("accession")
-                            @Pattern(
-                                    regexp = FieldValueValidator.ACCESSION_REGEX,
-                                    flags = {Pattern.Flag.CASE_INSENSITIVE},
-                                    message = "{search.literature.invalid.accession}")
-                            String accession,
-                    @Valid LiteratureMappedRequestDTO requestDTO,
-                    HttpServletRequest request,
-                    HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
-        QueryResult<LiteratureEntry> literatureEntry =
-                this.literatureService.getMappedLiteratureByUniprotAccession(accession, requestDTO);
-        return super.getSearchResponse(
-                literatureEntry, requestDTO.getFields(), contentType, request, response);
-    }
-
     @Override
     protected String getEntityId(LiteratureEntry entity) {
         return String.valueOf(entity.getPubmedId());
@@ -161,23 +135,5 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     @Override
     protected Optional<String> getEntityRedirectId(LiteratureEntry entity) {
         return Optional.empty();
-    }
-
-    private String updateFieldsWithoutMappedReferences(String requestField, MediaType contentType) {
-        if (Utils.nullOrEmpty(requestField) && contentType.equals(APPLICATION_JSON)) {
-            requestField =
-                    Arrays.stream(LiteratureField.ResultFields.values())
-                            .filter(
-                                    resultFields ->
-                                            !resultFields
-                                                    .name()
-                                                    .equals(
-                                                            LiteratureField.ResultFields
-                                                                    .mapped_references
-                                                                    .name()))
-                            .map(LiteratureField.ResultFields::name)
-                            .collect(Collectors.joining(", "));
-        }
-        return requestField;
     }
 }
