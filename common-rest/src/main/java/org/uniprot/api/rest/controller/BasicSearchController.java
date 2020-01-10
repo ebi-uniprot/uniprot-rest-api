@@ -83,7 +83,7 @@ public abstract class BasicSearchController<T> {
             MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
-        handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
+        handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
         context.setFields(fields);
@@ -109,7 +109,7 @@ public abstract class BasicSearchController<T> {
             MediaType contentType,
             HttpServletRequest request,
             String encoding) {
-        handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
+        handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
@@ -157,7 +157,7 @@ public abstract class BasicSearchController<T> {
         return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));
     }
 
-    private void handleUnknownMediaType(MediaType contentType, Object request) {
+    private void handleUnknownMediaType(MediaType contentType, HttpServletRequest request) {
         if (Utils.notNull(request) && request instanceof MutableHttpServletRequest) {
             MutableHttpServletRequest mutableRequest = (MutableHttpServletRequest) request;
 

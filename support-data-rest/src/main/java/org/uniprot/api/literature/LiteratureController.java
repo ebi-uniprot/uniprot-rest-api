@@ -1,20 +1,5 @@
 package org.uniprot.api.literature;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -24,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.literature.request.LiteratureMappedRequestDTO;
 import org.uniprot.api.literature.request.LiteratureRequestDTO;
 import org.uniprot.api.literature.service.LiteratureService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -32,9 +16,18 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.LiteratureField;
-import org.uniprot.store.search.field.validator.FieldValueValidator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
 
 /**
  * @author lgonzales
@@ -83,9 +76,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     String fields,
             HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        String updatedFields = updateFieldsWithoutMappedReferences(fields, contentType);
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
-        return super.getEntityResponse(literatureEntry, updatedFields, contentType);
+        return super.getEntityResponse(literatureEntry, fields, contentType, request);
     }
 
     @RequestMapping(
@@ -102,10 +94,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             HttpServletRequest request,
             HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
-        String updatedFields =
-                updateFieldsWithoutMappedReferences(searchRequest.getFields(), contentType);
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
-        return super.getSearchResponse(results, updatedFields, contentType, request, response);
+        return super.getSearchResponse(
+                results, searchRequest.getFields(), contentType, request, response);
     }
 
     @RequestMapping(
