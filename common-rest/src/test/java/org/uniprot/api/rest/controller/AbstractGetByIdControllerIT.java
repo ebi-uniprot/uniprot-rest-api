@@ -1,15 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,6 +24,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 /** @author lgonzales */
 @Slf4j
@@ -288,8 +287,6 @@ public abstract class AbstractGetByIdControllerIT {
         saveEntry();
 
         // when
-
-        // when
         String extension = "json";
         ResultActions response =
                 mockMvc.perform(get(getIdRequestPath() + idParameter.getId() + "." + extension));
@@ -312,8 +309,6 @@ public abstract class AbstractGetByIdControllerIT {
 
         // given
         saveEntry();
-
-        // when
 
         // when
         ResultActions response =

@@ -58,8 +58,6 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     private final UniProtEntryService entryService;
     private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
 
-    @Autowired private HttpServletRequest request;
-
     @Autowired
     public UniprotKBController(
             ApplicationEventPublisher eventPublisher,
@@ -125,7 +123,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
-        MediaType contentType = getAcceptHeader(this.request);
+        MediaType contentType = getAcceptHeader(request);
         QueryResult<UniProtEntry> result = entryService.search(searchRequest);
         return super.getSearchResponse(
                 result, searchRequest.getFields(), contentType, request, response);
@@ -180,13 +178,14 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
-                    String fields) {
+                    String fields,
+            HttpServletRequest request) {
 
         UniProtEntry entry = entryService.findByUniqueId(accession, fields);
 
-        MediaType contentType = getAcceptHeader(this.request);
+        MediaType contentType = getAcceptHeader(request);
 
-        return super.getEntityResponse(entry, fields, contentType, this.request);
+        return super.getEntityResponse(entry, fields, contentType, request);
     }
 
     /*
@@ -244,7 +243,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        MediaType contentType = getAcceptHeader(this.request);
+        MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<UniProtEntry> context =
                 converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));

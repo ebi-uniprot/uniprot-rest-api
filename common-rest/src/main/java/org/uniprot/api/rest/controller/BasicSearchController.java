@@ -17,6 +17,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
+import org.uniprot.core.util.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +54,7 @@ public abstract class BasicSearchController<T> {
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
             T entity, String fields, MediaType contentType, HttpServletRequest request) {
-        handleUnknownMediaType(contentType, (MutableHttpServletRequest) request);
+        handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setEntityOnly(true);
@@ -156,11 +157,17 @@ public abstract class BasicSearchController<T> {
         return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));
     }
 
-    private void handleUnknownMediaType(MediaType contentType, MutableHttpServletRequest request) {
-        if (contentType.getType().equals(UNKNOWN_MEDIA_TYPE_TYPE)) {
-            request.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
-            throw new InvalidRequestException(
-                    "Invalid format requested: '" + contentType.getSubtype() + "'");
+    private void handleUnknownMediaType(MediaType contentType, Object request) {
+        if (Utils.notNull(request) && request instanceof MutableHttpServletRequest) {
+            MutableHttpServletRequest mutableRequest = (MutableHttpServletRequest) request;
+
+            if (contentType.getType().equals(UNKNOWN_MEDIA_TYPE_TYPE)) {
+                mutableRequest.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
+                throw new InvalidRequestException(
+                        "Invalid format requested: '" + contentType.getSubtype() + "'");
+            }
+        } else {
+            log.debug("Unknown request: {}", request);
         }
     }
 
