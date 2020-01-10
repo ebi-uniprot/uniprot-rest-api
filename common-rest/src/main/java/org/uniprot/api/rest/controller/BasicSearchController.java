@@ -53,7 +53,8 @@ public abstract class BasicSearchController<T> {
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
-            T entity, String fields, MediaType contentType, HttpServletRequest request) {
+            T entity, String fields, HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
         handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
@@ -80,9 +81,9 @@ public abstract class BasicSearchController<T> {
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
             QueryResult<T> result,
             String fields,
-            MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
         handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 

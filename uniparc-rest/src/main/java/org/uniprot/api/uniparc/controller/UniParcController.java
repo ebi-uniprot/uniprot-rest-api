@@ -1,5 +1,18 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -18,18 +31,6 @@ import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.field.UniParcResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 /**
  * @author jluo
@@ -70,11 +71,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                     boolean preview,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
         setPreviewInfo(searchRequest, preview);
         QueryResult<UniParcEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -99,9 +98,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        MediaType contentType = getAcceptHeader(request);
         UniParcEntry entry = queryService.findByUniqueId(upi.toUpperCase());
-        return super.getEntityResponse(entry, fields, contentType, request);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(

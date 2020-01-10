@@ -1,5 +1,17 @@
 package org.uniprot.api.uniref.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -19,17 +31,6 @@ import org.uniprot.api.uniref.service.UniRefQueryService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.field.UniRefResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
 /**
  * @author jluo
@@ -78,9 +79,8 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        MediaType contentType = getAcceptHeader(request);
         UniRefEntry entry = queryService.findByUniqueId(id);
-        return super.getEntityResponse(entry, fields, contentType, request);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(
@@ -100,11 +100,9 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
                     boolean preview,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
         setPreviewInfo(searchRequest, preview);
         QueryResult<UniRefEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(

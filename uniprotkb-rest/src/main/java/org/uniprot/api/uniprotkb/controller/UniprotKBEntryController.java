@@ -77,6 +77,6 @@ public class UniprotKBEntryController extends BasicSearchController<PublicationE
                 this.publicationService.getPublicationsByUniprotAccession(
                         accession, publicationRequest);
 
-        return super.getSearchResponse(literatureEntry, "", contentType, request, response);
+        return super.getSearchResponse(literatureEntry, "", request, response);
     }
 }

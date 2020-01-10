@@ -14,7 +14,6 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -102,10 +101,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             HttpServletRequest request) {
 
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(keywordId);
-
-        MediaType acceptHeader = getAcceptHeader(request);
-
-        return super.getEntityResponse(keywordEntry, fields, acceptHeader, request);
+        return super.getEntityResponse(keywordEntry, fields, request);
     }
 
     @Tag(name = "keyword")
@@ -140,9 +136,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<KeywordEntry> results = keywordService.search(searchRequest);
-        MediaType acceptHeader = getAcceptHeader(request);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), acceptHeader, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @Tag(name = "keyword")

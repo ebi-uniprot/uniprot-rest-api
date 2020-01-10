@@ -1,9 +1,22 @@
 package org.uniprot.api.proteome.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -19,19 +32,6 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
 
 /**
  * @author jluo
@@ -63,10 +63,8 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             @Valid GeneCentricRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -81,12 +79,10 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                     String upid,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
         GeneCentricRequest searchRequest = new GeneCentricRequest();
         searchRequest.setQuery(GeneCentricField.Search.upid.name() + ":" + upid);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -104,7 +100,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                     String fields,
             HttpServletRequest request) {
         CanonicalProtein entry = service.findByUniqueId(accession.toUpperCase());
-        return super.getEntityResponse(entry, fields, getAcceptHeader(request), request);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(

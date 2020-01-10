@@ -66,9 +66,8 @@ public class DiseaseController extends BasicSearchController<Disease> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        MediaType contentType = getAcceptHeader(request);
         Disease disease = this.diseaseService.findByUniqueId(accession);
-        return super.getEntityResponse(disease, fields, contentType, request);
+        return super.getEntityResponse(disease, fields, request);
     }
 
     @GetMapping(
@@ -84,10 +83,8 @@ public class DiseaseController extends BasicSearchController<Disease> {
             @Valid DiseaseSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
         QueryResult<Disease> results = this.diseaseService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(

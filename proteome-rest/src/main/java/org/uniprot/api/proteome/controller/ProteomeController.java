@@ -70,10 +70,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     boolean preview,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
         QueryResult<ProteomeEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -97,9 +95,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        MediaType contentType = getAcceptHeader(request);
         ProteomeEntry entry = queryService.findByUniqueId(upid.toUpperCase());
-        return super.getEntityResponse(entry, fields, contentType, request);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(
