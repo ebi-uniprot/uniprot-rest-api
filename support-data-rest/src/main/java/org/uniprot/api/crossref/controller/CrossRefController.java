@@ -12,7 +12,6 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -52,12 +51,10 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             @ValidReturnFields(fieldValidatorClazz = CrossRefField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
-
+            HttpServletRequest request) {
         CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(accession);
 
-        return super.getEntityResponse(crossRefEntry, fields, contentType);
+        return super.getEntityResponse(crossRefEntry, fields, request);
     }
 
     @RequestMapping(
@@ -66,15 +63,11 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> search(
             @Valid CrossRefSearchRequest searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
-
         QueryResult<CrossRefEntry> results = this.crossRefService.search(searchRequest);
 
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @Override

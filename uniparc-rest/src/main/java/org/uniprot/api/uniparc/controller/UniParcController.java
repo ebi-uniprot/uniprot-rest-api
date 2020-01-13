@@ -69,14 +69,11 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             @Valid UniParcRequest searchRequest,
             @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
         QueryResult<UniParcEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -100,10 +97,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             @ValidReturnFields(fieldValidatorClazz = UniParcResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
         UniParcEntry entry = queryService.findByUniqueId(upi.toUpperCase());
-        return super.getEntityResponse(entry, fields, contentType);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(

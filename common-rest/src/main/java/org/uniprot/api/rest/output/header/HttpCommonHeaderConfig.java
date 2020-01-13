@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
@@ -42,9 +44,13 @@ public class HttpCommonHeaderConfig {
             protected void doFilterInternal(
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
+                MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
+                HttpServletRequestContentTypeMutator.mutate(mutableRequest);
+
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords");
-                chain.doFilter(request, response);
+
+                chain.doFilter(mutableRequest, response);
             }
         };
     }

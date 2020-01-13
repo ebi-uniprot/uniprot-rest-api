@@ -32,6 +32,9 @@ public abstract class AbstractGetIdParameterResolver implements ParameterResolve
                                                 "AbstractGetIdParameterResolver: Unable to find tested method"));
         switch (method.getName()) {
             case "validIdReturnSuccess":
+            case "idWithoutContentTypeMeansUseDefaultContentType":
+            case "idWithExtensionMeansUseThatContentType":
+            case "idWithInvalidExtensionMeansBadRequestInDefaultContentType":
                 result = validIdParameter();
                 break;
             case "invalidIdReturnBadRequest":

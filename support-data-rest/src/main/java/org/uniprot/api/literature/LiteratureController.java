@@ -75,10 +75,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
-        return super.getEntityResponse(literatureEntry, fields, contentType);
+        return super.getEntityResponse(literatureEntry, fields, request);
     }
 
     @RequestMapping(
@@ -92,13 +91,10 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> search(
             @Valid LiteratureRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(

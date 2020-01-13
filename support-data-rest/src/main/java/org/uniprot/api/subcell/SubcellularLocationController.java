@@ -76,12 +76,10 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             @ValidReturnFields(fieldValidatorClazz = SubcellularLocationField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
-
+            HttpServletRequest request) {
         SubcellularLocationEntry subcellularLocationEntry =
                 this.subcellularLocationService.findByUniqueId(subcellularLocationId);
-        return super.getEntityResponse(subcellularLocationEntry, fields, contentType);
+        return super.getEntityResponse(subcellularLocationEntry, fields, request);
     }
 
     @RequestMapping(
@@ -96,14 +94,11 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> search(
             @Valid SubcellularLocationRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<SubcellularLocationEntry> results =
                 subcellularLocationService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
