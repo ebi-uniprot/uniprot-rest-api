@@ -72,11 +72,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             @ValidReturnFields(fieldValidatorClazz = TaxonomyField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
-
+            HttpServletRequest request) {
         TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.valueOf(taxonId));
-        return super.getEntityResponse(taxonomyEntry, fields, contentType);
+        return super.getEntityResponse(taxonomyEntry, fields, request);
     }
 
     @RequestMapping(
@@ -90,13 +88,10 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> search(
             @Valid TaxonomyRequestDTO searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<TaxonomyEntry> results = taxonomyService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(

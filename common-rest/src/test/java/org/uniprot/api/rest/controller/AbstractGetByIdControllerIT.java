@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +29,7 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -254,6 +255,75 @@ public abstract class AbstractGetByIdControllerIT {
                 resultActions.andExpect(resultMatcher);
             }
         }
+    }
+
+    // -----------------------------------------------
+    // TEST DEFAULT CONTENT TYPE AND ENTRY EXTENSION
+    // -----------------------------------------------
+
+    // if no content type is provided, use json
+    @Test
+    void idWithoutContentTypeMeansUseDefaultContentType(GetIdParameter idParameter)
+            throws Exception {
+        checkParameterInput(idParameter);
+
+        // given
+        saveEntry();
+
+        // when
+        ResultActions response = mockMvc.perform(get(getIdRequestPath() + idParameter.getId()));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE));
+    }
+
+    // if extension for content type present for fetching an entry, use it
+    @Test
+    void idWithExtensionMeansUseThatContentType(GetIdParameter idParameter) throws Exception {
+        checkParameterInput(idParameter);
+
+        // given
+        saveEntry();
+
+        // when
+        String extension = "json";
+        ResultActions response =
+                mockMvc.perform(get(getIdRequestPath() + idParameter.getId() + "." + extension));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.getMediaTypeForFileExtension(extension)
+                                                .toString()));
+    }
+
+    // if format parameter for content type present for search, but is invalid, show error in json
+    @Test
+    void idWithInvalidExtensionMeansBadRequestInDefaultContentType(GetIdParameter idParameter)
+            throws Exception {
+        checkParameterInput(idParameter);
+
+        // given
+        saveEntry();
+
+        // when
+        ResultActions response =
+                mockMvc.perform(get(getIdRequestPath() + idParameter.getId() + ".xxxx"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid request received. Invalid format requested: 'xxxx'")));
     }
 
     protected DataStoreManager getStoreManager() {

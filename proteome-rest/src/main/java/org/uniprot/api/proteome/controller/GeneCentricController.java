@@ -17,7 +17,6 @@ import javax.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -62,13 +61,10 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> searchCursor(
             @Valid GeneCentricRequest searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -81,15 +77,12 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         GeneCentricRequest searchRequest = new GeneCentricRequest();
         searchRequest.setQuery(GeneCentricField.Search.upid.name() + ":" + upid);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -105,10 +98,9 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             @ValidReturnFields(fieldValidatorClazz = GeneCentricField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
         CanonicalProtein entry = service.findByUniqueId(accession.toUpperCase());
-        return super.getEntityResponse(entry, fields, contentType);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(
@@ -117,12 +109,11 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public DeferredResult<ResponseEntity<MessageConverterContext<CanonicalProtein>>> download(
             @Valid GeneCentricRequest searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         Stream<CanonicalProtein> result = service.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request, encoding);
+        return super.download(
+                result, searchRequest.getFields(), getAcceptHeader(request), request, encoding);
     }
 
     @Override

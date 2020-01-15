@@ -78,10 +78,9 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
             @ValidReturnFields(fieldValidatorClazz = UniRefResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
         UniRefEntry entry = queryService.findByUniqueId(id);
-        return super.getEntityResponse(entry, fields, contentType);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(
@@ -99,14 +98,11 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
             @Valid UniRefRequest searchRequest,
             @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
         QueryResult<UniRefEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(

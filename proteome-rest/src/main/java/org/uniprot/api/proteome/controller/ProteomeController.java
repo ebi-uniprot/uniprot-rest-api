@@ -1,18 +1,5 @@
 package org.uniprot.api.proteome.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,6 +19,18 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.field.ProteomeResultFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
 
 /**
  * @author jluo
@@ -69,13 +68,10 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             @Valid ProteomeRequest searchRequest,
             @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<ProteomeEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), contentType, request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @RequestMapping(
@@ -98,10 +94,9 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             @ValidReturnFields(fieldValidatorClazz = ProteomeResultFields.class)
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType) {
+            HttpServletRequest request) {
         ProteomeEntry entry = queryService.findByUniqueId(upid.toUpperCase());
-        return super.getEntityResponse(entry, fields, contentType);
+        return super.getEntityResponse(entry, fields, request);
     }
 
     @RequestMapping(

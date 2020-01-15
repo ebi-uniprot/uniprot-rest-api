@@ -12,10 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -44,8 +42,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/keyword")
 @Validated
 public class KeywordController extends BasicSearchController<KeywordEntry> {
-    @Autowired private HttpServletRequest request;
-
     private final KeywordService keywordService;
     private static final String KEYWORD_ID_REGEX = "^KW-[0-9]{4}";
 
@@ -101,13 +97,11 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                                     "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
                     @RequestParam(value = "fields", required = false)
-                    String fields) {
+                    String fields,
+            HttpServletRequest request) {
 
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(keywordId);
-
-        MediaType acceptHeader = getAcceptHeader(this.request);
-
-        return super.getEntityResponse(keywordEntry, fields, acceptHeader);
+        return super.getEntityResponse(keywordEntry, fields, request);
     }
 
     @Tag(name = "keyword")
@@ -138,11 +132,11 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(
-            @Valid @ModelAttribute KeywordRequestDTO searchRequest, HttpServletResponse response) {
+            @Valid @ModelAttribute KeywordRequestDTO searchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         QueryResult<KeywordEntry> results = keywordService.search(searchRequest);
-        MediaType acceptHeader = getAcceptHeader(this.request);
-        return super.getSearchResponse(
-                results, searchRequest.getFields(), acceptHeader, this.request, response);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @Tag(name = "keyword")

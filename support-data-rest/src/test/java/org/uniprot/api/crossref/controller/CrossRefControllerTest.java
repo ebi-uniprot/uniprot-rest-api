@@ -1,6 +1,7 @@
 package org.uniprot.api.crossref.controller;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,7 +41,8 @@ class CrossRefControllerTest {
         ResultActions response =
                 this.mockMvc.perform(
                         MockMvcRequestBuilders.get("/xref/" + accession)
-                                .param("accessionId", accession));
+                                .param("accessionId", accession)
+                                .header(HttpHeaders.ACCEPT, APPLICATION_JSON_VALUE));
 
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))

@@ -7,6 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.field.SearchField;
@@ -564,6 +566,68 @@ public abstract class AbstractSearchControllerIT {
                 getSearchRequestPath(),
                 requestMappingHandlerMapping,
                 contentTypeParam.getContentTypeParams());
+    }
+
+    // -----------------------------------------------
+    // TEST DEFAULT CONTENT TYPE AND FORMAT
+    // -----------------------------------------------
+
+    // if no content type is provided, use json
+    @Test
+    void searchWithoutContentTypeMeansUseDefaultContentType() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response = mockMvc.perform(get(getSearchRequestPath()).param("query", "*:*"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE));
+    }
+
+    // if format parameter for content type present for search, use it
+    @Test
+    void searchWithFormatParameterMeansUseThatContentType() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        String extension = "json";
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .param("format", extension));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.getMediaTypeForFileExtension(extension)
+                                                .toString()));
+    }
+
+    // if format parameter for content type present for search, but is invalid, show error in json
+    @Test
+    void searchWithInvalidFormatParameterMeansBadRequestInDefaultContentType() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath()).param("query", "*:*").param("format", "xxxx"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid request received. Invalid format requested: 'xxxx'")));
     }
 
     // ----------------------------------------- TEST PAGINATION

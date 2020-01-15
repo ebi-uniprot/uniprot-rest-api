@@ -65,9 +65,6 @@ public class LiteratureEntryFilter {
             case lit_abstract:
                 entryBuilder.literatureAbstract(null);
                 break;
-            case mapped_references:
-                entryBuilder.literatureMappedReference(null);
-                break;
             case statistics:
                 entryBuilder.statistics(null);
                 break;
