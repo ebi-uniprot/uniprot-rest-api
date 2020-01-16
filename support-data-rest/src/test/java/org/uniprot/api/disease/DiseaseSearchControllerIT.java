@@ -5,10 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -38,7 +35,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.field.DiseaseField;
-import org.uniprot.store.search.field.SearchField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -81,14 +77,16 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(DiseaseField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(DiseaseField.Search.values())
+                .map(DiseaseField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if ("accession".equalsIgnoreCase(searchField.getName())) {
+        if ("accession".equalsIgnoreCase(searchField)) {
             return SEARCH_ACCESSION1;
         }
         return value;
@@ -111,6 +109,11 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         return Arrays.stream(DiseaseField.ResultFields.values())
                 .map(DiseaseField.ResultFields::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean fieldValueIsValid(String field, String value) {
+        return DiseaseField.Search.valueOf(field).hasValidValue(value);
     }
 
     @Override

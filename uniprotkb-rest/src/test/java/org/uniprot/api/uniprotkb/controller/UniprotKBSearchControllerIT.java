@@ -1,21 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,6 +34,7 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.cv.chebi.ChebiRepo;
 import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
+import org.uniprot.core.cv.xdb.UniProtXDbTypes;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
@@ -70,8 +56,22 @@ import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
-import org.uniprot.store.search.field.SearchField;
-import org.uniprot.store.search.field.UniProtField;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.UniProtKBSearchFields;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -563,39 +563,41 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(UniProtField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+                .map(SearchField::getName)
+                //                .filter(n -> !n.startsWith("xref_count_"))
+                .collect(Collectors.toSet());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
-        UniProtField.Search search = UniProtField.Search.valueOf(searchField.getName());
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if (searchField.getName().startsWith("ftlen_")) {
+        if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
-            switch (search) {
-                case accession:
-                case accession_id:
+            switch (searchField) {
+                case "accession":
+                case "accession_id":
                     value = "P21802";
                     break;
-                case organism_id:
-                case host_id:
-                case taxonomy_id:
+                case "organism_id":
+                case "host_id":
+                case "taxonomy_id":
                     value = "9606";
                     break;
-                case modified:
-                case created:
-                case sequence_modified:
-                case lit_pubdate:
-                case length:
-                case mass:
+                case "modified":
+                case "created":
+                case "sequence_modified":
+                case "lit_pubdate":
+                case "length":
+                case "mass":
                     value = "[* TO *]";
                     break;
-                case proteome:
+                case "proteome":
                     value = "UP000000000";
                     break;
-                case annotation_score:
+                case "annotation_score":
                     value = "5";
                     break;
             }
@@ -604,9 +606,15 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return Arrays.stream(UniProtField.Sort.values())
-                .map(UniProtField.Sort::name)
+    protected boolean fieldValueIsValid(String field, String value) {
+        return UniProtKBSearchFields.INSTANCE.fieldValueIsValid(field, value);
+    }
+
+    @Override
+    protected Collection<String> getAllSortFields() {
+        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
@@ -688,6 +696,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMisc.add("Search All");
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
+
+            UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
+                    .map(db -> db.getName().toLowerCase())
+                    .forEach(dbName -> doc.xrefCountMap.put("xref_count_" + dbName, 0L));
 
             Arrays.stream(FeatureType.values())
                     .map(type -> type.getName().toLowerCase())
@@ -828,7 +840,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'gene' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'gene' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

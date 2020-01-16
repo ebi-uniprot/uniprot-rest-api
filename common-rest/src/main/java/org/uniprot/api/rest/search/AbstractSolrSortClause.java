@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
  * @author sahmad
  */
 public abstract class AbstractSolrSortClause {
+    public static final String SCORE = "score";
+
     public Sort getSort(String sortClause, boolean hasScore) {
         Sort result;
         if (StringUtils.isEmpty(sortClause)) {

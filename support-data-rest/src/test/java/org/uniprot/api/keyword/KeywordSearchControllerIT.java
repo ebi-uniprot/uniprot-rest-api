@@ -5,10 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -38,7 +35,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.field.KeywordField;
-import org.uniprot.store.search.field.SearchField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -81,14 +77,16 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(KeywordField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(KeywordField.Search.values())
+                .map(KeywordField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        switch (searchField.getName()) {
+        switch (searchField) {
             case "id":
             case "keyword_id":
                 value = "KW-0001";
@@ -114,6 +112,11 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         return Arrays.stream(KeywordField.ResultFields.values())
                 .map(KeywordField.ResultFields::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean fieldValueIsValid(String field, String value) {
+        return KeywordField.Search.valueOf(field).hasValidValue(value);
     }
 
     @Override

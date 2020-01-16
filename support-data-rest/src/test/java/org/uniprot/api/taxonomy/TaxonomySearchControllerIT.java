@@ -5,10 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -38,7 +35,6 @@ import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.TaxonomyField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,14 +80,16 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(TaxonomyField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(TaxonomyField.Search.values())
+                .map(TaxonomyField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        switch (searchField.getName()) {
+        switch (searchField) {
             case "id":
             case "tax_id":
             case "host":
@@ -118,6 +116,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         return Arrays.stream(TaxonomyField.ResultFields.values())
                 .map(TaxonomyField.ResultFields::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean fieldValueIsValid(String field, String value) {
+        return TaxonomyField.Search.valueOf(field).hasValidValue(value);
     }
 
     @Override

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
+import java.util.Collection;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,6 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.SearchField;
 
 /** @author lgonzales */
 @Slf4j
@@ -215,11 +215,11 @@ public abstract class AbstractSearchControllerIT {
         // given
         saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
 
-        List<SearchField> searchFields = getAllSearchFields();
+        Collection<String> searchFields = getAllSearchFields();
         assertThat(searchFields, notNullValue());
         assertThat(searchFields, not(emptyIterable()));
 
-        for (SearchField searchField : searchFields) {
+        for (String searchField : searchFields) {
             // when
             String fieldValue = getFieldValueForField(searchField);
             ResultActions response =
@@ -386,7 +386,7 @@ public abstract class AbstractSearchControllerIT {
         // given
         saveEntry(SaveScenario.SORT_SUCCESS);
 
-        List<String> sortFields = getAllSortFields();
+        Collection<String> sortFields = getAllSortFields();
         assertThat(sortFields, notNullValue());
         assertThat(sortFields, not(emptyIterable()));
 
@@ -762,11 +762,11 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract int getDefaultPageSize();
 
-    protected abstract List<SearchField> getAllSearchFields();
+    protected abstract Collection<String> getAllSearchFields();
 
-    protected abstract String getFieldValueForValidatedField(SearchField searchField);
+    protected abstract String getFieldValueForValidatedField(String searchField);
 
-    protected abstract List<String> getAllSortFields();
+    protected abstract Collection<String> getAllSortFields();
 
     protected abstract List<String> getAllFacetFields();
 
@@ -776,12 +776,14 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract void saveEntries(int numberOfEntries);
 
-    private String getFieldValueForField(SearchField searchField) {
+    protected abstract boolean fieldValueIsValid(String field, String value);
+
+    private String getFieldValueForField(String searchField) {
         String value = getFieldValueForValidatedField(searchField);
         if (value.isEmpty()) {
-            if (searchField.hasValidValue("*")) {
+            if (fieldValueIsValid(searchField, "*")) {
                 value = "*";
-            } else if (searchField.hasValidValue("true")) {
+            } else if (fieldValueIsValid(searchField, "true")) {
                 value = "true";
             }
         }

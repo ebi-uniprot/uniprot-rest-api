@@ -3,10 +3,7 @@ package org.uniprot.api.crossref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -36,7 +33,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 import org.uniprot.store.search.field.CrossRefField;
-import org.uniprot.store.search.field.SearchField;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -86,14 +82,16 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(CrossRefField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(CrossRefField.Search.values())
+                .map(CrossRefField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if ("accession".equalsIgnoreCase(searchField.getName())) {
+        if ("accession".equalsIgnoreCase(searchField)) {
             return SEARCH_ACCESSION1;
         }
         return value;
@@ -104,6 +102,11 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         return Arrays.stream(CrossRefField.Sort.values())
                 .map(CrossRefField.Sort::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean fieldValueIsValid(String field, String value) {
+        return CrossRefField.Search.valueOf(field).hasValidValue(value);
     }
 
     @Override

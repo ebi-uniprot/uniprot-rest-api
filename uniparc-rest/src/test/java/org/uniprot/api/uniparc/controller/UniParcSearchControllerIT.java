@@ -6,10 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,7 +43,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
-import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniParcField;
 import org.uniprot.store.search.field.UniParcResultFields;
 
@@ -104,14 +100,16 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(UniParcField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(UniParcField.Search.values())
+                .map(UniParcField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        switch (searchField.getName()) {
+        switch (searchField) {
             case "upi":
                 value = UPI_PREF + 11;
                 break;
@@ -137,6 +135,11 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         return Arrays.stream(UniParcField.Sort.values())
                 .map(UniParcField.Sort::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean fieldValueIsValid(String field, String value) {
+        return UniParcField.Search.valueOf(field).hasValidValue(value);
     }
 
     @Override

@@ -1,16 +1,17 @@
 package org.uniprot.api.configure.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.core.cv.xdb.UniProtXDbTypes;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
+import org.uniprot.store.search.domain2.UniProtKBSearchItems;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UniProtConfigureService {
@@ -31,6 +32,10 @@ public class UniProtConfigureService {
 
     public List<SearchItem> getUniProtSearchItems() {
         return SEARCH_ITEMS.getSearchItems();
+    }
+
+    public List<org.uniprot.store.search.domain2.SearchItem> getUniProtSearchItems2() {
+        return UniProtKBSearchItems.INSTANCE.getSearchItems();
     }
 
     public List<EvidenceGroup> getAnnotationEvidences() {
@@ -54,10 +59,6 @@ public class UniProtConfigureService {
 
         return databases;
     }
-
-    //    public List<FieldGroup> getDatabaseFields() {
-    //        return UniProtResultFields.INSTANCE.getDatabaseFields();
-    //    }
 
     public List<FieldGroup> getResultFields() {
         List<FieldGroup> results = new ArrayList<>();

@@ -5,10 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -49,7 +46,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefResultFields;
 
@@ -128,14 +124,21 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<SearchField> getAllSearchFields() {
-        return Arrays.asList(UniRefField.Search.values());
+    protected Collection<String> getAllSearchFields() {
+        return Arrays.stream(UniRefField.Search.values())
+                .map(UniRefField.Search::getName)
+                .collect(Collectors.toList());
     }
 
     @Override
-    protected String getFieldValueForValidatedField(SearchField searchField) {
+    protected boolean fieldValueIsValid(String field, String value) {
+        return UniRefField.Search.valueOf(field).hasValidValue(value);
+    }
+
+    @Override
+    protected String getFieldValueForValidatedField(String searchField) {
         String value = "*";
-        switch (searchField.getName()) {
+        switch (searchField) {
             case "id":
                 value = ID_PREF + 11;
                 break;
