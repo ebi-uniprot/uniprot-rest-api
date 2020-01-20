@@ -1,6 +1,21 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,21 +72,7 @@ import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.domain2.UniProtKBSearchFields;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -564,7 +565,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+        return UniProtSearchFields.UNIPROTKB.getSearchFields().stream()
                 .map(SearchField::getName)
                 //                .filter(n -> !n.startsWith("xref_count_"))
                 .collect(Collectors.toSet());
@@ -607,12 +608,12 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtKBSearchFields.INSTANCE.fieldValueIsValid(field, value);
+        return UniProtSearchFields.UNIPROTKB.fieldValueIsValid(field, value);
     }
 
     @Override
     protected Collection<String> getAllSortFields() {
-        return UniProtKBSearchFields.INSTANCE.getSearchFields().stream()
+        return UniProtSearchFields.UNIPROTKB.getSearchFields().stream()
                 .filter(field -> field.getSortField().isPresent())
                 .map(SearchField::getName)
                 .collect(Collectors.toList());

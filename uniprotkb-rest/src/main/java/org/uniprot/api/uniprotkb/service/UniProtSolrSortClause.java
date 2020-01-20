@@ -3,7 +3,7 @@ package org.uniprot.api.uniprotkb.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.domain2.UniProtKBSearchFields;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 
 @Component
 public class UniProtSolrSortClause extends AbstractSolrSortClause {
@@ -13,24 +13,24 @@ public class UniProtSolrSortClause extends AbstractSolrSortClause {
                 .and(
                         new Sort(
                                         Sort.Direction.DESC,
-                                        UniProtKBSearchFields.INSTANCE
+                                        UniProtSearchFields.UNIPROTKB
                                                 .getSortFieldFor("annotation_score")
                                                 .getName())
                                 .and(
                                         new Sort(
                                                 Sort.Direction.ASC,
-                                                UniProtKBSearchFields.INSTANCE
+                                                UniProtSearchFields.UNIPROTKB
                                                         .getSortFieldFor("accession")
                                                         .getName())));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtKBSearchFields.INSTANCE.getSortFieldFor("accession").getName();
+        return UniProtSearchFields.UNIPROTKB.getSortFieldFor("accession").getName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
-        return UniProtKBSearchFields.INSTANCE.getSortFieldFor(name).getName();
+        return UniProtSearchFields.UNIPROTKB.getSortFieldFor(name).getName();
     }
 }

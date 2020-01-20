@@ -1,14 +1,14 @@
 package org.uniprot.api.rest.validation;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour
