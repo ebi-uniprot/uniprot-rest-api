@@ -1,15 +1,15 @@
 package org.uniprot.api.rest.validation2;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.store.search.domain2.UniProtKBSearchFields;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour
@@ -156,7 +156,7 @@ class SortFieldValidatorImplTest {
     private ValidSolrSortFields getMockedValidSolrQueryFields() {
         ValidSolrSortFields validSolrSortFields = Mockito.mock(ValidSolrSortFields.class);
 
-        Class<? extends Enum> returnFieldValidator = UniProtKBSearchFields.class;
+        Class<? extends Enum> returnFieldValidator = UniProtSearchFields.class;
         OngoingStubbing<Class<?>> ongoingStubbing =
                 Mockito.when(validSolrSortFields.sortFieldEnumClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);

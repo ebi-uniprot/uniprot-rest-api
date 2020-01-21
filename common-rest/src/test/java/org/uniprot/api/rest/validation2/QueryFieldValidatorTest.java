@@ -1,19 +1,18 @@
 package org.uniprot.api.rest.validation2;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.rest.validation2.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
-
-import java.util.*;
-
-import javax.validation.ConstraintValidatorContext;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 import org.uniprot.store.search.domain2.SearchFields;
-import org.uniprot.store.search.domain2.UniProtKBSearchFields;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
+
+import javax.validation.ConstraintValidatorContext;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.rest.validation2.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
 
 /**
  * Unit Test class to validate QueryFieldValidator class behaviour
@@ -212,7 +211,7 @@ class QueryFieldValidatorTest {
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
         ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
 
-        Class<? extends SearchFields> returnFieldValidator = UniProtKBSearchFields.class;
+        Class<? extends SearchFields> returnFieldValidator = UniProtSearchFields.class;
         OngoingStubbing<Class<?>> ongoingStubbing =
                 Mockito.when(validReturnFields.fieldValidatorClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
