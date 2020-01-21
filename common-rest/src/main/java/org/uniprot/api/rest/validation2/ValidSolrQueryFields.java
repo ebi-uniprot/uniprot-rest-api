@@ -1,20 +1,5 @@
 package org.uniprot.api.rest.validation2;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
-
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -25,6 +10,20 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.domain2.SearchFieldType;
 import org.uniprot.store.search.domain2.SearchFields;
+
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * This is the solr query validator that is responsible to verify if the query has. - valid field
@@ -48,12 +47,14 @@ public @interface ValidSolrQueryFields {
 
     Class<? extends Payload>[] payload() default {};
 
+    String enumValueName();
+
     class QueryFieldValidator implements ConstraintValidator<ValidSolrQueryFields, String> {
 
         private static final Logger LOGGER = getLogger(QueryFieldValidator.class);
         private static final String DEFAULT_FIELD_NAME = "default_field";
         private String messagePrefix;
-        private SearchFields searchFields;
+        private SearchFields searchFields = null;
 
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
@@ -61,7 +62,18 @@ public @interface ValidSolrQueryFields {
                 Class<? extends Enum<? extends SearchFields>> enumClass =
                         constraintAnnotation.fieldValidatorClazz();
 
-                searchFields = (SearchFields) enumClass.getEnumConstants()[0];
+                String enumValueName = constraintAnnotation.enumValueName();
+                for (Enum<? extends SearchFields> enumConstant : enumClass.getEnumConstants()) {
+                    if (enumConstant.name().equals(enumValueName)) {
+                        searchFields = (SearchFields) enumConstant;
+                        break;
+                    }
+                }
+
+                if (Objects.isNull(searchFields)) {
+                    throw new IllegalArgumentException(
+                            "Unknown enum value: [" + enumValueName + " in [" + enumClass + "].");
+                }
 
                 messagePrefix = constraintAnnotation.messagePrefix();
             } catch (Exception e) {

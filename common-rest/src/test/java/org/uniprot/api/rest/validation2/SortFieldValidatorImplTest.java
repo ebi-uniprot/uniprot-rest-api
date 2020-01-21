@@ -160,6 +160,8 @@ class SortFieldValidatorImplTest {
         OngoingStubbing<Class<?>> ongoingStubbing =
                 Mockito.when(validSolrSortFields.sortFieldEnumClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
+        Mockito.when(validSolrSortFields.enumValueName())
+                .thenReturn(UniProtSearchFields.UNIPROTKB.name());
         return validSolrSortFields;
     }
 
