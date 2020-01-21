@@ -1,7 +1,5 @@
 package org.uniprot.api.literature.service;
 
-import java.util.function.Supplier;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.literature.repository.LiteratureRepository;
@@ -9,7 +7,10 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.LiteratureField;
+
+import java.util.function.Supplier;
 
 /**
  * @author lgonzales
@@ -21,8 +22,9 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
                     new DefaultSearchHandler(
-                            LiteratureField.Search.content,
-                            LiteratureField.Search.id,
+                            UniProtSearchFields.LITERATURE,
+                            "content",
+                            "id",
                             LiteratureField.Search.getBoostFields());
 
     public LiteratureService(

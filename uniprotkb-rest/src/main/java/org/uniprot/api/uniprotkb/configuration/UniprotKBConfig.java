@@ -1,14 +1,15 @@
 package org.uniprot.api.uniprotkb.configuration;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.store.search.DefaultSearchHandler;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniProtField;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 public class UniprotKBConfig {
@@ -21,6 +22,6 @@ public class UniprotKBConfig {
                         .collect(Collectors.toList());
 
         return new DefaultSearchHandler(
-                UniProtField.Search.content, UniProtField.Search.accession, boostFields);
+                UniProtSearchFields.UNIPROTKB, "content", "accession", boostFields);
     }
 }

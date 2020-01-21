@@ -1,14 +1,15 @@
 package org.uniprot.api.subcell.service;
 
-import java.util.function.Supplier;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.SubcellularLocationField;
+
+import java.util.function.Supplier;
 
 /**
  * @author lgonzales
@@ -21,8 +22,9 @@ public class SubcellularLocationService
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
                     new DefaultSearchHandler(
-                            SubcellularLocationField.Search.content,
-                            SubcellularLocationField.Search.id,
+                            UniProtSearchFields.SUBCELL,
+                            "content",
+                            "id",
                             SubcellularLocationField.Search.getBoostFields());
 
     public SubcellularLocationService(
