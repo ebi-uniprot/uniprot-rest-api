@@ -209,7 +209,7 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

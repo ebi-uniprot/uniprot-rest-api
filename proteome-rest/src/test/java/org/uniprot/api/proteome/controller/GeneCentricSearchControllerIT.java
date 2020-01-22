@@ -291,7 +291,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'gene' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'gene' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
