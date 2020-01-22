@@ -1,11 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -27,7 +21,13 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-import org.uniprot.store.search.field.UniProtField;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
@@ -75,7 +75,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
 
     @Override
     protected String getIdField() {
-        return UniProtField.Search.accession_id.name();
+        return UniProtSearchFields.UNIPROTKB.getField("accession_id").getName();
     }
 
     @Override
@@ -120,7 +120,8 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
 
         if (needsToFilterIsoform(uniProtRequest)) {
             List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
-            queries.add(UniProtField.Search.is_isoform.name() + ":" + false);
+            queries.add(
+                    UniProtSearchFields.UNIPROTKB.getField("is_isoform").getName() + ":" + false);
             solrRequest.setFilterQueries(queries);
         }
 
@@ -147,9 +148,9 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
                         request.getQuery(),
-                        UniProtField.Search.accession_id.name(),
-                        UniProtField.Search.mnemonic.name(),
-                        UniProtField.Search.is_isoform.name());
+                        UniProtSearchFields.UNIPROTKB.getField("accession_id").getName(),
+                        UniProtSearchFields.UNIPROTKB.getField("mnemonic").getName(),
+                        UniProtSearchFields.UNIPROTKB.getField("is_isoform").getName());
 
         if (!hasIdFieldTerms) {
             return !request.isIncludeIsoform();
