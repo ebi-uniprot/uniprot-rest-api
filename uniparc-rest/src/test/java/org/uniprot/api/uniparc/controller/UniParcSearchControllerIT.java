@@ -1,15 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.nio.ByteBuffer;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import com.beust.jcommander.internal.Lists;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,11 +35,19 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
-import org.uniprot.store.search.field.UniParcField;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.UniParcResultFields;
 
-import com.beust.jcommander.internal.Lists;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author jluo
@@ -101,9 +101,9 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(UniParcField.Search.values())
-                .map(UniParcField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.UNIPARC.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -132,14 +132,14 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(UniParcField.Sort.values())
-                .map(UniParcField.Sort::name)
+        return UniProtSearchFields.UNIPARC.getSortFields().stream()
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return UniParcField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.UNIPARC.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -361,7 +361,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
