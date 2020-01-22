@@ -1,6 +1,14 @@
 package org.uniprot.api.taxonomy;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,14 +39,7 @@ import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.TaxonomyField;
 
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -102,7 +103,8 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected List<String> getAllSortFields() {
-        return UniProtSearchFields.TAXONOMY.getSortFields().stream()
+        return UniProtSearchFields.TAXONOMY.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
                 .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
@@ -225,7 +227,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'scientific' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'scientific' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
@@ -259,7 +261,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchSortWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("sort", Collections.singletonList("name desc"))
+                    .queryParam("sort", Collections.singletonList("scientific desc"))
                     .resultMatcher(jsonPath("$.results.*.taxonId", contains(20, 10)))
                     .resultMatcher(
                             jsonPath(

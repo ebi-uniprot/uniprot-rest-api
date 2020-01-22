@@ -1,7 +1,10 @@
 package org.uniprot.api.proteome.request;
 
-import com.google.common.base.Strings;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -13,8 +16,7 @@ import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.ProteomeField;
 import org.uniprot.store.search.field.ProteomeResultFields;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import com.google.common.base.Strings;
 
 /**
  * @author jluo

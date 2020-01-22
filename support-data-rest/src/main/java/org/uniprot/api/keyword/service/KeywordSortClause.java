@@ -12,8 +12,14 @@ public class KeywordSortClause extends AbstractSolrSortClause {
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
         return new Sort(Sort.Direction.DESC, "score")
-                .and(new Sort(Sort.Direction.ASC, UniProtSearchFields.KEYWORD.getField("keyword_id").getName()))
-                .and(new Sort(Sort.Direction.ASC, UniProtSearchFields.KEYWORD.getField("id").getName()));
+                .and(
+                        new Sort(
+                                Sort.Direction.ASC,
+                                UniProtSearchFields.KEYWORD.getField("keyword_id").getName()))
+                .and(
+                        new Sort(
+                                Sort.Direction.ASC,
+                                UniProtSearchFields.KEYWORD.getField("id").getName()));
     }
 
     @Override

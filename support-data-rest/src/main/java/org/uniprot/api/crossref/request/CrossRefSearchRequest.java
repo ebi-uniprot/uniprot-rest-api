@@ -1,6 +1,10 @@
 package org.uniprot.api.crossref.request;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.crossref.config.CrossRefFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -10,9 +14,6 @@ import org.uniprot.api.rest.validation2.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation2.ValidSolrSortFields;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.CrossRefField;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 @Data
 public class CrossRefSearchRequest implements SearchRequest {

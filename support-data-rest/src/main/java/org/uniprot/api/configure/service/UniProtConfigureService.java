@@ -1,5 +1,10 @@
 package org.uniprot.api.configure.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
@@ -7,11 +12,6 @@ import org.uniprot.core.cv.xdb.UniProtXDbTypes;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
 import org.uniprot.store.search.domain2.UniProtKBSearchItems;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UniProtConfigureService {

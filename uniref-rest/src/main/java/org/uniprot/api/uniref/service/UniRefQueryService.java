@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.service;
 
+import java.util.function.Supplier;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.store.StoreStreamer;
@@ -12,8 +14,6 @@ import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefField.Search;
-
-import java.util.function.Supplier;
 
 /**
  * @author jluo

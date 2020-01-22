@@ -1,7 +1,10 @@
 package org.uniprot.api.uniref.request;
 
-import com.google.common.base.Strings;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -12,8 +15,7 @@ import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefResultFields;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import com.google.common.base.Strings;
 
 /**
  * @author jluo

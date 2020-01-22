@@ -1,6 +1,17 @@
 package org.uniprot.api.uniref.controller;
 
-import com.beust.jcommander.internal.Lists;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,17 +53,7 @@ import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefResultFields;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.beust.jcommander.internal.Lists;
 
 /**
  * @author jluo
@@ -170,7 +171,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return UniProtSearchFields.UNIREF.getSortFields().stream()
+        return UniProtSearchFields.UNIREF.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
                 .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
@@ -320,7 +322,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
@@ -339,8 +341,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
                                     containsInAnyOrder(
                                             "The 'id' value has invalid format. It should be a valid UniRef Cluster id",
                                             "The taxonomy id filter value should be a number",
-                                            "'length' filter type 'term' is invalid. Expected 'range' filter type",
-                                            "'count' filter type 'term' is invalid. Expected 'range' filter type",
+                                            "'length' filter type 'general' is invalid. Expected 'range' filter type",
+                                            "'count' filter type 'general' is invalid. Expected 'range' filter type",
                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                     .build();
         }

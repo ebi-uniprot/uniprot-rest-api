@@ -1,14 +1,14 @@
 package org.uniprot.api.proteome.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author jluo
