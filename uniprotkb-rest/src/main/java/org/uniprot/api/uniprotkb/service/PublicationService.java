@@ -1,5 +1,10 @@
 package org.uniprot.api.uniprotkb.service;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -25,11 +30,6 @@ import org.uniprot.core.uniprot.UniProtReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author lgonzales
