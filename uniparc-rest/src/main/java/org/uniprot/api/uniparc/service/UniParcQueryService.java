@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.service;
 
+import java.util.function.Supplier;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.service.BasicSearchService;
@@ -10,8 +12,6 @@ import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.UniParcField.Search;
-
-import java.util.function.Supplier;
 
 /**
  * @author jluo

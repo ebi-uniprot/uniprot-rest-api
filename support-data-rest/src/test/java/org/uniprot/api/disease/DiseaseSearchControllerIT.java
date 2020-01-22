@@ -1,6 +1,16 @@
 package org.uniprot.api.disease;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
+
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +38,7 @@ import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.DiseaseField;
 
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -258,7 +259,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

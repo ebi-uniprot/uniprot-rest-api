@@ -1,7 +1,15 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidContentTypes;
@@ -14,14 +22,9 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Search cursor request Entity
@@ -51,7 +54,9 @@ public class UniProtKBRequest implements SearchRequest {
     private String fields;
 
     @Parameter(description = "Name of the field to be sorted on")
-    @ValidSolrSortFields(sortFieldEnumClazz = UniProtSearchFields.class, enumValueName = "UNIPROTKB")
+    @ValidSolrSortFields(
+            sortFieldEnumClazz = UniProtSearchFields.class,
+            enumValueName = "UNIPROTKB")
     private String sort;
 
     @Parameter(hidden = true)

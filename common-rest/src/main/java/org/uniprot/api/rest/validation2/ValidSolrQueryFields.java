@@ -1,5 +1,20 @@
 package org.uniprot.api.rest.validation2;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -10,20 +25,6 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.domain2.SearchFieldType;
 import org.uniprot.store.search.domain2.SearchFields;
-
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * This is the solr query validator that is responsible to verify if the query has. - valid field

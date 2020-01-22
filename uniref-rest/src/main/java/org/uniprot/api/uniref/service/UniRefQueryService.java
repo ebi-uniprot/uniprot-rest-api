@@ -12,6 +12,7 @@ import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefField.Search;
 
@@ -22,7 +23,9 @@ import org.uniprot.store.search.field.UniRefField.Search;
 @Service
 public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocument, UniRefEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
-            () -> new DefaultSearchHandler(Search.content, Search.upi, Search.getBoostFields());
+            () ->
+                    new DefaultSearchHandler(
+                            UniProtSearchFields.UNIREF, "content", "upi", Search.getBoostFields());
 
     @Autowired
     public UniRefQueryService(

@@ -3,6 +3,7 @@ package org.uniprot.api.subcell.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**
@@ -20,7 +21,7 @@ public class SubcellularLocationSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return SubcellularLocationField.Search.id.getName();
+        return UniProtSearchFields.SUBCELL.getField("id").getName();
     }
 
     @Override

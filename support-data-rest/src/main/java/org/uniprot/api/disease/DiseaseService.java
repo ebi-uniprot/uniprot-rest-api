@@ -1,5 +1,7 @@
 package org.uniprot.api.disease;
 
+import java.util.function.Supplier;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.cv.disease.Disease;
@@ -8,18 +10,16 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.DiseaseField;
 
-import java.util.function.Supplier;
-
 @Service
 public class DiseaseService extends BasicSearchService<DiseaseDocument, Disease> {
 
     private static Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
                     new DefaultSearchHandler(
-                        UniProtSearchFields.DISEASE,
+                            UniProtSearchFields.DISEASE,
                             "content",
-                        "accession",
-                        DiseaseField.Search.getBoostFields());
+                            "accession",
+                            DiseaseField.Search.getBoostFields());
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -36,6 +36,6 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, Disease>
 
     @Override
     protected String getIdField() {
-        return DiseaseField.Search.accession.name();
+        return UniProtSearchFields.DISEASE.getField("accession").getName();
     }
 }

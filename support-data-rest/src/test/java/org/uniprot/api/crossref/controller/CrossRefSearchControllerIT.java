@@ -85,9 +85,9 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(CrossRefField.Search.values())
-                .map(CrossRefField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.CROSSREF.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return CrossRefField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.CROSSREF.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -217,7 +217,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
