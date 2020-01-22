@@ -124,7 +124,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                 value = "P12345";
                 break;
             case "upid":
-                value = "UP000005640";
+                value = "UPI000002ED67";
                 break;
         }
         return value;
@@ -132,7 +132,8 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return UniProtSearchFields.UNIPARC.getSortFields().stream()
+        return UniProtSearchFields.UNIPARC.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
                 .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
@@ -172,7 +173,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
         builder.entryStored(getBinary(entry));
         entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
-        builder.upid("UP000005640");
+        builder.upid("UPI000002ED67");
         UniParcDocument doc = builder.build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
@@ -379,7 +380,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                                     "$.messages.*",
                                     containsInAnyOrder(
                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI",
-                                            "'length' filter type 'term' is invalid. Expected 'range' filter type",
+                                            "'length' filter type 'general' is invalid. Expected 'range' filter type",
                                             "The taxonomy id filter value should be a number",
                                             "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                     .build();
