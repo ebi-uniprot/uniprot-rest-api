@@ -6,6 +6,7 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation2.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation2.ValidSolrSortFields;
 import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.LiteratureField;
@@ -22,7 +23,7 @@ public class LiteratureRequestDTO implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @org.uniprot.api.rest.validation2.ValidSolrQueryFields(
+    @ValidSolrQueryFields(
             fieldValidatorClazz = UniProtSearchFields.class,
             enumValueName = "LITERATURE",
             messagePrefix = "search.literature")
