@@ -1,14 +1,6 @@
 package org.uniprot.api.literature;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,9 +32,18 @@ import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.LiteratureField;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author lgonzales
@@ -90,9 +91,9 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(LiteratureField.Search.values())
-                .map(LiteratureField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.LITERATURE.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -108,8 +109,8 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(LiteratureField.Sort.values())
-                .map(LiteratureField.Sort::name)
+        return UniProtSearchFields.LITERATURE.getSortFields().stream()
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +128,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return LiteratureField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.LITERATURE.fieldValueIsValid(field, value);
     }
 
     @Override
