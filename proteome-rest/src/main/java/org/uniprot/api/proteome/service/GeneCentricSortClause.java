@@ -1,14 +1,14 @@
 package org.uniprot.api.proteome.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.GeneCentricField;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author jluo
@@ -16,9 +16,13 @@ import org.uniprot.store.search.field.GeneCentricField;
  */
 @Component
 public class GeneCentricSortClause extends AbstractSolrSortClause {
+    private static final String ACCESSION_ID = "accession_id";
+
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(Sort.Direction.ASC, GeneCentricField.Sort.accession_id.getSolrFieldName());
+        return new Sort(
+                Sort.Direction.ASC,
+                UniProtSearchFields.GENECENTRIC.getSortFieldFor(ACCESSION_ID).getName());
     }
 
     @Override
@@ -29,15 +33,18 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
                         val ->
                                 val.getLeft()
                                         .equals(
-                                                GeneCentricField.Sort.accession_id
-                                                        .getSolrFieldName()))) {
+                                                UniProtSearchFields.GENECENTRIC
+                                                        .getSortFieldFor(ACCESSION_ID)
+                                                        .getName()))) {
             return fieldSortPairs;
         } else {
             List<Pair<String, Sort.Direction>> newFieldSortPairs = new ArrayList<>();
             newFieldSortPairs.addAll(fieldSortPairs);
             newFieldSortPairs.add(
                     new ImmutablePair<>(
-                            GeneCentricField.Sort.accession_id.getSolrFieldName(),
+                            UniProtSearchFields.GENECENTRIC
+                                    .getSortFieldFor(ACCESSION_ID)
+                                    .getName(),
                             Sort.Direction.ASC));
             return newFieldSortPairs;
         }
@@ -45,7 +52,7 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return GeneCentricField.Search.accession_id.name();
+        return UniProtSearchFields.GENECENTRIC.getField(ACCESSION_ID).getName();
     }
 
     @Override

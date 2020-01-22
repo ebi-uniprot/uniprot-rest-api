@@ -1,19 +1,18 @@
 package org.uniprot.api.keyword.request;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
-
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.api.rest.validation2.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation2.ValidSolrSortFields;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.KeywordField;
-
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
-import io.swagger.v3.oas.annotations.Parameter;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @Data
 public class KeywordRequestDTO implements SearchRequest {
@@ -23,13 +22,16 @@ public class KeywordRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = KeywordField.Search.class,
-            messagePrefix = "search.keyword")
+        fieldValidatorClazz = UniProtSearchFields.class,
+        enumValueName = "KEYWORD",
+        messagePrefix = "search.keyword")
     private String query;
 
     @Parameter(description = "Name of the field to be sorted on")
     @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_sort_param_meta.json")
-    @ValidSolrSortFields(sortFieldEnumClazz = KeywordField.Sort.class)
+    @ValidSolrSortFields(
+        sortFieldEnumClazz = UniProtSearchFields.class,
+        enumValueName = "KEYWORD")
     private String sort;
 
     @Parameter(hidden = true)
