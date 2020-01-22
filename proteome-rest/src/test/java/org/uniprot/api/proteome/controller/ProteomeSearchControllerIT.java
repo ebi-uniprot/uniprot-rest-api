@@ -298,7 +298,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'organism_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'organism_name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

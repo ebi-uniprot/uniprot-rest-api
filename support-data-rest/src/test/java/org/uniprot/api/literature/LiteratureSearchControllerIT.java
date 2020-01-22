@@ -233,7 +233,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'title' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'title' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
