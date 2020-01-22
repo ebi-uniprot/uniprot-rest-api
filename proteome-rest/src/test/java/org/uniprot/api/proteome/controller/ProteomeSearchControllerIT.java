@@ -1,15 +1,7 @@
 package org.uniprot.api.proteome.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.nio.ByteBuffer;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import com.beust.jcommander.internal.Lists;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,11 +35,22 @@ import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-import org.uniprot.store.search.field.ProteomeField;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.ProteomeResultFields;
 
-import com.beust.jcommander.internal.Lists;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author jluo
@@ -101,9 +104,9 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(ProteomeField.Search.values())
-                .map(ProteomeField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.PROTEOME.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -133,14 +136,14 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(ProteomeField.Sort.values())
-                .map(ProteomeField.Sort::name)
+        return UniProtSearchFields.PROTEOME.getSortFields().stream()
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return ProteomeField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.PROTEOME.fieldValueIsValid(field, value);
     }
 
     @Override

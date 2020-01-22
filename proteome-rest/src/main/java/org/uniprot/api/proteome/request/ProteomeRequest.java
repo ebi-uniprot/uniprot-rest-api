@@ -1,17 +1,20 @@
 package org.uniprot.api.proteome.request;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-
+import com.google.common.base.Strings;
 import lombok.Data;
-
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidFacets;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation2.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation2.ValidSolrSortFields;
+import org.uniprot.store.search.domain2.UniProtSearchFields;
 import org.uniprot.store.search.field.ProteomeField;
 import org.uniprot.store.search.field.ProteomeResultFields;
 
-import com.google.common.base.Strings;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * @author jluo
@@ -22,11 +25,12 @@ public class ProteomeRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = ProteomeField.Search.class,
+            fieldValidatorClazz = UniProtSearchFields.class,
+            enumValueName = "PROTEOME",
             messagePrefix = "search.proteome")
     private String query;
 
-    @ValidSolrSortFields(sortFieldEnumClazz = ProteomeField.Sort.class)
+    @ValidSolrSortFields(sortFieldEnumClazz = UniProtSearchFields.class, enumValueName = "PROTEOME")
     private String sort;
 
     private String cursor;
