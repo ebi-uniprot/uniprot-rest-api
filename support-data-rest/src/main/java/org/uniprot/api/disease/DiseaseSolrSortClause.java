@@ -3,8 +3,8 @@ package org.uniprot.api.disease;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Component
 public class DiseaseSolrSortClause extends AbstractSolrSortClause {

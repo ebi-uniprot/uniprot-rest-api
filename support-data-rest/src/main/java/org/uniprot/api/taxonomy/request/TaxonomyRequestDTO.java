@@ -1,19 +1,14 @@
 package org.uniprot.api.taxonomy.request;
 
+import lombok.Data;
+import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
+import org.uniprot.store.search.field.TaxonomyField;
+import org.uniprot.store.search.field.UniProtSearchFields;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-
-import lombok.Data;
-
-import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.rest.validation.ValidSolrQueryFields;
-import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.rest.validation.ValidSolrSortFields;
-import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
-import org.uniprot.store.search.field.UniProtSearchFields;
-import org.uniprot.store.search.field.TaxonomyField;
 
 @Data
 public class TaxonomyRequestDTO implements SearchRequest {

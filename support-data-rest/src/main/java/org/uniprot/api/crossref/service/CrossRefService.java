@@ -10,8 +10,8 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.CrossRefField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {

@@ -1,14 +1,6 @@
 package org.uniprot.api.suggester.service;
 
-import static org.uniprot.core.util.Utils.notNullOrEmpty;
-
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.SimpleQuery;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -18,8 +10,15 @@ import org.uniprot.api.suggester.Suggestions;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.QueryBuilder;
+import org.uniprot.store.search.field.UniProtSearchFields;
+
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.core.util.Utils.notNullOrEmpty;
 
 /**
  * Created 18/07/18

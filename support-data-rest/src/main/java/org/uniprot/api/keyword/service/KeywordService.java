@@ -8,8 +8,8 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.KeywordField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 public class KeywordService extends BasicSearchService<KeywordDocument, KeywordEntry> {

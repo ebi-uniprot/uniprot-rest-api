@@ -47,8 +47,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.ProteomeResultFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;

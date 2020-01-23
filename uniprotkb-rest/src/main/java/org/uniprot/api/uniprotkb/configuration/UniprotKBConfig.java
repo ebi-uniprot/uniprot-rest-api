@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.store.search.DefaultSearchHandler;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.SearchField;
 import org.uniprot.store.search.field.UniProtField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Configuration
 public class UniprotKBConfig {

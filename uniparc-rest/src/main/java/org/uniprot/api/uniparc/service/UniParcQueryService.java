@@ -10,8 +10,8 @@ import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniParcField.Search;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo

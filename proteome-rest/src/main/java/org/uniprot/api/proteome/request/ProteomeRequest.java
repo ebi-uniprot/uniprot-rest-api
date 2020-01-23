@@ -12,9 +12,9 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.ProteomeField;
 import org.uniprot.store.search.field.ProteomeResultFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.google.common.base.Strings;
 

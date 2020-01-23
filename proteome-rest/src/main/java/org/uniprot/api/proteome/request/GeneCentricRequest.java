@@ -1,15 +1,17 @@
 package org.uniprot.api.proteome.request;
 
-import com.google.common.base.Strings;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.UniProtSearchFields;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import com.google.common.base.Strings;
 
 /**
  * @author jluo

@@ -9,8 +9,8 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.ProteomeField.Search;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo

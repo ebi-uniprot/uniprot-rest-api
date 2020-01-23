@@ -10,8 +10,8 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Data
 public class DiseaseSearchRequest implements SearchRequest {

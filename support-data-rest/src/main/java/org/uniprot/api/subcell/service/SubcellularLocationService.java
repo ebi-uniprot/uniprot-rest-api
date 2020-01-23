@@ -8,8 +8,8 @@ import org.uniprot.api.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.SubcellularLocationField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales

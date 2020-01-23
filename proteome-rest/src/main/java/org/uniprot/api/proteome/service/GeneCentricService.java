@@ -10,8 +10,8 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.GeneCentricField.Search;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo

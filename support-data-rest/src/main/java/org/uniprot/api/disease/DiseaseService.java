@@ -7,8 +7,8 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.cv.disease.Disease;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 public class DiseaseService extends BasicSearchService<DiseaseDocument, Disease> {
