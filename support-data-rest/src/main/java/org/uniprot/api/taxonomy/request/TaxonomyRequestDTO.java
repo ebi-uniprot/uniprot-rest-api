@@ -12,7 +12,7 @@ import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.TaxonomyField;
 
 @Data

@@ -8,7 +8,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.KeywordField;
 
 @Service

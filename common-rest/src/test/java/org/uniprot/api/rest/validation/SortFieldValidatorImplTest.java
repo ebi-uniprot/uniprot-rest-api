@@ -9,7 +9,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour

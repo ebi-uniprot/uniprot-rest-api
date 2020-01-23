@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * Created 15/01/2020

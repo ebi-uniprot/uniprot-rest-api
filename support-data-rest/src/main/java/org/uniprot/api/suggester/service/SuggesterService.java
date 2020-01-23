@@ -18,7 +18,7 @@ import org.uniprot.api.suggester.Suggestions;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.QueryBuilder;
 
 /**

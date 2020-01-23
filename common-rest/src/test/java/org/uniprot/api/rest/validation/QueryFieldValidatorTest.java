@@ -1,19 +1,18 @@
 package org.uniprot.api.rest.validation;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.rest.validation.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
-
-import java.util.*;
-
-import javax.validation.ConstraintValidatorContext;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.store.search.domain2.SearchFields;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.SearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
+
+import javax.validation.ConstraintValidatorContext;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.rest.validation.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
 
 /**
  * Unit Test class to validate QueryFieldValidator class behaviour

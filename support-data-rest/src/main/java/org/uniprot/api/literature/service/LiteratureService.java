@@ -9,7 +9,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.LiteratureField;
 
 /**

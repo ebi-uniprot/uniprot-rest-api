@@ -50,7 +50,7 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefResultFields;
 
 import com.beust.jcommander.internal.Lists;

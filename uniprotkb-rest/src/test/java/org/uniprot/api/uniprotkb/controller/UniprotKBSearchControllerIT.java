@@ -72,7 +72,7 @@ import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})

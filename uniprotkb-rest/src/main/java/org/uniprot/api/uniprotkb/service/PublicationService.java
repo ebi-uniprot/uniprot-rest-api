@@ -29,7 +29,7 @@ import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales

@@ -35,7 +35,7 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.DiseaseField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

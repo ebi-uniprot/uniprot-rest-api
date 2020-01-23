@@ -44,7 +44,7 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniParcResultFields;
 
 import com.beust.jcommander.internal.Lists;

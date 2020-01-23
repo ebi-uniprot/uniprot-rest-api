@@ -30,7 +30,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.store.search.domain2.UniProtSearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 

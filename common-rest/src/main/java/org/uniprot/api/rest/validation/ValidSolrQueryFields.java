@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.domain2.SearchFieldType;
-import org.uniprot.store.search.domain2.SearchFields;
+import org.uniprot.store.search.field.SearchFields;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;

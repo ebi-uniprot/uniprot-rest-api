@@ -19,7 +19,7 @@ import javax.validation.Payload;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.domain2.SearchFields;
+import org.uniprot.store.search.field.SearchFields;
 
 /**
  * This is the solr query solr validator is responsible to verify if the sort field parameter has
