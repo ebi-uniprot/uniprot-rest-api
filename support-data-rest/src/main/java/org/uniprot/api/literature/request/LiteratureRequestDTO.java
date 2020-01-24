@@ -7,8 +7,13 @@ import lombok.Data;
 
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidFacets;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.search.field.LiteratureField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales
@@ -20,11 +25,14 @@ public class LiteratureRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = LiteratureField.Search.class,
+            fieldValidatorClazz = UniProtSearchFields.class,
+            enumValueName = "LITERATURE",
             messagePrefix = "search.literature")
     private String query;
 
-    @ValidSolrSortFields(sortFieldEnumClazz = LiteratureField.Sort.class)
+    @ValidSolrSortFields(
+            sortFieldEnumClazz = UniProtSearchFields.class,
+            enumValueName = "LITERATURE")
     private String sort;
 
     private String cursor;

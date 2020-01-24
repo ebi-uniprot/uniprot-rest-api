@@ -6,8 +6,13 @@ import javax.validation.constraints.Positive;
 import lombok.Data;
 
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidFacets;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefField;
 import org.uniprot.store.search.field.UniRefResultFields;
 
@@ -22,11 +27,12 @@ public class UniRefRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = UniRefField.Search.class,
+            fieldValidatorClazz = UniProtSearchFields.class,
+            enumValueName = "UNIREF",
             messagePrefix = "search.uniref")
     private String query;
 
-    @ValidSolrSortFields(sortFieldEnumClazz = UniRefField.Sort.class)
+    @ValidSolrSortFields(sortFieldEnumClazz = UniProtSearchFields.class, enumValueName = "UNIREF")
     private String sort;
 
     private String cursor;

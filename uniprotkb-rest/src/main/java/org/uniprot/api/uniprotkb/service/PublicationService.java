@@ -29,7 +29,7 @@ import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-import org.uniprot.store.search.field.LiteratureField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales
@@ -207,7 +207,10 @@ public class PublicationService {
     private SolrRequest getSolrRequest(String query) {
         return SolrRequest.builder()
                 .query(query)
-                .addSort(new Sort(Sort.Direction.ASC, LiteratureField.Search.id.name()))
+                .addSort(
+                        new Sort(
+                                Sort.Direction.ASC,
+                                UniProtSearchFields.LITERATURE.getField("id").getName()))
                 .defaultQueryOperator(Query.Operator.OR)
                 .rows(100)
                 .build();

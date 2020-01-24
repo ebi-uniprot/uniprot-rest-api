@@ -1,6 +1,6 @@
 package org.uniprot.api.taxonomy.service;
 
-import static org.uniprot.store.search.field.TaxonomyField.Search;
+import static java.util.Collections.emptyList;
 
 import java.util.function.Supplier;
 
@@ -11,11 +11,14 @@ import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
-            () -> new DefaultSearchHandler(Search.content, Search.id, Search.getBoostFields());
+            () ->
+                    new DefaultSearchHandler(
+                            UniProtSearchFields.TAXONOMY, "content", "id", emptyList());
 
     public TaxonomyService(
             TaxonomyRepository repository,
@@ -32,6 +35,6 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
 
     @Override
     protected String getIdField() {
-        return Search.id.name();
+        return UniProtSearchFields.TAXONOMY.getField("id").getName();
     }
 }

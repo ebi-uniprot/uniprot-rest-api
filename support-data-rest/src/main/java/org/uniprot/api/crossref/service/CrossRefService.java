@@ -1,5 +1,7 @@
 package org.uniprot.api.crossref.service;
 
+import static java.util.Collections.emptyList;
+
 import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
@@ -10,16 +12,14 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
-import org.uniprot.store.search.field.CrossRefField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
     private static Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
                     new DefaultSearchHandler(
-                            CrossRefField.Search.content,
-                            CrossRefField.Search.accession,
-                            CrossRefField.Search.getBoostFields());
+                            UniProtSearchFields.CROSSREF, "content", "accession", emptyList());
 
     public CrossRefService(
             CrossRefRepository crossRefRepository,
@@ -36,6 +36,6 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
 
     @Override
     protected String getIdField() {
-        return CrossRefField.Search.accession.name();
+        return UniProtSearchFields.CROSSREF.getField("accession").getName();
     }
 }

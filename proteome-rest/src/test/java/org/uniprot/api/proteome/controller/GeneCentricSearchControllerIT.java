@@ -40,7 +40,9 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentricDocumentBuilder;
+import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.GeneCentricField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -100,9 +102,9 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(GeneCentricField.Search.values())
-                .map(GeneCentricField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.GENECENTRIC.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -131,8 +133,9 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(GeneCentricField.Sort.values())
-                .map(GeneCentricField.Sort::name)
+        return UniProtSearchFields.GENECENTRIC.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
@@ -150,7 +153,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return GeneCentricField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.GENECENTRIC.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -290,7 +293,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'gene' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'gene' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

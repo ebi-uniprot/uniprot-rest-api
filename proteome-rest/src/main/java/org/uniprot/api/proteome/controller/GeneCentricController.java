@@ -31,6 +31,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.validator.FieldValueValidator;
 
 /**
@@ -80,7 +81,8 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             HttpServletRequest request,
             HttpServletResponse response) {
         GeneCentricRequest searchRequest = new GeneCentricRequest();
-        searchRequest.setQuery(GeneCentricField.Search.upid.name() + ":" + upid);
+        searchRequest.setQuery(
+                UniProtSearchFields.GENECENTRIC.getField("upid").getName() + ":" + upid);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }

@@ -1,16 +1,6 @@
 package org.uniprot.api.disease;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
-
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +24,20 @@ import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
+import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -78,9 +79,9 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(DiseaseField.Search.values())
-                .map(DiseaseField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.DISEASE.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -94,8 +95,8 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(DiseaseField.Sort.values())
-                .map(DiseaseField.Sort::name)
+        return UniProtSearchFields.DISEASE.getSortFields().stream()
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
@@ -113,7 +114,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return DiseaseField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.DISEASE.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -257,7 +258,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

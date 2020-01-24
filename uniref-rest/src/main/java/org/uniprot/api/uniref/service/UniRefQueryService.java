@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.service;
 
+import static java.util.Collections.emptyList;
+
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +14,7 @@ import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
-import org.uniprot.store.search.field.UniRefField;
-import org.uniprot.store.search.field.UniRefField.Search;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo
@@ -22,7 +23,9 @@ import org.uniprot.store.search.field.UniRefField.Search;
 @Service
 public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocument, UniRefEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
-            () -> new DefaultSearchHandler(Search.content, Search.upi, Search.getBoostFields());
+            () ->
+                    new DefaultSearchHandler(
+                            UniProtSearchFields.UNIREF, "content", "upi", emptyList());
 
     @Autowired
     public UniRefQueryService(
@@ -48,6 +51,6 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
 
     @Override
     protected String getIdField() {
-        return UniRefField.Search.id.name();
+        return UniProtSearchFields.UNIREF.getField("id").getName();
     }
 }

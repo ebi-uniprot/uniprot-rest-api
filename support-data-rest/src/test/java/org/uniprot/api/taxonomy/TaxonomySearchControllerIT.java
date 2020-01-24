@@ -35,7 +35,9 @@ import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.TaxonomyField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -81,9 +83,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(TaxonomyField.Search.values())
-                .map(TaxonomyField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.TAXONOMY.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -101,8 +103,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(TaxonomyField.Sort.values())
-                .map(TaxonomyField.Sort::name)
+        return UniProtSearchFields.TAXONOMY.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
@@ -120,7 +123,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return TaxonomyField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.TAXONOMY.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -224,7 +227,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'scientific' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'scientific' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
@@ -258,7 +261,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchSortWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("sort", Collections.singletonList("name desc"))
+                    .queryParam("sort", Collections.singletonList("scientific desc"))
                     .resultMatcher(jsonPath("$.results.*.taxonId", contains(20, 10)))
                     .resultMatcher(
                             jsonPath(

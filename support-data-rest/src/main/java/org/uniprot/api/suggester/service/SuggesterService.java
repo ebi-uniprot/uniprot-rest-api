@@ -19,7 +19,7 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
 import org.uniprot.store.search.field.QueryBuilder;
-import org.uniprot.store.search.field.SuggestField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * Created 18/07/18
@@ -98,6 +98,7 @@ public class SuggesterService {
                 + query
                 + "\""
                 + " +"
-                + QueryBuilder.query(SuggestField.Search.dict.name(), dict.name());
+                + QueryBuilder.query(
+                        UniProtSearchFields.SUGGEST.getField("dict").getName(), dict.name());
     }
 }

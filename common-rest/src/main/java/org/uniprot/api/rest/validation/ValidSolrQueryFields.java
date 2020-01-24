@@ -6,9 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -24,8 +22,9 @@ import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
 import org.uniprot.core.util.Utils;
-import org.uniprot.store.search.field.SearchField;
-import org.uniprot.store.search.field.SearchFieldType;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.domain2.SearchFieldType;
+import org.uniprot.store.search.field.SearchFields;
 
 /**
  * This is the solr query validator that is responsible to verify if the query has. - valid field
@@ -39,7 +38,7 @@ import org.uniprot.store.search.field.SearchFieldType;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrQueryFields {
 
-    Class<? extends Enum<? extends SearchField>> fieldValidatorClazz();
+    Class<? extends Enum<? extends SearchFields>> fieldValidatorClazz();
 
     String messagePrefix();
 
@@ -49,25 +48,34 @@ public @interface ValidSolrQueryFields {
 
     Class<? extends Payload>[] payload() default {};
 
+    String enumValueName();
+
     class QueryFieldValidator implements ConstraintValidator<ValidSolrQueryFields, String> {
 
         private static final Logger LOGGER = getLogger(QueryFieldValidator.class);
         private static final String DEFAULT_FIELD_NAME = "default_field";
-        private List<SearchField> fieldList;
         private String messagePrefix;
+        private SearchFields searchFields = null;
 
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
             try {
-                fieldList = new ArrayList<>();
-                Class<? extends Enum<? extends SearchField>> enumClass =
+                Class<? extends Enum<? extends SearchFields>> enumClass =
                         constraintAnnotation.fieldValidatorClazz();
 
-                Enum[] enumValArr = enumClass.getEnumConstants();
-
-                for (Enum enumVal : enumValArr) {
-                    fieldList.add((SearchField) enumVal);
+                String enumValueName = constraintAnnotation.enumValueName();
+                for (Enum<? extends SearchFields> enumConstant : enumClass.getEnumConstants()) {
+                    if (enumConstant.name().equals(enumValueName)) {
+                        searchFields = (SearchFields) enumConstant;
+                        break;
+                    }
                 }
+
+                if (Objects.isNull(searchFields)) {
+                    throw new IllegalArgumentException(
+                            "Unknown enum value: [" + enumValueName + " in [" + enumClass + "].");
+                }
+
                 messagePrefix = constraintAnnotation.messagePrefix();
             } catch (Exception e) {
                 LOGGER.error("Error initializing QueryFieldValidator", e);
@@ -109,8 +117,7 @@ public @interface ValidSolrQueryFields {
                 SearchFieldType type,
                 ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = "{" + messagePrefix + ".invalid.query.field.type}";
-            String expectedFieldType =
-                    getFieldByName(fieldName).getSearchFieldType().name().toLowerCase();
+            String expectedFieldType = getFieldByName(fieldName).getType().name().toLowerCase();
             contextImpl.addMessageParameter("0", fieldName);
             contextImpl.addMessageParameter("1", type.name().toLowerCase());
             contextImpl.addMessageParameter("2", expectedFieldType);
@@ -138,17 +145,17 @@ public @interface ValidSolrQueryFields {
                 TermQuery termQuery = (TermQuery) inputQuery;
                 String fieldName = termQuery.getTerm().field();
                 String value = termQuery.getTerm().text();
-                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof WildcardQuery) {
                 WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
                 String fieldName = wildcardQuery.getTerm().field();
                 String value = wildcardQuery.getTerm().text();
-                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof PrefixQuery) {
                 PrefixQuery prefixQuery = (PrefixQuery) inputQuery;
                 String fieldName = prefixQuery.getPrefix().field();
                 String value = prefixQuery.getPrefix().text();
-                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof TermRangeQuery) {
                 TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;
                 String fieldName = rangeQuery.getField();
@@ -161,7 +168,7 @@ public @interface ValidSolrQueryFields {
                         Arrays.stream(phraseQuery.getTerms())
                                 .map(Term::text)
                                 .collect(Collectors.joining(" "));
-                validField = isValidField(context, fieldName, SearchFieldType.TERM, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof BooleanQuery) {
                 BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
                 for (BooleanClause clause : booleanQuery.clauses()) {
@@ -183,15 +190,16 @@ public @interface ValidSolrQueryFields {
                 String value) {
             boolean validField = true;
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            SearchField searchField = getFieldByName(fieldName);
-            if (searchField == null && !fieldName.equals(DEFAULT_FIELD_NAME)) {
+            boolean fieldExists = searchFields.hasField(fieldName);
+            if (!fieldExists && !fieldName.equals(DEFAULT_FIELD_NAME)) {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
-            } else if (searchField != null) {
-                if (!Objects.equals(type, searchField.getSearchFieldType())) {
+            } else if (fieldExists) {
+                SearchField searchField = getFieldByName(fieldName);
+                if (!Objects.equals(type, searchField.getType())) {
                     addFieldTypeErrorMessage(fieldName, type, contextImpl);
                     validField = false;
-                } else if (!searchField.hasValidValue(value)) {
+                } else if (!searchFields.fieldValueIsValid(fieldName, value)) {
                     addFieldValueErrorMessage(fieldName, value, contextImpl);
                     validField = false;
                 }
@@ -200,10 +208,7 @@ public @interface ValidSolrQueryFields {
         }
 
         private SearchField getFieldByName(String fieldName) {
-            return fieldList.stream()
-                    .filter(searchField -> searchField.getName().equalsIgnoreCase(fieldName))
-                    .findFirst()
-                    .orElse(null);
+            return searchFields.getField(fieldName);
         }
     }
 }

@@ -32,7 +32,9 @@ import org.uniprot.core.crossref.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
+import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.CrossRefField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -83,9 +85,9 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(CrossRefField.Search.values())
-                .map(CrossRefField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.CROSSREF.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -99,14 +101,15 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(CrossRefField.Sort.values())
-                .map(CrossRefField.Sort::name)
+        return UniProtSearchFields.CROSSREF.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return CrossRefField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.CROSSREF.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -215,7 +218,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 

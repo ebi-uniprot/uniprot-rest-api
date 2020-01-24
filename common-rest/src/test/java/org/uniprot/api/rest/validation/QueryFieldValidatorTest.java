@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.uniprot.api.rest.validation.QueryFieldValidatorTest.FakeQueryFieldValidator.ErrorType;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import javax.validation.ConstraintValidatorContext;
 
@@ -13,10 +12,8 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.store.search.field.BoostValue;
-import org.uniprot.store.search.field.SearchField;
-import org.uniprot.store.search.field.SearchFieldType;
-import org.uniprot.store.search.field.validator.FieldValueValidator;
+import org.uniprot.store.search.field.SearchFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * Unit Test class to validate QueryFieldValidator class behaviour
@@ -215,10 +212,12 @@ class QueryFieldValidatorTest {
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
         ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
 
-        Class<? extends SearchField> returnFieldValidator = FakeSearchFields.class;
+        Class<? extends SearchFields> returnFieldValidator = UniProtSearchFields.class;
         OngoingStubbing<Class<?>> ongoingStubbing =
                 Mockito.when(validReturnFields.fieldValidatorClazz());
         ongoingStubbing.thenReturn(returnFieldValidator);
+        Mockito.when(validReturnFields.enumValueName())
+                .thenReturn(UniProtSearchFields.UNIPROTKB.name());
         return validReturnFields;
     }
 
@@ -252,7 +251,7 @@ class QueryFieldValidatorTest {
         @Override
         public void addFieldTypeErrorMessage(
                 String fieldName,
-                SearchFieldType type,
+                org.uniprot.store.search.domain2.SearchFieldType type,
                 ConstraintValidatorContextImpl contextImpl) {
             errorFields.get(ErrorType.TYPE).add(fieldName);
         }
@@ -266,52 +265,6 @@ class QueryFieldValidatorTest {
         @Override
         public void addQueryTypeErrorMessage(Query inputQuery, ConstraintValidatorContext context) {
             errorFields.get(ErrorType.INVALID_TYPE).add(inputQuery.getClass().getName());
-        }
-    }
-
-    /** this enum is responsible to fake SearchField to help tests */
-    enum FakeSearchFields implements SearchField {
-        active(SearchFieldType.TERM, FieldValueValidator::isBooleanValue),
-        accession(SearchFieldType.TERM, FieldValueValidator::isAccessionValid),
-        organism_id(SearchFieldType.TERM, null),
-        organism_name(SearchFieldType.TERM, null),
-        ec(SearchFieldType.TERM, null),
-        taxonomy_id(SearchFieldType.TERM, FieldValueValidator::isNumberValue),
-        gene(SearchFieldType.TERM, null),
-        cc_bpcp_kinetics(SearchFieldType.TERM, null),
-        ccev_bpcp_kinetics(SearchFieldType.TERM, null),
-        proteome(SearchFieldType.TERM, FieldValueValidator::isProteomeIdValue);
-
-        private final Predicate<String> fieldValueValidator;
-        private final SearchFieldType searchFieldType;
-
-        FakeSearchFields() {
-            this.searchFieldType = null;
-            this.fieldValueValidator = null;
-        }
-
-        FakeSearchFields(SearchFieldType searchFieldType, Predicate<String> fieldValueValidator) {
-            this.searchFieldType = searchFieldType;
-            this.fieldValueValidator = fieldValueValidator;
-        }
-
-        public Predicate<String> getFieldValueValidator() {
-            return this.fieldValueValidator;
-        }
-
-        @Override
-        public BoostValue getBoostValue() {
-            return null;
-        }
-
-        @Override
-        public String getName() {
-            return this.name();
-        }
-
-        @Override
-        public SearchFieldType getSearchFieldType() {
-            return this.searchFieldType;
         }
     }
 }

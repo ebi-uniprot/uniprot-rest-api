@@ -12,7 +12,7 @@ import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-import org.uniprot.store.search.field.TaxonomyField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,7 +37,7 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
 
     @Override
     protected String getIdField() {
-        return TaxonomyField.Search.id.name();
+        return UniProtSearchFields.TAXONOMY.getField("id").getName();
     }
 
     @Override

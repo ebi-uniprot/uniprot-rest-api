@@ -5,7 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,7 +49,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.UniRefField;
+import org.uniprot.store.search.domain2.SearchField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefResultFields;
 
 import com.beust.jcommander.internal.Lists;
@@ -125,14 +129,14 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(UniRefField.Search.values())
-                .map(UniRefField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.UNIREF.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return UniRefField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.UNIREF.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -167,8 +171,9 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(UniRefField.Sort.values())
-                .map(UniRefField.Sort::getSolrFieldName)
+        return UniProtSearchFields.UNIREF.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
@@ -317,7 +322,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
@@ -336,8 +341,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
                                     containsInAnyOrder(
                                             "The 'id' value has invalid format. It should be a valid UniRef Cluster id",
                                             "The taxonomy id filter value should be a number",
-                                            "'length' filter type 'term' is invalid. Expected 'range' filter type",
-                                            "'count' filter type 'term' is invalid. Expected 'range' filter type",
+                                            "'length' filter type 'general' is invalid. Expected 'range' filter type",
+                                            "'count' filter type 'general' is invalid. Expected 'range' filter type",
                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                     .build();
         }

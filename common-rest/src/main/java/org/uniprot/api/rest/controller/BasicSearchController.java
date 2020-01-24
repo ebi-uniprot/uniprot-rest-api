@@ -1,6 +1,19 @@
 package org.uniprot.api.rest.controller;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,17 +31,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
 /**
  * @param <T>
