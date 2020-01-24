@@ -11,6 +11,7 @@ import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.search.field.KeywordField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,13 +24,14 @@ public class KeywordRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = KeywordField.Search.class,
+            fieldValidatorClazz = UniProtSearchFields.class,
+            enumValueName = "KEYWORD",
             messagePrefix = "search.keyword")
     private String query;
 
     @Parameter(description = "Name of the field to be sorted on")
     @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_sort_param_meta.json")
-    @ValidSolrSortFields(sortFieldEnumClazz = KeywordField.Sort.class)
+    @ValidSolrSortFields(sortFieldEnumClazz = UniProtSearchFields.class, enumValueName = "KEYWORD")
     private String sort;
 
     @Parameter(hidden = true)

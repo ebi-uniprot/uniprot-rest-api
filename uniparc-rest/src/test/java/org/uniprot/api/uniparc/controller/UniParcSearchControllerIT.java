@@ -43,8 +43,9 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
-import org.uniprot.store.search.field.UniParcField;
+import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.UniParcResultFields;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -101,9 +102,9 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected Collection<String> getAllSearchFields() {
-        return Arrays.stream(UniParcField.Search.values())
-                .map(UniParcField.Search::getName)
-                .collect(Collectors.toList());
+        return UniProtSearchFields.UNIPARC.getSearchFields().stream()
+                .map(SearchField::getName)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -124,7 +125,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                 value = "P12345";
                 break;
             case "upid":
-                value = "UP000005640";
+                value = "UPI000002ED67";
                 break;
         }
         return value;
@@ -132,14 +133,15 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected List<String> getAllSortFields() {
-        return Arrays.stream(UniParcField.Sort.values())
-                .map(UniParcField.Sort::name)
+        return UniProtSearchFields.UNIPARC.getSearchFields().stream()
+                .filter(field -> field.getSortField().isPresent())
+                .map(SearchField::getName)
                 .collect(Collectors.toList());
     }
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return UniParcField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.UNIPARC.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -172,7 +174,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
         builder.entryStored(getBinary(entry));
         entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
-        builder.upid("UP000005640");
+        builder.upid("UPI000002ED67");
         UniParcDocument doc = builder.build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
@@ -361,7 +363,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'term' filter type")))
+                                            "'taxonomy_name' filter type 'range' is invalid. Expected 'general' filter type")))
                     .build();
         }
 
@@ -379,7 +381,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                                     "$.messages.*",
                                     containsInAnyOrder(
                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI",
-                                            "'length' filter type 'term' is invalid. Expected 'range' filter type",
+                                            "'length' filter type 'general' is invalid. Expected 'range' filter type",
                                             "The taxonomy id filter value should be a number",
                                             "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                     .build();

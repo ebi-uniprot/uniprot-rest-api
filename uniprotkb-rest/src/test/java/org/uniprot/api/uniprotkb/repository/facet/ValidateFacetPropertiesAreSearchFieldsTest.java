@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.repository.facet;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
-import org.uniprot.store.search.domain2.UniProtKBSearchFields;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * Created 15/01/2020
@@ -26,7 +26,7 @@ class ValidateFacetPropertiesAreSearchFieldsTest {
                 .forEach(
                         facetField -> {
                             assertThat(
-                                    UniProtKBSearchFields.INSTANCE.hasField(facetField), is(true));
+                                    UniProtSearchFields.UNIPROTKB.hasField(facetField), is(true));
                         });
     }
 

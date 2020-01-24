@@ -3,7 +3,7 @@ package org.uniprot.api.literature.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.LiteratureField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales
@@ -15,16 +15,19 @@ public class LiteratureSortClause extends AbstractSolrSortClause {
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
         return new Sort(Sort.Direction.DESC, "score")
-                .and(new Sort(Sort.Direction.ASC, LiteratureField.Search.id.name()));
+                .and(
+                        new Sort(
+                                Sort.Direction.ASC,
+                                UniProtSearchFields.LITERATURE.getField("id").getName()));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return LiteratureField.Search.id.getName();
+        return UniProtSearchFields.LITERATURE.getField("id").getName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
-        return LiteratureField.Sort.valueOf(name).getSolrFieldName();
+        return UniProtSearchFields.LITERATURE.getSortFieldFor(name).getName();
     }
 }

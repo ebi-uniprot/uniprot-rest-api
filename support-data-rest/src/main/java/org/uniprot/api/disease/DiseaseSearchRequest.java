@@ -11,17 +11,19 @@ import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Data
 public class DiseaseSearchRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = DiseaseField.Search.class,
+            fieldValidatorClazz = UniProtSearchFields.class,
+            enumValueName = "DISEASE",
             messagePrefix = "search.disease")
     private String query;
 
-    @ValidSolrSortFields(sortFieldEnumClazz = DiseaseField.Sort.class)
+    @ValidSolrSortFields(sortFieldEnumClazz = UniProtSearchFields.class, enumValueName = "DISEASE")
     private String sort;
 
     private String cursor;

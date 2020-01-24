@@ -1,5 +1,7 @@
 package org.uniprot.api.proteome.service;
 
+import static java.util.Collections.emptyList;
+
 import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
@@ -9,7 +11,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-import org.uniprot.store.search.field.ProteomeField.Search;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo
@@ -18,7 +20,9 @@ import org.uniprot.store.search.field.ProteomeField.Search;
 @Service
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
-            () -> new DefaultSearchHandler(Search.content, Search.upid, Search.getBoostFields());
+            () ->
+                    new DefaultSearchHandler(
+                            UniProtSearchFields.PROTEOME, "content", "upid", emptyList());
 
     public ProteomeQueryService(
             ProteomeQueryRepository repository,
@@ -34,6 +38,6 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
 
     @Override
     protected String getIdField() {
-        return Search.upid.name();
+        return UniProtSearchFields.PROTEOME.getField("upid").getName();
     }
 }

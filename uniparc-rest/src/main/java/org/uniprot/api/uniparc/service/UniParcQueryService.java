@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.service;
 
+import static java.util.Collections.emptyList;
+
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,7 @@ import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.field.UniParcField.Search;
+import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo
@@ -20,7 +22,9 @@ import org.uniprot.store.search.field.UniParcField.Search;
 public class UniParcQueryService extends BasicSearchService<UniParcDocument, UniParcEntry> {
 
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
-            () -> new DefaultSearchHandler(Search.content, Search.upi, Search.getBoostFields());
+            () ->
+                    new DefaultSearchHandler(
+                            UniProtSearchFields.UNIPARC, "content", "upi", emptyList());
 
     @Autowired
     public UniParcQueryService(
@@ -39,6 +43,6 @@ public class UniParcQueryService extends BasicSearchService<UniParcDocument, Uni
 
     @Override
     protected String getIdField() {
-        return Search.upi.name();
+        return UniProtSearchFields.UNIPARC.getField("upi").getName();
     }
 }
