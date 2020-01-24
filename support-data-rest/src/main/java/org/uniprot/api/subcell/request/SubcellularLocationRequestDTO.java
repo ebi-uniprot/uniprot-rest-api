@@ -1,6 +1,10 @@
 package org.uniprot.api.subcell.request;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
@@ -8,9 +12,6 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.search.field.SubcellularLocationField;
 import org.uniprot.store.search.field.UniProtSearchFields;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 @Data
 public class SubcellularLocationRequestDTO implements SearchRequest {

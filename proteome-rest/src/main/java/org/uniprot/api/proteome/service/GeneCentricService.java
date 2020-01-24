@@ -1,5 +1,7 @@
 package org.uniprot.api.proteome.service;
 
+import static java.util.Collections.emptyList;
+
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
-import org.uniprot.store.search.field.GeneCentricField.Search;
 import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
@@ -25,7 +26,7 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
                             UniProtSearchFields.GENECENTRIC,
                             "accession",
                             "accession_id",
-                            Search.getBoostFields());
+                            emptyList());
 
     @Autowired
     public GeneCentricService(
@@ -42,6 +43,6 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
 
     @Override
     protected String getIdField() {
-        return Search.accession_id.name();
+        return UniProtSearchFields.GENECENTRIC.getField("accession_id").getName();
     }
 }

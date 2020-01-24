@@ -1,16 +1,6 @@
 package org.uniprot.api.disease;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
-
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +28,16 @@ import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.DiseaseField;
 import org.uniprot.store.search.field.UniProtSearchFields;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -115,7 +114,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected boolean fieldValueIsValid(String field, String value) {
-        return DiseaseField.Search.valueOf(field).hasValidValue(value);
+        return UniProtSearchFields.DISEASE.fieldValueIsValid(field, value);
     }
 
     @Override
