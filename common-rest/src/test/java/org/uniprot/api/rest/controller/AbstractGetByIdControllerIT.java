@@ -357,7 +357,7 @@ public abstract class AbstractGetByIdControllerIT {
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
         ControllerITUtils.verifyContentTypes(
-                getIdRequestPath(),
+                getIdRequestPath()+"{",
                 requestMappingHandlerMapping,
                 contentTypeParam.getContentTypeParams());
     }
