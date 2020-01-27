@@ -11,9 +11,10 @@ import org.uniprot.store.search.domain2.JsonLoader;
 import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.UniProtSearchFields;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,23 +22,43 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Created 27/01/2020
+ * The purpose of this class is to check whether the REST API documentation is aligned with the
+ * actual fields defined in our schemas.
+ *
+ * <p>There are two types of test:
+ *
+ * <ul>
+ *   <li>check that all fields defined in uniprotkb_query_param_meta.json are indeed valid fields
+ *       known by {@link UniProtSearchFields#UNIPROTKB}
+ *   <li>check that all fields defined in {@link UniProtSearchFields#UNIPROTKB} are documented,
+ *       except for a predefined list of fields that <b>should not</b> be documented.
+ * </ul>
+ *
+ * <p>Created 27/01/2020
  *
  * @author Edd
  */
-public class VerifyFieldsInAPIDocumentationExist {
+class VerifyFieldsInAPIDocumentationExist {
 
     private static final String JSON_FILE = "uniprotkb_query_param_meta.json";
-    private static Set<QueryParamMeta> documentedSearchFields;
+
+    private static final List<Predicate<String>> DOCUMENTED_FIELD_EXCLUSIONS;
+    private static Set<String> documentedSearchFields;
+
+    static {
+        // predicates to match fields not to be documented in JSON_FILE
+        DOCUMENTED_FIELD_EXCLUSIONS = new ArrayList<>();
+        DOCUMENTED_FIELD_EXCLUSIONS.add(f -> !f.startsWith("xref_count"));
+    }
 
     @BeforeAll
     static void beforeAll() {
-        ObjectMapper mapper = getJsonMapper(QueryParamMeta.class, QueryParamMetaImpl.class);
+        ObjectMapper mapper = getJsonMapper();
         JavaType type =
                 mapper.getTypeFactory().constructCollectionType(List.class, QueryParamMeta.class);
-        Set<QueryParamMeta> things = JsonLoader.loadItems(JSON_FILE, mapper, type);
-
-                        .stream().map(QueryParamMeta::getName).collect(Collectors.toSet());
+        List<QueryParamMeta> things = JsonLoader.loadItems(JSON_FILE, mapper, type);
+        documentedSearchFields =
+                things.stream().map(QueryParamMeta::getName).collect(Collectors.toSet());
     }
 
     @ParameterizedTest(name = "{0} is a valid field?")
@@ -53,22 +74,28 @@ public class VerifyFieldsInAPIDocumentationExist {
     }
 
     private static Stream<Arguments> provideSearchFields() {
-        Set<String> fieldsExcludedFromDocumentation = new HashSet<>();
-        fieldsExcludedFromDocumentation.add("asdf");
         return UniProtSearchFields.UNIPROTKB.getSearchFields().stream()
                 .map(SearchField::getName)
-                .filter(f -> !fieldsExcludedFromDocumentation.contains(f))
+                .filter(
+                        field -> {
+                            for (Predicate<String> predicate : DOCUMENTED_FIELD_EXCLUSIONS) {
+                                if (!predicate.test(field)) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        })
                 .map(Arguments::of);
     }
 
     private static Stream<Arguments> provideDocumentedSearchFields() {
-        return documentedSearchFields.stream().map(QueryParamMeta::getName).map(Arguments::of);
+        return documentedSearchFields.stream().map(Arguments::of);
     }
 
-    private static <I, C extends I> ObjectMapper getJsonMapper(Class<I> clazz, Class<C> subClazz) {
+    private static ObjectMapper getJsonMapper() {
         final ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule mod = new SimpleModule();
-        mod.addAbstractTypeMapping(clazz, subClazz);
+        mod.addAbstractTypeMapping(QueryParamMeta.class, QueryParamMetaImpl.class);
         objectMapper.registerModule(mod);
         return objectMapper;
     }
@@ -88,13 +115,13 @@ public class VerifyFieldsInAPIDocumentationExist {
             return name;
         }
 
+        public void setName(String name) {
+            this.name = name;
+        }
+
         @Override
         public String getType() {
             return type;
-        }
-
-        public void setName(String name) {
-            this.name = name;
         }
 
         public void setType(String type) {
