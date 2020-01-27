@@ -25,7 +25,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.service.PublicationService;
-import org.uniprot.store.search.field.validator.FieldValueValidator;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * @author lgonzales
@@ -64,7 +64,7 @@ public class UniprotKBEntryController extends BasicSearchController<PublicationE
             getMappedLiteratureByUniprotAccession(
                     @PathVariable("accession")
                             @Pattern(
-                                    regexp = FieldValueValidator.ACCESSION_REGEX,
+                                    regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                                     flags = {Pattern.Flag.CASE_INSENSITIVE},
                                     message = "{search.invalid.accession.value}")
                             String accession,

@@ -30,7 +30,7 @@ import org.uniprot.api.uniref.request.UniRefRequest;
 import org.uniprot.api.uniref.service.UniRefQueryService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.search.field.UniRefResultFields;
-import org.uniprot.store.search.field.validator.FieldValueValidator;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * @author jluo
@@ -71,7 +71,7 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
             @PathVariable("id")
                     @Pattern(
-                            regexp = FieldValueValidator.UNIREF_CLUSTER_ID_REX,
+                            regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.id.value}")
                     String id,

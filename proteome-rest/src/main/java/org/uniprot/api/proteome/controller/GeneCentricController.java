@@ -1,19 +1,5 @@
 package org.uniprot.api.proteome.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,7 +18,20 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.UniProtSearchFields;
-import org.uniprot.store.search.field.validator.FieldValueValidator;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
 
 /**
  * @author jluo
@@ -74,7 +73,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByUpId(
             @PathVariable("upid")
                     @Pattern(
-                            regexp = FieldValueValidator.PROTEOME_ID_REX,
+                            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
@@ -93,7 +92,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByAccession(
             @PathVariable("accession")
                     @Pattern(
-                            regexp = FieldValueValidator.ACCESSION_REGEX,
+                            regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,

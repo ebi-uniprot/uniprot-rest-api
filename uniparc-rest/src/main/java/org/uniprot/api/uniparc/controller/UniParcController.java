@@ -30,7 +30,7 @@ import org.uniprot.api.uniparc.request.UniParcRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.field.UniParcResultFields;
-import org.uniprot.store.search.field.validator.FieldValueValidator;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * @author jluo
@@ -90,7 +90,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpId(
             @PathVariable("upi")
                     @Pattern(
-                            regexp = FieldValueValidator.UNIPARC_UPI_REX,
+                            regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upi.value}")
                     String upi,

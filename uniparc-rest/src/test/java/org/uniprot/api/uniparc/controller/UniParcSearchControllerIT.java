@@ -125,7 +125,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                 value = "P12345";
                 break;
             case "upid":
-                value = "UPI000002ED67";
+                value = "UP000005640";
                 break;
         }
         return value;
@@ -174,7 +174,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
         builder.entryStored(getBinary(entry));
         entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
-        builder.upid("UPI000002ED67");
+        builder.upid("UP000005640");
         UniParcDocument doc = builder.build();
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
