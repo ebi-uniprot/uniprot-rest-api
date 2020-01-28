@@ -1246,5 +1246,17 @@
   {
     "name": "go_unknown",
     "type": "String"
+  },
+  {
+    "name": "go_manual",
+    "type": "String"
+  },
+  {
+    "name": "go_automatic",
+    "type": "String"
+  },
+  {
+    "name": "proteins_with",
+    "type": "String"
   }
 ]
