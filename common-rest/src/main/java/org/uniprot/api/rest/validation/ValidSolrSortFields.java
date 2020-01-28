@@ -15,7 +15,6 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -62,7 +61,7 @@ public @interface ValidSolrSortFields {
                 }
             }
 
-            if (Objects.isNull(searchFields)) {
+            if (searchFields == null) {
                 throw new IllegalArgumentException(
                         "Unknown enum value: [" + enumValueName + " in [" + enumClass + "].");
             } else {
