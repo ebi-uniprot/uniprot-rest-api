@@ -38,7 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Edd
  */
-class VerifyFieldsInAPIDocumentationExist {
+class VerifyFieldsInAPIDocumentationExistTest {
 
     private static final String JSON_FILE = "uniprotkb_query_param_meta.json";
     private static final List<Predicate<String>> DOCUMENTED_FIELD_EXCLUSIONS;
