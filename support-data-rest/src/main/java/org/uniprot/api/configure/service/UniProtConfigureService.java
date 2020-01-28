@@ -75,7 +75,7 @@ public class UniProtConfigureService {
         List<UniProtXDbTypeDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
         List<Tuple> databaseTypes =
                 dbTypes.stream()
-                        .filter(val -> val.getLinkTp().equals("Explicit"))
+                        .filter(val -> !val.isImplicit())
                         .map(this::convertToTuple)
                         .collect(Collectors.toList());
         return new DatabaseGroupImpl(dbCategory.getDisplayName(), databaseTypes);
