@@ -489,7 +489,7 @@ class DiseaseControllerSearchTestIT {
 
     private byte[] getDiseaseObjectBinary(Disease disease) {
         try {
-            DiseaseBuilder diseaseBuilder = DiseaseBuilder.newInstance().from(disease);
+            DiseaseBuilder diseaseBuilder = DiseaseBuilder.from(disease);
             return this.diseaseObjectMapper.writeValueAsBytes(diseaseBuilder.build());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse disease to binary json: ", e);
