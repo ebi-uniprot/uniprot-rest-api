@@ -1,15 +1,15 @@
 package org.uniprot.api.rest.output.converter;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.comment.Comment;
 import org.uniprot.core.uniprot.feature.Feature;
 import org.uniprot.core.uniprot.xdb.UniProtDBCrossReference;
 import org.uniprot.store.search.field.UniProtField;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 
 public class UniProtEntryFilters {
     private static final String ALL = "all";

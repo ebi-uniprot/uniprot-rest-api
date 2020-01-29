@@ -277,10 +277,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         .locations(locations)
                         .build();
         SequenceFeature sf3 =
-                new SequenceFeatureBuilder()
-                        .from(sf)
-                        .signatureDbType(SignatureDbType.PROSITE)
-                        .build();
+                SequenceFeatureBuilder.from(sf).signatureDbType(SignatureDbType.PROSITE).build();
         return Arrays.asList(sf, sf3);
     }
 

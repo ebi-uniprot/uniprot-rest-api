@@ -1,8 +1,13 @@
 package org.uniprot.api.uniprotkb.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -19,10 +24,7 @@ import org.uniprot.core.uniprot.builder.UniProtIdBuilder;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.UniProtField;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>}
