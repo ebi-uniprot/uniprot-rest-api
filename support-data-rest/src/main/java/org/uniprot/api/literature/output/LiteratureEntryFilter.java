@@ -26,7 +26,7 @@ public class LiteratureEntryFilter {
     }
 
     public static LiteratureEntry filterEntry(LiteratureEntry entity, List<String> fields) {
-        LiteratureEntryBuilder entryBuilder = new LiteratureEntryBuilder().from(entity);
+        LiteratureEntryBuilder entryBuilder = LiteratureEntryBuilder.from(entity);
         if (Utils.notNullOrEmpty(fields)) {
             for (LiteratureField.ResultFields field : LiteratureField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {

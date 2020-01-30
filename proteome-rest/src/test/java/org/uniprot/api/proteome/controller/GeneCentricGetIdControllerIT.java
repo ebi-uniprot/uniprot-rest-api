@@ -104,7 +104,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private CanonicalProtein create() {
         Protein protein =
-                ProteinBuilder.newInstance()
+                new ProteinBuilder()
                         .accession(ACCESSION)
                         .entryType(UniProtEntryType.SWISSPROT)
                         .geneName("some gene")
@@ -113,7 +113,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .build();
 
         Protein protein2 =
-                ProteinBuilder.newInstance()
+                new ProteinBuilder()
                         .accession("P21912")
                         .entryType(UniProtEntryType.SWISSPROT)
                         .geneName("some gene1")
@@ -121,14 +121,14 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .sequenceLength(334)
                         .build();
         Protein protein3 =
-                ProteinBuilder.newInstance()
+                new ProteinBuilder()
                         .accession("P31912")
                         .entryType(UniProtEntryType.TREMBL)
                         .geneName("some gene3")
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
                         .sequenceLength(434)
                         .build();
-        CanonicalProteinBuilder builder = CanonicalProteinBuilder.newInstance();
+        CanonicalProteinBuilder builder = new CanonicalProteinBuilder();
 
         return builder.canonicalProtein(protein)
                 .addRelatedProtein(protein2)
