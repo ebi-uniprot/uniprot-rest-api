@@ -140,7 +140,7 @@ class DiseaseControllerTest {
         Long reviewedProteinCount = 10L;
         Long unreviewedProteinCount = 20L;
 
-        DiseaseBuilder builder = DiseaseBuilder.newInstance();
+        DiseaseBuilder builder = new DiseaseBuilder();
         builder.id(id)
                 .accession(accession)
                 .acronym(acronym)

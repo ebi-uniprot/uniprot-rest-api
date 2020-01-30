@@ -209,7 +209,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
 
     private CanonicalProtein createProtein(int i) {
         Protein protein =
-                ProteinBuilder.newInstance()
+                new ProteinBuilder()
                         .accession(getName(ACCESSION_PREF, i))
                         .entryType(UniProtEntryType.SWISSPROT)
                         .geneName(getName("gene", i))
@@ -218,7 +218,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                         .build();
 
         Protein protein2 =
-                ProteinBuilder.newInstance()
+                new ProteinBuilder()
                         .accession(getName(RELATED_ACCESSION_PREF_1, i))
                         .entryType(UniProtEntryType.SWISSPROT)
                         .geneName(getName("agene", i))
@@ -226,14 +226,14 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                         .sequenceLength(334)
                         .build();
         Protein protein3 =
-                ProteinBuilder.newInstance()
+                new ProteinBuilder()
                         .accession(getName(RELATED_ACCESSION_PREF_2, i))
                         .entryType(UniProtEntryType.TREMBL)
                         .geneName(getName("twogene", i))
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
                         .sequenceLength(434)
                         .build();
-        CanonicalProteinBuilder builder = CanonicalProteinBuilder.newInstance();
+        CanonicalProteinBuilder builder = new CanonicalProteinBuilder();
 
         return builder.canonicalProtein(protein)
                 .addRelatedProtein(protein2)
