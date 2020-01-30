@@ -18,7 +18,6 @@
 		<poi.version>4.1.0</poi.version>
 		<jaxb.version>2.3.0</jaxb.version>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-		<commons-compress.version>1.19</commons-compress.version>
 	</properties>
 
 	<dependencies>
@@ -136,7 +135,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<version>${commons-compress.version}</version>
 		</dependency>
 
 
