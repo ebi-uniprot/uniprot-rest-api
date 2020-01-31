@@ -4,7 +4,9 @@ import static java.util.Collections.emptyList;
 
 import java.util.function.Supplier;
 
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
@@ -18,6 +20,7 @@ import org.uniprot.store.search.field.UniProtSearchFields;
  * @since 2019-07-04
  */
 @Service
+@Import(LiteratureQueryBoostsConfig.class)
 public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
 
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
@@ -29,8 +32,15 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             LiteratureRepository repository,
             LiteratureEntryConverter entryConverter,
             LiteratureFacetConfig facetConfig,
-            LiteratureSortClause literatureSortClause) {
-        super(repository, entryConverter, literatureSortClause, handlerSupplier.get(), facetConfig);
+            LiteratureSortClause literatureSortClause,
+            QueryBoosts literatureQueryBoosts) {
+        super(
+                repository,
+                entryConverter,
+                literatureSortClause,
+                handlerSupplier.get(),
+                literatureQueryBoosts,
+                facetConfig);
     }
 
     @Override

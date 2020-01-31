@@ -5,7 +5,9 @@ import static java.util.Collections.emptyList;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
@@ -19,6 +21,7 @@ import org.uniprot.store.search.field.UniProtSearchFields;
  * @date: 30 Apr 2019
  */
 @Service
+@Import(GeneCentricQueryBoostsConfig.class)
 public class GeneCentricService extends BasicSearchService<GeneCentricDocument, CanonicalProtein> {
     private static final Supplier<DefaultSearchHandler> handlerSupplier =
             () ->
@@ -32,12 +35,14 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
     public GeneCentricService(
             GeneCentricQueryRepository repository,
             GeneCentricFacetConfig facetConfig,
-            GeneCentricSortClause solrSortClause) {
+            GeneCentricSortClause solrSortClause,
+            QueryBoosts geneCentricQueryBoosts) {
         super(
                 repository,
                 new GeneCentricEntryConverter(),
                 solrSortClause,
                 handlerSupplier.get(),
+                geneCentricQueryBoosts,
                 facetConfig);
     }
 

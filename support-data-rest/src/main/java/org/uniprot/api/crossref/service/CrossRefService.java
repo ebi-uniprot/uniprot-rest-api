@@ -1,5 +1,9 @@
 package org.uniprot.api.crossref.service;
 
+import static java.util.Collections.emptyList;
+
+import java.util.function.Supplier;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
@@ -12,10 +16,6 @@ import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 import org.uniprot.store.search.field.UniProtSearchFields;
-
-import java.util.function.Supplier;
-
-import static java.util.Collections.emptyList;
 
 @Service
 @Import(CrossRefQueryBoostsConfig.class)
@@ -30,13 +30,13 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             CrossRefEntryConverter toCrossRefEntryConverter,
             CrossRefSolrSortClause crossRefSolrSortClause,
             CrossRefFacetConfig crossRefFacetConfig,
-            QueryBoosts queryBoosts) {
+            QueryBoosts crossRefQueryBoosts) {
         super(
                 crossRefRepository,
                 toCrossRefEntryConverter,
                 crossRefSolrSortClause,
                 handlerSupplier.get(),
-                queryBoosts,
+                crossRefQueryBoosts,
                 crossRefFacetConfig);
     }
 
