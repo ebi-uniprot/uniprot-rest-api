@@ -256,9 +256,8 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     private List<Taxonomy> getTaxonomies() {
         Taxonomy taxonomy =
-                TaxonomyBuilder.newInstance().taxonId(9606).scientificName("Homo sapiens").build();
-        Taxonomy taxonomy2 =
-                TaxonomyBuilder.newInstance().taxonId(10090).scientificName("MOUSE").build();
+                new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
+        Taxonomy taxonomy2 = new TaxonomyBuilder().taxonId(10090).scientificName("MOUSE").build();
         return Arrays.asList(taxonomy, taxonomy2);
     }
 
@@ -277,10 +276,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         .locations(locations)
                         .build();
         SequenceFeature sf3 =
-                new SequenceFeatureBuilder()
-                        .from(sf)
-                        .signatureDbType(SignatureDbType.PROSITE)
-                        .build();
+                SequenceFeatureBuilder.from(sf).signatureDbType(SignatureDbType.PROSITE).build();
         return Arrays.asList(sf, sf3);
     }
 

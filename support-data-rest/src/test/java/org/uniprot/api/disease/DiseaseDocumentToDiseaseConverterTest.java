@@ -50,7 +50,7 @@ class DiseaseDocumentToDiseaseConverterTest {
         String kwAC = "KW-1234";
         Keyword keyword = new KeywordImpl(kId, kwAC);
 
-        DiseaseBuilder builder = DiseaseBuilder.newInstance();
+        DiseaseBuilder builder = new DiseaseBuilder();
         builder.id(id).accession(accession).acronym(acronym).definition(def);
         builder.alternativeNames(altNames).crossReferences(cr);
         builder.keywords(keyword)

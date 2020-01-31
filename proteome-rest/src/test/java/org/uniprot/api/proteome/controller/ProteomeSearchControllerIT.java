@@ -217,7 +217,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         ProteomeId proteomeId = new ProteomeIdBuilder(getName(UPID_PREF, i)).build();
         String description = getName("Description", i);
         Taxonomy taxonomy =
-                TaxonomyBuilder.newInstance().taxonId(9606).scientificName("Homo sapiens").build();
+                new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
         LocalDate modified = LocalDate.of(2015, 11, 5);
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
@@ -230,14 +230,14 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         xrefs.add(xref1);
         List<Component> components = new ArrayList<>();
         Component component1 =
-                ComponentBuilder.newInstance()
+                new ComponentBuilder()
                         .name("someName1")
                         .description("some description")
                         .type(org.uniprot.core.proteome.ComponentType.UNPLACED)
                         .build();
 
         Component component2 =
-                ComponentBuilder.newInstance()
+                new ComponentBuilder()
                         .name("someName2")
                         .description("some description 2")
                         .type(org.uniprot.core.proteome.ComponentType.SEGMENTED_GENOME)
@@ -247,7 +247,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         components.add(component2);
         List<Citation> citations = new ArrayList<>();
         ProteomeEntryBuilder builder =
-                ProteomeEntryBuilder.newInstance()
+                new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
                         .description(description)
                         .taxonomy(taxonomy)
