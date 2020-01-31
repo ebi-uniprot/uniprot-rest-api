@@ -27,6 +27,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.field.LiteratureField;
 
@@ -118,7 +119,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
 
     @Override
     protected String getEntityId(LiteratureEntry entity) {
-        return String.valueOf(entity.getPubmedId());
+        Literature literature = (Literature) entity.getCitation();
+        return String.valueOf(literature.getPubmedId());
     }
 
     @Override

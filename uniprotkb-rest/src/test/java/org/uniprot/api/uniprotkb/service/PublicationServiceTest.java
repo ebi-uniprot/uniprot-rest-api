@@ -19,6 +19,8 @@ import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.Submission;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
@@ -59,17 +61,19 @@ class PublicationServiceTest {
 
         PublicationEntry journal = entries.get(0);
         assertNotNull(journal);
-        assertNotNull(journal.getLiteratureEntry());
-        assertNotNull(journal.getUniProtReference());
+        assertNotNull(journal.getReference());
+        assertNotNull(journal.getReference().getCitation());
+        assertTrue(journal.getReference().getCitation() instanceof Literature);
         assertNull(journal.getLiteratureMappedReference());
         assertEquals("Swiss-Prot", journal.getPublicationSource());
         assertTrue(journal.getCategories().containsAll(Arrays.asList("Pathol", "Interaction")));
 
         PublicationEntry submission = entries.get(1);
         assertNotNull(submission);
-        assertNull(submission.getLiteratureEntry());
         assertNull(submission.getLiteratureMappedReference());
-        assertNotNull(submission.getUniProtReference());
+        assertNotNull(submission.getReference());
+        assertNotNull(submission.getReference().getCitation());
+        assertTrue(submission.getReference().getCitation() instanceof Submission);
         assertEquals("Swiss-Prot", submission.getPublicationSource());
         assertEquals(1, submission.getCategories().size());
         assertTrue(submission.getCategories().contains("Interaction"));
@@ -102,8 +106,9 @@ class PublicationServiceTest {
 
         PublicationEntry journal = entries.get(0);
         assertNotNull(journal);
-        assertNull(journal.getUniProtReference());
-        assertNotNull(journal.getLiteratureEntry());
+        assertNotNull(journal.getReference());
+        assertNotNull(journal.getReference().getCitation());
+        assertTrue(journal.getReference().getCitation() instanceof Literature);
         assertNotNull(journal.getLiteratureMappedReference());
         assertEquals("Computationally mapped", journal.getPublicationSource());
         assertTrue(journal.getCategories().contains("Function"));
@@ -176,9 +181,14 @@ class PublicationServiceTest {
         List<PublicationEntry> entries = new ArrayList<>(result.getContent());
         assertNotNull(entries);
         assertEquals(3, entries.size());
-        assertEquals(new Long(10), entries.get(0).getLiteratureEntry().getPubmedId());
-        assertEquals(new Long(20), entries.get(1).getLiteratureEntry().getPubmedId());
-        assertEquals(new Long(30), entries.get(2).getLiteratureEntry().getPubmedId());
+        Literature literature = (Literature) entries.get(0).getReference().getCitation();
+        assertEquals(new Long(10), literature.getPubmedId());
+
+        literature = (Literature) entries.get(1).getReference().getCitation();
+        assertEquals(new Long(20), literature.getPubmedId());
+
+        literature = (Literature) entries.get(2).getReference().getCitation();
+        assertEquals(new Long(30), literature.getPubmedId());
     }
 
     @Test
@@ -208,9 +218,14 @@ class PublicationServiceTest {
         List<PublicationEntry> entries = new ArrayList<>(result.getContent());
         assertNotNull(entries);
         assertEquals(3, entries.size());
-        assertEquals(new Long(40), entries.get(0).getLiteratureEntry().getPubmedId());
-        assertEquals(new Long(50), entries.get(1).getLiteratureEntry().getPubmedId());
-        assertEquals(new Long(60), entries.get(2).getLiteratureEntry().getPubmedId());
+        Literature literature = (Literature) entries.get(0).getReference().getCitation();
+        assertEquals(new Long(40), literature.getPubmedId());
+
+        literature = (Literature) entries.get(1).getReference().getCitation();
+        assertEquals(new Long(50), literature.getPubmedId());
+
+        literature = (Literature) entries.get(2).getReference().getCitation();
+        assertEquals(new Long(60), literature.getPubmedId());
     }
 
     @Test
@@ -240,7 +255,8 @@ class PublicationServiceTest {
         List<PublicationEntry> entries = new ArrayList<>(result.getContent());
         assertNotNull(entries);
         assertEquals(1, entries.size());
-        assertEquals(new Long(70), entries.get(0).getLiteratureEntry().getPubmedId());
+        Literature literature = (Literature) entries.get(0).getReference().getCitation();
+        assertEquals(new Long(70), literature.getPubmedId());
     }
 
     private LiteratureRepository getMockedPaginationRepository() {

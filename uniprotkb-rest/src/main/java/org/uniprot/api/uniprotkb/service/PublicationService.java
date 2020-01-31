@@ -22,11 +22,13 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtReference;
+import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.field.UniProtSearchFields;
@@ -114,7 +116,12 @@ public class PublicationService {
         return literatures
                 .map(entryStoreConverter)
                 .map(LiteratureStoreEntry::getLiteratureEntry)
-                .collect(Collectors.toMap(LiteratureEntry::getPubmedId, Function.identity()));
+                .collect(Collectors.toMap(this::getPubmedIdFromEntry, Function.identity()));
+    }
+
+    private Long getPubmedIdFromEntry(LiteratureEntry entry) {
+        Literature literature = (Literature) entry.getCitation();
+        return literature.getPubmedId();
     }
 
     private boolean hasPubmedId(UniProtReference uniProtReference) {
@@ -137,16 +144,24 @@ public class PublicationService {
             LiteratureEntry literatureEntry,
             UniProtReference uniProtReference,
             String publicationSource) {
-        return PublicationEntry.builder()
-                .literatureEntry(literatureEntry)
-                .uniProtReference(uniProtReference)
+        PublicationEntry.PublicationEntryBuilder builder = PublicationEntry.builder();
+        UniProtReferenceBuilder referenceBuilder = UniProtReferenceBuilder.from(uniProtReference);
+        if (Utils.notNull(literatureEntry)) {
+            if (literatureEntry.hasCitation()) {
+                referenceBuilder.citation(literatureEntry.getCitation());
+            }
+            if (literatureEntry.hasStatistics()) {
+                builder.statistics(literatureEntry.getStatistics());
+            }
+        }
+        return builder.reference(referenceBuilder.build())
                 .categories(getCategoriesFromUniprotReference(uniProtReference))
                 .publicationSource(publicationSource)
                 .build();
     }
 
     private List<String> getCategoriesFromUniprotReference(UniProtReference uniProtReference) {
-        List<String> result = new ArrayList<>();
+        Set<String> result = new HashSet<>();
         if (uniProtReference.hasReferencePositions()) {
             for (String position : uniProtReference.getReferencePositions()) {
                 for (PublicationCategory category : PublicationCategory.values()) {
@@ -158,7 +173,7 @@ public class PublicationService {
                 }
             }
         }
-        return result;
+        return new ArrayList<>(result);
     }
 
     private List<PublicationEntry> getMappedPublicationEntries(String accession) {
@@ -196,8 +211,14 @@ public class PublicationService {
                             .collect(Collectors.toList());
             mappedReference.getSourceCategory().clear();
         }
+        UniProtReference reference =
+                new UniProtReferenceBuilder()
+                        .citation(literatureEntry.getLiteratureEntry().getCitation())
+                        .build();
+
         return PublicationEntry.builder()
-                .literatureEntry(literatureEntry.getLiteratureEntry())
+                .reference(reference)
+                .statistics(literatureEntry.getLiteratureEntry().getStatistics())
                 .literatureMappedReference(mappedReference)
                 .publicationSource("Computationally mapped")
                 .categories(categories)
