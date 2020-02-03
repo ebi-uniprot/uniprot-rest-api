@@ -1,6 +1,14 @@
 package org.uniprot.api.common.repository.search;
 
+import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
+import static org.uniprot.core.util.Utils.*;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.data.domain.Sort;
@@ -8,13 +16,6 @@ import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.*;
 
 /**
  * Created 14/06/19

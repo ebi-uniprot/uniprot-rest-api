@@ -1,9 +1,5 @@
 package org.uniprot.api.uniparc.service;
 
-import static java.util.Collections.emptyList;
-
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -12,7 +8,6 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.field.UniProtSearchFields;
 
@@ -23,12 +18,6 @@ import org.uniprot.store.search.field.UniProtSearchFields;
 @Service
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends BasicSearchService<UniParcDocument, UniParcEntry> {
-
-    private static final Supplier<DefaultSearchHandler> handlerSupplier =
-            () ->
-                    new DefaultSearchHandler(
-                            UniProtSearchFields.UNIPARC, "content", "upi", emptyList());
-
     @Autowired
     public UniParcQueryService(
             UniParcQueryRepository repository,
@@ -37,13 +26,7 @@ public class UniParcQueryService extends BasicSearchService<UniParcDocument, Uni
             UniParcSortClause solrSortClause,
             QueryBoosts uniParcQueryBoosts) {
 
-        super(
-                repository,
-                uniParcEntryConverter,
-                solrSortClause,
-                handlerSupplier.get(),
-                uniParcQueryBoosts,
-                facetConfig);
+        super(repository, uniParcEntryConverter, solrSortClause, uniParcQueryBoosts, facetConfig);
     }
 
     @Override

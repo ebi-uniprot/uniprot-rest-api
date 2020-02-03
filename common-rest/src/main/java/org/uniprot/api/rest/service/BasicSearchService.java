@@ -1,11 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -18,8 +12,13 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -32,7 +31,6 @@ public abstract class BasicSearchService<D extends Document, R> {
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     private AbstractSolrSortClause solrSortClause;
-    private DefaultSearchHandler defaultSearchHandler;
     private QueryBoosts queryBoosts;
     private FacetConfig facetConfig;
 
@@ -42,20 +40,18 @@ public abstract class BasicSearchService<D extends Document, R> {
     private Integer solrBatchSize;
 
     public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
-        this(repository, entryConverter, null, null, null, null);
+        this(repository, entryConverter, null, null, null);
     }
 
     public BasicSearchService(
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler,
             QueryBoosts queryBoosts,
             FacetConfig facetConfig) {
         this.repository = repository;
         this.entryConverter = entryConverter;
         this.solrSortClause = solrSortClause;
-        this.defaultSearchHandler = defaultSearchHandler;
         this.queryBoosts = queryBoosts;
         this.facetConfig = facetConfig;
     }
@@ -154,7 +150,6 @@ public abstract class BasicSearchService<D extends Document, R> {
                         request,
                         this.facetConfig,
                         this.solrSortClause,
-                        this.defaultSearchHandler,
                         includeFacets,
                         this.queryBoosts);
 
@@ -165,7 +160,6 @@ public abstract class BasicSearchService<D extends Document, R> {
             SearchRequest request,
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler,
             boolean includeFacets,
             QueryBoosts queryBoosts) {
 
@@ -175,13 +169,6 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         boolean hasScore = false;
 
-        // TODO: 29/01/2020 can remove this block of code when removing DefaultSearchHandler
-        //        if (defaultSearchHandler != null &&
-        // defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
-        //            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
-        //            hasScore = true;
-        //            requestBuilder.defaultQueryOperator(Query.Operator.OR);
-        //        }
         requestBuilder.query(requestedQuery);
 
         if (solrSortClause != null) {
