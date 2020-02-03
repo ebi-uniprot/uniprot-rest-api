@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryBoosts;
@@ -177,11 +176,12 @@ public abstract class BasicSearchService<D extends Document, R> {
         boolean hasScore = false;
 
         // TODO: 29/01/2020 can remove this block of code when removing DefaultSearchHandler
-        if (defaultSearchHandler != null && defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
-            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
-            hasScore = true;
-            requestBuilder.defaultQueryOperator(Query.Operator.OR);
-        }
+        //        if (defaultSearchHandler != null &&
+        // defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
+        //            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
+        //            hasScore = true;
+        //            requestBuilder.defaultQueryOperator(Query.Operator.OR);
+        //        }
         requestBuilder.query(requestedQuery);
 
         if (solrSortClause != null) {
