@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.uniprotkb.UniprotKbObjectsForTests.*;
 
 import java.util.*;
 
@@ -9,10 +10,14 @@ import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
-import org.uniprot.core.literature.LiteratureEntry;
+import org.uniprot.core.DBCrossReference;
+import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureStatistics;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
 import org.uniprot.core.literature.builder.LiteratureStatisticsBuilder;
+import org.uniprot.core.uniprot.UniProtReference;
+import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
 
 /**
  * @author lgonzales
@@ -157,12 +162,14 @@ class PublicationFacetConfigTest {
         assertEquals(2, publications.size());
 
         PublicationEntry entry = publications.get(0);
+        Literature literature = (Literature) entry.getReference().getCitation();
         assertFalse(entry.isLargeScale());
-        assertEquals(new Long(50), entry.getLiteratureEntry().getPubmedId());
+        assertEquals(new Long(50), literature.getPubmedId());
 
         entry = publications.get(1);
+        literature = (Literature) entry.getReference().getCitation();
         assertFalse(entry.isLargeScale());
-        assertEquals(new Long(49), entry.getLiteratureEntry().getPubmedId());
+        assertEquals(new Long(49), literature.getPubmedId());
     }
 
     @Test
@@ -205,21 +212,19 @@ class PublicationFacetConfigTest {
 
     private List<PublicationEntry> getScalePublicationEntries() {
         List<PublicationEntry> publications = new ArrayList<>();
-        LiteratureStatistics largeStat =
-                new LiteratureStatisticsBuilder().reviewedProteinCount(51).build();
-        LiteratureEntry largeEntry =
-                new LiteratureEntryBuilder().pubmedId(51L).statistics(largeStat).build();
-
-        LiteratureStatistics smallStat =
-                new LiteratureStatisticsBuilder().reviewedProteinCount(50).build();
-        LiteratureEntry smallEntry =
-                new LiteratureEntryBuilder().pubmedId(50L).statistics(smallStat).build();
-        LiteratureEntry smallEntry2 =
-                new LiteratureEntryBuilder().pubmedId(49L).statistics(smallStat).build();
-
-        publications.add(PublicationEntry.builder().literatureEntry(largeEntry).build());
-        publications.add(PublicationEntry.builder().literatureEntry(smallEntry).build());
-        publications.add(PublicationEntry.builder().literatureEntry(smallEntry2).build());
+        publications.add(getScalePublicationEntry(51));
+        publications.add(getScalePublicationEntry(50));
+        publications.add(getScalePublicationEntry(49));
         return publications;
+    }
+
+    private PublicationEntry getScalePublicationEntry(int count) {
+        DBCrossReference<CitationXrefType> pubmed =
+                getCitationXref(CitationXrefType.PUBMED, String.valueOf(count));
+        Literature literature = new LiteratureBuilder().addCitationXrefs(pubmed).build();
+        UniProtReference reference = new UniProtReferenceBuilder().citation(literature).build();
+        LiteratureStatistics largeStat =
+                new LiteratureStatisticsBuilder().reviewedProteinCount(count).build();
+        return PublicationEntry.builder().statistics(largeStat).reference(reference).build();
     }
 }
