@@ -27,7 +27,7 @@ public class LiteratureEntryFilter {
 
     public static LiteratureEntry filterEntry(LiteratureEntry entity, List<String> fields) {
         LiteratureEntryBuilder entryBuilder = LiteratureEntryBuilder.from(entity);
-        if (Utils.notNullOrEmpty(fields)) {
+        if (Utils.notNullNotEmpty(fields)) {
             for (LiteratureField.ResultFields field : LiteratureField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {
                     remove(entryBuilder, field);
@@ -51,10 +51,10 @@ public class LiteratureEntryFilter {
                 entryBuilder.title(null);
                 break;
             case authoring_group:
-                entryBuilder.authoringGroup(null);
+                entryBuilder.authoringGroupsSet(null);
                 break;
             case author:
-                entryBuilder.authors(null);
+                entryBuilder.authorsSet(null);
                 break;
             case journal:
                 entryBuilder.journal((Journal) null);

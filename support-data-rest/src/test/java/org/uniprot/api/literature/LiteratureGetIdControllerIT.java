@@ -83,7 +83,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                 new LiteratureEntryBuilder()
                         .pubmedId(PUBMED_ID)
                         .title("The Title")
-                        .addAuthor(new AuthorImpl("The Author"))
+                        .authorsAdd(new AuthorImpl("The Author"))
                         .literatureAbstract("literature abstract")
                         .publicationDate(new PublicationDateImpl("2019"))
                         .firstPage("10")

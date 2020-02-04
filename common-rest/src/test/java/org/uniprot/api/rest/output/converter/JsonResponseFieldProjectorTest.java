@@ -46,12 +46,12 @@ class JsonResponseFieldProjectorTest {
                         .acronym("ZTTKS")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
-                        .alternativeNames(
+                        .alternativeNamesSet(
                                 Arrays.asList(
                                         "Zhu-Tokita-Takenouchi-Kim syndrome",
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
-                        .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
-                        .keywords(keyword)
+                        .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
+                        .keywordsAdd(keyword)
                         .reviewedProteinCount(1L)
                         .unreviewedProteinCount(0L)
                         .build();
@@ -211,7 +211,7 @@ class JsonResponseFieldProjectorTest {
                         uniProtId,
                         UniProtEntryType.SWISSPROT);
         UniProtEntry entry =
-                builder.secondaryAccessionAdd(UniProtAccessionTest.getUniProtAccession())
+                builder.secondaryAccessionsAdd(UniProtAccessionTest.getUniProtAccession())
                         .entryAudit(EntryAuditTest.getEntryAudit())
                         .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
                         .proteinDescription(ProteinDescriptionTest.getProteinDescription())

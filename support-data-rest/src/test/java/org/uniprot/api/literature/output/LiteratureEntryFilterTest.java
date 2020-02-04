@@ -83,7 +83,7 @@ class LiteratureEntryFilterTest {
         assertNull(filterEntry.getStatistics());
         assertNull(filterEntry.getJournal());
         assertTrue(filterEntry.getAuthors().isEmpty());
-        assertTrue(filterEntry.getAuthoringGroup().isEmpty());
+        assertTrue(filterEntry.getAuthoringGroups().isEmpty());
     }
 
     private LiteratureEntry getCompleteLiteratureEntry() {
@@ -97,8 +97,8 @@ class LiteratureEntryFilterTest {
                 .literatureAbstract("literature Abstract")
                 .publicationDate(new PublicationDateImpl("21-06-2019"))
                 .statistics(createCompleteLiteratureStatistics())
-                .addAuthor(new AuthorImpl("author name"))
-                .addAuthoringGroup("authoring group")
+                .authorsAdd(new AuthorImpl("author name"))
+                .authoringGroupsAdd("authoring group")
                 .title("title")
                 .completeAuthorList(false)
                 .build();

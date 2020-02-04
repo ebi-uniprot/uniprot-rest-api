@@ -151,7 +151,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                         .pubmedId(pubMedId)
                         .doiId("doi " + pubMedId)
                         .title("title " + pubMedId)
-                        .addAuthor(new AuthorImpl("author " + pubMedId))
+                        .authorsAdd(new AuthorImpl("author " + pubMedId))
                         .journal("journal " + pubMedId)
                         .publicationDate(new PublicationDateImpl("2019"))
                         .build();

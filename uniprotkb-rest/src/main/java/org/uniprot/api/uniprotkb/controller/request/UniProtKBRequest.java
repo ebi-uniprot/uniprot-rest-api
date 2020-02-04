@@ -103,6 +103,6 @@ public class UniProtKBRequest implements SearchRequest {
     }
 
     public boolean hasFacets() {
-        return Utils.notNullOrEmpty(facets);
+        return Utils.notNullNotEmpty(facets);
     }
 }

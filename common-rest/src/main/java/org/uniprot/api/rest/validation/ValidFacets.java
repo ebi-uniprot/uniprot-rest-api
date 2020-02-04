@@ -69,7 +69,7 @@ public @interface ValidFacets {
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if (Utils.notNullOrEmpty(value)) {
+            if (Utils.notNullNotEmpty(value)) {
                 // verify if facet name is valid.
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;

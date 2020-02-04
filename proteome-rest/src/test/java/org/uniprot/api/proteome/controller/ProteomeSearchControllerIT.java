@@ -254,10 +254,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                         .modified(modified)
                         .proteomeType(ProteomeType.NORMAL)
                         //	.redundantTo(redId)
-                        .dbXReferences(xrefs)
-                        .components(components)
+                        .dbXReferencesSet(xrefs)
+                        .componentsSet(components)
                         .superkingdom(Superkingdom.EUKARYOTA)
-                        .references(citations)
+                        .referencesSet(citations)
                         .annotationScore(15);
 
         return builder.build();

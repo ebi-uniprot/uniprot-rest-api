@@ -145,8 +145,8 @@ class DiseaseControllerTest {
                 .accession(accession)
                 .acronym(acronym)
                 .definition(definition)
-                .alternativeNames(alternativeNames);
-        builder.crossReferences(xrefs).keywords(keywords);
+                .alternativeNamesSet(alternativeNames);
+        builder.crossReferencesSet(xrefs).keywordsSet(keywords);
         builder.reviewedProteinCount(reviewedProteinCount)
                 .unreviewedProteinCount(unreviewedProteinCount);
 

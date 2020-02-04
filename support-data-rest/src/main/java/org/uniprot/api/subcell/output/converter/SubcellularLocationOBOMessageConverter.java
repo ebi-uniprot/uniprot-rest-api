@@ -32,7 +32,7 @@ public class SubcellularLocationOBOMessageConverter
         frame.addClause(getNameClause(subcellularLocationEntry));
 
         // add synonyms
-        if (Utils.notNullOrEmpty(subcellularLocationEntry.getSynonyms())) {
+        if (Utils.notNullNotEmpty(subcellularLocationEntry.getSynonyms())) {
             for (String syn : subcellularLocationEntry.getSynonyms()) {
                 frame.addClause(getSynonymClause(syn));
             }
@@ -42,13 +42,13 @@ public class SubcellularLocationOBOMessageConverter
         frame.addClause(getDefClause(subcellularLocationEntry));
 
         // add xref
-        if (Utils.notNullOrEmpty(subcellularLocationEntry.getLinks())) {
+        if (Utils.notNullNotEmpty(subcellularLocationEntry.getLinks())) {
             for (String xref : subcellularLocationEntry.getLinks()) {
                 frame.addClause(getLinksXRefClause(xref));
             }
         }
         // add xref for GO terms
-        if (Utils.notNullOrEmpty(subcellularLocationEntry.getGeneOntologies())) {
+        if (Utils.notNullNotEmpty(subcellularLocationEntry.getGeneOntologies())) {
             for (GeneOntology go : subcellularLocationEntry.getGeneOntologies()) {
                 frame.addClause(getGeneOntologyXRefClause(go));
             }
