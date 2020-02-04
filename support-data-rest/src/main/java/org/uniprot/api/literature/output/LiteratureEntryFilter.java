@@ -3,7 +3,12 @@ package org.uniprot.api.literature.output;
 import java.util.Arrays;
 import java.util.List;
 
-import org.uniprot.core.citation.Journal;
+import org.uniprot.core.DBCrossReference;
+import org.uniprot.core.citation.Author;
+import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.PublicationDate;
+import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
 import org.uniprot.core.util.Utils;
@@ -26,57 +31,62 @@ public class LiteratureEntryFilter {
     }
 
     public static LiteratureEntry filterEntry(LiteratureEntry entity, List<String> fields) {
-        LiteratureEntryBuilder entryBuilder = LiteratureEntryBuilder.from(entity);
         if (Utils.notNullOrEmpty(fields)) {
             for (LiteratureField.ResultFields field : LiteratureField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {
-                    remove(entryBuilder, field);
+                    entity = remove(entity, field);
                 }
             }
         }
-        return entryBuilder.build();
+        return entity;
     }
 
-    private static void remove(
-            LiteratureEntryBuilder entryBuilder, LiteratureField.ResultFields field) {
+    private static LiteratureEntry remove(
+            LiteratureEntry entity, LiteratureField.ResultFields field) {
+        LiteratureEntryBuilder entryBuilder = LiteratureEntryBuilder.from(entity);
+        Literature literature = (Literature) entity.getCitation();
+        LiteratureBuilder litBuilder = LiteratureBuilder.from(literature);
         switch (field) {
             case id:
             case reference:
             case author_and_group:
                 break;
             case doi:
-                entryBuilder.doiId(null);
+                List<DBCrossReference<CitationXrefType>> xrefs = literature.getCitationXrefs();
+                xrefs.removeIf(xref -> xref.getDatabaseType().equals(CitationXrefType.DOI));
+                litBuilder.citationXrefs(xrefs);
                 break;
             case title:
-                entryBuilder.title(null);
+                litBuilder.title(null);
                 break;
             case authoring_group:
-                entryBuilder.authoringGroup(null);
+                litBuilder.authoringGroups(null);
                 break;
             case author:
-                entryBuilder.authors(null);
+                litBuilder.authors((List<Author>) null);
                 break;
             case journal:
-                entryBuilder.journal((Journal) null);
+                litBuilder.journalName(null);
                 break;
             case publication:
-                entryBuilder.publicationDate(null);
+                litBuilder.publicationDate((PublicationDate) null);
                 break;
             case lit_abstract:
-                entryBuilder.literatureAbstract(null);
+                litBuilder.literatureAbstract(null);
                 break;
             case statistics:
                 entryBuilder.statistics(null);
                 break;
             case first_page:
-                entryBuilder.firstPage(null);
+                litBuilder.firstPage(null);
                 break;
             case last_page:
-                entryBuilder.lastPage(null);
+                litBuilder.lastPage(null);
                 break;
             case volume:
-                entryBuilder.volume(null);
+                litBuilder.volume(null);
                 break;
         }
+        return entryBuilder.citation(litBuilder.build()).build();
     }
 }

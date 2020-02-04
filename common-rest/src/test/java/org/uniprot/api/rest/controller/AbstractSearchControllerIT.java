@@ -410,6 +410,7 @@ public abstract class AbstractSearchControllerIT {
     // ----------------------------------------- TEST RETURNED FIELDS
     // -----------------------------------------------
     @Test
+    @Disabled // @lgonzales: TRM-23571
     void searchFieldsWithCorrectValuesReturnSuccess(SearchParameter queryParameter)
             throws Exception {
         checkSearchParameterInput(queryParameter);
