@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.core.citation.impl.AuthorImpl;
-import org.uniprot.core.citation.impl.PublicationDateImpl;
+import org.uniprot.core.DBCrossReference;
+import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.citation.Citation;
+import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
@@ -47,7 +51,7 @@ class LiteratureEntryFilterTest {
 
     @Test
     void filterWithoutFieldsEntry() {
-        LiteratureEntry entry = getCompleteLiteratureEntry();
+        LiteratureEntry entry = createCompleteLiteratureEntry();
         LiteratureEntry filterEntry = LiteratureEntryFilter.filterEntry(entry, null);
         assertNotNull(filterEntry);
         assertEquals(entry, filterEntry);
@@ -55,7 +59,7 @@ class LiteratureEntryFilterTest {
 
     @Test
     void filterWithAllFieldsEntry() {
-        LiteratureEntry entry = getCompleteLiteratureEntry();
+        LiteratureEntry entry = createCompleteLiteratureEntry();
         List<String> allFields =
                 Arrays.stream(LiteratureField.ResultFields.values())
                         .map(LiteratureField.ResultFields::name)
@@ -68,39 +72,61 @@ class LiteratureEntryFilterTest {
 
     @Test
     void filterWithIdAndTitleFieldEntry() {
-        LiteratureEntry entry = getCompleteLiteratureEntry();
+        LiteratureEntry entry = createCompleteLiteratureEntry();
+        Literature literature = (Literature) entry.getCitation();
         List<String> allFields = Arrays.asList("id", "title");
 
         LiteratureEntry filterEntry = LiteratureEntryFilter.filterEntry(entry, allFields);
         assertNotNull(filterEntry);
-        assertEquals(entry.getPubmedId(), filterEntry.getPubmedId());
-        assertEquals(entry.getTitle(), filterEntry.getTitle());
-        assertEquals(filterEntry.getDoiId(), "");
-        assertEquals(filterEntry.getFirstPage(), "");
-        assertEquals(filterEntry.getLastPage(), "");
-        assertEquals(filterEntry.getVolume(), "");
-        assertNull(filterEntry.getPublicationDate());
+        assertNotNull(filterEntry.getCitation());
+        Literature filteredLiterature = (Literature) filterEntry.getCitation();
+
+        assertEquals(literature.getPubmedId(), filteredLiterature.getPubmedId());
+        assertEquals(literature.getTitle(), filteredLiterature.getTitle());
+        assertEquals("", filteredLiterature.getDoiId());
+        assertEquals("", filteredLiterature.getFirstPage());
+        assertEquals("", filteredLiterature.getLastPage());
+        assertEquals("", filteredLiterature.getVolume());
+        assertNull(filteredLiterature.getPublicationDate());
         assertNull(filterEntry.getStatistics());
-        assertNull(filterEntry.getJournal());
-        assertTrue(filterEntry.getAuthors().isEmpty());
-        assertTrue(filterEntry.getAuthoringGroups().isEmpty());
+        assertNull(filteredLiterature.getJournal());
+        assertTrue(filteredLiterature.getAuthors().isEmpty());
+        assertTrue(filteredLiterature.getAuthoringGroups().isEmpty());
     }
 
-    private LiteratureEntry getCompleteLiteratureEntry() {
+    private LiteratureEntry createCompleteLiteratureEntry() {
         return new LiteratureEntryBuilder()
-                .doiId("doi Id")
-                .pubmedId(100L)
-                .firstPage("first Page")
-                .journal("journal Name")
-                .volume("volume")
-                .lastPage("last Page")
-                .literatureAbstract("literature Abstract")
-                .publicationDate(new PublicationDateImpl("21-06-2019"))
+                .citation(createCompleteLiteratureCitation())
                 .statistics(createCompleteLiteratureStatistics())
-                .authorsAdd(new AuthorImpl("author name"))
-                .authoringGroupsAdd("authoring group")
-                .title("title")
-                .completeAuthorList(false)
+                .build();
+    }
+
+    private Citation createCompleteLiteratureCitation() {
+        DBCrossReference<CitationXrefType> pubmed =
+                new DBCrossReferenceBuilder<CitationXrefType>()
+                        .databaseType(CitationXrefType.PUBMED)
+                        .id("12345")
+                        .build();
+
+        DBCrossReference<CitationXrefType> doi =
+                new DBCrossReferenceBuilder<CitationXrefType>()
+                        .databaseType(CitationXrefType.DOI)
+                        .id("doiId")
+                        .build();
+
+        return new LiteratureBuilder()
+                .literatureAbstract("literature abstract")
+                .completeAuthorList(true)
+                .firstPage("first page")
+                .lastPage("last page")
+                .volume("the volume")
+                .journalName("The journal name")
+                .authorsAdd("John")
+                .authorGroupsAdd("the author group")
+                .citationXrefsAdd(pubmed)
+                .citationXrefsAdd(doi)
+                .publicationDate("2015-MAY")
+                .title("the big title")
                 .build();
     }
 

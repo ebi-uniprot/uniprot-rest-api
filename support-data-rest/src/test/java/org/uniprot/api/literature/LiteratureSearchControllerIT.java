@@ -29,7 +29,12 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.core.DBCrossReference;
+import org.uniprot.core.builder.DBCrossReferenceBuilder;
 import org.uniprot.core.citation.Author;
+import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
@@ -146,15 +151,29 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     private void saveEntry(long pubMedId, boolean facet) {
 
-        LiteratureEntry entry =
-                new LiteratureEntryBuilder()
-                        .pubmedId(pubMedId)
-                        .doiId("doi " + pubMedId)
+        DBCrossReference<CitationXrefType> pubmed =
+                new DBCrossReferenceBuilder<CitationXrefType>()
+                        .databaseType(CitationXrefType.PUBMED)
+                        .id(String.valueOf(pubMedId))
+                        .build();
+
+        DBCrossReference<CitationXrefType> doi =
+                new DBCrossReferenceBuilder<CitationXrefType>()
+                        .databaseType(CitationXrefType.DOI)
+                        .id("doi " + pubMedId)
+                        .build();
+
+        Literature literature =
+                new LiteratureBuilder()
+                        .citationXrefsAdd(pubmed)
+                        .addCitationXrefs(doi)
                         .title("title " + pubMedId)
-                        .authorsAdd(new AuthorImpl("author " + pubMedId))
-                        .journal("journal " + pubMedId)
+                        .addAuthor(new AuthorImpl("author " + pubMedId))
+                        .journalName("journal " + pubMedId)
                         .publicationDate(new PublicationDateImpl("2019"))
                         .build();
+
+        LiteratureEntry entry = new LiteratureEntryBuilder().citation(literature).build();
 
         LiteratureStoreEntry storeEntry =
                 new LiteratureStoreEntryBuilder().literatureEntry(entry).build();
@@ -162,14 +181,14 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         LiteratureDocument document =
                 LiteratureDocument.builder()
                         .id(String.valueOf(pubMedId))
-                        .doi(entry.getDoiId())
-                        .title(entry.getTitle())
+                        .doi(literature.getDoiId())
+                        .title(literature.getTitle())
                         .author(
-                                entry.getAuthors().stream()
+                                literature.getAuthors().stream()
                                         .map(Author::getValue)
                                         .collect(Collectors.toSet()))
-                        .journal(entry.getJournal().getName())
-                        .published(entry.getPublicationDate().getValue())
+                        .journal(literature.getJournal().getName())
+                        .published(literature.getPublicationDate().getValue())
                         .citedin(facet)
                         .mappedin(facet)
                         .content(Collections.singleton(String.valueOf(pubMedId)))
@@ -196,9 +215,11 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("id:10"))
-                    .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10)))
-                    .resultMatcher(jsonPath("$.results.*.title", contains("title 10")))
-                    .resultMatcher(jsonPath("$.results.*.publicationDate", contains("2019")))
+                    .resultMatcher(
+                            jsonPath("$.results.*.citation.citationXrefs[0].id", contains("10")))
+                    .resultMatcher(jsonPath("$.results.*.citation.title", contains("title 10")))
+                    .resultMatcher(
+                            jsonPath("$.results.*.citation.publicationDate", contains("2019")))
                     .build();
         }
 
@@ -214,14 +235,17 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("title:*"))
-                    .resultMatcher(jsonPath("$.results.*.pubmedId", containsInAnyOrder(10, 20)))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.title",
+                                    "$.results.*.citation.citationXrefs[0].id",
+                                    containsInAnyOrder("10", "20")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.title",
                                     containsInAnyOrder("title 10", "title 20")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.publicationDate",
+                                    "$.results.*.citation.publicationDate",
                                     containsInAnyOrder("2019", "2019")))
                     .build();
         }
@@ -262,8 +286,13 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("title desc"))
-                    .resultMatcher(jsonPath("$.results.*.pubmedId", contains(20, 10)))
-                    .resultMatcher(jsonPath("$.results.*.title", contains("title 20", "title 10")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.citationXrefs[0].id",
+                                    contains("20", "10")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.title", contains("title 20", "title 10")))
                     .build();
         }
 
@@ -272,10 +301,15 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("id,title"))
-                    .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10, 20)))
-                    .resultMatcher(jsonPath("$.results.*.title", contains("title 10", "title 20")))
-                    .resultMatcher(jsonPath("$.results.*.authors").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.journal").doesNotExist())
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.citationXrefs[0].id",
+                                    contains("10", "20")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.title", contains("title 10", "title 20")))
+                    .resultMatcher(jsonPath("$.results.*.citation.authors").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.citation.journal").doesNotExist())
                     .build();
         }
 
@@ -284,8 +318,13 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("citedin,mappedin"))
-                    .resultMatcher(jsonPath("$.results.*.pubmedId", contains(10, 20)))
-                    .resultMatcher(jsonPath("$.results.*.title", contains("title 10", "title 20")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.citationXrefs[0].id",
+                                    contains("10", "20")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.title", contains("title 10", "title 20")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets.*.name", contains("citedin", "mappedin")))
@@ -305,15 +344,15 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.pubmedId",
-                                                    containsInAnyOrder(10, 20)))
+                                                    "$.results.*.citation.citationXrefs[0].id",
+                                                    containsInAnyOrder("10", "20")))
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.title",
+                                                    "$.results.*.citation.title",
                                                     containsInAnyOrder("title 10", "title 20")))
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.publicationDate",
+                                                    "$.results.*.citation.publicationDate",
                                                     containsInAnyOrder("2019", "2019")))
                                     .build())
                     .contentTypeParam(

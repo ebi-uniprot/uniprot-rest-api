@@ -6,20 +6,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.uniprot.core.DBCrossReference;
 import org.uniprot.core.builder.DBCrossReferenceBuilder;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.SubmissionDatabase;
 import org.uniprot.core.citation.builder.JournalArticleBuilder;
+import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.citation.builder.SubmissionBuilder;
 import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
+import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
 import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
+import org.uniprot.core.literature.builder.LiteratureStatisticsBuilder;
 import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
 import org.uniprot.core.uniprot.UniProtAccession;
 import org.uniprot.core.uniprot.UniProtEntry;
@@ -100,16 +105,17 @@ public class UniprotKbObjectsForTests {
     public static LiteratureDocument getLiteratureDocument(long pubMedId, String... accessions) {
         LiteratureStoreEntry storeEntry = getLiteratureStoreEntry(pubMedId, accessions);
         LiteratureEntry entry = storeEntry.getLiteratureEntry();
+        Literature literature = (Literature) entry.getCitation();
         return LiteratureDocument.builder()
                 .id(String.valueOf(pubMedId))
-                .doi(entry.getDoiId())
-                .title(entry.getTitle())
+                .doi(literature.getDoiId())
+                .title(literature.getTitle())
                 .author(
-                        entry.getAuthors().stream()
+                        literature.getAuthors().stream()
                                 .map(Author::getValue)
                                 .collect(Collectors.toSet()))
-                .journal(entry.getJournal().getName())
-                .published(entry.getPublicationDate().getValue())
+                .journal(literature.getJournal().getName())
+                .published(literature.getPublicationDate().getValue())
                 .content(Collections.singleton(String.valueOf(pubMedId)))
                 .mappedProteins(
                         storeEntry.getLiteratureMappedReferences().stream()
@@ -130,14 +136,34 @@ public class UniprotKbObjectsForTests {
     }
 
     public static LiteratureEntry getLiteratureEntry(long pubMedId) {
-        return new LiteratureEntryBuilder()
-                .pubmedId(pubMedId)
-                .doiId("doi " + pubMedId)
-                .title("title " + pubMedId)
-                .authorsAdd(new AuthorImpl("author " + pubMedId))
-                .journal("journal " + pubMedId)
-                .publicationDate(new PublicationDateImpl("2019"))
-                .build();
+        DBCrossReference<CitationXrefType> pubmed =
+                getCitationXref(CitationXrefType.PUBMED, String.valueOf(pubMedId));
+        DBCrossReference<CitationXrefType> doi =
+                getCitationXref(CitationXrefType.DOI, "doi " + pubMedId);
+
+        Literature literature =
+                new LiteratureBuilder()
+                        .citationXrefsAdd(pubmed)
+                        .citationXrefsAdd(doi)
+                        .title("title " + pubMedId)
+                        .authorsAdd(new AuthorImpl("author " + pubMedId))
+                        .journalName("journal " + pubMedId)
+                        .publicationDate(new PublicationDateImpl("2019"))
+                        .build();
+
+        LiteratureStatistics statistics =
+                new LiteratureStatisticsBuilder()
+                        .reviewedProteinCount(10)
+                        .unreviewedProteinCount(20)
+                        .mappedProteinCount(30)
+                        .build();
+
+        return new LiteratureEntryBuilder().citation(literature).statistics(statistics).build();
+    }
+
+    public static DBCrossReference<CitationXrefType> getCitationXref(
+            CitationXrefType pubmed2, String s) {
+        return new DBCrossReferenceBuilder<CitationXrefType>().databaseType(pubmed2).id(s).build();
     }
 
     public static ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {

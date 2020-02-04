@@ -102,11 +102,18 @@ class UniprotKBEntryControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(4)))
-                .andExpect(jsonPath("$.results.*.literatureEntry.pubmedId", contains(11, 12, 13)))
+                .andExpect(
+                        jsonPath("$.results[0].reference.citation.citationXrefs[0].id", is("11")))
+                .andExpect(
+                        jsonPath("$.results[1].reference.citation.citationType", is("submission")))
+                .andExpect(
+                        jsonPath("$.results[2].reference.citation.citationXrefs[0].id", is("12")))
+                .andExpect(
+                        jsonPath("$.results[3].reference.citation.citationXrefs[0].id", is("13")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.literatureEntry.title",
-                                contains("title 11", "title 12", "title 13")))
+                                "$.results.*.reference.citation.title",
+                                contains("title 11", "Submission tittle", "title 12", "title 13")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.categories",
@@ -164,8 +171,8 @@ class UniprotKBEntryControllerIT {
                                 "$.facets[1].values.*.value",
                                 contains("Interaction", "Function", "Pathol")))
                 .andExpect(jsonPath("$.facets[1].values.*.count", contains(3, 2, 2)))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("Small")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(5)));
+                .andExpect(jsonPath("$.facets[2].values.*.value", contains("Large", "Small")))
+                .andExpect(jsonPath("$.facets[2].values.*.count", contains(4, 1)));
     }
 
     @Test
@@ -199,8 +206,8 @@ class UniprotKBEntryControllerIT {
                 .andExpect(
                         jsonPath("$.facets[1].values.*.value", contains("Interaction", "Pathol")))
                 .andExpect(jsonPath("$.facets[1].values.*.count", contains(3, 2)))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("Small")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(3)));
+                .andExpect(jsonPath("$.facets[2].values.*.value", contains("Large", "Small")))
+                .andExpect(jsonPath("$.facets[2].values.*.count", contains(2, 1)));
     }
 
     @Test

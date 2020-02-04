@@ -81,7 +81,8 @@ public class PublicationFacetConfig extends FacetConfig {
         if (Utils.notNullNotEmpty(query)) {
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.source.name())) {
                 String value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.source.name());
-                publications.removeIf(entry -> !entry.getPublicationSource().equals(value));
+                publications.removeIf(
+                        entry -> !entry.getPublicationSource().equalsIgnoreCase(value.trim()));
             }
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.category.name())) {
                 String value =
@@ -91,7 +92,7 @@ public class PublicationFacetConfig extends FacetConfig {
                                 entry.getCategories().stream()
                                         .noneMatch(
                                                 cat -> {
-                                                    return cat.equalsIgnoreCase(value);
+                                                    return cat.equalsIgnoreCase(value.trim());
                                                 }));
             }
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.scale.name())) {
