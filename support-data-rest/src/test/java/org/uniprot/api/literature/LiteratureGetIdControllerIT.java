@@ -92,7 +92,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         Literature literature =
                 new LiteratureBuilder()
-                        .addCitationXrefs(pubmed)
+                        .citationXrefsAdd(pubmed)
                         .title("The Title")
                         .authorsAdd(new AuthorImpl("The Author"))
                         .literatureAbstract("literature abstract")

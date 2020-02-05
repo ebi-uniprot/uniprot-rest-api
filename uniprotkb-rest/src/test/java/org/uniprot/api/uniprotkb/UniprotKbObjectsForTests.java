@@ -55,8 +55,10 @@ public class UniprotKbObjectsForTests {
                         .map(
                                 pubmedId -> {
                                     return new UniProtReferenceBuilder()
-                                            .referencePositionsAdd("Position MUTAGENESIS pathol " + pubmedId)
-                                            .referencePositionsAdd("Position INTERACTION " + pubmedId)
+                                            .referencePositionsAdd(
+                                                    "Position MUTAGENESIS pathol " + pubmedId)
+                                            .referencePositionsAdd(
+                                                    "Position INTERACTION " + pubmedId)
                                             .citation(
                                                     new JournalArticleBuilder()
                                                             .citationXrefsAdd(

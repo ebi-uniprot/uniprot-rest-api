@@ -1,5 +1,7 @@
 package org.uniprot.api.literature.output;
 
+import static org.uniprot.core.util.Utils.modifiableList;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,7 +54,8 @@ public class LiteratureEntryFilter {
             case author_and_group:
                 break;
             case doi:
-                List<DBCrossReference<CitationXrefType>> xrefs = literature.getCitationXrefs();
+                List<DBCrossReference<CitationXrefType>> xrefs =
+                        modifiableList(literature.getCitationXrefs());
                 xrefs.removeIf(xref -> xref.getDatabaseType().equals(CitationXrefType.DOI));
                 litBuilder.citationXrefsSet(xrefs);
                 break;

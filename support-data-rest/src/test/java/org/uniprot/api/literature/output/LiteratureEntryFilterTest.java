@@ -122,7 +122,7 @@ class LiteratureEntryFilterTest {
                 .volume("the volume")
                 .journalName("The journal name")
                 .authorsAdd("John")
-                .authorGroupsAdd("the author group")
+                .authoringGroupsAdd("the author group")
                 .citationXrefsAdd(pubmed)
                 .citationXrefsAdd(doi)
                 .publicationDate("2015-MAY")

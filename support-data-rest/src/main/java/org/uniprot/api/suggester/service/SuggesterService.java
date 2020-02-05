@@ -1,7 +1,5 @@
 package org.uniprot.api.suggester.service;
 
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
-
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
