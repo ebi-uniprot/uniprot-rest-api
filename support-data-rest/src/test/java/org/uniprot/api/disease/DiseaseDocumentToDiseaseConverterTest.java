@@ -52,8 +52,8 @@ class DiseaseDocumentToDiseaseConverterTest {
 
         DiseaseBuilder builder = new DiseaseBuilder();
         builder.id(id).accession(accession).acronym(acronym).definition(def);
-        builder.alternativeNames(altNames).crossReferences(cr);
-        builder.keywords(keyword)
+        builder.alternativeNamesSet(altNames).crossReferencesAdd(cr);
+        builder.keywordsAdd(keyword)
                 .reviewedProteinCount(reviwedProteinCount)
                 .unreviewedProteinCount(unreviwedProteinCount);
 

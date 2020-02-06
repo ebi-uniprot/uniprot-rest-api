@@ -96,7 +96,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .commonName("common")
                         .mnemonic("mnemonic")
                         .parentId(9000L)
-                        .links(Collections.singletonList("link"))
+                        .linksSet(Collections.singletonList("link"))
                         .build();
 
         TaxonomyDocument document =

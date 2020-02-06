@@ -1,5 +1,7 @@
 package org.uniprot.api.literature.output;
 
+import static org.uniprot.core.util.Utils.modifiableList;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class LiteratureEntryFilter {
     }
 
     public static LiteratureEntry filterEntry(LiteratureEntry entity, List<String> fields) {
-        if (Utils.notNullOrEmpty(fields)) {
+        if (Utils.notNullNotEmpty(fields)) {
             for (LiteratureField.ResultFields field : LiteratureField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {
                     entity = remove(entity, field);
@@ -52,18 +54,19 @@ public class LiteratureEntryFilter {
             case author_and_group:
                 break;
             case doi:
-                List<DBCrossReference<CitationXrefType>> xrefs = literature.getCitationXrefs();
+                List<DBCrossReference<CitationXrefType>> xrefs =
+                        modifiableList(literature.getCitationXrefs());
                 xrefs.removeIf(xref -> xref.getDatabaseType().equals(CitationXrefType.DOI));
-                litBuilder.citationXrefs(xrefs);
+                litBuilder.citationXrefsSet(xrefs);
                 break;
             case title:
                 litBuilder.title(null);
                 break;
             case authoring_group:
-                litBuilder.authoringGroups(null);
+                litBuilder.authoringGroupsSet(null);
                 break;
             case author:
-                litBuilder.authors((List<Author>) null);
+                litBuilder.authorsSet((List<Author>) null);
                 break;
             case journal:
                 litBuilder.journalName(null);

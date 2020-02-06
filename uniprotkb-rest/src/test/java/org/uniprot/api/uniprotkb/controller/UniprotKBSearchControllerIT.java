@@ -753,11 +753,11 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
             entry =
                     new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
-                            .databaseCrossReferenceAdd(
+                            .databaseCrossReferencesAdd(
                                     new UniProtDBCrossReferenceBuilder()
                                             .databaseType(new UniProtXDbType("Proteomes"))
                                             .id("UP000000000")
-                                            .addProperty(
+                                            .propertiesAdd(
                                                     new DBXRefTypeAttribute("a", "a", "a"), "value")
                                             .build())
                             .build();

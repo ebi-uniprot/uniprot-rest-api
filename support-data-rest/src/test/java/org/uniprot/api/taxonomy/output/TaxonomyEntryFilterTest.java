@@ -77,7 +77,7 @@ class TaxonomyEntryFilterTest {
         assertEquals(entry.getSynonyms(), filterEntry.getSynonyms());
         assertEquals(entry.getOtherNames(), filterEntry.getOtherNames());
         assertEquals(entry.getRank(), filterEntry.getRank());
-        assertEquals(entry.getLineage(), filterEntry.getLineage());
+        assertEquals(entry.getLineages(), filterEntry.getLineages());
         assertEquals(entry.getStrains(), filterEntry.getStrains());
         assertEquals(entry.getHosts(), filterEntry.getHosts());
         assertEquals(entry.getLinks(), filterEntry.getLinks());
@@ -101,7 +101,7 @@ class TaxonomyEntryFilterTest {
         assertTrue(filterEntry.getSynonyms().isEmpty());
         assertTrue(filterEntry.getOtherNames().isEmpty());
         assertNull(filterEntry.getRank());
-        assertTrue(filterEntry.getLineage().isEmpty());
+        assertTrue(filterEntry.getLineages().isEmpty());
         assertTrue(filterEntry.getStrains().isEmpty());
         assertTrue(filterEntry.getHosts().isEmpty());
         assertTrue(filterEntry.getLinks().isEmpty());
@@ -122,12 +122,12 @@ class TaxonomyEntryFilterTest {
         builder.active(true);
         builder.statistics(new TaxonomyStatisticsBuilder().reviewedProteinCount(10).build());
 
-        builder.addSynonyms("synonym");
-        builder.addOtherNames("otherName");
-        builder.addLineage(new TaxonomyLineageBuilder().scientificName("scientificName").build());
-        builder.addStrain(new TaxonomyStrainBuilder().name("name").build());
-        builder.addHost(getCompleteTaxonomy());
-        builder.addLink("link");
+        builder.synonymsAdd("synonym");
+        builder.otherNamesAdd("otherName");
+        builder.lineagesAdd(new TaxonomyLineageBuilder().scientificName("scientificName").build());
+        builder.strainsAdd(new TaxonomyStrainBuilder().name("name").build());
+        builder.hostsAdd(getCompleteTaxonomy());
+        builder.linksAdd("link");
 
         return builder.build();
     }
@@ -137,7 +137,7 @@ class TaxonomyEntryFilterTest {
                 .taxonId(9606)
                 .scientificName("Homo sapiens")
                 .commonName("Human")
-                .synonyms(Collections.singletonList("Some name"))
+                .synonymsSet(Collections.singletonList("Some name"))
                 .mnemonic("HUMAN")
                 .build();
     }

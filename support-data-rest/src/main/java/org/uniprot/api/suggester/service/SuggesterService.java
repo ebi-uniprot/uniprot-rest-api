@@ -1,7 +1,5 @@
 package org.uniprot.api.suggester.service;
 
-import static org.uniprot.core.util.Utils.notNullOrEmpty;
-
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -15,6 +13,7 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.suggester.Suggestion;
 import org.uniprot.api.suggester.Suggestions;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
@@ -83,7 +82,7 @@ public class SuggesterService {
                 .map(
                         doc -> {
                             String value = doc.value;
-                            if (notNullOrEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
+                            if (Utils.notNullNotEmpty(doc.altValues) && !doc.altValues.isEmpty()) {
                                 StringJoiner joiner = new StringJoiner("/", " (", ")");
                                 doc.altValues.forEach(joiner::add);
                                 value += joiner.toString();

@@ -221,7 +221,7 @@ class PublicationFacetConfigTest {
     private PublicationEntry getScalePublicationEntry(int count) {
         DBCrossReference<CitationXrefType> pubmed =
                 getCitationXref(CitationXrefType.PUBMED, String.valueOf(count));
-        Literature literature = new LiteratureBuilder().addCitationXrefs(pubmed).build();
+        Literature literature = new LiteratureBuilder().citationXrefsAdd(pubmed).build();
         UniProtReference reference = new UniProtReferenceBuilder().citation(literature).build();
         LiteratureStatistics largeStat =
                 new LiteratureStatisticsBuilder().reviewedProteinCount(count).build();

@@ -85,7 +85,7 @@ public @interface ValidSolrQueryFields {
         @Override
         public boolean isValid(String queryString, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if (Utils.notNullOrEmpty(queryString)) {
+            if (Utils.notNullNotEmpty(queryString)) {
                 try {
                     QueryParser qp = new QueryParser(DEFAULT_FIELD_NAME, new WhitespaceAnalyzer());
                     qp.setAllowLeadingWildcard(true);

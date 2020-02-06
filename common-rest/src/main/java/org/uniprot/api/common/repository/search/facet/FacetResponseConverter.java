@@ -36,13 +36,13 @@ public class FacetResponseConverter implements Converter<QueryResponse, List<Fac
     @Override
     public List<Facet> convert(QueryResponse queryResponse) {
         List<Facet> facetResult = new ArrayList<>();
-        if (Utils.notNullOrEmpty(queryResponse.getFacetFields())) {
+        if (Utils.notNullNotEmpty(queryResponse.getFacetFields())) {
             for (FacetField facetField : queryResponse.getFacetFields()) {
                 // Iterating over all Query response Facets
                 facetResult.add(convertFieldFacets(facetField));
             }
         }
-        if (Utils.notNullOrEmpty(queryResponse.getIntervalFacets())) {
+        if (Utils.notNullNotEmpty(queryResponse.getIntervalFacets())) {
             for (IntervalFacet intervalFacet : queryResponse.getIntervalFacets()) {
                 facetResult.add(convertIntervalFacets(intervalFacet));
             }
@@ -60,7 +60,7 @@ public class FacetResponseConverter implements Converter<QueryResponse, List<Fac
     private Facet convertIntervalFacets(IntervalFacet intervalFacet) {
         // Iterating over all Query response Interval Facets
         List<FacetItem> values = new ArrayList<>();
-        if (Utils.notNullOrEmpty(intervalFacet.getIntervals())) {
+        if (Utils.notNullNotEmpty(intervalFacet.getIntervals())) {
             for (IntervalFacet.Count count : intervalFacet.getIntervals()) {
                 // Iterating over all query response interval facet items
                 if (count != null) {
@@ -95,7 +95,7 @@ public class FacetResponseConverter implements Converter<QueryResponse, List<Fac
      */
     private Facet convertFieldFacets(FacetField facetField) {
         List<FacetItem> values = new ArrayList<>();
-        if (Utils.notNullOrEmpty(facetField.getValues())) {
+        if (Utils.notNullNotEmpty(facetField.getValues())) {
             for (FacetField.Count count : facetField.getValues()) {
                 // Iterating over all query response facet items
                 if (count != null) {
