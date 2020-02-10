@@ -13,8 +13,8 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.core.cv.ec.EC;
-import org.uniprot.core.cv.ec.ECRepo;
+import org.uniprot.cv.ec.EC;
+import org.uniprot.cv.ec.ECRepo;
 
 import com.google.common.base.Strings;
 

@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.core.util.Utils;
+import org.uniprot.cv.keyword.KeywordEntry;
+import org.uniprot.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.store.search.field.KeywordField;
 
 /** @author lgonzales */

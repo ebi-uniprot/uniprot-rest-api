@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.uniprot.api.keyword.output.KeywordEntryFilter;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractTsvMessagerConverter;
-import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.parser.tsv.keyword.KeywordEntryMap;
+import org.uniprot.cv.keyword.KeywordEntry;
 import org.uniprot.store.search.field.KeywordField;
 
 public class KeywordTsvMessageConverter extends AbstractTsvMessagerConverter<KeywordEntry> {

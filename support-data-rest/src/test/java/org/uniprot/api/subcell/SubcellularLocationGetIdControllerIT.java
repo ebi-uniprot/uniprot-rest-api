@@ -26,10 +26,10 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.cv.subcell.SubcellLocationCategory;
-import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
+import org.uniprot.cv.subcell.SubcellLocationCategory;
+import org.uniprot.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
