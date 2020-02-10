@@ -27,7 +27,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.subcell.request.SubcellularLocationRequestDTO;
 import org.uniprot.api.subcell.service.SubcellularLocationService;
-import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**

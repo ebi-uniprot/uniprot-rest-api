@@ -7,9 +7,9 @@ import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.uniprot.api.rest.output.converter.AbstractOBOMessagerConverter;
-import org.uniprot.core.cv.keyword.GeneOntology;
-import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.util.Utils;
+import org.uniprot.cv.keyword.GeneOntology;
+import org.uniprot.cv.subcell.SubcellularLocationEntry;
 
 /**
  * @author lgonzales

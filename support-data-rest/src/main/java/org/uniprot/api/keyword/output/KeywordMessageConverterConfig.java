@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.cv.keyword.KeywordEntry;
+import org.uniprot.cv.keyword.KeywordEntry;
 
 /**
  * @author jluo

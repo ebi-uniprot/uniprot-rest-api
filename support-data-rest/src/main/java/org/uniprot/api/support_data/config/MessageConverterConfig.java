@@ -27,8 +27,6 @@ import org.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
 import org.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
 import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.cv.disease.Disease;
-import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.json.parser.crossref.CrossRefJsonConfig;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
@@ -37,6 +35,8 @@ import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.cv.keyword.KeywordEntry;
+import org.uniprot.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.search.field.*;
 
 @Configuration

@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
 import org.uniprot.api.subcell.output.SubcellularLocationEntryFilter;
-import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.parser.tsv.subcell.SubcellularLocationEntryMap;
+import org.uniprot.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**
