@@ -35,7 +35,7 @@ public class HttpServletRequestContentTypeMutator {
     private static final String SEARCH = "/search";
     private static final String DOWNLOAD = "/download";
     private static final Pattern ENTRY_CONTEXT_PATH_MATCHER =
-            Pattern.compile("^(.*/(.*)/(.*))\\.(\\w+)$");
+            Pattern.compile("^(.*/(.*)/(.*))\\.([\\w-]+)$");
     private static final Set<String> ALLOWED_ACCEPT_HEADERS =
             UniProtMediaType.ALL_TYPES.stream().map(MimeType::toString).collect(Collectors.toSet());
 
@@ -51,7 +51,7 @@ public class HttpServletRequestContentTypeMutator {
         boolean mutated = false;
         String format = request.getParameter(FORMAT);
         if ((request.getRequestURI().endsWith(DOWNLOAD) || request.getRequestURI().endsWith(SEARCH))
-                && Utils.notNullOrEmpty(format)) {
+                && Utils.notNullNotEmpty(format)) {
             addContentTypeHeaderForFormat(request, format);
             mutated = true;
         }
@@ -82,7 +82,7 @@ public class HttpServletRequestContentTypeMutator {
         // if no accept header was added based on format/extension, then add default content type
         if (!mutated
                 && (Utils.nullOrEmpty(request.getHeader(HttpHeaders.ACCEPT))
-                        || (Utils.notNullOrEmpty(request.getHeader(HttpHeaders.ACCEPT))
+                        || (Utils.notNullNotEmpty(request.getHeader(HttpHeaders.ACCEPT))
                                 && (request.getHeader(HttpHeaders.ACCEPT).equals("*/*")
                                         || !ALLOWED_ACCEPT_HEADERS.contains(
                                                 request.getHeader(HttpHeaders.ACCEPT)))))) {

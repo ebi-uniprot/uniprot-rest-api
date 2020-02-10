@@ -46,8 +46,6 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.cv.chebi.ChebiRepo;
-import org.uniprot.core.cv.ec.ECRepo;
 import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
 import org.uniprot.core.cv.xdb.UniProtXDbTypes;
 import org.uniprot.core.uniprot.UniProtEntry;
@@ -58,6 +56,8 @@ import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
 import org.uniprot.core.uniprot.xdb.UniProtXDbType;
 import org.uniprot.core.uniprot.xdb.builder.UniProtDBCrossReferenceBuilder;
+import org.uniprot.cv.chebi.ChebiRepo;
+import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -753,11 +753,11 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
             entry =
                     new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
-                            .databaseCrossReferenceAdd(
+                            .databaseCrossReferencesAdd(
                                     new UniProtDBCrossReferenceBuilder()
                                             .databaseType(new UniProtXDbType("Proteomes"))
                                             .id("UP000000000")
-                                            .addProperty(
+                                            .propertiesAdd(
                                                     new DBXRefTypeAttribute("a", "a", "a"), "value")
                                             .build())
                             .build();

@@ -27,6 +27,11 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.core.DBCrossReference;
+import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.citation.impl.AuthorImpl;
 import org.uniprot.core.citation.impl.PublicationDateImpl;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
@@ -79,15 +84,23 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
 
-        LiteratureEntry literatureEntry =
-                new LiteratureEntryBuilder()
-                        .pubmedId(PUBMED_ID)
+        DBCrossReference<CitationXrefType> pubmed =
+                new DBCrossReferenceBuilder<CitationXrefType>()
+                        .databaseType(CitationXrefType.PUBMED)
+                        .id(String.valueOf(PUBMED_ID))
+                        .build();
+
+        Literature literature =
+                new LiteratureBuilder()
+                        .citationXrefsAdd(pubmed)
                         .title("The Title")
-                        .addAuthor(new AuthorImpl("The Author"))
+                        .authorsAdd(new AuthorImpl("The Author"))
                         .literatureAbstract("literature abstract")
                         .publicationDate(new PublicationDateImpl("2019"))
                         .firstPage("10")
                         .build();
+
+        LiteratureEntry literatureEntry = new LiteratureEntryBuilder().citation(literature).build();
 
         LiteratureStoreEntry storeEntry =
                 new LiteratureStoreEntryBuilder().literatureEntry(literatureEntry).build();
@@ -123,9 +136,9 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
-                    .resultMatcher(jsonPath("$.pubmedId", is(100)))
-                    .resultMatcher(jsonPath("$.authors", contains("The Author")))
-                    .resultMatcher(jsonPath("$.title", is("The Title")))
+                    .resultMatcher(jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.authors", contains("The Author")))
+                    .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .build();
         }
 
@@ -155,9 +168,9 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("id,title")
-                    .resultMatcher(jsonPath("$.pubmedId", is(100)))
-                    .resultMatcher(jsonPath("$.title", is("The Title")))
-                    .resultMatcher(jsonPath("$.authors").doesNotExist())
+                    .resultMatcher(jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.title", is("The Title")))
+                    .resultMatcher(jsonPath("$.citation.authors").doesNotExist())
                     .build();
         }
 
@@ -220,9 +233,11 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.pubmedId", is(100)))
-                                    .resultMatcher(jsonPath("$.authors", contains("The Author")))
-                                    .resultMatcher(jsonPath("$.title", is("The Title")))
+                                    .resultMatcher(
+                                            jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                                    .resultMatcher(
+                                            jsonPath("$.citation.authors", contains("The Author")))
+                                    .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

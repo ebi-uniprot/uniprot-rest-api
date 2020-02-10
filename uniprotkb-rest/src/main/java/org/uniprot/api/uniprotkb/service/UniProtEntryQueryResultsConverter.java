@@ -92,7 +92,7 @@ class UniProtEntryQueryResultsConverter {
                 return opEntry;
             }
             UniProtEntryBuilder builder = UniProtEntryBuilder.from(opEntry.get());
-            return Optional.of(builder.lineagesSet(taxEntry.getLineage()).build());
+            return Optional.of(builder.lineagesSet(taxEntry.getLineages()).build());
         } else return opEntry;
     }
 
@@ -110,7 +110,7 @@ class UniProtEntryQueryResultsConverter {
         EntryInactiveReason inactiveReason =
                 new EntryInactiveReasonBuilder()
                         .type(type)
-                        .mergeDemergeTo(mergeDemergeList)
+                        .mergeDemergeTosSet(mergeDemergeList)
                         .build();
 
         UniProtEntryBuilder entryBuilder =

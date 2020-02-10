@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
-import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.uniprot.UniProtReference;
@@ -19,11 +18,11 @@ import org.uniprot.core.util.Utils;
 @Builder
 public class PublicationEntry {
 
-    private LiteratureEntry literatureEntry;
+    private UniProtReference reference;
+
+    private LiteratureStatistics statistics;
 
     private LiteratureMappedReference literatureMappedReference;
-
-    private UniProtReference uniProtReference;
 
     private List<String> categories;
 
@@ -31,8 +30,8 @@ public class PublicationEntry {
 
     public boolean isLargeScale() {
         boolean result = false;
-        if (hasLiteratureEntry() && getLiteratureEntry().hasStatistics()) {
-            LiteratureStatistics stat = getLiteratureEntry().getStatistics();
+        if (hasStatistics()) {
+            LiteratureStatistics stat = getStatistics();
             long referencedProteins =
                     stat.getMappedProteinCount()
                             + stat.getReviewedProteinCount()
@@ -44,23 +43,23 @@ public class PublicationEntry {
         return result;
     }
 
-    public boolean hasLiteratureEntry() {
-        return getLiteratureEntry() != null;
+    public boolean hasStatistics() {
+        return getStatistics() != null;
     }
 
     public boolean hasLiteratureMappedReference() {
         return getLiteratureMappedReference() != null;
     }
 
-    public boolean hasUniProtReference() {
-        return getUniProtReference() != null;
+    public boolean hasReference() {
+        return getReference() != null;
     }
 
     public boolean hasCategories() {
-        return Utils.notNullOrEmpty(getCategories());
+        return Utils.notNullNotEmpty(getCategories());
     }
 
     public boolean hasPublicationSource() {
-        return Utils.notNullOrEmpty(publicationSource);
+        return Utils.notNullNotEmpty(publicationSource);
     }
 }

@@ -34,9 +34,9 @@ public class PublicationJsonMessageConverter extends JsonMessageConverter<Public
     }
 
     enum ResultFields implements ReturnField {
-        literatureEntry("literatureEntry"),
+        reference("reference"),
+        statistics("statistics"),
         literatureMappedReference("literatureMappedReference"),
-        uniProtReference("uniProtReference"),
         categories("categories"),
         publicationSource("publicationSource");
 

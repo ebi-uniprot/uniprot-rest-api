@@ -264,7 +264,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     protected Optional<String> getEntityRedirectId(UniProtEntry entity) {
         if (isInactiveAndMergedEntry(entity)) {
             return Optional.of(
-                    String.valueOf(entity.getInactiveReason().getMergeDemergeTo().get(0)));
+                    String.valueOf(entity.getInactiveReason().getMergeDemergeTos().get(0)));
         } else {
             return Optional.empty();
         }
@@ -277,7 +277,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                         .getInactiveReason()
                         .getInactiveReasonType()
                         .equals(InactiveReasonType.MERGED)
-                && Utils.notNullOrEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTo());
+                && Utils.notNullNotEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTos());
     }
 
     private void setPreviewInfo(UniProtKBRequest searchRequest, boolean preview) {

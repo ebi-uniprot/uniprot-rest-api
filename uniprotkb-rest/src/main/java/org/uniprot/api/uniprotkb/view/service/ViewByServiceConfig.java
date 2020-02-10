@@ -5,12 +5,12 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.core.cv.ec.ECRepo;
-import org.uniprot.core.cv.ec.ECRepoFactory;
-import org.uniprot.core.cv.keyword.KeywordService;
-import org.uniprot.core.cv.keyword.impl.KeywordServiceImpl;
-import org.uniprot.core.cv.pathway.UniPathwayService;
-import org.uniprot.core.cv.pathway.impl.UniPathwayServiceImpl;
+import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.ec.ECRepoFactory;
+import org.uniprot.cv.keyword.KeywordService;
+import org.uniprot.cv.keyword.impl.KeywordServiceImpl;
+import org.uniprot.cv.pathway.UniPathwayService;
+import org.uniprot.cv.pathway.impl.UniPathwayServiceImpl;
 
 @Configuration
 public class ViewByServiceConfig {

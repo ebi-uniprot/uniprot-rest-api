@@ -14,9 +14,9 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
-import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.CrossReference;
 import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseBuilder;
 
 class DiseaseOBOConverterTest {
     private static final String NOW = OBOFormatConstants.headerDateFormat().format(new Date());
@@ -65,11 +65,11 @@ class DiseaseOBOConverterTest {
                         .accession("DI-04860")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
-                        .alternativeNames(
+                        .alternativeNamesSet(
                                 Arrays.asList(
                                         "Zhu-Tokita-Takenouchi-Kim syndrome",
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
-                        .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
+                        .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
                         .build();
 
         // create another disease object
@@ -84,7 +84,7 @@ class DiseaseOBOConverterTest {
                         .accession("DI-03673")
                         .definition(
                                 "A metabolic disorder characterized by increased levels of 2-oxoadipate and 2-hydroxyadipate in the urine, and elevated 2-aminoadipate in the plasma. Patients can have mild to severe intellectual disability, muscular hypotonia, developmental delay, ataxia, and epilepsy. Most cases are asymptomatic.")
-                        .crossReferences(Arrays.asList(xref11, xref22, xref33))
+                        .crossReferencesSet(Arrays.asList(xref11, xref22, xref33))
                         .build();
 
         OBODoc oboDoc = new OBODoc();

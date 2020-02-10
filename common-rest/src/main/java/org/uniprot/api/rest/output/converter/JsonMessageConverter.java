@@ -109,7 +109,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
-        if (Utils.notNullOrEmpty(fields)) {
+        if (Utils.notNullNotEmpty(fields)) {
             Map<String, List<String>> filters = new HashMap<>();
             for (String field : fields.split(COMMA)) {
                 filters.put(field, Collections.emptyList());

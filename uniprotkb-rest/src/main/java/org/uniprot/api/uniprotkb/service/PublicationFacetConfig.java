@@ -39,7 +39,7 @@ public class PublicationFacetConfig extends FacetConfig {
 
     static List<Facet> getFacets(List<PublicationEntry> publications, String requestFacets) {
         List<Facet> facets = new ArrayList<>();
-        if (Utils.notNullOrEmpty(requestFacets)) {
+        if (Utils.notNullNotEmpty(requestFacets)) {
             if (requestFacets.contains(PUBLICATION_FACETS.source.name())) {
                 Facet source =
                         Facet.builder()
@@ -78,10 +78,11 @@ public class PublicationFacetConfig extends FacetConfig {
 
     static void applyFacetFilters(List<PublicationEntry> publications, PublicationRequest request) {
         String query = request.getQuery();
-        if (Utils.notNullOrEmpty(query)) {
+        if (Utils.notNullNotEmpty(query)) {
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.source.name())) {
                 String value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.source.name());
-                publications.removeIf(entry -> !entry.getPublicationSource().equals(value));
+                publications.removeIf(
+                        entry -> !entry.getPublicationSource().equalsIgnoreCase(value.trim()));
             }
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.category.name())) {
                 String value =
@@ -91,7 +92,7 @@ public class PublicationFacetConfig extends FacetConfig {
                                 entry.getCategories().stream()
                                         .noneMatch(
                                                 cat -> {
-                                                    return cat.equalsIgnoreCase(value);
+                                                    return cat.equalsIgnoreCase(value.trim());
                                                 }));
             }
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.scale.name())) {

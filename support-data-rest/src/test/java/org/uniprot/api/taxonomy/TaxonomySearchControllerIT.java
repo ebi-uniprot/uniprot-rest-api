@@ -146,7 +146,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                         .scientificName("scientific" + taxId)
                         .mnemonic("mnemonic" + taxId)
                         .commonName("common" + taxId)
-                        .addSynonyms("synonym" + taxId)
+                        .synonymsAdd("synonym" + taxId)
                         .parentId(taxId - 1)
                         .build();
 
