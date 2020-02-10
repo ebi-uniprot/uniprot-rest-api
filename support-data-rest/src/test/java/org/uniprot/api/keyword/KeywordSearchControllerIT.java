@@ -27,10 +27,10 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.core.cv.keyword.KeywordEntry;
+import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
-import org.uniprot.cv.keyword.KeywordEntry;
-import org.uniprot.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;

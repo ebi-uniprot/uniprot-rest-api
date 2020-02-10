@@ -26,7 +26,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.cv.keyword.KeywordEntry;
+import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.search.field.KeywordField;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;

@@ -3,9 +3,9 @@ package org.uniprot.api.subcell.output;
 import java.util.Arrays;
 import java.util.List;
 
+import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.util.Utils;
-import org.uniprot.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**
