@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.cv.pathway.UniPathway;
+import org.uniprot.core.cv.pathway.UniPathway;
 import org.uniprot.cv.pathway.UniPathwayService;
 
 import com.google.common.base.Strings;

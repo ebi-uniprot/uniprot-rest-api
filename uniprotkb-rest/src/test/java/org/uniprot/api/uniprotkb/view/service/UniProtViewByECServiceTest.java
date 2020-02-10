@@ -19,9 +19,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.cv.ec.EC;
+import org.uniprot.core.cv.ec.EC;
+import org.uniprot.core.cv.ec.ECImpl;
 import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.ec.impl.ECImpl;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByECServiceTest {

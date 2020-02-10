@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.uniprot.core.cv.keyword.impl.GeneOntologyImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
-import org.uniprot.cv.keyword.impl.GeneOntologyImpl;
-import org.uniprot.cv.subcell.SubcellLocationCategory;
-import org.uniprot.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.cv.subcell.impl.SubcellularLocationEntryImpl;
-import org.uniprot.cv.subcell.impl.SubcellularLocationStatisticsImpl;
+import org.uniprot.core.cv.subcell.SubcellLocationCategory;
+import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
+import org.uniprot.core.cv.subcell.impl.SubcellularLocationStatisticsImpl;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**

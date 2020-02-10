@@ -13,7 +13,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.cv.keyword.KeywordEntry;
+import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.cv.keyword.KeywordService;
 
 import com.google.common.base.Strings;

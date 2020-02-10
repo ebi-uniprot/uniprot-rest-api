@@ -12,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.uniprot.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.cv.subcell.SubcellularLocationFileReader;
 
 /**

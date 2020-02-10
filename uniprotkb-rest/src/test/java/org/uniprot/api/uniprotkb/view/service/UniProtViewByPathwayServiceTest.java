@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.cv.pathway.UniPathway;
+import org.uniprot.core.cv.pathway.UniPathway;
 import org.uniprot.cv.pathway.UniPathwayService;
 
 @ExtendWith(MockitoExtension.class)
