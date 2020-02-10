@@ -1,25 +1,24 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.DefaultSearchHandler;
 import org.uniprot.store.search.document.Document;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -32,7 +31,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     private AbstractSolrSortClause solrSortClause;
-    private DefaultSearchHandler defaultSearchHandler;
+    private QueryBoosts queryBoosts;
     private FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
@@ -48,12 +47,12 @@ public abstract class BasicSearchService<D extends Document, R> {
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler,
+            QueryBoosts queryBoosts,
             FacetConfig facetConfig) {
         this.repository = repository;
         this.entryConverter = entryConverter;
         this.solrSortClause = solrSortClause;
-        this.defaultSearchHandler = defaultSearchHandler;
+        this.queryBoosts = queryBoosts;
         this.facetConfig = facetConfig;
     }
 
@@ -151,8 +150,8 @@ public abstract class BasicSearchService<D extends Document, R> {
                         request,
                         this.facetConfig,
                         this.solrSortClause,
-                        this.defaultSearchHandler,
-                        includeFacets);
+                        includeFacets,
+                        this.queryBoosts);
 
         return builder.build();
     }
@@ -161,19 +160,15 @@ public abstract class BasicSearchService<D extends Document, R> {
             SearchRequest request,
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
-            DefaultSearchHandler defaultSearchHandler,
-            boolean includeFacets) {
+            boolean includeFacets,
+            QueryBoosts queryBoosts) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
 
         String requestedQuery = request.getQuery();
 
         boolean hasScore = false;
-        if (defaultSearchHandler != null && defaultSearchHandler.hasDefaultSearch(requestedQuery)) {
-            requestedQuery = defaultSearchHandler.optimiseDefaultSearch(requestedQuery);
-            hasScore = true;
-            requestBuilder.defaultQueryOperator(Query.Operator.OR);
-        }
+
         requestBuilder.query(requestedQuery);
 
         if (solrSortClause != null) {
@@ -199,6 +194,8 @@ public abstract class BasicSearchService<D extends Document, R> {
         } else { // total number of rows requested by the client
             requestBuilder.totalRows(requestedSize);
         }
+
+        requestBuilder.queryBoosts(queryBoosts);
 
         return requestBuilder;
     }
