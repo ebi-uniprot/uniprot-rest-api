@@ -17,7 +17,7 @@
 
 	<properties>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-		<openapi-maven-plugin.version>0.2</openapi-maven-plugin.version>
+		<openapi-maven-plugin.version>master</openapi-maven-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -36,6 +36,17 @@
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
 			<version>${dropwizard.metrics.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>uniprot-config</artifactId>
+			<version>${project.parent.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>org.json</artifactId>
+					<groupId>json</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -184,32 +195,32 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>openapi</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>uk.ac.ebi.uniprot</groupId>
-						<artifactId>openapi-maven-plugin</artifactId>
-						<version>${openapi-maven-plugin.version}</version>
-						<configuration>
-							<packageLocations>org.uniprot.api.keyword</packageLocations>
-							<openApiDirectory>generated/swagger</openApiDirectory>
-							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>compile</phase>
-								<goals>
-									<goal>oas-generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+	<!-- <profiles> -->
+	<!-- <profile> -->
+	<!-- <id>openapi</id> -->
+	<!-- <build> -->
+	<!-- <plugins> -->
+	<!-- <plugin> -->
+	<!-- <groupId>uk.ac.ebi.uniprot</groupId> -->
+	<!-- <artifactId>openapi-maven-plugin</artifactId> -->
+	<!-- <version>${openapi-maven-plugin.version}</version> -->
+	<!-- <configuration> -->
+	<!-- <packageLocations>org.uniprot.api.keyword</packageLocations> -->
+	<!-- <openApiDirectory>generated/swagger</openApiDirectory> -->
+	<!-- <openApiFileName>uniprot-openapi3.yaml</openApiFileName> -->
+	<!-- <serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl> -->
+	<!-- </configuration> -->
+	<!-- <executions> -->
+	<!-- <execution> -->
+	<!-- <phase>compile</phase> -->
+	<!-- <goals> -->
+	<!-- <goal>oas-generate</goal> -->
+	<!-- </goals> -->
+	<!-- </execution> -->
+	<!-- </executions> -->
+	<!-- </plugin> -->
+	<!-- </plugins> -->
+	<!-- </build> -->
+	<!-- </profile> -->
+	<!-- </profiles> -->
 </project>

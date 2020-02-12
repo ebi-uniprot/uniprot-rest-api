@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.configure.service.UniProtConfigureService;
+import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
@@ -27,7 +28,7 @@ public class UniProtConfigureController {
     }
 
     @GetMapping("/search-terms")
-    public List<org.uniprot.store.search.domain2.SearchItem> getUniProtSearchTerms2() {
+    public List<AdvanceSearchTerm> getUniProtSearchTerms2() {
         return service.getUniProtSearchItems2();
     }
 
