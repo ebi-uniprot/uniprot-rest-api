@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.uniprot.core.Statistics;
+import org.uniprot.core.builder.StatisticsBuilder;
 import org.uniprot.core.cv.keyword.impl.GeneOntologyImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.cv.subcell.SubcellLocationCategory;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
-import org.uniprot.core.cv.subcell.impl.SubcellularLocationStatisticsImpl;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**
@@ -70,6 +71,8 @@ class SubcellularLocationEntryFilterTest {
     }
 
     private SubcellularLocationEntry getCompleteSubcellularLocationEntry(boolean hasChild) {
+        Statistics statistics =
+                new StatisticsBuilder().reviewedProteinCount(10).unreviewedProteinCount(20).build();
         SubcellularLocationEntryImpl entry = new SubcellularLocationEntryImpl();
         entry.setAccession("accession");
         entry.setContent("content");
@@ -80,7 +83,7 @@ class SubcellularLocationEntryFilterTest {
         entry.setLinks(Collections.singletonList("link"));
         entry.setNote("note");
         entry.setReferences(Collections.singletonList("synonym"));
-        entry.setStatistics(new SubcellularLocationStatisticsImpl(10L, 20L));
+        entry.setStatistics(statistics);
         entry.setSynonyms(Collections.singletonList("synonym"));
         entry.setCategory(SubcellLocationCategory.LOCATION);
         if (hasChild) {
