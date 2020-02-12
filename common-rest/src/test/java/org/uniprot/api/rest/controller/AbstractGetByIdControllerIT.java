@@ -134,8 +134,7 @@ public abstract class AbstractGetByIdControllerIT {
         }
     }
 
-    @Test
-    @Disabled // @lgonzales: TRM-23571
+    @Test // @lgonzales: TRM-23571
     void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
         assertThat(idParameter, notNullValue());
         if (Utils.notNullOrEmpty(idParameter.getFields())) {

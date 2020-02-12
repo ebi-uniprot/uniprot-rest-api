@@ -2,11 +2,15 @@ package org.uniprot.api.rest.output.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.github.bohnman.squiggly.context.provider.SimpleSquigglyContextProvider;
+import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
+import com.github.bohnman.squiggly.parser.SquigglyParser;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
@@ -22,21 +26,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
+    private static final String EXCLUDE_FILTER_ID = "dynamicExclude";
     private static final String COMMA = "\\s*,\\s*";
     private final ObjectMapper objectMapper;
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
-    private List<ReturnField> allFields;
-    private JsonResponseFieldProjector fieldProjector;
 
     public JsonMessageConverter(
             ObjectMapper objectMapper,
-            Class<T> messageConverterEntryClass,
-            List<ReturnField> allFields) {
+            Class<T> messageConverterEntryClass) {
         super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
-        this.allFields = allFields;
-        this.fieldProjector = new JsonResponseFieldProjector();
     }
 
     @Override
@@ -78,7 +78,22 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     @Override
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
         JsonGenerator generator = tlJsonGenerator.get();
-        generator.writeObject(projectEntryFields(entity));
+        ObjectWriter objectWriter = objectMapper.writer();
+        Set<String> fieldFilters = getFilters();
+        if(Utils.notNullOrEmpty(fieldFilters)) {
+            FilterProvider filters = configFilters(fieldFilters);
+            objectWriter = objectWriter.with(filters);
+        }
+        objectWriter.writeValue(generator, entity);
+    }
+
+    private Set<String> getFilters() {
+        Set<String> fieldFilters = getThreadLocalFilterMap().values()
+                .stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
+        fieldFilters.addAll(getThreadLocalFilterMap().keySet());
+        return fieldFilters;
     }
 
     @Override
@@ -96,16 +111,6 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
     protected Map<String, List<String>> getThreadLocalFilterMap() {
         return tlFilters.get();
-    }
-
-    // returns only the required fields asked by the client or all fields in T.ResultFields enum
-    protected Map<String, Object> projectEntryFields(T entity) {
-
-        Map<String, List<String>> filterFieldMap = getThreadLocalFilterMap();
-
-        Map<String, Object> result =
-                this.fieldProjector.project(entity, filterFieldMap, this.allFields);
-        return result;
     }
 
     protected Map<String, List<String>> getFilterFieldMap(String fields) {
@@ -127,4 +132,19 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             throw new StopStreamException("Failed to write Facet JSON object", e);
         }
     }
+
+    private FilterProvider configFilters(Set<String> fields) {
+        SimpleFilterProvider filterProvider = null;
+        if(Utils.notNullOrEmpty(fields)) {
+            String fieldRequest = String.join(",", fields);
+            SquigglyPropertyFilter filter =
+                    new SquigglyPropertyFilter(
+                            new SimpleSquigglyContextProvider(new SquigglyParser(), fieldRequest));
+
+            filterProvider = new SimpleFilterProvider()
+                    .addFilter(SquigglyPropertyFilter.FILTER_ID, filter);
+        }
+        return filterProvider;
+    }
+
 }

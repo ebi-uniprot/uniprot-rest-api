@@ -91,43 +91,37 @@ public class MessageConverterConfig {
                 JsonMessageConverter<LiteratureEntry> litJsonConverter =
                         new JsonMessageConverter<>(
                                 LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
-                                LiteratureEntry.class,
-                                Arrays.asList(LiteratureField.ResultFields.values()));
+                                LiteratureEntry.class);
                 converters.add(0, litJsonConverter);
 
                 JsonMessageConverter<KeywordEntry> keywordJsonConverter =
                         new JsonMessageConverter<>(
                                 KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
-                                KeywordEntry.class,
-                                Arrays.asList(KeywordField.ResultFields.values()));
+                                KeywordEntry.class);
                 converters.add(0, keywordJsonConverter);
 
                 JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
                         new JsonMessageConverter<>(
                                 TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
-                                TaxonomyEntry.class,
-                                Arrays.asList(TaxonomyField.ResultFields.values()));
+                                TaxonomyEntry.class);
                 converters.add(0, taxonomyJsonConverter);
 
                 JsonMessageConverter<SubcellularLocationEntry> subcellJsonConverter =
                         new JsonMessageConverter<>(
                                 SubcellularLocationJsonConfig.getInstance().getSimpleObjectMapper(),
-                                SubcellularLocationEntry.class,
-                                Arrays.asList(SubcellularLocationField.ResultFields.values()));
+                                SubcellularLocationEntry.class);
                 converters.add(0, subcellJsonConverter);
 
                 JsonMessageConverter<Disease> diseaseJsonConverter =
                         new JsonMessageConverter(
                                 DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
-                                Disease.class,
-                                Arrays.asList(DiseaseField.ResultFields.values()));
+                                Disease.class);
                 converters.add(0, diseaseJsonConverter);
 
                 JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
                         new JsonMessageConverter<>(
                                 CrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
-                                CrossRefEntry.class,
-                                Arrays.asList(CrossRefField.ResultFields.values()));
+                                CrossRefEntry.class);
                 converters.add(0, xrefJsonConverter);
             }
         };

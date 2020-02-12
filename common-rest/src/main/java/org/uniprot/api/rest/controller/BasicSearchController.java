@@ -64,7 +64,8 @@ public abstract class BasicSearchController<T> {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(Stream.of(getEntityId(entity)));
         } else {
-            context.setEntities(Stream.of(entity));
+            Stream<T> stream = Stream.of(filterEntityLists(entity, fields));
+            context.setEntities(stream);
         }
 
         ResponseEntity.BodyBuilder responseBuilder =
@@ -99,12 +100,26 @@ public abstract class BasicSearchController<T> {
                             .collect(Collectors.toList());
             context.setEntityIds(accList.stream());
         } else {
-            context.setEntities(result.getContent().stream());
+            Stream<T> stream = result.getContent().stream()
+                    .map(entity -> filterEntityLists(entity, fields));
+            context.setEntities(stream);
         }
         this.eventPublisher.publishEvent(
                 new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
         return ResponseEntity.ok().headers(createHttpSearchHeader(contentType)).body(context);
     }
+
+    /**
+     * By Default we do not filter the Entity Lists, But we have an use case in
+     * UniprotKb (for now) that will need to filter comments, references and features.
+     * @param entity response entity
+     * @param fields search fields from request
+     * @return by default it returns the same entity
+     */
+    protected T filterEntityLists(T entity, String fields){
+        return entity;
+    }
+
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
             Stream<T> result,
@@ -119,7 +134,8 @@ public abstract class BasicSearchController<T> {
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(result.map(this::getEntityId));
         } else {
-            context.setEntities(result);
+            Stream<T> stream = result.map(entity -> filterEntityLists(entity,fields));
+            context.setEntities(stream);
         }
         return getDeferredResultResponseEntity(request, context);
     }

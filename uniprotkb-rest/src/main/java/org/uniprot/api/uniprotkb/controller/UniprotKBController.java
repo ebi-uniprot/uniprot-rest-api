@@ -6,7 +6,9 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
 import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,11 +28,16 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.UniProtEntryFilters;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprot.InactiveReasonType;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
+import org.uniprot.core.uniprot.comment.Comment;
+import org.uniprot.core.uniprot.feature.Feature;
+import org.uniprot.core.uniprot.xdb.UniProtDBCrossReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
@@ -258,6 +265,35 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     @Override
     protected String getEntityId(UniProtEntry entity) {
         return entity.getPrimaryAccession().getValue();
+    }
+
+    @Override
+    protected UniProtEntry filterEntityLists(UniProtEntry entity, String fields){
+        UniProtEntryBuilder builder = UniProtEntryBuilder.from(entity);
+        if (((List<?>) fieldValue).get(0)
+                instanceof Comment) { // check one to decide the type of list items
+            Predicate<Comment> filter =
+                    UniProtEntryFilters.createCommentFilter(neededFieldValues);
+            List<Comment> comments = (List<Comment>) fieldValue;
+            comments.removeIf(comment -> !filter.test(comment));
+            return comments;
+        } else if (((List<?>) fieldValue).get(0) instanceof Feature) { // feature
+            Predicate<Feature> filter =
+                    UniProtEntryFilters.createFeatureFilter(neededFieldValues);
+            List<Feature> features = (List<Feature>) fieldValue;
+            features.removeIf(feature -> !filter.test(feature));
+            return features;
+
+        } else if (((List<?>) fieldValue).get(0)
+                instanceof UniProtDBCrossReference) { // cross ref
+            Predicate<UniProtDBCrossReference> filter =
+                    UniProtEntryFilters.createDbReferenceFilter(neededFieldValues);
+            List<UniProtDBCrossReference> crossReferences =
+                    (List<UniProtDBCrossReference>) fieldValue;
+            crossReferences.removeIf(xref -> !filter.test(xref));
+            return crossReferences;
+        }
+        return builder.build();
     }
 
     @Override

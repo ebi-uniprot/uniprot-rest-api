@@ -146,29 +146,7 @@ public class JsonResponseFieldProjector {
                 && fieldValue instanceof List<?>
                 && Utils.notNullOrEmpty((List<?>) fieldValue)) {
             // comment
-            if (((List<?>) fieldValue).get(0)
-                    instanceof Comment) { // check one to decide the type of list items
-                Predicate<Comment> filter =
-                        UniProtEntryFilters.createCommentFilter(neededFieldValues);
-                List<Comment> comments = (List<Comment>) fieldValue;
-                comments.removeIf(comment -> !filter.test(comment));
-                return comments;
-            } else if (((List<?>) fieldValue).get(0) instanceof Feature) { // feature
-                Predicate<Feature> filter =
-                        UniProtEntryFilters.createFeatureFilter(neededFieldValues);
-                List<Feature> features = (List<Feature>) fieldValue;
-                features.removeIf(feature -> !filter.test(feature));
-                return features;
 
-            } else if (((List<?>) fieldValue).get(0)
-                    instanceof UniProtDBCrossReference) { // cross ref
-                Predicate<UniProtDBCrossReference> filter =
-                        UniProtEntryFilters.createDbReferenceFilter(neededFieldValues);
-                List<UniProtDBCrossReference> crossReferences =
-                        (List<UniProtDBCrossReference>) fieldValue;
-                crossReferences.removeIf(xref -> !filter.test(xref));
-                return crossReferences;
-            }
         }
 
         return fieldValue;
