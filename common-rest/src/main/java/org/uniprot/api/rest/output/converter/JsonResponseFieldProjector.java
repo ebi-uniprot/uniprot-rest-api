@@ -141,10 +141,10 @@ public class JsonResponseFieldProjector {
     }
 
     private Object getObjectsWithValues(Object fieldValue, List<String> neededFieldValues) {
-        if (Utils.notNullOrEmpty(neededFieldValues)
+        if (Utils.notNullNotEmpty(neededFieldValues)
                 && fieldValue != null
                 && fieldValue instanceof List<?>
-                && Utils.notNullOrEmpty((List<?>) fieldValue)) {
+                && Utils.notNullNotEmpty((List<?>) fieldValue)) {
             // comment
             if (((List<?>) fieldValue).get(0)
                     instanceof Comment) { // check one to decide the type of list items

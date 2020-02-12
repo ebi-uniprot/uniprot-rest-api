@@ -28,9 +28,9 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.CrossReference;
 import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseBuilder;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -94,12 +94,12 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .acronym("ZTTKS")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
-                        .alternativeNames(
+                        .alternativeNamesSet(
                                 Arrays.asList(
                                         "Zhu-Tokita-Takenouchi-Kim syndrome",
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
-                        .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
-                        .keywords(keyword)
+                        .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
+                        .keywordsAdd(keyword)
                         .reviewedProteinCount(1L)
                         .unreviewedProteinCount(0L)
                         .build();

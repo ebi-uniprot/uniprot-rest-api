@@ -24,7 +24,7 @@ public class KeywordEntryFilter {
 
     public static KeywordEntry filterEntry(KeywordEntry entry, List<String> fields) {
         KeywordEntryImpl entryImpl = (KeywordEntryImpl) entry;
-        if (Utils.notNullOrEmpty(fields)) {
+        if (Utils.notNullNotEmpty(fields)) {
             for (KeywordField.ResultFields field : KeywordField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {
                     remove(entryImpl, field);

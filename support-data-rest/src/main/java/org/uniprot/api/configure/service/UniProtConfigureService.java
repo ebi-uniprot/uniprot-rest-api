@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
-import org.uniprot.core.cv.xdb.UniProtXDbTypes;
+import org.uniprot.cv.xdb.UniProtXDbTypes;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
 import org.uniprot.store.search.domain2.UniProtKBSearchItems;

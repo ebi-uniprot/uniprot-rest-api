@@ -247,10 +247,10 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
                 .uniParcId(new UniParcIdBuilder(getName(UPI_PREF, i)).build())
-                .databaseCrossReferences(xrefs)
+                .databaseCrossReferencesSet(xrefs)
                 .sequence(sequence)
-                .sequenceFeatures(seqFeatures)
-                .taxonomies(taxonomies)
+                .sequenceFeaturesSet(seqFeatures)
+                .taxonomiesSet(taxonomies)
                 .build();
     }
 
@@ -273,7 +273,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         .interproGroup(domain)
                         .signatureDbType(SignatureDbType.PFAM)
                         .signatureDbId(getName("SIG0000", i))
-                        .locations(locations)
+                        .locationsSet(locations)
                         .build();
         SequenceFeature sf3 =
                 SequenceFeatureBuilder.from(sf).signatureDbType(SignatureDbType.PROSITE).build();
@@ -296,7 +296,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         .active(true)
                         .created(LocalDate.of(2017, 5, 17))
                         .lastUpdated(LocalDate.of(2017, 2, 27))
-                        .properties(properties)
+                        .propertiesSet(properties)
                         .build();
 
         List<Property> properties2 = new ArrayList<>();
@@ -315,7 +315,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         .active(true)
                         .created(LocalDate.of(2017, 2, 12))
                         .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .properties(properties2)
+                        .propertiesSet(properties2)
                         .build();
 
         return Arrays.asList(xref, xref2);

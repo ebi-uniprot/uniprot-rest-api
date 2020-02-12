@@ -24,7 +24,7 @@ public class TaxonomyEntryFilter {
     }
 
     public static TaxonomyEntry filterEntry(TaxonomyEntry entry, List<String> fields) {
-        if (Utils.notNullOrEmpty(fields)) {
+        if (Utils.notNullNotEmpty(fields)) {
             TaxonomyEntryBuilder builder = TaxonomyEntryBuilder.from(entry);
             builder.hidden(null);
             builder.active(null);
@@ -56,25 +56,25 @@ public class TaxonomyEntryFilter {
                 builder.commonName(null);
                 break;
             case synonym:
-                builder.synonyms(null);
+                builder.synonymsSet(null);
                 break;
             case other_names:
-                builder.otherNames(null);
+                builder.otherNamesSet(null);
                 break;
             case rank:
                 builder.rank(null);
                 break;
             case lineage:
-                builder.lineage(null);
+                builder.lineagesSet(null);
                 break;
             case strain:
-                builder.strains(null);
+                builder.strainsSet(null);
                 break;
             case host:
-                builder.hosts(null);
+                builder.hostsSet(null);
                 break;
             case link:
-                builder.links(null);
+                builder.linksSet(null);
                 break;
             case statistics:
             case reviewed:

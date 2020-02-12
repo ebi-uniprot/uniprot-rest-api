@@ -91,7 +91,7 @@ class LiteratureEntryFilterTest {
         assertNull(filterEntry.getStatistics());
         assertNull(filteredLiterature.getJournal());
         assertTrue(filteredLiterature.getAuthors().isEmpty());
-        assertTrue(filteredLiterature.getAuthoringGroup().isEmpty());
+        assertTrue(filteredLiterature.getAuthoringGroups().isEmpty());
     }
 
     private LiteratureEntry createCompleteLiteratureEntry() {
@@ -121,10 +121,10 @@ class LiteratureEntryFilterTest {
                 .lastPage("last page")
                 .volume("the volume")
                 .journalName("The journal name")
-                .addAuthor("John")
-                .addAuthorGroup("the author group")
-                .addCitationXrefs(pubmed)
-                .addCitationXrefs(doi)
+                .authorsAdd("John")
+                .authoringGroupsAdd("the author group")
+                .citationXrefsAdd(pubmed)
+                .citationXrefsAdd(doi)
                 .publicationDate("2015-MAY")
                 .title("the big title")
                 .build();

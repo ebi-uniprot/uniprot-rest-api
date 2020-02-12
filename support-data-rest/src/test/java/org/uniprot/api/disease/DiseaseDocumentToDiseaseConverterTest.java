@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.core.builder.DiseaseBuilder;
 import org.uniprot.core.cv.disease.CrossReference;
 import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseBuilder;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -52,8 +52,8 @@ class DiseaseDocumentToDiseaseConverterTest {
 
         DiseaseBuilder builder = new DiseaseBuilder();
         builder.id(id).accession(accession).acronym(acronym).definition(def);
-        builder.alternativeNames(altNames).crossReferences(cr);
-        builder.keywords(keyword)
+        builder.alternativeNamesSet(altNames).crossReferencesAdd(cr);
+        builder.keywordsAdd(keyword)
                 .reviewedProteinCount(reviwedProteinCount)
                 .unreviewedProteinCount(unreviwedProteinCount);
 

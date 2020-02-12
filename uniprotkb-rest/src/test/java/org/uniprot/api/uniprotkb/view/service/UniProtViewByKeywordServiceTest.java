@@ -18,9 +18,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.KeywordService;
 import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
+import org.uniprot.cv.keyword.KeywordService;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByKeywordServiceTest {

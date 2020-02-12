@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.KeywordService;
+import org.uniprot.cv.keyword.KeywordService;
 
 import com.google.common.base.Strings;
 

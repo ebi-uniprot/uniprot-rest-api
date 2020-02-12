@@ -56,10 +56,10 @@ public class PublicationEntry {
     }
 
     public boolean hasCategories() {
-        return Utils.notNullOrEmpty(getCategories());
+        return Utils.notNullNotEmpty(getCategories());
     }
 
     public boolean hasPublicationSource() {
-        return Utils.notNullOrEmpty(publicationSource);
+        return Utils.notNullNotEmpty(publicationSource);
     }
 }
