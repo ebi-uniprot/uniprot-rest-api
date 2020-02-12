@@ -34,14 +34,14 @@ public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamR
             sortResultMatcher =
                     result ->
                             assertThat(
-                                    "Disease TSV accession not in order",
+                                    "DiseaseEntry TSV accession not in order",
                                     getAccessionsFromTSV(result.getResponse().getContentAsString()),
                                     equalTo(sortedAccessions));
         } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
             sortResultMatcher =
                     result ->
                             assertThat(
-                                    "Disease List accession not in order",
+                                    "DiseaseEntry List accession not in order",
                                     Arrays.asList(
                                             result.getResponse().getContentAsString().split("\n")),
                                     equalTo(sortedAccessions));
@@ -49,14 +49,14 @@ public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamR
             sortResultMatcher =
                     result ->
                             assertThat(
-                                    "Disease OBO accession not in order",
+                                    "DiseaseEntry OBO accession not in order",
                                     getAccessionsFromOBO(result.getResponse().getContentAsString()),
                                     equalTo(sortedAccessions));
         } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
             sortResultMatcher =
                     result ->
                             assertThat(
-                                    "Disease Excel accession not in order",
+                                    "DiseaseEntry Excel accession not in order",
                                     XLS_ACCESSIONS,
                                     equalTo(sortedAccessions));
         }
@@ -94,7 +94,7 @@ public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamR
                 } else {
                     assertThat(
                             headerList.get(i) + " is null", !cell.getStringCellValue().isEmpty());
-                    if (i == headerList.indexOf("Disease ID")) { // Disease ID field
+                    if (i == headerList.indexOf("DiseaseEntry ID")) { // DiseaseEntry ID field
                         XLS_ACCESSIONS.add(cell.getStringCellValue());
                     }
                     i++;
@@ -104,7 +104,8 @@ public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamR
         }
         assertThat(
                 "Header of excel file doesn't match",
-                headerList.equals(Arrays.asList("Name", "Disease ID", "Mnemonic", "Description")));
+                headerList.equals(
+                        Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description")));
     }
 
     private DownloadParamAndResult getDownloadDefaultParamAndResult(
@@ -131,11 +132,11 @@ public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamR
             resultMatchers.add(
                     result ->
                             assertThat(
-                                    "Disease TSV header do not match",
+                                    "DiseaseEntry TSV header do not match",
                                     result.getResponse()
                                             .getContentAsString()
                                             .startsWith(
-                                                    "Name\tDisease ID\tMnemonic\tDescription")));
+                                                    "Name\tDiseaseEntry ID\tMnemonic\tDescription")));
         } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
             addListResultMatcher(resultMatchers, expectedEntryCount);
         } else if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {

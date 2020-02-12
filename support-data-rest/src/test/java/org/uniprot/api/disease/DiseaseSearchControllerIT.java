@@ -25,9 +25,10 @@ import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
-import org.uniprot.core.cv.disease.DiseaseBuilder;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -138,17 +139,20 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     private void saveEntry(String accession, long suffix) {
-        DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
+        DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation" + suffix, "KW-0991" + suffix);
-        CrossReference xref1 =
-                new CrossReference(
+        DiseaseCrossReference xref1 =
+                new DiseaseCrossReferenceImpl(
                         "MIM" + suffix,
                         "617140" + suffix,
                         Collections.singletonList("phenotype" + suffix));
-        CrossReference xref2 = new CrossReference("MedGen" + suffix, "CN238690" + suffix);
-        CrossReference xref3 = new CrossReference("MeSH" + suffix, "D000015" + suffix);
-        CrossReference xref4 = new CrossReference("MeSH" + suffix, "D008607" + suffix);
-        Disease diseaseEntry =
+        DiseaseCrossReference xref2 =
+                new DiseaseCrossReferenceImpl("MedGen" + suffix, "CN238690" + suffix);
+        DiseaseCrossReference xref3 =
+                new DiseaseCrossReferenceImpl("MeSH" + suffix, "D000015" + suffix);
+        DiseaseCrossReference xref4 =
+                new DiseaseCrossReferenceImpl("MeSH" + suffix, "D008607" + suffix);
+        DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .id("ZTTK syndrome" + suffix)
                         .accession(accession)
@@ -199,12 +203,12 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
-    private ByteBuffer getDiseaseBinary(Disease entry) {
+    private ByteBuffer getDiseaseBinary(DiseaseEntry entry) {
         try {
             return ByteBuffer.wrap(
                     DiseaseJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse Disease entry to binary json: ", e);
+            throw new RuntimeException("Unable to parse DiseaseEntry entry to binary json: ", e);
         }
     }
 

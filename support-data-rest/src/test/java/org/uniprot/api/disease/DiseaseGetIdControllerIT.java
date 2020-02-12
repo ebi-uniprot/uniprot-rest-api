@@ -28,9 +28,10 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
-import org.uniprot.core.cv.disease.DiseaseBuilder;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -80,14 +81,15 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
 
-        DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
+        DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
-        CrossReference xref1 =
-                new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
-        CrossReference xref2 = new CrossReference("MedGen", "CN238690");
-        CrossReference xref3 = new CrossReference("MeSH", "D000015");
-        CrossReference xref4 = new CrossReference("MeSH", "D008607");
-        Disease diseaseEntry =
+        DiseaseCrossReference xref1 =
+                new DiseaseCrossReferenceImpl(
+                        "MIM", "617140", Collections.singletonList("phenotype"));
+        DiseaseCrossReference xref2 = new DiseaseCrossReferenceImpl("MedGen", "CN238690");
+        DiseaseCrossReference xref3 = new DiseaseCrossReferenceImpl("MeSH", "D000015");
+        DiseaseCrossReference xref4 = new DiseaseCrossReferenceImpl("MeSH", "D008607");
+        DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .id("ZTTK syndrome")
                         .accession(ACCESSION)
@@ -138,12 +140,12 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
-    private ByteBuffer getDiseaseBinary(Disease entry) {
+    private ByteBuffer getDiseaseBinary(DiseaseEntry entry) {
         try {
             return ByteBuffer.wrap(
                     DiseaseJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse Disease to binary json: ", e);
+            throw new RuntimeException("Unable to parse DiseaseEntry to binary json: ", e);
         }
     }
 
@@ -311,7 +313,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Name\tDisease ID\tMnemonic\tDescription")))
+                                                                    "Name\tDiseaseEntry ID\tMnemonic\tDescription")))
                                     .resultMatcher(
                                             content()
                                                     .string(

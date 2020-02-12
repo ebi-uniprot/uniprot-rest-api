@@ -10,9 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
-import org.uniprot.core.cv.disease.DiseaseBuilder;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -31,7 +32,7 @@ class DiseaseDocumentToDiseaseConverterTest {
     @Test
     void shouldConvertDiseaseDocToDisease() throws JsonProcessingException {
         // create a disease object
-        String id = "Sample Disease";
+        String id = "Sample DiseaseEntry";
         String accession = "DI-12345";
         String acronym = "SAMPLE-DIS";
         String def = "This is sample definition.";
@@ -43,21 +44,21 @@ class DiseaseDocumentToDiseaseConverterTest {
         List<String> props = Arrays.asList("prop1", "prop2", "prop3");
         String xrefId = "XREF-123";
         String databaseType = "SAMPLE_TYPE";
-        CrossReference cr = new CrossReference(databaseType, xrefId, props);
+        DiseaseCrossReference cr = new DiseaseCrossReferenceImpl(databaseType, xrefId, props);
 
         // keyword
         String kId = "Sample Keyword";
         String kwAC = "KW-1234";
         Keyword keyword = new KeywordImpl(kId, kwAC);
 
-        DiseaseBuilder builder = new DiseaseBuilder();
+        DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
         builder.id(id).accession(accession).acronym(acronym).definition(def);
         builder.alternativeNamesSet(altNames).crossReferencesAdd(cr);
         builder.keywordsAdd(keyword)
                 .reviewedProteinCount(reviwedProteinCount)
                 .unreviewedProteinCount(unreviwedProteinCount);
 
-        Disease disease = builder.build();
+        DiseaseEntry disease = builder.build();
 
         // convert disease to object
         byte[] diseaseObj = this.diseaseObjectMapper.writeValueAsBytes(disease);
@@ -67,7 +68,7 @@ class DiseaseDocumentToDiseaseConverterTest {
         docBuilder.diseaseObj(ByteBuffer.wrap(diseaseObj));
 
         DiseaseDocument diseaseDocument = docBuilder.build();
-        Disease convertedDisease = this.toDiseaseConverter.apply(diseaseDocument);
+        DiseaseEntry convertedDisease = this.toDiseaseConverter.apply(diseaseDocument);
 
         // verify the result
         Assertions.assertEquals(disease.getId(), convertedDisease.getId());

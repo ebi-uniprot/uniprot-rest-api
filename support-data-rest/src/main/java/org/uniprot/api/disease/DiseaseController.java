@@ -24,19 +24,19 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.store.search.field.DiseaseField;
 
 @RestController
 @RequestMapping("/disease")
 @Validated
-public class DiseaseController extends BasicSearchController<Disease> {
+public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     @Autowired private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
 
     protected DiseaseController(
             ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<Disease> diseaseMessageConverterContextFactory,
+            MessageConverterContextFactory<DiseaseEntry> diseaseMessageConverterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
 
         super(
@@ -55,7 +55,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public ResponseEntity<MessageConverterContext<Disease>> getByAccession(
+    public ResponseEntity<MessageConverterContext<DiseaseEntry>> getByAccession(
             @PathVariable("accessionId")
                     @Pattern(
                             regexp = ACCESSION_REGEX,
@@ -66,7 +66,7 @@ public class DiseaseController extends BasicSearchController<Disease> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        Disease disease = this.diseaseService.findByUniqueId(accession);
+        DiseaseEntry disease = this.diseaseService.findByUniqueId(accession);
         return super.getEntityResponse(disease, fields, request);
     }
 
@@ -79,11 +79,11 @@ public class DiseaseController extends BasicSearchController<Disease> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public ResponseEntity<MessageConverterContext<Disease>> searchCursor(
+    public ResponseEntity<MessageConverterContext<DiseaseEntry>> searchCursor(
             @Valid DiseaseSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<Disease> results = this.diseaseService.search(searchRequest);
+        QueryResult<DiseaseEntry> results = this.diseaseService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
@@ -97,25 +97,25 @@ public class DiseaseController extends BasicSearchController<Disease> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<Disease>>> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> download(
             @Valid DiseaseSearchRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        Stream<Disease> result = this.diseaseService.download(searchRequest);
+        Stream<DiseaseEntry> result = this.diseaseService.download(searchRequest);
 
         return super.download(result, searchRequest.getFields(), contentType, request, encoding);
     }
 
     @Override
-    protected String getEntityId(Disease entity) {
+    protected String getEntityId(DiseaseEntry entity) {
         return entity.getAccession();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(Disease entity) {
+    protected Optional<String> getEntityRedirectId(DiseaseEntry entity) {
         return Optional.empty();
     }
 }

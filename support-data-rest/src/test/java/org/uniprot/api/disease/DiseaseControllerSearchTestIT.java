@@ -32,8 +32,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.cv.disease.Disease;
-import org.uniprot.core.cv.disease.DiseaseBuilder;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.cv.disease.DiseaseFileReader;
@@ -68,7 +68,7 @@ class DiseaseControllerSearchTestIT {
         ReflectionTestUtils.setField(repository, "solrTemplate", solrTemplate);
 
         DiseaseFileReader diseaseFileReader = new DiseaseFileReader();
-        List<Disease> diseases =
+        List<DiseaseEntry> diseases =
                 diseaseFileReader.parse("src/test/resources/sample-humdisease.txt");
         // convert the disease to disease document
         List<DiseaseDocument> docs = convertToDocs(diseases);
@@ -450,10 +450,10 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(jsonPath("$.results.*.accession", Matchers.contains(accession)));
     }
 
-    private List<DiseaseDocument> convertToDocs(List<Disease> diseases) {
+    private List<DiseaseDocument> convertToDocs(List<DiseaseEntry> diseases) {
         List<DiseaseDocument> docs = new ArrayList<>();
 
-        for (Disease disease : diseases) {
+        for (DiseaseEntry disease : diseases) {
             List<String> kwIds = new ArrayList<>();
             if (disease.getKeywords() != null) {
                 kwIds =
@@ -487,9 +487,9 @@ class DiseaseControllerSearchTestIT {
         return docs;
     }
 
-    private byte[] getDiseaseObjectBinary(Disease disease) {
+    private byte[] getDiseaseObjectBinary(DiseaseEntry disease) {
         try {
-            DiseaseBuilder diseaseBuilder = DiseaseBuilder.from(disease);
+            DiseaseEntryBuilder diseaseBuilder = DiseaseEntryBuilder.from(disease);
             return this.diseaseObjectMapper.writeValueAsBytes(diseaseBuilder.build());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse disease to binary json: ", e);
