@@ -8,8 +8,8 @@ import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
-import org.uniprot.store.config.FieldItem;
-import org.uniprot.store.config.UniProtSearchFieldConfiguration;
+import org.uniprot.store.config.model.FieldItem;
+import org.uniprot.store.config.uniprotkb.UniProtSearchFieldConfiguration;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
 
@@ -102,39 +102,6 @@ public class UniProtConfigureService {
     }
 
     private List<AdvanceSearchTerm> convert(List<FieldItem> fieldItems) {
-        return fieldItems.stream().map(fi -> convert(fi)).sorted().collect(Collectors.toList());
-    }
-
-    private AdvanceSearchTerm convert(FieldItem fi) {
-        AdvanceSearchTerm.AdvanceSearchTermBuilder b = AdvanceSearchTerm.builder();
-        b.id(fi.getId()).parentId(fi.getParentId()).childNumber(fi.getChildNumber());
-        b.seqNumber(fi.getSeqNumber()).label(fi.getLabel()).term(fi.getFieldName());
-        b.description(fi.getDescription())
-                .example(fi.getExample())
-                .autoComplete(fi.getAutoComplete());
-        b.regex(fi.getValidRegex());
-        if (fi.getItemType() != null) {
-            b.itemType(fi.getItemType().name());
-        }
-        if (fi.getDataType() != null) {
-            b.dataType(fi.getDataType().name());
-        }
-        if (fi.getFieldType() != null) {
-            b.fieldType(fi.getFieldType().name());
-        }
-
-        List<FieldItem.Value> values = fi.getValues();
-        if (values != null) {
-            List<AdvanceSearchTerm.Value> stcValues =
-                    values.stream()
-                            .map(
-                                    value ->
-                                            new AdvanceSearchTerm.Value(
-                                                    value.getName(), value.getValue()))
-                            .collect(Collectors.toList());
-            b.values(stcValues);
-        }
-
-        return b.build();
+        return fieldItems.stream().map(fi -> AdvanceSearchTerm.from(fi)).sorted().collect(Collectors.toList());
     }
 }
