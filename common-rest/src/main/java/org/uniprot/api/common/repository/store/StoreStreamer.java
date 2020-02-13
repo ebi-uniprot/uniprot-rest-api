@@ -1,21 +1,21 @@
 package org.uniprot.api.common.repository.store;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
+import org.springframework.web.client.ResourceAccessException;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.document.Document;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * The purpose of this class is to stream results from a data-store, e.g., Voldemort. Clients of
@@ -123,20 +123,9 @@ public class StoreStreamer<D extends Document, T> {
         @Override
         List<T> convertBatch(List<String> batch) {
             return Failsafe.with(retryPolicy)
-                    .onFailure(
-                            throwable -> log.error("http call to RDF server failed. Retrying..."))
-                    .get(
-                            () -> {
-                                try {
-                                    return storeClient.getEntries(batch);
-                                } catch (Exception e) {
-                                    log.error(
-                                            "RDF get call failed for accessions {} with error {}",
-                                            batch,
-                                            e.getMessage());
-                                    throw e;
-                                }
-                            });
+                    .onFailure(throwable -> log.error("Call to RDF server failed for accessions {} with error {}", batch,
+                            throwable.getFailure().getMessage()))
+                    .get(() -> storeClient.getEntries(batch));
         }
     }
 }

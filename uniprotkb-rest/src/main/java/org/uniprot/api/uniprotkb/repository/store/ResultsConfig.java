@@ -1,11 +1,7 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +17,10 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 /**
  * Created 21/08/18
  *
@@ -28,6 +28,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  */
 @Configuration
 @Import(RepositoryConfig.class)
+@Slf4j
 public class ResultsConfig {
     @Bean
     public StoreStreamer<UniProtDocument, UniProtEntry> uniProtEntryStoreStreamer(
@@ -49,7 +50,8 @@ public class ResultsConfig {
                 new RetryPolicy<>()
                         .handle(IOException.class)
                         .withBackoff(rdfRetryDelay, maxRdfRetryDelay, ChronoUnit.MILLIS)
-                        .withMaxRetries(rdfConfigProperties().getMaxRetries());
+                        .withMaxRetries(rdfConfigProperties().getMaxRetries())
+                        .onRetry(e -> log.warn("Call to RDF server failed. Failure #{}. Retrying...", e.getAttemptCount()));
 
         return StoreStreamer.<UniProtDocument, UniProtEntry>builder()
                 .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
