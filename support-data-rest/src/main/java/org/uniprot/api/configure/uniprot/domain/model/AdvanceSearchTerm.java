@@ -8,9 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import org.uniprot.store.config.model.FieldItem;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.uniprot.store.config.model.FieldItem;
 
 @Data
 @Builder
@@ -62,8 +63,11 @@ public class AdvanceSearchTerm implements Serializable, Comparable<AdvanceSearch
         AdvanceSearchTerm.AdvanceSearchTermBuilder b = AdvanceSearchTerm.builder();
         b.id(fi.getId()).parentId(fi.getParentId()).childNumber(fi.getChildNumber());
         b.seqNumber(fi.getSeqNumber()).label(fi.getLabel()).term(fi.getFieldName());
-        b.description(fi.getDescription()).example(fi.getExample()).autoComplete(fi.getAutoComplete());
-        b.autoCompleteQueryField(fi.getAutoCompleteQueryField()).autoCompleteQueryFieldValidRegex(fi.getAutoCompleteQueryFieldValidRegex());
+        b.description(fi.getDescription())
+                .example(fi.getExample())
+                .autoComplete(fi.getAutoComplete());
+        b.autoCompleteQueryField(fi.getAutoCompleteQueryField())
+                .autoCompleteQueryFieldValidRegex(fi.getAutoCompleteQueryFieldValidRegex());
         b.regex(fi.getValidRegex());
         if (fi.getItemType() != null) {
             b.itemType(fi.getItemType().name());

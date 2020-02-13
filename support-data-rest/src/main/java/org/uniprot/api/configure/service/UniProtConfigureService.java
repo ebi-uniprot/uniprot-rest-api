@@ -102,6 +102,9 @@ public class UniProtConfigureService {
     }
 
     private List<AdvanceSearchTerm> convert(List<FieldItem> fieldItems) {
-        return fieldItems.stream().map(fi -> AdvanceSearchTerm.from(fi)).sorted().collect(Collectors.toList());
+        return fieldItems.stream()
+                .map(fi -> AdvanceSearchTerm.from(fi))
+                .sorted()
+                .collect(Collectors.toList());
     }
 }
