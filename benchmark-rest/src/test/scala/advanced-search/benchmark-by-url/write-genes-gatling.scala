@@ -1,6 +1,7 @@
 // https://computingforgeeks.com/how-to-install-apache-spark-on-ubuntu-debian/
 import java.io.FileInputStream
 import java.util.Properties
+import WriteToGatling
 
 val service = "uniprotkb"
 
