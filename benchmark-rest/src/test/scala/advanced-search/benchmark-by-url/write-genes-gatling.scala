@@ -17,10 +17,8 @@ val (inputFile, outputDir) =
   }
 
 val ff = sc.textFile("file://" + inputFile)
-
 val contentTypes = Seq("application/json", "text/tsv", "text/flatfile", "application/json", "application/vnd.ms-excel", "text/fasta", "text/gff")
-val endPoints = Seq("/uniprot/api/" + service + "/search?query=XXXX")
-
+val endPoints = Seq("/uniprot/api/" + service + "/search?query=XXXX", "/uniprot/api/"+ service + "/download?query=XXXX")
 val pattern = "^GN   Name=([A-Za-z0-9_]+).*".r
 val count = 20000
 val random = new Random
@@ -29,16 +27,18 @@ def randomItemFrom(l: Seq[String]): String = {
   return l(random.nextInt(l.length))
 }
 
+def createGatlingLine(v: String): String = {
+  randomItemFrom(endPoints).replaceAll("XXXX", v) + "#" + randomItemFrom(contentTypes)
+}
+
 sc.parallelize(ff
   .filter(line => line.startsWith("GN   Name="))
   .map(line => {
     val pattern(name) = line
     name
   })
-  .map(gene => randomItemFrom(endPoints).replaceAll("XXXX", gene) + "#" + randomItemFrom(contentTypes))
+  .map(createGatlingLine)
   .distinct()
-  .take(count))
-  //  .coalesce(1)
-  .saveAsTextFile("file://" + outputDir)
+  .take(count)).coalesce(1).saveAsTextFile("file://" + outputDir)
 
 println("========= DONE =========")
