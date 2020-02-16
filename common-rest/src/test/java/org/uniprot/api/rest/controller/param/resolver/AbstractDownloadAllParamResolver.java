@@ -52,6 +52,21 @@ public abstract class AbstractDownloadAllParamResolver extends BaseDownloadParam
             case "testDownloadAllXLS":
                 result = getDownloadAllParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
+            case "testDownloadAllFF":
+                result = getDownloadAllParamAndResult(UniProtMediaType.FF_MEDIA_TYPE);
+                break;
+            case "testDownloadAllXML":
+                result = getDownloadAllParamAndResult(MediaType.APPLICATION_XML);
+                break;
+            case "testDownloadAllFASTA":
+                result = getDownloadAllParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE);
+                break;
+            case "testDownloadAllGFF":
+                result = getDownloadAllParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE);
+                break;
+            case "testDownloadAllRDF":
+                result = getDownloadAllParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE);
+                break;
         }
         return result;
     }
