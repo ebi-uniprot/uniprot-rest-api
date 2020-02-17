@@ -1,7 +1,7 @@
 // https://computingforgeeks.com/how-to-install-apache-spark-on-ubuntu-debian/
 import java.io.FileInputStream
 import java.util.Properties
-import WriteToGatling
+import scala.util.Random
 
 val service = "uniprotkb"
 
@@ -9,7 +9,7 @@ val service = "uniprotkb"
 val (inputFile, outputDir, count, contentTypesStr, endPointsStr) =
   try {
     val prop = new Properties()
-    prop.load(new FileInputStream("/home/edd/working/intellij/website/uniprot-rest-api/benchmark-rest/src/test/scala/advanced-search/benchmark-by-url/config.properties"))
+    prop.load(new FileInputStream("/home/eddturner/working/intellij/website/uniprot-rest-api/benchmark-rest/src/test/scala/advanced-search/benchmark-by-url/config.properties"))
     (prop.getProperty("uniprotkb.sourceFilePath"),
       prop.getProperty("uniprotkb.genes.outputDir"),
       new Integer(prop.getProperty("uniprotkb.genes.count")),
