@@ -35,7 +35,6 @@ public class UniProtConfigureService {
     }
 
     public List<AdvanceSearchTerm> getUniProtSearchItems2() {
-        //        return UniProtKBSearchItems.INSTANCE.getSearchItems();
         return getUniprotSearchTerms();
     }
 
