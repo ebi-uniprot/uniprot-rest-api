@@ -7,19 +7,19 @@ import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.uniprot.api.rest.output.converter.AbstractOBOMessagerConverter;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.util.Utils;
 
-public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Disease> {
+public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<DiseaseEntry> {
     private static final String DISEASE_NAMESPACE = "uniprot:diseases";
 
     public DiseaseOBOMessageConverter() {
-        super(Disease.class);
+        super(DiseaseEntry.class);
     }
 
     @Override
-    public Frame getTermFrame(Disease diseaseEntry) {
+    public Frame getTermFrame(DiseaseEntry diseaseEntry) {
         Frame frame = new Frame(Frame.FrameType.TERM);
 
         frame.setId(diseaseEntry.getAccession());
@@ -35,7 +35,7 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
         frame.addClause(getDefClause(diseaseEntry));
 
         // add xref
-        for (CrossReference xref : diseaseEntry.getCrossReferences()) {
+        for (DiseaseCrossReference xref : diseaseEntry.getCrossReferences()) {
             frame.addClause(getXRefClause(xref));
         }
 
@@ -54,23 +54,23 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<Dis
         return clause;
     }
 
-    public Clause getDefClause(Disease diseaseEntry) {
+    public Clause getDefClause(DiseaseEntry diseaseEntry) {
         Clause clause =
                 new Clause(OBOFormatConstants.OboFormatTag.TAG_DEF, diseaseEntry.getDefinition());
         return clause;
     }
 
-    public Clause getIdClause(Disease disease) {
+    public Clause getIdClause(DiseaseEntry disease) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, disease.getAccession());
         return clause;
     }
 
-    public Clause getNameClause(Disease disease) {
+    public Clause getNameClause(DiseaseEntry disease) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, disease.getId());
         return clause;
     }
 
-    public Clause getXRefClause(CrossReference crossRef) {
+    public Clause getXRefClause(DiseaseCrossReference crossRef) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_XREF);
         Xref xref = new Xref(crossRef.getDatabaseType() + ":" + crossRef.getId());
         if (Utils.notNullNotEmpty(crossRef.getProperties())) {

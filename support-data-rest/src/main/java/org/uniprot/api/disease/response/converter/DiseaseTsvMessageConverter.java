@@ -8,20 +8,20 @@ import java.util.stream.Collectors;
 import org.uniprot.api.configure.util.SupportingDataUtils;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractTsvMessagerConverter;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.parser.tsv.disease.DiseaseEntryMap;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.DiseaseField;
 
-public class DiseaseTsvMessageConverter extends AbstractTsvMessagerConverter<Disease> {
+public class DiseaseTsvMessageConverter extends AbstractTsvMessagerConverter<DiseaseEntry> {
     private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
 
     public DiseaseTsvMessageConverter() {
-        super(Disease.class);
+        super(DiseaseEntry.class);
     }
 
     @Override
-    protected List<String> entry2TsvStrings(Disease entity) {
+    protected List<String> entry2TsvStrings(DiseaseEntry entity) {
         Map<String, String> mappedField = new DiseaseEntryMap(entity).attributeValues();
         return getData(mappedField);
     }
@@ -37,7 +37,7 @@ public class DiseaseTsvMessageConverter extends AbstractTsvMessagerConverter<Dis
     }
 
     @Override
-    protected void initBefore(MessageConverterContext<Disease> context) {
+    protected void initBefore(MessageConverterContext<DiseaseEntry> context) {
         if (Utils.nullOrEmpty(context.getFields())) {
             this.tlFields.set(
                     Arrays.asList(

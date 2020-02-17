@@ -83,7 +83,7 @@ public class DiseaseDownloadFieldsParamResolver extends AbstractDownloadFieldsRe
                 } else {
                     assertThat(
                             headerList.get(i) + " is null", !cell.getStringCellValue().isEmpty());
-                    if (i == headerList.indexOf("Disease ID")) { // Disease ID field
+                    if (i == headerList.indexOf("DiseaseEntry ID")) { // DiseaseEntry ID field
                         XLS_ACCESSIONS.add(cell.getStringCellValue());
                     }
                     i++;
@@ -93,7 +93,8 @@ public class DiseaseDownloadFieldsParamResolver extends AbstractDownloadFieldsRe
         }
         assertThat(
                 "Header of excel file doesn't match",
-                headerList.equals(Arrays.asList("Name", "Disease ID", "Mnemonic", "Description")));
+                headerList.equals(
+                        Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description")));
     }
 
     private DownloadParamAndResult getDownloadDefaultParamAndResult(
@@ -120,11 +121,11 @@ public class DiseaseDownloadFieldsParamResolver extends AbstractDownloadFieldsRe
             resultMatchers.add(
                     result ->
                             assertThat(
-                                    "Disease TSV header do not match",
+                                    "DiseaseEntry TSV header do not match",
                                     result.getResponse()
                                             .getContentAsString()
                                             .startsWith(
-                                                    "Name\tDisease ID\tMnemonic\tDescription")));
+                                                    "Name\tDiseaseEntry ID\tMnemonic\tDescription")));
         } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
             addListResultMatcher(resultMatchers, expectedEntryCount);
         } else if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {

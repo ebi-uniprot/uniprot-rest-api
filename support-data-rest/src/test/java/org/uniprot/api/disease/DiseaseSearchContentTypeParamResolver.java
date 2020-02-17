@@ -52,7 +52,7 @@ public class DiseaseSearchContentTypeParamResolver extends AbstractSearchContent
                                         content()
                                                 .string(
                                                         containsString(
-                                                                "Name\tDisease ID\tMnemonic\tDescription")))
+                                                                "Name\tDiseaseEntry ID\tMnemonic\tDescription")))
                                 .resultMatcher(
                                         content()
                                                 .string(
