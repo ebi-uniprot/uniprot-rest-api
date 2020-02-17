@@ -1,25 +1,23 @@
 package org.uniprot.api.configure.uniprot.domain.model;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
 import org.uniprot.store.config.model.FieldItem;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.uniprot.store.config.model.FieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class AdvanceSearchTerm implements Serializable, Comparable<AdvanceSearchTerm> {
+public class AdvanceSearchTerm implements Serializable {
     private String id;
     @JsonIgnore private String parentId;
     @JsonIgnore private Integer childNumber;
@@ -29,34 +27,15 @@ public class AdvanceSearchTerm implements Serializable, Comparable<AdvanceSearch
     private String term;
     private String dataType;
     private String fieldType;
-    @JsonIgnore
-    private String description;
+    @JsonIgnore private String description;
     private String example;
     private String autoComplete;
     private String autoCompleteQueryField;
-    @JsonIgnore
-    private String autoCompleteQueryFieldValidRegex;
+    @JsonIgnore private String autoCompleteQueryFieldValidRegex;
     private String regex;
     private List<Value> values;
     private List<AdvanceSearchTerm> items;
     private List<EvidenceGroup> evidenceGroups;
-
-    @Override
-    public int compareTo(AdvanceSearchTerm that) {
-        Integer thisChildNumber = this.getChildNumber();
-        Integer thatChildNumber = that.getChildNumber();
-        if (shouldCompareSeqNumber(thisChildNumber, thatChildNumber)) {
-            return this.getSeqNumber().compareTo(that.getSeqNumber());
-        } else {
-            return thisChildNumber.compareTo(thatChildNumber);
-        }
-    }
-
-    private boolean shouldCompareSeqNumber(Integer thisChildNumber, Integer thatChildNumber) {
-        return thisChildNumber == null
-                || thatChildNumber == null
-                || thisChildNumber.compareTo(thatChildNumber) == 0;
-    }
 
     @Data
     @AllArgsConstructor
@@ -83,7 +62,7 @@ public class AdvanceSearchTerm implements Serializable, Comparable<AdvanceSearch
         }
         if (fi.getFieldType() != null) {
             b.fieldType(fi.getFieldType().name());
-            if(fi.getFieldType() == FieldType.evidence){
+            if (fi.getFieldType() == FieldType.evidence) {
                 b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
             }
         }
