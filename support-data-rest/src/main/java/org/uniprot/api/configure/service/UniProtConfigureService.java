@@ -88,22 +88,24 @@ public class UniProtConfigureService {
     private List<AdvanceSearchTerm> getUniProtSearchTerms() {
         UniProtSearchFieldConfiguration config = UniProtSearchFieldConfiguration.getInstance();
         List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
-        List<AdvanceSearchTerm> rootSearchTermConfigs = convert(rootFieldItems);
+        Comparator<AdvanceSearchTerm> comparatorBySeqNumber = Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
+        Comparator<AdvanceSearchTerm> comparatorByChildNumber = Comparator.comparing(AdvanceSearchTerm::getChildNumber);
+        List<AdvanceSearchTerm> rootSearchTermConfigs = convert(rootFieldItems, comparatorBySeqNumber);
         Queue<AdvanceSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
         while (!queue.isEmpty()) {
             AdvanceSearchTerm currentItem = queue.remove();
             List<AdvanceSearchTerm> children =
-                    convert(config.getChildFieldItems(currentItem.getId()));
+                    convert(config.getChildFieldItems(currentItem.getId()), comparatorByChildNumber);
             queue.addAll(children);
             currentItem.setItems(children);
         }
         return rootSearchTermConfigs;
     }
 
-    private List<AdvanceSearchTerm> convert(List<FieldItem> fieldItems) {
+    private List<AdvanceSearchTerm> convert(List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
         return fieldItems.stream()
                 .map(fi -> AdvanceSearchTerm.from(fi))
-                .sorted()
+                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 }
