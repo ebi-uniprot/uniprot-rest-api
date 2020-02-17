@@ -35,7 +35,7 @@ public class UniProtConfigureService {
     }
 
     public List<AdvanceSearchTerm> getUniProtSearchItems2() {
-        return getUniprotSearchTerms();
+        return getUniProtSearchTerms();
     }
 
     public List<EvidenceGroup> getAnnotationEvidences() {
@@ -85,7 +85,7 @@ public class UniProtConfigureService {
         return DBX_TYPES.getAllDBXRefTypes();
     }
 
-    private List<AdvanceSearchTerm> getUniprotSearchTerms() {
+    private List<AdvanceSearchTerm> getUniProtSearchTerms() {
         UniProtSearchFieldConfiguration config = UniProtSearchFieldConfiguration.getInstance();
         List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
         List<AdvanceSearchTerm> rootSearchTermConfigs = convert(rootFieldItems);
