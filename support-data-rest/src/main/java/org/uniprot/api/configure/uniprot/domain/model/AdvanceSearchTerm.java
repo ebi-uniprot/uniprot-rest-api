@@ -12,6 +12,9 @@ import org.uniprot.store.config.model.FieldItem;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.uniprot.store.config.model.FieldType;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 
 @Data
 @Builder
@@ -26,14 +29,17 @@ public class AdvanceSearchTerm implements Serializable, Comparable<AdvanceSearch
     private String term;
     private String dataType;
     private String fieldType;
+    @JsonIgnore
     private String description;
     private String example;
     private String autoComplete;
     private String autoCompleteQueryField;
+    @JsonIgnore
     private String autoCompleteQueryFieldValidRegex;
     private String regex;
     private List<Value> values;
     private List<AdvanceSearchTerm> items;
+    private List<EvidenceGroup> evidenceGroups;
 
     @Override
     public int compareTo(AdvanceSearchTerm that) {
@@ -77,6 +83,9 @@ public class AdvanceSearchTerm implements Serializable, Comparable<AdvanceSearch
         }
         if (fi.getFieldType() != null) {
             b.fieldType(fi.getFieldType().name());
+            if(fi.getFieldType() == FieldType.evidence){
+                b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
+            }
         }
 
         List<FieldItem.Value> values = fi.getValues();
