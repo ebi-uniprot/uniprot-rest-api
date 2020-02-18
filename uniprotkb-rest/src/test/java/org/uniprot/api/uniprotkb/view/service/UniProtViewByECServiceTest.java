@@ -20,7 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.ec.ECEntry;
-import org.uniprot.core.cv.ec.ECEntryImpl;
+import org.uniprot.core.cv.ec.impl.ECEntryImpl;
 import org.uniprot.cv.ec.ECRepo;
 
 @ExtendWith(MockitoExtension.class)

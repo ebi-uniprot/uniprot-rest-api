@@ -11,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -67,16 +67,23 @@ public class DiseaseSolrDocumentHelper {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation" + suffix, "KW-0991" + suffix);
         DiseaseCrossReference xref1 =
-                new DiseaseCrossReferenceImpl(
-                        "MIM" + suffix,
-                        "617140" + suffix,
-                        Collections.singletonList("phenotype" + suffix));
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM" + suffix)
+                        .id("617140" + suffix)
+                        .propertiesAdd("phenotype" + suffix)
+                        .build();
         DiseaseCrossReference xref2 =
-                new DiseaseCrossReferenceImpl("MedGen" + suffix, "CN238690" + suffix);
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MedGen")
+                        .id("CN238690" + suffix)
+                        .build();
         DiseaseCrossReference xref3 =
-                new DiseaseCrossReferenceImpl("MeSH" + suffix, "D000015" + suffix);
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MeSH")
+                        .id("D000015" + suffix)
+                        .build();
         DiseaseCrossReference xref4 =
-                new DiseaseCrossReferenceImpl("MeSH" + suffix, "D008607" + suffix);
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .id("ZTTK syndrome" + suffix)

@@ -27,8 +27,8 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 
@@ -132,9 +132,17 @@ class DiseaseControllerTest {
         List<String> alternativeNames = Arrays.asList("name1", "name2", "name3");
 
         DiseaseCrossReference xr1 =
-                new DiseaseCrossReferenceImpl("DT1", "ID1", Arrays.asList("p1", "p2"));
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("DT1")
+                        .id("ID1")
+                        .propertiesSet(Arrays.asList("p1", "p2"))
+                        .build();
         DiseaseCrossReference xr2 =
-                new DiseaseCrossReferenceImpl("DT2", "ID2", Arrays.asList("p3", "p4"));
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("DT2")
+                        .id("ID2")
+                        .propertiesSet(Arrays.asList("p3", "p4"))
+                        .build();
         List<DiseaseCrossReference> xrefs = Arrays.asList(xr1, xr2);
         List<Keyword> keywords =
                 Arrays.asList(
