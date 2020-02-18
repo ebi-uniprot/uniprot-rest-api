@@ -99,7 +99,7 @@ public class UniProtViewByECService implements UniProtViewByService {
         }
         Optional<ECEntry> ecOpt = ecRepo.getEC(fullEc);
         viewBy.setId(fullEc);
-        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.label()));
+        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.getLabel()));
 
         viewBy.setLink(URL_PREFIX + fullEc);
         viewBy.setCount(count.getCount());

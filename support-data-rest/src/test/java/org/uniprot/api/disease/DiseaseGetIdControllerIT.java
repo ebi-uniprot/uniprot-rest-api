@@ -30,8 +30,8 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -84,11 +84,17 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
         DiseaseCrossReference xref1 =
-                new DiseaseCrossReferenceImpl(
-                        "MIM", "617140", Collections.singletonList("phenotype"));
-        DiseaseCrossReference xref2 = new DiseaseCrossReferenceImpl("MedGen", "CN238690");
-        DiseaseCrossReference xref3 = new DiseaseCrossReferenceImpl("MeSH", "D000015");
-        DiseaseCrossReference xref4 = new DiseaseCrossReferenceImpl("MeSH", "D008607");
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM")
+                        .id("617140")
+                        .propertiesAdd("phenotype")
+                        .build();
+        DiseaseCrossReference xref2 =
+                new DiseaseCrossReferenceBuilder().databaseType("MedGen").id("CN238690").build();
+        DiseaseCrossReference xref3 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000015").build();
+        DiseaseCrossReference xref4 =
+                DiseaseCrossReferenceBuilder.from(xref3).id("D008607").build();
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .id("ZTTK syndrome")

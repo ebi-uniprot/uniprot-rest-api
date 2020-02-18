@@ -12,8 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -44,7 +44,12 @@ class DiseaseDocumentToDiseaseConverterTest {
         List<String> props = Arrays.asList("prop1", "prop2", "prop3");
         String xrefId = "XREF-123";
         String databaseType = "SAMPLE_TYPE";
-        DiseaseCrossReference cr = new DiseaseCrossReferenceImpl(databaseType, xrefId, props);
+        DiseaseCrossReference cr =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType(databaseType)
+                        .id(xrefId)
+                        .propertiesSet(props)
+                        .build();
 
         // keyword
         String kId = "Sample Keyword";

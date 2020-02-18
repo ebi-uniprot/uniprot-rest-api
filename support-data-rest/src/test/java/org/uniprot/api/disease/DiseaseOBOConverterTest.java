@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
 import org.junit.jupiter.api.Assertions;
@@ -16,8 +15,8 @@ import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceImpl;
 
 class DiseaseOBOConverterTest {
     private static final String NOW = OBOFormatConstants.headerDateFormat().format(new Date());
@@ -56,11 +55,17 @@ class DiseaseOBOConverterTest {
         // create a disease object
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         DiseaseCrossReference xref1 =
-                new DiseaseCrossReferenceImpl(
-                        "MIM", "617140", Collections.singletonList("phenotype"));
-        DiseaseCrossReference xref2 = new DiseaseCrossReferenceImpl("MedGen", "CN238690");
-        DiseaseCrossReference xref3 = new DiseaseCrossReferenceImpl("MeSH", "D000015");
-        DiseaseCrossReference xref4 = new DiseaseCrossReferenceImpl("MeSH", "D008607");
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM")
+                        .id("617140")
+                        .propertiesAdd("phenotype")
+                        .build();
+        DiseaseCrossReference xref2 =
+                new DiseaseCrossReferenceBuilder().databaseType("MedGen").id("CN238690").build();
+        DiseaseCrossReference xref3 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000015").build();
+        DiseaseCrossReference xref4 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
         DiseaseEntry diseaseEntry1 =
                 diseaseBuilder
                         .id("ZTTK syndrome")
@@ -77,10 +82,15 @@ class DiseaseOBOConverterTest {
         // create another disease object
         diseaseBuilder = new DiseaseEntryBuilder();
         DiseaseCrossReference xref11 =
-                new DiseaseCrossReferenceImpl(
-                        "MIM", "204750", Collections.singletonList("phenotype"));
-        DiseaseCrossReference xref22 = new DiseaseCrossReferenceImpl("MedGen", "C1859817");
-        DiseaseCrossReference xref33 = new DiseaseCrossReferenceImpl("MeSH", "D000592");
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM")
+                        .id("204750")
+                        .propertiesAdd("phenotype")
+                        .build();
+        DiseaseCrossReference xref22 =
+                new DiseaseCrossReferenceBuilder().databaseType("MedGen").id("C1859817").build();
+        DiseaseCrossReference xref33 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000592").build();
         DiseaseEntry diseaseEntry2 =
                 diseaseBuilder
                         .id("2-aminoadipic 2-oxoadipic aciduria")
