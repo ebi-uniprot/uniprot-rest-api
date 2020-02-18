@@ -26,7 +26,7 @@ import org.uniprot.api.subcell.output.converter.SubcellularLocationXlsMessageCon
 import org.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
 import org.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
 import org.uniprot.core.crossref.CrossRefEntry;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.json.parser.crossref.CrossRefJsonConfig;
@@ -116,10 +116,10 @@ public class MessageConverterConfig {
                                 Arrays.asList(SubcellularLocationField.ResultFields.values()));
                 converters.add(0, subcellJsonConverter);
 
-                JsonMessageConverter<Disease> diseaseJsonConverter =
+                JsonMessageConverter<DiseaseEntry> diseaseJsonConverter =
                         new JsonMessageConverter(
                                 DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
-                                Disease.class,
+                                DiseaseEntry.class,
                                 Arrays.asList(DiseaseField.ResultFields.values()));
                 converters.add(0, diseaseJsonConverter);
 

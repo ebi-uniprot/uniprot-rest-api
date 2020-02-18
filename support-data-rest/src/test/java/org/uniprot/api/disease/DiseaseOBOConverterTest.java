@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
 import org.junit.jupiter.api.Assertions;
@@ -14,9 +13,10 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
-import org.uniprot.core.builder.DiseaseBuilder;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
 
 class DiseaseOBOConverterTest {
     private static final String NOW = OBOFormatConstants.headerDateFormat().format(new Date());
@@ -53,38 +53,51 @@ class DiseaseOBOConverterTest {
                         + "xref: MeSH:D000592\n"
                         + "xref: MIM:204750 \"phenotype\"";
         // create a disease object
-        DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
-        CrossReference xref1 =
-                new CrossReference("MIM", "617140", Collections.singletonList("phenotype"));
-        CrossReference xref2 = new CrossReference("MedGen", "CN238690");
-        CrossReference xref3 = new CrossReference("MeSH", "D000015");
-        CrossReference xref4 = new CrossReference("MeSH", "D008607");
-        Disease diseaseEntry1 =
+        DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
+        DiseaseCrossReference xref1 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM")
+                        .id("617140")
+                        .propertiesAdd("phenotype")
+                        .build();
+        DiseaseCrossReference xref2 =
+                new DiseaseCrossReferenceBuilder().databaseType("MedGen").id("CN238690").build();
+        DiseaseCrossReference xref3 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000015").build();
+        DiseaseCrossReference xref4 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
+        DiseaseEntry diseaseEntry1 =
                 diseaseBuilder
                         .id("ZTTK syndrome")
                         .accession("DI-04860")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
-                        .alternativeNames(
+                        .alternativeNamesSet(
                                 Arrays.asList(
                                         "Zhu-Tokita-Takenouchi-Kim syndrome",
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
-                        .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
+                        .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
                         .build();
 
         // create another disease object
-        diseaseBuilder = new DiseaseBuilder();
-        CrossReference xref11 =
-                new CrossReference("MIM", "204750", Collections.singletonList("phenotype"));
-        CrossReference xref22 = new CrossReference("MedGen", "C1859817");
-        CrossReference xref33 = new CrossReference("MeSH", "D000592");
-        Disease diseaseEntry2 =
+        diseaseBuilder = new DiseaseEntryBuilder();
+        DiseaseCrossReference xref11 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM")
+                        .id("204750")
+                        .propertiesAdd("phenotype")
+                        .build();
+        DiseaseCrossReference xref22 =
+                new DiseaseCrossReferenceBuilder().databaseType("MedGen").id("C1859817").build();
+        DiseaseCrossReference xref33 =
+                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000592").build();
+        DiseaseEntry diseaseEntry2 =
                 diseaseBuilder
                         .id("2-aminoadipic 2-oxoadipic aciduria")
                         .accession("DI-03673")
                         .definition(
                                 "A metabolic disorder characterized by increased levels of 2-oxoadipate and 2-hydroxyadipate in the urine, and elevated 2-aminoadipate in the plasma. Patients can have mild to severe intellectual disability, muscular hypotonia, developmental delay, ataxia, and epilepsy. Most cases are asymptomatic.")
-                        .crossReferences(Arrays.asList(xref11, xref22, xref33))
+                        .crossReferencesSet(Arrays.asList(xref11, xref22, xref33))
                         .build();
 
         OBODoc oboDoc = new OBODoc();

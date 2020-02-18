@@ -155,6 +155,8 @@ class SolrCursorMarkIteratorTest {
     }
 
     private static class FakeDocument implements Document {
+        private static final long serialVersionUID = 3417989825254194620L;
+
         @Override
         public String getDocumentId() {
             return "anything";

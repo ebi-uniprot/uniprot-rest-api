@@ -48,7 +48,12 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtDocument, UniProtEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService) {
-        super(repository, uniprotFacetConfig, uniProtSolrSortClause, uniProtEntryStoreStreamer);
+        super(
+                repository,
+                uniprotFacetConfig,
+                uniProtSolrSortClause,
+                uniProtEntryStoreStreamer,
+                uniProtKBQueryBoosts);
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
         this.queryBoosts = uniProtKBQueryBoosts;

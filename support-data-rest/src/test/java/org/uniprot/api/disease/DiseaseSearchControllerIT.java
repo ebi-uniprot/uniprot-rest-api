@@ -25,9 +25,10 @@ import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.builder.DiseaseBuilder;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
@@ -138,29 +139,42 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     private void saveEntry(String accession, long suffix) {
-        DiseaseBuilder diseaseBuilder = new DiseaseBuilder();
+        DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         Keyword keyword = new KeywordImpl("Mental retardation" + suffix, "KW-0991" + suffix);
-        CrossReference xref1 =
-                new CrossReference(
-                        "MIM" + suffix,
-                        "617140" + suffix,
-                        Collections.singletonList("phenotype" + suffix));
-        CrossReference xref2 = new CrossReference("MedGen" + suffix, "CN238690" + suffix);
-        CrossReference xref3 = new CrossReference("MeSH" + suffix, "D000015" + suffix);
-        CrossReference xref4 = new CrossReference("MeSH" + suffix, "D008607" + suffix);
-        Disease diseaseEntry =
+        DiseaseCrossReference xref1 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MIM" + suffix)
+                        .id("617140" + suffix)
+                        .propertiesAdd("phenotype" + suffix)
+                        .build();
+        DiseaseCrossReference xref2 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MedGen" + suffix)
+                        .id("CN238690" + suffix)
+                        .build();
+        DiseaseCrossReference xref3 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MeSH" + suffix)
+                        .id("D000015" + suffix)
+                        .build();
+        DiseaseCrossReference xref4 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MeSH" + suffix)
+                        .id("D008607" + suffix)
+                        .build();
+        DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .id("ZTTK syndrome" + suffix)
                         .accession(accession)
                         .acronym("ZTTKS" + suffix)
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
-                        .alternativeNames(
+                        .alternativeNamesSet(
                                 Arrays.asList(
                                         "Zhu-Tokita-Takenouchi-Kim syndrome",
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
-                        .crossReferences(Arrays.asList(xref1, xref2, xref3, xref4))
-                        .keywords(keyword)
+                        .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
+                        .keywordsAdd(keyword)
                         .reviewedProteinCount(suffix)
                         .unreviewedProteinCount(suffix)
                         .build();
@@ -199,12 +213,12 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.DISEASE, document);
     }
 
-    private ByteBuffer getDiseaseBinary(Disease entry) {
+    private ByteBuffer getDiseaseBinary(DiseaseEntry entry) {
         try {
             return ByteBuffer.wrap(
                     DiseaseJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse Disease entry to binary json: ", e);
+            throw new RuntimeException("Unable to parse DiseaseEntry entry to binary json: ", e);
         }
     }
 

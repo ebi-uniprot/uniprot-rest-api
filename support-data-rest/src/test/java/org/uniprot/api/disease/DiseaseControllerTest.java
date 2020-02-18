@@ -25,9 +25,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.builder.DiseaseBuilder;
-import org.uniprot.core.cv.disease.CrossReference;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseCrossReference;
+import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.Keyword;
 import org.uniprot.core.cv.keyword.impl.KeywordImpl;
 
@@ -41,7 +42,7 @@ class DiseaseControllerTest {
     @Test
     void testGetDiseaseByAccession() throws Exception {
         String accession = "DI-12345";
-        Disease disease = createDisease();
+        DiseaseEntry disease = createDisease();
         Mockito.when(this.diseaseService.findByUniqueId(accession)).thenReturn(disease);
 
         ResultActions response =
@@ -123,16 +124,26 @@ class DiseaseControllerTest {
                 .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
     }
 
-    private Disease createDisease() {
+    private DiseaseEntry createDisease() {
         String id = "Sample ID";
         String accession = "DI-12345";
         String acronym = "ACR";
         String definition = "test definition";
         List<String> alternativeNames = Arrays.asList("name1", "name2", "name3");
 
-        CrossReference xr1 = new CrossReference("DT1", "ID1", Arrays.asList("p1", "p2"));
-        CrossReference xr2 = new CrossReference("DT2", "ID2", Arrays.asList("p3", "p4"));
-        List<CrossReference> xrefs = Arrays.asList(xr1, xr2);
+        DiseaseCrossReference xr1 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("DT1")
+                        .id("ID1")
+                        .propertiesSet(Arrays.asList("p1", "p2"))
+                        .build();
+        DiseaseCrossReference xr2 =
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("DT2")
+                        .id("ID2")
+                        .propertiesSet(Arrays.asList("p3", "p4"))
+                        .build();
+        List<DiseaseCrossReference> xrefs = Arrays.asList(xr1, xr2);
         List<Keyword> keywords =
                 Arrays.asList(
                         new KeywordImpl("keyword1", "kw-1"), new KeywordImpl("keyword2", "kw-2"));
@@ -140,13 +151,13 @@ class DiseaseControllerTest {
         Long reviewedProteinCount = 10L;
         Long unreviewedProteinCount = 20L;
 
-        DiseaseBuilder builder = new DiseaseBuilder();
+        DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
         builder.id(id)
                 .accession(accession)
                 .acronym(acronym)
                 .definition(definition)
-                .alternativeNames(alternativeNames);
-        builder.crossReferences(xrefs).keywords(keywords);
+                .alternativeNamesSet(alternativeNames);
+        builder.crossReferencesSet(xrefs).keywordsSet(keywords);
         builder.reviewedProteinCount(reviewedProteinCount)
                 .unreviewedProteinCount(unreviewedProteinCount);
 

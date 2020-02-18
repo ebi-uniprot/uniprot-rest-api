@@ -30,19 +30,19 @@ public interface SearchRequest {
     void setSize(Integer size);
 
     default boolean hasFields() {
-        return Utils.notNullOrEmpty(getFields());
+        return Utils.notNullNotEmpty(getFields());
     }
 
     default boolean hasSort() {
-        return Utils.notNullOrEmpty(getSort());
+        return Utils.notNullNotEmpty(getSort());
     }
 
     default boolean hasCursor() {
-        return Utils.notNullOrEmpty(getCursor());
+        return Utils.notNullNotEmpty(getCursor());
     }
 
     default boolean hasFacets() {
-        return Utils.notNullOrEmpty(getFacets());
+        return Utils.notNullNotEmpty(getFacets());
     }
 
     default SimpleQuery getSimpleQuery() {

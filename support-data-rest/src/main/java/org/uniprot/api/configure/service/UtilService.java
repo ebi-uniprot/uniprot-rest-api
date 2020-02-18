@@ -13,7 +13,7 @@ public class UtilService {
 
     public SolrJsonQuery convertQuery(String query) {
         SolrJsonQuery solrJsonQuery = null;
-        if (Utils.notNullOrEmpty(query)) {
+        if (Utils.notNullNotEmpty(query)) {
             try {
                 QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
                 qp.setAllowLeadingWildcard(true);

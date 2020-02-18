@@ -55,11 +55,13 @@ public class UniprotKbObjectsForTests {
                         .map(
                                 pubmedId -> {
                                     return new UniProtReferenceBuilder()
-                                            .addPositions("Position MUTAGENESIS pathol " + pubmedId)
-                                            .addPositions("Position INTERACTION " + pubmedId)
+                                            .referencePositionsAdd(
+                                                    "Position MUTAGENESIS pathol " + pubmedId)
+                                            .referencePositionsAdd(
+                                                    "Position INTERACTION " + pubmedId)
                                             .citation(
                                                     new JournalArticleBuilder()
-                                                            .addCitationXrefs(
+                                                            .citationXrefsAdd(
                                                                     new DBCrossReferenceBuilder<
                                                                                     CitationXrefType>()
                                                                             .databaseType(
@@ -74,11 +76,11 @@ public class UniprotKbObjectsForTests {
 
         references.add(
                 new UniProtReferenceBuilder()
-                        .addPositions("Position INTERACTION ")
+                        .referencePositionsAdd("Position INTERACTION ")
                         .citation(
                                 new SubmissionBuilder()
                                         .title("Submission tittle")
-                                        .addAuthor("Submission Author")
+                                        .authorsAdd("Submission Author")
                                         .submittedToDatabase(SubmissionDatabase.PDB)
                                         .build())
                         .build());
@@ -97,7 +99,7 @@ public class UniprotKbObjectsForTests {
                 .uniprotAccession(accession)
                 .source("source " + accession)
                 .sourceId("source id " + accession)
-                .addSourceCategory("function")
+                .sourceCategoriesAdd("function")
                 .annotation("annotation " + accession)
                 .build();
     }
@@ -130,7 +132,7 @@ public class UniprotKbObjectsForTests {
             long pubMedId, String... accessions) {
         return new LiteratureStoreEntryBuilder()
                 .literatureEntry(getLiteratureEntry(pubMedId))
-                .literatureMappedReference(
+                .literatureMappedReferencesSet(
                         UniprotKbObjectsForTests.getLiteratureMappedReferences(accessions))
                 .build();
     }
@@ -143,10 +145,10 @@ public class UniprotKbObjectsForTests {
 
         Literature literature =
                 new LiteratureBuilder()
-                        .addCitationXrefs(pubmed)
-                        .addCitationXrefs(doi)
+                        .citationXrefsAdd(pubmed)
+                        .citationXrefsAdd(doi)
                         .title("title " + pubMedId)
-                        .addAuthor(new AuthorImpl("author " + pubMedId))
+                        .authorsAdd(new AuthorImpl("author " + pubMedId))
                         .journalName("journal " + pubMedId)
                         .publicationDate(new PublicationDateImpl("2019"))
                         .build();

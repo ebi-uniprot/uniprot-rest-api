@@ -10,15 +10,15 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.cv.disease.Disease;
+import org.uniprot.core.cv.disease.DiseaseEntry;
 
 /** @author sahmad */
 @Configuration
 public class DiseaseMessageConverterConfig {
 
     @Bean(name = "diseaseMessageConverterContextFactory")
-    public MessageConverterContextFactory<Disease> diseaseMessageConverterContextFactory() {
-        MessageConverterContextFactory<Disease> contextFactory =
+    public MessageConverterContextFactory<DiseaseEntry> diseaseMessageConverterContextFactory() {
+        MessageConverterContextFactory<DiseaseEntry> contextFactory =
                 new MessageConverterContextFactory<>();
 
         Arrays.asList(
@@ -32,8 +32,8 @@ public class DiseaseMessageConverterConfig {
         return contextFactory;
     }
 
-    private MessageConverterContext<Disease> context(MediaType contentType) {
-        return MessageConverterContext.<Disease>builder()
+    private MessageConverterContext<DiseaseEntry> context(MediaType contentType) {
+        return MessageConverterContext.<DiseaseEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.DISEASE)
                 .contentType(contentType)
                 .build();

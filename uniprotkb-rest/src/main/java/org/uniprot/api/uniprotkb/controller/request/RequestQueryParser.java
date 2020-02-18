@@ -13,7 +13,7 @@ import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.core.uniprot.ProteinExistence;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureType;
-import org.uniprot.core.uniprot.xdb.UniProtXDbDisplayOrder;
+import org.uniprot.cv.xdb.UniProtXDbDisplayOrder;
 
 /**
  * This class is responsible to parse FROM old uniprot lucene query string format TO new uniprot

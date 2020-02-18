@@ -13,8 +13,8 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.core.cv.ec.EC;
-import org.uniprot.core.cv.ec.ECRepo;
+import org.uniprot.core.cv.ec.ECEntry;
+import org.uniprot.cv.ec.ECRepo;
 
 import com.google.common.base.Strings;
 
@@ -97,9 +97,9 @@ public class UniProtViewByECService implements UniProtViewByService {
         } else {
             viewBy.setExpand(false);
         }
-        Optional<EC> ecOpt = ecRepo.getEC(fullEc);
+        Optional<ECEntry> ecOpt = ecRepo.getEC(fullEc);
         viewBy.setId(fullEc);
-        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.label()));
+        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.getLabel()));
 
         viewBy.setLink(URL_PREFIX + fullEc);
         viewBy.setCount(count.getCount());

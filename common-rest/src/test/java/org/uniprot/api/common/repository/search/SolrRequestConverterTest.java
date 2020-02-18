@@ -154,6 +154,46 @@ class SolrRequestConverterTest {
         }
 
         @Test
+        void intQueryBoostWithPlaceholderAndIntQueryIsReplacedCorrectly() {
+            // given
+            SolrRequest request =
+                    SolrRequest.builder()
+                            .query("9606")
+                            .queryBoosts(
+                                    QueryBoosts.builder()
+                                            .defaultSearchBoost("field1=number:{query}^3")
+                                            .build())
+                            .build();
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request);
+
+            // then
+            assertThat(solrQuery.getParams("bq"), is(arrayContaining("field1:(9606)^3")));
+            assertThat(solrQuery.get("boost"), is(nullValue()));
+        }
+
+        @Test
+        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly() {
+            // given
+            SolrRequest request =
+                    SolrRequest.builder()
+                            .query("hello")
+                            .queryBoosts(
+                                    QueryBoosts.builder()
+                                            .defaultSearchBoost("field1=number:{query}^3")
+                                            .build())
+                            .build();
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request);
+
+            // then
+            assertThat(solrQuery.getParams("bq"), is(nullValue()));
+            assertThat(solrQuery.get("boost"), is(nullValue()));
+        }
+
+        @Test
         void defaultQueryBoostsAndFunctionsCreatedCorrectly() {
             // given
             SolrRequest request =

@@ -99,6 +99,7 @@ class StoreStreamerIT {
     }
 
     private static class FakeDocument implements Document {
+        private static final long serialVersionUID = 7689868007129327083L;
         public String id;
 
         @Override

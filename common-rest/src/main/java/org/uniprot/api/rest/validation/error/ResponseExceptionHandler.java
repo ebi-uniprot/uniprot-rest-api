@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.validation.error;
 
 import static java.util.Collections.singletonList;
-import static org.uniprot.core.util.Utils.notNullOrEmpty;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +31,7 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.core.util.Utils;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -216,7 +216,7 @@ public class ResponseExceptionHandler {
     private MediaType getContentTypeFromRequest(HttpServletRequest request) {
         MediaType result = MediaType.APPLICATION_JSON;
         String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        if (notNullOrEmpty(acceptHeader)) {
+        if (Utils.notNullNotEmpty(acceptHeader)) {
             result = MediaType.valueOf(acceptHeader);
         }
         return result;

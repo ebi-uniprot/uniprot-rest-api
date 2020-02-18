@@ -65,7 +65,7 @@ public class PublicationService {
 
         // CREATE FACETS
         List<Facet> facets = new ArrayList<>();
-        if (Utils.notNullOrEmpty(request.getFacets())) {
+        if (Utils.notNullNotEmpty(request.getFacets())) {
             facets.addAll(PublicationFacetConfig.getFacets(publications, request.getFacets()));
         }
 
@@ -198,7 +198,7 @@ public class PublicationService {
         List<String> categories = new ArrayList<>();
         if (mappedReference.hasSourceCategory()) {
             categories =
-                    mappedReference.getSourceCategory().stream()
+                    mappedReference.getSourceCategories().stream()
                             .map(
                                     category -> {
                                         return Arrays.stream(PublicationCategory.values())
@@ -207,9 +207,9 @@ public class PublicationService {
                                                 .findFirst()
                                                 .orElse("");
                                     })
-                            .filter(Utils::notNullOrEmpty)
+                            .filter(Utils::notNullNotEmpty)
                             .collect(Collectors.toList());
-            mappedReference.getSourceCategory().clear();
+            mappedReference.getSourceCategories().clear();
         }
         UniProtReference reference =
                 new UniProtReferenceBuilder()

@@ -165,10 +165,10 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
         Literature literature =
                 new LiteratureBuilder()
-                        .addCitationXrefs(pubmed)
-                        .addCitationXrefs(doi)
+                        .citationXrefsAdd(pubmed)
+                        .citationXrefsAdd(doi)
                         .title("title " + pubMedId)
-                        .addAuthor(new AuthorImpl("author " + pubMedId))
+                        .authorsAdd(new AuthorImpl("author " + pubMedId))
                         .journalName("journal " + pubMedId)
                         .publicationDate(new PublicationDateImpl("2019"))
                         .build();
