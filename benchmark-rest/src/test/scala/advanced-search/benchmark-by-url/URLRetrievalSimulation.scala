@@ -1,4 +1,9 @@
-
+import io.gatling.core.Predef._
+import io.gatling.core.scenario.Simulation
+import io.gatling.core.structure.ChainBuilder
+import io.gatling.http.Predef._
+import scala.concurrent.duration._
+import com.typesafe.config._
 
 /**
  * Simulates simple retrieval of URLs from the REST service. Since these URLs can be anywhere, this simulation
