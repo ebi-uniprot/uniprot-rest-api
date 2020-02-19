@@ -27,7 +27,7 @@ class URLRetrievalSimulation extends Simulation {
       case urlRegex(baseUrl, _) => println(">>(matched)" + url)
       "url=" + baseUrl
       case _ => println(">>(unmatched)" + url)
-      "Url request"
+      url
     }
     val httpReqInfo: String = basicRequest + ", format=${format}";
     val requestStr: String = host + "${url}";
