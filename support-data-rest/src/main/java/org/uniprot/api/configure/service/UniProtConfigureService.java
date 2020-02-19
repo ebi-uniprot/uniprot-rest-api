@@ -88,21 +88,27 @@ public class UniProtConfigureService {
     private List<AdvanceSearchTerm> getUniProtSearchTerms() {
         UniProtSearchFieldConfiguration config = UniProtSearchFieldConfiguration.getInstance();
         List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
-        Comparator<AdvanceSearchTerm> comparatorBySeqNumber = Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
-        Comparator<AdvanceSearchTerm> comparatorByChildNumber = Comparator.comparing(AdvanceSearchTerm::getChildNumber);
-        List<AdvanceSearchTerm> rootSearchTermConfigs = convert(rootFieldItems, comparatorBySeqNumber);
+        Comparator<AdvanceSearchTerm> comparatorBySeqNumber =
+                Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
+        Comparator<AdvanceSearchTerm> comparatorByChildNumber =
+                Comparator.comparing(AdvanceSearchTerm::getChildNumber);
+        List<AdvanceSearchTerm> rootSearchTermConfigs =
+                convert(rootFieldItems, comparatorBySeqNumber);
         Queue<AdvanceSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
         while (!queue.isEmpty()) {
             AdvanceSearchTerm currentItem = queue.remove();
             List<AdvanceSearchTerm> children =
-                    convert(config.getChildFieldItems(currentItem.getId()), comparatorByChildNumber);
+                    convert(
+                            config.getChildFieldItems(currentItem.getId()),
+                            comparatorByChildNumber);
             queue.addAll(children);
             currentItem.setItems(children);
         }
         return rootSearchTermConfigs;
     }
 
-    private List<AdvanceSearchTerm> convert(List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
+    private List<AdvanceSearchTerm> convert(
+            List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
         return fieldItems.stream()
                 .map(fi -> AdvanceSearchTerm.from(fi))
                 .sorted(comparator)
