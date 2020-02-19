@@ -24,9 +24,9 @@ class URLRetrievalSimulation extends Simulation {
     val url: String = "${url}"
     val urlRegex = raw"([A-Za-z0-9_\-\/]+)(\?|\/).*".r
     val basicRequest: String = url match {
-      case urlRegex(baseUrl, _) => println(">>(matched)" + line)
+      case urlRegex(baseUrl, _) => println(">>(matched)" + url)
       "url=" + baseUrl
-      case _ => println(">>(unmatched)" + line)
+      case _ => println(">>(unmatched)" + url)
       "Url request"
     }
     val httpReqInfo: String = basicRequest + ", format=${format}";
