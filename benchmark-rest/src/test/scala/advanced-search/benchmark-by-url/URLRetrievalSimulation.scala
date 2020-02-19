@@ -1,14 +1,9 @@
-import io.gatling.core.Predef._
-import io.gatling.core.scenario.Simulation
-import io.gatling.core.structure.ChainBuilder
-import io.gatling.http.Predef._
-import scala.concurrent.duration._
-import com.typesafe.config._
+
 
 /**
-  * Simulates simple retrieval of URLs from the REST service. Since these URLs can be anywhere, this simulation
-  * can be used to test anything.
-  */
+ * Simulates simple retrieval of URLs from the REST service. Since these URLs can be anywhere, this simulation
+ * can be used to test anything.
+ */
 class URLRetrievalSimulation extends Simulation {
 
   val conf = ConfigFactory.load()
@@ -21,7 +16,13 @@ class URLRetrievalSimulation extends Simulation {
   val feeder = separatedValues(conf.getString("a.s.url.retrieval.list"), '#').random
 
   def getRequest(): ChainBuilder = {
-    val httpReqInfo: String = "url ${url}, format=${format}";
+    val url: String = "${url}"
+    val urlRegex: String = raw"([A-Za-z0-9_\-\/]+)(\?|\/).*".r
+    val basicRequest: String = url match {
+      case urlRegex(baseUrl, _) => "url=" + baseUrl
+      case _ => "Url request"
+    }
+    val httpReqInfo: String = basicRequest + ", format=${format}";
     val requestStr: String = host + "${url}";
 
     val request =
