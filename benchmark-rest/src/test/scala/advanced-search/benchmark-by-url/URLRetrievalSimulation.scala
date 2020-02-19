@@ -21,13 +21,11 @@ class URLRetrievalSimulation extends Simulation {
   val feeder = separatedValues(conf.getString("a.s.url.retrieval.list"), '#').random
 
   def getRequest(): ChainBuilder = {
-    val url: String = "${url}"
-    val urlRegex = raw"([A-Za-z0-9_\-\/]+)(\?|\/).*".r
-    val basicRequest: String = url match {
-      case urlRegex(baseUrl, _) => println(">>(matched)" + url)
-      "url=" + baseUrl
-      case _ => println(">>(unmatched)" + url)
-      url
+    val url2: String = "${url}"
+    val urlRegex = raw"([A-Za-z0-9_\-\/]+)[\?\/].*".r
+    val basicRequest: String = url2 match {
+      case urlRegex(baseUrl) => "url=" + baseUrl
+      case _ => url2
     }
     val httpReqInfo: String = basicRequest + ", format=${format}";
     val requestStr: String = host + "${url}";
