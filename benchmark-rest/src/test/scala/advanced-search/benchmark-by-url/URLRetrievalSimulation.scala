@@ -21,7 +21,7 @@ class URLRetrievalSimulation extends Simulation {
   val feeder = separatedValues(conf.getString("a.s.url.retrieval.list"), '#').random
 
   def getRequest(): ChainBuilder = {
-    val httpReqInfo: String = "URL retrieval, format=${format}";
+    val httpReqInfo: String = "url ${url}, format=${format}";
     val requestStr: String = host + "${url}";
 
     val request =
