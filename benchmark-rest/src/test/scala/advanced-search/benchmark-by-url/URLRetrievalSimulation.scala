@@ -17,7 +17,7 @@ class URLRetrievalSimulation extends Simulation {
 
   def getRequest(): ChainBuilder = {
     val url: String = "${url}"
-    val urlRegex: String = raw"([A-Za-z0-9_\-\/]+)(\?|\/).*".r
+    val urlRegex = raw"([A-Za-z0-9_\-\/]+)(\?|\/).*".r
     val basicRequest: String = url match {
       case urlRegex(baseUrl, _) => "url=" + baseUrl
       case _ => "Url request"
