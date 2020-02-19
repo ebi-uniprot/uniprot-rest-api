@@ -11,8 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.highcharts.version>2.3.1</gatling.highcharts.version>
-        <gatling-plugin.version>2.2.4</gatling-plugin.version>
+        <gatling.highcharts.version>3.3.1</gatling.highcharts.version>
+        <gatling-plugin.version>3.0.5</gatling-plugin.version>
     </properties>
 
     <dependencies>
@@ -56,10 +56,9 @@
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>execute</goal>
+                                    <goal>test</goal>
                                 </goals>
                                 <configuration>
-                                    <dataFolder>src/test/resources/data/advanced-search</dataFolder>
                                     <resultsFolder>target/gatling/results/advanced-search</resultsFolder>
                                     <simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
                                     <runMultipleSimulations>true</runMultipleSimulations>
