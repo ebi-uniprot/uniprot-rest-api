@@ -64,7 +64,10 @@ class VerifyFieldsInAPIDocumentationExistTest {
     @ParameterizedTest(name = "{0} is a valid field?")
     @MethodSource("provideDocumentedSearchFields")
     void documentedSearchFieldIsKnownToSearchEngine(String documentedSearchField) {
-        assertThat(UniProtSearchFields.UNIPROTKB.hasField(documentedSearchField), is(true));
+        assertThat(
+                documentedSearchField + " not found",
+                UniProtSearchFields.UNIPROTKB.hasField(documentedSearchField),
+                is(true));
     }
 
     @ParameterizedTest(name = "{0} documented?")
