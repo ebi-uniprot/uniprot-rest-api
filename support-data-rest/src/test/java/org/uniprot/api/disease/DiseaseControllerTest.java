@@ -29,8 +29,8 @@ import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.keyword.Keyword;
-import org.uniprot.core.cv.keyword.impl.KeywordImpl;
+import org.uniprot.core.cv.keyword.KeywordEntryKeyword;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
@@ -144,9 +144,10 @@ class DiseaseControllerTest {
                         .propertiesSet(Arrays.asList("p3", "p4"))
                         .build();
         List<DiseaseCrossReference> xrefs = Arrays.asList(xr1, xr2);
-        List<Keyword> keywords =
+        List<KeywordEntryKeyword> keywords =
                 Arrays.asList(
-                        new KeywordImpl("keyword1", "kw-1"), new KeywordImpl("keyword2", "kw-2"));
+                        new KeywordEntryKeywordBuilder().id("keyword1").accession("kw-1").build(),
+                        new KeywordEntryKeywordBuilder().id("keyword2").accession("kw-2").build());
 
         Long reviewedProteinCount = 10L;
         Long unreviewedProteinCount = 20L;
