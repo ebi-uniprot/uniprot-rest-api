@@ -1,17 +1,17 @@
 package org.uniprot.api.configure.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.store.config.model.FieldItem;
+import org.uniprot.store.config.uniprotkb.UniProtSearchFieldConfiguration;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
-import org.uniprot.store.search.domain2.UniProtKBSearchItems;
 
 @Service
 public class UniProtConfigureService {
@@ -34,8 +34,8 @@ public class UniProtConfigureService {
         return SEARCH_ITEMS.getSearchItems();
     }
 
-    public List<org.uniprot.store.search.domain2.SearchItem> getUniProtSearchItems2() {
-        return UniProtKBSearchItems.INSTANCE.getSearchItems();
+    public List<AdvanceSearchTerm> getUniProtSearchItems2() {
+        return getUniProtSearchTerms();
     }
 
     public List<EvidenceGroup> getAnnotationEvidences() {
@@ -83,5 +83,29 @@ public class UniProtConfigureService {
 
     public List<UniProtXDbTypeDetail> getAllDatabases() {
         return DBX_TYPES.getAllDBXRefTypes();
+    }
+
+    private List<AdvanceSearchTerm> getUniProtSearchTerms() {
+        UniProtSearchFieldConfiguration config = UniProtSearchFieldConfiguration.getInstance();
+        List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
+        Comparator<AdvanceSearchTerm> comparatorBySeqNumber = Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
+        Comparator<AdvanceSearchTerm> comparatorByChildNumber = Comparator.comparing(AdvanceSearchTerm::getChildNumber);
+        List<AdvanceSearchTerm> rootSearchTermConfigs = convert(rootFieldItems, comparatorBySeqNumber);
+        Queue<AdvanceSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
+        while (!queue.isEmpty()) {
+            AdvanceSearchTerm currentItem = queue.remove();
+            List<AdvanceSearchTerm> children =
+                    convert(config.getChildFieldItems(currentItem.getId()), comparatorByChildNumber);
+            queue.addAll(children);
+            currentItem.setItems(children);
+        }
+        return rootSearchTermConfigs;
+    }
+
+    private List<AdvanceSearchTerm> convert(List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
+        return fieldItems.stream()
+                .map(fi -> AdvanceSearchTerm.from(fi))
+                .sorted(comparator)
+                .collect(Collectors.toList());
     }
 }
