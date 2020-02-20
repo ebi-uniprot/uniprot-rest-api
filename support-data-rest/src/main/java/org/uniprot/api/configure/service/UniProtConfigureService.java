@@ -8,8 +8,9 @@ import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.store.config.common.FieldConfiguration;
 import org.uniprot.store.config.model.FieldItem;
-import org.uniprot.store.config.uniprotkb.UniProtSearchFieldConfiguration;
+import org.uniprot.store.config.uniprotkb.UniProtKBSearchFieldConfiguration;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
 
@@ -86,7 +87,7 @@ public class UniProtConfigureService {
     }
 
     private List<AdvanceSearchTerm> getUniProtSearchTerms() {
-        UniProtSearchFieldConfiguration config = UniProtSearchFieldConfiguration.getInstance();
+        FieldConfiguration config = UniProtKBSearchFieldConfiguration.getInstance();
         List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
         Comparator<AdvanceSearchTerm> comparatorBySeqNumber =
                 Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
@@ -110,7 +111,7 @@ public class UniProtConfigureService {
     private List<AdvanceSearchTerm> convert(
             List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
         return fieldItems.stream()
-                .map(fi -> AdvanceSearchTerm.from(fi))
+                .map(AdvanceSearchTerm::from)
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
