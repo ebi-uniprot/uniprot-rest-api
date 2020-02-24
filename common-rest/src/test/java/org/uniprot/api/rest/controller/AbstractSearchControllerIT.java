@@ -11,6 +11,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VA
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,8 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.model.FieldItem;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 
@@ -763,11 +766,21 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract int getDefaultPageSize();
 
-    protected abstract Collection<String> getAllSearchFields();
+    protected abstract SearchFieldConfig getSearchFieldConfig();
+
+    protected Collection<String> getAllSearchFields() {
+        return getSearchFieldConfig().getSearchFieldItems().stream()
+                .map(FieldItem::getFieldName)
+                .collect(Collectors.toSet());
+    }
 
     protected abstract String getFieldValueForValidatedField(String searchField);
 
-    protected abstract Collection<String> getAllSortFields();
+    protected List<String> getAllSortFields() {
+        return getSearchFieldConfig().getSortFieldItems().stream()
+                .map(FieldItem::getFieldName)
+                .collect(Collectors.toList());
+    }
 
     protected abstract List<String> getAllFacetFields();
 
@@ -777,7 +790,9 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract void saveEntries(int numberOfEntries);
 
-    protected abstract boolean fieldValueIsValid(String field, String value);
+    protected boolean fieldValueIsValid(String field, String value) {
+        return getSearchFieldConfig().isSearchFieldValueValid(field, value);
+    }
 
     private String getFieldValueForField(String searchField) {
         String value = getFieldValueForValidatedField(searchField);

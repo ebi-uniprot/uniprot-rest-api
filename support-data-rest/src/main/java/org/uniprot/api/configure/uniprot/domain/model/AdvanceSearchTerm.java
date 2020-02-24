@@ -8,8 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import org.uniprot.store.config.model.FieldItem;
-import org.uniprot.store.config.model.FieldType;
+import org.uniprot.store.config.searchfield.model.FieldItem;
+import org.uniprot.store.config.searchfield.model.FieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 

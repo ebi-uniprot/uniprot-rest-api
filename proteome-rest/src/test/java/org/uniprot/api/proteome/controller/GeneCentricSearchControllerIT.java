@@ -36,13 +36,14 @@ import org.uniprot.core.proteome.Protein;
 import org.uniprot.core.proteome.builder.CanonicalProteinBuilder;
 import org.uniprot.core.proteome.builder.ProteinBuilder;
 import org.uniprot.core.uniprot.UniProtEntryType;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentricDocumentBuilder;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.GeneCentricField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -101,10 +102,8 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.GENECENTRIC.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.genecentric);
     }
 
     @Override
@@ -132,14 +131,6 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.GENECENTRIC.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
     }
@@ -149,11 +140,6 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         return Arrays.stream(GeneCentricField.ResultFields.values())
                 .map(GeneCentricField.ResultFields::name)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.GENECENTRIC.fieldValueIsValid(field, value);
     }
 
     @Override

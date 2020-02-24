@@ -3,17 +3,21 @@ package org.uniprot.api.crossref.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 @Component
 public class CrossRefSolrSortClause extends AbstractSolrSortClause {
+    private SearchFieldConfig fieldConfig =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.crossref);
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
         Sort defaultSort =
                 new Sort(
                         Sort.Direction.ASC,
-                        UniProtSearchFields.CROSSREF.getField("accession").getName());
+                        fieldConfig.getSearchFieldItemByName("accession").getFieldName());
 
         if (hasScore) {
             defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
@@ -24,7 +28,7 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtSearchFields.CROSSREF.getField("accession").getName();
+        return fieldConfig.getSearchFieldItemByName("accession").getFieldName();
     }
 
     @Override
