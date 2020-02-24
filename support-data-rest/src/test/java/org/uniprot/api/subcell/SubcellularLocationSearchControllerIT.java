@@ -5,7 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -31,12 +34,13 @@ import org.uniprot.core.cv.subcell.SubcellLocationCategory;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.SubcellularLocationField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -84,10 +88,8 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.SUBCELL.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.subcelllocation);
     }
 
     @Override
@@ -102,14 +104,6 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.SUBCELL.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>();
     }
@@ -119,11 +113,6 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         return Arrays.stream(SubcellularLocationField.ResultFields.values())
                 .map(SubcellularLocationField.ResultFields::name)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.SUBCELL.fieldValueIsValid(field, value);
     }
 
     @Override

@@ -32,12 +32,13 @@ import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.TaxonomyField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -82,10 +83,8 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.TAXONOMY.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.taxonomy);
     }
 
     @Override
@@ -102,14 +101,6 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.TAXONOMY.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
     }
@@ -119,11 +110,6 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         return Arrays.stream(TaxonomyField.ResultFields.values())
                 .map(TaxonomyField.ResultFields::name)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.TAXONOMY.fieldValueIsValid(field, value);
     }
 
     @Override
