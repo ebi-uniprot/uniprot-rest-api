@@ -10,20 +10,19 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.field.DiseaseField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Data
 public class DiseaseSearchRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = UniProtSearchFields.class,
-            enumValueName = "DISEASE",
+            uniProtDataType = UniProtDataType.disease,
             messagePrefix = "search.disease")
     private String query;
 
-    @ValidSolrSortFields(sortFieldEnumClazz = UniProtSearchFields.class, enumValueName = "DISEASE")
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.disease)
     private String sort;
 
     private String cursor;
