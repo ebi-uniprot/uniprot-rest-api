@@ -71,7 +71,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
     void documentedSearchFieldIsKnownToSearchEngine(String documentedSearchField) {
         assertThat(
                 documentedSearchField + " not found",
-                searchFieldConfig.hasSearchFieldItem(documentedSearchField),
+                searchFieldConfig.doesSearchFieldItemExist(documentedSearchField),
                 is(true));
     }
 

@@ -85,7 +85,8 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
         GeneCentricRequest searchRequest = new GeneCentricRequest();
         SearchFieldConfig searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.genecentric);
-        String query = searchFieldConfig.getFieldItemById("upid").getFieldName() + ":" + upid;
+        String query =
+                searchFieldConfig.getSearchFieldItemByName("upid").getFieldName() + ":" + upid;
         searchRequest.setQuery(query);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);

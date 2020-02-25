@@ -789,7 +789,7 @@ public abstract class AbstractSearchControllerIT {
         SearchFieldConfig fieldConfig = getSearchFieldConfig();
         return fieldConfig.getSearchFieldItems().stream()
                 .map(FieldItem::getFieldName)
-                .filter(fieldConfig::hasCorrespondingSortField)
+                .filter(fieldConfig::doesCorrespondingSortFieldExist)
                 .collect(Collectors.toList());
     }
 

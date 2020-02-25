@@ -3,6 +3,7 @@ package org.uniprot.api.configure.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
@@ -90,7 +91,7 @@ public class UniProtConfigureService {
     private List<AdvanceSearchTerm> getUniProtSearchTerms() {
         SearchFieldConfig config =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
-        List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
+        List<FieldItem> rootFieldItems = getTopLevelFieldItems(config);
         Comparator<AdvanceSearchTerm> comparatorBySeqNumber =
                 Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
         Comparator<AdvanceSearchTerm> comparatorByChildNumber =
@@ -102,7 +103,7 @@ public class UniProtConfigureService {
             AdvanceSearchTerm currentItem = queue.remove();
             List<AdvanceSearchTerm> children =
                     convert(
-                            config.getChildFieldItems(currentItem.getId()),
+                            getChildFieldItems(config, currentItem.getId()),
                             comparatorByChildNumber);
             queue.addAll(children);
             currentItem.setItems(children);
@@ -116,5 +117,26 @@ public class UniProtConfigureService {
                 .map(AdvanceSearchTerm::from)
                 .sorted(comparator)
                 .collect(Collectors.toList());
+    }
+
+    private List<FieldItem> getTopLevelFieldItems(SearchFieldConfig searchFieldConfig) {
+        return searchFieldConfig.getAllFieldItems().stream()
+                .filter(this::isTopLevel)
+                .collect(Collectors.toList());
+    }
+
+    private List<FieldItem> getChildFieldItems(
+            SearchFieldConfig searchFieldConfig, String parentId) {
+        return searchFieldConfig.getAllFieldItems().stream()
+                .filter(fi -> isChildOf(parentId, fi))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isChildOf(String parentId, FieldItem fieldItem) {
+        return parentId.equals(fieldItem.getParentId());
+    }
+
+    private boolean isTopLevel(FieldItem fi) {
+        return StringUtils.isBlank(fi.getParentId()) && fi.getSeqNumber() != null;
     }
 }

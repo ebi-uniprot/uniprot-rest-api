@@ -175,7 +175,7 @@ public @interface ValidSolrQueryFields {
                 String value) {
             boolean validField = true;
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            boolean fieldExists = this.searchFieldConfig.hasSearchFieldItem(fieldName);
+            boolean fieldExists = this.searchFieldConfig.doesSearchFieldItemExist(fieldName);
             if (!fieldExists && !fieldName.equals(DEFAULT_FIELD_NAME)) {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;

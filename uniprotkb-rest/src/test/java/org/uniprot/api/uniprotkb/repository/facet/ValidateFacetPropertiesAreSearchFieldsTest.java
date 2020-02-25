@@ -29,7 +29,9 @@ class ValidateFacetPropertiesAreSearchFieldsTest {
         config.getFacetNames()
                 .forEach(
                         facetField -> {
-                            assertThat(searchFieldConfig.hasSearchFieldItem(facetField), is(true));
+                            assertThat(
+                                    searchFieldConfig.doesSearchFieldItemExist(facetField),
+                                    is(true));
                         });
     }
 
