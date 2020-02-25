@@ -1,10 +1,7 @@
 package org.uniprot.api.uniprotkb.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.jcache.JCacheManagerFactoryBean;
-import org.springframework.stereotype.Service;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
@@ -16,10 +13,14 @@ import javax.annotation.PostConstruct;
  *
  * @author Edd
  */
-@Service
+//@Service
 public class FetchEntryService {
-    @Autowired private CacheManager cacheManager;
+    private CacheManager cacheManager;
     private Cache cache;
+
+    public FetchEntryService(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @PostConstruct
     public void fetchEntryService() {

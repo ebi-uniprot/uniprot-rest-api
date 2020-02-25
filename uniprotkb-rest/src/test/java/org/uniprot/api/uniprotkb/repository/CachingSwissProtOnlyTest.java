@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -36,9 +38,9 @@ class CachingSwissProtOnlyTest {
     @TestConfiguration
     @EnableCaching
     public static class TestConfig {
-//        @Bean
-//        public FetchEntryService fetchEntryService() {
-//            return new FetchEntryService();
-//        }
+        @Bean
+        public FetchEntryService fetchEntryService(CacheManager cacheManager) {
+            return new FetchEntryService(cacheManager);
+        }
     }
 }
