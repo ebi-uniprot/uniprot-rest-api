@@ -14,11 +14,13 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.suggester.Suggestion;
 import org.uniprot.api.suggester.Suggestions;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
 import org.uniprot.store.search.field.QueryBuilder;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * Created 18/07/18
@@ -41,10 +43,13 @@ public class SuggesterService {
 
     private final SolrTemplate solrTemplate;
     private final SolrCollection collection;
+    private final SearchFieldConfig searchFieldConfig;
 
     public SuggesterService(SolrTemplate solrTemplate, SolrCollection collection) {
         this.solrTemplate = solrTemplate;
         this.collection = collection;
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.suggest);
     }
 
     public Suggestions findSuggestions(String dictionaryStr, String queryStr) {
@@ -98,6 +103,7 @@ public class SuggesterService {
                 + "\""
                 + " +"
                 + QueryBuilder.query(
-                        UniProtSearchFields.SUGGEST.getField("dict").getName(), dict.name());
+                        searchFieldConfig.getSearchFieldItemByName("dict").getFieldName(),
+                        dict.name());
     }
 }

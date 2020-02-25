@@ -1,9 +1,12 @@
 package org.uniprot.api.uniprotkb.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.uniprotkb.UniprotKbObjectsForTests.*;
+import static org.uniprot.api.uniprotkb.UniprotKbObjectsForTests.getCitationXref;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;

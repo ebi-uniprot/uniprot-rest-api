@@ -11,8 +11,10 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,9 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, TaxonomyEntry>
         implements TaxonomyService {
+    private SearchFieldConfig searchFieldConfig;
+
     @Autowired
     public TaxonomyServiceImpl(TaxonomyRepository taxRepo) {
         super(taxRepo, new TaxonomyEntryConverter());
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.taxonomy);
     }
 
     @Cacheable("taxonomyCache")
@@ -37,7 +43,7 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.TAXONOMY.getField("id").getName();
+        return searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 
     @Override

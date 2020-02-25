@@ -3,9 +3,7 @@ package org.uniprot.api.proteome.output;
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
@@ -20,12 +18,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
-import org.uniprot.api.proteome.output.converter.GeneCentricJsonMessageConverter;
-import org.uniprot.api.proteome.output.converter.GeneCentricXmlMessageConverter;
-import org.uniprot.api.proteome.output.converter.ProteomeJsonMessageConverter;
-import org.uniprot.api.proteome.output.converter.ProteomeTsvMessageConverter;
-import org.uniprot.api.proteome.output.converter.ProteomeXmlMessageConverter;
-import org.uniprot.api.proteome.output.converter.ProteomeXslMessageConverter;
+import org.uniprot.api.proteome.output.converter.*;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;

@@ -30,8 +30,10 @@ import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtReference;
 import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales
@@ -43,6 +45,7 @@ public class PublicationService {
     private final UniProtKBStoreClient uniProtKBStore;
     private final LiteratureRepository repository;
     private final LiteratureStoreEntryConverter entryStoreConverter;
+    private final SearchFieldConfig searchFieldConfig;
 
     public PublicationService(
             UniProtKBStoreClient entryStore,
@@ -51,6 +54,8 @@ public class PublicationService {
         this.uniProtKBStore = entryStore;
         this.repository = repository;
         this.entryStoreConverter = entryStoreConverter;
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.literature);
     }
 
     public QueryResult<PublicationEntry> getPublicationsByUniprotAccession(
@@ -231,7 +236,9 @@ public class PublicationService {
                 .addSort(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.LITERATURE.getField("id").getName()))
+                                this.searchFieldConfig
+                                        .getSearchFieldItemByName("id")
+                                        .getFieldName()))
                 .defaultQueryOperator(Query.Operator.OR)
                 .rows(100)
                 .build();

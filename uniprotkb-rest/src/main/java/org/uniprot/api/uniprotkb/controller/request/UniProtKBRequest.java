@@ -12,12 +12,7 @@ import lombok.Data;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.ValidContentTypes;
-import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.rest.validation.ValidSolrQueryFields;
-import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;

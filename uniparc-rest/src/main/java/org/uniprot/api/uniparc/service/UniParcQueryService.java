@@ -8,8 +8,10 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo
@@ -18,6 +20,8 @@ import org.uniprot.store.search.field.UniProtSearchFields;
 @Service
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends BasicSearchService<UniParcDocument, UniParcEntry> {
+    private SearchFieldConfig searchFieldConfig;
+
     @Autowired
     public UniParcQueryService(
             UniParcQueryRepository repository,
@@ -27,10 +31,12 @@ public class UniParcQueryService extends BasicSearchService<UniParcDocument, Uni
             QueryBoosts uniParcQueryBoosts) {
 
         super(repository, uniParcEntryConverter, solrSortClause, uniParcQueryBoosts, facetConfig);
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniparc);
     }
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.UNIPARC.getField("upi").getName();
+        return this.searchFieldConfig.getSearchFieldItemByName("upi").getFieldName();
     }
 }

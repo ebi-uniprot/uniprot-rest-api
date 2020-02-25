@@ -9,7 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
  * Created 15/01/2020
@@ -19,14 +21,15 @@ import org.uniprot.store.search.field.UniProtSearchFields;
 @SpringBootTest
 class ValidateFacetPropertiesAreSearchFieldsTest {
     @Autowired private UniprotFacetConfig config;
+    private SearchFieldConfig searchFieldConfig =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
 
     @Test
     void validateAllFacetFieldsAreSearchFields() {
         config.getFacetNames()
                 .forEach(
                         facetField -> {
-                            assertThat(
-                                    UniProtSearchFields.UNIPROTKB.hasField(facetField), is(true));
+                            assertThat(searchFieldConfig.hasSearchFieldItem(facetField), is(true));
                         });
     }
 
