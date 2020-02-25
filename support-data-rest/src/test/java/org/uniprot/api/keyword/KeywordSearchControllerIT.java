@@ -28,7 +28,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.KeywordEntryKeyword;
+import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
@@ -136,12 +136,12 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     private void saveEntry(String keywordId, boolean facet) {
-        KeywordEntryKeyword keyword =
+        KeywordId keyword =
                 new KeywordEntryKeywordBuilder()
                         .id("my keyword " + keywordId)
                         .accession(keywordId)
                         .build();
-        KeywordEntryKeyword category =
+        KeywordId category =
                 new KeywordEntryKeywordBuilder().id("Ligand").accession("KW-9993").build();
 
         KeywordEntry keywordEntry =

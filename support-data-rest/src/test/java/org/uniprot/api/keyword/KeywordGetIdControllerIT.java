@@ -27,7 +27,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.KeywordEntryKeyword;
+import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
@@ -71,12 +71,12 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        KeywordEntryKeyword keyword =
+        KeywordId keyword =
                 new KeywordEntryKeywordBuilder()
                         .id("my keyword")
                         .accession(KEYWORD_ACCESSION)
                         .build();
-        KeywordEntryKeyword category =
+        KeywordId category =
                 new KeywordEntryKeywordBuilder().id("Ligand").accession("KW-9993").build();
 
         KeywordEntry keywordEntry =

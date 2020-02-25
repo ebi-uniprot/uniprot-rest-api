@@ -18,7 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.KeywordEntryKeyword;
+import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.cv.keyword.KeywordService;
@@ -116,7 +116,7 @@ class UniProtViewByKeywordServiceTest {
         when(keywordService.getByAccession(any())).thenReturn(parent);
     }
 
-    private KeywordEntryKeyword kw(String id, String accession) {
+    private KeywordId kw(String id, String accession) {
         return new KeywordEntryKeywordBuilder().id(id).accession(accession).build();
     }
 }

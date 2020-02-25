@@ -13,7 +13,7 @@ import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.keyword.KeywordEntryKeyword;
+import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -65,7 +65,7 @@ public class DiseaseSolrDocumentHelper {
 
     private static DiseaseDocument createDiseaseDocument(String accession, long suffix) {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
-        KeywordEntryKeyword keyword =
+        KeywordId keyword =
                 new KeywordEntryKeywordBuilder()
                         .id("Mental retardation" + suffix)
                         .accession("KW-0991" + suffix)
@@ -109,7 +109,7 @@ public class DiseaseSolrDocumentHelper {
         if (diseaseEntry.getKeywords() != null) {
             kwIds =
                     diseaseEntry.getKeywords().stream()
-                            .map(KeywordEntryKeyword::getId)
+                            .map(KeywordId::getName)
                             .collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();
