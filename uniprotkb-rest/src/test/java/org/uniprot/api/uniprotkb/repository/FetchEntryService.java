@@ -7,13 +7,16 @@ import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created 24/02/20
  *
  * @author Edd
  */
-//@Service
 public class FetchEntryService {
     private CacheManager cacheManager;
     private Cache cache;
@@ -24,34 +27,41 @@ public class FetchEntryService {
 
     @PostConstruct
     public void fetchEntryService() {
-                cache = cacheManager.getCache("swissProtEntryCache");
-//        System.out.println("hello world");
-//        cache = null;
+        cache = cacheManager.getCache("swissProtEntryCache");
     }
 
-    // https://stackoverflow.com/questions/21806298/compare-enums-in-spel
-    // https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#cache
-    //    @Cacheable(value = "swissProtEntryCache",
-    //             unless = "#result.getEntryType().name() != 'SWISSPROT'"
-    //    )
     public UniProtEntry getEntry(String id) {
-        System.out.print("Fetching id=" + id + "... ");
+        return getEntries(Collections.singletonList(id)).get(0);
+    }
 
-        UniProtEntry toReturn;
-        UniProtEntry cachedEntry = cache.get(id, UniProtEntry.class);
-        if (cachedEntry != null) {
-            toReturn = cachedEntry;
-        } else {
-            UniProtEntry fetchedEntry = pretendFetchEntry(id);
-            if (fetchedEntry.getEntryType().equals(UniProtEntryType.SWISSPROT)) {
-                cache.putIfAbsent(id, fetchedEntry);
+    public List<UniProtEntry> getEntries(List<String> ids) {
+        List<UniProtEntry> entries = new ArrayList<>();
+        List<String> idsToFetchFromStore = new ArrayList<>();
+        for (String id : ids) {
+            UniProtEntry cachedEntry = cache.get(id, UniProtEntry.class);
+            if (cachedEntry != null) {
+                System.out.println("Fetched cached entry: " + id);
+                entries.add(cachedEntry);
+            } else {
+                idsToFetchFromStore.add(id);
             }
-            toReturn = fetchedEntry;
         }
 
-        System.out.println(" Done.");
+        List<UniProtEntry> entriesFromStore = pretendFetchEntries(idsToFetchFromStore);
+        for (UniProtEntry fetchedEntry : entriesFromStore) {
+            if (fetchedEntry.getEntryType().equals(UniProtEntryType.SWISSPROT)) {
+                cache.putIfAbsent(fetchedEntry.getPrimaryAccession().getValue(), fetchedEntry);
+            }
+        }
 
-        return toReturn;
+        entries.addAll(entriesFromStore);
+        return entries;
+    }
+
+    private List<UniProtEntry> pretendFetchEntries(List<String> idsToFetchFromStore) {
+        return idsToFetchFromStore.stream()
+                .map(this::pretendFetchEntry)
+                .collect(Collectors.toList());
     }
 
     public UniProtEntry pretendFetchEntry(String id) {

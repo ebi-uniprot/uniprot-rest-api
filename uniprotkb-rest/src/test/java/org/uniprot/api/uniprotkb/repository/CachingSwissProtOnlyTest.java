@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
+import static java.util.Arrays.asList;
+
 /**
  * Created 24/02/2020
  *
@@ -26,13 +28,16 @@ class CachingSwissProtOnlyTest {
 
     @Test
     void doIt() {
-        for (int i = 0; i < 10; i++) {
-            service.getEntry("accession" + i);
-        }
-        System.out.println("-------------");
-        for (int i = 0; i < 10; i++) {
-            service.getEntry("accession" + i);
-        }
+//        for (int i = 0; i < 10; i++) {
+//            service.getEntry("accession" + i);
+//        }
+//        System.out.println("-------------");
+//        for (int i = 0; i < 10; i++) {
+//            service.getEntry("accession" + i);
+//        }
+
+        service.getEntries(asList("a1", "a2", "a3", "a4", "a5", "a6"));
+        service.getEntries(asList("a1", "a2", "a3", "a4", "a5", "a6"));
     }
 
     @TestConfiguration
