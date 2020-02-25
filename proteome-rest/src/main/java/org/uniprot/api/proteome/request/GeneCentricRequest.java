@@ -8,8 +8,8 @@ import lombok.Data;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.field.GeneCentricField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.google.common.base.Strings;
 
@@ -22,14 +22,11 @@ public class GeneCentricRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = UniProtSearchFields.class,
-            enumValueName = "GENECENTRIC",
+            uniProtDataType = UniProtDataType.genecentric,
             messagePrefix = "search.genecentric")
     private String query;
 
-    @ValidSolrSortFields(
-            sortFieldEnumClazz = UniProtSearchFields.class,
-            enumValueName = "GENECENTRIC")
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.genecentric)
     private String sort;
 
     private String cursor;

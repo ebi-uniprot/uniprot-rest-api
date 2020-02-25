@@ -15,8 +15,8 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,8 +38,7 @@ public class UniProtKBRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            fieldValidatorClazz = UniProtSearchFields.class,
-            enumValueName = "UNIPROTKB",
+            uniProtDataType = UniProtDataType.uniprotkb,
             messagePrefix = "search.uniprot")
     private String query;
 
@@ -49,9 +48,7 @@ public class UniProtKBRequest implements SearchRequest {
     private String fields;
 
     @Parameter(description = "Name of the field to be sorted on")
-    @ValidSolrSortFields(
-            sortFieldEnumClazz = UniProtSearchFields.class,
-            enumValueName = "UNIPROTKB")
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.uniprotkb)
     private String sort;
 
     @Parameter(hidden = true)

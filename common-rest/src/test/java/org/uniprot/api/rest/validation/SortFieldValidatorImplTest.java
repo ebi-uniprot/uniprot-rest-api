@@ -8,8 +8,7 @@ import java.util.List;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour
@@ -155,13 +154,7 @@ class SortFieldValidatorImplTest {
 
     private ValidSolrSortFields getMockedValidSolrQueryFields() {
         ValidSolrSortFields validSolrSortFields = Mockito.mock(ValidSolrSortFields.class);
-
-        Class<? extends Enum> returnFieldValidator = UniProtSearchFields.class;
-        OngoingStubbing<Class<?>> ongoingStubbing =
-                Mockito.when(validSolrSortFields.sortFieldEnumClazz());
-        ongoingStubbing.thenReturn(returnFieldValidator);
-        Mockito.when(validSolrSortFields.enumValueName())
-                .thenReturn(UniProtSearchFields.UNIPROTKB.name());
+        Mockito.when(validSolrSortFields.uniProtDataType()).thenReturn(UniProtDataType.uniprotkb);
         return validSolrSortFields;
     }
 

@@ -11,9 +11,8 @@ import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
-import org.uniprot.store.search.field.SearchFields;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.searchfield.model.FieldType;
 
 /**
  * Unit Test class to validate QueryFieldValidator class behaviour
@@ -210,15 +209,9 @@ class QueryFieldValidatorTest {
     }
 
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
-        ValidSolrQueryFields validReturnFields = Mockito.mock(ValidSolrQueryFields.class);
-
-        Class<? extends SearchFields> returnFieldValidator = UniProtSearchFields.class;
-        OngoingStubbing<Class<?>> ongoingStubbing =
-                Mockito.when(validReturnFields.fieldValidatorClazz());
-        ongoingStubbing.thenReturn(returnFieldValidator);
-        Mockito.when(validReturnFields.enumValueName())
-                .thenReturn(UniProtSearchFields.UNIPROTKB.name());
-        return validReturnFields;
+        ValidSolrQueryFields validSolrQueryFields = Mockito.mock(ValidSolrQueryFields.class);
+        Mockito.when(validSolrQueryFields.uniProtDataType()).thenReturn(UniProtDataType.uniprotkb);
+        return validSolrQueryFields;
     }
 
     /** this class is responsible to fake buildErrorMessage to help tests with */
@@ -250,9 +243,7 @@ class QueryFieldValidatorTest {
 
         @Override
         public void addFieldTypeErrorMessage(
-                String fieldName,
-                org.uniprot.store.search.domain2.SearchFieldType type,
-                ConstraintValidatorContextImpl contextImpl) {
+                String fieldName, FieldType type, ConstraintValidatorContextImpl contextImpl) {
             errorFields.get(ErrorType.TYPE).add(fieldName);
         }
 
