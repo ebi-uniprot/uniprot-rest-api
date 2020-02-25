@@ -14,9 +14,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.searchfield.model.FieldItem;
 import org.uniprot.store.search.domain2.JsonLoader;
-import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,9 +32,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  *
  * <ul>
  *   <li>check that all fields defined in uniprotkb_query_param_meta.json are indeed valid fields
- *       known by {@link UniProtSearchFields#UNIPROTKB}
- *   <li>check that all fields defined in {@link UniProtSearchFields#UNIPROTKB} are documented,
- *       except for a predefined list of fields that <b>should not</b> be documented.
+ *       known by {@link SearchFieldConfig}
+ *   <li>check that all fields defined in {@link SearchFieldConfig} are documented, except for a
+ *       predefined list of fields that <b>should not</b> be documented.
  * </ul>
  *
  * <p>Created 27/01/2020
@@ -44,6 +46,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
     private static final String JSON_FILE = "uniprotkb_query_param_meta.json";
     private static final List<Predicate<String>> DOCUMENTED_FIELD_EXCLUSIONS;
     private static Set<String> documentedSearchFields;
+    private static SearchFieldConfig searchFieldConfig;
 
     static {
         // predicates to match fields not to be documented in JSON_FILE
@@ -59,6 +62,8 @@ class VerifyFieldsInAPIDocumentationExistTest {
         List<QueryParamMeta> things = JsonLoader.loadItems(JSON_FILE, mapper, type);
         documentedSearchFields =
                 things.stream().map(QueryParamMeta::getName).collect(Collectors.toSet());
+        searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
     }
 
     @ParameterizedTest(name = "{0} is a valid field?")
@@ -66,7 +71,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
     void documentedSearchFieldIsKnownToSearchEngine(String documentedSearchField) {
         assertThat(
                 documentedSearchField + " not found",
-                UniProtSearchFields.UNIPROTKB.hasField(documentedSearchField),
+                searchFieldConfig.hasSearchFieldItem(documentedSearchField),
                 is(true));
     }
 
@@ -77,8 +82,8 @@ class VerifyFieldsInAPIDocumentationExistTest {
     }
 
     private static Stream<Arguments> provideSearchFields() {
-        return UniProtSearchFields.UNIPROTKB.getSearchFields().stream()
-                .map(SearchField::getName)
+        return searchFieldConfig.getSearchFieldItems().stream()
+                .map(FieldItem::getFieldName)
                 .filter(
                         field -> {
                             for (Predicate<String> predicate : DOCUMENTED_FIELD_EXCLUSIONS) {

@@ -13,8 +13,7 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 @Service
 @Import(DiseaseQueryBoostsConfig.class)
 public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseEntry> {
-    private SearchFieldConfig searchFieldConfig =
-            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.disease);
+    private SearchFieldConfig searchFieldConfig;
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -28,6 +27,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 diseaseSolrSortClause,
                 diseaseQueryBoosts,
                 null);
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.disease);
     }
 
     @Override

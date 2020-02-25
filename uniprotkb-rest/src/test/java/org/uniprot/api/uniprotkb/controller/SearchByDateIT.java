@@ -40,6 +40,9 @@ import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
@@ -47,7 +50,6 @@ import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -187,7 +189,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         "*",
                         false,
                         creationDate.atStartOfDay().format(DATE_FORMAT),
@@ -221,7 +223,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(1989, 10, 1);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         "*",
                         false,
                         creationDate.atStartOfDay().format(DATE_FORMAT),
@@ -234,7 +236,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(1999, 3, 15);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         "*",
                         false,
                         creationDate.atStartOfDay().format(DATE_FORMAT),
@@ -247,7 +249,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2004, 10, 26);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         "*",
                         false,
                         updateDate.atStartOfDay().format(DATE_FORMAT),
@@ -261,7 +263,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2004, 10, 27);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         "*",
                         false,
                         updateDate.atStartOfDay().format(DATE_FORMAT),
@@ -275,7 +277,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2006, 2, 8);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         "*",
                         false,
                         updateDate.atStartOfDay().format(DATE_FORMAT),
@@ -289,7 +291,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(2014, 3, 30);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         creationDate.atStartOfDay().format(DATE_FORMAT),
                         false,
                         "*",
@@ -302,7 +304,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(2003, 7, 29);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         creationDate.atStartOfDay().format(DATE_FORMAT),
                         false,
                         "*",
@@ -316,7 +318,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(1999, 3, 15);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         creationDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -329,7 +331,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2014, 4, 1);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         updateDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -342,7 +344,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2012, 12, 31);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         updateDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -355,7 +357,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2006, 2, 6);
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         updateDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -370,7 +372,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -385,7 +387,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -400,7 +402,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -415,7 +417,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("modified").getName(),
+                        getSearchField("modified"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -434,7 +436,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -449,7 +451,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -464,7 +466,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -479,7 +481,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -499,7 +501,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -514,7 +516,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -529,7 +531,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -544,11 +546,17 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        UniProtSearchFields.UNIPROTKB.getField("created").getName(),
+                        getSearchField("created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
                         true);
         verifyTest(query, ACCESSION_BST);
+    }
+
+    private String getSearchField(String name) {
+        SearchFieldConfig searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
+        return searchFieldConfig.getSearchFieldItemByName(name).getFieldName();
     }
 }

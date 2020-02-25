@@ -6,8 +6,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,13 +41,14 @@ import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.builder.*;
 import org.uniprot.core.uniprot.taxonomy.Taxonomy;
 import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.UniParcResultFields;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -101,13 +104,6 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.UNIPARC.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
         switch (searchField) {
@@ -132,16 +128,8 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.UNIPARC.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.UNIPARC.fieldValueIsValid(field, value);
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniparc);
     }
 
     @Override

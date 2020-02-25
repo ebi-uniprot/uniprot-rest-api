@@ -394,6 +394,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(sortFields, not(emptyIterable()));
 
         for (String sortField : sortFields) {
+            System.out.println("====================>" + sortField);
             // when
             ResultActions response =
                     mockMvc.perform(
@@ -768,6 +769,14 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract SearchFieldConfig getSearchFieldConfig();
 
+    protected abstract List<String> getAllFacetFields();
+
+    protected abstract List<String> getAllReturnedFields();
+
+    protected abstract void saveEntry(SaveScenario saveContext);
+
+    protected abstract void saveEntries(int numberOfEntries);
+
     protected Collection<String> getAllSearchFields() {
         return getSearchFieldConfig().getSearchFieldItems().stream()
                 .map(FieldItem::getFieldName)
@@ -776,19 +785,13 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract String getFieldValueForValidatedField(String searchField);
 
-    protected List<String> getAllSortFields() {
-        return getSearchFieldConfig().getSortFieldItems().stream()
+    protected Collection<String> getAllSortFields() {
+        SearchFieldConfig fieldConfig = getSearchFieldConfig();
+        return fieldConfig.getSearchFieldItems().stream()
                 .map(FieldItem::getFieldName)
+                .filter(fieldConfig::hasCorrespondingSortField)
                 .collect(Collectors.toList());
     }
-
-    protected abstract List<String> getAllFacetFields();
-
-    protected abstract List<String> getAllReturnedFields();
-
-    protected abstract void saveEntry(SaveScenario saveContext);
-
-    protected abstract void saveEntries(int numberOfEntries);
 
     protected boolean fieldValueIsValid(String field, String value) {
         return getSearchFieldConfig().isSearchFieldValueValid(field, value);

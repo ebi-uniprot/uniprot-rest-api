@@ -3,7 +3,9 @@ package org.uniprot.api.literature.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
  * @author lgonzales
@@ -11,6 +13,8 @@ import org.uniprot.store.search.field.UniProtSearchFields;
  */
 @Component
 public class LiteratureSortClause extends AbstractSolrSortClause {
+    private SearchFieldConfig searchFieldConfig =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.literature);
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
@@ -18,16 +22,18 @@ public class LiteratureSortClause extends AbstractSolrSortClause {
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.LITERATURE.getField("id").getName()));
+                                this.searchFieldConfig
+                                        .getSearchFieldItemByName("id")
+                                        .getFieldName()));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtSearchFields.LITERATURE.getField("id").getName();
+        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
-        return UniProtSearchFields.LITERATURE.getSortFieldFor(name).getName();
+        return this.searchFieldConfig.getCorrespondingSortField(name).getFieldName();
     }
 }

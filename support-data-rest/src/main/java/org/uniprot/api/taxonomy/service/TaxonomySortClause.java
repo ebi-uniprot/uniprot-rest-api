@@ -3,10 +3,14 @@ package org.uniprot.api.taxonomy.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 @Component
 public class TaxonomySortClause extends AbstractSolrSortClause {
+    private SearchFieldConfig searchFieldConfig =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.taxonomy);
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
@@ -14,20 +18,22 @@ public class TaxonomySortClause extends AbstractSolrSortClause {
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.TAXONOMY.getField("tax_id").getName()))
+                                searchFieldConfig
+                                        .getSearchFieldItemByName("tax_id")
+                                        .getFieldName()))
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.TAXONOMY.getField("id").getName()));
+                                searchFieldConfig.getSearchFieldItemByName("id").getFieldName()));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtSearchFields.TAXONOMY.getField("id").getName();
+        return searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
-        return UniProtSearchFields.TAXONOMY.getSortFieldFor(name).getName();
+        return searchFieldConfig.getCorrespondingSortField(name).getFieldName();
     }
 }
