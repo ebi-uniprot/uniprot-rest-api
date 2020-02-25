@@ -54,8 +54,7 @@ class DiseaseDocumentToDiseaseConverterTest {
         // keyword
         String kId = "Sample Keyword";
         String kwAC = "KW-1234";
-        KeywordId keyword =
-                new KeywordEntryKeywordBuilder().id(kId).accession(kwAC).build();
+        KeywordId keyword = new KeywordEntryKeywordBuilder().id(kId).accession(kwAC).build();
 
         DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
         builder.id(id).accession(accession).acronym(acronym).definition(def);

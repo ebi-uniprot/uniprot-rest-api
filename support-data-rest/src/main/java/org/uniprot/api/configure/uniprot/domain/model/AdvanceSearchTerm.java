@@ -1,18 +1,20 @@
 package org.uniprot.api.configure.uniprot.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
 import org.uniprot.store.config.model.FieldItem;
 import org.uniprot.store.config.model.FieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Data
 @Builder
