@@ -6,7 +6,6 @@ import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,13 +20,8 @@ public class FetchEntryService {
     private CacheManager cacheManager;
     private Cache cache;
 
-    public FetchEntryService(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
-    @PostConstruct
-    public void fetchEntryService() {
-        cache = cacheManager.getCache("swissProtEntryCache");
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 
     public UniProtEntry getEntry(String id) {
@@ -76,7 +70,7 @@ public class FetchEntryService {
         String uniProtId = "id-" + id;
         UniProtEntry entry = new UniProtEntryBuilder(id, uniProtId, entryType).build();
 
-        System.out.print("[acc=" + id + ", id=" + uniProtId + ", type=" + entryType + "]");
+        System.out.println("[acc=" + id + ", id=" + uniProtId + ", type=" + entryType + "]");
 
         return entry;
     }
