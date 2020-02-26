@@ -150,6 +150,13 @@
 			<artifactId>owlapi-oboformat</artifactId>
 			<version>5.1.11</version>
 		</dependency>
+
+		<!-- json filter content by json path -->
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<version>2.4.0</version>
+		</dependency>
 		<!-- Tests -->
 
 		<dependency>
