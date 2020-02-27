@@ -7,6 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
  * A class to handle solr sort clause, like parsing, providing default sort order
@@ -40,6 +43,12 @@ public abstract class AbstractSolrSortClause {
     protected abstract String getSolrDocumentIdFieldName();
 
     protected abstract String getSolrSortFieldName(String name);
+
+    protected abstract UniProtDataType getUniProtDataType();
+
+    protected SearchFieldConfig getSearchFieldConfig(UniProtDataType dataType) {
+        return SearchFieldConfigFactory.getSearchFieldConfig(dataType);
+    }
 
     protected List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
         List<Pair<String, Sort.Direction>> fieldSortPairs = new ArrayList<>();
