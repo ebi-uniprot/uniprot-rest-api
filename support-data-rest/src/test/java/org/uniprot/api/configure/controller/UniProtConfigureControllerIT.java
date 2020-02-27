@@ -96,19 +96,6 @@ class UniProtConfigureControllerIT {
         validateResponse(response);
     }
 
-    @Test
-    void testGetUniProtSearchTerms() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/search-terms")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
-    }
-
     private void validateResponse(ResultActions response) throws Exception {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))

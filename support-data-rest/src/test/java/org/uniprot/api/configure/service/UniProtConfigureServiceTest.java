@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.uniprot.store.search.domain.SearchItem;
+import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
 
 class UniProtConfigureServiceTest {
     private static UniProtConfigureService service;
@@ -19,7 +19,7 @@ class UniProtConfigureServiceTest {
 
     @Test
     void testGetUniProtSearchItems() {
-        List<SearchItem> items = service.getUniProtSearchItems();
+        List<AdvanceUniProtKBSearchTerm> items = service.getUniProtSearchItems();
         assertEquals(27, items.size());
     }
 

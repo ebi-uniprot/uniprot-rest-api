@@ -11,7 +11,6 @@ import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
-import org.uniprot.store.search.domain.SearchItem;
 
 @RestController
 @RequestMapping("/configure/uniprotkb")
@@ -23,13 +22,8 @@ public class UniProtConfigureController {
     }
 
     @GetMapping("/search_terms")
-    public List<SearchItem> getUniProtSearchTerms() {
+    public List<AdvanceUniProtKBSearchTerm> getUniProtSearchTerms() {
         return service.getUniProtSearchItems();
-    }
-
-    @GetMapping("/search-terms")
-    public List<AdvanceUniProtKBSearchTerm> getUniProtSearchTerms2() {
-        return service.getUniProtSearchItems2();
     }
 
     @GetMapping("/annotation_evidences")

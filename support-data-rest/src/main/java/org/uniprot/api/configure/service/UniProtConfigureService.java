@@ -8,7 +8,10 @@ import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
-import org.uniprot.store.search.domain.*;
+import org.uniprot.store.search.domain.DatabaseGroup;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.FieldGroup;
+import org.uniprot.store.search.domain.Tuple;
 import org.uniprot.store.search.domain.impl.*;
 
 @Service
@@ -23,16 +26,11 @@ public class UniProtConfigureService {
                             new TupleImpl(ANY_CROSS_REFERENCE_NAME, ANY_CROSS_REFERENCE_VALUE)));
 
     // By loading these enums at startup, there is no pause on first request
-    private static final UniProtSearchItems SEARCH_ITEMS = UniProtSearchItems.INSTANCE;
     private static final AnnotationEvidences ANNOTATION_EVIDENCES = AnnotationEvidences.INSTANCE;
     private static final GoEvidences GO_EVIDENCES = GoEvidences.INSTANCE;
     private static final UniProtXDbTypes DBX_TYPES = UniProtXDbTypes.INSTANCE;
 
-    public List<SearchItem> getUniProtSearchItems() {
-        return SEARCH_ITEMS.getSearchItems();
-    }
-
-    public List<AdvanceUniProtKBSearchTerm> getUniProtSearchItems2() {
+    public List<AdvanceUniProtKBSearchTerm> getUniProtSearchItems() {
         return AdvanceUniProtKBSearchTerm.getUniProtKBSearchTerms();
     }
 
