@@ -3,16 +3,11 @@ package org.uniprot.api.configure.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
+import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
 import org.uniprot.core.cv.xdb.DatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.config.searchfield.model.FieldItem;
 import org.uniprot.store.search.domain.*;
 import org.uniprot.store.search.domain.impl.*;
 
@@ -37,8 +32,8 @@ public class UniProtConfigureService {
         return SEARCH_ITEMS.getSearchItems();
     }
 
-    public List<AdvanceSearchTerm> getUniProtSearchItems2() {
-        return getUniProtSearchTerms();
+    public List<AdvanceUniProtKBSearchTerm> getUniProtSearchItems2() {
+        return AdvanceUniProtKBSearchTerm.getUniProtKBSearchTerms();
     }
 
     public List<EvidenceGroup> getAnnotationEvidences() {
@@ -86,57 +81,5 @@ public class UniProtConfigureService {
 
     public List<UniProtXDbTypeDetail> getAllDatabases() {
         return DBX_TYPES.getAllDBXRefTypes();
-    }
-
-    private List<AdvanceSearchTerm> getUniProtSearchTerms() {
-        SearchFieldConfig config =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
-        List<FieldItem> rootFieldItems = getTopLevelFieldItems(config);
-        Comparator<AdvanceSearchTerm> comparatorBySeqNumber =
-                Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
-        Comparator<AdvanceSearchTerm> comparatorByChildNumber =
-                Comparator.comparing(AdvanceSearchTerm::getChildNumber);
-        List<AdvanceSearchTerm> rootSearchTermConfigs =
-                convert(rootFieldItems, comparatorBySeqNumber);
-        Queue<AdvanceSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
-        while (!queue.isEmpty()) {
-            AdvanceSearchTerm currentItem = queue.remove();
-            List<AdvanceSearchTerm> children =
-                    convert(
-                            getChildFieldItems(config, currentItem.getId()),
-                            comparatorByChildNumber);
-            queue.addAll(children);
-            currentItem.setItems(children);
-        }
-        return rootSearchTermConfigs;
-    }
-
-    private List<AdvanceSearchTerm> convert(
-            List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
-        return fieldItems.stream()
-                .map(AdvanceSearchTerm::from)
-                .sorted(comparator)
-                .collect(Collectors.toList());
-    }
-
-    private List<FieldItem> getTopLevelFieldItems(SearchFieldConfig searchFieldConfig) {
-        return searchFieldConfig.getAllFieldItems().stream()
-                .filter(this::isTopLevel)
-                .collect(Collectors.toList());
-    }
-
-    private List<FieldItem> getChildFieldItems(
-            SearchFieldConfig searchFieldConfig, String parentId) {
-        return searchFieldConfig.getAllFieldItems().stream()
-                .filter(fi -> isChildOf(parentId, fi))
-                .collect(Collectors.toList());
-    }
-
-    private boolean isChildOf(String parentId, FieldItem fieldItem) {
-        return parentId.equals(fieldItem.getParentId());
-    }
-
-    private boolean isTopLevel(FieldItem fi) {
-        return StringUtils.isBlank(fi.getParentId()) && fi.getSeqNumber() != null;
     }
 }

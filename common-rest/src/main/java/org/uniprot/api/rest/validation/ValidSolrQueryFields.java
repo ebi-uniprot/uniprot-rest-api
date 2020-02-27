@@ -180,7 +180,8 @@ public @interface ValidSolrQueryFields {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
             } else if (fieldExists) {
-                FieldType fieldType = this.searchFieldConfig.getFieldTypeByFieldName(fieldName);
+                FieldType fieldType =
+                        this.searchFieldConfig.getFieldTypeBySearchFieldName(fieldName);
                 if (!Objects.equals(type, fieldType)) {
                     addFieldTypeErrorMessage(fieldName, type, contextImpl);
                     validField = false;
