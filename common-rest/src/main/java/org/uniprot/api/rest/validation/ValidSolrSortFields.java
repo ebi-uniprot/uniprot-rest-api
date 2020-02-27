@@ -19,7 +19,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.config.searchfield.model.FieldItem;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * This is the solr query solr validator is responsible to verify if the sort field parameter has
@@ -57,7 +57,7 @@ public @interface ValidSolrSortFields {
             valueList =
                     searchFieldConfig.getSearchFieldItems().stream()
                             .filter(field -> field.getSortFieldId() != null)
-                            .map(FieldItem::getFieldName)
+                            .map(SearchFieldItem::getFieldName)
                             .collect(Collectors.toList());
         }
 

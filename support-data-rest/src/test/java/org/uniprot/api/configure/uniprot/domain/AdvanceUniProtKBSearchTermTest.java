@@ -9,7 +9,7 @@ import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.config.searchfield.model.FieldItem;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 public class AdvanceUniProtKBSearchTermTest {
 
@@ -22,7 +22,7 @@ public class AdvanceUniProtKBSearchTermTest {
 
     @Test
     void testGetTopLevelFields() {
-        List<FieldItem> roots = AdvanceUniProtKBSearchTerm.getTopLevelFieldItems(fieldConfig);
+        List<SearchFieldItem> roots = AdvanceUniProtKBSearchTerm.getTopLevelFieldItems(fieldConfig);
         Assertions.assertNotNull(roots);
         Assertions.assertFalse(roots.isEmpty());
     }
@@ -30,7 +30,7 @@ public class AdvanceUniProtKBSearchTermTest {
     @Test
     void testGetChildFields() {
         String parentId = "structure";
-        List<FieldItem> fields =
+        List<SearchFieldItem> fields =
                 AdvanceUniProtKBSearchTerm.getChildFieldItems(fieldConfig, parentId);
         Assertions.assertNotNull(fields);
         Assertions.assertFalse(fields.isEmpty());
@@ -39,7 +39,7 @@ public class AdvanceUniProtKBSearchTermTest {
     @Test
     void testGetNoChildFields() {
         String parentId = "length_sort";
-        List<FieldItem> fields =
+        List<SearchFieldItem> fields =
                 AdvanceUniProtKBSearchTerm.getChildFieldItems(fieldConfig, parentId);
         Assertions.assertNotNull(fields);
         Assertions.assertTrue(fields.isEmpty());
@@ -48,7 +48,7 @@ public class AdvanceUniProtKBSearchTermTest {
     @Test
     void testGetChildFieldsWithWrongParent() {
         String parentId = "random";
-        List<FieldItem> fields =
+        List<SearchFieldItem> fields =
                 AdvanceUniProtKBSearchTerm.getChildFieldItems(fieldConfig, parentId);
         Assertions.assertNotNull(fields);
         Assertions.assertTrue(fields.isEmpty());
