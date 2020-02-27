@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
-import java.util.Collections;
-
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,9 +11,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.store.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.store.datastore.voldemort.VoldemortClient;
-import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteCachingUniProtKBEntryStore;
+
+import java.util.Collections;
 
 /**
  * Created 21/08/18
@@ -23,6 +22,8 @@ import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEnt
  */
 @Configuration
 public class UniProtStoreConfig {
+    private static final String UNIPROTKB_EH_CACHE_NAME = "uniProtKBEntryCache";
+
     @Bean
     public UniProtStoreConfigProperties storeConfigProperties() {
         return new UniProtStoreConfigProperties();
@@ -31,13 +32,14 @@ public class UniProtStoreConfig {
     @Bean
     @Profile("live")
     public UniProtKBStoreClient uniProtStoreClient(
-            UniProtStoreConfigProperties uniProtStoreConfigProperties) {
-        VoldemortClient<UniProtEntry> client =
-                new VoldemortRemoteUniProtKBEntryStore(
+            UniProtStoreConfigProperties uniProtStoreConfigProperties, CacheManager cacheManager) {
+        VoldemortRemoteCachingUniProtKBEntryStore uniProtKBEntryStore =
+                new VoldemortRemoteCachingUniProtKBEntryStore(
                         uniProtStoreConfigProperties.getNumberOfConnections(),
                         uniProtStoreConfigProperties.getStoreName(),
                         uniProtStoreConfigProperties.getHost());
-        return new UniProtKBStoreClient(client);
+        uniProtKBEntryStore.setCache(cacheManager.getCache(UNIPROTKB_EH_CACHE_NAME));
+        return new UniProtKBStoreClient(uniProtKBEntryStore);
     }
 
     @Bean(name = "rdfRestTemplate")

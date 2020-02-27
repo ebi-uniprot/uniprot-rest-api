@@ -12,4 +12,16 @@
 			<heap unit="MB">10</heap>
 		</resources>
 	</cache>
+
+	<cache alias="uniProtKBEntryCache">
+		<expiry>
+			<!-- entries in cache should expire if not accessed for this time -->
+			<tti unit="seconds">1800</tti>
+		</expiry>
+
+		<resources>
+			<heap unit="MB">1000</heap>
+		</resources>
+	</cache>
+
 </config>
