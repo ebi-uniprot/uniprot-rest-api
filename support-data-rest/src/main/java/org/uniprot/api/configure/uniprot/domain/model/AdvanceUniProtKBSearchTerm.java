@@ -40,7 +40,7 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
     @JsonIgnore private String description;
     private String example;
     private String autoComplete;
-    private String autoCompleteQueryField;
+    private String autoCompleteQueryTerm;
     @JsonIgnore private String autoCompleteQueryFieldValidRegex;
     private String regex;
     private List<Value> values;
@@ -99,7 +99,7 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
         b.description(fi.getDescription())
                 .example(fi.getExample())
                 .autoComplete(fi.getAutoComplete());
-        b.autoCompleteQueryField(fi.getAutoCompleteQueryField())
+        b.autoCompleteQueryTerm(fi.getAutoCompleteQueryField())
                 .autoCompleteQueryFieldValidRegex(fi.getAutoCompleteQueryFieldValidRegex());
         b.regex(fi.getValidRegex());
         if (fi.getItemType() != null) {
