@@ -18,7 +18,7 @@ import org.uniprot.store.config.searchfield.common.JsonLoader;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.config.searchfield.model.FieldItem;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,7 +83,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
 
     private static Stream<Arguments> provideSearchFields() {
         return searchFieldConfig.getSearchFieldItems().stream()
-                .map(FieldItem::getFieldName)
+                .map(SearchFieldItem::getFieldName)
                 .filter(
                         field -> {
                             for (Predicate<String> predicate : DOCUMENTED_FIELD_EXCLUSIONS) {

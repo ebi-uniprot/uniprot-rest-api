@@ -15,8 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.config.searchfield.model.FieldItem;
-import org.uniprot.store.config.searchfield.model.FieldType;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import org.uniprot.store.config.searchfield.model.SearchFieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 
@@ -57,7 +57,7 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
     public static List<AdvanceUniProtKBSearchTerm> getUniProtKBSearchTerms() {
         SearchFieldConfig config =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
-        List<FieldItem> rootFieldItems = getTopLevelFieldItems(config);
+        List<SearchFieldItem> rootFieldItems = getTopLevelFieldItems(config);
         Comparator<AdvanceUniProtKBSearchTerm> comparatorBySeqNumber =
                 Comparator.comparing(AdvanceUniProtKBSearchTerm::getSeqNumber);
         Comparator<AdvanceUniProtKBSearchTerm> comparatorByChildNumber =
@@ -69,7 +69,7 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
 
         while (!queue.isEmpty()) { // BFS logic
             AdvanceUniProtKBSearchTerm currentItem = queue.remove();
-            List<FieldItem> childFieldItems = getChildFieldItems(config, currentItem.getId());
+            List<SearchFieldItem> childFieldItems = getChildFieldItems(config, currentItem.getId());
             List<AdvanceUniProtKBSearchTerm> children =
                     convert(childFieldItems, comparatorByChildNumber);
             queue.addAll(children);
@@ -78,20 +78,20 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
         return rootSearchTermConfigs;
     }
 
-    public static List<FieldItem> getTopLevelFieldItems(SearchFieldConfig searchFieldConfig) {
+    public static List<SearchFieldItem> getTopLevelFieldItems(SearchFieldConfig searchFieldConfig) {
         return searchFieldConfig.getAllFieldItems().stream()
                 .filter(AdvanceUniProtKBSearchTerm::isTopLevel)
                 .collect(Collectors.toList());
     }
 
-    public static List<FieldItem> getChildFieldItems(
+    public static List<SearchFieldItem> getChildFieldItems(
             SearchFieldConfig searchFieldConfig, String parentId) {
         return searchFieldConfig.getAllFieldItems().stream()
                 .filter(fi -> isChildOf(parentId, fi))
                 .collect(Collectors.toList());
     }
 
-    private static AdvanceUniProtKBSearchTerm from(FieldItem fi) {
+    private static AdvanceUniProtKBSearchTerm from(SearchFieldItem fi) {
         AdvanceUniProtKBSearchTerm.AdvanceUniProtKBSearchTermBuilder b =
                 AdvanceUniProtKBSearchTerm.builder();
         b.id(fi.getId()).parentId(fi.getParentId()).childNumber(fi.getChildNumber());
@@ -110,12 +110,12 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
         }
         if (fi.getFieldType() != null) {
             b.fieldType(fi.getFieldType().name());
-            if (fi.getFieldType() == FieldType.evidence) {
+            if (fi.getFieldType() == SearchFieldType.evidence) {
                 b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
             }
         }
 
-        List<FieldItem.Value> values = fi.getValues();
+        List<SearchFieldItem.Value> values = fi.getValues();
         if (values != null) {
             List<AdvanceUniProtKBSearchTerm.Value> stcValues =
                     values.stream()
@@ -131,18 +131,18 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
     }
 
     private static List<AdvanceUniProtKBSearchTerm> convert(
-            List<FieldItem> fieldItems, Comparator<AdvanceUniProtKBSearchTerm> comparator) {
+            List<SearchFieldItem> fieldItems, Comparator<AdvanceUniProtKBSearchTerm> comparator) {
         return fieldItems.stream()
                 .map(AdvanceUniProtKBSearchTerm::from)
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
-    private static boolean isChildOf(String parentId, FieldItem fieldItem) {
+    private static boolean isChildOf(String parentId, SearchFieldItem fieldItem) {
         return parentId.equals(fieldItem.getParentId());
     }
 
-    private static boolean isTopLevel(FieldItem fi) {
+    private static boolean isTopLevel(SearchFieldItem fi) {
         return StringUtils.isBlank(fi.getParentId()) && fi.getSeqNumber() != null;
     }
 }

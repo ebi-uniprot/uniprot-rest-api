@@ -34,7 +34,7 @@ import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.model.FieldItem;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 
@@ -779,7 +779,7 @@ public abstract class AbstractSearchControllerIT {
 
     protected Collection<String> getAllSearchFields() {
         return getSearchFieldConfig().getSearchFieldItems().stream()
-                .map(FieldItem::getFieldName)
+                .map(SearchFieldItem::getFieldName)
                 .collect(Collectors.toSet());
     }
 
@@ -788,7 +788,7 @@ public abstract class AbstractSearchControllerIT {
     protected Collection<String> getAllSortFields() {
         SearchFieldConfig fieldConfig = getSearchFieldConfig();
         return fieldConfig.getSearchFieldItems().stream()
-                .map(FieldItem::getFieldName)
+                .map(SearchFieldItem::getFieldName)
                 .filter(fieldConfig::doesCorrespondingSortFieldExist)
                 .collect(Collectors.toList());
     }

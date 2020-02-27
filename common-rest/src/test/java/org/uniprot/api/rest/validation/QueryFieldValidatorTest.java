@@ -12,7 +12,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.config.searchfield.model.FieldType;
+import org.uniprot.store.config.searchfield.model.SearchFieldType;
 
 /**
  * Unit Test class to validate QueryFieldValidator class behaviour
@@ -243,7 +243,9 @@ class QueryFieldValidatorTest {
 
         @Override
         public void addFieldTypeErrorMessage(
-                String fieldName, FieldType type, ConstraintValidatorContextImpl contextImpl) {
+                String fieldName,
+                SearchFieldType type,
+                ConstraintValidatorContextImpl contextImpl) {
             errorFields.get(ErrorType.TYPE).add(fieldName);
         }
 
