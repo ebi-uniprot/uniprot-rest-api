@@ -38,6 +38,8 @@ import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.builder.SequenceBuilder;
+import org.uniprot.core.cv.go.GoAspect;
+import org.uniprot.core.cv.go.builder.GeneOntologyEntryBuilder;
 import org.uniprot.core.uniparc.builder.UniParcIdBuilder;
 import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
 import org.uniprot.core.uniref.*;
@@ -228,9 +230,21 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
                 .commonTaxon("Homo sapiens")
                 .representativeMember(createReprestativeMember(i))
                 .membersAdd(createMember(i))
-                .goTermsAdd(new GoTermBuilder().type(GoTermType.COMPONENT).id("GO:0044444").build())
-                .goTermsAdd(new GoTermBuilder().type(GoTermType.FUNCTION).id("GO:0044459").build())
-                .goTermsAdd(new GoTermBuilder().type(GoTermType.PROCESS).id("GO:0032459").build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.COMPONENT)
+                                .id("GO:0044444")
+                                .build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.FUNCTION)
+                                .id("GO:0044459")
+                                .build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.PROCESS)
+                                .id("GO:0032459")
+                                .build())
                 .memberCount(2)
                 .build();
     }

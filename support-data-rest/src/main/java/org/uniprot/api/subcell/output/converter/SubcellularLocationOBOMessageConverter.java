@@ -7,7 +7,7 @@ import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.uniprot.api.rest.output.converter.AbstractOBOMessagerConverter;
-import org.uniprot.core.cv.keyword.KeywordGeneOntology;
+import org.uniprot.core.cv.go.GeneOntologyEntry;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.util.Utils;
 
@@ -49,7 +49,7 @@ public class SubcellularLocationOBOMessageConverter
         }
         // add xref for GO terms
         if (Utils.notNullNotEmpty(subcellularLocationEntry.getGeneOntologies())) {
-            for (KeywordGeneOntology go : subcellularLocationEntry.getGeneOntologies()) {
+            for (GeneOntologyEntry go : subcellularLocationEntry.getGeneOntologies()) {
                 frame.addClause(getGeneOntologyXRefClause(go));
             }
         }
@@ -67,10 +67,10 @@ public class SubcellularLocationOBOMessageConverter
         return frame;
     }
 
-    private Clause getGeneOntologyXRefClause(KeywordGeneOntology go) {
+    private Clause getGeneOntologyXRefClause(GeneOntologyEntry go) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_XREF);
-        Xref xref = new Xref(go.getGoId());
-        xref.setAnnotation(go.getGoTerm());
+        Xref xref = new Xref(go.getId());
+        xref.setAnnotation(go.getName());
         clause.setValue(xref);
         return clause;
     }
