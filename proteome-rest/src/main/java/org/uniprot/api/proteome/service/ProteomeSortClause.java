@@ -8,8 +8,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
@@ -19,28 +17,37 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 @Component
 public class ProteomeSortClause extends AbstractSolrSortClause {
     private static final String UPID = "upid";
-    private SearchFieldConfig fieldConfig =
-            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.proteome);
 
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
         return new Sort(
                         Sort.Direction.DESC,
-                        fieldConfig.getCorrespondingSortField("annotation_score").getFieldName())
+                        getSearchFieldConfig(getUniProtDataType())
+                                .getCorrespondingSortField("annotation_score")
+                                .getFieldName())
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                fieldConfig.getCorrespondingSortField(UPID).getFieldName()));
+                                getSearchFieldConfig(getUniProtDataType())
+                                        .getCorrespondingSortField(UPID)
+                                        .getFieldName()));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return fieldConfig.getSearchFieldItemByName(UPID).getFieldName();
+        return getSearchFieldConfig(getUniProtDataType())
+                .getSearchFieldItemByName(UPID)
+                .getFieldName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
         return name;
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.proteome;
     }
 
     @Override
@@ -51,7 +58,7 @@ public class ProteomeSortClause extends AbstractSolrSortClause {
                         val ->
                                 val.getLeft()
                                         .equals(
-                                                fieldConfig
+                                                getSearchFieldConfig(getUniProtDataType())
                                                         .getCorrespondingSortField(UPID)
                                                         .getFieldName()))) {
             return fieldSortPairs;
@@ -60,7 +67,9 @@ public class ProteomeSortClause extends AbstractSolrSortClause {
             newFieldSortPairs.addAll(fieldSortPairs);
             newFieldSortPairs.add(
                     new ImmutablePair<>(
-                            fieldConfig.getCorrespondingSortField(UPID).getFieldName(),
+                            getSearchFieldConfig(getUniProtDataType())
+                                    .getCorrespondingSortField(UPID)
+                                    .getFieldName(),
                             Sort.Direction.ASC));
             return newFieldSortPairs;
         }
