@@ -73,7 +73,7 @@ public class UniProtViewByKeywordService implements UniProtViewByService {
         KeywordEntry keyword = keywordAccMap.get(count.getName());
         viewBy.setLink(URL_PREFIX + count.getName());
         if (keyword != null) {
-            viewBy.setLabel(keyword.getKeyword().getId());
+            viewBy.setLabel(keyword.getKeyword().getName());
             viewBy.setExpand(!keyword.getChildren().isEmpty());
         }
         return viewBy;

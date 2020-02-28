@@ -20,7 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.ec.ECEntry;
-import org.uniprot.core.cv.ec.impl.ECEntryImpl;
+import org.uniprot.core.cv.ec.builder.ECEntryBuilder;
 import org.uniprot.cv.ec.ECRepo;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,8 +65,12 @@ class UniProtViewByECServiceTest {
     }
 
     void mockEcService() {
-        ECEntry ec1 = new ECEntryImpl("1.1.1.-", "With NAD(+) or NADP(+) as acceptor");
-        ECEntry ec2 = new ECEntryImpl("1.1.3.-", "With oxygen as acceptor");
+        ECEntry ec1 =
+                new ECEntryBuilder()
+                        .id("1.1.1.-")
+                        .label("With NAD(+) or NADP(+) as acceptor")
+                        .build();
+        ECEntry ec2 = new ECEntryBuilder().id("1.1.3.-").label("With oxygen as acceptor").build();
         doReturn(Optional.of(ec1)).when(ecRepo).getEC("1.1.1.-");
         doReturn(Optional.of(ec2)).when(ecRepo).getEC("1.1.3.-");
     }

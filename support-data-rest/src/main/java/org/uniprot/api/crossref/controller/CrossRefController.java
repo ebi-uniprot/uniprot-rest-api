@@ -22,7 +22,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.core.crossref.CrossRefEntry;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.search.field.CrossRefField;
 
 @RestController

@@ -32,8 +32,8 @@ import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.keyword.Keyword;
-import org.uniprot.core.cv.keyword.impl.KeywordImpl;
+import org.uniprot.core.cv.keyword.KeywordId;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -82,7 +82,11 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     protected void saveEntry() {
 
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
-        Keyword keyword = new KeywordImpl("Mental retardation", "KW-0991");
+        KeywordId keyword =
+                new KeywordEntryKeywordBuilder()
+                        .id("Mental retardation")
+                        .accession("KW-0991")
+                        .build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
                         .databaseType("MIM")
@@ -116,7 +120,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         if (diseaseEntry.getKeywords() != null) {
             kwIds =
                     diseaseEntry.getKeywords().stream()
-                            .map(Keyword::getId)
+                            .map(KeywordId::getName)
                             .collect(Collectors.toList());
         } else {
             kwIds = new ArrayList<>();

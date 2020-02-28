@@ -34,7 +34,7 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
-import org.uniprot.core.cv.keyword.Keyword;
+import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.cv.disease.DiseaseFileReader;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -458,7 +458,7 @@ class DiseaseControllerSearchTestIT {
             if (disease.getKeywords() != null) {
                 kwIds =
                         disease.getKeywords().stream()
-                                .map(Keyword::getId)
+                                .map(KeywordId::getName)
                                 .collect(Collectors.toList());
             }
             // name is a combination of id, acronym, definition, synonyms, keywords

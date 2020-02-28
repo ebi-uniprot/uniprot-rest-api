@@ -8,7 +8,7 @@ import org.uniprot.api.crossref.config.CrossRefQueryBoostsConfig;
 import org.uniprot.api.crossref.repository.CrossRefRepository;
 import org.uniprot.api.crossref.request.CrossRefEntryConverter;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.core.crossref.CrossRefEntry;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 import org.uniprot.store.search.field.UniProtSearchFields;
 

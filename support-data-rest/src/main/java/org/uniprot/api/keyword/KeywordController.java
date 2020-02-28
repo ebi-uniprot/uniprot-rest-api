@@ -177,7 +177,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
 
     @Override
     protected String getEntityId(KeywordEntry entity) {
-        return entity.getKeyword().getAccession();
+        return entity.getKeyword().getId();
     }
 
     @Override
