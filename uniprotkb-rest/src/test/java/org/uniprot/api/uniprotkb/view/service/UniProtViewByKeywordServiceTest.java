@@ -18,8 +18,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
-import org.uniprot.core.cv.keyword.impl.KeywordImpl;
+import org.uniprot.core.cv.keyword.KeywordId;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.cv.keyword.KeywordService;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,36 +74,49 @@ class UniProtViewByKeywordServiceTest {
     }
 
     void mockKeywordService() {
-        KeywordEntryImpl keyword = new KeywordEntryImpl();
-        keyword.setKeyword(new KeywordImpl("Catecholamine metabolism", "KW-9999"));
-        Set<KeywordEntry> parents = Collections.singleton(keyword);
-        KeywordEntryImpl kw1 = new KeywordEntryImpl();
-        kw1.setKeyword(new KeywordImpl("Catecholamine metabolism", "KW-0128"));
-        kw1.setParents(parents);
-        KeywordEntryImpl kw2 = new KeywordEntryImpl();
-        kw2.setKeyword(new KeywordImpl("Cell adhesion", "KW-0130"));
-        kw2.setParents(parents);
+        KeywordEntry growthArrest =
+                new KeywordEntryBuilder().keyword(kw("Growth arrest", "KW-0338")).build();
 
-        KeywordEntryImpl kw3 = new KeywordEntryImpl();
-        kw3.setKeyword(new KeywordImpl("Cell cycle", "KW-0131"));
-        kw3.setParents(parents);
-        List<KeywordEntry> kws = new ArrayList<>();
-        kws.add(kw1);
-        kws.add(kw2);
-        kws.add(kw3);
-        Set<KeywordEntry> kws3 = Collections.singleton(kw3);
-        KeywordEntryImpl kw31 = new KeywordEntryImpl();
-        kw31.setKeyword(new KeywordImpl("Cell division", "KW-0132"));
-        kw31.setParents(kws3);
-        KeywordEntryImpl kw32 = new KeywordEntryImpl();
-        kw32.setKeyword(new KeywordImpl("Growth arrest", "KW-0338"));
-        List<KeywordEntry> kws33 = new ArrayList<>();
-        kws33.add(kw31);
-        kws33.add(kw32);
-        kw31.setParents(kws3);
-        kw3.setChildren(kws33);
-        keyword.setChildren(kws);
+        KeywordEntry parent =
+                new KeywordEntryBuilder()
+                        .keyword(kw("Catecholamine metabolism", "KW-9999"))
+                        .build();
 
-        when(keywordService.getByAccession(any())).thenReturn(keyword);
+        KeywordEntry cellCycle =
+                new KeywordEntryBuilder()
+                        .keyword(kw("Cell cycle", "KW-0131"))
+                        .parentsAdd(parent)
+                        .build();
+
+        KeywordEntry cellDivision =
+                new KeywordEntryBuilder()
+                        .keyword(kw("Cell division", "KW-0132"))
+                        .parentsAdd(cellCycle)
+                        .build();
+
+        KeywordEntry catecholamineMetabolism =
+                new KeywordEntryBuilder()
+                        .keyword(kw("Catecholamine metabolism", "KW-0128"))
+                        .parentsAdd(parent)
+                        .build();
+
+        KeywordEntry cellAdhesion =
+                new KeywordEntryBuilder()
+                        .keyword(kw("Cell adhesion", "KW-0130"))
+                        .parentsAdd(parent)
+                        .build();
+
+        List<KeywordEntry> cellCycleChildren = Arrays.asList(cellDivision, growthArrest);
+        cellCycle = KeywordEntryBuilder.from(cellCycle).childrenSet(cellCycleChildren).build();
+
+        List<KeywordEntry> children =
+                Arrays.asList(catecholamineMetabolism, cellAdhesion, cellCycle);
+        parent = KeywordEntryBuilder.from(parent).childrenSet(children).build();
+
+        when(keywordService.getByAccession(any())).thenReturn(parent);
+    }
+
+    private KeywordId kw(String id, String accession) {
+        return new KeywordEntryKeywordBuilder().id(id).accession(accession).build();
     }
 }

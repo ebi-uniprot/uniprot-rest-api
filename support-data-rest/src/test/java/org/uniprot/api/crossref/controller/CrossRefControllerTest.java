@@ -22,8 +22,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.crossref.service.CrossRefService;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.crossref.CrossRefEntry;
-import org.uniprot.core.crossref.CrossRefEntryBuilder;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
+import org.uniprot.core.cv.xdb.builder.CrossRefEntryBuilder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})

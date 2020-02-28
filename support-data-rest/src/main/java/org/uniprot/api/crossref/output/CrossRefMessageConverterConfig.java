@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.crossref.CrossRefEntry;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
 
 /** @author sahmad */
 @Configuration
