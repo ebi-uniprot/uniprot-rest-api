@@ -55,5 +55,5 @@ class URLRetrievalSimulation extends Simulation {
   )
     .protocols(httpConf)
     .maxDuration(conf.getInt("a.s.url.retrieval.maxDuration") minutes)
-    .assertions(global.successfulRequests.percent.gt(conf.getInt("a.s.url.retrieval.minimumSuccessPercent")))
+    .assertions(global.successfulRequests.percent.gt(conf.getInt("a.s.url.retrieval.successPercentGreaterThan")))
 }
