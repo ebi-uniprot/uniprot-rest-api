@@ -115,15 +115,15 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         LocalDate modified = LocalDate.of(2015, 11, 5);
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
-        List<DBCrossReference<ProteomeXReferenceType>> xrefs = new ArrayList<>();
-        DBCrossReference<ProteomeXReferenceType> xref1 =
-                new DBCrossReferenceBuilder<ProteomeXReferenceType>()
-                        .databaseType(ProteomeXReferenceType.GENOME_ACCESSION)
+        List<DBCrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
+        DBCrossReference<ProteomeDatabase> xref1 =
+                new DBCrossReferenceBuilder<ProteomeDatabase>()
+                        .databaseType(ProteomeDatabase.GENOME_ACCESSION)
                         .id("ACA121")
                         .build();
-        DBCrossReference<ProteomeXReferenceType> xref2 =
-                new DBCrossReferenceBuilder<ProteomeXReferenceType>()
-                        .databaseType(ProteomeXReferenceType.GENOME_ANNOTATION)
+        DBCrossReference<ProteomeDatabase> xref2 =
+                new DBCrossReferenceBuilder<ProteomeDatabase>()
+                        .databaseType(ProteomeDatabase.GENOME_ANNOTATION)
                         .id("ADFDA121")
                         .build();
         xrefs.add(xref1);

@@ -181,17 +181,17 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     private void processDbReference(UniParcDBCrossReference xref, UniParcDocumentBuilder builder) {
-        UniParcDatabaseType type = xref.getDatabaseType();
+        UniParcDatabase type = xref.getDatabaseType();
         if (xref.isActive()) {
             builder.active(type.toDisplayName());
         }
         builder.database(type.toDisplayName());
-        if ((type == UniParcDatabaseType.SWISSPROT) || (type == UniParcDatabaseType.TREMBL)) {
+        if ((type == UniParcDatabase.SWISSPROT) || (type == UniParcDatabase.TREMBL)) {
             builder.uniprotAccession(xref.getId());
             builder.uniprotIsoform(xref.getId());
         }
 
-        if (type == UniParcDatabaseType.SWISSPROT_VARSPLIC) {
+        if (type == UniParcDatabase.SWISSPROT_VARSPLIC) {
             builder.uniprotIsoform(xref.getId());
         }
         xref.getProperties().stream()
@@ -290,7 +290,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         UniParcDBCrossReference xref =
                 new UniParcDBCrossReferenceBuilder()
                         .versionI(3)
-                        .databaseType(UniParcDatabaseType.SWISSPROT)
+                        .databaseType(UniParcDatabase.SWISSPROT)
                         .id("P12345")
                         .version(7)
                         .active(true)
@@ -309,7 +309,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         UniParcDBCrossReference xref2 =
                 new UniParcDBCrossReferenceBuilder()
                         .versionI(1)
-                        .databaseType(UniParcDatabaseType.TREMBL)
+                        .databaseType(UniParcDatabase.TREMBL)
                         .id(getName("P123", i))
                         .version(7)
                         .active(true)

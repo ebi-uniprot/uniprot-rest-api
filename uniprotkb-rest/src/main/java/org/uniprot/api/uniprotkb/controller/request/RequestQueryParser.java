@@ -9,7 +9,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
-import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.uniprot.ProteinExistence;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureType;
@@ -461,11 +461,11 @@ public class RequestQueryParser {
         boolean isFieldNameType = termQuery.getTerm().field().equalsIgnoreCase("type");
 
         String value = termQuery.getTerm().text();
-        List<UniProtXDbTypeDetail> dbxrefs = UniProtXDbDisplayOrder.INSTANCE.getOrderedDatabases();
+        List<UniProtDatabaseDetail> dbxrefs = UniProtXDbDisplayOrder.INSTANCE.getOrderedDatabases();
 
         boolean isValueAValidDatabase =
                 dbxrefs.stream()
-                        .map(UniProtXDbTypeDetail::getName)
+                        .map(UniProtDatabaseDetail::getName)
                         .anyMatch(databaseType -> databaseType.equalsIgnoreCase(value));
 
         return isFieldNameType && isValueAValidDatabase;

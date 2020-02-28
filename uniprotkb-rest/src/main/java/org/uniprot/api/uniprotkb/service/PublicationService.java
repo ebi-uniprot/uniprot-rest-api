@@ -21,7 +21,7 @@ import org.uniprot.api.uniprotkb.model.PublicationCategory;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
@@ -127,7 +127,7 @@ public class PublicationService {
     private boolean hasPubmedId(UniProtReference uniProtReference) {
         return uniProtReference
                 .getCitation()
-                .getCitationXrefsByType(CitationXrefType.PUBMED)
+                .getCitationXrefsByType(CitationDatabase.PUBMED)
                 .isPresent();
     }
 
@@ -135,7 +135,7 @@ public class PublicationService {
         final Long[] result = {0L};
         uniProtReference
                 .getCitation()
-                .getCitationXrefsByType(CitationXrefType.PUBMED)
+                .getCitationXrefsByType(CitationDatabase.PUBMED)
                 .ifPresent(xref -> result[0] = Long.valueOf(xref.getId()));
         return result[0];
     }

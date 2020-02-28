@@ -46,7 +46,7 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
+import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
@@ -56,7 +56,7 @@ import org.uniprot.core.uniprot.feature.FeatureType;
 import org.uniprot.core.uniprot.xdb.builder.UniProtDBCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.xdb.UniProtXDbTypeImpl;
+import org.uniprot.cv.xdb.UniProtDatabaseImpl;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -755,10 +755,11 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
                             .databaseCrossReferencesAdd(
                                     new UniProtDBCrossReferenceBuilder()
-                                            .databaseType(new UniProtXDbTypeImpl("Proteomes"))
+                                            .databaseType(new UniProtDatabaseImpl("Proteomes"))
                                             .id("UP000000000")
                                             .propertiesAdd(
-                                                    new DBXRefTypeAttribute("a", "a", "a"), "value")
+                                                    new UniProtDatabaseAttribute("a", "a", "a"),
+                                                    "value")
                                             .build())
                             .build();
 

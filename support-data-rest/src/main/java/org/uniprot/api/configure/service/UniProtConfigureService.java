@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
-import org.uniprot.core.cv.xdb.DatabaseCategory;
-import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
+import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
 import org.uniprot.store.config.common.FieldConfiguration;
 import org.uniprot.store.config.model.FieldItem;
@@ -49,8 +49,8 @@ public class UniProtConfigureService {
 
     public List<DatabaseGroup> getDatabases() {
         List<DatabaseGroup> databases =
-                Arrays.stream(DatabaseCategory.values())
-                        .filter(dbCat -> dbCat != DatabaseCategory.UNKNOWN)
+                Arrays.stream(UniProtDatabaseCategory.values())
+                        .filter(dbCat -> dbCat != UniProtDatabaseCategory.UNKNOWN)
                         .map(this::getDatabaseGroup)
                         .filter(dbGroup -> !dbGroup.getItems().isEmpty())
                         .collect(Collectors.toList());
@@ -68,12 +68,12 @@ public class UniProtConfigureService {
         return results;
     }
 
-    private Tuple convertToTuple(UniProtXDbTypeDetail dbType) {
+    private Tuple convertToTuple(UniProtDatabaseDetail dbType) {
         return new TupleImpl(dbType.getName(), dbType.getName().toLowerCase());
     }
 
-    private DatabaseGroup getDatabaseGroup(DatabaseCategory dbCategory) {
-        List<UniProtXDbTypeDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
+    private DatabaseGroup getDatabaseGroup(UniProtDatabaseCategory dbCategory) {
+        List<UniProtDatabaseDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
         List<Tuple> databaseTypes =
                 dbTypes.stream()
                         .filter(val -> !val.isImplicit())
@@ -82,7 +82,7 @@ public class UniProtConfigureService {
         return new DatabaseGroupImpl(dbCategory.getDisplayName(), databaseTypes);
     }
 
-    public List<UniProtXDbTypeDetail> getAllDatabases() {
+    public List<UniProtDatabaseDetail> getAllDatabases() {
         return DBX_TYPES.getAllDBXRefTypes();
     }
 

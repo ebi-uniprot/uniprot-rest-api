@@ -29,7 +29,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.DBCrossReference;
 import org.uniprot.core.builder.DBCrossReferenceBuilder;
-import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.citation.impl.AuthorImpl;
@@ -84,9 +84,9 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
 
-        DBCrossReference<CitationXrefType> pubmed =
-                new DBCrossReferenceBuilder<CitationXrefType>()
-                        .databaseType(CitationXrefType.PUBMED)
+        DBCrossReference<CitationDatabase> pubmed =
+                new DBCrossReferenceBuilder<CitationDatabase>()
+                        .databaseType(CitationDatabase.PUBMED)
                         .id(String.valueOf(PUBMED_ID))
                         .build();
 
