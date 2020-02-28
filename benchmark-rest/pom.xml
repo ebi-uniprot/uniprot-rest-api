@@ -8,10 +8,11 @@
     <groupId>org.uniprot</groupId>
     <artifactId>benchmark-rest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-
+    mvn -P benchmark clean test -Da.s.host=http://ves-hx-cb:8095 -Da.s.url.retrieval.users=10 -Da.s.url.retrieval.maxDuration=1 -Da.s.url.retrieval.list=/home/eddturner/working/intellij/website/uniprot-rest-api/benchmark-rest/src/test/scala/advanced-search/benchmark-by-url/urls -Dgatling.simulationClass=URLRetrievalSimulation
+    1975  vi src/test/scala/advanced-search/benchmark-by-url/URLRetrievalSimulation.scala
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.highcharts.version>3.3.1</gatling.highcharts.version>
+        <gatling.highcharts.version>3.3.0</gatling.highcharts.version>
         <gatling-plugin.version>3.0.5</gatling-plugin.version>
     </properties>
 
