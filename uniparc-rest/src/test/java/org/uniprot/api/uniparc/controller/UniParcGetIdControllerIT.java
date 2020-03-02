@@ -99,8 +99,8 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
     }
 
-    private void processDbReference(UniParcDBCrossReference xref, UniParcDocumentBuilder builder) {
-        UniParcDatabase type = xref.getDatabaseType();
+    private void processDbReference(UniParcCrossReference xref, UniParcDocumentBuilder builder) {
+        UniParcDatabase type = xref.getDatabase();
         if (xref.isActive()) {
             builder.active(type.toDisplayName());
         }
@@ -114,17 +114,17 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
             builder.uniprotIsoform(xref.getId());
         }
         xref.getProperties().stream()
-                .filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_PROTEOME_ID))
+                .filter(val -> val.getKey().equals(UniParcCrossReference.PROPERTY_PROTEOME_ID))
                 .map(Property::getValue)
                 .forEach(builder::upid);
 
         xref.getProperties().stream()
-                .filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_PROTEIN_NAME))
+                .filter(val -> val.getKey().equals(UniParcCrossReference.PROPERTY_PROTEIN_NAME))
                 .map(Property::getValue)
                 .forEach(builder::proteinName);
 
         xref.getProperties().stream()
-                .filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_GENE_NAME))
+                .filter(val -> val.getKey().equals(UniParcCrossReference.PROPERTY_GENE_NAME))
                 .map(Property::getValue)
                 .forEach(builder::geneName);
     }
@@ -160,7 +160,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
     private UniParcEntry create() {
         String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
         Sequence sequence = new SequenceBuilder(seq).build();
-        List<UniParcDBCrossReference> xrefs = getXrefs();
+        List<UniParcCrossReference> xrefs = getXrefs();
         List<SequenceFeature> seqFeatures = getSeqFeatures();
         List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
@@ -194,12 +194,12 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         return Arrays.asList(sf, sf3);
     }
 
-    private List<UniParcDBCrossReference> getXrefs() {
+    private List<UniParcCrossReference> getXrefs() {
         List<Property> properties = new ArrayList<>();
-        properties.add(new Property(UniParcDBCrossReference.PROPERTY_PROTEIN_NAME, "some pname"));
-        properties.add(new Property(UniParcDBCrossReference.PROPERTY_GENE_NAME, "some gname"));
-        UniParcDBCrossReference xref =
-                new UniParcDBCrossReferenceBuilder()
+        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "some pname"));
+        properties.add(new Property(UniParcCrossReference.PROPERTY_GENE_NAME, "some gname"));
+        UniParcCrossReference xref =
+                new UniParcCrossReferenceBuilder()
                         .versionI(3)
                         .databaseType(UniParcDatabase.SWISSPROT)
                         .id("P12345")
@@ -211,11 +211,11 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .build();
 
         List<Property> properties2 = new ArrayList<>();
-        properties2.add(new Property(UniParcDBCrossReference.PROPERTY_PROTEIN_NAME, "some pname"));
-        properties2.add(new Property(UniParcDBCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "9606"));
+        properties2.add(new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "some pname"));
+        properties2.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "9606"));
 
-        UniParcDBCrossReference xref2 =
-                new UniParcDBCrossReferenceBuilder()
+        UniParcCrossReference xref2 =
+                new UniParcCrossReferenceBuilder()
                         .versionI(1)
                         .databaseType(UniParcDatabase.TREMBL)
                         .id("P52346")

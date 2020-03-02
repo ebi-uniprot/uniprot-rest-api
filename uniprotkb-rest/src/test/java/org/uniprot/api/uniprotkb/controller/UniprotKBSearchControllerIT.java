@@ -53,7 +53,7 @@ import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
-import org.uniprot.core.uniprot.xdb.builder.UniProtDBCrossReferenceBuilder;
+import org.uniprot.core.uniprot.xdb.builder.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseImpl;
@@ -754,7 +754,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             entry =
                     new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
                             .databaseCrossReferencesAdd(
-                                    new UniProtDBCrossReferenceBuilder()
+                                    new UniProtCrossReferenceBuilder()
                                             .databaseType(new UniProtDatabaseImpl("Proteomes"))
                                             .id("UP000000000")
                                             .propertiesAdd(

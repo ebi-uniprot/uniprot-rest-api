@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.builder.CrossReferenceBuilder;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
@@ -62,7 +62,7 @@ public class UniprotKbObjectsForTests {
                                             .citation(
                                                     new JournalArticleBuilder()
                                                             .citationXrefsAdd(
-                                                                    new DBCrossReferenceBuilder<
+                                                                    new CrossReferenceBuilder<
                                                                                     CitationDatabase>()
                                                                             .databaseType(
                                                                                     CitationDatabase
@@ -138,9 +138,9 @@ public class UniprotKbObjectsForTests {
     }
 
     public static LiteratureEntry getLiteratureEntry(long pubMedId) {
-        DBCrossReference<CitationDatabase> pubmed =
+        CrossReference<CitationDatabase> pubmed =
                 getCitationXref(CitationDatabase.PUBMED, String.valueOf(pubMedId));
-        DBCrossReference<CitationDatabase> doi =
+        CrossReference<CitationDatabase> doi =
                 getCitationXref(CitationDatabase.DOI, "doi " + pubMedId);
 
         Literature literature =
@@ -163,9 +163,9 @@ public class UniprotKbObjectsForTests {
         return new LiteratureEntryBuilder().citation(literature).statistics(statistics).build();
     }
 
-    public static DBCrossReference<CitationDatabase> getCitationXref(
+    public static CrossReference<CitationDatabase> getCitationXref(
             CitationDatabase pubmed2, String s) {
-        return new DBCrossReferenceBuilder<CitationDatabase>().databaseType(pubmed2).id(s).build();
+        return new CrossReferenceBuilder<CitationDatabase>().databaseType(pubmed2).id(s).build();
     }
 
     public static ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {

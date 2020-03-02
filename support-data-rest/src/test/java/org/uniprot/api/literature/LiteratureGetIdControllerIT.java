@@ -27,8 +27,8 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.builder.CrossReferenceBuilder;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.builder.LiteratureBuilder;
@@ -84,8 +84,8 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
 
-        DBCrossReference<CitationDatabase> pubmed =
-                new DBCrossReferenceBuilder<CitationDatabase>()
+        CrossReference<CitationDatabase> pubmed =
+                new CrossReferenceBuilder<CitationDatabase>()
                         .databaseType(CitationDatabase.PUBMED)
                         .id(String.valueOf(PUBMED_ID))
                         .build();

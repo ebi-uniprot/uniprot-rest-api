@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.comment.Comment;
 import org.uniprot.core.uniprot.feature.Feature;
-import org.uniprot.core.uniprot.xdb.UniProtDBCrossReference;
+import org.uniprot.core.uniprot.xdb.UniProtCrossReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.ReturnField;
 
@@ -161,11 +161,11 @@ public class JsonResponseFieldProjector {
                 return features;
 
             } else if (((List<?>) fieldValue).get(0)
-                    instanceof UniProtDBCrossReference) { // cross ref
-                Predicate<UniProtDBCrossReference> filter =
+                    instanceof UniProtCrossReference) { // cross ref
+                Predicate<UniProtCrossReference> filter =
                         UniProtEntryFilters.createDbReferenceFilter(neededFieldValues);
-                List<UniProtDBCrossReference> crossReferences =
-                        (List<UniProtDBCrossReference>) fieldValue;
+                List<UniProtCrossReference> crossReferences =
+                        (List<UniProtCrossReference>) fieldValue;
                 crossReferences.removeIf(xref -> !filter.test(xref));
                 return crossReferences;
             }

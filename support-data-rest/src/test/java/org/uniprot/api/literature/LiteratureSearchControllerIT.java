@@ -29,8 +29,8 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.builder.CrossReferenceBuilder;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
@@ -151,14 +151,14 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     private void saveEntry(long pubMedId, boolean facet) {
 
-        DBCrossReference<CitationDatabase> pubmed =
-                new DBCrossReferenceBuilder<CitationDatabase>()
+        CrossReference<CitationDatabase> pubmed =
+                new CrossReferenceBuilder<CitationDatabase>()
                         .databaseType(CitationDatabase.PUBMED)
                         .id(String.valueOf(pubMedId))
                         .build();
 
-        DBCrossReference<CitationDatabase> doi =
-                new DBCrossReferenceBuilder<CitationDatabase>()
+        CrossReference<CitationDatabase> doi =
+                new CrossReferenceBuilder<CitationDatabase>()
                         .databaseType(CitationDatabase.DOI)
                         .id("doi " + pubMedId)
                         .build();

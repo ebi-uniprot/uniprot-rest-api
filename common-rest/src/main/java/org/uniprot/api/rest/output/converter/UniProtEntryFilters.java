@@ -8,7 +8,7 @@ import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.comment.Comment;
 import org.uniprot.core.uniprot.feature.Feature;
-import org.uniprot.core.uniprot.xdb.UniProtDBCrossReference;
+import org.uniprot.core.uniprot.xdb.UniProtCrossReference;
 import org.uniprot.store.search.field.UniProtField;
 
 public class UniProtEntryFilters {
@@ -36,8 +36,8 @@ public class UniProtEntryFilters {
                     builder.featuresSet(features);
                 } else if (component == UniProtField.ResultFields.xref) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
-                    Predicate<UniProtDBCrossReference> filter = createDbReferenceFilter(values);
-                    List<UniProtDBCrossReference> crossReferences =
+                    Predicate<UniProtCrossReference> filter = createDbReferenceFilter(values);
+                    List<UniProtCrossReference> crossReferences =
                             entry.getDatabaseCrossReferences();
                     crossReferences.removeIf(xref -> !filter.test(xref));
                     builder.databaseCrossReferencesSet(crossReferences);
@@ -49,15 +49,15 @@ public class UniProtEntryFilters {
         }
     }
 
-    public static Predicate<UniProtDBCrossReference> createDbReferenceFilter(List<String> values) {
+    public static Predicate<UniProtCrossReference> createDbReferenceFilter(List<String> values) {
         return v -> createXrefPredicate(v, values);
     }
 
-    private static boolean createXrefPredicate(UniProtDBCrossReference v, List<String> values) {
+    private static boolean createXrefPredicate(UniProtCrossReference v, List<String> values) {
         if (values.contains(ALL)) {
             return true;
         }
-        return values.contains(v.getDatabaseType().getName().toLowerCase());
+        return values.contains(v.getDatabase().getName().toLowerCase());
     }
 
     public static Predicate<Feature> createFeatureFilter(List<String> values) {
