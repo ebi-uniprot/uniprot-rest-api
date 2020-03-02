@@ -56,7 +56,7 @@ public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
     }
 
     @Test
-    protected void testDownloadMoreThanBatchSizeJSON(DownloadParamAndResult paramAndResult)
+    protected void testDownloadMoreThanDefaultBatchSizeJSON(DownloadParamAndResult paramAndResult)
             throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }

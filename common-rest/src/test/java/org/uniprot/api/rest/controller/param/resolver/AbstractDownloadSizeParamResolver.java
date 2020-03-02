@@ -64,11 +64,36 @@ public abstract class AbstractDownloadSizeParamResolver extends BaseDownloadPara
             case "testDownloadDefaultBatchSizeJSON":
                 result = getDownloadDefaultBatchSizeParamAndResult(MediaType.APPLICATION_JSON);
                 break;
-            case "testDownloadMoreThanBatchSizeJSON":
+            case "testDownloadMoreThanDefaultBatchSizeJSON":
                 result = getDownloadMoreThanBatchSizeParamAndResult(MediaType.APPLICATION_JSON);
                 break;
             case "testDownloadSizeLessThanZeroJSON":
                 result = getDownloadSizeLessThanZeroParamAndResult(MediaType.APPLICATION_JSON);
+                break;
+            case "testDownloadLessThanDefaultBatchSizeFF":
+                result =
+                        getDownloadLessThanDefaultBatchSizeParamAndResult(
+                                UniProtMediaType.FF_MEDIA_TYPE);
+                break;
+            case "testDownloadLessThanDefaultBatchSizeXML":
+                result =
+                        getDownloadLessThanDefaultBatchSizeParamAndResult(
+                                MediaType.APPLICATION_XML);
+                break;
+            case "testDownloadLessThanDefaultBatchSizeFasta":
+                result =
+                        getDownloadLessThanDefaultBatchSizeParamAndResult(
+                                UniProtMediaType.FASTA_MEDIA_TYPE);
+                break;
+            case "testDownloadLessThanDefaultBatchSizeGFF":
+                result =
+                        getDownloadLessThanDefaultBatchSizeParamAndResult(
+                                UniProtMediaType.GFF_MEDIA_TYPE);
+                break;
+            case "testDownloadLessThanDefaultBatchSizeRDF":
+                result =
+                        getDownloadLessThanDefaultBatchSizeParamAndResult(
+                                UniProtMediaType.RDF_MEDIA_TYPE);
                 break;
         }
         return result;

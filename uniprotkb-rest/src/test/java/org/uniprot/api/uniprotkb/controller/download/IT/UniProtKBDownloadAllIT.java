@@ -34,6 +34,8 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 @ExtendWith(value = {SpringExtension.class, UniprotKBDownloadAllParamResolver.class})
 public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
 
+    private static final String RDF_TEST_FILE = "src/test/resources/downloadIT/P12345.rdf";
+
     @Qualifier("rdfRestTemplate")
     @Autowired
     private RestTemplate restTemplate;
@@ -75,9 +77,7 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
 
     @Test
     protected void testDownloadAllRDF(DownloadParamAndResult paramAndResult) throws Exception {
-        String rdfString =
-                FileUtils.readFileToString(
-                        new File("src/test/resources/downloadIT/P12345.rdf"), "UTF-8");
+        String rdfString = FileUtils.readFileToString(new File(RDF_TEST_FILE), "UTF-8");
         DefaultUriBuilderFactory urilBuilderFactory = new DefaultUriBuilderFactory();
         Mockito.when(this.restTemplate.getUriTemplateHandler()).thenReturn(urilBuilderFactory);
         Mockito.when(
