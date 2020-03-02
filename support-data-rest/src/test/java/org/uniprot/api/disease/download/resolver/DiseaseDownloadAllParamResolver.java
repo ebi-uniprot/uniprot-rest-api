@@ -39,7 +39,7 @@ public class DiseaseDownloadAllParamResolver extends AbstractDownloadAllParamRes
             List<ResultMatcher> oldResultMatchers,
             Integer expectedEntryCount) {
         List<ResultMatcher> resultMatchers = new ArrayList<>(oldResultMatchers);
-        if (MediaType.APPLICATION_JSON.equals(contentType)) { // TODO add exists
+        if (MediaType.APPLICATION_JSON.equals(contentType)) {
             resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
         } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
             addTSVResultMatcher(resultMatchers, expectedEntryCount);
@@ -70,6 +70,13 @@ public class DiseaseDownloadAllParamResolver extends AbstractDownloadAllParamRes
 
     private void addOBOResultMatcher(
             List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The obo response doesn't start with correct format",
+                                result.getResponse()
+                                        .getContentAsString()
+                                        .startsWith("format-version: 1.2")));
         resultMatchers.add(
                 result ->
                         assertThat(

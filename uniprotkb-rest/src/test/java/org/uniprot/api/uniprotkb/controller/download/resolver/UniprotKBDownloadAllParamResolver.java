@@ -39,6 +39,7 @@ public class UniprotKBDownloadAllParamResolver extends AbstractDownloadAllParamR
             MediaType contentType,
             List<ResultMatcher> oldResultMatchers,
             Integer expectedEntryCount) {
+
         List<ResultMatcher> resultMatchers = new ArrayList<>(oldResultMatchers);
         if (MediaType.APPLICATION_JSON.equals(contentType)) {
             resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
@@ -58,6 +59,8 @@ public class UniprotKBDownloadAllParamResolver extends AbstractDownloadAllParamR
             addXLSResultMatcher(resultMatchers, expectedEntryCount);
         } else if (UniProtMediaType.RDF_MEDIA_TYPE.equals(contentType)) {
             addRDFResultMatcher(resultMatchers);
+        } else if (UniProtMediaType.FF_MEDIA_TYPE.equals(contentType)) {
+            addFFResultMatcher(resultMatchers, expectedEntryCount);
         }
         return resultMatchers;
     }
@@ -120,6 +123,16 @@ public class UniprotKBDownloadAllParamResolver extends AbstractDownloadAllParamR
                                 "The excel rows count doesn't match",
                                 getExcelRowCountAndVerifyContent(result),
                                 is(expectedEntryCount + 1))); // with header
+    }
+
+    private void addFFResultMatcher(
+            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The number of entries in flat files does not match",
+                                result.getResponse().getContentAsString().split("//\n").length,
+                                is(expectedEntryCount)));
     }
 
     @Override

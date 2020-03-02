@@ -27,11 +27,11 @@ public abstract class BaseDownloadParamResolver {
                 DownloadParamAndResult.builder()
                         .queryParam("query", Collections.singletonList("*"))
                         .contentType(contentType);
-        if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {
-            addOBOResultMatcher(builder);
-        } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
+
+        if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
             addXLSResultMatcher(builder);
         }
+
         return builder.build();
     }
 
@@ -52,15 +52,5 @@ public abstract class BaseDownloadParamResolver {
                                 "The excel response is empty",
                                 result.getResponse().getContentAsString(),
                                 not(isEmptyOrNullString())));
-    }
-
-    private void addOBOResultMatcher(DownloadParamAndResult.DownloadParamAndResultBuilder builder) {
-        builder.resultMatcher(
-                result ->
-                        assertThat(
-                                "The obo response doesn't start with correct format",
-                                result.getResponse()
-                                        .getContentAsString()
-                                        .startsWith("format-version: 1.2")));
     }
 }
