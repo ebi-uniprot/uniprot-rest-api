@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -20,7 +21,15 @@ public abstract class AbstractDownloadSizeParamResolver extends BaseDownloadPara
     public boolean supportsParameter(
             ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class);
+
+        boolean paramSourceProvided =
+                extensionContext
+                        .getTestMethod()
+                        .map(t -> t.getAnnotation(MethodSource.class) != null)
+                        .orElse(false);
+
+        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class)
+                && !paramSourceProvided;
     }
 
     @Override
@@ -99,15 +108,15 @@ public abstract class AbstractDownloadSizeParamResolver extends BaseDownloadPara
         return result;
     }
 
-    protected abstract DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult(
+    public abstract DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult(
             MediaType contentType);
 
-    protected abstract DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult(
+    public abstract DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult(
             MediaType contentType);
 
-    protected abstract DownloadParamAndResult getDownloadMoreThanBatchSizeParamAndResult(
+    public abstract DownloadParamAndResult getDownloadMoreThanBatchSizeParamAndResult(
             MediaType contentType);
 
-    protected abstract DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(
+    public abstract DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(
             MediaType contentType);
 }

@@ -18,7 +18,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 
 public class DiseaseDownloadAllParamResolver extends AbstractDownloadAllParamResolver {
     @Override
-    protected DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType) {
+    public DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType) {
         return getDownloadDefaultParamAndResult(contentType, ENTRY_COUNT);
     }
 
