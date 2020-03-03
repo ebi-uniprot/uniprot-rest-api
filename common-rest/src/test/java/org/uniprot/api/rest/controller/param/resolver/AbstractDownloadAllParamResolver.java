@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.output.UniProtMediaType;
 
 /**
  * Parameter resolver for tests download all/everything without any filter for all supported content
@@ -47,33 +46,6 @@ public abstract class AbstractDownloadAllParamResolver extends BaseDownloadParam
         switch (method.getName()) {
             case "testDownloadAllJSON":
                 result = getDownloadAllParamAndResult(MediaType.APPLICATION_JSON);
-                break;
-            case "testDownloadAllTSV":
-                result = getDownloadAllParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE);
-                break;
-            case "testDownloadAllList":
-                result = getDownloadAllParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE);
-                break;
-            case "testDownloadAllOBO":
-                result = getDownloadAllParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE);
-                break;
-            case "testDownloadAllXLS":
-                result = getDownloadAllParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
-                break;
-            case "testDownloadAllFF":
-                result = getDownloadAllParamAndResult(UniProtMediaType.FF_MEDIA_TYPE);
-                break;
-            case "testDownloadAllXML":
-                result = getDownloadAllParamAndResult(MediaType.APPLICATION_XML);
-                break;
-            case "testDownloadAllFASTA":
-                result = getDownloadAllParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE);
-                break;
-            case "testDownloadAllGFF":
-                result = getDownloadAllParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE);
-                break;
-            case "testDownloadAllRDF":
-                result = getDownloadAllParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE);
                 break;
         }
         return result;

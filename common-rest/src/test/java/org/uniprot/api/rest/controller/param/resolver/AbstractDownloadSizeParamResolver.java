@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.output.UniProtMediaType;
 
 /**
  * Parameter resolver for tests download n entries (a batch size) for all supported content types
@@ -50,26 +49,6 @@ public abstract class AbstractDownloadSizeParamResolver extends BaseDownloadPara
                         getDownloadLessThanDefaultBatchSizeParamAndResult(
                                 MediaType.APPLICATION_JSON);
                 break;
-            case "testDownloadLessThanDefaultBatchSizeTSV":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeList":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeOBO":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeXLS":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE);
-                break;
             case "testDownloadDefaultBatchSizeJSON":
                 result = getDownloadDefaultBatchSizeParamAndResult(MediaType.APPLICATION_JSON);
                 break;
@@ -78,31 +57,6 @@ public abstract class AbstractDownloadSizeParamResolver extends BaseDownloadPara
                 break;
             case "testDownloadSizeLessThanZeroJSON":
                 result = getDownloadSizeLessThanZeroParamAndResult(MediaType.APPLICATION_JSON);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeFF":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeXML":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                MediaType.APPLICATION_XML);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeFasta":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeGFF":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE);
-                break;
-            case "testDownloadLessThanDefaultBatchSizeRDF":
-                result =
-                        getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE);
                 break;
         }
         return result;

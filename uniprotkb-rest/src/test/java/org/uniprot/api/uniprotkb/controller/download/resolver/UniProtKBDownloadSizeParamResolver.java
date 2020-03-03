@@ -17,7 +17,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 
 public class UniProtKBDownloadSizeParamResolver extends AbstractDownloadSizeParamResolver {
     @RegisterExtension
-    static UniProtKBDownloadParamAndResultProvider resultProvider =
+    static UniProtKBDownloadParamAndResultProvider paramAndResultProvider =
             new UniProtKBDownloadParamAndResultProvider();
 
     @Override
@@ -66,7 +66,7 @@ public class UniProtKBDownloadSizeParamResolver extends AbstractDownloadSizePara
             MediaType contentType, Integer entryCount) {
         // add the common param and result matcher
         DownloadParamAndResult paramAndResult =
-                resultProvider.getDownloadParamAndResult(contentType, entryCount);
+                paramAndResultProvider.getDownloadParamAndResult(contentType, entryCount);
         // add param
         Map<String, List<String>> updatedQueryParams =
                 addQueryParam(

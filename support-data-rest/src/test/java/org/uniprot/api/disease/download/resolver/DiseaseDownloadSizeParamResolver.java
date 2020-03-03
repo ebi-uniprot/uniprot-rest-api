@@ -1,36 +1,30 @@
 package org.uniprot.api.disease.download.resolver;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadSizeParamResolver;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.BasicSearchService;
 
 public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamResolver {
+    @RegisterExtension
+    static DiseaseDownloadParamAndResultProvider paramAndResultProvider =
+            new DiseaseDownloadParamAndResultProvider();
 
     @Override
     public DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult(
             MediaType contentType) {
         Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
         DownloadParamAndResult paramAndResult =
-                getDownloadDefaultParamAndResult(contentType, downloadSize);
-        // add param
-        Map<String, List<String>> updatedQueryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "size",
-                        Collections.singletonList(String.valueOf(downloadSize)));
-        paramAndResult.setQueryParams(updatedQueryParams);
+                getDownloadParamAndResult(contentType, downloadSize);
         return paramAndResult;
     }
 
@@ -38,14 +32,7 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
     public DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult(MediaType contentType) {
         Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE;
         DownloadParamAndResult paramAndResult =
-                getDownloadDefaultParamAndResult(contentType, downloadSize);
-        // add param
-        Map<String, List<String>> updatedQueryParams =
-                addQueryParam(
-                        paramAndResult.getQueryParams(),
-                        "size",
-                        Collections.singletonList(String.valueOf(downloadSize)));
-        paramAndResult.setQueryParams(updatedQueryParams);
+                getDownloadParamAndResult(contentType, downloadSize);
         return paramAndResult;
     }
 
@@ -54,10 +41,34 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
             MediaType contentType) {
         Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
         DownloadParamAndResult paramAndResult =
-                getDownloadDefaultParamAndResult(contentType, downloadSize);
-        // add param
+                getDownloadParamAndResult(contentType, downloadSize);
+        return paramAndResult;
+    }
+
+    @Override
+    public DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(MediaType contentType) {
+        DownloadParamAndResult.DownloadParamAndResultBuilder builder =
+                DownloadParamAndResult.builder()
+                        .queryParam("query", Collections.singletonList("*"))
+                        .queryParam("size", Collections.singletonList(String.valueOf(-1)))
+                        .contentType(contentType);
+
+        if (MediaType.APPLICATION_JSON.equals(contentType)) {
+            builder.resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(
+                            jsonPath("$.messages.*", contains("'size' must be greater than 0")));
+        }
+        return builder.build();
+    }
+
+    private DownloadParamAndResult getDownloadParamAndResult(
+            MediaType contentType, Integer downloadSize) {
+        // add the common param and result matcher
+        DownloadParamAndResult paramAndResult =
+                paramAndResultProvider.getDownloadParamAndResult(contentType, downloadSize);
+        // add size param
         Map<String, List<String>> updatedQueryParams =
-                addQueryParam(
+                paramAndResultProvider.addQueryParam(
                         paramAndResult.getQueryParams(),
                         "size",
                         Collections.singletonList(String.valueOf(downloadSize)));
@@ -66,177 +77,5 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
     }
 
     @Override
-    public DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(MediaType contentType) {
-        return DownloadParamAndResult.builder()
-                .queryParam("query", Collections.singletonList("*"))
-                .queryParam("size", Collections.singletonList(String.valueOf(-1)))
-                .contentType(contentType)
-                .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                .resultMatcher(jsonPath("$.messages.*", contains("'size' must be greater than 0")))
-                .build();
-    }
-
-    private DownloadParamAndResult getDownloadDefaultParamAndResult(
-            MediaType contentType, Integer entryCount) {
-        // add the common param and result matcher
-        DownloadParamAndResult paramAndResult = getCommonDownloadParamAndResult(contentType);
-        // add disease specific result matcher
-        List<ResultMatcher> resultMatchers =
-                getDiseaseSpecificResultMatcher(
-                        contentType, paramAndResult.getResultMatchers(), entryCount);
-        paramAndResult.setResultMatchers(resultMatchers);
-        return paramAndResult;
-    }
-
-    private List<ResultMatcher> getDiseaseSpecificResultMatcher(
-            MediaType contentType,
-            List<ResultMatcher> oldResultMatchers,
-            Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = new ArrayList<>(oldResultMatchers);
-        if (MediaType.APPLICATION_JSON.equals(contentType)) { // TODO add exists
-            resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
-        } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
-            addTSVResultMatcher(resultMatchers, expectedEntryCount);
-            resultMatchers.add(
-                    result ->
-                            assertThat(
-                                    "DiseaseEntry TSV header do not match",
-                                    result.getResponse()
-                                            .getContentAsString()
-                                            .startsWith(
-                                                    "Name\tDiseaseEntry ID\tMnemonic\tDescription")));
-        } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
-            addListResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {
-            addOBOResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
-            addXLSResultMatcher(resultMatchers, expectedEntryCount);
-        }
-        return resultMatchers;
-    }
-
-    private Map<String, List<String>> addQueryParam(
-            Map<String, List<String>> queryParams, String paramName, List<String> values) {
-        Map<String, List<String>> updatedQueryParams = new HashMap<>(queryParams);
-        updatedQueryParams.put(paramName, values);
-        return updatedQueryParams;
-    }
-
-    private void addOBOResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The number of obo entries in list does not match",
-                                result.getResponse()
-                                        .getContentAsString()
-                                        .split("\\[Term\\]")
-                                        .length,
-                                is(expectedEntryCount + 1)));
-
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The obo response doesn't contain namespace",
-                                result.getResponse()
-                                        .getContentAsString()
-                                        .contains("default-namespace: uniprot:diseases")));
-
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The obo term doesn't contain id",
-                                Arrays.asList(
-                                                result.getResponse()
-                                                        .getContentAsString()
-                                                        .split("\\[Term\\]"))
-                                        .stream()
-                                        .allMatch(
-                                                s ->
-                                                        s.contains("id:")
-                                                                || s.startsWith(
-                                                                        "format-version"))));
-
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The obo term doesn't contain name",
-                                Arrays.asList(
-                                                result.getResponse()
-                                                        .getContentAsString()
-                                                        .split("\\[Term\\]"))
-                                        .stream()
-                                        .allMatch(
-                                                s ->
-                                                        s.contains("name:")
-                                                                || s.startsWith(
-                                                                        "format-version"))));
-    }
-
-    private void addListResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The number of entries in list does not match",
-                                result.getResponse().getContentAsString().split("\n").length,
-                                is(expectedEntryCount)));
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The list item doesn't start with DI-",
-                                Arrays.asList(result.getResponse().getContentAsString().split("\n"))
-                                        .stream()
-                                        .allMatch(s -> s.startsWith("DI-"))));
-    }
-
-    private void addTSVResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The number of entries does not match",
-                                result.getResponse().getContentAsString().split("\n").length,
-                                is(expectedEntryCount + 1)));
-    }
-
-    private void addXLSResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The excel rows count doesn't match",
-                                getExcelRowCountAndVerifyContent(result),
-                                is(expectedEntryCount + 1))); // with header
-    }
-
-    private static List<String> XLS_ACCESSIONS = new ArrayList<>();
-
-    @Override
-    protected void verifyExcelData(Sheet sheet) {
-        XLS_ACCESSIONS = new ArrayList<>();
-        List<String> headerList = new ArrayList<>();
-        boolean headerRead = false;
-        for (Row row : sheet) {
-            int i = 0;
-            for (Cell cell : row) {
-                if (!headerRead) {
-                    headerList.add(cell.getStringCellValue());
-
-                } else {
-                    assertThat(
-                            headerList.get(i) + " is null", !cell.getStringCellValue().isEmpty());
-                    if (i == headerList.indexOf("DiseaseEntry ID")) { // DiseaseEntry ID field
-                        XLS_ACCESSIONS.add(cell.getStringCellValue());
-                    }
-                    i++;
-                }
-            }
-            headerRead = true;
-        }
-        assertThat(
-                "Header of excel file doesn't match",
-                headerList.equals(
-                        Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description")));
-    }
+    protected void verifyExcelData(Sheet sheet) {}
 }

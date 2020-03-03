@@ -10,12 +10,12 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadAllParamRe
 
 public class UniprotKBDownloadAllParamResolver extends AbstractDownloadAllParamResolver {
     @RegisterExtension
-    static UniProtKBDownloadParamAndResultProvider resultProvider =
+    static UniProtKBDownloadParamAndResultProvider paramAndResultProvider =
             new UniProtKBDownloadParamAndResultProvider();
 
     @Override
     public DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType) {
-        return resultProvider.getDownloadParamAndResult(contentType, ENTRY_COUNT);
+        return paramAndResultProvider.getDownloadParamAndResult(contentType, ENTRY_COUNT);
     }
 
     @Override
