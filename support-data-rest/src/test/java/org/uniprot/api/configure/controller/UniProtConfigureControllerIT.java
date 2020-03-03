@@ -33,12 +33,25 @@ class UniProtConfigureControllerIT {
     @Autowired private MockMvc mockMvc;
 
     @Test
-    void canGetUniProtSearchTerms() throws Exception {
+    void canGetUniProtSearchTermsTemp() throws Exception {
 
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(BASIC_RESOURCE + "/search_terms")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        validateResponse(response);
+    }
+
+    @Test
+    void canGetUniProtSearchTerms() throws Exception {
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/search-terms")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

@@ -107,14 +107,14 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
                 .autoCompleteQueryFieldValidRegex(fi.getAutoCompleteQueryFieldValidRegex());
         b.regex(fi.getValidRegex());
         if (fi.getItemType() != null) {
-            b.itemType(fi.getItemType().name());
+            b.itemType(fi.getItemType().name().toLowerCase());
         }
         if (fi.getDataType() != null) {
-            b.dataType(fi.getDataType().name());
+            b.dataType(fi.getDataType().name().toLowerCase());
         }
         if (fi.getFieldType() != null) {
-            b.fieldType(fi.getFieldType().name());
-            if (fi.getFieldType() == SearchFieldType.evidence) {
+            b.fieldType(fi.getFieldType().name().toLowerCase());
+            if (fi.getFieldType() == SearchFieldType.EVIDENCE) {
                 b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
             }
         }
