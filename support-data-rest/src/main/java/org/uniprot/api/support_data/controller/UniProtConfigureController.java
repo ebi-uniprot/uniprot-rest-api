@@ -7,6 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +33,7 @@ public class UniProtConfigureController {
 
     // FIXME Delete this method once UI team starts consuming response of getUniProtSearchTerms
     @GetMapping("/search_terms")
-    public String getUniProtSearchTermsTemp() throws IOException, URISyntaxException {
+    public ResponseEntity<String> getUniProtSearchTermsTemp() throws IOException, URISyntaxException {
         if (searchTermResponse == null) {
             URI uri =
                     UniProtConfigureController.class
@@ -37,7 +41,10 @@ public class UniProtConfigureController {
                             .toURI();
             searchTermResponse = new String(Files.readAllBytes(Paths.get(uri)));
         }
-        return searchTermResponse;
+
+        final HttpHeaders httpHeaders= new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        return new ResponseEntity<>(searchTermResponse, httpHeaders, HttpStatus.OK);
     }
 
     @GetMapping("/search-terms")
