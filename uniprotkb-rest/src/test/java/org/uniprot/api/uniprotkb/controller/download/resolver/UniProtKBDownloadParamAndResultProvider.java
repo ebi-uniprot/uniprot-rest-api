@@ -14,11 +14,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.TestInstance;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultMatcher;
-import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadParamAndResultProvider;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.api.uniprotkb.output.converter.UniProtKBXmlMessageConverter;
 
@@ -26,48 +23,9 @@ import org.uniprot.api.uniprotkb.output.converter.UniProtKBXmlMessageConverter;
 public class UniProtKBDownloadParamAndResultProvider
         extends AbstractDownloadParamAndResultProvider {
 
-    public DownloadParamAndResult getDownloadParamAndResult(
-            MediaType contentType, Integer entryCount) {
-        // add the common param and result matcher
-        DownloadParamAndResult paramAndResult = getCommonDownloadParamAndResult(contentType);
-        // add uniprot specific result matcher
-        List<ResultMatcher> resultMatchers =
-                getUniProtKBSpecificResultMatcher(
-                        contentType, paramAndResult.getResultMatchers(), entryCount);
-        paramAndResult.setResultMatchers(resultMatchers);
-        return paramAndResult;
-    }
-
-    private List<ResultMatcher> getUniProtKBSpecificResultMatcher(
-            MediaType contentType,
-            List<ResultMatcher> oldResultMatchers,
-            Integer expectedEntryCount) {
-
-        List<ResultMatcher> resultMatchers = new ArrayList<>(oldResultMatchers);
-        if (MediaType.APPLICATION_JSON.equals(contentType)) {
-            resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
-        } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
-            addTSVResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
-            addListResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
-            addXLSResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.RDF_MEDIA_TYPE.equals(contentType)) {
-            addRDFResultMatcher(resultMatchers);
-        } else if (UniProtMediaType.FF_MEDIA_TYPE.equals(contentType)) {
-            addFFResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (MediaType.APPLICATION_XML.equals(contentType)) {
-            addXMLResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.FASTA_MEDIA_TYPE.equals(contentType)) {
-            addFastaResultMatcher(resultMatchers, expectedEntryCount);
-        } else if (UniProtMediaType.GFF_MEDIA_TYPE.equals(contentType)) {
-            addGFFResultMatcher(resultMatchers, expectedEntryCount);
-        }
-        return resultMatchers;
-    }
-
-    private void addGFFResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+    @Override
+    protected List<ResultMatcher> getGFFResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result -> {
                     String gffStr = result.getResponse().getContentAsString();
@@ -86,10 +44,12 @@ public class UniProtKBDownloadParamAndResultProvider
                             entryCount,
                             is(Long.valueOf(expectedEntryCount)));
                 });
+        return resultMatchers;
     }
 
-    private void addFastaResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+    @Override
+    protected List<ResultMatcher> getFastaResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result -> {
                     String fastaStr = result.getResponse().getContentAsString();
@@ -101,10 +61,14 @@ public class UniProtKBDownloadParamAndResultProvider
                             entryCount,
                             is(Long.valueOf(expectedEntryCount)));
                 });
+
+        return resultMatchers;
     }
 
-    private void addXMLResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+    @Override
+    protected List<ResultMatcher> getXMLResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+
         resultMatchers.add(
                 result -> {
                     String xmlStr = result.getResponse().getContentAsString();
@@ -125,10 +89,61 @@ public class UniProtKBDownloadParamAndResultProvider
                             entryTags.length,
                             is(expectedEntryCount + 1));
                 });
+
+        return resultMatchers;
     }
 
-    private void addListResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+    @Override
+    protected List<ResultMatcher> getFFResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The number of entries in flat files does not match",
+                                result.getResponse().getContentAsString().split("//\n").length,
+                                is(expectedEntryCount)));
+
+        return resultMatchers;
+    }
+
+    @Override
+    protected List<ResultMatcher> getRDFResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The rdf response does't starts with expected tag.",
+                                result.getResponse()
+                                        .getContentAsString()
+                                        .startsWith(RDFService.RDF_PROLOG)));
+
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The rdf response does't end with expected tag.",
+                                result.getResponse()
+                                        .getContentAsString()
+                                        .trim()
+                                        .endsWith(RDFService.RDF_CLOSE_TAG)));
+        return resultMatchers;
+    }
+
+    @Override
+    protected List<ResultMatcher> getXLSResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The excel rows count doesn't match",
+                                getExcelRowCountAndVerifyContent(result),
+                                is(expectedEntryCount + 1))); // with header
+        return resultMatchers;
+    }
+
+    @Override
+    protected List<ResultMatcher> getListResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+
         resultMatchers.add(
                 result ->
                         assertThat(
@@ -146,10 +161,12 @@ public class UniProtKBDownloadParamAndResultProvider
                                                         s.startsWith("O")
                                                                 || s.startsWith("P")
                                                                 || s.startsWith("Q"))));
+        return resultMatchers;
     }
 
-    private void addTSVResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
+    @Override
+    protected List<ResultMatcher> getTSVResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
                         assertThat(
@@ -164,45 +181,14 @@ public class UniProtKBDownloadParamAndResultProvider
                                         .getContentAsString()
                                         .startsWith(
                                                 "Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")));
+        return resultMatchers;
     }
 
-    private void addRDFResultMatcher(List<ResultMatcher> resultMatchers) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The rdf response does't starts with expected tag.",
-                                result.getResponse()
-                                        .getContentAsString()
-                                        .startsWith(RDFService.RDF_PROLOG)));
-
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The rdf response does't end with expected tag.",
-                                result.getResponse()
-                                        .getContentAsString()
-                                        .trim()
-                                        .endsWith(RDFService.RDF_CLOSE_TAG)));
-    }
-
-    private void addXLSResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The excel rows count doesn't match",
-                                getExcelRowCountAndVerifyContent(result),
-                                is(expectedEntryCount + 1))); // with header
-    }
-
-    private void addFFResultMatcher(
-            List<ResultMatcher> resultMatchers, Integer expectedEntryCount) {
-        resultMatchers.add(
-                result ->
-                        assertThat(
-                                "The number of entries in flat files does not match",
-                                result.getResponse().getContentAsString().split("//\n").length,
-                                is(expectedEntryCount)));
+    @Override
+    protected List<ResultMatcher> getJsonResultMatchers(Integer expectedEntryCount) {
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+        resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
+        return resultMatchers;
     }
 
     @Override
@@ -234,5 +220,10 @@ public class UniProtKBDownloadParamAndResultProvider
                                 "Gene Names",
                                 "Organism",
                                 "Length")));
+    }
+
+    @Override
+    protected List<ResultMatcher> getOBOResultMatchers(Integer expectedEntryCount) {
+        throw new UnsupportedOperationException("content type not supported");
     }
 }
