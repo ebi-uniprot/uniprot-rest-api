@@ -39,6 +39,6 @@ public class LiteratureSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.literature;
+        return UniProtDataType.LITERATURE;
     }
 }

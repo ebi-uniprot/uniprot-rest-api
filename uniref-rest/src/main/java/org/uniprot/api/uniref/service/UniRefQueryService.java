@@ -42,7 +42,7 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
                 storeStreamer,
                 uniRefQueryBoosts);
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniref);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
     }
 
     @Override

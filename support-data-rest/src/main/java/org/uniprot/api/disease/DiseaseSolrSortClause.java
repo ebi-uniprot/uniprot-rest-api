@@ -36,6 +36,6 @@ public class DiseaseSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.disease;
+        return UniProtDataType.DISEASE;
     }
 }

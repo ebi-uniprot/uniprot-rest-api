@@ -33,7 +33,7 @@ public class SubcellularLocationService
                 subcellQueryBoosts,
                 null);
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.subcelllocation);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
     }
 
     @Override

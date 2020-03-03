@@ -20,7 +20,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 @Import(ProteomeQueryBoostsConfig.class)
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     private SearchFieldConfig fieldConfig =
-            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.proteome);
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
 
     public ProteomeQueryService(
             ProteomeQueryRepository repository,

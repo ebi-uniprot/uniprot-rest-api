@@ -47,7 +47,7 @@ public class ProteomeSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.proteome;
+        return UniProtDataType.PROTEOME;
     }
 
     @Override

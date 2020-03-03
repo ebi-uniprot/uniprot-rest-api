@@ -26,7 +26,7 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
 
         super(repository, converter, taxonomySortClause, taxonomyQueryBoosts, facetConfig);
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.taxonomy);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
     }
 
     public TaxonomyEntry findById(final long taxId) {

@@ -22,10 +22,10 @@ import com.google.common.base.Strings;
 public class UniRefRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(uniProtDataType = UniProtDataType.uniref, messagePrefix = "search.uniref")
+    @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.uniref)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 
     private String cursor;

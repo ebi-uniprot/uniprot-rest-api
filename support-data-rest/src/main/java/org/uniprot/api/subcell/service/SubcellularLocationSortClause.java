@@ -39,6 +39,6 @@ public class SubcellularLocationSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.subcelllocation;
+        return UniProtDataType.SUBCELLLOCATION;
     }
 }

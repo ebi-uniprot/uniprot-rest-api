@@ -85,7 +85,7 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.keyword);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
     }
 
     @Override

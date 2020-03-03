@@ -18,7 +18,7 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 @Import(CrossRefQueryBoostsConfig.class)
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
     private SearchFieldConfig fieldConfig =
-            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.crossref);
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
 
     public CrossRefService(
             CrossRefRepository crossRefRepository,

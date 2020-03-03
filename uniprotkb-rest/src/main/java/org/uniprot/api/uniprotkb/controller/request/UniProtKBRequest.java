@@ -38,7 +38,7 @@ public class UniProtKBRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.uniprotkb,
+            uniProtDataType = UniProtDataType.UNIPROTKB,
             messagePrefix = "search.uniprot")
     private String query;
 
@@ -48,7 +48,7 @@ public class UniProtKBRequest implements SearchRequest {
     private String fields;
 
     @Parameter(description = "Name of the field to be sorted on")
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.uniprotkb)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 
     @Parameter(hidden = true)

@@ -104,7 +104,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.proteome);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
     }
 
     @Override

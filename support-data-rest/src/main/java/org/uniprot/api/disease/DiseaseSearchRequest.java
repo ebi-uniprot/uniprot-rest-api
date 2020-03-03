@@ -18,11 +18,11 @@ public class DiseaseSearchRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.disease,
+            uniProtDataType = UniProtDataType.DISEASE,
             messagePrefix = "search.disease")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.disease)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.DISEASE)
     private String sort;
 
     private String cursor;

@@ -38,6 +38,6 @@ public class CrossRefSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.crossref;
+        return UniProtDataType.CROSSREF;
     }
 }

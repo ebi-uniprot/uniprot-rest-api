@@ -63,7 +63,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
         documentedSearchFields =
                 things.stream().map(QueryParamMeta::getName).collect(Collectors.toSet());
         searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @ParameterizedTest(name = "{0} is a valid field?")
@@ -71,7 +71,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
     void documentedSearchFieldIsKnownToSearchEngine(String documentedSearchField) {
         assertThat(
                 documentedSearchField + " not found",
-                searchFieldConfig.doesSearchFieldItemExist(documentedSearchField),
+                searchFieldConfig.searchFieldItemExists(documentedSearchField),
                 is(true));
     }
 

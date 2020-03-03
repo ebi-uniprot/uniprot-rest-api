@@ -66,6 +66,6 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.genecentric;
+        return UniProtDataType.GENECENTRIC;
     }
 }

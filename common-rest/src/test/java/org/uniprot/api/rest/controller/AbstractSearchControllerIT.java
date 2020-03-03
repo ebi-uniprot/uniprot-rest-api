@@ -394,7 +394,6 @@ public abstract class AbstractSearchControllerIT {
         assertThat(sortFields, not(emptyIterable()));
 
         for (String sortField : sortFields) {
-            System.out.println("====================>" + sortField);
             // when
             ResultActions response =
                     mockMvc.perform(
@@ -789,7 +788,7 @@ public abstract class AbstractSearchControllerIT {
         SearchFieldConfig fieldConfig = getSearchFieldConfig();
         return fieldConfig.getSearchFieldItems().stream()
                 .map(SearchFieldItem::getFieldName)
-                .filter(fieldConfig::doesCorrespondingSortFieldExist)
+                .filter(fieldConfig::correspondingSortFieldExists)
                 .collect(Collectors.toList());
     }
 

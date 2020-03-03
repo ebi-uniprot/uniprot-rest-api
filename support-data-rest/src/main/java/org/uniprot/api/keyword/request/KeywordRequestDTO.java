@@ -24,13 +24,13 @@ public class KeywordRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.keyword,
+            uniProtDataType = UniProtDataType.KEYWORD,
             messagePrefix = "search.keyword")
     private String query;
 
     @Parameter(description = "Name of the field to be sorted on")
     @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_sort_param_meta.json")
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.keyword)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.KEYWORD)
     private String sort;
 
     @Parameter(hidden = true)

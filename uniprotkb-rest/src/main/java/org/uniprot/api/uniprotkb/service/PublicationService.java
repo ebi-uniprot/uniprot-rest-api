@@ -55,7 +55,7 @@ public class PublicationService {
         this.repository = repository;
         this.entryStoreConverter = entryStoreConverter;
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.literature);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
     }
 
     public QueryResult<PublicationEntry> getPublicationsByUniprotAccession(

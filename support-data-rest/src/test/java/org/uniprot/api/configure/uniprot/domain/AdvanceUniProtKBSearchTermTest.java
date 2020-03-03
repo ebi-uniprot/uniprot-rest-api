@@ -17,7 +17,7 @@ public class AdvanceUniProtKBSearchTermTest {
 
     @BeforeAll
     static void setUp() {
-        fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
+        fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @Test

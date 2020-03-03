@@ -22,11 +22,11 @@ public class GeneCentricRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.genecentric,
+            uniProtDataType = UniProtDataType.GENECENTRIC,
             messagePrefix = "search.genecentric")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.genecentric)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String sort;
 
     private String cursor;

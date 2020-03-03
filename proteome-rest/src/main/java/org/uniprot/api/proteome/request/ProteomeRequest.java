@@ -23,11 +23,11 @@ public class ProteomeRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.proteome,
+            uniProtDataType = UniProtDataType.PROTEOME,
             messagePrefix = "search.proteome")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.proteome)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String sort;
 
     private String cursor;

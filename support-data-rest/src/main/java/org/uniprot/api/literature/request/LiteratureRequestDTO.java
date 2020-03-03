@@ -21,11 +21,11 @@ public class LiteratureRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.literature,
+            uniProtDataType = UniProtDataType.LITERATURE,
             messagePrefix = "search.literature")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.literature)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.LITERATURE)
     private String sort;
 
     private String cursor;

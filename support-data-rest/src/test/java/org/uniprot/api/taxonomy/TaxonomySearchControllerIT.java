@@ -87,7 +87,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.taxonomy);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
     }
 
     @Override
