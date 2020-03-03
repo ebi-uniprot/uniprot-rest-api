@@ -1,0 +1,3009 @@
+[
+  {
+    "id": "id_accession",
+    "label": "UniProtKB AC",
+    "itemType": "single",
+    "term": "accession",
+    "dataType": "string",
+    "description": "Search by UniProtKB Accession",
+    "example": "P12345"
+  },
+  {
+    "id": "id_mnemonic",
+    "label": "Entry Name [ID]",
+    "itemType": "single",
+    "term": "mnemonic",
+    "dataType": "string",
+    "description": "Search by UniProtKB entry name",
+    "example": "P53_HUMAN"
+  },
+  {
+    "id": "id_name",
+    "label": "Protein Name [DE]",
+    "itemType": "single",
+    "term": "name",
+    "dataType": "string",
+    "description": "Search by UniProtKB Protein name",
+    "example": "mas5"
+  },
+  {
+    "id": "id_gene",
+    "label": "Gene Name [GN]",
+    "itemType": "single",
+    "term": "gene",
+    "dataType": "string",
+    "description": "Search by UniProtKB gene name",
+    "example": "ydj1"
+  },
+  {
+    "id": "id_organism",
+    "label": "Organism [OS]",
+    "itemType": "single",
+    "term": "organism",
+    "dataType": "string",
+    "autoComplete": "/uniprot/api/suggester?dict=organism&query=?",
+    "description": "Search by Organism name",
+    "example": "saccharomyces",
+    "termSuffix": true
+  },
+  {
+    "id": "id_taxonomy",
+    "label": "Taxonomy [OC]",
+    "itemType": "single",
+    "term": "taxonomy",
+    "dataType": "string",
+    "autoComplete": "/uniprot/api/suggester?dict=taxonomy&query=?",
+    "description": "Search by NCBI taxonomy",
+    "example": "human",
+    "termSuffix": true
+  },
+  {
+    "id": "id_host",
+    "label": "Virus host",
+    "itemType": "single",
+    "term": "host",
+    "dataType": "string",
+    "autoComplete": "/uniprot/api/suggester?dict=host&query=?",
+    "description": "Search by virus host",
+    "example": "human",
+    "termSuffix": true
+  },
+  {
+    "id": "id_existence",
+    "label": "Protein Existence [PE]",
+    "itemType": "single",
+    "term": "existence",
+    "dataType": "enum",
+    "values": [
+      {
+        "name": "Evidence at protein level",
+        "value": "protein_level"
+      },
+      {
+        "name": "Evidence at transcript level",
+        "value": "transcript_level"
+      },
+      {
+        "name": "Inferred from homology",
+        "value": "homology"
+      },
+      {
+        "name": "Predicted",
+        "value": "predicted"
+      },
+      {
+        "name": "Uncertain",
+        "value": "uncertain"
+      }
+    ],
+    "description": "Search by protein existence",
+    "example": "1"
+  },
+  {
+    "id": "id_group_function",
+    "label": "Function",
+    "itemType": "group",
+    "term": "",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_ec",
+        "label": "Enzyme classification [EC]",
+        "itemType": "single",
+        "term": "ec",
+        "dataType": "string",
+        "autoComplete": "/uniprot/api/suggester?dict=ec&query=?",
+        "description": "Search by Enzyme EC number",
+        "example": "1.1.2.3"
+      },
+      {
+        "id": "id_group_cofactors",
+        "label": "Cofactors",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_cofactor_chebi",
+            "label": "ChEBI term",
+            "itemType": "comment",
+            "term": "cofactor_chebi",
+            "dataType": "string",
+            "hasEvidence": true,
+            "autoComplete": "/uniprot/api/suggester?dict=chebi&query=?",
+            "description": "Search by cofactor chebi ",
+            "example": "29105"
+          },
+          {
+            "id": "id_cofactor_note",
+            "label": "Note",
+            "itemType": "comment",
+            "term": "cofactor_note",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by cofactor note",
+            "example": "subunit"
+          }
+        ]
+      },
+      {
+        "id": "id_group_bpcp",
+        "label": "Biophysicochemical properties",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_bpcp",
+            "label": "Any",
+            "itemType": "comment",
+            "term": "bpcp",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by biophysicochemical properties",
+            "example": "\"some value\""
+          },
+          {
+            "id": "id_bpcp_absorption",
+            "label": "Absorption",
+            "itemType": "comment",
+            "term": "bpcp_absorption",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by biophysicochemical properties: absorption",
+            "example": "prosthetic"
+          },
+          {
+            "id": "id_bpcp_kinetics",
+            "label": "Kinetics",
+            "itemType": "comment",
+            "term": "bpcp_kinetics",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by biophysicochemical properties: kinetic parameters",
+            "example": "aspartate"
+          },
+          {
+            "id": "id_bpcp_ph_dependence",
+            "label": "ph dependence",
+            "itemType": "comment",
+            "term": "bpcp_ph_dependence",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by biophysicochemical properties: ph dependence",
+            "example": "optimum"
+          },
+          {
+            "id": "id_bpcp_redox_potential",
+            "label": "Redox potential",
+            "itemType": "comment",
+            "term": "bpcp_redox_potential",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by biophysicochemical properties: redox potential",
+            "example": "siroheme"
+          },
+          {
+            "id": "id_bpcp_temp_dependence",
+            "label": "Temperature dependence",
+            "itemType": "comment",
+            "term": "bpcp_temp_dependence",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by biophysicochemical properties: tempeature dependence",
+            "example": "*"
+          }
+        ]
+      },
+      {
+        "id": "id_catalytic_activity",
+        "label": "Catalytic Activity",
+        "itemType": "comment",
+        "term": "catalytic_activity",
+        "dataType": "string",
+        "hasEvidence": true,
+        "autoComplete": "/uniprot/api/suggester?dict=catalytic_activity&query=?",
+        "description": "Search by comment catalytic activity",
+        "example": "tyrosine"
+      },
+      {
+        "id": "id_activity_regulation",
+        "label": "Activity regulation",
+        "itemType": "comment",
+        "term": "activity_regulation",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by comment activity regulation",
+        "example": "inhibited"
+      },
+      {
+        "id": "id_function_cc",
+        "label": "Function [CC]",
+        "itemType": "comment",
+        "term": "function",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by comment function",
+        "example": "enzyme"
+      },
+      {
+        "id": "id_caution",
+        "label": "Caution",
+        "itemType": "comment",
+        "term": "caution",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by caution comment",
+        "example": "kinase"
+      },
+      {
+        "id": "id_group_sites",
+        "label": "Sites",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_sites",
+            "label": "Any",
+            "itemType": "feature",
+            "term": "sites",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by feature sites",
+            "example": "translocation"
+          },
+          {
+            "id": "id_act_site",
+            "label": "Active site",
+            "itemType": "feature",
+            "term": "act_site",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by feature  active site",
+            "example": "phosphocysteine"
+          },
+          {
+            "id": "id_metal",
+            "label": "Metal binding",
+            "itemType": "feature",
+            "term": "metal",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by feature metal binding",
+            "example": "phosphocysteine"
+          },
+          {
+            "id": "id_binding",
+            "label": "Binding site",
+            "itemType": "feature",
+            "term": "binding",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by feature binding site",
+            "example": "phosphocysteine"
+          },
+          {
+            "id": "id_site",
+            "label": "Other",
+            "itemType": "feature",
+            "term": "site",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by feature other site",
+            "example": "phosphocysteine"
+          }
+        ]
+      },
+      {
+        "id": "id_ca_bind",
+        "label": "Calcium binding",
+        "itemType": "feature",
+        "term": "ca_bind",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature calcium binding",
+        "example": "site"
+      },
+      {
+        "id": "id_dna_bind",
+        "label": "DNA binding",
+        "itemType": "feature",
+        "term": "dna_bind",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature DNA binding",
+        "example": "*"
+      },
+      {
+        "id": "id_np_bind",
+        "label": "Nucleotide binding",
+        "itemType": "feature",
+        "term": "np_bind",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature Nucleotide binding",
+        "example": "NADP"
+      },
+      {
+        "id": "id_pathway",
+        "label": "Pathway",
+        "itemType": "comment",
+        "term": "pathway",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by comment pathway",
+        "example": "metabolism"
+      },
+      {
+        "id": "id_miscellaneous",
+        "label": "Miscellaneous [CC]",
+        "itemType": "comment",
+        "term": "miscellaneous",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by comment Miscellaneous",
+        "example": "abscisic"
+      }
+    ]
+  },
+  {
+    "id": "id_group_scl",
+    "label": "Subcellular location",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_group_scl_term_note",
+        "label": "Subcellular location [CC]",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_scl_term",
+            "label": "Subcellular location term",
+            "itemType": "comment",
+            "term": "scl_term",
+            "dataType": "string",
+            "hasEvidence": true,
+            "autoComplete": "/uniprot/api/suggester?dict=subcell&query=?",
+            "description": "Search by comment subcellular location term",
+            "example": "membrane"
+          },
+          {
+            "id": "id_scl_note",
+            "label": "Subcellular location note",
+            "itemType": "comment",
+            "term": "scl_note",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by comment subcellular location note",
+            "example": "membrane"
+          }
+        ]
+      },
+      {
+        "id": "id_transmem",
+        "label": "Transmembrane",
+        "itemType": "feature",
+        "term": "transmem",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Transmembrane",
+        "example": "forming"
+      },
+      {
+        "id": "id_topo_dom",
+        "label": "Topological domain",
+        "itemType": "feature",
+        "term": "topo_dom",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Topological domain",
+        "example": "forming"
+      },
+      {
+        "id": "id_intramem",
+        "label": "Intramembrane",
+        "itemType": "feature",
+        "term": "intramem",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Intramembrane",
+        "example": "forming"
+      }
+    ]
+  },
+  {
+    "id": "id_group_pathology",
+    "label": "Pathology & Biotech",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_disease",
+        "label": "Disease",
+        "itemType": "comment",
+        "term": "disease",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment disease",
+        "example": "nephrotic"
+      },
+      {
+        "id": "id_allergen",
+        "label": "Alergenic properties",
+        "itemType": "comment",
+        "term": "allergen",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment alergenic properties",
+        "example": "allergic"
+      },
+      {
+        "id": "id_toxic_dose",
+        "label": "Toxic dose",
+        "itemType": "comment",
+        "term": "toxic_dose",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Toxic dose",
+        "example": "intracistenal"
+      },
+      {
+        "id": "id_biotechnology",
+        "label": "Biotechnological use",
+        "itemType": "comment",
+        "term": "biotechnology",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Biotechnological use",
+        "example": "vaccine"
+      },
+      {
+        "id": "id_pharmaceutical",
+        "label": "Pharmaceutical use",
+        "itemType": "comment",
+        "term": "pharmaceutical",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Pharmaceutical use",
+        "example": "peptide"
+      },
+      {
+        "id": "id_disruption_phenotype",
+        "label": "Disruption phenotype",
+        "itemType": "comment",
+        "term": "disruption_phenotype",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Disruption phenotype",
+        "example": "infected"
+      },
+      {
+        "id": "id_mutagen",
+        "label": "Mutagenesis",
+        "itemType": "feature",
+        "term": "mutagen",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Feature Mutagenesis",
+        "example": "phosphatase"
+      }
+    ]
+  },
+  {
+    "id": "id_group_ptm_processing",
+    "label": "PTM/Processing",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_ptm",
+        "label": "Post-translational modification [CC]",
+        "itemType": "comment",
+        "term": "ptm",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Post-translational modification",
+        "example": "mitosis"
+      },
+      {
+        "id": "id_mod_res",
+        "label": "Modified residue [FT]",
+        "itemType": "feature",
+        "term": "mod_res",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Feature Modified residue",
+        "example": "phosphoserine"
+      },
+      {
+        "id": "id_lipid",
+        "label": "Lipidation [FT]",
+        "itemType": "feature",
+        "term": "lipid",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Feature Lipidation",
+        "example": "cysteine"
+      },
+      {
+        "id": "id_carbohyd",
+        "label": "Glycosylation [FT]",
+        "itemType": "feature",
+        "term": "carbohyd",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Feature Glycosylation",
+        "example": "cysteine"
+      },
+      {
+        "id": "id_disulfid",
+        "label": "Disulfide bond [FT]",
+        "itemType": "feature",
+        "term": "disulfid",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Feature Disulfide bond",
+        "example": "reversible"
+      },
+      {
+        "id": "id_crosslnk",
+        "label": "Cross-link [FT]",
+        "itemType": "feature",
+        "term": "crosslnk",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by Feature Cross-link",
+        "example": "lysine"
+      },
+      {
+        "id": "id_group_molecule_processing",
+        "label": "Molecule Processing [FT]",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_molecule_processing",
+            "label": "Any molecule processing",
+            "itemType": "feature",
+            "term": "molecule_processing",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature Molecule Processing",
+            "example": "disulfide"
+          },
+          {
+            "id": "id_chain",
+            "label": "Chain",
+            "itemType": "feature",
+            "term": "chain",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature chain",
+            "example": "kinase"
+          },
+          {
+            "id": "id_init_met",
+            "label": "Initiator methionine",
+            "itemType": "feature",
+            "term": "init_met",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature initiator methionine",
+            "example": "Removed"
+          },
+          {
+            "id": "id_peptide",
+            "label": "Peptide",
+            "itemType": "feature",
+            "term": "peptide",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature peptide",
+            "example": "Removed"
+          },
+          {
+            "id": "id_signal",
+            "label": "Signal Peptide",
+            "itemType": "feature",
+            "term": "signal",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature signal peptide",
+            "example": "cleaved"
+          },
+          {
+            "id": "id_propep",
+            "label": "Propeptide",
+            "itemType": "feature",
+            "term": "propep",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature signal peptide",
+            "example": "Activation peptide"
+          },
+          {
+            "id": "id_transit",
+            "label": "Transit Peptide",
+            "itemType": "feature",
+            "term": "transit",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature signal peptide",
+            "example": "Mitochondrion"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "id_group_expression",
+    "label": "Expression",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_developmental_stage",
+        "label": "Developmental stage",
+        "itemType": "comment",
+        "term": "developmental_stage",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Developmental stage",
+        "example": "brain"
+      },
+      {
+        "id": "id_induction",
+        "label": "Induction",
+        "itemType": "comment",
+        "term": "induction",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Induction",
+        "example": "calcium"
+      },
+      {
+        "id": "id_tissue_specificity",
+        "label": "Tissue specificity",
+        "itemType": "comment",
+        "term": "tissue_specificity",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Tissue specificity",
+        "example": "pancreas"
+      }
+    ]
+  },
+  {
+    "id": "id_group_interaction",
+    "label": "Interaction",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_interactor",
+        "label": "Binary Interaction",
+        "itemType": "single",
+        "term": "interactor",
+        "dataType": "string",
+        "hasEvidence": false,
+        "description": "Search by Comment Binary Interaction",
+        "example": "EBI-1042898"
+      },
+      {
+        "id": "id_subunit",
+        "label": "Subunit structure",
+        "itemType": "comment",
+        "term": "subunit",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Subunit structure",
+        "example": "homodimer"
+      }
+    ]
+  },
+  {
+    "id": "id_group_structure",
+    "label": "Structure",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_d3structure",
+        "label": "3D Structure",
+        "itemType": "single",
+        "term": "d3structure",
+        "dataType": "enum",
+        "values": [
+          {
+            "name": "Yes",
+            "value": "true"
+          },
+          {
+            "name": "No",
+            "value": "false"
+          }
+        ],
+        "hasEvidence": false,
+        "description": "Search by having pdb cross reference or not",
+        "example": "true"
+      },
+      {
+        "id": "id_group_secondary_structure",
+        "label": "Secondary structure",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_secstruct",
+            "label": "Any",
+            "itemType": "feature",
+            "term": "secstruct",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature Any secondary structure",
+            "example": "*"
+          },
+          {
+            "id": "id_helix",
+            "label": "Helix",
+            "itemType": "feature",
+            "term": "helix",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature helix",
+            "example": "*"
+          },
+          {
+            "id": "id_turn",
+            "label": "Turn",
+            "itemType": "feature",
+            "term": "turn",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature turn",
+            "example": "*"
+          },
+          {
+            "id": "id_strand",
+            "label": "Beta strand",
+            "itemType": "feature",
+            "term": "strand",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature Beta strand",
+            "example": "*"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "id_group_sequence",
+    "label": "Sequence",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_mass",
+        "label": "Mass(Da)",
+        "itemType": "single",
+        "term": "mass",
+        "dataType": "integer",
+        "hasRange": true,
+        "description": "Search by Sequence mass",
+        "example": "[441126 TO 441126]"
+      },
+      {
+        "id": "id_length",
+        "label": "Sequence length",
+        "itemType": "single",
+        "term": "length",
+        "dataType": "integer",
+        "hasRange": true,
+        "description": "Search by Sequence length",
+        "example": "[441 TO 450]"
+      },
+      {
+        "id": "id_group_alternative_products",
+        "label": "Alternative products (isoforms)",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_ap",
+            "label": "Any",
+            "itemType": "comment",
+            "term": "ap",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment alternative Products",
+            "example": "tissues"
+          },
+          {
+            "id": "id_ap_apu",
+            "label": "Alternative promoter usage",
+            "itemType": "comment",
+            "term": "ap_apu",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment alternative Products: alternative promoter usage",
+            "example": "*"
+          },
+          {
+            "id": "id_ap_as",
+            "label": "Alternative splicing",
+            "itemType": "comment",
+            "term": "ap_as",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment alternative Products: alternative splicing",
+            "example": "experimental"
+          },
+          {
+            "id": "id_ap_ai",
+            "label": "Alternative initiation",
+            "itemType": "comment",
+            "term": "ap_ai",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment alternative Products: alternative initiation",
+            "example": "acetylalanine"
+          },
+          {
+            "id": "id_ap_rf",
+            "label": "Ribosomal frameshifting",
+            "itemType": "comment",
+            "term": "ap_rf",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment alternative Products: ribosomal frameshifting",
+            "example": "translation"
+          }
+        ]
+      },
+      {
+        "id": "id_group_sequence_caution",
+        "label": "Sequence caution",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_sc",
+            "label": "Any",
+            "itemType": "comment",
+            "term": "sequence_caution",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment Sequence caution",
+            "example": "translated"
+          },
+          {
+            "id": "id_sc_framesh",
+            "label": "Framshift",
+            "itemType": "comment",
+            "term": "sc_framesh",
+            "dataType": "string",
+            "hasEvidence": false,
+            "description": "Search by Comment Sequence caution: frameshift",
+            "example": "*"
+          },
+          {
+            "id": "id_sc_einit",
+            "label": "Erroneous initiation",
+            "itemType": "comment",
+            "term": "sc_einit",
+            "dataType": "string",
+            "hasEvidence": false,
+            "description": "Search by Comment Sequence caution: erroneous initiation",
+            "example": "extended"
+          },
+          {
+            "id": "id_sc_eterm",
+            "label": "Erroneous termination",
+            "itemType": "comment",
+            "term": "sc_eterm",
+            "dataType": "string",
+            "hasEvidence": false,
+            "description": "Search by Comment Sequence caution: erroneous termination",
+            "example": "translated"
+          },
+          {
+            "id": "id_sc_epred",
+            "label": "Erroneous gene model prediction",
+            "itemType": "comment",
+            "term": "sc_epred",
+            "dataType": "string",
+            "hasEvidence": false,
+            "description": "Search by Comment Sequence caution: erroneous gene model prediction",
+            "example": "*"
+          },
+          {
+            "id": "id_sc_etran",
+            "label": "Erroneous translation",
+            "itemType": "comment",
+            "term": "sc_etran",
+            "dataType": "string",
+            "hasEvidence": false,
+            "description": "Search by Comment Sequence caution: erroneous translation",
+            "example": "choice"
+          },
+          {
+            "id": "id_sc_misc",
+            "label": "Miscellaneous Discrepancy",
+            "itemType": "comment",
+            "term": "sc_misc",
+            "dataType": "string",
+            "hasEvidence": true,
+            "description": "Search by Comment Sequence caution: miscellaneous discrepancy",
+            "example": "sequence"
+          }
+        ]
+      },
+      {
+        "id": "id_mass_spectrometry",
+        "label": "ectrometry",
+        "itemType": "comment",
+        "term": "mass_spectrometry",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment ectrometry",
+        "example": "electrospray"
+      },
+      {
+        "id": "id_polymorphism",
+        "label": "Polymorphism",
+        "itemType": "comment",
+        "term": "polymorphism",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment Polymorphism",
+        "example": "transcript"
+      },
+      {
+        "id": "id_rna_editing",
+        "label": "RNA Editing",
+        "itemType": "comment",
+        "term": "rna_editing",
+        "dataType": "string",
+        "hasEvidence": true,
+        "description": "Search by Comment rna editing",
+        "example": "target"
+      },
+      {
+        "id": "id_group_natural_variations",
+        "label": "Natural Variations",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_variants",
+            "label": "Any",
+            "itemType": "feature",
+            "term": "variants",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature natural variations",
+            "example": "colorectal"
+          },
+          {
+            "id": "id_variant",
+            "label": "Natural variant",
+            "itemType": "feature",
+            "term": "variant",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature natural variant",
+            "example": "colorectal"
+          },
+          {
+            "id": "id_var_seq",
+            "label": "Alternative sequence",
+            "itemType": "feature",
+            "term": "var_seq",
+            "dataType": "string",
+            "hasRange": true,
+            "hasEvidence": true,
+            "description": "Search by Feature alternative sequence",
+            "example": "isoform"
+          }
+        ]
+      },
+      {
+        "id": "id_non_std",
+        "label": "Non-standard residue",
+        "itemType": "feature",
+        "term": "non_std",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature non standard residue",
+        "example": "selenocysteine"
+      },
+      {
+        "id": "id_non_ter",
+        "label": "Non-terminal residue",
+        "itemType": "feature",
+        "term": "non_ter",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature non-terminal residue",
+        "example": "*"
+      },
+      {
+        "id": "id_non_cons",
+        "label": "Non-adjacent residue",
+        "itemType": "feature",
+        "term": "non_cons",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature non-adjacent residue",
+        "example": "*"
+      },
+      {
+        "id": "id_conflict",
+        "label": "Sequence conflict",
+        "itemType": "feature",
+        "term": "conflict",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature Sequence conflict",
+        "example": "*"
+      },
+      {
+        "id": "id_unsure",
+        "label": "Sequence uncertainty",
+        "itemType": "feature",
+        "term": "unsure",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature Sequence uncertainty",
+        "example": "*"
+      },
+      {
+        "id": "id_positional",
+        "label": "Sequence features [FT]",
+        "itemType": "feature",
+        "term": "positional",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by sequence positional features",
+        "example": "colorectal"
+      },
+      {
+        "id": "id_fragment",
+        "label": "Fragment",
+        "itemType": "single",
+        "term": "fragment",
+        "dataType": "enum",
+        "values": [
+          {
+            "name": "Yes",
+            "value": "true"
+          },
+          {
+            "name": "No",
+            "value": "false"
+          }
+        ],
+        "description": "Search by fragment",
+        "example": "true"
+      },
+      {
+        "id": "id_organelle",
+        "label": "Encoded in",
+        "itemType": "single",
+        "term": "organelle",
+        "dataType": "enum",
+        "values": [
+          {
+            "name": "Mitochondrion",
+            "value": "mitochondrion"
+          },
+          {
+            "name": "Plastid",
+            "value": "plastid"
+          },
+          {
+            "name": "Chloroplast",
+            "value": "chloroplast"
+          },
+          {
+            "name": "Cyanelle",
+            "value": "cyanelle"
+          },
+          {
+            "name": "Apicoplast",
+            "value": "apicoplast"
+          },
+          {
+            "name": "Organellar chromatophore",
+            "value": "organellar chromatophore"
+          },
+          {
+            "name": "Non-photosynthetic plastid",
+            "value": "non-photosynthetic plastid"
+          },
+          {
+            "name": "Nucleomorph",
+            "value": "nucleomorph"
+          },
+          {
+            "name": "Hydrogenosome",
+            "value": "hydrogenosome"
+          }
+        ],
+        "description": "Search by organelle",
+        "example": "mitochondrion"
+      },
+      {
+        "id": "id_precursor",
+        "label": "Precursor",
+        "itemType": "single",
+        "term": "precursor",
+        "dataType": "enum",
+        "values": [
+          {
+            "name": "Yes",
+            "value": "true"
+          },
+          {
+            "name": "No",
+            "value": "false"
+          }
+        ],
+        "description": "Search by precursor",
+        "example": "true"
+      },
+      {
+        "id": "id_group_sequence_from",
+        "label": "Sequence from ... [RC]",
+        "itemType": "group",
+        "dataType": "string",
+        "items": [
+          {
+            "id": "id_tissue",
+            "label": "Tissue",
+            "itemType": "single",
+            "term": "tissue",
+            "dataType": "string",
+            "description": "Search by tissue",
+            "example": "head"
+          },
+          {
+            "id": "id_strain",
+            "label": "Strain",
+            "itemType": "single",
+            "term": "strain",
+            "dataType": "string",
+            "description": "Search by strain",
+            "example": "berkeley"
+          },
+          {
+            "id": "id_plasmid",
+            "label": "Plasmid",
+            "itemType": "single",
+            "term": "plasmid",
+            "dataType": "string",
+            "description": "Search by plasmid",
+            "example": "pO113"
+          },
+          {
+            "id": "id_transposon",
+            "label": "Transposon",
+            "itemType": "single",
+            "term": "transposon",
+            "dataType": "string",
+            "description": "Search by transposon",
+            "example": "tn3"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "id_group_family_domains",
+    "label": "Family and Domains",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_domain_ft",
+        "label": "Domain [FT]",
+        "itemType": "feature",
+        "term": "domain",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature domain",
+        "example": "phosphatase"
+      },
+      {
+        "id": "id_domain_cc",
+        "label": "Domain Comments [CC]",
+        "itemType": "comment",
+        "term": "domain",
+        "dataType": "string",
+        "hasRange": false,
+        "hasEvidence": true,
+        "description": "Search by comment domain",
+        "example": "conformation"
+      },
+      {
+        "id": "id_family",
+        "label": "Protein family",
+        "itemType": "single",
+        "term": "family",
+        "dataType": "string",
+        "description": "Search by protein belongs to a family",
+        "example": "pa28"
+      },
+      {
+        "id": "id_coiled",
+        "label": "Coiled-coil",
+        "itemType": "feature",
+        "term": "coiled",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature coiled coil",
+        "example": "*"
+      },
+      {
+        "id": "id_compbias",
+        "label": "Compositional bias",
+        "itemType": "feature",
+        "term": "compbias",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature compositional bias",
+        "example": "glu-rich"
+      },
+      {
+        "id": "id_motif",
+        "label": "Motif",
+        "itemType": "feature",
+        "term": "motif",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature motif",
+        "example": "motif"
+      },
+      {
+        "id": "id_region",
+        "label": "Region",
+        "itemType": "feature",
+        "term": "region",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature region",
+        "example": "motif"
+      },
+      {
+        "id": "id_repeat",
+        "label": "Repeat",
+        "itemType": "feature",
+        "term": "repeat",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature repeat",
+        "example": "motif"
+      },
+      {
+        "id": "id_similarity",
+        "label": "Sequence similarity",
+        "itemType": "comment",
+        "term": "similarity",
+        "dataType": "string",
+        "hasRange": false,
+        "hasEvidence": true,
+        "description": "Search by comment similarity",
+        "example": "phosphatase"
+      },
+      {
+        "id": "id_zn_fing",
+        "label": "Zinc finger",
+        "itemType": "feature",
+        "term": "zn_fing",
+        "dataType": "string",
+        "hasRange": true,
+        "hasEvidence": true,
+        "description": "Search by feature zinc finger",
+        "example": "UBP"
+      }
+    ]
+  },
+  {
+    "id": "id_group_cross_references",
+    "label": "Cross-references",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_xref_any",
+        "label": "Any cross-reference",
+        "itemType": "database",
+        "term": "xref",
+        "dataType": "string",
+        "valuePrefix": "any"
+      },
+      {
+        "id": "id_group_sequence_databases",
+        "label": "Sequence databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_embl",
+            "label": "EMBL",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "embl"
+          },
+          {
+            "id": "id_xref_ccds",
+            "label": "CCDS",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ccds"
+          },
+          {
+            "id": "id_xref_pir",
+            "label": "PIR",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pir"
+          },
+          {
+            "id": "id_xref_refseq",
+            "label": "RefSeq",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "refseq"
+          }
+        ]
+      },
+      {
+        "id": "id_group_3d_structure_databases",
+        "label": "3D structure databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_pdb",
+            "label": "PDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pdb"
+          },
+          {
+            "id": "id_xref_pdbsum",
+            "label": "PDBsum",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pdbsum"
+          },
+          {
+            "id": "id_xref_smr",
+            "label": "SMR",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "smr"
+          }
+        ]
+      },
+      {
+        "id": "id_group_protein_protein_interaction_databases",
+        "label": "Protein-protein interaction databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_biogrid",
+            "label": "BioGrid",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "biogrid"
+          },
+          {
+            "id": "id_xref_complexportal",
+            "label": "ComplexPortal",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "complexportal"
+          },
+          {
+            "id": "id_xref_corum",
+            "label": "CORUM",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "corum"
+          },
+          {
+            "id": "id_xref_dip",
+            "label": "DIP",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "dip"
+          },
+          {
+            "id": "id_xref_elm",
+            "label": "ELM",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "elm"
+          },
+          {
+            "id": "id_xref_intact",
+            "label": "IntAct",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "intact"
+          },
+          {
+            "id": "id_xref_mint",
+            "label": "MINT",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "mint"
+          },
+          {
+            "id": "id_xref_string",
+            "label": "STRING",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "string"
+          }
+        ]
+      },
+      {
+        "id": "id_group_chemistry",
+        "label": "Chemistry",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_bindingdb",
+            "label": "BindingDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "bindingdb"
+          },
+          {
+            "id": "id_xref_chembl",
+            "label": "ChEMBL",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "chembl"
+          },
+          {
+            "id": "id_xref_drugbank",
+            "label": "DrugBank",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "drugbank"
+          },
+          {
+            "id": "id_xref_guidetopharmacology",
+            "label": "GuidetoPHARMACOLOGY",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "guidetopharmacology"
+          },
+          {
+            "id": "id_xref_swisslipids",
+            "label": "SwissLipids",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "swisslipids"
+          },
+          {
+            "id": "id_xref_drugcentral",
+            "label": "DrugCentral",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "drugcentral"
+          }
+        ]
+      },
+      {
+        "id": "id_group_protein_family_group_databases",
+        "label": "Protein family/group databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_allergome",
+            "label": "Allergome",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "allergome"
+          },
+          {
+            "id": "id_xref_cazy",
+            "label": "CAZy",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "cazy"
+          },
+          {
+            "id": "id_xref_esther",
+            "label": "ESTHER",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "esther"
+          },
+          {
+            "id": "id_xref_imgt_gene-db",
+            "label": "IMGT_GENE-DB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "imgt_gene-db"
+          },
+          {
+            "id": "id_xref_merops",
+            "label": "MEROPS",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "merops"
+          },
+          {
+            "id": "id_xref_moondb",
+            "label": "MoonDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "moondb"
+          },
+          {
+            "id": "id_xref_moonprot",
+            "label": "MoonProt",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "moonprot"
+          },
+          {
+            "id": "id_xref_mycoclap",
+            "label": "mycoCLAP",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "mycoclap"
+          },
+          {
+            "id": "id_xref_peroxibase",
+            "label": "PeroxiBase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "peroxibase"
+          },
+          {
+            "id": "id_xref_rebase",
+            "label": "REBASE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "rebase"
+          },
+          {
+            "id": "id_xref_tcdb",
+            "label": "TCDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "tcdb"
+          },
+          {
+            "id": "id_xref_unilectin",
+            "label": "UniLectin",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "unilectin"
+          }
+        ]
+      },
+      {
+        "id": "id_group_ptm_databases",
+        "label": "PTM databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_carbonyldb",
+            "label": "CarbonylDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "carbonyldb"
+          },
+          {
+            "id": "id_xref_depod",
+            "label": "DEPOD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "depod"
+          },
+          {
+            "id": "id_xref_glyconnect",
+            "label": "GlyConnect",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "glyconnect"
+          },
+          {
+            "id": "id_xref_iptmnet",
+            "label": "iPTMnet",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "iptmnet"
+          },
+          {
+            "id": "id_xref_phosphositeplus",
+            "label": "PhosphoSitePlus",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "phosphositeplus"
+          },
+          {
+            "id": "id_xref_swisspalm",
+            "label": "SwissPalm",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "swisspalm"
+          },
+          {
+            "id": "id_xref_unicarbkb",
+            "label": "UniCarbKB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "unicarbkb"
+          }
+        ]
+      },
+      {
+        "id": "id_group_polymorphism_and_mutation_databases",
+        "label": "Polymorphism and mutation databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_biomuta",
+            "label": "BioMuta",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "biomuta"
+          },
+          {
+            "id": "id_xref_dmdm",
+            "label": "DMDM",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "dmdm"
+          },
+          {
+            "id": "id_xref_dbsnp",
+            "label": "dbSNP",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "dbsnp"
+          }
+        ]
+      },
+      {
+        "id": "id_group_2d_gel_databases",
+        "label": "2D gel databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_compluyeast-2dpage",
+            "label": "COMPLUYEAST-2DPAGE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "compluyeast-2dpage"
+          },
+          {
+            "id": "id_xref_dosac-cobs-2dpage",
+            "label": "DOSAC-COBS-2DPAGE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "dosac-cobs-2dpage"
+          },
+          {
+            "id": "id_xref_ogp",
+            "label": "OGP",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ogp"
+          },
+          {
+            "id": "id_xref_reproduction-2dpage",
+            "label": "REPRODUCTION-2DPAGE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "reproduction-2dpage"
+          },
+          {
+            "id": "id_xref_swiss-2dpage",
+            "label": "SWISS-2DPAGE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "swiss-2dpage"
+          },
+          {
+            "id": "id_xref_ucd-2dpage",
+            "label": "UCD-2DPAGE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ucd-2dpage"
+          },
+          {
+            "id": "id_xref_world-2dpage",
+            "label": "World-2DPAGE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "world-2dpage"
+          }
+        ]
+      },
+      {
+        "id": "id_group_proteomic_databases",
+        "label": "Proteomic databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_cptac",
+            "label": "CPTAC",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "cptac"
+          },
+          {
+            "id": "id_xref_epd",
+            "label": "EPD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "epd"
+          },
+          {
+            "id": "id_xref_maxqb",
+            "label": "MaxQB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "maxqb"
+          },
+          {
+            "id": "id_xref_paxdb",
+            "label": "PaxDb",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "paxdb"
+          },
+          {
+            "id": "id_xref_peptideatlas",
+            "label": "PeptideAtlas",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "peptideatlas"
+          },
+          {
+            "id": "id_xref_pride",
+            "label": "PRIDE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pride"
+          },
+          {
+            "id": "id_xref_promex",
+            "label": "ProMEX",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "promex"
+          },
+          {
+            "id": "id_xref_proteomicsdb",
+            "label": "ProteomicsDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "proteomicsdb"
+          },
+          {
+            "id": "id_xref_topdownproteomics",
+            "label": "TopDownProteomics",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "topdownproteomics"
+          },
+          {
+            "id": "id_xref_jpost",
+            "label": "jPOST",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "jpost"
+          },
+          {
+            "id": "id_xref_massive",
+            "label": "MassIVE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "massive"
+          }
+        ]
+      },
+      {
+        "id": "id_group_protocols_and_materials_databases",
+        "label": "Protocols and materials databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_dnasu",
+            "label": "DNASU",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "dnasu"
+          },
+          {
+            "id": "id_xref_abcd",
+            "label": "ABCD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "abcd"
+          }
+        ]
+      },
+      {
+        "id": "id_group_genome_annotation_databases",
+        "label": "Genome annotation databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_ensembl",
+            "label": "Ensembl",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ensembl"
+          },
+          {
+            "id": "id_xref_ensemblbacteria",
+            "label": "EnsemblBacteria",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ensemblbacteria"
+          },
+          {
+            "id": "id_xref_ensemblfungi",
+            "label": "EnsemblFungi",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ensemblfungi"
+          },
+          {
+            "id": "id_xref_ensemblmetazoa",
+            "label": "EnsemblMetazoa",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ensemblmetazoa"
+          },
+          {
+            "id": "id_xref_ensemblplants",
+            "label": "EnsemblPlants",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ensemblplants"
+          },
+          {
+            "id": "id_xref_ensemblprotists",
+            "label": "EnsemblProtists",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ensemblprotists"
+          },
+          {
+            "id": "id_xref_genedb",
+            "label": "GeneDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genedb"
+          },
+          {
+            "id": "id_xref_geneid",
+            "label": "GeneID",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "geneid"
+          },
+          {
+            "id": "id_xref_gramene",
+            "label": "Gramene",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "gramene"
+          },
+          {
+            "id": "id_xref_kegg",
+            "label": "KEGG",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "kegg"
+          },
+          {
+            "id": "id_xref_patric",
+            "label": "PATRIC",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "patric"
+          },
+          {
+            "id": "id_xref_ucsc",
+            "label": "UCSC",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ucsc"
+          },
+          {
+            "id": "id_xref_vectorbase",
+            "label": "VectorBase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "vectorbase"
+          },
+          {
+            "id": "id_xref_wbparasite",
+            "label": "WBParaSite",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "wbparasite"
+          }
+        ]
+      },
+      {
+        "id": "id_group_organism_specific_databases",
+        "label": "Organism-specific databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_arachnoserver",
+            "label": "ArachnoServer",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "arachnoserver"
+          },
+          {
+            "id": "id_xref_araport",
+            "label": "Araport",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "araport"
+          },
+          {
+            "id": "id_xref_cgd",
+            "label": "CGD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "cgd"
+          },
+          {
+            "id": "id_xref_conoserver",
+            "label": "ConoServer",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "conoserver"
+          },
+          {
+            "id": "id_xref_ctd",
+            "label": "CTD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ctd"
+          },
+          {
+            "id": "id_xref_dictybase",
+            "label": "dictyBase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "dictybase"
+          },
+          {
+            "id": "id_xref_disgenet",
+            "label": "DisGeNET",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "disgenet"
+          },
+          {
+            "id": "id_xref_echobase",
+            "label": "EchoBASE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "echobase"
+          },
+          {
+            "id": "id_xref_euhcvdb",
+            "label": "euHCVdb",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "euhcvdb"
+          },
+          {
+            "id": "id_xref_eupathdb",
+            "label": "EuPathDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "eupathdb"
+          },
+          {
+            "id": "id_xref_flybase",
+            "label": "FlyBase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "flybase"
+          },
+          {
+            "id": "id_xref_genecards",
+            "label": "GeneCards",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genecards"
+          },
+          {
+            "id": "id_xref_genereviews",
+            "label": "GeneReviews",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genereviews"
+          },
+          {
+            "id": "id_xref_hgnc",
+            "label": "HGNC",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "hgnc"
+          },
+          {
+            "id": "id_xref_hpa",
+            "label": "HPA",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "hpa"
+          },
+          {
+            "id": "id_xref_legiolist",
+            "label": "LegioList",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "legiolist"
+          },
+          {
+            "id": "id_xref_leproma",
+            "label": "Leproma",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "leproma"
+          },
+          {
+            "id": "id_xref_maizegdb",
+            "label": "MaizeGDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "maizegdb"
+          },
+          {
+            "id": "id_xref_malacards",
+            "label": "MalaCards",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "malacards"
+          },
+          {
+            "id": "id_xref_mgi",
+            "label": "MGI",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "mgi"
+          },
+          {
+            "id": "id_xref_mim",
+            "label": "MIM",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "mim"
+          },
+          {
+            "id": "id_xref_niagads",
+            "label": "NIAGADS",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "niagads"
+          },
+          {
+            "id": "id_xref_nextprot",
+            "label": "neXtProt",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "nextprot"
+          },
+          {
+            "id": "id_xref_opentargets",
+            "label": "OpenTargets",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "opentargets"
+          },
+          {
+            "id": "id_xref_orphanet",
+            "label": "Orphanet",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "orphanet"
+          },
+          {
+            "id": "id_xref_pharmgkb",
+            "label": "PharmGKB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pharmgkb"
+          },
+          {
+            "id": "id_xref_pombase",
+            "label": "PomBase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pombase"
+          },
+          {
+            "id": "id_xref_pseudocap",
+            "label": "PseudoCAP",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pseudocap"
+          },
+          {
+            "id": "id_xref_rgd",
+            "label": "RGD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "rgd"
+          },
+          {
+            "id": "id_xref_sgd",
+            "label": "SGD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "sgd"
+          },
+          {
+            "id": "id_xref_tair",
+            "label": "TAIR",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "tair"
+          },
+          {
+            "id": "id_xref_tuberculist",
+            "label": "TubercuList",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "tuberculist"
+          },
+          {
+            "id": "id_xref_vgnc",
+            "label": "VGNC",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "vgnc"
+          },
+          {
+            "id": "id_xref_wormbase",
+            "label": "WormBase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "wormbase"
+          },
+          {
+            "id": "id_xref_xenbase",
+            "label": "Xenbase",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "xenbase"
+          },
+          {
+            "id": "id_xref_zfin",
+            "label": "ZFIN",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "zfin"
+          }
+        ]
+      },
+      {
+        "id": "id_group_phylogenomic_databases",
+        "label": "Phylogenomic databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_eggnog",
+            "label": "eggNOG",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "eggnog"
+          },
+          {
+            "id": "id_xref_genetree",
+            "label": "GeneTree",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genetree"
+          },
+          {
+            "id": "id_xref_hogenom",
+            "label": "HOGENOM",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "hogenom"
+          },
+          {
+            "id": "id_xref_inparanoid",
+            "label": "InParanoid",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "inparanoid"
+          },
+          {
+            "id": "id_xref_ko",
+            "label": "KO",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "ko"
+          },
+          {
+            "id": "id_xref_oma",
+            "label": "OMA",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "oma"
+          },
+          {
+            "id": "id_xref_orthodb",
+            "label": "OrthoDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "orthodb"
+          },
+          {
+            "id": "id_xref_phylomedb",
+            "label": "PhylomeDB",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "phylomedb"
+          },
+          {
+            "id": "id_xref_treefam",
+            "label": "TreeFam",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "treefam"
+          }
+        ]
+      },
+      {
+        "id": "id_group_enzyme_and_pathway_databases",
+        "label": "Enzyme and pathway databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_biocyc",
+            "label": "BioCyc",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "biocyc"
+          },
+          {
+            "id": "id_xref_brenda",
+            "label": "BRENDA",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "brenda"
+          },
+          {
+            "id": "id_xref_reactome",
+            "label": "Reactome",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "reactome"
+          },
+          {
+            "id": "id_xref_sabio-rk",
+            "label": "SABIO-RK",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "sabio-rk"
+          },
+          {
+            "id": "id_xref_signalink",
+            "label": "SignaLink",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "signalink"
+          },
+          {
+            "id": "id_xref_signor",
+            "label": "SIGNOR",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "signor"
+          },
+          {
+            "id": "id_xref_unipathway",
+            "label": "UniPathway",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "unipathway"
+          },
+          {
+            "id": "id_xref_plantreactome",
+            "label": "PlantReactome",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "plantreactome"
+          }
+        ]
+      },
+      {
+        "id": "id_group_other",
+        "label": "Other",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_chitars",
+            "label": "ChiTaRS",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "chitars"
+          },
+          {
+            "id": "id_xref_evolutionarytrace",
+            "label": "EvolutionaryTrace",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "evolutionarytrace"
+          },
+          {
+            "id": "id_xref_genewiki",
+            "label": "GeneWiki",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genewiki"
+          },
+          {
+            "id": "id_xref_genomernai",
+            "label": "GenomeRNAi",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genomernai"
+          },
+          {
+            "id": "id_xref_pro",
+            "label": "PRO",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pro"
+          },
+          {
+            "id": "id_xref_pharos",
+            "label": "Pharos",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pharos"
+          },
+          {
+            "id": "id_xref_rnact",
+            "label": "RNAct",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "rnact"
+          }
+        ]
+      },
+      {
+        "id": "id_group_gene_expression_databases",
+        "label": "Gene expression databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_bgee",
+            "label": "Bgee",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "bgee"
+          },
+          {
+            "id": "id_xref_cleanex",
+            "label": "CleanEx",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "cleanex"
+          },
+          {
+            "id": "id_xref_collectf",
+            "label": "CollecTF",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "collectf"
+          },
+          {
+            "id": "id_xref_expressionatlas",
+            "label": "ExpressionAtlas",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "expressionatlas"
+          },
+          {
+            "id": "id_xref_genevisible",
+            "label": "Genevisible",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "genevisible"
+          }
+        ]
+      },
+      {
+        "id": "id_group_family_and_domain_databases",
+        "label": "Family and domain databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_cdd",
+            "label": "CDD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "cdd"
+          },
+          {
+            "id": "id_xref_gene3d",
+            "label": "Gene3D",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "gene3d"
+          },
+          {
+            "id": "id_xref_hamap",
+            "label": "HAMAP",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "hamap"
+          },
+          {
+            "id": "id_xref_interpro",
+            "label": "InterPro",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "interpro"
+          },
+          {
+            "id": "id_xref_panther",
+            "label": "PANTHER",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "panther"
+          },
+          {
+            "id": "id_xref_pfam",
+            "label": "Pfam",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pfam"
+          },
+          {
+            "id": "id_xref_pirsf",
+            "label": "PIRSF",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "pirsf"
+          },
+          {
+            "id": "id_xref_prints",
+            "label": "PRINTS",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "prints"
+          },
+          {
+            "id": "id_xref_prodom",
+            "label": "ProDom",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "prodom"
+          },
+          {
+            "id": "id_xref_sfld",
+            "label": "SFLD",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "sfld"
+          },
+          {
+            "id": "id_xref_smart",
+            "label": "SMART",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "smart"
+          },
+          {
+            "id": "id_xref_supfam",
+            "label": "SUPFAM",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "supfam"
+          },
+          {
+            "id": "id_xref_tigrfams",
+            "label": "TIGRFAMs",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "tigrfams"
+          },
+          {
+            "id": "id_xref_prosite",
+            "label": "PROSITE",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "prosite"
+          },
+          {
+            "id": "id_xref_disprot",
+            "label": "DisProt",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "disprot"
+          }
+        ]
+      },
+      {
+        "id": "id_group_ontologies",
+        "label": "Ontologies",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_go",
+            "label": "GO",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "go"
+          }
+        ]
+      },
+      {
+        "id": "id_group_proteomes_databases",
+        "label": "Proteomes databases",
+        "itemType": "group",
+        "dataType": "",
+        "items": [
+          {
+            "id": "id_xref_proteomes",
+            "label": "Proteomes",
+            "itemType": "database",
+            "term": "xref",
+            "dataType": "string",
+            "valuePrefix": "proteomes"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "id_webresource",
+    "label": "Web Resources",
+    "itemType": "comment",
+    "term": "webresource",
+    "dataType": "string",
+    "description": "Search by comment Web resources",
+    "example": "lck"
+  },
+  {
+    "id": "id_group_date_of",
+    "label": "Date Of",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_created",
+        "label": "Date Of Creation",
+        "itemType": "single",
+        "term": "created",
+        "dataType": "date",
+        "hasRange": true,
+        "description": "Search by Date of creation",
+        "example": "[2018-03-04 TO 2018-03-08]"
+      },
+      {
+        "id": "id_modified",
+        "label": "Date of last entry modification",
+        "itemType": "single",
+        "term": "modified",
+        "dataType": "date",
+        "hasRange": true,
+        "description": "Search by Date of last entry modification",
+        "example": "[2018-03-04 TO 2018-03-08]"
+      },
+      {
+        "id": "id_sequence_modified",
+        "label": "Date of last sequence modification",
+        "itemType": "single",
+        "term": "sequence_modified",
+        "dataType": "date",
+        "hasRange": true,
+        "description": "Search by Date of last sequence modification",
+        "example": "[2018-03-04 TO 2018-03-08]"
+      }
+    ]
+  },
+  {
+    "id": "id_go",
+    "label": "Gene Ontology [GO]",
+    "itemType": "goterm",
+    "term": "go",
+    "dataType": "string",
+    "hasEvidence": true,
+    "autoComplete": "/uniprot/api/suggester?dict=go&query=?",
+    "description": "search go term with evidence. If evidence is not consider term is go. If evidence is considered such as iea, the term is go_iea",
+    "example": "0009986"
+  },
+  {
+    "id": "id_keyword",
+    "label": "Keyword [KW]",
+    "itemType": "single",
+    "term": "keyword",
+    "dataType": "string",
+    "autoComplete": "/uniprot/api/suggester?dict=keyword&query=?",
+    "description": "Search by keyword",
+    "example": "chromosomal"
+  },
+  {
+    "id": "id_",
+    "label": "Literature Citation",
+    "itemType": "groupDisplay",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_lit_author",
+        "label": "Author",
+        "itemType": "single",
+        "term": "lit_author",
+        "dataType": "string",
+        "description": "Search by author",
+        "example": "smith"
+      },
+      {
+        "id": "id_lit_journal",
+        "label": "Journal",
+        "itemType": "single",
+        "term": "lit_journal",
+        "dataType": "string",
+        "description": "Search by journal name",
+        "example": "nature"
+      },
+      {
+        "id": "id_lit_pubdate",
+        "label": "Published",
+        "itemType": "single",
+        "term": "lit_pubdate",
+        "dataType": "date",
+        "hasRange": true,
+        "description": "Search by published date",
+        "example": "[2017-01-01 TO 2010-12-31]"
+      },
+      {
+        "id": "id_lit_pubmed",
+        "label": "PubMed Id",
+        "itemType": "single",
+        "term": "lit_pubmed",
+        "dataType": "string",
+        "description": "Search by pubmed id",
+        "example": "15165820"
+      },
+      {
+        "id": "id_lit_title",
+        "label": "Title",
+        "itemType": "single",
+        "term": "lit_title",
+        "dataType": "string",
+        "description": "Search by title",
+        "example": "protein"
+      }
+    ]
+  },
+  {
+    "id": "id_group_proteomes",
+    "label": "Proteomes",
+    "itemType": "group",
+    "dataType": "string",
+    "items": [
+      {
+        "id": "id_proteome",
+        "label": "Proteome ID",
+        "itemType": "single",
+        "term": "proteome",
+        "dataType": "string",
+        "description": "Search by Proteome ID",
+        "example": "UP000005640"
+      },
+      {
+        "id": "id_proteomecomponent",
+        "label": "Proteome Component",
+        "itemType": "single",
+        "term": "proteomecomponent",
+        "dataType": "string",
+        "description": "Search by Proteome component",
+        "example": "chromosome"
+      }
+    ]
+  },
+  {
+    "id": "id_scope",
+    "label": "Cited for",
+    "itemType": "single",
+    "term": "scope",
+    "dataType": "string",
+    "description": "Search by citation RP cited for",
+    "example": "microtubule"
+  },
+  {
+    "id": "id_reviewed",
+    "label": "Reviewed",
+    "itemType": "single",
+    "term": "reviewed",
+    "dataType": "enum",
+    "values": [
+      {
+        "name": "Yes",
+        "value": "true"
+      },
+      {
+        "name": "No",
+        "value": "false"
+      }
+    ],
+    "description": "Search by reviewed",
+    "example": "true"
+  },
+  {
+    "id": "id_active",
+    "label": "Active",
+    "itemType": "single",
+    "term": "active",
+    "dataType": "enum",
+    "values": [
+      {
+        "name": "Yes",
+        "value": "true"
+      },
+      {
+        "name": "No",
+        "value": "false"
+      }
+    ],
+    "description": "Search by active or not",
+    "example": "true"
+  }
+]

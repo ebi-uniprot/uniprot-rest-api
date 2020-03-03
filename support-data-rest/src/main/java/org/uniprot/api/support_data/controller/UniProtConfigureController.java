@@ -1,5 +1,10 @@
 package org.uniprot.api.support_data.controller;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +21,26 @@ import org.uniprot.store.search.domain.FieldGroup;
 @RequestMapping("/configure/uniprotkb")
 public class UniProtConfigureController {
     private UniProtConfigureService service;
+    private String searchTermResponse;
 
     public UniProtConfigureController(UniProtConfigureService service) {
         this.service = service;
     }
 
+    // FIXME Delete this method once UI team starts consuming response of getUniProtSearchTerms
     @GetMapping("/search_terms")
+    public String getUniProtSearchTermsTemp() throws IOException, URISyntaxException {
+        if (searchTermResponse == null) {
+            URI uri =
+                    UniProtConfigureController.class
+                            .getResource("/search_terms-response.json")
+                            .toURI();
+            searchTermResponse = new String(Files.readAllBytes(Paths.get(uri)));
+        }
+        return searchTermResponse;
+    }
+
+    @GetMapping("/search-terms")
     public List<AdvanceUniProtKBSearchTerm> getUniProtSearchTerms() {
         return service.getUniProtSearchItems();
     }

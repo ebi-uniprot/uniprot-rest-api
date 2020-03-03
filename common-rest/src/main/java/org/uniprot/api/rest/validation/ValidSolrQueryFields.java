@@ -132,22 +132,22 @@ public @interface ValidSolrQueryFields {
                 TermQuery termQuery = (TermQuery) inputQuery;
                 String fieldName = termQuery.getTerm().field();
                 String value = termQuery.getTerm().text();
-                validField = isValidField(context, fieldName, SearchFieldType.general, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof WildcardQuery) {
                 WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
                 String fieldName = wildcardQuery.getTerm().field();
                 String value = wildcardQuery.getTerm().text();
-                validField = isValidField(context, fieldName, SearchFieldType.general, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof PrefixQuery) {
                 PrefixQuery prefixQuery = (PrefixQuery) inputQuery;
                 String fieldName = prefixQuery.getPrefix().field();
                 String value = prefixQuery.getPrefix().text();
-                validField = isValidField(context, fieldName, SearchFieldType.general, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof TermRangeQuery) {
                 TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;
                 String fieldName = rangeQuery.getField();
                 String value = rangeQuery.toString("");
-                validField = isValidField(context, fieldName, SearchFieldType.range, value);
+                validField = isValidField(context, fieldName, SearchFieldType.RANGE, value);
             } else if (inputQuery instanceof PhraseQuery) {
                 PhraseQuery phraseQuery = (PhraseQuery) inputQuery;
                 String fieldName = phraseQuery.getTerms()[0].field();
@@ -155,7 +155,7 @@ public @interface ValidSolrQueryFields {
                         Arrays.stream(phraseQuery.getTerms())
                                 .map(Term::text)
                                 .collect(Collectors.joining(" "));
-                validField = isValidField(context, fieldName, SearchFieldType.general, value);
+                validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof BooleanQuery) {
                 BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
                 for (BooleanClause clause : booleanQuery.clauses()) {
