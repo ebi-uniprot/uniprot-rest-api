@@ -556,7 +556,7 @@ class SearchByDateIT {
 
     private String getSearchField(String name) {
         SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         return searchFieldConfig.getSearchFieldItemByName(name).getFieldName();
     }
 }

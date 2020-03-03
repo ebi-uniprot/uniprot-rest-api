@@ -210,7 +210,7 @@ class QueryFieldValidatorTest {
 
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
         ValidSolrQueryFields validSolrQueryFields = Mockito.mock(ValidSolrQueryFields.class);
-        Mockito.when(validSolrQueryFields.uniProtDataType()).thenReturn(UniProtDataType.uniprotkb);
+        Mockito.when(validSolrQueryFields.uniProtDataType()).thenReturn(UniProtDataType.UNIPROTKB);
         return validSolrQueryFields;
     }
 

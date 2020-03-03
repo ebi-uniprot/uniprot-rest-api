@@ -22,7 +22,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordSortClause keywordSortClause,
             QueryBoosts keywordQueryBoosts) {
         super(repository, keywordEntryConverter, keywordSortClause, keywordQueryBoosts, null);
-        this.fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.keyword);
+        this.fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
     }
 
     @Override

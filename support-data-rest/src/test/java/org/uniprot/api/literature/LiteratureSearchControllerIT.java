@@ -101,7 +101,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.literature);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
     }
 
     @Override

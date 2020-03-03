@@ -89,7 +89,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.crossref);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
     }
 
     @Override

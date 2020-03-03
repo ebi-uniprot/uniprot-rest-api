@@ -29,7 +29,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             QueryBoosts literatureQueryBoosts) {
         super(repository, entryConverter, literatureSortClause, literatureQueryBoosts, facetConfig);
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.literature);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
     }
 
     @Override

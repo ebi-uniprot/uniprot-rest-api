@@ -35,6 +35,6 @@ public class UniParcSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.uniparc;
+        return UniProtDataType.UNIPARC;
     }
 }

@@ -40,6 +40,6 @@ public class TaxonomySortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.taxonomy;
+        return UniProtDataType.TAXONOMY;
     }
 }

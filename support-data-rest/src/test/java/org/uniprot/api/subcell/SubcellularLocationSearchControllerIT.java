@@ -89,7 +89,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.subcelllocation);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
     }
 
     @Override

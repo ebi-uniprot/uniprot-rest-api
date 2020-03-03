@@ -19,11 +19,11 @@ public class SubcellularLocationRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.subcelllocation,
+            uniProtDataType = UniProtDataType.SUBCELLLOCATION,
             messagePrefix = "search.subcellularLocation")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.subcelllocation)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String sort;
 
     private String cursor;

@@ -129,7 +129,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniparc);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
     }
 
     @Override

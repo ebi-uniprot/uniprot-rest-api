@@ -32,7 +32,7 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
     public TaxonomyServiceImpl(TaxonomyRepository taxRepo) {
         super(taxRepo, new TaxonomyEntryConverter());
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.taxonomy);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
     }
 
     @Cacheable("taxonomyCache")

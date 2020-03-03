@@ -37,7 +37,7 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
     @Override
     protected String getIdField() {
         SearchFieldConfig fieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.genecentric);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
         return fieldConfig.getSearchFieldItemByName("accession_id").getFieldName();
     }
 }

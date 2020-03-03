@@ -41,6 +41,6 @@ public class KeywordSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.keyword;
+        return UniProtDataType.KEYWORD;
     }
 }

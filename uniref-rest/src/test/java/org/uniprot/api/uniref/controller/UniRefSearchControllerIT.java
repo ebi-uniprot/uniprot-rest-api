@@ -160,7 +160,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniref);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
     }
 
     @Override

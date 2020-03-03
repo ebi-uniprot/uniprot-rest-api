@@ -22,7 +22,7 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 class ValidateFacetPropertiesAreSearchFieldsTest {
     @Autowired private UniprotFacetConfig config;
     private SearchFieldConfig searchFieldConfig =
-            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
 
     @Test
     void validateAllFacetFieldsAreSearchFields() {
@@ -30,8 +30,7 @@ class ValidateFacetPropertiesAreSearchFieldsTest {
                 .forEach(
                         facetField -> {
                             assertThat(
-                                    searchFieldConfig.doesSearchFieldItemExist(facetField),
-                                    is(true));
+                                    searchFieldConfig.searchFieldItemExists(facetField), is(true));
                         });
     }
 

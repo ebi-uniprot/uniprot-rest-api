@@ -54,26 +54,30 @@ public class AdvanceUniProtKBSearchTerm implements Serializable {
         private String value;
     }
 
+    private static List<AdvanceUniProtKBSearchTerm> rootSearchTermConfigs;
+
     public static List<AdvanceUniProtKBSearchTerm> getUniProtKBSearchTerms() {
-        SearchFieldConfig config =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniprotkb);
-        List<SearchFieldItem> rootFieldItems = getTopLevelFieldItems(config);
-        Comparator<AdvanceUniProtKBSearchTerm> comparatorBySeqNumber =
-                Comparator.comparing(AdvanceUniProtKBSearchTerm::getSeqNumber);
-        Comparator<AdvanceUniProtKBSearchTerm> comparatorByChildNumber =
-                Comparator.comparing(AdvanceUniProtKBSearchTerm::getChildNumber);
-        List<AdvanceUniProtKBSearchTerm> rootSearchTermConfigs =
-                convert(rootFieldItems, comparatorBySeqNumber);
+        if (rootSearchTermConfigs == null) {
+            SearchFieldConfig config =
+                    SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+            List<SearchFieldItem> rootFieldItems = getTopLevelFieldItems(config);
+            Comparator<AdvanceUniProtKBSearchTerm> comparatorBySeqNumber =
+                    Comparator.comparing(AdvanceUniProtKBSearchTerm::getSeqNumber);
+            Comparator<AdvanceUniProtKBSearchTerm> comparatorByChildNumber =
+                    Comparator.comparing(AdvanceUniProtKBSearchTerm::getChildNumber);
+            rootSearchTermConfigs = convert(rootFieldItems, comparatorBySeqNumber);
 
-        Queue<AdvanceUniProtKBSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
+            Queue<AdvanceUniProtKBSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
 
-        while (!queue.isEmpty()) { // BFS logic
-            AdvanceUniProtKBSearchTerm currentItem = queue.remove();
-            List<SearchFieldItem> childFieldItems = getChildFieldItems(config, currentItem.getId());
-            List<AdvanceUniProtKBSearchTerm> children =
-                    convert(childFieldItems, comparatorByChildNumber);
-            queue.addAll(children);
-            currentItem.setItems(children);
+            while (!queue.isEmpty()) { // BFS logic
+                AdvanceUniProtKBSearchTerm currentItem = queue.remove();
+                List<SearchFieldItem> childFieldItems =
+                        getChildFieldItems(config, currentItem.getId());
+                List<AdvanceUniProtKBSearchTerm> children =
+                        convert(childFieldItems, comparatorByChildNumber);
+                queue.addAll(children);
+                currentItem.setItems(children);
+            }
         }
         return rootSearchTermConfigs;
     }

@@ -28,7 +28,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 diseaseQueryBoosts,
                 null);
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.disease);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
     }
 
     @Override

@@ -85,7 +85,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.disease);
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
     }
 
     @Override

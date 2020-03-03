@@ -23,11 +23,11 @@ public class UniParcRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.uniparc,
+            uniProtDataType = UniProtDataType.UNIPARC,
             messagePrefix = "search.uniparc")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.uniparc)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;
 
     private String cursor;

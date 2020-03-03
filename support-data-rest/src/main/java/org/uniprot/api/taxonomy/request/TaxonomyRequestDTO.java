@@ -17,11 +17,11 @@ public class TaxonomyRequestDTO implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.taxonomy,
+            uniProtDataType = UniProtDataType.TAXONOMY,
             messagePrefix = "search.taxonomy")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.taxonomy)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String sort;
 
     private String cursor;

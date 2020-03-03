@@ -154,7 +154,7 @@ class SortFieldValidatorImplTest {
 
     private ValidSolrSortFields getMockedValidSolrQueryFields() {
         ValidSolrSortFields validSolrSortFields = Mockito.mock(ValidSolrSortFields.class);
-        Mockito.when(validSolrSortFields.uniProtDataType()).thenReturn(UniProtDataType.uniprotkb);
+        Mockito.when(validSolrSortFields.uniProtDataType()).thenReturn(UniProtDataType.UNIPROTKB);
         return validSolrSortFields;
     }
 

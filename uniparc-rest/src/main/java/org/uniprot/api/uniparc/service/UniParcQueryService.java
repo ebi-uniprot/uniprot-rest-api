@@ -32,7 +32,7 @@ public class UniParcQueryService extends BasicSearchService<UniParcDocument, Uni
 
         super(repository, uniParcEntryConverter, solrSortClause, uniParcQueryBoosts, facetConfig);
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.uniparc);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
     }
 
     @Override

@@ -49,7 +49,7 @@ public class SuggesterService {
         this.solrTemplate = solrTemplate;
         this.collection = collection;
         this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.suggest);
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUGGEST);
     }
 
     public Suggestions findSuggestions(String dictionaryStr, String queryStr) {

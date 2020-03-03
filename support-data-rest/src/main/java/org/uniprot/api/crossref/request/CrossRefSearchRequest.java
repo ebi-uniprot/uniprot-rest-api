@@ -16,11 +16,11 @@ public class CrossRefSearchRequest implements SearchRequest {
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.crossref,
+            uniProtDataType = UniProtDataType.CROSSREF,
             messagePrefix = "search.crossref")
     private String query;
 
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.crossref)
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.CROSSREF)
     private String sort;
 
     private String cursor;
