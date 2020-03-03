@@ -19,7 +19,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamResolver {
 
     @Override
-    protected DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult(
+    public DownloadParamAndResult getDownloadLessThanDefaultBatchSizeParamAndResult(
             MediaType contentType) {
         Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
         DownloadParamAndResult paramAndResult =
@@ -35,8 +35,7 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
     }
 
     @Override
-    protected DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult(
-            MediaType contentType) {
+    public DownloadParamAndResult getDownloadDefaultBatchSizeParamAndResult(MediaType contentType) {
         Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE;
         DownloadParamAndResult paramAndResult =
                 getDownloadDefaultParamAndResult(contentType, downloadSize);
@@ -51,7 +50,7 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
     }
 
     @Override
-    protected DownloadParamAndResult getDownloadMoreThanBatchSizeParamAndResult(
+    public DownloadParamAndResult getDownloadMoreThanBatchSizeParamAndResult(
             MediaType contentType) {
         Integer downloadSize = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
         DownloadParamAndResult paramAndResult =
@@ -67,8 +66,7 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
     }
 
     @Override
-    protected DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(
-            MediaType contentType) {
+    public DownloadParamAndResult getDownloadSizeLessThanZeroParamAndResult(MediaType contentType) {
         return DownloadParamAndResult.builder()
                 .queryParam("query", Collections.singletonList("*"))
                 .queryParam("size", Collections.singletonList(String.valueOf(-1)))

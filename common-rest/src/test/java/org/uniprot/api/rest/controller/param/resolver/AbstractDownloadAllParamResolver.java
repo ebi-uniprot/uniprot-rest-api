@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -21,7 +22,14 @@ public abstract class AbstractDownloadAllParamResolver extends BaseDownloadParam
     public boolean supportsParameter(
             ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class);
+        boolean paramSourceProvided =
+                extensionContext
+                        .getTestMethod()
+                        .map(t -> t.getAnnotation(MethodSource.class) != null)
+                        .orElse(false);
+
+        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class)
+                && !paramSourceProvided;
     }
 
     @Override
@@ -71,5 +79,5 @@ public abstract class AbstractDownloadAllParamResolver extends BaseDownloadParam
         return result;
     }
 
-    protected abstract DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType);
+    public abstract DownloadParamAndResult getDownloadAllParamAndResult(MediaType contentType);
 }
