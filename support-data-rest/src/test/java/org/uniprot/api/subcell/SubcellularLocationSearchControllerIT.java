@@ -29,7 +29,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.subcell.SubcellLocationCategory;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
+import org.uniprot.core.cv.subcell.builder.SubcellularLocationEntryBuilder;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -138,11 +138,13 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
     }
 
     private void saveEntry(String accession) {
-        SubcellularLocationEntryImpl subcellularLocationEntry = new SubcellularLocationEntryImpl();
-        subcellularLocationEntry.setId("Name value " + accession);
-        subcellularLocationEntry.setAccession(accession);
-        subcellularLocationEntry.setCategory(SubcellLocationCategory.LOCATION);
-        subcellularLocationEntry.setDefinition("Definition value " + accession);
+        SubcellularLocationEntry subcellularLocationEntry =
+                new SubcellularLocationEntryBuilder()
+                        .id("Name value " + accession)
+                        .accession(accession)
+                        .category(SubcellLocationCategory.LOCATION)
+                        .definition("Definition value " + accession)
+                        .build();
 
         SubcellularLocationDocument document =
                 SubcellularLocationDocument.builder()

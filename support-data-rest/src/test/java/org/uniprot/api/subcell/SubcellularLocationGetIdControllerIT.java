@@ -28,7 +28,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.subcell.SubcellLocationCategory;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
+import org.uniprot.core.cv.subcell.builder.SubcellularLocationEntryBuilder;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -71,11 +71,13 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
 
     @Override
     protected void saveEntry() {
-        SubcellularLocationEntryImpl subcellularLocationEntry = new SubcellularLocationEntryImpl();
-        subcellularLocationEntry.setId("the id");
-        subcellularLocationEntry.setAccession(SUBCELL_ACCESSION);
-        subcellularLocationEntry.setCategory(SubcellLocationCategory.LOCATION);
-        subcellularLocationEntry.setDefinition("Definition value");
+        SubcellularLocationEntry subcellularLocationEntry =
+                new SubcellularLocationEntryBuilder()
+                        .id("the id")
+                        .accession(SUBCELL_ACCESSION)
+                        .category(SubcellLocationCategory.LOCATION)
+                        .definition("Definition value")
+                        .build();
 
         SubcellularLocationDocument document =
                 SubcellularLocationDocument.builder()

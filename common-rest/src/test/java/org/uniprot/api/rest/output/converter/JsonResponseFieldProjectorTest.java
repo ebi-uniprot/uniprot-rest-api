@@ -12,7 +12,7 @@ import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.keyword.builder.KeywordIdBuilder;
 import org.uniprot.core.json.parser.uniprot.*;
 import org.uniprot.core.json.parser.uniprot.comment.*;
 import org.uniprot.core.uniprot.ProteinExistence;
@@ -35,10 +35,7 @@ class JsonResponseFieldProjectorTest {
     void setUp() {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         KeywordId keyword =
-                new KeywordEntryKeywordBuilder()
-                        .id("Mental retardation")
-                        .accession("KW-0991")
-                        .build();
+                new KeywordIdBuilder().id("Mental retardation").accession("KW-0991").build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
                         .databaseType("MIM")

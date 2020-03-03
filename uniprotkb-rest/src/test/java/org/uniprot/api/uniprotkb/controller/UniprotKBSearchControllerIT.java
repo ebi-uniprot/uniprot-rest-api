@@ -57,7 +57,7 @@ import org.uniprot.core.uniprot.xdb.builder.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseImpl;
-import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -697,7 +697,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
 
-            UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
+            UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
                     .map(db -> db.getName().toLowerCase())
                     .forEach(dbName -> doc.xrefCountMap.put("xref_count_" + dbName, 0L));
 

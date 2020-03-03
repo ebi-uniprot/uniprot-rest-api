@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.common.FieldConfiguration;
 import org.uniprot.store.config.model.FieldItem;
 import org.uniprot.store.config.uniprotkb.UniProtKBSearchFieldConfiguration;
@@ -29,7 +29,7 @@ public class UniProtConfigureService {
     private static final UniProtSearchItems SEARCH_ITEMS = UniProtSearchItems.INSTANCE;
     private static final AnnotationEvidences ANNOTATION_EVIDENCES = AnnotationEvidences.INSTANCE;
     private static final GoEvidences GO_EVIDENCES = GoEvidences.INSTANCE;
-    private static final UniProtXDbTypes DBX_TYPES = UniProtXDbTypes.INSTANCE;
+    private static final UniProtDatabaseTypes DBX_TYPES = UniProtDatabaseTypes.INSTANCE;
 
     public List<SearchItem> getUniProtSearchItems() {
         return SEARCH_ITEMS.getSearchItems();
@@ -83,7 +83,7 @@ public class UniProtConfigureService {
     }
 
     public List<UniProtDatabaseDetail> getAllDatabases() {
-        return DBX_TYPES.getAllDBXRefTypes();
+        return DBX_TYPES.getAllDbTypes();
     }
 
     private List<AdvanceSearchTerm> getUniProtSearchTerms() {

@@ -13,7 +13,7 @@ import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.uniprot.ProteinExistence;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureType;
-import org.uniprot.cv.xdb.UniProtXDbDisplayOrder;
+import org.uniprot.cv.xdb.UniProtCrossReferenceDisplayOrder;
 
 /**
  * This class is responsible to parse FROM old uniprot lucene query string format TO new uniprot
@@ -461,7 +461,8 @@ public class RequestQueryParser {
         boolean isFieldNameType = termQuery.getTerm().field().equalsIgnoreCase("type");
 
         String value = termQuery.getTerm().text();
-        List<UniProtDatabaseDetail> dbxrefs = UniProtXDbDisplayOrder.INSTANCE.getOrderedDatabases();
+        List<UniProtDatabaseDetail> dbxrefs =
+                UniProtCrossReferenceDisplayOrder.INSTANCE.getOrderedDatabases();
 
         boolean isValueAValidDatabase =
                 dbxrefs.stream()
