@@ -5,7 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -28,15 +31,17 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
-import org.uniprot.core.cv.keyword.impl.KeywordImpl;
+import org.uniprot.core.cv.keyword.KeywordId;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.KeywordField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -79,10 +84,8 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.KEYWORD.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
     }
 
     @Override
@@ -98,14 +101,6 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.KEYWORD.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(); // Facets are not supported by Keyword
     }
@@ -115,11 +110,6 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         return Arrays.stream(KeywordField.ResultFields.values())
                 .map(KeywordField.ResultFields::name)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.KEYWORD.fieldValueIsValid(field, value);
     }
 
     @Override
@@ -135,10 +125,20 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     private void saveEntry(String keywordId, boolean facet) {
-        KeywordEntryImpl keywordEntry = new KeywordEntryImpl();
-        keywordEntry.setDefinition("Definition value");
-        keywordEntry.setKeyword(new KeywordImpl("my keyword " + keywordId, keywordId));
-        keywordEntry.setCategory(new KeywordImpl("Ligand", "KW-9993"));
+        KeywordId keyword =
+                new KeywordEntryKeywordBuilder()
+                        .id("my keyword " + keywordId)
+                        .accession(keywordId)
+                        .build();
+        KeywordId category =
+                new KeywordEntryKeywordBuilder().id("Ligand").accession("KW-9993").build();
+
+        KeywordEntry keywordEntry =
+                new KeywordEntryBuilder()
+                        .definition("Definition value")
+                        .keyword(keyword)
+                        .category(category)
+                        .build();
 
         KeywordDocument document =
                 KeywordDocument.builder()

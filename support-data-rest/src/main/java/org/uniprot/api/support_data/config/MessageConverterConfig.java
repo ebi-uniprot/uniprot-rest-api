@@ -25,10 +25,10 @@ import org.uniprot.api.subcell.output.converter.SubcellularLocationTsvMessageCon
 import org.uniprot.api.subcell.output.converter.SubcellularLocationXlsMessageConverter;
 import org.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
 import org.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
-import org.uniprot.core.crossref.CrossRefEntry;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.json.parser.crossref.CrossRefJsonConfig;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;

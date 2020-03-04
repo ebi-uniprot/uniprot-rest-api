@@ -25,9 +25,11 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
@@ -38,6 +40,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
     private StoreStreamer<UniProtDocument, UniProtEntry> storeStreamer;
+    private final SearchFieldConfig searchFieldConfig;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -59,6 +62,8 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         this.queryBoosts = uniProtKBQueryBoosts;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.storeStreamer = uniProtEntryStoreStreamer;
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @Override
@@ -80,7 +85,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.UNIPROTKB.getField("accession_id").getName();
+        return searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName();
     }
 
     @Override
@@ -126,7 +131,9 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         if (needsToFilterIsoform(uniProtRequest)) {
             List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
             queries.add(
-                    UniProtSearchFields.UNIPROTKB.getField("is_isoform").getName() + ":" + false);
+                    searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName()
+                            + ":"
+                            + false);
             solrRequest.setFilterQueries(queries);
         }
 
@@ -153,9 +160,9 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
                         request.getQuery(),
-                        UniProtSearchFields.UNIPROTKB.getField("accession_id").getName(),
-                        UniProtSearchFields.UNIPROTKB.getField("mnemonic").getName(),
-                        UniProtSearchFields.UNIPROTKB.getField("is_isoform").getName());
+                        searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName(),
+                        searchFieldConfig.getSearchFieldItemByName("mnemonic").getFieldName(),
+                        searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName());
 
         if (!hasIdFieldTerms) {
             return !request.isIncludeIsoform();

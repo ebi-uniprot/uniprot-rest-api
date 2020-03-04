@@ -8,8 +8,10 @@ import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.proteome.CanonicalProtein;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo
@@ -34,6 +36,8 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.GENECENTRIC.getField("accession_id").getName();
+        SearchFieldConfig fieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
+        return fieldConfig.getSearchFieldItemByName("accession_id").getFieldName();
     }
 }

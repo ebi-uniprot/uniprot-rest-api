@@ -10,8 +10,10 @@ import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author jluo
@@ -20,6 +22,9 @@ import org.uniprot.store.search.field.UniProtSearchFields;
 @Service
 @Import(UniRefQueryBoostsConfig.class)
 public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocument, UniRefEntry> {
+
+    private SearchFieldConfig searchFieldConfig;
+
     @Autowired
     public UniRefQueryService(
             UniRefQueryRepository repository,
@@ -36,6 +41,8 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
                 facetConfig,
                 storeStreamer,
                 uniRefQueryBoosts);
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
     }
 
     @Override
@@ -45,6 +52,6 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.UNIREF.getField("id").getName();
+        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 }

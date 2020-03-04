@@ -8,13 +8,18 @@ import org.uniprot.api.crossref.config.CrossRefQueryBoostsConfig;
 import org.uniprot.api.crossref.repository.CrossRefRepository;
 import org.uniprot.api.crossref.request.CrossRefEntryConverter;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.core.crossref.CrossRefEntry;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 @Service
 @Import(CrossRefQueryBoostsConfig.class)
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
+    private SearchFieldConfig fieldConfig =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
+
     public CrossRefService(
             CrossRefRepository crossRefRepository,
             CrossRefEntryConverter toCrossRefEntryConverter,
@@ -31,6 +36,6 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.CROSSREF.getField("accession").getName();
+        return fieldConfig.getSearchFieldItemByName("accession").getFieldName();
     }
 }

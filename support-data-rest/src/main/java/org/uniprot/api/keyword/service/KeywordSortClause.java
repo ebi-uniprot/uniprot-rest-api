@@ -3,32 +3,44 @@ package org.uniprot.api.keyword.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /** @author lgonzales */
 @Component
 public class KeywordSortClause extends AbstractSolrSortClause {
-
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
         return new Sort(Sort.Direction.DESC, "score")
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.KEYWORD.getField("keyword_id").getName()))
+                                getSearchFieldConfig(getUniProtDataType())
+                                        .getSearchFieldItemByName("keyword_id")
+                                        .getFieldName()))
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.KEYWORD.getField("id").getName()));
+                                getSearchFieldConfig(getUniProtDataType())
+                                        .getSearchFieldItemByName("id")
+                                        .getFieldName()));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtSearchFields.KEYWORD.getField("id").getName();
+        return getSearchFieldConfig(getUniProtDataType())
+                .getSearchFieldItemByName("id")
+                .getFieldName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
-        return UniProtSearchFields.KEYWORD.getSortFieldFor(name).getName();
+        return getSearchFieldConfig(getUniProtDataType())
+                .getCorrespondingSortField(name)
+                .getFieldName();
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.KEYWORD;
     }
 }

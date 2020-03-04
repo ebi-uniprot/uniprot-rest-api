@@ -3,7 +3,7 @@ package org.uniprot.api.uniref.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
  * @author jluo
@@ -11,19 +11,30 @@ import org.uniprot.store.search.field.UniProtSearchFields;
  */
 @Component
 public class UniRefSortClause extends AbstractSolrSortClause {
+
     @Override
     protected Sort createDefaultSort(boolean hasScore) {
         return new Sort(
-                Sort.Direction.ASC, UniProtSearchFields.UNIREF.getSortFieldFor("id").getName());
+                Sort.Direction.ASC,
+                getSearchFieldConfig(getUniProtDataType())
+                        .getCorrespondingSortField("id")
+                        .getFieldName());
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtSearchFields.UNIREF.getField("id").getName();
+        return getSearchFieldConfig(getUniProtDataType())
+                .getSearchFieldItemByName("id")
+                .getFieldName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
         return name;
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIREF;
     }
 }

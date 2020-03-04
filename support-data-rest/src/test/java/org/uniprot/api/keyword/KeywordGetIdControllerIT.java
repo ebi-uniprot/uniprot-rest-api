@@ -27,8 +27,9 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.core.cv.keyword.impl.KeywordEntryImpl;
-import org.uniprot.core.cv.keyword.impl.KeywordImpl;
+import org.uniprot.core.cv.keyword.KeywordId;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
+import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -70,11 +71,20 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        KeywordEntryImpl keywordEntry = new KeywordEntryImpl();
-        keywordEntry.setDefinition("Definition value");
-        keywordEntry.setKeyword(new KeywordImpl("my keyword", KEYWORD_ACCESSION));
-        keywordEntry.setCategory(new KeywordImpl("Ligand", "KW-9993"));
+        KeywordId keyword =
+                new KeywordEntryKeywordBuilder()
+                        .id("my keyword")
+                        .accession(KEYWORD_ACCESSION)
+                        .build();
+        KeywordId category =
+                new KeywordEntryKeywordBuilder().id("Ligand").accession("KW-9993").build();
 
+        KeywordEntry keywordEntry =
+                new KeywordEntryBuilder()
+                        .definition("Definition value")
+                        .keyword(keyword)
+                        .category(category)
+                        .build();
         KeywordDocument document =
                 KeywordDocument.builder()
                         .id(KEYWORD_ACCESSION)

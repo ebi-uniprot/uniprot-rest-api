@@ -3,7 +3,10 @@ package org.uniprot.api.crossref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -27,14 +30,15 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.crossref.CrossRefEntry;
-import org.uniprot.core.crossref.CrossRefEntryBuilder;
+import org.uniprot.core.cv.xdb.CrossRefEntry;
+import org.uniprot.core.cv.xdb.builder.CrossRefEntryBuilder;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.CrossRefField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -84,10 +88,8 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.CROSSREF.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
     }
 
     @Override
@@ -97,19 +99,6 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
             return SEARCH_ACCESSION1;
         }
         return value;
-    }
-
-    @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.CROSSREF.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.CROSSREF.fieldValueIsValid(field, value);
     }
 
     @Override

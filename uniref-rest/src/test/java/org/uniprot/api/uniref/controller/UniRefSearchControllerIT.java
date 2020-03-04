@@ -6,10 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -38,19 +36,22 @@ import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.builder.SequenceBuilder;
+import org.uniprot.core.cv.go.GoAspect;
+import org.uniprot.core.cv.go.builder.GeneOntologyEntryBuilder;
 import org.uniprot.core.uniparc.builder.UniParcIdBuilder;
 import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.builder.*;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefResultFields;
 
 import com.beust.jcommander.internal.Lists;
@@ -128,18 +129,6 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.UNIREF.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.UNIREF.fieldValueIsValid(field, value);
-    }
-
-    @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "*";
         switch (searchField) {
@@ -170,11 +159,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.UNIREF.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
     }
 
     @Override
@@ -228,9 +214,21 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
                 .commonTaxon("Homo sapiens")
                 .representativeMember(createReprestativeMember(i))
                 .membersAdd(createMember(i))
-                .goTermsAdd(new GoTermBuilder().type(GoTermType.COMPONENT).id("GO:0044444").build())
-                .goTermsAdd(new GoTermBuilder().type(GoTermType.FUNCTION).id("GO:0044459").build())
-                .goTermsAdd(new GoTermBuilder().type(GoTermType.PROCESS).id("GO:0032459").build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.COMPONENT)
+                                .id("GO:0044444")
+                                .build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.FUNCTION)
+                                .id("GO:0044459")
+                                .build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.PROCESS)
+                                .id("GO:0032459")
+                                .build())
                 .memberCount(2)
                 .build();
     }

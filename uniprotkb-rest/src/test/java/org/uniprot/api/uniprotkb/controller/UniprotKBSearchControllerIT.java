@@ -58,6 +58,9 @@ import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.xdb.UniProtXDbTypeImpl;
 import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -71,8 +74,6 @@ import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
-import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -564,10 +565,8 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.UNIPROTKB.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @Override
@@ -603,19 +602,6 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             }
         }
         return value;
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.UNIPROTKB.fieldValueIsValid(field, value);
-    }
-
-    @Override
-    protected Collection<String> getAllSortFields() {
-        return UniProtSearchFields.UNIPROTKB.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
     }
 
     @Override

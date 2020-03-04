@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,8 +16,10 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.field.SearchFields;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * This is the solr query solr validator is responsible to verify if the sort field parameter has
@@ -31,15 +32,13 @@ import org.uniprot.store.search.field.SearchFields;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrSortFields {
 
-    Class<? extends Enum<?>> sortFieldEnumClazz();
+    UniProtDataType uniProtDataType();
 
     String message() default "{search.invalid.sort}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    String enumValueName();
 
     class SortFieldValidatorImpl implements ConstraintValidator<ValidSolrSortFields, String> {
 
@@ -50,28 +49,16 @@ public @interface ValidSolrSortFields {
 
         @Override
         public void initialize(ValidSolrSortFields constraintAnnotation) {
-            valueList = new ArrayList<>();
-            Class<? extends Enum<?>> enumClass = constraintAnnotation.sortFieldEnumClazz();
+            UniProtDataType passedDataType = constraintAnnotation.uniProtDataType();
 
-            String enumValueName = constraintAnnotation.enumValueName();
-            SearchFields searchFields = null;
-            for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-                if (enumConstant.name().equals(enumValueName)) {
-                    searchFields = (SearchFields) enumConstant;
-                    break;
-                }
-            }
+            SearchFieldConfig searchFieldConfig =
+                    SearchFieldConfigFactory.getSearchFieldConfig(passedDataType);
 
-            if (searchFields == null) {
-                throw new IllegalArgumentException(
-                        "Unknown enum value: [" + enumValueName + " in [" + enumClass + "].");
-            } else {
-                valueList =
-                        searchFields.getSearchFields().stream()
-                                .filter(field -> field.getSortField().isPresent())
-                                .map(SearchField::getName)
-                                .collect(Collectors.toList());
-            }
+            valueList =
+                    searchFieldConfig.getSearchFieldItems().stream()
+                            .filter(field -> field.getSortFieldId() != null)
+                            .map(SearchFieldItem::getFieldName)
+                            .collect(Collectors.toList());
         }
 
         @Override
