@@ -7,10 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,12 +41,13 @@ import org.uniprot.core.proteome.builder.ProteomeEntryBuilder;
 import org.uniprot.core.proteome.builder.ProteomeIdBuilder;
 import org.uniprot.core.uniprot.taxonomy.Taxonomy;
 import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.ProteomeResultFields;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -104,10 +103,8 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.PROTEOME.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
     }
 
     @Override
@@ -133,19 +130,6 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                 break;
         }
         return value;
-    }
-
-    @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.PROTEOME.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.PROTEOME.fieldValueIsValid(field, value);
     }
 
     @Override

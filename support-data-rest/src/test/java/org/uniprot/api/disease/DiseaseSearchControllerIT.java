@@ -5,7 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.disease.download.IT.BaseDiseaseDownloadIT.*;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -32,12 +35,13 @@ import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.builder.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
-import org.uniprot.store.search.domain2.SearchField;
 import org.uniprot.store.search.field.DiseaseField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -80,10 +84,8 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.DISEASE.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
     }
 
     @Override
@@ -96,13 +98,6 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.DISEASE.getSortFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>();
     }
@@ -112,11 +107,6 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         return Arrays.stream(DiseaseField.ResultFields.values())
                 .map(DiseaseField.ResultFields::name)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.DISEASE.fieldValueIsValid(field, value);
     }
 
     @Override

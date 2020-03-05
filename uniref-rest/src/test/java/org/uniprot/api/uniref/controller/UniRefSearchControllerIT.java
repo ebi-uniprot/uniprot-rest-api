@@ -6,10 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -46,13 +44,14 @@ import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.builder.*;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.domain2.SearchField;
-import org.uniprot.store.search.field.UniProtSearchFields;
 import org.uniprot.store.search.field.UniRefResultFields;
 
 import com.beust.jcommander.internal.Lists;
@@ -130,18 +129,6 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected Collection<String> getAllSearchFields() {
-        return UniProtSearchFields.UNIREF.getSearchFields().stream()
-                .map(SearchField::getName)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    protected boolean fieldValueIsValid(String field, String value) {
-        return UniProtSearchFields.UNIREF.fieldValueIsValid(field, value);
-    }
-
-    @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "*";
         switch (searchField) {
@@ -172,11 +159,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllSortFields() {
-        return UniProtSearchFields.UNIREF.getSearchFields().stream()
-                .filter(field -> field.getSortField().isPresent())
-                .map(SearchField::getName)
-                .collect(Collectors.toList());
+    protected SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
     }
 
     @Override

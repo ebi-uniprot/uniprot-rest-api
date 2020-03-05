@@ -8,7 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.store.search.field.UniProtSearchFields;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 /**
  * @author jluo
@@ -22,21 +22,32 @@ public class ProteomeSortClause extends AbstractSolrSortClause {
     protected Sort createDefaultSort(boolean hasScore) {
         return new Sort(
                         Sort.Direction.DESC,
-                        UniProtSearchFields.PROTEOME.getSortFieldFor("annotation_score").getName())
+                        getSearchFieldConfig(getUniProtDataType())
+                                .getCorrespondingSortField("annotation_score")
+                                .getFieldName())
                 .and(
                         new Sort(
                                 Sort.Direction.ASC,
-                                UniProtSearchFields.PROTEOME.getSortFieldFor(UPID).getName()));
+                                getSearchFieldConfig(getUniProtDataType())
+                                        .getCorrespondingSortField(UPID)
+                                        .getFieldName()));
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return UniProtSearchFields.PROTEOME.getField(UPID).getName();
+        return getSearchFieldConfig(getUniProtDataType())
+                .getSearchFieldItemByName(UPID)
+                .getFieldName();
     }
 
     @Override
     protected String getSolrSortFieldName(String name) {
         return name;
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.PROTEOME;
     }
 
     @Override
@@ -47,16 +58,18 @@ public class ProteomeSortClause extends AbstractSolrSortClause {
                         val ->
                                 val.getLeft()
                                         .equals(
-                                                UniProtSearchFields.PROTEOME
-                                                        .getSortFieldFor(UPID)
-                                                        .getName()))) {
+                                                getSearchFieldConfig(getUniProtDataType())
+                                                        .getCorrespondingSortField(UPID)
+                                                        .getFieldName()))) {
             return fieldSortPairs;
         } else {
             List<Pair<String, Sort.Direction>> newFieldSortPairs = new ArrayList<>();
             newFieldSortPairs.addAll(fieldSortPairs);
             newFieldSortPairs.add(
                     new ImmutablePair<>(
-                            UniProtSearchFields.PROTEOME.getSortFieldFor(UPID).getName(),
+                            getSearchFieldConfig(getUniProtDataType())
+                                    .getCorrespondingSortField(UPID)
+                                    .getFieldName(),
                             Sort.Direction.ASC));
             return newFieldSortPairs;
         }

@@ -6,8 +6,10 @@ import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales
@@ -17,6 +19,8 @@ import org.uniprot.store.search.field.UniProtSearchFields;
 @Import(SubcellularLocationQueryBoostsConfig.class)
 public class SubcellularLocationService
         extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
+    private SearchFieldConfig searchFieldConfig;
+
     public SubcellularLocationService(
             SubcellularLocationRepository repository,
             SubcellularLocationEntryConverter subcellularLocationEntryConverter,
@@ -28,10 +32,12 @@ public class SubcellularLocationService
                 subcellularLocationSortClause,
                 subcellQueryBoosts,
                 null);
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
     }
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.SUBCELL.getField("id").getName();
+        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 }

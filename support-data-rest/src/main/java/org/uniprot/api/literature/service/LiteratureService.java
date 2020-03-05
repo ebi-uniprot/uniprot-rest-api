@@ -7,8 +7,10 @@ import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.literature.LiteratureEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-import org.uniprot.store.search.field.UniProtSearchFields;
 
 /**
  * @author lgonzales
@@ -17,6 +19,8 @@ import org.uniprot.store.search.field.UniProtSearchFields;
 @Service
 @Import(LiteratureQueryBoostsConfig.class)
 public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
+    private SearchFieldConfig searchFieldConfig;
+
     public LiteratureService(
             LiteratureRepository repository,
             LiteratureEntryConverter entryConverter,
@@ -24,10 +28,12 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             LiteratureSortClause literatureSortClause,
             QueryBoosts literatureQueryBoosts) {
         super(repository, entryConverter, literatureSortClause, literatureQueryBoosts, facetConfig);
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
     }
 
     @Override
     protected String getIdField() {
-        return UniProtSearchFields.LITERATURE.getField("id").getName();
+        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 }

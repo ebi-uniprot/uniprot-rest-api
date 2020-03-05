@@ -4,14 +4,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.api.configure.uniprot.domain.model.AdvanceSearchTerm;
+import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
-import org.uniprot.store.config.common.FieldConfiguration;
-import org.uniprot.store.config.model.FieldItem;
-import org.uniprot.store.config.uniprotkb.UniProtKBSearchFieldConfiguration;
-import org.uniprot.store.search.domain.*;
+import org.uniprot.store.search.domain.DatabaseGroup;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.FieldGroup;
+import org.uniprot.store.search.domain.Tuple;
 import org.uniprot.store.search.domain.impl.*;
 
 @Service
@@ -26,17 +26,12 @@ public class UniProtConfigureService {
                             new TupleImpl(ANY_CROSS_REFERENCE_NAME, ANY_CROSS_REFERENCE_VALUE)));
 
     // By loading these enums at startup, there is no pause on first request
-    private static final UniProtSearchItems SEARCH_ITEMS = UniProtSearchItems.INSTANCE;
     private static final AnnotationEvidences ANNOTATION_EVIDENCES = AnnotationEvidences.INSTANCE;
     private static final GoEvidences GO_EVIDENCES = GoEvidences.INSTANCE;
     private static final UniProtDatabaseTypes DBX_TYPES = UniProtDatabaseTypes.INSTANCE;
 
-    public List<SearchItem> getUniProtSearchItems() {
-        return SEARCH_ITEMS.getSearchItems();
-    }
-
-    public List<AdvanceSearchTerm> getUniProtSearchItems2() {
-        return getUniProtSearchTerms();
+    public List<AdvanceUniProtKBSearchTerm> getUniProtSearchItems() {
+        return AdvanceUniProtKBSearchTerm.getUniProtKBSearchTerms();
     }
 
     public List<EvidenceGroup> getAnnotationEvidences() {
@@ -84,35 +79,5 @@ public class UniProtConfigureService {
 
     public List<UniProtDatabaseDetail> getAllDatabases() {
         return DBX_TYPES.getAllDbTypes();
-    }
-
-    private List<AdvanceSearchTerm> getUniProtSearchTerms() {
-        FieldConfiguration config = UniProtKBSearchFieldConfiguration.getInstance();
-        List<FieldItem> rootFieldItems = config.getTopLevelFieldItems();
-        Comparator<AdvanceSearchTerm> comparatorBySeqNumber =
-                Comparator.comparing(AdvanceSearchTerm::getSeqNumber);
-        Comparator<AdvanceSearchTerm> comparatorByChildNumber =
-                Comparator.comparing(AdvanceSearchTerm::getChildNumber);
-        List<AdvanceSearchTerm> rootSearchTermConfigs =
-                convert(rootFieldItems, comparatorBySeqNumber);
-        Queue<AdvanceSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
-        while (!queue.isEmpty()) {
-            AdvanceSearchTerm currentItem = queue.remove();
-            List<AdvanceSearchTerm> children =
-                    convert(
-                            config.getChildFieldItems(currentItem.getId()),
-                            comparatorByChildNumber);
-            queue.addAll(children);
-            currentItem.setItems(children);
-        }
-        return rootSearchTermConfigs;
-    }
-
-    private List<AdvanceSearchTerm> convert(
-            List<FieldItem> fieldItems, Comparator<AdvanceSearchTerm> comparator) {
-        return fieldItems.stream()
-                .map(AdvanceSearchTerm::from)
-                .sorted(comparator)
-                .collect(Collectors.toList());
     }
 }
