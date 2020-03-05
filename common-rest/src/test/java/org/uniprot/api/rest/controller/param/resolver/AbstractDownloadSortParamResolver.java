@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -17,7 +18,14 @@ public abstract class AbstractDownloadSortParamResolver extends BaseDownloadPara
     public boolean supportsParameter(
             ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class);
+        boolean paramSourceProvided =
+                extensionContext
+                        .getTestMethod()
+                        .map(t -> t.getAnnotation(MethodSource.class) != null)
+                        .orElse(false);
+
+        return parameterContext.getParameter().getType().equals(DownloadParamAndResult.class)
+                && !paramSourceProvided;
     }
 
     @Override
@@ -33,25 +41,25 @@ public abstract class AbstractDownloadSortParamResolver extends BaseDownloadPara
                                         new RuntimeException(
                                                 "AbstractDownloadParameterResolver: Unable to find test method"));
         switch (method.getName()) {
-            case "testDownloadWithSortJSON":
-                result = getDownloadWithSortParamAndResult(MediaType.APPLICATION_JSON);
+            case "testDownloadWithSortByAccessionJSON":
+                result = getDownloadWithSortParamAndResult(MediaType.APPLICATION_JSON, "accession", "desc");
                 break;
             case "testDownloadWithSortList":
-                result = getDownloadWithSortParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE);
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE, "accession", "desc");
                 break;
             case "testDownloadWithSortTSV":
-                result = getDownloadWithSortParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE);
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, "accession", "desc");
                 break;
             case "testDownloadWithSortOBO":
-                result = getDownloadWithSortParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE);
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE, "accession", "desc");
                 break;
             case "testDownloadWithSortXLS":
-                result = getDownloadWithSortParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE, "accession", "desc");
                 break;
         }
         return result;
     }
 
     protected abstract DownloadParamAndResult getDownloadWithSortParamAndResult(
-            MediaType contentType);
+            MediaType contentType, String fieldName, String sortOrder);
 }
