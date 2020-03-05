@@ -5,11 +5,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.*;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,22 +29,25 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
+import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
+import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
 import org.uniprot.core.Location;
 import org.uniprot.core.Property;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.builder.SequenceBuilder;
-import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.builder.*;
 import org.uniprot.core.uniprot.taxonomy.Taxonomy;
 import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
+import org.uniprot.core.xml.jaxb.uniparc.Entry;
+import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
 import org.uniprot.store.search.field.UniParcField;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -52,6 +56,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @ContextConfiguration(
         classes = {
+            UniParcStreamConfig.class,
             UniParcDataStoreTestConfig.class,
             UniParcRestApplication.class,
             ErrorHandlerConfig.class
@@ -68,6 +73,8 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UPI = "UPI0000083A08";
     @Autowired private UniParcQueryRepository repository;
 
+    private UniParcStoreClient storeClient;
+
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.UNIPARC;
@@ -83,73 +90,32 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         return repository;
     }
 
+    @BeforeAll
+    void initDataStore() {
+        storeClient =
+                new UniParcStoreClient(
+                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
+
+        getStoreManager()
+                .addDocConverter(
+                        DataStoreManager.StoreType.UNIPARC,
+                        new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+    }
+
+    @AfterEach
+    void cleanStoreClient() {
+        storeClient.truncate();
+    }
+
     @Override
     protected void saveEntry() {
         UniParcEntry entry = create();
-        UniParcDocumentBuilder builder = UniParcDocument.builder();
-        builder.upi(UPI)
-                .seqLength(entry.getSequence().getLength())
-                .sequenceChecksum(entry.getSequence().getCrc64());
-        entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
-        builder.entryStored(getBinary(entry));
-        entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
+        UniParcEntryConverter converter = new UniParcEntryConverter();
+        Entry xmlEntry = converter.toXml(entry);
 
-        UniParcDocument doc = builder.build();
-
-        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
-    }
-
-    private void processDbReference(UniParcDBCrossReference xref, UniParcDocumentBuilder builder) {
-        UniParcDatabaseType type = xref.getDatabaseType();
-        if (xref.isActive()) {
-            builder.active(type.toDisplayName());
-        }
-        builder.database(type.toDisplayName());
-        if ((type == UniParcDatabaseType.SWISSPROT) || (type == UniParcDatabaseType.TREMBL)) {
-            builder.uniprotAccession(xref.getId());
-            builder.uniprotIsoform(xref.getId());
-        }
-
-        if (type == UniParcDatabaseType.SWISSPROT_VARSPLIC) {
-            builder.uniprotIsoform(xref.getId());
-        }
-        xref.getProperties().stream()
-                .filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_PROTEOME_ID))
-                .map(Property::getValue)
-                .forEach(builder::upid);
-
-        xref.getProperties().stream()
-                .filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_PROTEIN_NAME))
-                .map(Property::getValue)
-                .forEach(builder::proteinName);
-
-        xref.getProperties().stream()
-                .filter(val -> val.getKey().equals(UniParcDBCrossReference.PROPERTY_GENE_NAME))
-                .map(Property::getValue)
-                .forEach(builder::geneName);
-    }
-
-    private void processTaxonomy(Taxonomy taxon, UniParcDocumentBuilder builder) {
-        builder.taxLineageId((int) taxon.getTaxonId());
-        builder.organismTaxon(taxon.getScientificName());
-        if (taxon.hasCommonName()) {
-            builder.organismTaxon(taxon.getCommonName());
-        }
-        if (taxon.hasMnemonic()) {
-            builder.organismTaxon(taxon.getMnemonic());
-        }
-        if (taxon.hasSynonyms()) {
-            builder.organismTaxons(taxon.getSynonyms());
-        }
-    }
-
-    private ByteBuffer getBinary(UniParcEntry entry) {
-        try {
-            return ByteBuffer.wrap(
-                    UniParcJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
-        }
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
     }
 
     @Override
