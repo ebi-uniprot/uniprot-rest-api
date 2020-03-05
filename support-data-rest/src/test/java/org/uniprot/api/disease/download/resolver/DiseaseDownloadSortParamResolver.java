@@ -20,7 +20,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamResolver {
 
     @Override
-    protected DownloadParamAndResult getDownloadWithSortParamAndResult(MediaType contentType) {
+    protected DownloadParamAndResult getDownloadWithSortParamAndResult(MediaType contentType, String fieldName, String sortOrder) {
         DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
         // add result matcher to match sorter accession
         List<String> sortedAccessions = Arrays.asList(ACC1, ACC2, ACC3);

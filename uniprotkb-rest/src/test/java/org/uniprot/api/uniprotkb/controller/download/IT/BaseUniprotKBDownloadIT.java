@@ -1,12 +1,5 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +7,10 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.builder.SequenceBuilder;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprot.UniProtEntryType;
+import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -27,19 +23,28 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 /** Class to keep things common to all disease download tests */
 public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     @Autowired private UniprotQueryRepository repository;
     public static String SEARCH_ACCESSION1 =
-            "DI-" + ThreadLocalRandom.current().nextLong(10000, 50000);
+            "O-" + ThreadLocalRandom.current().nextLong(10000, 50000);
     public static String SEARCH_ACCESSION2 =
-            "DI-" + ThreadLocalRandom.current().nextLong(50001, 99999);
-    public static List<String> SORTED_ACCESSIONS =
-            new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
+            "P-" + ThreadLocalRandom.current().nextLong(50001, 99999);
 
-    public static final String ACC1 = "DI-12345";
-    public static final String ACC2 = "DI-11111";
-    public static final String ACC3 = "DI-54321";
+
+    public static final String ACC1 = "O12345";
+    public static final String ACC2 = "P12345";
+    public static final String ACC3 = "Q12345";
+    public static final String SEQUENCE1 = "KDVHMPKHPELADKNVPNLHVMKAMQS";
+    public static final String SEQUENCE2 = "RIAIHELLFKEGVMVAK";
+    public static final String SEQUENCE3 = "MLMPKKN";
+
+    public static List<String> SORTED_BY_LENGTH = Arrays.asList(ACC3, ACC2, ACC1);
 
     private UniProtKBStoreClient storeClient;
 
@@ -64,11 +69,6 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
                 new UniProtKBStoreClient(
                         VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
-    }
-
-    @AfterEach
-    void cleanStore() {
-        this.storeClient.truncate();
     }
 
     @Override
@@ -100,7 +100,18 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
 
     @Override
     protected void saveEntry(String accession, long suffix) {
-        //        DiseaseSolrDocumentHelper.createDiseaseDocuments(this.getStoreManager(),
-        // accession, suffix);
+        UniProtEntry entry = UniProtEntryMocker.create(accession);
+        UniProtEntryBuilder builder = UniProtEntryBuilder.from(entry);
+        if(ACC1.equals(accession)){
+            builder.sequence(new SequenceBuilder(SEQUENCE1).build());
+        } else if(ACC2.equals(accession)){
+            builder.sequence(new SequenceBuilder(SEQUENCE2).build());
+        } else if(ACC3.equals(accession)){
+            builder.sequence(new SequenceBuilder(SEQUENCE3).build());
+        }
+
+        builder.entryType(UniProtEntryType.SWISSPROT);
+
+        this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, builder.build());
     }
 }

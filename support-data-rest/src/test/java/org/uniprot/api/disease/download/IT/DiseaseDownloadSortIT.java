@@ -29,7 +29,7 @@ public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
     }
 
     @Test
-    protected void testDownloadWithSortJSON(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortByAccessionJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
         // then
         sendAndVerify(parameterAndResult, HttpStatus.OK);

@@ -48,6 +48,7 @@ public abstract class AbstractDownloadControllerIT {
 
     @AfterEach
     public void cleanData() {
+        storeManager.cleanStore(getStoreType());
         storeManager.cleanSolr(getStoreType());
     }
 
@@ -69,19 +70,6 @@ public abstract class AbstractDownloadControllerIT {
 
     protected DataStoreManager getStoreManager() {
         return storeManager;
-    }
-
-    private ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
-        ResultActions resultActions = mockMvc.perform(builder);
-        if (resultActions.andReturn().getRequest().isAsyncStarted()) {
-            return mockMvc.perform(
-                    asyncDispatch(
-                            resultActions
-                                    .andExpect(request().asyncResult(anything()))
-                                    .andReturn()));
-        } else {
-            return resultActions;
-        }
     }
 
     protected void sendAndVerify(DownloadParamAndResult paramAndResult, HttpStatus httpStatus)
@@ -107,6 +95,19 @@ public abstract class AbstractDownloadControllerIT {
 
         for (ResultMatcher resultMatcher : paramAndResult.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
+        }
+    }
+
+    private ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
+        ResultActions resultActions = mockMvc.perform(builder);
+        if (resultActions.andReturn().getRequest().isAsyncStarted()) {
+            return mockMvc.perform(
+                    asyncDispatch(
+                            resultActions
+                                    .andExpect(request().asyncResult(anything()))
+                                    .andReturn()));
+        } else {
+            return resultActions;
         }
     }
 }
