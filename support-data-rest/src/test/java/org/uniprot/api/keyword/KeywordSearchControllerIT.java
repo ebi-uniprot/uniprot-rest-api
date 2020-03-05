@@ -33,7 +33,7 @@ import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.keyword.builder.KeywordIdBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -126,12 +126,8 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     private void saveEntry(String keywordId, boolean facet) {
         KeywordId keyword =
-                new KeywordEntryKeywordBuilder()
-                        .id("my keyword " + keywordId)
-                        .accession(keywordId)
-                        .build();
-        KeywordId category =
-                new KeywordEntryKeywordBuilder().id("Ligand").accession("KW-9993").build();
+                new KeywordIdBuilder().id("my keyword " + keywordId).accession(keywordId).build();
+        KeywordId category = new KeywordIdBuilder().id("Ligand").accession("KW-9993").build();
 
         KeywordEntry keywordEntry =
                 new KeywordEntryBuilder()
@@ -168,9 +164,9 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("keyword_id:KW-0001"))
-                    .resultMatcher(jsonPath("$.results.*.keyword.accession", contains("KW-0001")))
+                    .resultMatcher(jsonPath("$.results.*.keyword.id", contains("KW-0001")))
                     .resultMatcher(
-                            jsonPath("$.results.*.keyword.id", contains("my keyword KW-0001")))
+                            jsonPath("$.results.*.keyword.name", contains("my keyword KW-0001")))
                     .resultMatcher(jsonPath("$.results.*.definition", contains("Definition value")))
                     .build();
         }
@@ -189,11 +185,11 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("name:*"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.keyword.accession",
+                                    "$.results.*.keyword.id",
                                     containsInAnyOrder("KW-0001", "KW-0002")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.keyword.id",
+                                    "$.results.*.keyword.name",
                                     containsInAnyOrder("my keyword KW-0001", "my keyword KW-0002")))
                     .resultMatcher(
                             jsonPath(
@@ -236,12 +232,10 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("name desc"))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.keyword.accession",
-                                    contains("KW-0002", "KW-0001")))
+                            jsonPath("$.results.*.keyword.id", contains("KW-0002", "KW-0001")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.keyword.id",
+                                    "$.results.*.keyword.name",
                                     contains("my keyword KW-0002", "my keyword KW-0001")))
                     .resultMatcher(
                             jsonPath(
@@ -256,12 +250,10 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("id,name"))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.keyword.accession",
-                                    contains("KW-0001", "KW-0002")))
+                            jsonPath("$.results.*.keyword.id", contains("KW-0001", "KW-0002")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.keyword.id",
+                                    "$.results.*.keyword.name",
                                     contains("my keyword KW-0001", "my keyword KW-0002")))
                     .resultMatcher(jsonPath("$.results.*.definition").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.category").doesNotExist())
@@ -286,11 +278,11 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.keyword.accession",
+                                                    "$.results.*.keyword.id",
                                                     containsInAnyOrder("KW-0002", "KW-0001")))
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.keyword.id",
+                                                    "$.results.*.keyword.name",
                                                     containsInAnyOrder(
                                                             "my keyword KW-0002",
                                                             "my keyword KW-0001")))

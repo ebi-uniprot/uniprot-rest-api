@@ -207,7 +207,8 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].keywords[1].id", Matchers.equalTo(searchString)));
+                .andExpect(
+                        jsonPath("$.results[0].keywords[1].name", Matchers.equalTo(searchString)));
     }
 
     // search by accession
@@ -384,7 +385,7 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].keywords[1].id",
+                                "$.results[0].keywords[1].name",
                                 Matchers.containsString(searchString)));
     }
 

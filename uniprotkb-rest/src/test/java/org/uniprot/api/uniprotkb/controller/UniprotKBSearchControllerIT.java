@@ -46,18 +46,18 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.cv.xdb.DBXRefTypeAttribute;
+import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
-import org.uniprot.core.uniprot.xdb.builder.UniProtDBCrossReferenceBuilder;
+import org.uniprot.core.uniprot.xdb.builder.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.xdb.UniProtXDbTypeImpl;
-import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.cv.xdb.UniProtDatabaseImpl;
+import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
@@ -683,7 +683,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
 
-            UniProtXDbTypes.INSTANCE.getAllDBXRefTypes().stream()
+            UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
                     .map(db -> db.getName().toLowerCase())
                     .forEach(dbName -> doc.xrefCountMap.put("xref_count_" + dbName, 0L));
 
@@ -740,11 +740,12 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             entry =
                     new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
                             .databaseCrossReferencesAdd(
-                                    new UniProtDBCrossReferenceBuilder()
-                                            .databaseType(new UniProtXDbTypeImpl("Proteomes"))
+                                    new UniProtCrossReferenceBuilder()
+                                            .databaseType(new UniProtDatabaseImpl("Proteomes"))
                                             .id("UP000000000")
                                             .propertiesAdd(
-                                                    new DBXRefTypeAttribute("a", "a", "a"), "value")
+                                                    new UniProtDatabaseAttribute("a", "a", "a"),
+                                                    "value")
                                             .build())
                             .build();
 

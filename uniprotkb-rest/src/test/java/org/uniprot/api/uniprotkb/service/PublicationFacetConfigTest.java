@@ -13,8 +13,8 @@ import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureStatistics;
@@ -222,8 +222,8 @@ class PublicationFacetConfigTest {
     }
 
     private PublicationEntry getScalePublicationEntry(int count) {
-        DBCrossReference<CitationXrefType> pubmed =
-                getCitationXref(CitationXrefType.PUBMED, String.valueOf(count));
+        CrossReference<CitationDatabase> pubmed =
+                getCitationXref(CitationDatabase.PUBMED, String.valueOf(count));
         Literature literature = new LiteratureBuilder().citationXrefsAdd(pubmed).build();
         UniProtReference reference = new UniProtReferenceBuilder().citation(literature).build();
         LiteratureStatistics largeStat =

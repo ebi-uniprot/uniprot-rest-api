@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.builder.CrossReferenceBuilder;
 import org.uniprot.core.citation.Citation;
-import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.builder.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -102,15 +102,15 @@ class LiteratureEntryFilterTest {
     }
 
     private Citation createCompleteLiteratureCitation() {
-        DBCrossReference<CitationXrefType> pubmed =
-                new DBCrossReferenceBuilder<CitationXrefType>()
-                        .databaseType(CitationXrefType.PUBMED)
+        CrossReference<CitationDatabase> pubmed =
+                new CrossReferenceBuilder<CitationDatabase>()
+                        .databaseType(CitationDatabase.PUBMED)
                         .id("12345")
                         .build();
 
-        DBCrossReference<CitationXrefType> doi =
-                new DBCrossReferenceBuilder<CitationXrefType>()
-                        .databaseType(CitationXrefType.DOI)
+        CrossReference<CitationDatabase> doi =
+                new CrossReferenceBuilder<CitationDatabase>()
+                        .databaseType(CitationDatabase.DOI)
                         .id("doiId")
                         .build();
 
