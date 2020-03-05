@@ -33,7 +33,8 @@ public class UniProtConfigureController {
 
     // FIXME Delete this method once UI team starts consuming response of getUniProtSearchTerms
     @GetMapping("/search_terms")
-    public ResponseEntity<String> getUniProtSearchTermsTemp() throws IOException, URISyntaxException {
+    public ResponseEntity<String> getUniProtSearchTermsTemp()
+            throws IOException, URISyntaxException {
         if (searchTermResponse == null) {
             URI uri =
                     UniProtConfigureController.class
@@ -42,7 +43,7 @@ public class UniProtConfigureController {
             searchTermResponse = new String(Files.readAllBytes(Paths.get(uri)));
         }
 
-        final HttpHeaders httpHeaders= new HttpHeaders();
+        final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
         return new ResponseEntity<>(searchTermResponse, httpHeaders, HttpStatus.OK);
     }
