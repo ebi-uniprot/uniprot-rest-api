@@ -34,13 +34,12 @@ public class UniProtEntryFilters {
                     List<Feature> features = entry.getFeatures();
                     features.removeIf(feature -> !filter.test(feature));
                     builder.featuresSet(features);
-                } else if (component == UniProtField.ResultFields.xref) {
+                } else if (component == UniProtField.ResultFields.crossReference) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
                     Predicate<UniProtCrossReference> filter = createDbReferenceFilter(values);
-                    List<UniProtCrossReference> crossReferences =
-                            entry.getDatabaseCrossReferences();
+                    List<UniProtCrossReference> crossReferences = entry.getUniProtCrossReferences();
                     crossReferences.removeIf(xref -> !filter.test(xref));
-                    builder.databaseCrossReferencesSet(crossReferences);
+                    builder.uniProtCrossReferencesSet(crossReferences);
                 }
             }
             return builder.build();
@@ -117,8 +116,8 @@ public class UniProtEntryFilters {
             case sequence:
                 builder.sequence(null);
                 break;
-            case xref:
-                builder.databaseCrossReferencesSet(null);
+            case crossReference:
+                builder.uniProtCrossReferencesSet(null);
                 break;
             case reference:
                 builder.referencesSet(null);

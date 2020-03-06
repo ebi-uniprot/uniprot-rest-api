@@ -208,7 +208,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
         CrossReference<ProteomeDatabase> xref1 =
                 new CrossReferenceBuilder<ProteomeDatabase>()
-                        .databaseType(ProteomeDatabase.GENOME_ACCESSION)
+                        .database(ProteomeDatabase.GENOME_ACCESSION)
                         .id(getName("ACA", i))
                         .build();
         xrefs.add(xref1);
@@ -238,10 +238,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                         .modified(modified)
                         .proteomeType(ProteomeType.NORMAL)
                         //	.redundantTo(redId)
-                        .dbXReferencesSet(xrefs)
+                        .proteomeCrossReferencesSet(xrefs)
                         .componentsSet(components)
                         .superkingdom(Superkingdom.EUKARYOTA)
-                        .referencesSet(citations)
+                        .citationsSet(citations)
                         .annotationScore(15);
 
         return builder.build();

@@ -132,7 +132,7 @@ public class PublicationService {
     private boolean hasPubmedId(UniProtReference uniProtReference) {
         return uniProtReference
                 .getCitation()
-                .getCitationXrefsByType(CitationDatabase.PUBMED)
+                .getCitationCrossReferenceByType(CitationDatabase.PUBMED)
                 .isPresent();
     }
 
@@ -140,7 +140,7 @@ public class PublicationService {
         final Long[] result = {0L};
         uniProtReference
                 .getCitation()
-                .getCitationXrefsByType(CitationDatabase.PUBMED)
+                .getCitationCrossReferenceByType(CitationDatabase.PUBMED)
                 .ifPresent(xref -> result[0] = Long.valueOf(xref.getId()));
         return result[0];
     }

@@ -55,9 +55,9 @@ public class LiteratureEntryFilter {
                 break;
             case doi:
                 List<CrossReference<CitationDatabase>> xrefs =
-                        modifiableList(literature.getCitationXrefs());
+                        modifiableList(literature.getCitationCrossReferences());
                 xrefs.removeIf(xref -> xref.getDatabase().equals(CitationDatabase.DOI));
-                litBuilder.citationXrefsSet(xrefs);
+                litBuilder.citationCrossReferencesSet(xrefs);
                 break;
             case title:
                 litBuilder.title(null);

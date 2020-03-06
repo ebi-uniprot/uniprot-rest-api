@@ -86,13 +86,13 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         CrossReference<CitationDatabase> pubmed =
                 new CrossReferenceBuilder<CitationDatabase>()
-                        .databaseType(CitationDatabase.PUBMED)
+                        .database(CitationDatabase.PUBMED)
                         .id(String.valueOf(PUBMED_ID))
                         .build();
 
         Literature literature =
                 new LiteratureBuilder()
-                        .citationXrefsAdd(pubmed)
+                        .citationCrossReferencesAdd(pubmed)
                         .title("The Title")
                         .authorsAdd(new AuthorImpl("The Author"))
                         .literatureAbstract("literature abstract")
@@ -136,7 +136,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
-                    .resultMatcher(jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .build();
@@ -168,7 +168,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("id,title")
-                    .resultMatcher(jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .resultMatcher(jsonPath("$.citation.authors").doesNotExist())
                     .build();
@@ -234,7 +234,9 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
-                                            jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                                            jsonPath(
+                                                    "$.citation.citationCrossReferences[0].id",
+                                                    is("100")))
                                     .resultMatcher(
                                             jsonPath("$.citation.authors", contains("The Author")))
                                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))

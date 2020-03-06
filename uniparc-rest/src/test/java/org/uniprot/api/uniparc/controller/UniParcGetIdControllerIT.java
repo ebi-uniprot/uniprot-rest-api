@@ -90,7 +90,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         builder.upi(UPI)
                 .seqLength(entry.getSequence().getLength())
                 .sequenceChecksum(entry.getSequence().getCrc64());
-        entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
+        entry.getUniParcCrossReferences().forEach(val -> processDbReference(val, builder));
         builder.entryStored(getBinary(entry));
         entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
 
@@ -165,7 +165,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
                 .uniParcId(new UniParcIdBuilder(UPI).build())
-                .databaseCrossReferencesSet(xrefs)
+                .uniParcCrossReferencesSet(xrefs)
                 .sequence(sequence)
                 .sequenceFeaturesSet(seqFeatures)
                 .taxonomiesSet(taxonomies)
@@ -201,7 +201,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
                         .versionI(3)
-                        .databaseType(UniParcDatabase.SWISSPROT)
+                        .database(UniParcDatabase.SWISSPROT)
                         .id("P12345")
                         .version(7)
                         .active(true)
@@ -217,7 +217,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         UniParcCrossReference xref2 =
                 new UniParcCrossReferenceBuilder()
                         .versionI(1)
-                        .databaseType(UniParcDatabase.TREMBL)
+                        .database(UniParcDatabase.TREMBL)
                         .id("P52346")
                         .version(7)
                         .active(true)

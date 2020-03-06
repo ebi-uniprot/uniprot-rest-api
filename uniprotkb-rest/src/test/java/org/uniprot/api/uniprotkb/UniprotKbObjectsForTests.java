@@ -61,10 +61,10 @@ public class UniprotKbObjectsForTests {
                                                     "Position INTERACTION " + pubmedId)
                                             .citation(
                                                     new JournalArticleBuilder()
-                                                            .citationXrefsAdd(
+                                                            .citationCrossReferencesAdd(
                                                                     new CrossReferenceBuilder<
                                                                                     CitationDatabase>()
-                                                                            .databaseType(
+                                                                            .database(
                                                                                     CitationDatabase
                                                                                             .PUBMED)
                                                                             .id(pubmedId)
@@ -145,8 +145,8 @@ public class UniprotKbObjectsForTests {
 
         Literature literature =
                 new LiteratureBuilder()
-                        .citationXrefsAdd(pubmed)
-                        .citationXrefsAdd(doi)
+                        .citationCrossReferencesAdd(pubmed)
+                        .citationCrossReferencesAdd(doi)
                         .title("title " + pubMedId)
                         .authorsAdd(new AuthorImpl("author " + pubMedId))
                         .journalName("journal " + pubMedId)
@@ -165,7 +165,7 @@ public class UniprotKbObjectsForTests {
 
     public static CrossReference<CitationDatabase> getCitationXref(
             CitationDatabase pubmed2, String s) {
-        return new CrossReferenceBuilder<CitationDatabase>().databaseType(pubmed2).id(s).build();
+        return new CrossReferenceBuilder<CitationDatabase>().database(pubmed2).id(s).build();
     }
 
     public static ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {

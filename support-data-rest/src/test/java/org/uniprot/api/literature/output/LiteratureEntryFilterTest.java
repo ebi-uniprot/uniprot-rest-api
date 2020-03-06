@@ -104,13 +104,13 @@ class LiteratureEntryFilterTest {
     private Citation createCompleteLiteratureCitation() {
         CrossReference<CitationDatabase> pubmed =
                 new CrossReferenceBuilder<CitationDatabase>()
-                        .databaseType(CitationDatabase.PUBMED)
+                        .database(CitationDatabase.PUBMED)
                         .id("12345")
                         .build();
 
         CrossReference<CitationDatabase> doi =
                 new CrossReferenceBuilder<CitationDatabase>()
-                        .databaseType(CitationDatabase.DOI)
+                        .database(CitationDatabase.DOI)
                         .id("doiId")
                         .build();
 
@@ -123,8 +123,8 @@ class LiteratureEntryFilterTest {
                 .journalName("The journal name")
                 .authorsAdd("John")
                 .authoringGroupsAdd("the author group")
-                .citationXrefsAdd(pubmed)
-                .citationXrefsAdd(doi)
+                .citationCrossReferencesAdd(pubmed)
+                .citationCrossReferencesAdd(doi)
                 .publicationDate("2015-MAY")
                 .title("the big title")
                 .build();
