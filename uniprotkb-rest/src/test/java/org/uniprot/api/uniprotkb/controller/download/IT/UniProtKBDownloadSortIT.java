@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,9 +25,6 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSortParamResolver;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
@@ -204,13 +204,13 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
                                 UniProtMediaType.GFF_MEDIA_TYPE,
                                 fieldName,
                                 sortOrder,
-                                accessionsOrder))//,
-//                Arguments.of(
-//                        paramResolver.getDownloadWithSortParamAndResult(
-//                                UniProtMediaType.RDF_MEDIA_TYPE,
-//                                fieldName,
-//                                sortOrder,
-//                                accessionsOrder))
-                                );
+                                accessionsOrder)) // ,
+                //                Arguments.of(
+                //                        paramResolver.getDownloadWithSortParamAndResult(
+                //                                UniProtMediaType.RDF_MEDIA_TYPE,
+                //                                fieldName,
+                //                                sortOrder,
+                //                                accessionsOrder))
+                );
     }
 }
