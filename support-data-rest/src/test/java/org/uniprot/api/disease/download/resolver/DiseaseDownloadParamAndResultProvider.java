@@ -16,7 +16,13 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadParamAndRe
 
 public class DiseaseDownloadParamAndResultProvider extends AbstractDownloadParamAndResultProvider {
     @Override
-    protected List<ResultMatcher> getOBOResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getOBOResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -76,7 +82,13 @@ public class DiseaseDownloadParamAndResultProvider extends AbstractDownloadParam
     }
 
     @Override
-    protected List<ResultMatcher> getXLSResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getXLSResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -95,7 +107,13 @@ public class DiseaseDownloadParamAndResultProvider extends AbstractDownloadParam
     }
 
     @Override
-    protected List<ResultMatcher> getListResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getListResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -115,7 +133,13 @@ public class DiseaseDownloadParamAndResultProvider extends AbstractDownloadParam
     }
 
     @Override
-    protected List<ResultMatcher> getTSVResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getTSVResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -127,7 +151,13 @@ public class DiseaseDownloadParamAndResultProvider extends AbstractDownloadParam
     }
 
     @Override
-    protected List<ResultMatcher> getJsonResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getJsonResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
         return resultMatchers;
@@ -160,27 +190,57 @@ public class DiseaseDownloadParamAndResultProvider extends AbstractDownloadParam
     // unsupported content type
 
     @Override
-    protected List<ResultMatcher> getGFFResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getGFFResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 
     @Override
-    protected List<ResultMatcher> getFastaResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getFastaResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 
     @Override
-    protected List<ResultMatcher> getXMLResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getXMLResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 
     @Override
-    protected List<ResultMatcher> getFFResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getFFResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 
     @Override
-    protected List<ResultMatcher> getRDFResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getRDFResultMatchers(
+            Integer expectedEntryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 }

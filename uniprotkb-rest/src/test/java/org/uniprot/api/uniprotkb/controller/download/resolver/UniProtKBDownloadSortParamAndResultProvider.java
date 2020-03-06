@@ -19,8 +19,8 @@ public class UniProtKBDownloadSortParamAndResultProvider
         extends UniProtKBDownloadParamAndResultProvider {
 
     @Override
-    protected List<ResultMatcher> getGFFResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getGFFResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getGFFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getGFFResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
         ResultMatcher sortResultMatcher =
                 result -> {
                     String gffStr = result.getResponse().getContentAsString();
@@ -39,7 +39,7 @@ public class UniProtKBDownloadSortParamAndResultProvider
                                     .keySet()
                                     .stream()
                                     .collect(Collectors.toList());
-                    assertThat(accessions, equalTo(this.getAccessionsInOrder()));
+                    assertThat(accessions, equalTo(accessionsInOrder));
                 };
 
         resultMatchers.add(sortResultMatcher);
@@ -47,8 +47,8 @@ public class UniProtKBDownloadSortParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getFastaResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getFastaResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getFastaResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getFastaResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
 
         ResultMatcher sortResultMatcher =
                 result -> {
@@ -59,7 +59,7 @@ public class UniProtKBDownloadSortParamAndResultProvider
                                     .filter(l -> l.startsWith(">sp"))
                                     .map(l -> l.split("\\|")[1])
                                     .collect(Collectors.toList());
-                    assertThat(accessions, equalTo(this.getAccessionsInOrder()));
+                    assertThat(accessions, equalTo(accessionsInOrder));
                 };
         resultMatchers.add(sortResultMatcher);
 
@@ -67,8 +67,8 @@ public class UniProtKBDownloadSortParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getXMLResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getXMLResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getXMLResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getXMLResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
 
         ResultMatcher sortResultMatcher =
                 result -> {
@@ -87,7 +87,7 @@ public class UniProtKBDownloadSortParamAndResultProvider
                                                             "  <accession>".length(),
                                                             accTag.indexOf("</")))
                                     .collect(Collectors.toList());
-                    assertThat(actualAccessions, equalTo(this.getAccessionsInOrder()));
+                    assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
 
         resultMatchers.add(sortResultMatcher);
@@ -95,14 +95,14 @@ public class UniProtKBDownloadSortParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getOBOResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getOBOResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getOBOResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getOBOResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getFFResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getFFResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getFFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getFFResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
         ResultMatcher sortResultMatcher =
                 result -> {
                     String resp = result.getResponse().getContentAsString();
@@ -116,31 +116,31 @@ public class UniProtKBDownloadSortParamAndResultProvider
                                     .flatMap(Arrays::stream)
                                     .filter(part -> !";".equals(part))
                                     .collect(Collectors.toList());
-                    assertThat(actualAccessions, equalTo(this.getAccessionsInOrder()));
+                    assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getRDFResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getRDFResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getRDFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getRDFResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getXLSResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getXLSResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getXLSResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getXLSResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
 
         ResultMatcher sortResultMatcher =
-                result -> assertThat(ACCESSIONS, equalTo(this.getAccessionsInOrder()));
+                result -> assertThat(ACCESSIONS, equalTo(accessionsInOrder));
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getListResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getListResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getListResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getListResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
         ResultMatcher sortResultMatcher =
                 result -> {
                     String resp = result.getResponse().getContentAsString();
@@ -148,7 +148,7 @@ public class UniProtKBDownloadSortParamAndResultProvider
                             Arrays.stream(resp.split("\n"))
                                     .map(row -> row.trim())
                                     .collect(Collectors.toList());
-                    assertThat(actualAccessions, equalTo(this.getAccessionsInOrder()));
+                    assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
         resultMatchers.add(sortResultMatcher);
 
@@ -156,8 +156,8 @@ public class UniProtKBDownloadSortParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getTSVResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getTSVResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getTSVResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getTSVResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
 
         ResultMatcher sortResultMatcher =
                 result -> {
@@ -168,7 +168,7 @@ public class UniProtKBDownloadSortParamAndResultProvider
                                     .map(row -> row.split("\t")[0])
                                     .collect(Collectors.toList());
 
-                    assertThat(actualAccessions, equalTo(this.getAccessionsInOrder()));
+                    assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
         resultMatchers.add(sortResultMatcher);
 
@@ -176,10 +176,10 @@ public class UniProtKBDownloadSortParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getJsonResultMatchers(Integer expectedEntryCount) {
-        List<ResultMatcher> resultMatchers = super.getJsonResultMatchers(expectedEntryCount);
+    protected List<ResultMatcher> getJsonResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+        List<ResultMatcher> resultMatchers = super.getJsonResultMatchers(entryCount, sortFieldName, sortOrder, accessionsInOrder, requestedFields, expectedFields);
         ResultMatcher sortResultMatcher =
-                jsonPath("$.results[*].primaryAccession", equalTo(this.getAccessionsInOrder()));
+                jsonPath("$.results[*].primaryAccession", equalTo(accessionsInOrder));
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }

@@ -18,7 +18,7 @@ public class UniprotKBDownloadFieldsParamResolver extends AbstractDownloadFields
             new UniProtKBDownloadFieldsParamAndResultProvider();
 
     @Override
-    protected DownloadParamAndResult getDownloadDefaultFieldsParamAndResult(
+    public DownloadParamAndResult getDownloadDefaultFieldsParamAndResult(
             MediaType contentType, List<String> expectedFields) {
         // set mandatory fields for json response type
         expectedFields =
@@ -37,7 +37,7 @@ public class UniprotKBDownloadFieldsParamResolver extends AbstractDownloadFields
     }
 
     @Override
-    protected DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
+    public DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
             MediaType contentType, List<String> requestedFields, List<String> expectedFields) {
         expectedFields =
                 MediaType.APPLICATION_JSON.equals(contentType)
@@ -58,7 +58,7 @@ public class UniprotKBDownloadFieldsParamResolver extends AbstractDownloadFields
     }
 
     @Override
-    protected DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(
+    public DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(
             MediaType contentType, List<String> invalidRequestedFields) {
         invalidRequestedFields =
                 MediaType.APPLICATION_JSON.equals(contentType)
