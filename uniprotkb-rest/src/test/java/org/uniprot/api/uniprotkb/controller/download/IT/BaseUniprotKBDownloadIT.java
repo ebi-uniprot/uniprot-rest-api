@@ -1,5 +1,10 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +33,6 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 /** Class to keep things common to all disease download tests */
 public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     @Autowired private UniprotQueryRepository repository;
@@ -59,7 +59,6 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static List<String> SORTED_BY_MNEMONIC = Arrays.asList(ACC2, ACC1, ACC3);
     public static List<String> SORTED_BY_GENE = Arrays.asList(ACC2, ACC3, ACC1);
     public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
-
 
     private UniProtKBStoreClient storeClient;
 
@@ -144,9 +143,11 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     }
 
     private Gene getGene(Gene oldGene, String name) {
-        GeneBuilder newGene = GeneBuilder.from(oldGene)
-                .geneName(new GeneNameBuilder(name,
-                        oldGene.getGeneName().getEvidences()).build());
+        GeneBuilder newGene =
+                GeneBuilder.from(oldGene)
+                        .geneName(
+                                new GeneNameBuilder(name, oldGene.getGeneName().getEvidences())
+                                        .build());
         return newGene.build();
     }
 
