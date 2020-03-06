@@ -1,8 +1,6 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -59,6 +57,19 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static List<String> SORTED_BY_MNEMONIC = Arrays.asList(ACC2, ACC1, ACC3);
     public static List<String> SORTED_BY_GENE = Arrays.asList(ACC2, ACC3, ACC1);
     public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
+    public static List<String> MANDATORY_JSON_FIELDS =
+            Arrays.asList(
+                    "entryType", "primaryAccession", "uniProtId", "entryAudit", "annotationScore");
+    public static List<String> REQUESTED_JSON_FIELDS =
+            Arrays.asList("protein_existence", "organism", "protein_name");
+    public static List<String> INVALID_RETURN_FIELDS =
+            Arrays.asList("protein", "accession", "kinetic");
+    public static List<String> RETURNED_JSON_FIELDS =
+            new ArrayList<>(Arrays.asList("proteinExistence", "organism", "proteinDescription"));
+
+    static {
+        RETURNED_JSON_FIELDS.addAll(MANDATORY_JSON_FIELDS);
+    }
 
     private UniProtKBStoreClient storeClient;
 

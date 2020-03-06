@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -20,6 +21,7 @@ public abstract class AbstractDownloadParamAndResultProvider {
     private String sortOrder;
     private Integer entryCount;
     private List<String> accessionsInOrder;
+    private List<String> expectedFields;
 
     public DownloadParamAndResult getDownloadParamAndResult(
             MediaType contentType, Integer entryCount) {
@@ -56,6 +58,33 @@ public abstract class AbstractDownloadParamAndResultProvider {
         return paramAndResult;
     }
 
+    public DownloadParamAndResult getDownloadParamAndResultForFields(
+            MediaType contentType,
+            Integer entryCount,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
+        this.accessionsInOrder = accessionsInOrder;
+        this.entryCount = entryCount;
+        this.expectedFields = expectedFields;
+
+        DownloadParamAndResult paramAndResult = getDownloadParamAndResult(contentType, entryCount);
+
+        if (Objects.nonNull(requestedFields) && !requestedFields.isEmpty()) {
+            String commaSeparated = requestedFields.stream().collect(Collectors.joining(","));
+            // add fields param
+            Map<String, List<String>> updatedQueryParams =
+                    addQueryParam(
+                            paramAndResult.getQueryParams(),
+                            "fields",
+                            Collections.singletonList(commaSeparated));
+
+            paramAndResult.setQueryParams(updatedQueryParams);
+        }
+
+        return paramAndResult;
+    }
+
     public String getFieldName() {
         return fieldName;
     }
@@ -70,6 +99,10 @@ public abstract class AbstractDownloadParamAndResultProvider {
 
     public List<String> getAccessionsInOrder() {
         return this.accessionsInOrder;
+    }
+
+    public List<String> getExpectedFields() {
+        return this.expectedFields;
     }
 
     protected List<ResultMatcher> getResultMatchers(

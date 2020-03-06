@@ -18,7 +18,8 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 public class DiseaseDownloadFieldsParamResolver extends AbstractDownloadFieldsResolver {
 
     @Override
-    protected DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(MediaType contentType) {
+    protected DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(
+            MediaType contentType, List<String> invalidRequestedFields) {
         DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
         // request extra fields than the default ones
         Map<String, List<String>> queryParams =
@@ -44,8 +45,14 @@ public class DiseaseDownloadFieldsParamResolver extends AbstractDownloadFieldsRe
     }
 
     @Override
+    protected DownloadParamAndResult getDownloadDefaultFieldsParamAndResult(
+            MediaType contentType, List<String> expectedFields) {
+        return null;
+    }
+
+    @Override
     protected DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
-            MediaType contentType) {
+            MediaType contentType, List<String> requestedFields, List<String> expectedFields) {
         DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);
         // request extra fields than the default ones
         Map<String, List<String>> queryParams =
