@@ -17,41 +17,46 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 
 /** class to provide common query param and result matcher */
 public abstract class AbstractDownloadParamAndResultProvider {
-    private String fieldName;
-    private String sortOrder;
-    private Integer entryCount;
-    private List<String> accessionsInOrder;
-    private List<String> expectedFields;
-
     public DownloadParamAndResult getDownloadParamAndResult(
             MediaType contentType, Integer entryCount) {
         DownloadParamAndResult.DownloadParamAndResultBuilder builder =
                 DownloadParamAndResult.builder();
         builder.queryParam("query", Collections.singletonList("*")).contentType(contentType);
 
-        List<ResultMatcher> resultMatchers = getResultMatchers(contentType, entryCount);
+        List<ResultMatcher> resultMatchers =
+                getResultMatchers(contentType, entryCount, null, null, null, null, null);
         builder.resultMatchers(resultMatchers);
         return builder.build();
     }
 
     public DownloadParamAndResult getDownloadParamAndResultForSort(
             MediaType contentType,
-            String fieldName,
+            String sortFieldName,
             String sortOrder,
             Integer entryCount,
             List<String> accessionsInOrder) {
-        this.fieldName = fieldName;
-        this.sortOrder = sortOrder;
-        this.entryCount = entryCount;
-        this.accessionsInOrder = accessionsInOrder;
 
-        DownloadParamAndResult paramAndResult = getDownloadParamAndResult(contentType, entryCount);
+        DownloadParamAndResult.DownloadParamAndResultBuilder builder =
+                DownloadParamAndResult.builder();
+        builder.queryParam("query", Collections.singletonList("*")).contentType(contentType);
+        List<ResultMatcher> resultMatchers =
+                getResultMatchers(
+                        contentType,
+                        entryCount,
+                        sortFieldName,
+                        sortOrder,
+                        accessionsInOrder,
+                        null,
+                        null);
+        builder.resultMatchers(resultMatchers);
+        DownloadParamAndResult paramAndResult = builder.build();
+
         // add sort param
         Map<String, List<String>> updatedQueryParams =
                 addQueryParam(
                         paramAndResult.getQueryParams(),
                         "sort",
-                        Collections.singletonList(fieldName + " " + sortOrder));
+                        Collections.singletonList(sortFieldName + " " + sortOrder));
 
         paramAndResult.setQueryParams(updatedQueryParams);
 
@@ -64,11 +69,22 @@ public abstract class AbstractDownloadParamAndResultProvider {
             List<String> accessionsInOrder,
             List<String> requestedFields,
             List<String> expectedFields) {
-        this.accessionsInOrder = accessionsInOrder;
-        this.entryCount = entryCount;
-        this.expectedFields = expectedFields;
+        // default query
+        DownloadParamAndResult.DownloadParamAndResultBuilder builder =
+                DownloadParamAndResult.builder();
+        builder.queryParam("query", Collections.singletonList("*")).contentType(contentType);
 
-        DownloadParamAndResult paramAndResult = getDownloadParamAndResult(contentType, entryCount);
+        List<ResultMatcher> resultMatchers =
+                getResultMatchers(
+                        contentType,
+                        entryCount,
+                        null,
+                        null,
+                        accessionsInOrder,
+                        requestedFields,
+                        expectedFields);
+        builder.resultMatchers(resultMatchers);
+        DownloadParamAndResult paramAndResult = builder.build();
 
         if (Objects.nonNull(requestedFields) && !requestedFields.isEmpty()) {
             String commaSeparated = requestedFields.stream().collect(Collectors.joining(","));
@@ -85,49 +101,106 @@ public abstract class AbstractDownloadParamAndResultProvider {
         return paramAndResult;
     }
 
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public String getSortOrder() {
-        return sortOrder;
-    }
-
-    public Integer getEntryCount() {
-        return entryCount;
-    }
-
-    public List<String> getAccessionsInOrder() {
-        return this.accessionsInOrder;
-    }
-
-    public List<String> getExpectedFields() {
-        return this.expectedFields;
-    }
-
     protected List<ResultMatcher> getResultMatchers(
-            MediaType contentType, Integer expectedEntryCount) {
+            MediaType contentType,
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
+
         List<ResultMatcher> resultMatchers;
         if (MediaType.APPLICATION_JSON.equals(contentType)) {
-            resultMatchers = getJsonResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getJsonResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getTSVResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getTSVResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getListResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getListResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getXLSResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getXLSResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.RDF_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getRDFResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getRDFResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.FF_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getFFResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getFFResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (MediaType.APPLICATION_XML.equals(contentType)) {
-            resultMatchers = getXMLResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getXMLResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.FASTA_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getFastaResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getFastaResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.GFF_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getGFFResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getGFFResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers = getOBOResultMatchers(expectedEntryCount);
+            resultMatchers =
+                    getOBOResultMatchers(
+                            entryCount,
+                            sortFieldName,
+                            sortOrder,
+                            accessionsInOrder,
+                            requestedFields,
+                            expectedFields);
         } else {
             throw new IllegalArgumentException("Unknown content type " + contentType);
         }
@@ -153,23 +226,83 @@ public abstract class AbstractDownloadParamAndResultProvider {
 
     protected abstract void verifyExcelData(Sheet sheet);
 
-    protected abstract List<ResultMatcher> getGFFResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getGFFResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getFastaResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getFastaResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getXMLResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getXMLResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getOBOResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getOBOResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getFFResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getFFResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getRDFResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getRDFResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getXLSResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getXLSResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getListResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getListResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getTSVResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getTSVResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getJsonResultMatchers(Integer expectedEntryCount);
+    protected abstract List<ResultMatcher> getJsonResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields);
 }

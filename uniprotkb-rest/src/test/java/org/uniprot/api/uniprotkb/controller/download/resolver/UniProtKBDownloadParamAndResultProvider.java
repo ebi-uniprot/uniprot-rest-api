@@ -19,12 +19,11 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadParamAndRe
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.api.uniprotkb.output.converter.UniProtKBXmlMessageConverter;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UniProtKBDownloadParamAndResultProvider
         extends AbstractDownloadParamAndResultProvider {
 
     @Override
-    protected List<ResultMatcher> getGFFResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getGFFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result -> {
@@ -33,7 +32,7 @@ public class UniProtKBDownloadParamAndResultProvider
                     List<String> lines = Arrays.asList(gffStr.split("\n"));
                     Predicate<String> isAccession =
                             l -> l.startsWith("O") || l.startsWith("P") || l.startsWith("Q");
-                    long entryCount =
+                    long expectedEntryCount =
                             lines.stream()
                                     .filter(isAccession)
                                     .map(l -> l.substring(0, l.indexOf("\t"))) // Stream<Accession>
@@ -41,32 +40,32 @@ public class UniProtKBDownloadParamAndResultProvider
                                     .count();
                     assertThat(
                             "Expected entry count doesn't match",
-                            entryCount,
-                            is(Long.valueOf(expectedEntryCount)));
+                            expectedEntryCount,
+                            is(Long.valueOf(entryCount)));
                 });
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getFastaResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getFastaResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result -> {
                     String fastaStr = result.getResponse().getContentAsString();
                     assertThat("Response is null", Objects.nonNull(fastaStr));
                     List<String> lines = Arrays.asList(fastaStr.split("\n"));
-                    long entryCount = lines.stream().filter(l -> l.startsWith(">sp")).count();
+                    long expectedEntryCount = lines.stream().filter(l -> l.startsWith(">sp")).count();
                     assertThat(
                             "Expected entry count doesn't match",
-                            entryCount,
-                            is(Long.valueOf(expectedEntryCount)));
+                            expectedEntryCount,
+                            is(Long.valueOf(entryCount)));
                 });
 
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getXMLResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getXMLResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
 
         resultMatchers.add(
@@ -87,27 +86,27 @@ public class UniProtKBDownloadParamAndResultProvider
                     assertThat(
                             "Expected entry count doesn't match",
                             entryTags.length,
-                            is(expectedEntryCount + 1));
+                            is(entryCount + 1));
                 });
 
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getFFResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getFFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
                         assertThat(
                                 "The number of entries in flat files does not match",
                                 result.getResponse().getContentAsString().split("//\n").length,
-                                is(expectedEntryCount)));
+                                is(entryCount)));
 
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getRDFResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getRDFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -129,19 +128,19 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getXLSResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getXLSResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
                         assertThat(
                                 "The excel rows count doesn't match",
                                 getExcelRowCountAndVerifyContent(result),
-                                is(expectedEntryCount + 1))); // with header
+                                is(entryCount + 1))); // with header
         return resultMatchers;
     }
 
     @Override
-    protected List<ResultMatcher> getListResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getListResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
 
         resultMatchers.add(
@@ -149,7 +148,7 @@ public class UniProtKBDownloadParamAndResultProvider
                         assertThat(
                                 "The number of entries in list does not match",
                                 result.getResponse().getContentAsString().split("\n").length,
-                                is(expectedEntryCount)));
+                                is(entryCount)));
         resultMatchers.add(
                 result ->
                         assertThat(
@@ -165,14 +164,14 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getTSVResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getTSVResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
                         assertThat(
                                 "The number of entries does not match",
                                 result.getResponse().getContentAsString().split("\n").length,
-                                is(expectedEntryCount + 1)));
+                                is(entryCount + 1)));
         resultMatchers.add(
                 result ->
                         assertThat(
@@ -185,9 +184,9 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getJsonResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getJsonResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
-        resultMatchers.add(jsonPath("$.results.length()", is(expectedEntryCount)));
+        resultMatchers.add(jsonPath("$.results.length()", is(entryCount)));
         return resultMatchers;
     }
 
@@ -223,7 +222,7 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getOBOResultMatchers(Integer expectedEntryCount) {
+    protected List<ResultMatcher> getOBOResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 }
