@@ -118,12 +118,12 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
         CrossReference<ProteomeDatabase> xref1 =
                 new CrossReferenceBuilder<ProteomeDatabase>()
-                        .databaseType(ProteomeDatabase.GENOME_ACCESSION)
+                        .database(ProteomeDatabase.GENOME_ACCESSION)
                         .id("ACA121")
                         .build();
         CrossReference<ProteomeDatabase> xref2 =
                 new CrossReferenceBuilder<ProteomeDatabase>()
-                        .databaseType(ProteomeDatabase.GENOME_ANNOTATION)
+                        .database(ProteomeDatabase.GENOME_ANNOTATION)
                         .id("ADFDA121")
                         .build();
         xrefs.add(xref1);
@@ -154,10 +154,10 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .modified(modified)
                         .proteomeType(ProteomeType.NORMAL)
                         //	.redundantTo(redId)
-                        .dbXReferencesSet(xrefs)
+                        .proteomeCrossReferencesSet(xrefs)
                         .componentsSet(components)
                         .superkingdom(Superkingdom.EUKARYOTA)
-                        .referencesSet(citations)
+                        .citationsSet(citations)
                         .annotationScore(15);
 
         return builder.build();

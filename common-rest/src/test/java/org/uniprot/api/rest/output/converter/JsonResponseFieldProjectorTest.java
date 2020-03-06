@@ -236,7 +236,7 @@ class JsonResponseFieldProjectorTest {
                         .geneLocationsSet(
                                 Collections.singletonList(GeneLocationTest.getGeneLocation()))
                         .referencesSet(UniProtReferenceTest.getUniProtReferences())
-                        .databaseCrossReferencesSet(
+                        .uniProtCrossReferencesSet(
                                 Collections.singletonList(
                                         UniProtCrossReferenceTest.getUniProtDBCrossReference()))
                         .sequence(SequenceTest.getSequence())
@@ -246,7 +246,7 @@ class JsonResponseFieldProjectorTest {
         filterFieldMap.put("gene", Collections.emptyList());
         filterFieldMap.put("organism", Collections.emptyList());
         filterFieldMap.put("feature", Collections.emptyList());
-        filterFieldMap.put("xref", Collections.emptyList());
+        filterFieldMap.put("crossReference", Collections.emptyList());
         filterFieldMap.put("keyword", Collections.emptyList());
         List<String> cTypes = new ArrayList<>();
         cTypes.add("disease");
@@ -267,7 +267,7 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertNotNull(result.get("genes"));
         Assertions.assertNotNull(result.get("organism"));
         Assertions.assertNotNull(result.get("features"));
-        Assertions.assertNotNull(result.get("databaseCrossReferences"));
+        Assertions.assertNotNull(result.get("uniProtCrossReferences"));
         Assertions.assertNotNull(result.get("keywords"));
         Assertions.assertNotNull(result.get("comments"));
         Assertions.assertEquals(cTypes.size(), ((List<?>) result.get("comments")).size());
@@ -305,6 +305,7 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertEquals(UniProtField.ResultFields.keyword.getJavaFieldName(), keywordsKey);
         String databaseCrossReferencesKey = (String) ((Map.Entry) orderedEntry[10]).getKey();
         Assertions.assertEquals(
-                UniProtField.ResultFields.xref.getJavaFieldName(), databaseCrossReferencesKey);
+                UniProtField.ResultFields.crossReference.getJavaFieldName(),
+                databaseCrossReferencesKey);
     }
 }

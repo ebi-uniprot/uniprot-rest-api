@@ -159,7 +159,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         builder.upi(entry.getUniParcId().getValue())
                 .seqLength(entry.getSequence().getLength())
                 .sequenceChecksum(entry.getSequence().getCrc64());
-        entry.getDbXReferences().forEach(val -> processDbReference(val, builder));
+        entry.getUniParcCrossReferences().forEach(val -> processDbReference(val, builder));
         builder.entryStored(getBinary(entry));
         entry.getTaxonomies().forEach(taxon -> processTaxonomy(taxon, builder));
         builder.upid("UP000005640");
@@ -235,7 +235,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
                 .uniParcId(new UniParcIdBuilder(getName(UPI_PREF, i)).build())
-                .databaseCrossReferencesSet(xrefs)
+                .uniParcCrossReferencesSet(xrefs)
                 .sequence(sequence)
                 .sequenceFeaturesSet(seqFeatures)
                 .taxonomiesSet(taxonomies)
@@ -278,7 +278,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
                         .versionI(3)
-                        .databaseType(UniParcDatabase.SWISSPROT)
+                        .database(UniParcDatabase.SWISSPROT)
                         .id("P12345")
                         .version(7)
                         .active(true)
@@ -297,7 +297,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         UniParcCrossReference xref2 =
                 new UniParcCrossReferenceBuilder()
                         .versionI(1)
-                        .databaseType(UniParcDatabase.TREMBL)
+                        .database(UniParcDatabase.TREMBL)
                         .id(getName("P123", i))
                         .version(7)
                         .active(true)

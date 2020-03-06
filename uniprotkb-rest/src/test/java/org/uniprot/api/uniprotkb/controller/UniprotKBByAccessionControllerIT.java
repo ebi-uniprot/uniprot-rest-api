@@ -395,7 +395,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
             fields.add(UniProtField.ResultFields.feature.getJavaFieldName());
             fields.add(UniProtField.ResultFields.keyword.getJavaFieldName());
             fields.add(UniProtField.ResultFields.reference.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.xref.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.crossReference.getJavaFieldName());
             fields.add(UniProtField.ResultFields.sequence.getJavaFieldName());
             return fields;
         }

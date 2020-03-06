@@ -103,13 +103,19 @@ class UniprotKBEntryControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(4)))
                 .andExpect(
-                        jsonPath("$.results[0].reference.citation.citationXrefs[0].id", is("11")))
+                        jsonPath(
+                                "$.results[0].reference.citation.citationCrossReferences[0].id",
+                                is("11")))
                 .andExpect(
                         jsonPath("$.results[1].reference.citation.citationType", is("submission")))
                 .andExpect(
-                        jsonPath("$.results[2].reference.citation.citationXrefs[0].id", is("12")))
+                        jsonPath(
+                                "$.results[2].reference.citation.citationCrossReferences[0].id",
+                                is("12")))
                 .andExpect(
-                        jsonPath("$.results[3].reference.citation.citationXrefs[0].id", is("13")))
+                        jsonPath(
+                                "$.results[3].reference.citation.citationCrossReferences[0].id",
+                                is("13")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.reference.citation.title",
