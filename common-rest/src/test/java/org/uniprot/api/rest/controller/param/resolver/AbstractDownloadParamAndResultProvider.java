@@ -14,13 +14,12 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-/**
- * class to provide common query param and result matcher
- */
+/** class to provide common query param and result matcher */
 public abstract class AbstractDownloadParamAndResultProvider {
     private String fieldName;
     private String sortOrder;
     private Integer entryCount;
+    private List<String> accessionsInOrder;
 
     public DownloadParamAndResult getDownloadParamAndResult(
             MediaType contentType, Integer entryCount) {
@@ -33,11 +32,16 @@ public abstract class AbstractDownloadParamAndResultProvider {
         return builder.build();
     }
 
-    public DownloadParamAndResult getDownloadParamAndResultForSort(MediaType contentType, String fieldName,
-                                                                   String sortOrder, Integer entryCount){
+    public DownloadParamAndResult getDownloadParamAndResultForSort(
+            MediaType contentType,
+            String fieldName,
+            String sortOrder,
+            Integer entryCount,
+            List<String> accessionsInOrder) {
         this.fieldName = fieldName;
-        this.sortOrder= sortOrder;
+        this.sortOrder = sortOrder;
         this.entryCount = entryCount;
+        this.accessionsInOrder = accessionsInOrder;
 
         DownloadParamAndResult paramAndResult = getDownloadParamAndResult(contentType, entryCount);
         // add sort param
@@ -64,6 +68,9 @@ public abstract class AbstractDownloadParamAndResultProvider {
         return entryCount;
     }
 
+    public List<String> getAccessionsInOrder() {
+        return this.accessionsInOrder;
+    }
 
     protected List<ResultMatcher> getResultMatchers(
             MediaType contentType, Integer expectedEntryCount) {

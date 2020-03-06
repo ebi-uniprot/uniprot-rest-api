@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller.download.resolver;
 
+import java.util.List;
+
 import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.MediaType;
@@ -13,14 +15,17 @@ public class UniProtKBDownloadSortParamResolver extends AbstractDownloadSortPara
             new UniProtKBDownloadSortParamAndResultProvider();
 
     @Override
-    public DownloadParamAndResult getDownloadWithSortParamAndResult(MediaType contentType, String fieldName, String sortOrder) {
-        DownloadParamAndResult paramAndResult = paramAndResultProvider.getDownloadParamAndResultForSort(contentType,
-                fieldName, sortOrder, 3);
+    public DownloadParamAndResult getDownloadWithSortParamAndResult(
+            MediaType contentType,
+            String fieldName,
+            String sortOrder,
+            List<String> expectedAccessions) {
+        DownloadParamAndResult paramAndResult =
+                paramAndResultProvider.getDownloadParamAndResultForSort(
+                        contentType, fieldName, sortOrder, 3, expectedAccessions);
         return paramAndResult;
     }
 
     @Override
-    protected void verifyExcelData(Sheet sheet) {
-    }
-
+    protected void verifyExcelData(Sheet sheet) {}
 }
