@@ -93,8 +93,10 @@ public abstract class AbstractDownloadControllerIT {
                                                 HttpHeaders.CONTENT_TYPE,
                                                 paramAndResult.getContentType().toString()));
 
-        for (ResultMatcher resultMatcher : paramAndResult.getResultMatchers()) {
-            resultActions.andExpect(resultMatcher);
+        if (HttpStatus.OK.equals(httpStatus)) {
+            for (ResultMatcher resultMatcher : paramAndResult.getResultMatchers()) {
+                resultActions.andExpect(resultMatcher);
+            }
         }
     }
 

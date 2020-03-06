@@ -8,9 +8,14 @@ import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.builder.SequenceBuilder;
+import org.uniprot.core.gene.Gene;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
+import org.uniprot.core.uniprot.builder.GeneBuilder;
+import org.uniprot.core.uniprot.builder.GeneNameBuilder;
 import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
+import org.uniprot.core.uniprot.taxonomy.Organism;
+import org.uniprot.core.uniprot.taxonomy.builder.OrganismBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -36,15 +41,25 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static String SEARCH_ACCESSION2 =
             "P-" + ThreadLocalRandom.current().nextLong(50001, 99999);
 
-
     public static final String ACC1 = "O12345";
     public static final String ACC2 = "P12345";
     public static final String ACC3 = "Q12345";
     public static final String SEQUENCE1 = "KDVHMPKHPELADKNVPNLHVMKAMQS";
     public static final String SEQUENCE2 = "RIAIHELLFKEGVMVAK";
     public static final String SEQUENCE3 = "MLMPKKN";
+    public static final String MNEMONIC1 = "MNEMONIC_A";
+    public static final String MNEMONIC2 = "MNEMONIC_B";
+    public static final String MNEMONIC3 = "MNEMONIC_C";
 
     public static List<String> SORTED_BY_LENGTH = Arrays.asList(ACC3, ACC2, ACC1);
+    public static List<String> SORTED_BY_MASS_DESC = Arrays.asList(ACC1, ACC2, ACC3);
+    public static List<String> SORTED_BY_ACCESSION = Arrays.asList(ACC1, ACC2, ACC3);
+    public static List<String> SORTED_BY_ACCESSION_DESC = Arrays.asList(ACC3, ACC2, ACC1);
+    public static List<String> SORTED_BY_ANNOTATION_SCORE = Arrays.asList(ACC2, ACC3, ACC1);
+    public static List<String> SORTED_BY_MNEMONIC = Arrays.asList(ACC2, ACC1, ACC3);
+    public static List<String> SORTED_BY_GENE = Arrays.asList(ACC2, ACC3, ACC1);
+    public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
+
 
     private UniProtKBStoreClient storeClient;
 
@@ -102,16 +117,40 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     protected void saveEntry(String accession, long suffix) {
         UniProtEntry entry = UniProtEntryMocker.create(accession);
         UniProtEntryBuilder builder = UniProtEntryBuilder.from(entry);
-        if(ACC1.equals(accession)){
+        Gene gene = entry.getGenes().get(0);
+        if (ACC1.equals(accession)) {
+            builder.organism(getOrganism("root", 1));
+            builder.genesAdd(getGene(gene, "cUrl"));
+            builder.uniProtId(MNEMONIC2);
+            builder.annotationScore(5.0);
             builder.sequence(new SequenceBuilder(SEQUENCE1).build());
-        } else if(ACC2.equals(accession)){
+        } else if (ACC2.equals(accession)) {
+            builder.organism(getOrganism("Bacteria", 2));
+            builder.genesAdd(getGene(gene, "aUrl"));
+            builder.annotationScore(1.0);
+            builder.uniProtId(MNEMONIC1);
             builder.sequence(new SequenceBuilder(SEQUENCE2).build());
-        } else if(ACC3.equals(accession)){
+        } else if (ACC3.equals(accession)) {
+            builder.organism(getOrganism("Human", 9606l));
+            builder.genesAdd(getGene(gene, "bUrl"));
+            builder.uniProtId(MNEMONIC3);
+            builder.annotationScore(3.0);
             builder.sequence(new SequenceBuilder(SEQUENCE3).build());
         }
 
         builder.entryType(UniProtEntryType.SWISSPROT);
 
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, builder.build());
+    }
+
+    private Gene getGene(Gene oldGene, String name) {
+        GeneBuilder newGene = GeneBuilder.from(oldGene)
+                .geneName(new GeneNameBuilder(name,
+                        oldGene.getGeneName().getEvidences()).build());
+        return newGene.build();
+    }
+
+    private Organism getOrganism(String name, long taxonId) {
+        return new OrganismBuilder().commonName(name).taxonId(taxonId).build();
     }
 }
