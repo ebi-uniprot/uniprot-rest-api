@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import java.util.Collections;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -21,9 +24,6 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniprotKBDownloadFieldsParamResolver;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-
-import java.util.Collections;
-import java.util.stream.Stream;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
@@ -82,34 +82,91 @@ public class UniProtKBDownloadFieldsIT extends BaseUniprotKBDownloadIT {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    private static Stream<Arguments> paramAndResultByTypeForDefault(){
-        return Stream.of(Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, TSV_DEFAULT_FIELDS)),
-        Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
-        Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(MediaType.APPLICATION_XML, MANDATORY_JSON_FIELDS)),
-        Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
-        Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
-        Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE, MANDATORY_JSON_FIELDS))//,
-        //Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE, MANDATORY_JSON_FIELDS))
+    private static Stream<Arguments> paramAndResultByTypeForDefault() {
+        return Stream.of(
+                Arguments.of(
+                        paramResolver.getDownloadDefaultFieldsParamAndResult(
+                                UniProtMediaType.TSV_MEDIA_TYPE, TSV_DEFAULT_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadDefaultFieldsParamAndResult(
+                                UniProtMediaType.FF_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadDefaultFieldsParamAndResult(
+                                MediaType.APPLICATION_XML, MANDATORY_JSON_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadDefaultFieldsParamAndResult(
+                                UniProtMediaType.XLS_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadDefaultFieldsParamAndResult(
+                                UniProtMediaType.FASTA_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadDefaultFieldsParamAndResult(
+                                UniProtMediaType.GFF_MEDIA_TYPE, MANDATORY_JSON_FIELDS)) // ,
+                // Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE, MANDATORY_JSON_FIELDS))
                 );
     }
 
-    private static Stream<Arguments> paramAndResultByTypeForNonDefault(){
-        return Stream.of(Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(MediaType.APPLICATION_XML, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())));
+    private static Stream<Arguments> paramAndResultByTypeForNonDefault() {
+        return Stream.of(
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                UniProtMediaType.TSV_MEDIA_TYPE,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())),
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                UniProtMediaType.FF_MEDIA_TYPE,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())),
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                MediaType.APPLICATION_XML,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())),
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                UniProtMediaType.XLS_MEDIA_TYPE,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())),
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                UniProtMediaType.FASTA_MEDIA_TYPE,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())),
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                UniProtMediaType.GFF_MEDIA_TYPE,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())),
+                Arguments.of(
+                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                UniProtMediaType.RDF_MEDIA_TYPE,
+                                REQUESTED_JSON_FIELDS,
+                                Collections.emptyList())));
     }
 
-    private static Stream<Arguments> paramAndResultByTypeForInvalid(){
-        return Stream.of(Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(MediaType.APPLICATION_XML, INVALID_RETURN_FIELDS)),
-                Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(paramResolver.getDownloadInvalidFieldsParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE, INVALID_RETURN_FIELDS)));
+    private static Stream<Arguments> paramAndResultByTypeForInvalid() {
+        return Stream.of(
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                UniProtMediaType.TSV_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                UniProtMediaType.FF_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                MediaType.APPLICATION_XML, INVALID_RETURN_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                UniProtMediaType.XLS_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                UniProtMediaType.FASTA_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                UniProtMediaType.GFF_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
+                Arguments.of(
+                        paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                UniProtMediaType.RDF_MEDIA_TYPE, INVALID_RETURN_FIELDS)));
     }
 }

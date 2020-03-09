@@ -49,7 +49,15 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static final String MNEMONIC2 = "MNEMONIC_B";
     public static final String MNEMONIC3 = "MNEMONIC_C";
 
-    public static List<String> TSV_DEFAULT_FIELDS = Arrays.asList("Entry","Entry Name","Reviewed","Protein names","Gene Names","Organism","Length");
+    public static List<String> TSV_DEFAULT_FIELDS =
+            Arrays.asList(
+                    "Entry",
+                    "Entry Name",
+                    "Reviewed",
+                    "Protein names",
+                    "Gene Names",
+                    "Organism",
+                    "Length");
     public static List<String> SORTED_BY_LENGTH = Arrays.asList(ACC3, ACC2, ACC1);
     public static List<String> SORTED_BY_MASS_DESC = Arrays.asList(ACC1, ACC2, ACC3);
     public static List<String> SORTED_BY_ACCESSION = Arrays.asList(ACC1, ACC2, ACC3);
