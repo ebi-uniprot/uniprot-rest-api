@@ -33,18 +33,16 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.CrossReference;
-import org.uniprot.core.builder.CrossReferenceBuilder;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
-import org.uniprot.core.citation.builder.LiteratureBuilder;
-import org.uniprot.core.citation.impl.AuthorImpl;
-import org.uniprot.core.citation.impl.PublicationDateImpl;
+import org.uniprot.core.citation.impl.*;
+import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureStoreEntry;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
@@ -157,9 +155,9 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                         .citationCrossReferencesAdd(pubmed)
                         .citationCrossReferencesAdd(doi)
                         .title("title " + pubMedId)
-                        .authorsAdd(new AuthorImpl("author " + pubMedId))
+                        .authorsAdd(new AuthorBuilder("author " + pubMedId).build())
                         .journalName("journal " + pubMedId)
-                        .publicationDate(new PublicationDateImpl("2019"))
+                        .publicationDate(new PublicationDateBuilder("2019").build())
                         .build();
 
         LiteratureEntry entry = new LiteratureEntryBuilder().citation(literature).build();

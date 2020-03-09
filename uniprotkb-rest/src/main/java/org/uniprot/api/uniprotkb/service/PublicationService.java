@@ -28,7 +28,7 @@ import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
+import org.uniprot.core.uniprot.impl.UniProtReferenceBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;

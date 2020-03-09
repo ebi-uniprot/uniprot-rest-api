@@ -27,10 +27,10 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordIdBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})

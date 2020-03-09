@@ -15,8 +15,8 @@ import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 
 class DiseaseOBOConverterTest {
     private static final String NOW = OBOFormatConstants.headerDateFormat().format(new Date());

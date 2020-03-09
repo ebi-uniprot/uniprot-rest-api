@@ -10,9 +10,9 @@ import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.PublicationDate;
-import org.uniprot.core.citation.builder.LiteratureBuilder;
+import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.LiteratureField;
 

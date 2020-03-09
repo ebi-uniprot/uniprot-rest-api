@@ -7,31 +7,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.uniprot.core.CrossReference;
-import org.uniprot.core.builder.CrossReferenceBuilder;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.SubmissionDatabase;
-import org.uniprot.core.citation.builder.JournalArticleBuilder;
-import org.uniprot.core.citation.builder.LiteratureBuilder;
-import org.uniprot.core.citation.builder.SubmissionBuilder;
-import org.uniprot.core.citation.impl.AuthorImpl;
-import org.uniprot.core.citation.impl.PublicationDateImpl;
+import org.uniprot.core.citation.impl.*;
+import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.literature.LiteratureStoreEntry;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureMappedReferenceBuilder;
-import org.uniprot.core.literature.builder.LiteratureStatisticsBuilder;
-import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureMappedReferenceBuilder;
+import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
+import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
 import org.uniprot.core.uniprot.UniProtAccession;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
+import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
+import org.uniprot.core.uniprot.impl.UniProtReferenceBuilder;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -148,9 +144,9 @@ public class UniprotKbObjectsForTests {
                         .citationCrossReferencesAdd(pubmed)
                         .citationCrossReferencesAdd(doi)
                         .title("title " + pubMedId)
-                        .authorsAdd(new AuthorImpl("author " + pubMedId))
+                        .authorsAdd(new AuthorBuilder("author " + pubMedId).build())
                         .journalName("journal " + pubMedId)
-                        .publicationDate(new PublicationDateImpl("2019"))
+                        .publicationDate(new PublicationDateBuilder("2019").build())
                         .build();
 
         LiteratureStatistics statistics =

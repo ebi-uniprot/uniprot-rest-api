@@ -16,11 +16,11 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
-import org.uniprot.core.citation.builder.LiteratureBuilder;
+import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureStatistics;
-import org.uniprot.core.literature.builder.LiteratureStatisticsBuilder;
+import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
 import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.builder.UniProtReferenceBuilder;
+import org.uniprot.core.uniprot.impl.UniProtReferenceBuilder;
 
 /**
  * @author lgonzales
