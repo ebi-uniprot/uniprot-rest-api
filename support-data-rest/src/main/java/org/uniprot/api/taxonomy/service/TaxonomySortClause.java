@@ -1,5 +1,10 @@
 package org.uniprot.api.taxonomy.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -7,35 +12,22 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 @Component
 public class TaxonomySortClause extends AbstractSolrSortClause {
+    private static final String DOC_ID = "id";
+    private static final String TAX_ID = "tax_id";
+
     @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(Sort.Direction.DESC, "score")
-                .and(
-                        new Sort(
-                                Sort.Direction.ASC,
-                                getSearchFieldConfig(getUniProtDataType())
-                                        .getSearchFieldItemByName("tax_id")
-                                        .getFieldName()))
-                .and(
-                        new Sort(
-                                Sort.Direction.ASC,
-                                getSearchFieldConfig(getUniProtDataType())
-                                        .getSearchFieldItemByName("id")
-                                        .getFieldName()));
+    protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
+        if (this.defaultFieldSortOrderPairs == null) {
+            this.defaultFieldSortOrderPairs = new ArrayList<>();
+            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(TAX_ID, Sort.Direction.ASC));
+            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(DOC_ID, Sort.Direction.ASC));
+        }
+        return this.defaultFieldSortOrderPairs;
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName("id")
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getCorrespondingSortField(name)
-                .getFieldName();
+        return DOC_ID;
     }
 
     @Override

@@ -17,32 +17,22 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 @Component
 public class ProteomeSortClause extends AbstractSolrSortClause {
     private static final String UPID = "upid";
+    private static final String ANNOTATION_SCORE = "annotation_score";
 
     @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(
-                        Sort.Direction.DESC,
-                        getSearchFieldConfig(getUniProtDataType())
-                                .getCorrespondingSortField("annotation_score")
-                                .getFieldName())
-                .and(
-                        new Sort(
-                                Sort.Direction.ASC,
-                                getSearchFieldConfig(getUniProtDataType())
-                                        .getCorrespondingSortField(UPID)
-                                        .getFieldName()));
+    protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
+        if (this.defaultFieldSortOrderPairs == null) {
+            this.defaultFieldSortOrderPairs = new ArrayList<>();
+            this.defaultFieldSortOrderPairs.add(
+                    new ImmutablePair<>(ANNOTATION_SCORE, Sort.Direction.DESC));
+            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(UPID, Sort.Direction.ASC));
+        }
+        return this.defaultFieldSortOrderPairs;
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName(UPID)
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return UPID;
     }
 
     @Override

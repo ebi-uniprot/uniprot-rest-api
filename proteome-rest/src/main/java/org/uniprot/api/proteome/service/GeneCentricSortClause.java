@@ -19,12 +19,13 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
     private static final String ACCESSION_ID = "accession_id";
 
     @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(
-                Sort.Direction.ASC,
-                getSearchFieldConfig(getUniProtDataType())
-                        .getCorrespondingSortField(ACCESSION_ID)
-                        .getFieldName());
+    protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
+        if (this.defaultFieldSortOrderPairs == null) {
+            this.defaultFieldSortOrderPairs = new ArrayList<>();
+            this.defaultFieldSortOrderPairs.add(
+                    new ImmutablePair<>(ACCESSION_ID, Sort.Direction.ASC));
+        }
+        return this.defaultFieldSortOrderPairs;
     }
 
     @Override
@@ -54,14 +55,7 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName(ACCESSION_ID)
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return ACCESSION_ID;
     }
 
     @Override

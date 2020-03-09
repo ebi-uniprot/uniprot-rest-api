@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.search;
 
+import static java.util.stream.Collectors.reducing;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,33 +20,36 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
  */
 public abstract class AbstractSolrSortClause {
     public static final String SCORE = "score";
+    protected List<Pair<String, Sort.Direction>> defaultFieldSortOrderPairs;
 
-    public Sort getSort(String sortClause, boolean hasScore) {
-        Sort result;
-        if (StringUtils.isEmpty(sortClause)) {
-            result = createDefaultSort(hasScore);
-        } else {
-            result = createSort(sortClause);
-        }
-
-        String documentIdFieldName = getSolrDocumentIdFieldName();
-        if (result != null && result.getOrderFor(documentIdFieldName) == null) {
-            result = result.and(new Sort(Sort.Direction.ASC, documentIdFieldName));
-        }
-        return result;
+    public Sort getSort(String sortClause) {
+        return StringUtils.isEmpty(sortClause) ? createDefaultSort() : createSort(sortClause);
     }
 
-    public Sort createSort(String sortClause) {
-        return convertToSolrSort(parseSortClause(sortClause));
-    }
-
-    protected abstract Sort createDefaultSort(boolean hasScore);
+    protected abstract List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs();
 
     protected abstract String getSolrDocumentIdFieldName();
 
-    protected abstract String getSolrSortFieldName(String name);
-
     protected abstract UniProtDataType getUniProtDataType();
+
+    protected String getSolrSortFieldName(String searchFieldName) {
+        UniProtDataType dataType = getUniProtDataType();
+        SearchFieldConfig searchFieldConfig = getSearchFieldConfig(dataType);
+        return searchFieldConfig.getCorrespondingSortField(searchFieldName).getFieldName();
+    }
+
+    protected Sort createSort(String sortClause) {
+        return convertToSolrSort(parseSortClause(sortClause));
+    }
+
+    protected Sort createDefaultSort() {
+        List<Pair<String, Sort.Direction>> fieldSortList = getDefaultFieldSortOrderPairs();
+        Sort result =
+                fieldSortList.stream()
+                        .map(this::createSortObject)
+                        .collect(reducing(new Sort(Sort.Direction.DESC, SCORE), Sort::and));
+        return result;
+    }
 
     protected SearchFieldConfig getSearchFieldConfig(UniProtDataType dataType) {
         return SearchFieldConfigFactory.getSearchFieldConfig(dataType);
@@ -56,6 +61,7 @@ public abstract class AbstractSolrSortClause {
         String[] tokenizedSortClause =
                 sortClause.split("\\s*,\\s*"); // e.g. field1 asc, field2 desc, field3 asc
         boolean hasIdField = false;
+
         for (String singleSortPairStr : tokenizedSortClause) {
             String[] fieldSortPairArr = singleSortPairStr.split("\\s+");
             if (fieldSortPairArr.length != 2) {
@@ -69,10 +75,14 @@ public abstract class AbstractSolrSortClause {
                 hasIdField = true;
             }
         }
-        if (!hasIdField && !fieldSortPairs.isEmpty()) {
+
+        if (fieldSortPairs.isEmpty()) { // sort by default fields
+            fieldSortPairs = getDefaultFieldSortOrderPairs();
+        } else if (!hasIdField) {
             fieldSortPairs.add(
                     new ImmutablePair<>(getSolrDocumentIdFieldName(), Sort.Direction.ASC));
         }
+
         return fieldSortPairs;
     }
 
@@ -80,11 +90,17 @@ public abstract class AbstractSolrSortClause {
         Sort sort = null;
         for (Pair<String, Sort.Direction> sField : fieldSortPairs) {
             if (sort == null) {
-                sort = new Sort(sField.getRight(), sField.getLeft());
+                sort = createSortObject(sField);
             } else {
-                sort = sort.and(new Sort(sField.getRight(), sField.getLeft()));
+                sort = sort.and(createSortObject(sField));
             }
         }
         return sort;
+    }
+
+    private Sort createSortObject(Pair<String, Sort.Direction> fieldSortPair) {
+        String sortFieldName = fieldSortPair.getLeft();
+        Sort.Direction sortOrder = fieldSortPair.getRight();
+        return new Sort(sortOrder, sortFieldName);
     }
 }
