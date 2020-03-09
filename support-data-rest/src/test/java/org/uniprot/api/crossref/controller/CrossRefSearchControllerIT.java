@@ -31,7 +31,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.core.cv.xdb.builder.CrossRefEntryBuilder;
+import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;

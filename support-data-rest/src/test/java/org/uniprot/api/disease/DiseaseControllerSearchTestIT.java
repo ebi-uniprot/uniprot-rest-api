@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.cv.disease.DiseaseFileReader;

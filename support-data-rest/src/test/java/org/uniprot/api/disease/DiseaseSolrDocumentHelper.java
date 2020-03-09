@@ -11,10 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordIdBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.disease.DiseaseDocument;

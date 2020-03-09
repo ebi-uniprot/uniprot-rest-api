@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.comment.Comment;
 import org.uniprot.core.uniprot.feature.Feature;
+import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.xdb.UniProtCrossReference;
 import org.uniprot.store.search.field.UniProtField;
 

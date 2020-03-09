@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.core.cv.subcell.builder.SubcellularLocationEntryBuilder;
+import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
