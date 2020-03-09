@@ -20,7 +20,8 @@ public class KeywordSortClause extends AbstractSolrSortClause {
     protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
         if (this.defaultFieldSortOrderPairs == null) {
             this.defaultFieldSortOrderPairs = new ArrayList<>();
-            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(KEYWORD_ID, Sort.Direction.ASC));
+            this.defaultFieldSortOrderPairs.add(
+                    new ImmutablePair<>(KEYWORD_ID, Sort.Direction.ASC));
             this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(DOC_ID, Sort.Direction.ASC));
         }
         return this.defaultFieldSortOrderPairs;
