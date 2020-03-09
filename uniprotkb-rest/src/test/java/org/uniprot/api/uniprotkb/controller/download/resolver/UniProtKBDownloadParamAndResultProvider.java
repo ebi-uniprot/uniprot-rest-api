@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.resolver.AbstractDownloadParamAndResultProvider;
 import org.uniprot.api.rest.service.RDFService;
@@ -23,7 +22,13 @@ public class UniProtKBDownloadParamAndResultProvider
         extends AbstractDownloadParamAndResultProvider {
 
     @Override
-    protected List<ResultMatcher> getGFFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getGFFResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result -> {
@@ -47,14 +52,21 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getFastaResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getFastaResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result -> {
                     String fastaStr = result.getResponse().getContentAsString();
                     assertThat("Response is null", Objects.nonNull(fastaStr));
                     List<String> lines = Arrays.asList(fastaStr.split("\n"));
-                    long expectedEntryCount = lines.stream().filter(l -> l.startsWith(">sp")).count();
+                    long expectedEntryCount =
+                            lines.stream().filter(l -> l.startsWith(">sp")).count();
                     assertThat(
                             "Expected entry count doesn't match",
                             expectedEntryCount,
@@ -65,7 +77,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getXMLResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getXMLResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
 
         resultMatchers.add(
@@ -93,7 +111,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getFFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getFFResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -106,7 +130,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getRDFResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getRDFResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -128,7 +158,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getXLSResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getXLSResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -140,7 +176,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getListResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getListResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
 
         resultMatchers.add(
@@ -164,7 +206,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getTSVResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getTSVResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(
                 result ->
@@ -184,7 +232,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getJsonResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getJsonResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         List<ResultMatcher> resultMatchers = new ArrayList<>();
         resultMatchers.add(jsonPath("$.results.length()", is(entryCount)));
         return resultMatchers;
@@ -222,7 +276,13 @@ public class UniProtKBDownloadParamAndResultProvider
     }
 
     @Override
-    protected List<ResultMatcher> getOBOResultMatchers(Integer entryCount, String sortFieldName, String sortOrder, List<String> accessionsInOrder, List<String> requestedFields, List<String> expectedFields) {
+    protected List<ResultMatcher> getOBOResultMatchers(
+            Integer entryCount,
+            String sortFieldName,
+            String sortOrder,
+            List<String> accessionsInOrder,
+            List<String> requestedFields,
+            List<String> expectedFields) {
         throw new UnsupportedOperationException("content type not supported");
     }
 }
