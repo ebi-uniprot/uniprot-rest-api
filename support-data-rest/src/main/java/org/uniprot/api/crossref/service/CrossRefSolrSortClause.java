@@ -1,5 +1,10 @@
 package org.uniprot.api.crossref.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -7,33 +12,20 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 @Component
 public class CrossRefSolrSortClause extends AbstractSolrSortClause {
+    private static final String DOC_ID = "accession";
 
     @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        Sort defaultSort =
-                new Sort(
-                        Sort.Direction.ASC,
-                        getSearchFieldConfig(getUniProtDataType())
-                                .getSearchFieldItemByName("accession")
-                                .getFieldName());
-
-        if (hasScore) {
-            defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
+    protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
+        if (this.defaultFieldSortOrderPairs == null) {
+            this.defaultFieldSortOrderPairs = new ArrayList<>();
+            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(DOC_ID, Sort.Direction.ASC));
         }
-
-        return defaultSort;
+        return this.defaultFieldSortOrderPairs;
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName("accession")
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return DOC_ID;
     }
 
     @Override

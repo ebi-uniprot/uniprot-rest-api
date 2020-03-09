@@ -4,9 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
@@ -27,12 +30,13 @@ class AbstractSolrSortClauseTest {
 
     @Test
     void emptySortClauseProducesDefaultSort() {
-        Sort defaultSort = fakeSolrSortClause.getSort("", false);
+        Sort defaultSort = fakeSolrSortClause.getSort("");
         List<String> defaultSorts =
                 defaultSort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
                 defaultSorts,
                 contains(
+                        new Sort(Sort.Direction.DESC, "score").toString(),
                         defaultSort().toString(),
                         new Sort(Sort.Direction.ASC, FakeSolrSortClause.ID).toString()));
     }
@@ -40,7 +44,7 @@ class AbstractSolrSortClauseTest {
     @Test
     void singleSortClauseProducesSingleSort() {
         String name = "name";
-        Sort sort = fakeSolrSortClause.getSort(name + " asc", false);
+        Sort sort = fakeSolrSortClause.getSort(name + " asc");
 
         List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
@@ -54,14 +58,14 @@ class AbstractSolrSortClauseTest {
     void invalidSortCausesException() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> fakeSolrSortClause.getSort("invalid-no-sort-direction", false));
+                () -> fakeSolrSortClause.getSort("invalid-no-sort-direction"));
     }
 
     @Test
     void multipleSortClausesWithIDProduceMultipleSorts() {
         String name = "name";
         String age = "age";
-        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc, id desc", false);
+        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc, id desc");
 
         List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
@@ -76,7 +80,7 @@ class AbstractSolrSortClauseTest {
     void multipleSortClausesProduceMultipleSorts() {
         String name = "name";
         String age = "age";
-        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc", false);
+        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc");
 
         List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
@@ -91,8 +95,11 @@ class AbstractSolrSortClauseTest {
         private static final String ID = "id_field";
 
         @Override
-        protected Sort createDefaultSort(boolean hasScore) {
-            return defaultSort();
+        protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
+            List<Pair<String, Sort.Direction>> defaultFields = new ArrayList<>();
+            defaultFields.add(new ImmutablePair<>("default", Sort.Direction.ASC));
+            defaultFields.add(new ImmutablePair<>(FakeSolrSortClause.ID, Sort.Direction.ASC));
+            return defaultFields;
         }
 
         @Override
@@ -101,7 +108,7 @@ class AbstractSolrSortClauseTest {
         }
 
         @Override
-        protected String getSolrSortFieldName(String name) {
+        public String getSolrSortFieldName(String name) {
             return field(name);
         }
 
