@@ -12,10 +12,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
@@ -54,7 +54,7 @@ class DiseaseDocumentToDiseaseConverterTest {
         // keyword
         String kId = "Sample Keyword";
         String kwAC = "KW-1234";
-        KeywordId keyword = new KeywordEntryKeywordBuilder().id(kId).accession(kwAC).build();
+        KeywordId keyword = new KeywordIdBuilder().id(kId).accession(kwAC).build();
 
         DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
         builder.id(id).accession(accession).acronym(acronym).definition(def);

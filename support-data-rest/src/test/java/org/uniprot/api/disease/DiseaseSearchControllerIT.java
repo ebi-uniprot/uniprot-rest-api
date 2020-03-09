@@ -30,10 +30,10 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -131,7 +131,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     private void saveEntry(String accession, long suffix) {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         KeywordId keyword =
-                new KeywordEntryKeywordBuilder()
+                new KeywordIdBuilder()
                         .id("Mental retardation" + suffix)
                         .accession("KW-0991" + suffix)
                         .build();

@@ -31,16 +31,16 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
+import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.Citation;
+import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.*;
-import org.uniprot.core.proteome.builder.ComponentBuilder;
-import org.uniprot.core.proteome.builder.ProteomeEntryBuilder;
-import org.uniprot.core.proteome.builder.ProteomeIdBuilder;
+import org.uniprot.core.proteome.impl.ComponentBuilder;
+import org.uniprot.core.proteome.impl.ProteomeEntryBuilder;
+import org.uniprot.core.proteome.impl.ProteomeIdBuilder;
 import org.uniprot.core.uniprot.taxonomy.Taxonomy;
-import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
+import org.uniprot.core.uniprot.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
@@ -205,10 +205,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         LocalDate modified = LocalDate.of(2015, 11, 5);
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
-        List<DBCrossReference<ProteomeXReferenceType>> xrefs = new ArrayList<>();
-        DBCrossReference<ProteomeXReferenceType> xref1 =
-                new DBCrossReferenceBuilder<ProteomeXReferenceType>()
-                        .databaseType(ProteomeXReferenceType.GENOME_ACCESSION)
+        List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
+        CrossReference<ProteomeDatabase> xref1 =
+                new CrossReferenceBuilder<ProteomeDatabase>()
+                        .database(ProteomeDatabase.GENOME_ACCESSION)
                         .id(getName("ACA", i))
                         .build();
         xrefs.add(xref1);
@@ -238,10 +238,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                         .modified(modified)
                         .proteomeType(ProteomeType.NORMAL)
                         //	.redundantTo(redId)
-                        .dbXReferencesSet(xrefs)
+                        .proteomeCrossReferencesSet(xrefs)
                         .componentsSet(components)
                         .superkingdom(Superkingdom.EUKARYOTA)
-                        .referencesSet(citations)
+                        .citationsSet(citations)
                         .annotationScore(15);
 
         return builder.build();
