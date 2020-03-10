@@ -1,10 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -15,16 +12,10 @@ public class UniProtSolrSortClause extends AbstractSolrSortClause {
     private static final String ANNOTATION_SCORE = "annotation_score";
     private static final String ACCESSION_ID = "accession_id";
 
-    @Override
-    protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
-        if (this.defaultFieldSortOrderPairs == null) {
-            this.defaultFieldSortOrderPairs = new ArrayList<>();
-            this.defaultFieldSortOrderPairs.add(
-                    new ImmutablePair<>(ANNOTATION_SCORE, Sort.Direction.DESC));
-            this.defaultFieldSortOrderPairs.add(
-                    new ImmutablePair<>(ACCESSION_ID, Sort.Direction.ASC));
-        }
-        return this.defaultFieldSortOrderPairs;
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(ANNOTATION_SCORE, Sort.Direction.DESC);
+        addDefaultFieldOrderPair(ACCESSION_ID, Sort.Direction.ASC);
     }
 
     @Override

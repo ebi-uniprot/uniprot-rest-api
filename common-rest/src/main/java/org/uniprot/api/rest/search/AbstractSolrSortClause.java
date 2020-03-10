@@ -20,17 +20,21 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
  */
 public abstract class AbstractSolrSortClause {
     public static final String SCORE = "score";
-    protected List<Pair<String, Sort.Direction>> defaultFieldSortOrderPairs;
+
+    private List<Pair<String, Sort.Direction>> defaultFieldSortOrderPairs = new ArrayList<>();
 
     public Sort getSort(String sortClause) {
         return StringUtils.isEmpty(sortClause) ? createDefaultSort() : createSort(sortClause);
     }
 
-    protected abstract List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs();
-
     protected abstract String getSolrDocumentIdFieldName();
 
     protected abstract UniProtDataType getUniProtDataType();
+
+    protected void addDefaultFieldOrderPair(String sortFieldName, Sort.Direction direction) {
+        Pair<String, Sort.Direction> fieldSortPair = new ImmutablePair<>(sortFieldName, direction);
+        this.defaultFieldSortOrderPairs.add(fieldSortPair);
+    }
 
     protected String getSolrSortFieldName(String searchFieldName) {
         UniProtDataType dataType = getUniProtDataType();
@@ -43,12 +47,9 @@ public abstract class AbstractSolrSortClause {
     }
 
     protected Sort createDefaultSort() {
-        List<Pair<String, Sort.Direction>> fieldSortList = getDefaultFieldSortOrderPairs();
-        Sort result =
-                fieldSortList.stream()
-                        .map(this::createSortObject)
-                        .collect(reducing(new Sort(Sort.Direction.DESC, SCORE), Sort::and));
-        return result;
+        return this.defaultFieldSortOrderPairs.stream()
+                .map(this::createSortObject)
+                .collect(reducing(new Sort(Sort.Direction.DESC, SCORE), Sort::and));
     }
 
     protected SearchFieldConfig getSearchFieldConfig(UniProtDataType dataType) {
@@ -77,7 +78,7 @@ public abstract class AbstractSolrSortClause {
         }
 
         if (fieldSortPairs.isEmpty()) { // sort by default fields
-            fieldSortPairs = getDefaultFieldSortOrderPairs();
+            fieldSortPairs = this.defaultFieldSortOrderPairs;
         } else if (!hasIdField) {
             fieldSortPairs.add(
                     new ImmutablePair<>(getSolrDocumentIdFieldName(), Sort.Direction.ASC));

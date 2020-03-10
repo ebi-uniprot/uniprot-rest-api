@@ -1,10 +1,7 @@
 package org.uniprot.api.taxonomy.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -15,14 +12,10 @@ public class TaxonomySortClause extends AbstractSolrSortClause {
     private static final String DOC_ID = "id";
     private static final String TAX_ID = "tax_id";
 
-    @Override
-    protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
-        if (this.defaultFieldSortOrderPairs == null) {
-            this.defaultFieldSortOrderPairs = new ArrayList<>();
-            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(TAX_ID, Sort.Direction.ASC));
-            this.defaultFieldSortOrderPairs.add(new ImmutablePair<>(DOC_ID, Sort.Direction.ASC));
-        }
-        return this.defaultFieldSortOrderPairs;
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(TAX_ID, Sort.Direction.ASC);
+        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
     }
 
     @Override

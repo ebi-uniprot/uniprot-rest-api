@@ -4,12 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
@@ -94,12 +91,9 @@ class AbstractSolrSortClauseTest {
     private static class FakeSolrSortClause extends AbstractSolrSortClause {
         private static final String ID = "id_field";
 
-        @Override
-        protected List<Pair<String, Sort.Direction>> getDefaultFieldSortOrderPairs() {
-            List<Pair<String, Sort.Direction>> defaultFields = new ArrayList<>();
-            defaultFields.add(new ImmutablePair<>("default", Sort.Direction.ASC));
-            defaultFields.add(new ImmutablePair<>(FakeSolrSortClause.ID, Sort.Direction.ASC));
-            return defaultFields;
+        FakeSolrSortClause() {
+            addDefaultFieldOrderPair("default", Sort.Direction.ASC);
+            addDefaultFieldOrderPair(FakeSolrSortClause.ID, Sort.Direction.ASC);
         }
 
         @Override
