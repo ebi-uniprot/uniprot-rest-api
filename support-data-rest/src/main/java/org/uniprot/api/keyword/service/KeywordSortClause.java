@@ -1,5 +1,7 @@
 package org.uniprot.api.keyword.service;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -8,35 +10,18 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 /** @author lgonzales */
 @Component
 public class KeywordSortClause extends AbstractSolrSortClause {
-    @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(Sort.Direction.DESC, "score")
-                .and(
-                        new Sort(
-                                Sort.Direction.ASC,
-                                getSearchFieldConfig(getUniProtDataType())
-                                        .getSearchFieldItemByName("keyword_id")
-                                        .getFieldName()))
-                .and(
-                        new Sort(
-                                Sort.Direction.ASC,
-                                getSearchFieldConfig(getUniProtDataType())
-                                        .getSearchFieldItemByName("id")
-                                        .getFieldName()));
+    private static final String DOC_ID = "id";
+    private static final String KEYWORD_ID = "keyword_id";
+
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(KEYWORD_ID, Sort.Direction.ASC);
+        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName("id")
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getCorrespondingSortField(name)
-                .getFieldName();
+        return DOC_ID;
     }
 
     @Override

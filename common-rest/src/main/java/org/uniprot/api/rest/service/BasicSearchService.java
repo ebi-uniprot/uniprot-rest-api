@@ -167,12 +167,10 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         String requestedQuery = request.getQuery();
 
-        boolean hasScore = false;
-
         requestBuilder.query(requestedQuery);
 
         if (solrSortClause != null) {
-            requestBuilder.addSort(solrSortClause.getSort(request.getSort(), hasScore));
+            requestBuilder.addSort(solrSortClause.getSort(request.getSort()));
         }
 
         if (includeFacets && request.hasFacets()) {

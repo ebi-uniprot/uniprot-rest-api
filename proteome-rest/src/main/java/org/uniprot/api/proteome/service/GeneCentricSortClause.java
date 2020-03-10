@@ -3,6 +3,8 @@ package org.uniprot.api.proteome.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Sort;
@@ -18,13 +20,9 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 public class GeneCentricSortClause extends AbstractSolrSortClause {
     private static final String ACCESSION_ID = "accession_id";
 
-    @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(
-                Sort.Direction.ASC,
-                getSearchFieldConfig(getUniProtDataType())
-                        .getCorrespondingSortField(ACCESSION_ID)
-                        .getFieldName());
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(ACCESSION_ID, Sort.Direction.ASC);
     }
 
     @Override
@@ -54,14 +52,7 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName(ACCESSION_ID)
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return ACCESSION_ID;
     }
 
     @Override
