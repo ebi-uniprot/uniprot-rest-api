@@ -1,5 +1,7 @@
 package org.uniprot.api.disease;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -8,30 +10,16 @@ import org.uniprot.store.search.field.DiseaseField;
 
 @Component
 public class DiseaseSolrSortClause extends AbstractSolrSortClause {
-    @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        Sort defaultSort =
-                new Sort(
-                        Sort.Direction.ASC,
-                        getSearchFieldConfig(getUniProtDataType())
-                                .getCorrespondingSortField("accession")
-                                .getFieldName());
+    private static final String DOC_ID = "accession";
 
-        if (hasScore) {
-            defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
-        }
-
-        return defaultSort;
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return DiseaseField.ResultFields.accession.name();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return DOC_ID;
     }
 
     @Override
