@@ -44,7 +44,7 @@ public class UniProtKBRequest implements SearchRequest {
 
     @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
-    @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
     @Parameter(description = "Name of the field to be sorted on")

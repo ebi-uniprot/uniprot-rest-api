@@ -10,6 +10,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.ReturnField;
 
 /**
@@ -73,7 +74,7 @@ class ReturnFieldsValidatorImplTest {
 
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
         validator.initialize(validReturnFields);
-        boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession", null);
+        boolean result = validator.isValid("gene_names,kinetics, entry_type ,accession", null);
         assertTrue(result);
     }
 
@@ -95,14 +96,10 @@ class ReturnFieldsValidatorImplTest {
 
     private ValidReturnFields getMockedValidReturnFields() {
         ValidReturnFields validReturnFields = Mockito.mock(ValidReturnFields.class);
-
-        Class<? extends Enum<? extends ReturnField>> returnFieldValidator =
-                FakeReturnFieldsValidator.class;
-        OngoingStubbing<Class<?>> ongoingStubbing =
-                Mockito.when(validReturnFields.fieldValidatorClazz());
-        ongoingStubbing.thenReturn(returnFieldValidator);
+        Mockito.when(validReturnFields.uniProtDataType()).thenReturn(UniProtDataType.UNIPROTKB);
         return validReturnFields;
     }
+
     /** this class is responsible to fake buildErrorMessage to help tests with */
     private static class FakeReturnFieldsValidatorImpl
             extends ValidReturnFields.ReturnFieldsValidatorImpl {
@@ -121,23 +118,6 @@ class ReturnFieldsValidatorImplTest {
 
         List<String> getErrorFields() {
             return errorFields;
-        }
-    }
-
-    /** this class is responsible to fake ReturnField to help with tests. */
-    private enum FakeReturnFieldsValidator implements ReturnField {
-        gene_primary,
-        gene_names,
-        kinetics,
-        reviewed,
-        accession;
-
-        FakeReturnFieldsValidator() {}
-
-        @Override
-        public boolean hasReturnField(String fieldName) {
-            return Arrays.stream(FakeReturnFieldsValidator.values())
-                    .anyMatch(returnItem -> returnItem.name().equalsIgnoreCase(fieldName));
         }
     }
 }

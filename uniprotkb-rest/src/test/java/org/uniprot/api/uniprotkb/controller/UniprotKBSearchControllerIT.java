@@ -61,8 +61,12 @@ import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
 import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
+import org.uniprot.core.uniprot.xdb.UniProtCrossReference;
+import org.uniprot.core.uniprot.xdb.UniProtDatabase;
+import org.uniprot.core.uniprot.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.xdb.UniProtDatabaseImpl;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -80,6 +84,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
+import org.uniprot.store.search.domain.impl.Databases;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
 @ContextConfiguration(
@@ -751,9 +756,21 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.goWithEvidenceMaps.put(
                                     "go_" + code, Collections.singleton("Search All")));
 
+
+            List<UniProtCrossReference> xrefs = new ArrayList<>();
+            UniProtDatabaseTypes.INSTANCE.getAllDbTypes().forEach(db -> {
+                UniProtCrossReference xref = new UniProtCrossReferenceBuilder()
+                        .database(new UniProtDatabaseImpl(db.getName()))
+                        .id("id_"+db.getName())
+                        .build();
+                xrefs.add(xref);
+                xrefs.add(xref);
+            });
+
             entry =
                     UniProtEntryBuilder.from(UniProtEntryIT.getCompleteUniProtEntry())
                             .primaryAccession("P00001")
+                            .uniProtCrossReferencesSet(xrefs)
                             .build();
 
             TaxonomyEntry taxonomyEntry = TaxonomyEntryTest.getCompleteTaxonomyEntry();
