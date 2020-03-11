@@ -20,13 +20,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.RDFMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.output.converter.*;
+import org.uniprot.core.json.parser.uniprot.UniprotJsonConfig;
 import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
  * Created 21/08/18
@@ -64,6 +64,13 @@ public class MessageConverterConfig {
      */
     @Bean
     public WebMvcConfigurer extendedMessageConverters() {
+        JsonMessageConverter<UniProtEntry> jsonMessageConverter =
+                new JsonMessageConverter<>(
+                        UniprotJsonConfig.getInstance().getSimpleObjectMapper(),
+                        UniProtEntry.class,
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB)
+                                .getReturnFields());
+
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -77,7 +84,7 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(0, new UniProtKBXmlMessageConverter());
-                converters.add(1, new UniProtKBJsonMessageConverter());
+                converters.add(1, jsonMessageConverter);
                 converters.add(2, new PublicationJsonMessageConverter());
             }
         };

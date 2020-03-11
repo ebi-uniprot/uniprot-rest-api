@@ -12,9 +12,9 @@ import lombok.Builder;
 import lombok.Data;
 
 import org.apache.commons.lang3.StringUtils;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.config.searchfield.model.SearchFieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;

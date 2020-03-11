@@ -30,7 +30,7 @@ public class PublicationJsonMessageConverter extends JsonMessageConverter<Public
         super(
                 PublicationJsonConfig.getInstance().getSimpleObjectMapper(),
                 PublicationEntry.class,
-                Arrays.asList(ResultFields.values()));
+                null); // TODO: fix return field before merge to master
     }
 
     enum ResultFields implements ReturnField {

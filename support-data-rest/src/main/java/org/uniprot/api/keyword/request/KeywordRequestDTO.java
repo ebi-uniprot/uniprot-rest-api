@@ -10,7 +10,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.KeywordField;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;

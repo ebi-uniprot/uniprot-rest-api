@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,8 +37,8 @@ class UniProtKBJsonMessageConverterTest {
     private ByteArrayOutputStream outputStream;
 
     @BeforeEach
-    void setUp() {
-        converter = new UniProtKBJsonMessageConverterTester();
+    void setUp() { // //TODO: REMOVE THIS TEST CLASS????
+        converter = new UniProtKBJsonMessageConverterTester(null, null, null);
         outputStream = new ByteArrayOutputStream();
     }
 
@@ -131,7 +132,12 @@ class UniProtKBJsonMessageConverterTest {
     // TODO: 08/11/18 test entity writing after flow has changed
 
     // class used to allow access methods before and after to test it properly...
-    private static class UniProtKBJsonMessageConverterTester extends UniProtKBJsonMessageConverter {
+    private static class UniProtKBJsonMessageConverterTester extends JsonMessageConverter {
+
+        public UniProtKBJsonMessageConverterTester(
+                ObjectMapper objectMapper, Class messageConverterEntryClass, List allFields) {
+            super(objectMapper, messageConverterEntryClass, allFields);
+        }
 
         @Override
         protected void before(MessageConverterContext context, OutputStream outputStream)

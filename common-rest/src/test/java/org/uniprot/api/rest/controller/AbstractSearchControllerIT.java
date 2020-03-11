@@ -33,6 +33,7 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -413,7 +414,6 @@ public abstract class AbstractSearchControllerIT {
     // ----------------------------------------- TEST RETURNED FIELDS
     // -----------------------------------------------
     @Test
-    @Disabled // @lgonzales: TRM-23571
     void searchFieldsWithCorrectValuesReturnSuccess(SearchParameter queryParameter)
             throws Exception {
         checkSearchParameterInput(queryParameter);
@@ -467,31 +467,31 @@ public abstract class AbstractSearchControllerIT {
                                         "Invalid fields parameter value 'otherInvalid'")));
     }
 
-    @Disabled // FIXME
     @Test
     void searchCanSearchWithAllAvailableReturnedFields() throws Exception {
 
         // given
         saveEntry(SaveScenario.SEARCH_ALL_RETURN_FIELDS);
 
-        List<String> returnFields = getAllReturnedFields();
+        List<ReturnField> returnFields = getAllReturnedFields();
         assertThat(returnFields, notNullValue());
         assertThat(returnFields, not(emptyIterable()));
 
-        for (String returnField : returnFields) {
+        for (ReturnField returnField : returnFields) {
             // when
             ResultActions response =
                     mockMvc.perform(
                             get(getSearchRequestPath())
                                     .param("query", "*:*")
-                                    .param("fields", returnField)
+                                    .param("fields", returnField.getName())
                                     .header(ACCEPT, APPLICATION_JSON_VALUE));
 
             // then
             response.andDo(print())
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+                    .andExpect(jsonPath("$.results.size()", greaterThan(0)))
+                    .andExpect(jsonPath("$.results[*]." + returnField.getPath()).exists());
         }
     }
 
@@ -770,7 +770,7 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract List<String> getAllFacetFields();
 
-    protected abstract List<String> getAllReturnedFields();
+    protected abstract List<ReturnField> getAllReturnedFields();
 
     protected abstract void saveEntry(SaveScenario saveContext);
 

@@ -9,11 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterEach;
@@ -24,12 +26,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
@@ -43,24 +47,28 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
+import org.uniprot.core.json.parser.uniprot.UniProtEntryIT;
+import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
 import org.uniprot.core.uniprot.comment.CommentType;
 import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
 import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.xdb.UniProtDatabaseImpl;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -68,12 +76,11 @@ import org.uniprot.store.indexer.uniprot.mockers.*;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
-import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.GoEvidences;
-import org.uniprot.store.search.domain.impl.UniProtResultFields;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -95,6 +102,8 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String ACCESSION_SP = "Q8DIA7";
 
     @Autowired private UniprotQueryRepository repository;
+
+    @Autowired private TaxonomyRepository taxRepository;
 
     private UniProtKBStoreClient storeClient;
 
@@ -120,6 +129,12 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 new UniProtKBStoreClient(
                         VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+
+        //Add taxonomy to the repo and and solr template injection..
+        dsm.addSolrClient(DataStoreManager.StoreType.TAXONOMY, SolrCollection.taxonomy);
+        SolrTemplate template = new SolrTemplate(getStoreManager().getSolrClient(DataStoreManager.StoreType.TAXONOMY));
+        template.afterPropertiesSet();
+        ReflectionTestUtils.setField(taxRepository, "solrTemplate", template);
     }
 
     @AfterEach
@@ -610,10 +625,9 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return UniProtResultFields.INSTANCE.getResultFields().stream()
-                .flatMap(fieldGroup -> fieldGroup.getFields().stream().map(Field::getName))
-                .collect(Collectors.toList());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB)
+                .getReturnFields();
     }
 
     @Override
@@ -738,19 +752,37 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     "go_" + code, Collections.singleton("Search All")));
 
             entry =
-                    new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
-                            .uniProtCrossReferencesAdd(
-                                    new UniProtCrossReferenceBuilder()
-                                            .database(new UniProtDatabaseImpl("Proteomes"))
-                                            .id("UP000000000")
-                                            .propertiesAdd(
-                                                    new UniProtDatabaseAttribute("a", "a", "a"),
-                                                    "value")
-                                            .build())
+                    UniProtEntryBuilder.from(UniProtEntryIT.getCompleteUniProtEntry())
+                            .primaryAccession("P00001")
                             .build();
+
+            TaxonomyEntry taxonomyEntry = TaxonomyEntryTest.getCompleteTaxonomyEntry();
+            TaxonomyDocument taxDoc = TaxonomyDocument.builder()
+                    .id("9606")
+                    .taxId(9606L)
+                    .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
+                    .build();
+            getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY,taxDoc);
+            taxDoc = TaxonomyDocument.builder()
+                    .id("197221")
+                    .taxId(197221L)
+                    .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
+                    .build();
+            getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY,taxDoc);
 
             getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
             getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
+        }
+    }
+
+    private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
+        try {
+            return ByteBuffer.wrap(
+                    TaxonomyJsonConfig.getInstance()
+                            .getFullObjectMapper()
+                            .writeValueAsBytes(entry));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
     }
 
@@ -878,7 +910,9 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("gene_primary,protein_name"))
+                    .queryParam(
+                            "fields",
+                            Collections.singletonList("accession,gene_primary,protein_name"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.primaryAccession",

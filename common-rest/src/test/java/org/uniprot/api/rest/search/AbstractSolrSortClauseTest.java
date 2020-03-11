@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * Created 01/10/2019
