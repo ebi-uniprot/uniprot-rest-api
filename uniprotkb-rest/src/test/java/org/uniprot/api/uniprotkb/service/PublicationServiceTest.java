@@ -24,7 +24,7 @@ import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.Submission;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 /**
@@ -36,7 +36,7 @@ class PublicationServiceTest {
     @Test
     void getPublicationsByUniprotAccessionCanReturnUniprotEntryPublications() {
         // when
-        UniProtEntry entry =
+        UniProtkbEntry entry =
                 UniprotKbObjectsForTests.getUniprotEntryForPublication("P12345", "200");
         UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
         when(storeClient.getEntry("P12345")).thenReturn(Optional.of(entry));
@@ -119,7 +119,7 @@ class PublicationServiceTest {
 
     @Test
     void getPublicationsByUniprotAccessionWithAllFacets() {
-        UniProtEntry entry =
+        UniProtkbEntry entry =
                 UniprotKbObjectsForTests.getUniprotEntryForPublication("P12345", "200");
         UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
         when(storeClient.getEntry("P12345")).thenReturn(Optional.of(entry));

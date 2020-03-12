@@ -7,7 +7,7 @@ import lombok.Data;
 
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStatistics;
-import org.uniprot.core.uniprot.UniProtReference;
+import org.uniprot.core.uniprotkb.UniProtkbReference;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -18,7 +18,7 @@ import org.uniprot.core.util.Utils;
 @Builder
 public class PublicationEntry {
 
-    private UniProtReference reference;
+    private UniProtkbReference reference;
 
     private LiteratureStatistics statistics;
 

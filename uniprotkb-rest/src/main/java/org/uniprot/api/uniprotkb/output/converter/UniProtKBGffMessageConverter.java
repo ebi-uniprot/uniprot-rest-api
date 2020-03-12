@@ -6,16 +6,18 @@ import java.io.OutputStream;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.parser.gff.uniprot.UniProtGffParser;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
 
-public class UniProtKBGffMessageConverter extends AbstractEntityHttpMessageConverter<UniProtEntry> {
+public class UniProtKBGffMessageConverter
+        extends AbstractEntityHttpMessageConverter<UniProtkbEntry> {
 
     public UniProtKBGffMessageConverter() {
-        super(UniProtMediaType.GFF_MEDIA_TYPE, UniProtEntry.class);
+        super(UniProtMediaType.GFF_MEDIA_TYPE, UniProtkbEntry.class);
     }
 
     @Override
-    protected void writeEntity(UniProtEntry entity, OutputStream outputStream) throws IOException {
+    protected void writeEntity(UniProtkbEntry entity, OutputStream outputStream)
+            throws IOException {
         outputStream.write((UniProtGffParser.convert(entity) + "\n").getBytes());
     }
 }
