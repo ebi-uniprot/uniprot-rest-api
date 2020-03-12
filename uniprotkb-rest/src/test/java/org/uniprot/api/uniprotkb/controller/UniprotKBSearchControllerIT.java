@@ -16,6 +16,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterEach;
@@ -54,6 +55,7 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniProtEntryIT;
+import org.uniprot.core.json.parser.uniprot.UniprotJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
@@ -772,6 +774,13 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             .primaryAccession("P00001")
                             .uniProtCrossReferencesSet(xrefs)
                             .build();
+
+            ObjectMapper mapper = UniprotJsonConfig.getInstance().getSimpleObjectMapper();
+            try {
+                System.out.println(mapper.writeValueAsString(entry));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
 
             TaxonomyEntry taxonomyEntry = TaxonomyEntryTest.getCompleteTaxonomyEntry();
             TaxonomyDocument taxDoc = TaxonomyDocument.builder()
