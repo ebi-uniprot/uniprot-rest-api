@@ -1,5 +1,10 @@
 package org.uniprot.api.configure.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
 import org.uniprot.api.configure.uniprot.domain.model.UniProtKBResultField;
@@ -11,11 +16,6 @@ import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
 import org.uniprot.store.search.domain.Tuple;
 import org.uniprot.store.search.domain.impl.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UniProtConfigureService {

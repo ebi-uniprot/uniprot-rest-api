@@ -28,7 +28,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.subcell.request.SubcellularLocationRequestDTO;
 import org.uniprot.api.subcell.service.SubcellularLocationService;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.store.search.field.SubcellularLocationField;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author lgonzales
@@ -73,7 +73,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.subcellularLocation.invalid.id}")
                     String subcellularLocationId,
-            @ValidReturnFields(fieldValidatorClazz = SubcellularLocationField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

@@ -11,7 +11,6 @@ import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.SubcellularLocationField;
 
 @Data
 public class SubcellularLocationRequestDTO implements SearchRequest {
@@ -28,7 +27,7 @@ public class SubcellularLocationRequestDTO implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = SubcellularLocationField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String fields;
 
     @Positive(message = "{search.positive}")

@@ -29,7 +29,7 @@ import org.uniprot.api.taxonomy.request.TaxonomyRequestDTO;
 import org.uniprot.api.taxonomy.service.TaxonomyService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
-import org.uniprot.store.search.field.TaxonomyField;
+import org.uniprot.store.config.UniProtDataType;
 
 @RestController
 @RequestMapping("/taxonomy")
@@ -69,7 +69,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.taxonomy.invalid.id}")
                     String taxonId,
-            @ValidReturnFields(fieldValidatorClazz = TaxonomyField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

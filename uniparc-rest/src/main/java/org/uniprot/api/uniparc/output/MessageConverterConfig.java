@@ -22,9 +22,13 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
+import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.uniparc.output.converter.*;
+import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
  * @author jluo
@@ -67,7 +71,14 @@ public class MessageConverterConfig {
                 converters.add(new UniParcTsvMessageConverter());
                 converters.add(new UniParcXslMessageConverter());
 
-                converters.add(0, new UniParcJsonMessageConverter());
+                JsonMessageConverter<UniParcEntry> uniparcJsonConverter =
+                        new JsonMessageConverter<>(
+                                UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniParcEntry.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.UNIPARC)
+                                        .getReturnFields());
+                converters.add(0, uniparcJsonConverter);
                 converters.add(1, new UniParcXmlMessageConverter(""));
             }
         };

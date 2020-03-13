@@ -6,7 +6,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.DiseaseField;
 
 @Component
 public class DiseaseSolrSortClause extends AbstractSolrSortClause {

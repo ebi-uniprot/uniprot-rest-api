@@ -8,9 +8,8 @@ import lombok.Data;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.UniParcField;
-import org.uniprot.store.search.field.UniParcResultFields;
 
 import com.google.common.base.Strings;
 
@@ -32,7 +31,7 @@ public class UniParcRequest implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = UniParcResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 
     @ValidFacets(facetConfig = UniParcFacetConfig.class)

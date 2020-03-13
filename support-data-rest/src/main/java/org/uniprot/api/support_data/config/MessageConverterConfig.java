@@ -1,6 +1,5 @@
 package org.uniprot.api.support_data.config;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -37,6 +36,8 @@ import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.search.field.*;
 
 @Configuration
@@ -92,42 +93,54 @@ public class MessageConverterConfig {
                         new JsonMessageConverter<>(
                                 LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
                                 LiteratureEntry.class,
-                                Arrays.asList(LiteratureField.ResultFields.values()));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.LITERATURE)
+                                        .getReturnFields());
                 converters.add(0, litJsonConverter);
 
                 JsonMessageConverter<KeywordEntry> keywordJsonConverter =
                         new JsonMessageConverter<>(
                                 KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
                                 KeywordEntry.class,
-                                Arrays.asList(KeywordField.ResultFields.values()));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.KEYWORD)
+                                        .getReturnFields());
                 converters.add(0, keywordJsonConverter);
 
                 JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
                         new JsonMessageConverter<>(
                                 TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
                                 TaxonomyEntry.class,
-                                Arrays.asList(TaxonomyField.ResultFields.values()));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.TAXONOMY)
+                                        .getReturnFields());
                 converters.add(0, taxonomyJsonConverter);
 
                 JsonMessageConverter<SubcellularLocationEntry> subcellJsonConverter =
                         new JsonMessageConverter<>(
                                 SubcellularLocationJsonConfig.getInstance().getSimpleObjectMapper(),
                                 SubcellularLocationEntry.class,
-                                Arrays.asList(SubcellularLocationField.ResultFields.values()));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.SUBCELLLOCATION)
+                                        .getReturnFields());
                 converters.add(0, subcellJsonConverter);
 
                 JsonMessageConverter<DiseaseEntry> diseaseJsonConverter =
-                        new JsonMessageConverter(
+                        new JsonMessageConverter<>(
                                 DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
                                 DiseaseEntry.class,
-                                Arrays.asList(DiseaseField.ResultFields.values()));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.DISEASE)
+                                        .getReturnFields());
                 converters.add(0, diseaseJsonConverter);
 
                 JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
                         new JsonMessageConverter<>(
                                 CrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
                                 CrossRefEntry.class,
-                                Arrays.asList(CrossRefField.ResultFields.values()));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.CROSSREF)
+                                        .getReturnFields());
                 converters.add(0, xrefJsonConverter);
             }
         };

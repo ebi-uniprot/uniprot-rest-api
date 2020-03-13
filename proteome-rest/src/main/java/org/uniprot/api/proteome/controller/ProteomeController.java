@@ -30,7 +30,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.ProteomeEntry;
-import org.uniprot.store.search.field.ProteomeResultFields;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
@@ -92,7 +92,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
-            @ValidReturnFields(fieldValidatorClazz = ProteomeResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

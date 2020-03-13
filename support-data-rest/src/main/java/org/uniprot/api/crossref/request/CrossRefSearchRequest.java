@@ -9,7 +9,6 @@ import org.uniprot.api.crossref.config.CrossRefFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.CrossRefField;
 
 @Data
 public class CrossRefSearchRequest implements SearchRequest {
@@ -28,7 +27,7 @@ public class CrossRefSearchRequest implements SearchRequest {
     @ValidFacets(facetConfig = CrossRefFacetConfig.class)
     private String facets;
 
-    @ValidReturnFields(fieldValidatorClazz = CrossRefField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
     private String fields;
 
     @Positive(message = "{search.positive}")

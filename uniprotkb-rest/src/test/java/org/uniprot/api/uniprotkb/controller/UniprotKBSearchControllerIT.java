@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterEach;
@@ -91,6 +90,8 @@ import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
@@ -139,9 +140,11 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                         VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
 
-        //Add taxonomy to the repo and and solr template injection..
+        // Add taxonomy to the repo and and solr template injection..
         dsm.addSolrClient(DataStoreManager.StoreType.TAXONOMY, SolrCollection.taxonomy);
-        SolrTemplate template = new SolrTemplate(getStoreManager().getSolrClient(DataStoreManager.StoreType.TAXONOMY));
+        SolrTemplate template =
+                new SolrTemplate(
+                        getStoreManager().getSolrClient(DataStoreManager.StoreType.TAXONOMY));
         template.afterPropertiesSet();
         ReflectionTestUtils.setField(taxRepository, "solrTemplate", template);
     }
@@ -448,8 +451,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession:Q00007")
+                                get(SEARCH_RESOURCE + "?query=accession:Q00007")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -483,8 +485,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=mnemonic:I8FBX2_YERPE")
+                                get(SEARCH_RESOURCE + "?query=mnemonic:I8FBX2_YERPE")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -707,34 +708,40 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.proteomes.add("UP000000000");
 
             List<UniProtCrossReference> xrefs = new ArrayList<>();
-            UniProtDatabaseTypes.INSTANCE.getAllDbTypes()
-                    .forEach(db -> {
-                        doc.xrefCountMap.put("xref_count_" + db.getName().toLowerCase(), 0L);
+            UniProtDatabaseTypes.INSTANCE
+                    .getAllDbTypes()
+                    .forEach(
+                            db -> {
+                                doc.xrefCountMap.put(
+                                        "xref_count_" + db.getName().toLowerCase(), 0L);
 
-                        UniProtCrossReference xref = new UniProtCrossReferenceBuilder()
-                                .database(new UniProtDatabaseImpl(db.getName()))
-                                .id("id_"+db.getName())
-                                .build();
-                        xrefs.add(xref);
-                    });
+                                UniProtCrossReference xref =
+                                        new UniProtCrossReferenceBuilder()
+                                                .database(new UniProtDatabaseImpl(db.getName()))
+                                                .id("id_" + db.getName())
+                                                .build();
+                                xrefs.add(xref);
+                            });
 
             List<Feature> features = new ArrayList<>();
             Arrays.stream(FeatureType.values())
-                    .forEach(type -> {
-                        String typeName = type.getName().toLowerCase();
-                        doc.featuresMap.put(
-                                "ft_" + typeName, Collections.singleton("Search All"));
-                        doc.featureEvidenceMap.put(
-                                "ftev_" + typeName, Collections.singleton("Search All"));
-                        doc.featureLengthMap.put(
-                                "ftlen_" + typeName, Collections.singleton(10));
+                    .forEach(
+                            type -> {
+                                String typeName = type.getName().toLowerCase();
+                                doc.featuresMap.put(
+                                        "ft_" + typeName, Collections.singleton("Search All"));
+                                doc.featureEvidenceMap.put(
+                                        "ftev_" + typeName, Collections.singleton("Search All"));
+                                doc.featureLengthMap.put(
+                                        "ftlen_" + typeName, Collections.singleton(10));
 
-                        Feature feature = new FeatureBuilder()
-                                .type(type)
-                                .description("Type description")
-                                .build();
-                        features.add(feature);
-                    });
+                                Feature feature =
+                                        new FeatureBuilder()
+                                                .type(type)
+                                                .description("Type description")
+                                                .build();
+                                features.add(feature);
+                            });
 
             Arrays.stream(FeatureCategory.values())
                     .map(type -> type.getName().toLowerCase())
@@ -750,18 +757,22 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
             List<Comment> comments = new ArrayList<>();
             Arrays.stream(CommentType.values())
-                    .forEach(type -> {
-                        String typeName = type.name().toLowerCase();
-                        doc.commentMap.put("cc_" + typeName, Collections.singleton("Search All"));
-                        doc.commentEvMap.put("ccev_" + typeName, Collections.singleton("Search All"));
-                        if(FreeTextCommentImpl.isFreeTextCommentType(type)){
-                            FreeTextComment freeText = new FreeTextCommentBuilder()
-                                    .commentType(type)
-                                    .molecule(type+" molecule")
-                                    .build();
-                            comments.add(freeText);
-                        }
-                    });
+                    .forEach(
+                            type -> {
+                                String typeName = type.name().toLowerCase();
+                                doc.commentMap.put(
+                                        "cc_" + typeName, Collections.singleton("Search All"));
+                                doc.commentEvMap.put(
+                                        "ccev_" + typeName, Collections.singleton("Search All"));
+                                if (FreeTextCommentImpl.isFreeTextCommentType(type)) {
+                                    FreeTextComment freeText =
+                                            new FreeTextCommentBuilder()
+                                                    .commentType(type)
+                                                    .molecule(type + " molecule")
+                                                    .build();
+                                    comments.add(freeText);
+                                }
+                            });
 
             List<String> goAssertionCodes =
                     GoEvidences.INSTANCE.getEvidences().stream()
@@ -781,26 +792,29 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
             UniProtEntry completeEntry = UniProtEntryIT.getCompleteUniProtEntry();
             comments.addAll(completeEntry.getComments());
-            entry = UniProtEntryBuilder.from(completeEntry)
-                    .primaryAccession("P00001")
-                    .uniProtCrossReferencesSet(xrefs)
-                    .featuresSet(features)
-                    .commentsSet(comments)
-                    .build();
+            entry =
+                    UniProtEntryBuilder.from(completeEntry)
+                            .primaryAccession("P00001")
+                            .uniProtCrossReferencesSet(xrefs)
+                            .featuresSet(features)
+                            .commentsSet(comments)
+                            .build();
 
             TaxonomyEntry taxonomyEntry = TaxonomyEntryTest.getCompleteTaxonomyEntry();
-            TaxonomyDocument taxDoc = TaxonomyDocument.builder()
-                    .id("9606")
-                    .taxId(9606L)
-                    .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
-                    .build();
-            getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY,taxDoc);
-            taxDoc = TaxonomyDocument.builder()
-                    .id("197221")
-                    .taxId(197221L)
-                    .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
-                    .build();
-            getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY,taxDoc);
+            TaxonomyDocument taxDoc =
+                    TaxonomyDocument.builder()
+                            .id("9606")
+                            .taxId(9606L)
+                            .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
+                            .build();
+            getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, taxDoc);
+            taxDoc =
+                    TaxonomyDocument.builder()
+                            .id("197221")
+                            .taxId(197221L)
+                            .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
+                            .build();
+            getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, taxDoc);
 
             getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
             getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);

@@ -9,7 +9,6 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.TaxonomyField;
 
 @Data
 public class TaxonomyRequestDTO implements SearchRequest {
@@ -26,7 +25,7 @@ public class TaxonomyRequestDTO implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = TaxonomyField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)

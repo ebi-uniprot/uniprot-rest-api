@@ -29,7 +29,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.store.search.field.LiteratureField;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author lgonzales
@@ -73,7 +73,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.literature.invalid.id}")
                     String literatureId,
-            @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

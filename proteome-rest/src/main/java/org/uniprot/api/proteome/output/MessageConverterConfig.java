@@ -23,9 +23,13 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
+import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.proteome.ProteomeEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
  * @author jluo
@@ -67,10 +71,25 @@ public class MessageConverterConfig {
 
                 converters.add(new ProteomeTsvMessageConverter());
                 converters.add(new ProteomeXslMessageConverter());
-                converters.add(0, new ProteomeJsonMessageConverter());
+
+                JsonMessageConverter<ProteomeEntry> proteomeJsonConverter =
+                        new JsonMessageConverter<>(
+                                ProteomeJsonConfig.getInstance().getSimpleObjectMapper(),
+                                ProteomeEntry.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.PROTEOME)
+                                        .getReturnFields());
+                converters.add(0, proteomeJsonConverter);
                 converters.add(1, new ProteomeXmlMessageConverter());
 
-                converters.add(0, new GeneCentricJsonMessageConverter());
+                JsonMessageConverter<CanonicalProtein> geneCentricJsonConverter =
+                        new JsonMessageConverter<>(
+                                ProteomeJsonConfig.getInstance().getSimpleObjectMapper(),
+                                CanonicalProtein.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                                UniProtDataType.GENECENTRIC)
+                                        .getReturnFields());
+                converters.add(0, geneCentricJsonConverter);
                 converters.add(1, new GeneCentricXmlMessageConverter());
             }
         };

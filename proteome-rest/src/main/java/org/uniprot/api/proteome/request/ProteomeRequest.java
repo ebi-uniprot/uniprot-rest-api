@@ -8,9 +8,8 @@ import lombok.Data;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.ProteomeField;
-import org.uniprot.store.search.field.ProteomeResultFields;
 
 import com.google.common.base.Strings;
 
@@ -32,7 +31,7 @@ public class ProteomeRequest implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = ProteomeResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String fields;
 
     @ValidFacets(facetConfig = ProteomeFacetConfig.class)

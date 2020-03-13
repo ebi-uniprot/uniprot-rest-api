@@ -11,7 +11,6 @@ import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.KeywordField;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,7 +37,7 @@ public class KeywordRequestDTO implements SearchRequest {
 
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_return_field_meta.json")
-    @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
     private String fields;
 
     @Parameter(description = "Size of the result. Defaults to 25")

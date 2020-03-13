@@ -9,7 +9,6 @@ import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.LiteratureField;
 
 /**
  * @author lgonzales
@@ -30,7 +29,7 @@ public class LiteratureRequestDTO implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
     private String fields;
 
     @Positive(message = "{search.positive}")

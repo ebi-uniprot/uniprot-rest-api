@@ -25,7 +25,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.config.UniProtDataType;
 
 @RestController
 @RequestMapping("/disease")
@@ -62,7 +62,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.disease.invalid.id}")
                     String accession,
-            @ValidReturnFields(fieldValidatorClazz = DiseaseField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

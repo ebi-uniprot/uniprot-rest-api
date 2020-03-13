@@ -489,10 +489,11 @@ public abstract class AbstractSearchControllerIT {
                                     .header(ACCEPT, APPLICATION_JSON_VALUE));
 
             String returnFieldValidatePath = "$.results[*]." + returnField.getPath();
-            if(Utils.notNullNotEmpty(returnField.getFilter())){
+            if (Utils.notNullNotEmpty(returnField.getFilter())) {
                 returnFieldValidatePath += returnField.getFilter();
             }
-            log.info("ReturnField:"+returnField.getName()+" Validation Path: "+returnFieldValidatePath);
+            log.info("ReturnField:" + returnField.getName() +
+                    " Validation Path: " + returnFieldValidatePath);
 
             // then
             response.andDo(print())
