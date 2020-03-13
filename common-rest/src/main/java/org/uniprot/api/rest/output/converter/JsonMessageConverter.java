@@ -155,9 +155,9 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     private SimpleFilterProvider getFieldsFilterProvider(List<ReturnField> fields) {
         String fieldsPath =
                 fields.stream()
-                        .map(ReturnField::getPath)//
+                        .map(ReturnField::getPath) //
                         .map(path -> path.replaceAll("\\[\\*]", ""))
-                        //.map(path -> path.replaceAll("(\\[\\*])", ".*"))
+                        // .map(path -> path.replaceAll("(\\[\\*])", ".*"))
                         .collect(Collectors.joining(","));
 
         SquigglyPropertyFilter filter =

@@ -16,7 +16,6 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterEach;
@@ -55,16 +54,20 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniProtEntryIT;
-import org.uniprot.core.json.parser.uniprot.UniprotJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.core.uniprot.UniProtEntryType;
+import org.uniprot.core.uniprot.comment.Comment;
 import org.uniprot.core.uniprot.comment.CommentType;
+import org.uniprot.core.uniprot.comment.FreeTextComment;
+import org.uniprot.core.uniprot.comment.impl.FreeTextCommentBuilder;
+import org.uniprot.core.uniprot.comment.impl.FreeTextCommentImpl;
+import org.uniprot.core.uniprot.feature.Feature;
 import org.uniprot.core.uniprot.feature.FeatureCategory;
 import org.uniprot.core.uniprot.feature.FeatureType;
+import org.uniprot.core.uniprot.feature.impl.FeatureBuilder;
 import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
 import org.uniprot.core.uniprot.xdb.UniProtCrossReference;
-import org.uniprot.core.uniprot.xdb.UniProtDatabase;
 import org.uniprot.core.uniprot.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
@@ -86,7 +89,6 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
-import org.uniprot.store.search.domain.impl.Databases;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
 @ContextConfiguration(
@@ -447,7 +449,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=accession:Q00007&fields=accession,organism")
+                                                + "?query=accession:Q00007")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -482,7 +484,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=mnemonic:I8FBX2_YERPE&fields=accession,organism")
+                                                + "?query=mnemonic:I8FBX2_YERPE")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -704,21 +706,35 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
 
-            UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
-                    .map(db -> db.getName().toLowerCase())
-                    .forEach(dbName -> doc.xrefCountMap.put("xref_count_" + dbName, 0L));
+            List<UniProtCrossReference> xrefs = new ArrayList<>();
+            UniProtDatabaseTypes.INSTANCE.getAllDbTypes()
+                    .forEach(db -> {
+                        doc.xrefCountMap.put("xref_count_" + db.getName().toLowerCase(), 0L);
 
+                        UniProtCrossReference xref = new UniProtCrossReferenceBuilder()
+                                .database(new UniProtDatabaseImpl(db.getName()))
+                                .id("id_"+db.getName())
+                                .build();
+                        xrefs.add(xref);
+                    });
+
+            List<Feature> features = new ArrayList<>();
             Arrays.stream(FeatureType.values())
-                    .map(type -> type.getName().toLowerCase())
-                    .forEach(
-                            type -> {
-                                doc.featuresMap.put(
-                                        "ft_" + type, Collections.singleton("Search All"));
-                                doc.featureEvidenceMap.put(
-                                        "ftev_" + type, Collections.singleton("Search All"));
-                                doc.featureLengthMap.put(
-                                        "ftlen_" + type, Collections.singleton(10));
-                            });
+                    .forEach(type -> {
+                        String typeName = type.getName().toLowerCase();
+                        doc.featuresMap.put(
+                                "ft_" + typeName, Collections.singleton("Search All"));
+                        doc.featureEvidenceMap.put(
+                                "ftev_" + typeName, Collections.singleton("Search All"));
+                        doc.featureLengthMap.put(
+                                "ftlen_" + typeName, Collections.singleton(10));
+
+                        Feature feature = new FeatureBuilder()
+                                .type(type)
+                                .description("Type description")
+                                .build();
+                        features.add(feature);
+                    });
 
             Arrays.stream(FeatureCategory.values())
                     .map(type -> type.getName().toLowerCase())
@@ -732,15 +748,20 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         "ftlen_" + type, Collections.singleton(10));
                             });
 
+            List<Comment> comments = new ArrayList<>();
             Arrays.stream(CommentType.values())
-                    .map(type -> type.name().toLowerCase())
-                    .forEach(
-                            type -> {
-                                doc.commentMap.put(
-                                        "cc_" + type, Collections.singleton("Search All"));
-                                doc.commentEvMap.put(
-                                        "ccev_" + type, Collections.singleton("Search All"));
-                            });
+                    .forEach(type -> {
+                        String typeName = type.name().toLowerCase();
+                        doc.commentMap.put("cc_" + typeName, Collections.singleton("Search All"));
+                        doc.commentEvMap.put("ccev_" + typeName, Collections.singleton("Search All"));
+                        if(FreeTextCommentImpl.isFreeTextCommentType(type)){
+                            FreeTextComment freeText = new FreeTextCommentBuilder()
+                                    .commentType(type)
+                                    .molecule(type+" molecule")
+                                    .build();
+                            comments.add(freeText);
+                        }
+                    });
 
             List<String> goAssertionCodes =
                     GoEvidences.INSTANCE.getEvidences().stream()
@@ -758,29 +779,14 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.goWithEvidenceMaps.put(
                                     "go_" + code, Collections.singleton("Search All")));
 
-
-            List<UniProtCrossReference> xrefs = new ArrayList<>();
-            UniProtDatabaseTypes.INSTANCE.getAllDbTypes().forEach(db -> {
-                UniProtCrossReference xref = new UniProtCrossReferenceBuilder()
-                        .database(new UniProtDatabaseImpl(db.getName()))
-                        .id("id_"+db.getName())
-                        .build();
-                xrefs.add(xref);
-                xrefs.add(xref);
-            });
-
-            entry =
-                    UniProtEntryBuilder.from(UniProtEntryIT.getCompleteUniProtEntry())
-                            .primaryAccession("P00001")
-                            .uniProtCrossReferencesSet(xrefs)
-                            .build();
-
-            ObjectMapper mapper = UniprotJsonConfig.getInstance().getSimpleObjectMapper();
-            try {
-                System.out.println(mapper.writeValueAsString(entry));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            UniProtEntry completeEntry = UniProtEntryIT.getCompleteUniProtEntry();
+            comments.addAll(completeEntry.getComments());
+            entry = UniProtEntryBuilder.from(completeEntry)
+                    .primaryAccession("P00001")
+                    .uniProtCrossReferencesSet(xrefs)
+                    .featuresSet(features)
+                    .commentsSet(comments)
+                    .build();
 
             TaxonomyEntry taxonomyEntry = TaxonomyEntryTest.getCompleteTaxonomyEntry();
             TaxonomyDocument taxDoc = TaxonomyDocument.builder()

@@ -4,8 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -19,7 +17,6 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.common.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
 
 /**
  * This Return Fields Constraint Validator class is responsible to verify if the inputted return

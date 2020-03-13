@@ -3,15 +3,12 @@ package org.uniprot.api.rest.validation;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.ReturnField;
 
 /**
  * Unit Test class to validate ReturnFieldsValidator class behaviour
