@@ -1,25 +1,23 @@
 package org.uniprot.api.configure.uniprot.domain.model;
 
-import static java.util.stream.Collectors.groupingBy;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
+import lombok.Data;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
+import org.uniprot.store.config.returnfield.model.ReturnFieldItemType;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.Builder;
-import lombok.Data;
-
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.common.ReturnFieldConfig;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ResultFieldItemType;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Created 10/03/2020
@@ -78,7 +76,7 @@ public class UniProtKBResultField {
     private static Map<String, List<UniProtKBResultField>> extractGroupToFieldsMappings(
             List<ReturnField> allFields) {
         return allFields.stream()
-                .filter(field -> field.getItemType().equals(ResultFieldItemType.SINGLE))
+                .filter(field -> field.getItemType().equals(ReturnFieldItemType.SINGLE))
                 .map(
                         field ->
                                 UniProtKBResultField.builder()
@@ -92,7 +90,7 @@ public class UniProtKBResultField {
 
     private static List<UniProtKBResultField> extractOrderedGroups(List<ReturnField> allFields) {
         return allFields.stream()
-                .filter(field -> field.getItemType().equals(ResultFieldItemType.GROUP))
+                .filter(field -> field.getItemType().equals(ReturnFieldItemType.GROUP))
                 .map(
                         rawGroup ->
                                 UniProtKBResultField.builder()
