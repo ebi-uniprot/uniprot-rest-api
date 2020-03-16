@@ -1,6 +1,9 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -10,15 +13,15 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.builder.SequenceBuilder;
 import org.uniprot.core.gene.Gene;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.UniProtEntryType;
-import org.uniprot.core.uniprot.builder.GeneBuilder;
-import org.uniprot.core.uniprot.builder.GeneNameBuilder;
-import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.taxonomy.Organism;
-import org.uniprot.core.uniprot.taxonomy.builder.OrganismBuilder;
+import org.uniprot.core.impl.SequenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntryType;
+import org.uniprot.core.uniprotkb.impl.GeneBuilder;
+import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtkbEntryBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.Organism;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -127,15 +130,15 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        List<UniProtEntry> entries =
+        List<UniProtkbEntry> entries =
                 UniProtEntryMocker.cloneEntries(UniProtEntryMocker.Type.SP, numberOfEntries);
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entries);
     }
 
     @Override
     protected void saveEntry(String accession, long suffix) {
-        UniProtEntry entry = UniProtEntryMocker.create(accession);
-        UniProtEntryBuilder builder = UniProtEntryBuilder.from(entry);
+        UniProtkbEntry entry = UniProtEntryMocker.create(accession);
+        UniProtkbEntryBuilder builder = UniProtkbEntryBuilder.from(entry);
         Gene gene = entry.getGenes().get(0);
         if (ACC1.equals(accession)) {
             builder.organism(getOrganism("root", 1));
@@ -157,7 +160,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
             builder.sequence(new SequenceBuilder(SEQUENCE3).build());
         }
 
-        builder.entryType(UniProtEntryType.SWISSPROT);
+        builder.entryType(UniProtkbEntryType.SWISSPROT);
 
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, builder.build());
     }
