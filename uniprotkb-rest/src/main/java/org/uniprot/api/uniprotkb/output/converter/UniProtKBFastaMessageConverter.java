@@ -5,17 +5,18 @@ import java.io.OutputStream;
 
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
-import org.uniprot.core.parser.fasta.uniprot.UniprotFastaParser;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.parser.fasta.uniprot.UniprotkbFastaParser;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
 
 public class UniProtKBFastaMessageConverter
-        extends AbstractEntityHttpMessageConverter<UniProtEntry> {
+        extends AbstractEntityHttpMessageConverter<UniProtkbEntry> {
     public UniProtKBFastaMessageConverter() {
-        super(UniProtMediaType.FASTA_MEDIA_TYPE, UniProtEntry.class);
+        super(UniProtMediaType.FASTA_MEDIA_TYPE, UniProtkbEntry.class);
     }
 
     @Override
-    protected void writeEntity(UniProtEntry entity, OutputStream outputStream) throws IOException {
-        outputStream.write((UniprotFastaParser.create(entity).toString() + "\n").getBytes());
+    protected void writeEntity(UniProtkbEntry entity, OutputStream outputStream)
+            throws IOException {
+        outputStream.write((UniprotkbFastaParser.create(entity).toString() + "\n").getBytes());
     }
 }

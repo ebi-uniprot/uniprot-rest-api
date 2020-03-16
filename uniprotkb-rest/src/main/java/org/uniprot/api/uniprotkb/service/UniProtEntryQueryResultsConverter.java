@@ -14,13 +14,13 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.json.parser.uniprot.UniprotJsonConfig;
+import org.uniprot.core.json.parser.uniprot.UniprotkbJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.uniprot.*;
-import org.uniprot.core.uniprot.impl.EntryInactiveReasonBuilder;
-import org.uniprot.core.uniprot.impl.UniProtAccessionBuilder;
-import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.impl.UniProtIdBuilder;
+import org.uniprot.core.uniprotkb.*;
+import org.uniprot.core.uniprotkb.impl.EntryInactiveReasonBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtkbAccessionBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtkbEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtkbIdBuilder;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.UniProtField;
 
@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>}
- * instances to {@code QueryResult<UniProtEntry>} or {@code Optional<UniProtEntry>}. It is used in
- * {@link UniProtEntryService}.
+ * instances to {@code QueryResult<UniProtkbEntry>} or {@code Optional<UniProtkbEntry>}. It is used
+ * in {@link UniProtEntryService}.
  *
  * <p>Note, this class will be replaced once we finalise a core domain model, which is the single
  * entity returned from by requests -- and on which all message converters will operate.
@@ -57,9 +57,9 @@ class UniProtEntryQueryResultsConverter {
         this.taxonomyService = taxonomyService;
     }
 
-    QueryResult<UniProtEntry> convertQueryResult(
+    QueryResult<UniProtkbEntry> convertQueryResult(
             QueryResult<UniProtDocument> results, Map<String, List<String>> filters) {
-        List<UniProtEntry> upEntries =
+        List<UniProtkbEntry> upEntries =
                 results.getContent().stream()
                         .map(doc -> convertDoc(doc, filters))
                         .filter(Optional::isPresent)
@@ -69,9 +69,9 @@ class UniProtEntryQueryResultsConverter {
                 upEntries, results.getPage(), results.getFacets(), results.getMatchedFields());
     }
 
-    Optional<UniProtEntry> convertDoc(UniProtDocument doc, Map<String, List<String>> filters) {
+    Optional<UniProtkbEntry> convertDoc(UniProtDocument doc, Map<String, List<String>> filters) {
         if (doc.active) {
-            Optional<UniProtEntry> opEntry = getEntryFromStore(doc, filters);
+            Optional<UniProtkbEntry> opEntry = getEntryFromStore(doc, filters);
             if (hasLineage(filters)) {
                 return addLineage(opEntry);
             } else return opEntry;
@@ -84,20 +84,20 @@ class UniProtEntryQueryResultsConverter {
         return filters.containsKey("lineage");
     }
 
-    private Optional<UniProtEntry> addLineage(Optional<UniProtEntry> opEntry) {
+    private Optional<UniProtkbEntry> addLineage(Optional<UniProtkbEntry> opEntry) {
         if (opEntry.isPresent()) {
             TaxonomyEntry taxEntry =
                     taxonomyService.findById(opEntry.get().getOrganism().getTaxonId());
             if (taxEntry == null) {
                 return opEntry;
             }
-            UniProtEntryBuilder builder = UniProtEntryBuilder.from(opEntry.get());
+            UniProtkbEntryBuilder builder = UniProtkbEntryBuilder.from(opEntry.get());
             return Optional.of(builder.lineagesSet(taxEntry.getLineages()).build());
         } else return opEntry;
     }
 
-    private Optional<UniProtEntry> getInactiveUniProtEntry(UniProtDocument doc) {
-        UniProtAccession accession = new UniProtAccessionBuilder(doc.accession).build();
+    private Optional<UniProtkbEntry> getInactiveUniProtEntry(UniProtDocument doc) {
+        UniProtkbAccession accession = new UniProtkbAccessionBuilder(doc.accession).build();
         List<String> mergeDemergeList = new ArrayList<>();
 
         String[] reasonItems = doc.inactiveReason.split(":");
@@ -106,31 +106,31 @@ class UniProtEntryQueryResultsConverter {
             mergeDemergeList.addAll(Arrays.asList(reasonItems[1].split(",")));
         }
 
-        UniProtId uniProtId = new UniProtIdBuilder(doc.id).build();
+        UniProtkbId uniProtkbId = new UniProtkbIdBuilder(doc.id).build();
         EntryInactiveReason inactiveReason =
                 new EntryInactiveReasonBuilder()
                         .type(type)
                         .mergeDemergeTosSet(mergeDemergeList)
                         .build();
 
-        UniProtEntryBuilder entryBuilder =
-                new UniProtEntryBuilder(accession, uniProtId, inactiveReason);
+        UniProtkbEntryBuilder entryBuilder =
+                new UniProtkbEntryBuilder(accession, uniProtkbId, inactiveReason);
         return Optional.of(entryBuilder.build());
     }
 
-    private Optional<UniProtEntry> getEntryFromStore(
+    private Optional<UniProtkbEntry> getEntryFromStore(
             UniProtDocument doc, Map<String, List<String>> filters) {
         if (FieldsParser.isDefaultFilters(filters) && (doc.avroBinary != null)) {
-            UniProtEntry uniProtEntry = null;
+            UniProtkbEntry uniProtkbEntry = null;
 
             try {
                 byte[] decodeEntry = Base64.getDecoder().decode(doc.avroBinary);
-                ObjectMapper jsonMapper = UniprotJsonConfig.getInstance().getFullObjectMapper();
-                uniProtEntry = jsonMapper.readValue(decodeEntry, UniProtEntry.class);
+                ObjectMapper jsonMapper = UniprotkbJsonConfig.getInstance().getFullObjectMapper();
+                uniProtkbEntry = jsonMapper.readValue(decodeEntry, UniProtkbEntry.class);
             } catch (IOException e) {
-                LOGGER.info("Error converting solr avro_binary default UniProtEntry", e);
+                LOGGER.info("Error converting solr avro_binary default UniProtkbEntry", e);
             }
-            if (Objects.isNull(uniProtEntry)) {
+            if (Objects.isNull(uniProtkbEntry)) {
                 return Optional.empty();
             }
             if (filters.containsKey(UniProtField.ResultFields.mass.name())
@@ -140,11 +140,11 @@ class UniProtEntryQueryResultsConverter {
                 SequenceBuilder seq =
                         new SequenceBuilder(new String(fakeSeqArrayWithCorrectLength));
                 // seq.molWeight(doc.seqMass); //TODO: TRM-22339 assigned to Jie
-                UniProtEntryBuilder entryBuilder = UniProtEntryBuilder.from(uniProtEntry);
+                UniProtkbEntryBuilder entryBuilder = UniProtkbEntryBuilder.from(uniProtkbEntry);
                 entryBuilder.sequence(seq.build());
-                uniProtEntry = entryBuilder.build();
+                uniProtkbEntry = entryBuilder.build();
             }
-            return Optional.of(uniProtEntry);
+            return Optional.of(uniProtkbEntry);
         } else {
             return Failsafe.with(retryPolicy).get(() -> entryStore.getEntry(doc.accession));
         }

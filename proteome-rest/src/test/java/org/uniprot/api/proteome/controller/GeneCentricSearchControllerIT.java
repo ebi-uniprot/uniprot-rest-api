@@ -38,7 +38,7 @@ import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.proteome.Protein;
 import org.uniprot.core.proteome.impl.CanonicalProteinBuilder;
 import org.uniprot.core.proteome.impl.ProteinBuilder;
-import org.uniprot.core.uniprot.UniProtEntryType;
+import org.uniprot.core.uniprotkb.UniProtkbEntryType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
@@ -189,7 +189,8 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                 .accessions(accessions)
                 .geneNames(genes)
                 .reviewed(
-                        protein.getCanonicalProtein().getEntryType() == UniProtEntryType.SWISSPROT)
+                        protein.getCanonicalProtein().getEntryType()
+                                == UniProtkbEntryType.SWISSPROT)
                 .upid(UPID)
                 .organismTaxId(TAX_ID);
         builder.geneCentricStored(getBinary(protein));
@@ -200,7 +201,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         Protein protein =
                 new ProteinBuilder()
                         .accession(getName(ACCESSION_PREF, i))
-                        .entryType(UniProtEntryType.SWISSPROT)
+                        .entryType(UniProtkbEntryType.SWISSPROT)
                         .geneName(getName("gene", i))
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
                         .sequenceLength(324)
@@ -209,7 +210,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         Protein protein2 =
                 new ProteinBuilder()
                         .accession(getName(RELATED_ACCESSION_PREF_1, i))
-                        .entryType(UniProtEntryType.SWISSPROT)
+                        .entryType(UniProtkbEntryType.SWISSPROT)
                         .geneName(getName("agene", i))
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
                         .sequenceLength(334)
@@ -217,7 +218,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         Protein protein3 =
                 new ProteinBuilder()
                         .accession(getName(RELATED_ACCESSION_PREF_2, i))
-                        .entryType(UniProtEntryType.TREMBL)
+                        .entryType(UniProtkbEntryType.TREMBL)
                         .geneName(getName("twogene", i))
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
                         .sequenceLength(434)

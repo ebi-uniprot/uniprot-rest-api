@@ -47,17 +47,17 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.UniProtEntryType;
-import org.uniprot.core.uniprot.comment.CommentType;
-import org.uniprot.core.uniprot.feature.FeatureCategory;
-import org.uniprot.core.uniprot.feature.FeatureType;
-import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.xdb.impl.UniProtCrossReferenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntryType;
+import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.feature.FeatureCategory;
+import org.uniprot.core.uniprotkb.feature.FeatureType;
+import org.uniprot.core.uniprotkb.impl.UniProtkbEntryBuilder;
+import org.uniprot.core.uniprotkb.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.xdb.UniProtDatabaseImpl;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
+import org.uniprot.cv.xdb.UniProtkbDatabaseImpl;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
@@ -145,7 +145,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -171,7 +171,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchSecondaryAccession() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -200,7 +200,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchCanonicalOnly() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -231,7 +231,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchCanonicalIsoformAccession() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -261,7 +261,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchIncludeCanonicalAndIsoForm() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -293,7 +293,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchByAccessionAndIncludeIsoForm() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -325,7 +325,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchIsoFormOnly() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -355,7 +355,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void canNotReturnFacetInformationForXML() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -383,7 +383,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchForMergedInactiveEntriesAlsoReturnsActiveOne() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> mergedList =
@@ -412,7 +412,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> demergedList =
@@ -447,7 +447,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchForDeletedInactiveEntriesReturnItself() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> deletedList =
@@ -478,7 +478,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void defaultSearchWithMatchedFields() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
@@ -507,7 +507,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void badDefaultSearchWithMatchedFields() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -531,7 +531,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void cannotReturnMatchedFieldsForXML() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -618,7 +618,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
-        UniProtEntry entry =
+        UniProtkbEntry entry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); // P21802
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
@@ -738,10 +738,10 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     "go_" + code, Collections.singleton("Search All")));
 
             entry =
-                    new UniProtEntryBuilder("P00001", "ID_P00001", UniProtEntryType.SWISSPROT)
+                    new UniProtkbEntryBuilder("P00001", "ID_P00001", UniProtkbEntryType.SWISSPROT)
                             .uniProtCrossReferencesAdd(
                                     new UniProtCrossReferenceBuilder()
-                                            .database(new UniProtDatabaseImpl("Proteomes"))
+                                            .database(new UniProtkbDatabaseImpl("Proteomes"))
                                             .id("UP000000000")
                                             .propertiesAdd(
                                                     new UniProtDatabaseAttribute("a", "a", "a"),
@@ -772,11 +772,11 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.active = true;
                             doc.isIsoform = false;
 
-                            UniProtEntry entry =
-                                    new UniProtEntryBuilder(
+                            UniProtkbEntry entry =
+                                    new UniProtkbEntryBuilder(
                                                     "P0000" + i,
                                                     "P12345_ID",
-                                                    UniProtEntryType.TREMBL)
+                                                    UniProtkbEntryType.TREMBL)
                                             .build();
 
                             getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);

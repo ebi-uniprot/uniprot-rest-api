@@ -39,7 +39,7 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -92,7 +92,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
     }
 
@@ -157,7 +157,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void canSearchIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -186,7 +186,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void canSearchCanonicalIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -215,7 +215,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void withMergedInactiveEntryReturnTheActiveOne() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> mergedList =
@@ -244,7 +244,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> demergedList =
@@ -274,7 +274,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void searchForDeletedInactiveEntriesReturnItself() throws Exception {
         // given
-        UniProtEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> deletedList =
@@ -384,7 +384,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
             List<String> fields = new LinkedList<>();
             fields.add(UniProtField.ResultFields.entryType.getJavaFieldName());
             fields.add(UniProtField.ResultFields.primaryAccession.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.uniProtId.getJavaFieldName());
+            fields.add(UniProtField.ResultFields.uniProtkbId.getJavaFieldName());
             fields.add(UniProtField.ResultFields.entryAudit.getJavaFieldName());
             fields.add(UniProtField.ResultFields.annotationScore.getJavaFieldName());
             fields.add(UniProtField.ResultFields.organism.getJavaFieldName());
@@ -412,7 +412,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
                                     .resultMatcher(jsonPath("$.entryType", is("Swiss-Prot")))
-                                    .resultMatcher(jsonPath("$.uniProtId", is("PURL_THEEB")))
+                                    .resultMatcher(jsonPath("$.uniProtkbId", is("PURL_THEEB")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

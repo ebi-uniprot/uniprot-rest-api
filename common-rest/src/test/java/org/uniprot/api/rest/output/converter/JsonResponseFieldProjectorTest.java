@@ -15,13 +15,13 @@ import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.uniprot.*;
 import org.uniprot.core.json.parser.uniprot.comment.*;
-import org.uniprot.core.uniprot.ProteinExistence;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.UniProtEntryType;
-import org.uniprot.core.uniprot.UniProtId;
-import org.uniprot.core.uniprot.comment.Comment;
-import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.impl.UniProtIdBuilder;
+import org.uniprot.core.uniprotkb.ProteinExistence;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntryType;
+import org.uniprot.core.uniprotkb.UniProtkbId;
+import org.uniprot.core.uniprotkb.comment.Comment;
+import org.uniprot.core.uniprotkb.impl.UniProtkbEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtkbIdBuilder;
 import org.uniprot.store.search.field.DiseaseField;
 import org.uniprot.store.search.field.UniProtField;
 
@@ -213,14 +213,14 @@ class JsonResponseFieldProjectorTest {
         comments.add(SubcellularLocationCommentTest.getSubcellularLocationComment());
         comments.add(WebResourceCommentTest.getWebResourceComment());
 
-        UniProtId uniProtId = new UniProtIdBuilder("uniprot id").build();
-        UniProtEntryBuilder builder =
-                new UniProtEntryBuilder(
-                        UniProtAccessionTest.getUniProtAccession(),
-                        uniProtId,
-                        UniProtEntryType.SWISSPROT);
-        UniProtEntry entry =
-                builder.secondaryAccessionsAdd(UniProtAccessionTest.getUniProtAccession())
+        UniProtkbId uniProtkbId = new UniProtkbIdBuilder("uniprot id").build();
+        UniProtkbEntryBuilder builder =
+                new UniProtkbEntryBuilder(
+                        UniProtkbAccessionTest.getUniProtAccession(),
+                        uniProtkbId,
+                        UniProtkbEntryType.SWISSPROT);
+        UniProtkbEntry entry =
+                builder.secondaryAccessionsAdd(UniProtkbAccessionTest.getUniProtAccession())
                         .entryAudit(EntryAuditTest.getEntryAudit())
                         .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
                         .proteinDescription(ProteinDescriptionTest.getProteinDescription())
@@ -235,10 +235,10 @@ class JsonResponseFieldProjectorTest {
                         .keywordsSet(Collections.singletonList(KeywordTest.getKeyword()))
                         .geneLocationsSet(
                                 Collections.singletonList(GeneLocationTest.getGeneLocation()))
-                        .referencesSet(UniProtReferenceTest.getUniProtReferences())
+                        .referencesSet(UniProtkbReferenceTest.getUniProtReferences())
                         .uniProtCrossReferencesSet(
                                 Collections.singletonList(
-                                        UniProtCrossReferenceTest.getUniProtDBCrossReference()))
+                                        UniProtkbCrossReferenceTest.getUniProtDBCrossReference()))
                         .sequence(SequenceTest.getSequence())
                         .build();
 
@@ -261,13 +261,13 @@ class JsonResponseFieldProjectorTest {
                 11, result.size(), "total number of expected fields does not match");
         Assertions.assertNotNull(result.get("entryType"));
         Assertions.assertNotNull(result.get("primaryAccession"));
-        Assertions.assertNotNull(result.get("uniProtId"));
+        Assertions.assertNotNull(result.get("uniProtkbId"));
         Assertions.assertNotNull(result.get("entryAudit"));
         Assertions.assertNotNull(result.get("annotationScore"));
         Assertions.assertNotNull(result.get("genes"));
         Assertions.assertNotNull(result.get("organism"));
         Assertions.assertNotNull(result.get("features"));
-        Assertions.assertNotNull(result.get("uniProtCrossReferences"));
+        Assertions.assertNotNull(result.get("uniProtkbCrossReferences"));
         Assertions.assertNotNull(result.get("keywords"));
         Assertions.assertNotNull(result.get("comments"));
         Assertions.assertEquals(cTypes.size(), ((List<?>) result.get("comments")).size());
@@ -286,7 +286,7 @@ class JsonResponseFieldProjectorTest {
                 UniProtField.ResultFields.primaryAccession.getJavaFieldName(), primaryAccessionKey);
         String uniProtIdKey = (String) ((Map.Entry) orderedEntry[2]).getKey();
         Assertions.assertEquals(
-                UniProtField.ResultFields.uniProtId.getJavaFieldName(), uniProtIdKey);
+                UniProtField.ResultFields.uniProtkbId.getJavaFieldName(), uniProtIdKey);
         String entryAuditKey = (String) ((Map.Entry) orderedEntry[3]).getKey();
         Assertions.assertEquals(
                 UniProtField.ResultFields.entryAudit.getJavaFieldName(), entryAuditKey);

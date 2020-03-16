@@ -7,23 +7,23 @@ import java.util.stream.Collectors;
 
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXslMessegerConverter;
-import org.uniprot.api.rest.output.converter.UniProtEntryFilters;
+import org.uniprot.api.rest.output.converter.UniProtkbEntryFilters;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import org.uniprot.core.parser.tsv.uniprot.EntryMap;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtkbEntry;
 import org.uniprot.store.search.domain.Field;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
 
-public class UniProtKBXslMessageConverter extends AbstractXslMessegerConverter<UniProtEntry> {
+public class UniProtKBXslMessageConverter extends AbstractXslMessegerConverter<UniProtkbEntry> {
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<List<String>> tlFields = new ThreadLocal<>();
 
     public UniProtKBXslMessageConverter() {
-        super(UniProtEntry.class);
+        super(UniProtkbEntry.class);
     }
 
     @Override
-    protected void initBefore(MessageConverterContext<UniProtEntry> context) {
+    protected void initBefore(MessageConverterContext<UniProtkbEntry> context) {
         tlFilters.set(FieldsParser.parseForFilters(context.getFields()));
         tlFields.set(FieldsParser.parse(context.getFields()));
     }
@@ -35,12 +35,12 @@ public class UniProtKBXslMessageConverter extends AbstractXslMessegerConverter<U
     }
 
     @Override
-    protected List<String> entry2TsvStrings(UniProtEntry entity) {
+    protected List<String> entry2TsvStrings(UniProtkbEntry entity) {
         Map<String, List<String>> filterParams = tlFilters.get();
 
         List<String> fields = tlFields.get();
         if ((filterParams != null) && !filterParams.isEmpty())
-            UniProtEntryFilters.filterEntry(entity, filterParams);
+            UniProtkbEntryFilters.filterEntry(entity, filterParams);
         EntryMap dlEntry = new EntryMap(entity, fields);
         return dlEntry.getData();
     }

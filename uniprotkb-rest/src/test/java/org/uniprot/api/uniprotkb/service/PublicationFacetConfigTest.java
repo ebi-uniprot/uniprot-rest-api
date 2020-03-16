@@ -19,8 +19,8 @@ import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
-import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.impl.UniProtReferenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtkbReference;
+import org.uniprot.core.uniprotkb.impl.UniProtkbReferenceBuilder;
 
 /**
  * @author lgonzales
@@ -225,7 +225,7 @@ class PublicationFacetConfigTest {
         CrossReference<CitationDatabase> pubmed =
                 getCitationXref(CitationDatabase.PUBMED, String.valueOf(count));
         Literature literature = new LiteratureBuilder().citationCrossReferencesAdd(pubmed).build();
-        UniProtReference reference = new UniProtReferenceBuilder().citation(literature).build();
+        UniProtkbReference reference = new UniProtkbReferenceBuilder().citation(literature).build();
         LiteratureStatistics largeStat =
                 new LiteratureStatisticsBuilder().reviewedProteinCount(count).build();
         return PublicationEntry.builder().statistics(largeStat).reference(reference).build();
