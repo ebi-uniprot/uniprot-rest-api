@@ -9,8 +9,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.gene.Gene;
@@ -71,7 +73,11 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
     public static List<String> MANDATORY_JSON_FIELDS =
             Arrays.asList(
-                    "entryType", "primaryAccession", "uniProtId", "entryAudit", "annotationScore");
+                    "entryType",
+                    "primaryAccession",
+                    "uniProtkbId",
+                    "entryAudit",
+                    "annotationScore");
     public static List<String> REQUESTED_JSON_FIELDS =
             Arrays.asList("protein_existence", "organism", "protein_name");
     public static List<String> INVALID_RETURN_FIELDS =
@@ -163,6 +169,18 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
         builder.entryType(UniProtkbEntryType.SWISSPROT);
 
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, builder.build());
+    }
+
+    protected static List<MediaType> getNonJSONSupportedContentTypes() {
+        return Arrays.asList(
+                UniProtMediaType.TSV_MEDIA_TYPE,
+                UniProtMediaType.FF_MEDIA_TYPE,
+                UniProtMediaType.LIST_MEDIA_TYPE,
+                MediaType.APPLICATION_XML,
+                UniProtMediaType.XLS_MEDIA_TYPE,
+                UniProtMediaType.FASTA_MEDIA_TYPE,
+                UniProtMediaType.RDF_MEDIA_TYPE,
+                UniProtMediaType.GFF_MEDIA_TYPE);
     }
 
     private Gene getGene(Gene oldGene, String name) {

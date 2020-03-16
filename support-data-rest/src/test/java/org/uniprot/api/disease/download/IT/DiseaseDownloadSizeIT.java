@@ -17,7 +17,6 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.download.resolver.DiseaseDownloadSizeParamResolver;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 
 /** Class to test download api with certain size.. */
@@ -82,66 +81,39 @@ public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeNegativeBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
+                                                type)));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
+                                                type)));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeMoreBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
+                                                type)));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeLessBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramResolver
+                                                .getDownloadLessThanDefaultBatchSizeParamAndResult(
+                                                        type)));
     }
 }

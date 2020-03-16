@@ -20,14 +20,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSizeParamResolver;
@@ -120,114 +118,26 @@ public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeNegativeBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                MediaType.APPLICATION_XML)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadSizeLessThanZeroParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(type -> paramResolver.getDownloadSizeLessThanZeroParamAndResult(type))
+                .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                MediaType.APPLICATION_XML)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(type -> paramResolver.getDownloadDefaultBatchSizeParamAndResult(type))
+                .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeMoreBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                MediaType.APPLICATION_XML)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadMoreThanBatchSizeParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(type -> paramResolver.getDownloadMoreThanBatchSizeParamAndResult(type))
+                .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeLessBatchSize() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                MediaType.APPLICATION_XML)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(type -> paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(type))
+                .map(param -> Arguments.of(param));
     }
 }

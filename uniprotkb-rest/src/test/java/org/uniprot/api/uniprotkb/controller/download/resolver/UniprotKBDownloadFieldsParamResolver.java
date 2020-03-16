@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
@@ -67,7 +66,4 @@ public class UniprotKBDownloadFieldsParamResolver extends AbstractDownloadFields
         return paramAndResultProvider.getDownloadParamAndResultForFields(
                 contentType, 1, null, invalidRequestedFields, Collections.emptyList());
     }
-
-    @Override
-    protected void verifyExcelData(Sheet sheet) {}
 }

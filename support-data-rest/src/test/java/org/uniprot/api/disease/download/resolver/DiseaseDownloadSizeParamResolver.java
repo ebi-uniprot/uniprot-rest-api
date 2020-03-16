@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
@@ -75,7 +74,4 @@ public class DiseaseDownloadSizeParamResolver extends AbstractDownloadSizeParamR
         paramAndResult.setQueryParams(updatedQueryParams);
         return paramAndResult;
     }
-
-    @Override
-    protected void verifyExcelData(Sheet sheet) {}
 }

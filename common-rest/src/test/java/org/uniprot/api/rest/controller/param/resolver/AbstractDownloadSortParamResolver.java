@@ -43,49 +43,33 @@ public abstract class AbstractDownloadSortParamResolver extends BaseDownloadPara
                                         new RuntimeException(
                                                 "AbstractDownloadParameterResolver: Unable to find test method"));
         switch (method.getName()) {
-            case "testDownloadWithSortByAccessionJSON":
-                result =
-                        getDownloadWithSortParamAndResult(
-                                MediaType.APPLICATION_JSON,
-                                "accession",
-                                "desc",
-                                Collections.emptyList());
+            case "testDownloadWithSortByUniqueFieldJSON":
+                result = getDownloadWithSortParamAndResult(MediaType.APPLICATION_JSON);
                 break;
-            case "testDownloadWithSortList":
-                result =
-                        getDownloadWithSortParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE,
-                                "accession",
-                                "desc",
-                                Collections.emptyList());
+            case "testDownloadWithSortByUniqueFieldList":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE);
                 break;
-            case "testDownloadWithSortTSV":
-                result =
-                        getDownloadWithSortParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE,
-                                "accession",
-                                "desc",
-                                Collections.emptyList());
+            case "testDownloadWithSortByUniqueFieldTSV":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE);
                 break;
-            case "testDownloadWithSortOBO":
-                result =
-                        getDownloadWithSortParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE,
-                                "accession",
-                                "desc",
-                                Collections.emptyList());
+            case "testDownloadWithSortByUniqueFieldOBO":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE);
                 break;
-            case "testDownloadWithSortXLS":
-                result =
-                        getDownloadWithSortParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE,
-                                "accession",
-                                "desc",
-                                Collections.emptyList());
+            case "testDownloadWithSortByUniqueFieldXLS":
+                result = getDownloadWithSortParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE);
                 break;
         }
         return result;
     }
+
+    protected DownloadParamAndResult getDownloadWithSortParamAndResult(MediaType contentType) {
+        String sortOrder = "desc";
+        String fieldName = getUniqueFieldName();
+        return getDownloadWithSortParamAndResult(
+                contentType, fieldName, sortOrder, Collections.emptyList());
+    }
+
+    protected abstract String getUniqueFieldName();
 
     protected abstract DownloadParamAndResult getDownloadWithSortParamAndResult(
             MediaType contentType,

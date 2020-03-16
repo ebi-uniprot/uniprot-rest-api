@@ -20,14 +20,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniprotKBDownloadAllParamResolver;
@@ -83,27 +81,7 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByType() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(UniProtMediaType.FF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(paramResolver.getDownloadAllParamAndResult(MediaType.APPLICATION_XML)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(type -> Arguments.of(paramResolver.getDownloadAllParamAndResult(type)));
     }
 }
