@@ -20,14 +20,23 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
- * Created 10/03/2020
+ * Generates a grouped return field listing, based on the {@link ReturnField}s retrieved from {@link
+ * ReturnFieldConfigFactory}. This class can be used by any {@link ReturnField}s for any {@link
+ * UniProtDataType}.
+ *
+ * <p>Created 10/03/2020
  *
  * @author Edd
  */
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class UniProtKBResultField {
+public class UniProtReturnField {
+    private static final Comparator<UniProtReturnField> GROUP_ORDER_COMPARATOR =
+            Comparator.comparing(UniProtReturnField::getSeqNumber);
+    private static final Comparator<UniProtReturnField> CHILD_ORDER_COMPARATOR =
+            Comparator.comparing(UniProtReturnField::getChildNumber);
+    private static List<UniProtReturnField> resultFields;
     @JsonIgnore private Integer seqNumber;
     @JsonIgnore private String parentId;
     @JsonIgnore private Integer childNumber;
@@ -35,23 +44,16 @@ public class UniProtKBResultField {
     private String name;
     private String groupName;
     private Boolean isDatabaseGroup;
-    @JsonIgnore private String id;
-    private List<UniProtKBResultField> fields;
+    private String id;
+    private List<UniProtReturnField> fields;
 
-    private static List<UniProtKBResultField> resultFields;
-    private static final Comparator<UniProtKBResultField> GROUP_ORDER_COMPARATOR =
-            Comparator.comparing(UniProtKBResultField::getSeqNumber);
-    private static final Comparator<UniProtKBResultField> CHILD_ORDER_COMPARATOR =
-            Comparator.comparing(UniProtKBResultField::getChildNumber);
-
-    public static List<UniProtKBResultField> getResultFields() {
+    public static List<UniProtReturnField> getReturnFieldsForClients(UniProtDataType dataType) {
         if (resultFields == null) {
-            ReturnFieldConfig fieldConfig =
-                    ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+            ReturnFieldConfig fieldConfig = ReturnFieldConfigFactory.getReturnFieldConfig(dataType);
             List<ReturnField> allFields = fieldConfig.getAllFields();
 
-            List<UniProtKBResultField> groups = extractOrderedGroups(allFields);
-            Map<String, List<UniProtKBResultField>> groupToFieldsMap =
+            List<UniProtReturnField> groups = extractOrderedGroups(allFields);
+            Map<String, List<UniProtReturnField>> groupToFieldsMap =
                     extractGroupToFieldsMappings(allFields);
 
             resultFields = createGroupsOfResultFields(groups, groupToFieldsMap);
@@ -59,13 +61,21 @@ public class UniProtKBResultField {
         return resultFields;
     }
 
-    private static List<UniProtKBResultField> createGroupsOfResultFields(
-            List<UniProtKBResultField> groups,
-            Map<String, List<UniProtKBResultField>> groupToFieldsMap) {
+    public static void main(String[] args) throws JsonProcessingException {
+        List<UniProtReturnField> resultFields =
+                UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPROTKB);
+
+        ObjectMapper om = new ObjectMapper();
+        System.out.println(om.writerWithDefaultPrettyPrinter().writeValueAsString(resultFields));
+    }
+
+    private static List<UniProtReturnField> createGroupsOfResultFields(
+            List<UniProtReturnField> groups,
+            Map<String, List<UniProtReturnField>> groupToFieldsMap) {
         return groups.stream()
                 .peek(
                         group -> {
-                            List<UniProtKBResultField> fieldsForGroup =
+                            List<UniProtReturnField> fieldsForGroup =
                                     groupToFieldsMap.get(group.getId());
                             fieldsForGroup.sort(CHILD_ORDER_COMPARATOR);
                             group.setFields(fieldsForGroup);
@@ -73,27 +83,28 @@ public class UniProtKBResultField {
                 .collect(Collectors.toList());
     }
 
-    private static Map<String, List<UniProtKBResultField>> extractGroupToFieldsMappings(
+    private static Map<String, List<UniProtReturnField>> extractGroupToFieldsMappings(
             List<ReturnField> allFields) {
         return allFields.stream()
                 .filter(field -> field.getItemType().equals(ReturnFieldItemType.SINGLE))
                 .map(
                         field ->
-                                UniProtKBResultField.builder()
+                                UniProtReturnField.builder()
                                         .label(field.getLabel())
                                         .name(field.getName())
+                                        .id(field.getId())
                                         .parentId(field.getParentId())
                                         .childNumber(field.getChildNumber())
                                         .build())
-                .collect(groupingBy(UniProtKBResultField::getParentId));
+                .collect(groupingBy(UniProtReturnField::getParentId));
     }
 
-    private static List<UniProtKBResultField> extractOrderedGroups(List<ReturnField> allFields) {
+    private static List<UniProtReturnField> extractOrderedGroups(List<ReturnField> allFields) {
         return allFields.stream()
                 .filter(field -> field.getItemType().equals(ReturnFieldItemType.GROUP))
                 .map(
                         rawGroup ->
-                                UniProtKBResultField.builder()
+                                UniProtReturnField.builder()
                                         .groupName(rawGroup.getGroupName())
                                         .seqNumber(rawGroup.getSeqNumber())
                                         .id(rawGroup.getId())
@@ -101,12 +112,5 @@ public class UniProtKBResultField {
                                         .build())
                 .sorted(GROUP_ORDER_COMPARATOR)
                 .collect(Collectors.toList());
-    }
-
-    public static void main(String[] args) throws JsonProcessingException {
-        List<UniProtKBResultField> resultFields = UniProtKBResultField.getResultFields();
-
-        ObjectMapper om = new ObjectMapper();
-        System.out.println(om.writerWithDefaultPrettyPrinter().writeValueAsString(resultFields));
     }
 }
