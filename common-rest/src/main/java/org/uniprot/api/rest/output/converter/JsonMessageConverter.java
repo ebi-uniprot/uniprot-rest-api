@@ -157,7 +157,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 fields.stream()
                         .map(ReturnField::getPath) //
                         .map(path -> path.replaceAll("\\[\\*]", ""))
-                        // .map(path -> path.replaceAll("(\\[\\*])", ".*"))
+                        .map(path -> path += ".*")
                         .collect(Collectors.joining(","));
 
         SquigglyPropertyFilter filter =

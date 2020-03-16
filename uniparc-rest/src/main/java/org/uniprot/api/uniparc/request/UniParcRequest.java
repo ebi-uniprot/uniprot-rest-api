@@ -42,15 +42,4 @@ public class UniParcRequest implements SearchRequest {
 
     public static final String DEFAULT_FIELDS =
             "upi,organism,accession,first_seen,last_seen,length";
-
-    @Override
-    public String getFields() {
-        if (Strings.isNullOrEmpty(fields)) {
-            fields = DEFAULT_FIELDS;
-        } else if (!fields.contains(UniParcField.Return.upi.name())) {
-            String temp = "upi," + fields;
-            this.fields = temp;
-        }
-        return fields;
-    }
 }

@@ -492,8 +492,11 @@ public abstract class AbstractSearchControllerIT {
             if (Utils.notNullNotEmpty(returnField.getFilter())) {
                 returnFieldValidatePath += returnField.getFilter();
             }
-            log.info("ReturnField:" + returnField.getName() +
-                    " Validation Path: " + returnFieldValidatePath);
+            log.info(
+                    "ReturnField:"
+                            + returnField.getName()
+                            + " Validation Path: "
+                            + returnFieldValidatePath);
 
             // then
             response.andDo(print())

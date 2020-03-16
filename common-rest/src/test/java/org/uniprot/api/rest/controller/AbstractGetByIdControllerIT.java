@@ -81,7 +81,6 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    @Disabled // @lgonzales: TRM-23571
     void withValidResponseFieldsOrder(GetIdParameter idParameter) throws Exception {
         validIdReturnSuccess(idParameter);
     }
@@ -135,7 +134,6 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    @Disabled // @lgonzales: TRM-23571
     void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
         assertThat(idParameter, notNullValue());
         if (Utils.notNullNotEmpty(idParameter.getFields())) {

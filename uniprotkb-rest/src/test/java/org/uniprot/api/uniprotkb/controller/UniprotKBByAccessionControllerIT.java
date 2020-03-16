@@ -170,7 +170,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + "P21802-2")
-                                        .param("fields", "organism")
+                                        .param("fields", "accession,organism")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -199,7 +199,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + "P21802-1")
-                                        .param("fields", "organism")
+                                        .param("fields", "accession,organism")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -335,7 +335,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION_ID)
-                    .fields("gene_primary")
+                    .fields("accession,gene_primary")
                     .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
                     .resultMatcher(jsonPath("$.genes").exists())
                     // ensure other parts of the entry were not returned (using one example)

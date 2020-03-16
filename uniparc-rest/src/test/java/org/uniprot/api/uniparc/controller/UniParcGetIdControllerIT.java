@@ -272,11 +272,10 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .id(UPI)
                     .fields("upi,organism")
                     .resultMatcher(jsonPath("$.uniParcId", is(UPI)))
-                    //
-                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                    //		                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
-                    //		                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
-                    //		                    .resultMatcher(jsonPath("$.links").doesNotExist())
+                    .resultMatcher(jsonPath("$.taxonomies").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences").doesNotExist())
+                    .resultMatcher(jsonPath("$.sequence").doesNotExist())
+                    .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .build();
         }
 
@@ -319,7 +318,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         protected List<String> getFieldsInOrder() {
             List<String> fields = new LinkedList<>();
             fields.add(UniParcField.ResultFields.uniParcId.getJavaFieldName());
-            fields.add(UniParcField.ResultFields.databaseCrossReferences.getJavaFieldName());
+            fields.add(UniParcField.ResultFields.uniParcCrossReferences.getJavaFieldName());
             fields.add(UniParcField.ResultFields.sequence.getJavaFieldName());
             fields.add(UniParcField.ResultFields.sequenceFeatures.getJavaFieldName());
             fields.add(UniParcField.ResultFields.taxonomies.getJavaFieldName());
