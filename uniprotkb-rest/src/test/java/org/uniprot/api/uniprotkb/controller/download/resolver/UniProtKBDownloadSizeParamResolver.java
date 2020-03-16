@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
@@ -83,7 +82,4 @@ public class UniProtKBDownloadSizeParamResolver extends AbstractDownloadSizePara
         updatedQueryParams.put(paramName, values);
         return updatedQueryParams;
     }
-
-    @Override
-    protected void verifyExcelData(Sheet sheet) {}
 }

@@ -17,7 +17,6 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.download.resolver.DiseaseDownloadAllParamResolver;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 
 /** Class to test download api without any filter.. kind of download everything */
@@ -41,18 +40,8 @@ public class DiseaseDownloadAllIT extends BaseDiseaseDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByType() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE)),
-                Arguments.of(
-                        paramResolver.getDownloadAllParamAndResult(
-                                UniProtMediaType.OBO_MEDIA_TYPE)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(type -> paramResolver.getDownloadAllParamAndResult(type))
+                .map(paramAndResult -> Arguments.of(paramAndResult));
     }
 }

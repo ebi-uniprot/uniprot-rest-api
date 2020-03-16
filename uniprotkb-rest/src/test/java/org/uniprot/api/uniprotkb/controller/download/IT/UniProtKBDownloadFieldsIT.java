@@ -107,66 +107,20 @@ public class UniProtKBDownloadFieldsIT extends BaseUniprotKBDownloadIT {
     }
 
     private static Stream<Arguments> paramAndResultByTypeForNonDefault() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_XML,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE,
-                                REQUESTED_JSON_FIELDS,
-                                Collections.emptyList())));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(
+                        type ->
+                                paramResolver.getDownloadNonDefaultFieldsParamAndResult(
+                                        type, REQUESTED_JSON_FIELDS, Collections.emptyList()))
+                .map(paramAndResult -> Arguments.of(paramAndResult));
     }
 
     private static Stream<Arguments> paramAndResultByTypeForInvalid() {
-        return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                MediaType.APPLICATION_XML, INVALID_RETURN_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE, INVALID_RETURN_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                UniProtMediaType.RDF_MEDIA_TYPE, INVALID_RETURN_FIELDS)));
+        return getNonJSONSupportedContentTypes().stream()
+                .map(
+                        type ->
+                                paramResolver.getDownloadInvalidFieldsParamAndResult(
+                                        type, INVALID_RETURN_FIELDS))
+                .map(paramAndResult -> Arguments.of(paramAndResult));
     }
 }

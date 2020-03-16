@@ -20,6 +20,11 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 public class DiseaseDownloadSortParamResolver extends AbstractDownloadSortParamResolver {
 
     @Override
+    protected String getUniqueFieldName() {
+        return "accession";
+    }
+
+    @Override
     protected DownloadParamAndResult getDownloadWithSortParamAndResult(
             MediaType contentType, String fieldName, String sortOrder, List<String> accessions) {
         DownloadParamAndResult paramAndResult = getDownloadDefaultParamAndResult(contentType, 3);

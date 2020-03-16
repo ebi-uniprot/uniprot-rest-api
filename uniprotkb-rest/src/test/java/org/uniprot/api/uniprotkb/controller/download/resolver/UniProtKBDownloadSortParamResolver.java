@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.controller.download.resolver;
 
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
@@ -27,5 +26,7 @@ public class UniProtKBDownloadSortParamResolver extends AbstractDownloadSortPara
     }
 
     @Override
-    protected void verifyExcelData(Sheet sheet) {}
+    protected String getUniqueFieldName() {
+        return "accession";
+    }
 }

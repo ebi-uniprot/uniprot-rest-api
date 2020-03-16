@@ -29,35 +29,35 @@ public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
     }
 
     @Test
-    protected void testDownloadWithSortByAccessionJSON(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortByUniqueFieldJSON(DownloadParamAndResult parameterAndResult)
             throws Exception {
         // then
         sendAndVerify(parameterAndResult, HttpStatus.OK);
     }
 
     @Test
-    protected void testDownloadWithSortList(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortByUniqueFieldList(DownloadParamAndResult parameterAndResult)
             throws Exception {
         // then
         sendAndVerify(parameterAndResult, HttpStatus.OK);
     }
 
     @Test
-    protected void testDownloadWithSortTSV(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortByUniqueFieldTSV(DownloadParamAndResult parameterAndResult)
             throws Exception {
         // then
         sendAndVerify(parameterAndResult, HttpStatus.OK);
     }
 
     @Test
-    protected void testDownloadWithSortXLS(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortByUniqueFieldXLS(DownloadParamAndResult parameterAndResult)
             throws Exception {
         // then
         sendAndVerify(parameterAndResult, HttpStatus.OK);
     }
 
     @Test
-    protected void testDownloadWithSortOBO(DownloadParamAndResult parameterAndResult)
+    protected void testDownloadWithSortByUniqueFieldOBO(DownloadParamAndResult parameterAndResult)
             throws Exception {
         // then
         sendAndVerify(parameterAndResult, HttpStatus.OK);

@@ -43,32 +43,38 @@ public abstract class AbstractDownloadFieldsResolver extends BaseDownloadParamRe
                                                 "AbstractDownloadParameterResolver: Unable to find test method"));
         switch (method.getName()) {
             case "testDownloadDefaultFieldsJSON":
-                result =
-                        getDownloadDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_JSON, Collections.emptyList());
+                result = getDownloadDefaultFieldsParamAndResult(MediaType.APPLICATION_JSON);
                 break;
             case "testDownloadNonDefaultFieldsJSON":
-                result =
-                        getDownloadNonDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_JSON,
-                                Collections.emptyList(),
-                                Collections.emptyList());
+                result = getDownloadNonDefaultFieldsParamAndResult(MediaType.APPLICATION_JSON);
                 break;
             case "testDownloadInvalidFieldsJSON":
-                result =
-                        getDownloadInvalidFieldsParamAndResult(
-                                MediaType.APPLICATION_JSON, Collections.emptyList());
+                result = getDownloadInvalidFieldsParamAndResult(MediaType.APPLICATION_JSON);
                 break;
         }
         return result;
     }
 
     // test for fields
+    protected DownloadParamAndResult getDownloadDefaultFieldsParamAndResult(MediaType contentType) {
+        return getDownloadDefaultFieldsParamAndResult(contentType, Collections.emptyList());
+    }
+
     protected abstract DownloadParamAndResult getDownloadDefaultFieldsParamAndResult(
             MediaType contentType, List<String> expectedFields);
 
+    protected DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
+            MediaType contentType) {
+        return getDownloadNonDefaultFieldsParamAndResult(
+                contentType, Collections.emptyList(), Collections.emptyList());
+    }
+
     protected abstract DownloadParamAndResult getDownloadNonDefaultFieldsParamAndResult(
             MediaType contentType, List<String> requestedFields, List<String> expectedFields);
+
+    protected DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(MediaType contentType) {
+        return getDownloadInvalidFieldsParamAndResult(contentType, Collections.emptyList());
+    }
 
     protected abstract DownloadParamAndResult getDownloadInvalidFieldsParamAndResult(
             MediaType contentType, List<String> invalidRequestedFields);
