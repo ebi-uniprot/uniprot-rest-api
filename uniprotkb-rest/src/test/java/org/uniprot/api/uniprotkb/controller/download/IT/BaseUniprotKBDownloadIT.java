@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
@@ -17,11 +16,11 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
-import org.uniprot.core.uniprotkb.UniProtkbEntryType;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.GeneBuilder;
 import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtkbEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
@@ -48,8 +47,6 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static final String MNEMONIC2 = "MNEMONIC_B";
     public static final String MNEMONIC3 = "MNEMONIC_C";
 
-
-
     public static List<String> MANDATORY_JSON_FIELDS =
             Arrays.asList(
                     "entryType",
@@ -59,7 +56,14 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
                     "annotationScore");
 
     public static List<String> DEFAULT_XLS_FIELDS =
-            Arrays.asList("Entry", "Entry Name", "Reviewed", "Protein names", "Gene Names", "Organism", "Length");
+            Arrays.asList(
+                    "Entry",
+                    "Entry Name",
+                    "Reviewed",
+                    "Protein names",
+                    "Gene Names",
+                    "Organism",
+                    "Length");
     public static List<String> DEFAULT_TSV_FIELDS =
             Arrays.asList(
                     "Entry",
@@ -69,8 +73,10 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
                     "Gene Names",
                     "Organism",
                     "Length");
-    public static List<String> TSV_RETURNED_HEADERS = Arrays.asList(new String[]{"Protein existence", "Organism", "Protein names"});
-    public static List<String> XLS_RETURNED_HEADERS = Arrays.asList(new String[]{"Protein existence", "Organism", "Protein names"});
+    public static List<String> TSV_RETURNED_HEADERS =
+            Arrays.asList(new String[] {"Protein existence", "Organism", "Protein names"});
+    public static List<String> XLS_RETURNED_HEADERS =
+            Arrays.asList(new String[] {"Protein existence", "Organism", "Protein names"});
 
     public static List<String> REQUESTED_JSON_FIELDS =
             Arrays.asList("protein_existence", "organism", "protein_name");
@@ -131,15 +137,15 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        List<UniProtkbEntry> entries =
+        List<UniProtKBEntry> entries =
                 UniProtEntryMocker.cloneEntries(UniProtEntryMocker.Type.SP, numberOfEntries);
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entries);
     }
 
     @Override
     protected void saveEntry(String accession, long suffix) {
-        UniProtkbEntry entry = UniProtEntryMocker.create(accession);
-        UniProtkbEntryBuilder builder = UniProtkbEntryBuilder.from(entry);
+        UniProtKBEntry entry = UniProtEntryMocker.create(accession);
+        UniProtKBEntryBuilder builder = UniProtKBEntryBuilder.from(entry);
         Gene gene = entry.getGenes().get(0);
         if (ACC1.equals(accession)) {
             builder.organism(getOrganism("root", 1));
@@ -161,7 +167,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
             builder.sequence(new SequenceBuilder(SEQUENCE3).build());
         }
 
-        builder.entryType(UniProtkbEntryType.SWISSPROT);
+        builder.entryType(UniProtKBEntryType.SWISSPROT);
 
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, builder.build());
     }
@@ -189,6 +195,10 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     }
 
     private Organism getOrganism(String name, long taxonId) {
-        return new OrganismBuilder().scientificName("Homo sapiens").commonName(name).taxonId(taxonId).build();
+        return new OrganismBuilder()
+                .scientificName("Homo sapiens")
+                .commonName(name)
+                .taxonId(taxonId)
+                .build();
     }
 }

@@ -15,9 +15,9 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @Repository
 public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument> {
     public UniprotQueryRepository(
-        SolrTemplate solrTemplate,
-        UniprotKBFacetConfig facetConfig,
-        SolrRequestConverter requestConverter) {
+            SolrTemplate solrTemplate,
+            UniprotKBFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
         super(
                 solrTemplate,
                 SolrCollection.uniprot,

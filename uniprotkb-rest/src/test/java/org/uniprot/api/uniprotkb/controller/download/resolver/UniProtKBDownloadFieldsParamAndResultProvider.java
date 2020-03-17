@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -86,8 +85,9 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
 
         // fasta always returns the fixed format whether we pass fields or not
         // example
-        // >sp|O12345|MNEMONIC_B Phosphoribosylformylglycinamidine synthase subunit PurL OS=Homo sapiens OX=1 GN=cUrl PE=3 SV=1
-        //KDVHMPKHPELADKNVPNLHVMKAMQS
+        // >sp|O12345|MNEMONIC_B Phosphoribosylformylglycinamidine synthase subunit PurL OS=Homo
+        // sapiens OX=1 GN=cUrl PE=3 SV=1
+        // KDVHMPKHPELADKNVPNLHVMKAMQS
         ResultMatcher fieldsResultMatcher =
                 result -> {
                     String fastaStr = result.getResponse().getContentAsString();
@@ -248,13 +248,14 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
         ResultMatcher sortResultMatcher =
                 result -> {
                     Sheet sheet = getExcelSheet(result);
-                    List<String> headers = stream(sheet.spliterator(), false)
-                            .limit(1)
-                            .flatMap(row -> stream(row.spliterator(), false))
-                            .map(Cell::getStringCellValue)
-                            .collect(toList());
+                    List<String> headers =
+                            stream(sheet.spliterator(), false)
+                                    .limit(1)
+                                    .flatMap(row -> stream(row.spliterator(), false))
+                                    .map(Cell::getStringCellValue)
+                                    .collect(toList());
                     assertThat("headers are not equal", expectedFields.equals(headers));
-        };
+                };
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }

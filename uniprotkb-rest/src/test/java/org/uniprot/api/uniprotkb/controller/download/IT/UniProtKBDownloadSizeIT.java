@@ -1,5 +1,10 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,14 +28,8 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
-import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadParamAndResultProvider;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSizeParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.stream.Stream;
 
 /** Class to test download api with certain size.. */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -39,9 +38,11 @@ import java.util.stream.Stream;
 @WebMvcTest(UniprotKBController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
-    private static final Integer LESS_THAN_BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
+    private static final Integer LESS_THAN_BATCH_SIZE =
+            BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
     private static final Integer BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE;
-    private static final Integer MORE_THAN_BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
+    private static final Integer MORE_THAN_BATCH_SIZE =
+            BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
     private static final Integer LESS_THAN_ZERO_SIZE = -1;
 
     @RegisterExtension
@@ -101,7 +102,10 @@ public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
 
     private static Stream<Arguments> provideRequestResponseByTypeNegativeBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, LESS_THAN_ZERO_SIZE))
+                .map(
+                        type ->
+                                paramAndResultProvider.getDownloadParamAndResult(
+                                        type, LESS_THAN_ZERO_SIZE))
                 .map(param -> Arguments.of(param));
     }
 
@@ -113,13 +117,19 @@ public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
 
     private static Stream<Arguments> provideRequestResponseByTypeMoreBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, MORE_THAN_BATCH_SIZE))
+                .map(
+                        type ->
+                                paramAndResultProvider.getDownloadParamAndResult(
+                                        type, MORE_THAN_BATCH_SIZE))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeLessBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, LESS_THAN_BATCH_SIZE))
+                .map(
+                        type ->
+                                paramAndResultProvider.getDownloadParamAndResult(
+                                        type, LESS_THAN_BATCH_SIZE))
                 .map(param -> Arguments.of(param));
     }
 }
