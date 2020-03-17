@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.uniprot.core.flatfile.parser.UniprotkbLineParser;
-import org.uniprot.core.flatfile.parser.impl.DefaultUniprotkbLineParserFactory;
+import org.uniprot.core.flatfile.parser.UniprotKBLineParser;
+import org.uniprot.core.flatfile.parser.impl.DefaultUniprotKBLineParserFactory;
 import org.uniprot.core.flatfile.parser.impl.ac.AcLineObject;
 import org.uniprot.core.flatfile.parser.impl.cc.cclineobject.CcLineObject;
 import org.uniprot.core.flatfile.parser.impl.de.DeLineObject;
@@ -26,14 +26,14 @@ import org.uniprot.core.flatfile.parser.impl.ox.OxLineObject;
 import org.uniprot.core.flatfile.parser.impl.pe.PeLineObject;
 import org.uniprot.core.flatfile.parser.impl.sq.SqLineObject;
 import org.uniprot.core.flatfile.writer.LineType;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 class UniProtEntryObjectProxy {
     private EntryObject entryObject;
-    private final UniprotkbLineParser<EntryObject> entryParser;
+    private final UniprotKBLineParser<EntryObject> entryParser;
 
     private UniProtEntryObjectProxy() {
-        this.entryParser = new DefaultUniprotkbLineParserFactory().createEntryParser();
+        this.entryParser = new DefaultUniprotKBLineParserFactory().createEntryParser();
     }
 
     private static UniProtEntryObjectProxy createEntryFromString(String entryText) {
@@ -60,7 +60,7 @@ class UniProtEntryObjectProxy {
     }
 
     void updateEntryObject(LineType lineType, String replacement) {
-        DefaultUniprotkbLineParserFactory parserFactory = new DefaultUniprotkbLineParserFactory();
+        DefaultUniprotKBLineParserFactory parserFactory = new DefaultUniprotKBLineParserFactory();
 
         if (!replacement.endsWith("\n")) {
             replacement += "\n";
@@ -68,67 +68,67 @@ class UniProtEntryObjectProxy {
 
         switch (lineType) {
             case AC:
-                UniprotkbLineParser<AcLineObject> acLineParser = parserFactory.createAcLineParser();
+                UniprotKBLineParser<AcLineObject> acLineParser = parserFactory.createAcLineParser();
                 entryObject.ac = acLineParser.parse(replacement);
                 break;
             case DE:
-                UniprotkbLineParser<DeLineObject> deLineParser = parserFactory.createDeLineParser();
+                UniprotKBLineParser<DeLineObject> deLineParser = parserFactory.createDeLineParser();
                 entryObject.de = deLineParser.parse(replacement);
                 break;
             case DR:
-                UniprotkbLineParser<DrLineObject> drLineParser = parserFactory.createDrLineParser();
+                UniprotKBLineParser<DrLineObject> drLineParser = parserFactory.createDrLineParser();
                 entryObject.dr = drLineParser.parse(replacement);
                 break;
             case DT:
-                UniprotkbLineParser<DtLineObject> dtLineParser = parserFactory.createDtLineParser();
+                UniprotKBLineParser<DtLineObject> dtLineParser = parserFactory.createDtLineParser();
                 entryObject.dt = dtLineParser.parse(replacement);
                 break;
             case GN:
-                UniprotkbLineParser<GnLineObject> gnLineParser = parserFactory.createGnLineParser();
+                UniprotKBLineParser<GnLineObject> gnLineParser = parserFactory.createGnLineParser();
                 entryObject.gn = gnLineParser.parse(replacement);
                 break;
             case ID:
-                UniprotkbLineParser<IdLineObject> idLineParser = parserFactory.createIdLineParser();
+                UniprotKBLineParser<IdLineObject> idLineParser = parserFactory.createIdLineParser();
                 entryObject.id = idLineParser.parse(replacement);
                 break;
             case KW:
-                UniprotkbLineParser<KwLineObject> kwLineParser = parserFactory.createKwLineParser();
+                UniprotKBLineParser<KwLineObject> kwLineParser = parserFactory.createKwLineParser();
                 entryObject.kw = kwLineParser.parse(replacement);
                 break;
             case OC:
-                UniprotkbLineParser<OcLineObject> ocLineParser = parserFactory.createOcLineParser();
+                UniprotKBLineParser<OcLineObject> ocLineParser = parserFactory.createOcLineParser();
                 entryObject.oc = ocLineParser.parse(replacement);
                 break;
             case OG:
-                UniprotkbLineParser<OgLineObject> ogLineParser = parserFactory.createOgLineParser();
+                UniprotKBLineParser<OgLineObject> ogLineParser = parserFactory.createOgLineParser();
                 entryObject.og = ogLineParser.parse(replacement);
                 break;
             case OH:
-                UniprotkbLineParser<OhLineObject> ohLineParser = parserFactory.createOhLineParser();
+                UniprotKBLineParser<OhLineObject> ohLineParser = parserFactory.createOhLineParser();
                 entryObject.oh = ohLineParser.parse(replacement);
                 break;
             case OS:
-                UniprotkbLineParser<OsLineObject> osLineParser = parserFactory.createOsLineParser();
+                UniprotKBLineParser<OsLineObject> osLineParser = parserFactory.createOsLineParser();
                 entryObject.os = osLineParser.parse(replacement);
                 break;
             case OX:
-                UniprotkbLineParser<OxLineObject> oxLineParser = parserFactory.createOxLineParser();
+                UniprotKBLineParser<OxLineObject> oxLineParser = parserFactory.createOxLineParser();
                 entryObject.ox = oxLineParser.parse(replacement);
                 break;
             case CC:
-                UniprotkbLineParser<CcLineObject> ccLineParser = parserFactory.createCcLineParser();
+                UniprotKBLineParser<CcLineObject> ccLineParser = parserFactory.createCcLineParser();
                 entryObject.cc = ccLineParser.parse(replacement);
                 break;
             case FT:
-                UniprotkbLineParser<FtLineObject> ftLineParser = parserFactory.createFtLineParser();
+                UniprotKBLineParser<FtLineObject> ftLineParser = parserFactory.createFtLineParser();
                 entryObject.ft = ftLineParser.parse(replacement);
                 break;
             case PE:
-                UniprotkbLineParser<PeLineObject> peLineParser = parserFactory.createPeLineParser();
+                UniprotKBLineParser<PeLineObject> peLineParser = parserFactory.createPeLineParser();
                 entryObject.pe = peLineParser.parse(replacement);
                 break;
             case SQ:
-                UniprotkbLineParser<SqLineObject> sqLineParser = parserFactory.createSqLineParser();
+                UniprotKBLineParser<SqLineObject> sqLineParser = parserFactory.createSqLineParser();
                 entryObject.sq = sqLineParser.parse(replacement);
                 break;
             default:
@@ -137,7 +137,7 @@ class UniProtEntryObjectProxy {
         }
     }
 
-    UniProtkbEntry convertToUniProtEntry(EntryObjectConverter entryObjectConverter) {
+    UniProtKBEntry convertToUniProtEntry(EntryObjectConverter entryObjectConverter) {
         return entryObjectConverter.convert(this.entryObject);
     }
 }

@@ -19,7 +19,7 @@ import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
@@ -32,7 +32,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @Slf4j
 public class ResultsConfig {
     @Bean
-    public StoreStreamer<UniProtDocument, UniProtkbEntry> uniProtEntryStoreStreamer(
+    public StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer(
             UniProtKBStoreClient uniProtClient,
             UniprotQueryRepository uniprotQueryRepository,
             @Qualifier("rdfRestTemplate") RestTemplate restTemplate) {
@@ -58,7 +58,7 @@ public class ResultsConfig {
                                                 "Call to RDF server failed. Failure #{}. Retrying...",
                                                 e.getAttemptCount()));
 
-        return StoreStreamer.<UniProtDocument, UniProtkbEntry>builder()
+        return StoreStreamer.<UniProtDocument, UniProtKBEntry>builder()
                 .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
                 .rdfBatchSize(rdfConfigProperties().getBatchSize())
                 .storeClient(uniProtClient)

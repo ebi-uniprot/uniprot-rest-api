@@ -26,9 +26,9 @@ import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStoreEntry;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
-import org.uniprot.core.uniprotkb.UniProtkbReference;
-import org.uniprot.core.uniprotkb.impl.UniProtkbReferenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBReference;
+import org.uniprot.core.uniprotkb.impl.UniProtKBReferenceBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -83,13 +83,13 @@ public class PublicationService {
 
     private List<PublicationEntry> getUniprotEntryPublicationEntries(String accession) {
         List<PublicationEntry> result = new ArrayList<>();
-        Optional<UniProtkbEntry> uniProtEntry = uniProtKBStore.getEntry(accession);
+        Optional<UniProtKBEntry> uniProtEntry = uniProtKBStore.getEntry(accession);
         if (uniProtEntry.isPresent()) {
-            UniProtkbEntry entry = uniProtEntry.get();
+            UniProtKBEntry entry = uniProtEntry.get();
             if (entry.hasReferences()) {
                 Map<Long, LiteratureEntry> literatureEntryMap =
                         getLiteraturesFromReferences(entry.getReferences());
-                for (UniProtkbReference uniProtkbReference : entry.getReferences()) {
+                for (UniProtKBReference uniProtkbReference : entry.getReferences()) {
                     Long pubmedId = getPubmedId(uniProtkbReference);
                     result.add(
                             getPublicationEntry(
@@ -103,7 +103,7 @@ public class PublicationService {
     }
 
     private Map<Long, LiteratureEntry> getLiteraturesFromReferences(
-            List<UniProtkbReference> references) {
+            List<UniProtKBReference> references) {
         BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
 
         references.stream()
@@ -129,14 +129,14 @@ public class PublicationService {
         return literature.getPubmedId();
     }
 
-    private boolean hasPubmedId(UniProtkbReference uniProtkbReference) {
+    private boolean hasPubmedId(UniProtKBReference uniProtkbReference) {
         return uniProtkbReference
                 .getCitation()
                 .getCitationCrossReferenceByType(CitationDatabase.PUBMED)
                 .isPresent();
     }
 
-    private Long getPubmedId(UniProtkbReference uniProtkbReference) {
+    private Long getPubmedId(UniProtKBReference uniProtkbReference) {
         final Long[] result = {0L};
         uniProtkbReference
                 .getCitation()
@@ -147,11 +147,11 @@ public class PublicationService {
 
     private PublicationEntry getPublicationEntry(
             LiteratureEntry literatureEntry,
-            UniProtkbReference uniProtkbReference,
+            UniProtKBReference uniProtkbReference,
             String publicationSource) {
         PublicationEntry.PublicationEntryBuilder builder = PublicationEntry.builder();
-        UniProtkbReferenceBuilder referenceBuilder =
-                UniProtkbReferenceBuilder.from(uniProtkbReference);
+        UniProtKBReferenceBuilder referenceBuilder =
+                UniProtKBReferenceBuilder.from(uniProtkbReference);
         if (Utils.notNull(literatureEntry)) {
             if (literatureEntry.hasCitation()) {
                 referenceBuilder.citation(literatureEntry.getCitation());
@@ -166,7 +166,7 @@ public class PublicationService {
                 .build();
     }
 
-    private List<String> getCategoriesFromUniprotReference(UniProtkbReference uniProtkbReference) {
+    private List<String> getCategoriesFromUniprotReference(UniProtKBReference uniProtkbReference) {
         Set<String> result = new HashSet<>();
         if (uniProtkbReference.hasReferencePositions()) {
             for (String position : uniProtkbReference.getReferencePositions()) {
@@ -217,8 +217,8 @@ public class PublicationService {
                             .collect(Collectors.toList());
             mappedReference.getSourceCategories().clear();
         }
-        UniProtkbReference reference =
-                new UniProtkbReferenceBuilder()
+        UniProtKBReference reference =
+                new UniProtKBReferenceBuilder()
                         .citation(literatureEntry.getLiteratureEntry().getCitation())
                         .build();
 

@@ -31,7 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.UniprotKbObjectsForTests;
+import org.uniprot.api.uniprotkb.UniprotKBObjectsForTests;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
@@ -325,13 +325,13 @@ class UniprotKBEntryControllerIT {
     private void saveEntry(long pubMedId, String... accessions) {
         System.out.println("Document for PUBMED_ID: " + pubMedId);
         LiteratureDocument document =
-                UniprotKbObjectsForTests.getLiteratureDocument(pubMedId, accessions);
+                UniprotKBObjectsForTests.getLiteratureDocument(pubMedId, accessions);
 
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
     private void saveUniprotEntryInStore(String accession, String... pubmedIds) {
         storeClient.saveEntry(
-                UniprotKbObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
+                UniprotKBObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
     }
 }

@@ -1,7 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.uniprotkb.UniprotKbObjectsForTests.getCitationXref;
+import static org.uniprot.api.uniprotkb.UniprotKBObjectsForTests.getCitationXref;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +19,8 @@ import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureStatistics;
 import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
-import org.uniprot.core.uniprotkb.UniProtkbReference;
-import org.uniprot.core.uniprotkb.impl.UniProtkbReferenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtKBReference;
+import org.uniprot.core.uniprotkb.impl.UniProtKBReferenceBuilder;
 
 /**
  * @author lgonzales
@@ -225,7 +225,7 @@ class PublicationFacetConfigTest {
         CrossReference<CitationDatabase> pubmed =
                 getCitationXref(CitationDatabase.PUBMED, String.valueOf(count));
         Literature literature = new LiteratureBuilder().citationCrossReferencesAdd(pubmed).build();
-        UniProtkbReference reference = new UniProtkbReferenceBuilder().citation(literature).build();
+        UniProtKBReference reference = new UniProtKBReferenceBuilder().citation(literature).build();
         LiteratureStatistics largeStat =
                 new LiteratureStatisticsBuilder().reviewedProteinCount(count).build();
         return PublicationEntry.builder().statistics(largeStat).reference(reference).build();

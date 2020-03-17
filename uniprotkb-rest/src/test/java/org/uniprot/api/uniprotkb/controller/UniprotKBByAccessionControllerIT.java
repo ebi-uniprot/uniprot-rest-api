@@ -39,7 +39,7 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -92,7 +92,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
     }
 
@@ -157,7 +157,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void canSearchIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
-        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -186,7 +186,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void canSearchCanonicalIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
-        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -215,7 +215,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void withMergedInactiveEntryReturnTheActiveOne() throws Exception {
         // given
-        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> mergedList =
@@ -244,7 +244,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
         // given
-        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> demergedList =
@@ -274,7 +274,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void searchForDeletedInactiveEntriesReturnItself() throws Exception {
         // given
-        UniProtkbEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         List<InactiveUniProtEntry> deletedList =

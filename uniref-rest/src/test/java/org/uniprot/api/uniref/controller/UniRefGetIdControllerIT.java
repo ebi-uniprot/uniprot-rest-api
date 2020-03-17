@@ -36,7 +36,7 @@ import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
 import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtkbAccessionBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
@@ -169,7 +169,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtkbAccessionBuilder("P12345").build())
+                .accessionsAdd(new UniProtKBAccessionBuilder("P12345").build())
                 .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
                 .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
                 .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
@@ -194,7 +194,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtkbAccessionBuilder("P12345").build())
+                .accessionsAdd(new UniProtKBAccessionBuilder("P12345").build())
                 .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
                 .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
                 .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())

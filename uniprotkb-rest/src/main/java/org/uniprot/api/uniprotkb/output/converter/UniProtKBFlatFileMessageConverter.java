@@ -6,16 +6,16 @@ import java.io.OutputStream;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.flatfile.writer.impl.UniProtFlatfileWriter;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 public class UniProtKBFlatFileMessageConverter
-        extends AbstractEntityHttpMessageConverter<UniProtkbEntry> {
+        extends AbstractEntityHttpMessageConverter<UniProtKBEntry> {
     public UniProtKBFlatFileMessageConverter() {
-        super(UniProtMediaType.FF_MEDIA_TYPE, UniProtkbEntry.class);
+        super(UniProtMediaType.FF_MEDIA_TYPE, UniProtKBEntry.class);
     }
 
     @Override
-    protected void writeEntity(UniProtkbEntry entity, OutputStream outputStream)
+    protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream)
             throws IOException {
         outputStream.write((UniProtFlatfileWriter.write(entity) + "\n").getBytes());
     }

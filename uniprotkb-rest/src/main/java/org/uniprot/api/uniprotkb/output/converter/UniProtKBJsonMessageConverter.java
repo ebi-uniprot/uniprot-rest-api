@@ -6,16 +6,16 @@ import java.util.Map;
 
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
-import org.uniprot.core.json.parser.uniprot.UniprotkbJsonConfig;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.field.UniProtField;
 
-public class UniProtKBJsonMessageConverter extends JsonMessageConverter<UniProtkbEntry> {
+public class UniProtKBJsonMessageConverter extends JsonMessageConverter<UniProtKBEntry> {
 
     public UniProtKBJsonMessageConverter() {
         super(
-                UniprotkbJsonConfig.getInstance().getSimpleObjectMapper(),
-                UniProtkbEntry.class,
+                UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
+                UniProtKBEntry.class,
                 Arrays.asList(UniProtField.ResultFields.values()));
     }
 
