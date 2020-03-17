@@ -95,7 +95,7 @@ public class UniProtKBDownloadFieldsIT extends BaseUniprotKBDownloadIT {
                                 MediaType.APPLICATION_XML, MANDATORY_JSON_FIELDS)),
                 Arguments.of(
                         paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
+                                UniProtMediaType.XLS_MEDIA_TYPE, DEFAULT_XLS_FIELDS)),
                 Arguments.of(
                         paramResolver.getDownloadDefaultFieldsParamAndResult(
                                 UniProtMediaType.FASTA_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),

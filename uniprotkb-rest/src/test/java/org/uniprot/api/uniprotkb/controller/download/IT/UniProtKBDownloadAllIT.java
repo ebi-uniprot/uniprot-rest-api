@@ -1,14 +1,8 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.stream.Stream;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,8 +22,13 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
-import org.uniprot.api.uniprotkb.controller.download.resolver.UniprotKBDownloadAllParamResolver;
+import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.stream.Stream;
 
 /**
  * Class to test download api without any filter.. kind of download everything for each type of
@@ -43,8 +42,8 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
 
     @RegisterExtension
-    static UniprotKBDownloadAllParamResolver paramResolver =
-            new UniprotKBDownloadAllParamResolver();
+    static UniProtKBDownloadParamAndResultProvider paramAndResultProvider =
+            new UniProtKBDownloadParamAndResultProvider();
 
     private static final String RDF_TEST_FILE = "src/test/resources/downloadIT/P12345.rdf";
 
@@ -69,11 +68,6 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
                 .thenReturn(rdfString);
     }
 
-    @Test
-    protected void testDownloadAllJSON(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByType")
     void testDownloadAll(DownloadParamAndResult paramAndResult) throws Exception {
@@ -82,6 +76,6 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
 
     private static Stream<Arguments> provideRequestResponseByType() {
         return getNonJSONSupportedContentTypes().stream()
-                .map(type -> Arguments.of(paramResolver.getDownloadAllParamAndResult(type)));
+                .map(type -> Arguments.of(paramAndResultProvider.getDownloadParamAndResult(type, ENTRY_COUNT)));
     }
 }
