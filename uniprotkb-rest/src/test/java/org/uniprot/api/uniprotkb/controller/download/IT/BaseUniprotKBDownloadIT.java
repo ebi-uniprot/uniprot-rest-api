@@ -38,12 +38,6 @@ import org.uniprot.store.search.SolrCollection;
 
 /** Class to keep things common to all disease download tests */
 public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
-    @Autowired private UniprotQueryRepository repository;
-    public static String SEARCH_ACCESSION1 =
-            "O-" + ThreadLocalRandom.current().nextLong(10000, 50000);
-    public static String SEARCH_ACCESSION2 =
-            "P-" + ThreadLocalRandom.current().nextLong(50001, 99999);
-
     public static final String ACC1 = "O12345";
     public static final String ACC2 = "P12345";
     public static final String ACC3 = "Q12345";
@@ -63,14 +57,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
                     "Gene Names",
                     "Organism",
                     "Length");
-    public static List<String> SORTED_BY_LENGTH = Arrays.asList(ACC3, ACC2, ACC1);
-    public static List<String> SORTED_BY_MASS_DESC = Arrays.asList(ACC1, ACC2, ACC3);
-    public static List<String> SORTED_BY_ACCESSION = Arrays.asList(ACC1, ACC2, ACC3);
-    public static List<String> SORTED_BY_ACCESSION_DESC = Arrays.asList(ACC3, ACC2, ACC1);
-    public static List<String> SORTED_BY_ANNOTATION_SCORE = Arrays.asList(ACC2, ACC3, ACC1);
-    public static List<String> SORTED_BY_MNEMONIC = Arrays.asList(ACC2, ACC1, ACC3);
-    public static List<String> SORTED_BY_GENE = Arrays.asList(ACC2, ACC3, ACC1);
-    public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
+
     public static List<String> MANDATORY_JSON_FIELDS =
             Arrays.asList(
                     "entryType",
@@ -78,6 +65,10 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
                     "uniProtkbId",
                     "entryAudit",
                     "annotationScore");
+
+    public static List<String> DEFAULT_XLS_FIELDS =
+            Arrays.asList("Entry", "Entry Name", "Reviewed", "Protein names", "Gene Names", "Organism", "Length");
+
     public static List<String> REQUESTED_JSON_FIELDS =
             Arrays.asList("protein_existence", "organism", "protein_name");
     public static List<String> INVALID_RETURN_FIELDS =
@@ -89,6 +80,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
         RETURNED_JSON_FIELDS.addAll(MANDATORY_JSON_FIELDS);
     }
 
+    @Autowired private UniprotQueryRepository repository;
     private UniProtKBStoreClient storeClient;
 
     @BeforeAll
@@ -173,6 +165,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
 
     protected static List<MediaType> getNonJSONSupportedContentTypes() {
         return Arrays.asList(
+                MediaType.APPLICATION_JSON,
                 UniProtMediaType.TSV_MEDIA_TYPE,
                 UniProtMediaType.FF_MEDIA_TYPE,
                 UniProtMediaType.LIST_MEDIA_TYPE,
@@ -193,6 +186,6 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     }
 
     private Organism getOrganism(String name, long taxonId) {
-        return new OrganismBuilder().commonName(name).taxonId(taxonId).build();
+        return new OrganismBuilder().scientificName("Homo sapiens").commonName(name).taxonId(taxonId).build();
     }
 }

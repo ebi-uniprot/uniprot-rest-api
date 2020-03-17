@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller.download.resolver;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,7 +14,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -54,7 +58,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                                                     Collectors.counting()))
                                     .keySet()
                                     .stream()
-                                    .collect(Collectors.toList());
+                                    .collect(toList());
                     assertThat(accessions, equalTo(accessionsInOrder));
                 };
 
@@ -79,18 +83,32 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                         requestedFields,
                         expectedFields);
 
-        ResultMatcher sortResultMatcher =
+        // fasta always returns the fixed format whether we pass fields or not
+        // example
+        // >sp|O12345|MNEMONIC_B Phosphoribosylformylglycinamidine synthase subunit PurL OS=Homo sapiens OX=1 GN=cUrl PE=3 SV=1
+        //KDVHMPKHPELADKNVPNLHVMKAMQS
+        ResultMatcher fieldsResultMatcher =
                 result -> {
                     String fastaStr = result.getResponse().getContentAsString();
-                    List<String> lines = Arrays.asList(fastaStr.split("\n"));
-                    List<String> accessions =
-                            lines.stream()
-                                    .filter(l -> l.startsWith(">sp"))
-                                    .map(l -> l.split("\\|")[1])
-                                    .collect(Collectors.toList());
-                    assertThat(accessions, equalTo(accessionsInOrder));
+                    String id = fastaStr.substring(1, fastaStr.indexOf(' '));
+                    assertThat("id is null", id != null);
+                    String[] idParts = id.split("\\|");
+                    assertThat("id format not valid", idParts.length == 3);
+                    String rest = fastaStr.substring(fastaStr.indexOf(' '));
+                    String[] headSeq = rest.split("\n");
+                    assertThat("header and sequence not present", headSeq.length == 2);
+                    String header = headSeq[0].trim();
+                    String desc = header.substring(0, header.indexOf(" OS="));
+                    String keyValPairs = header.substring(desc.length());
+                    assertThat("OS not found", keyValPairs.contains("OS"));
+                    assertThat("OX not found", keyValPairs.contains("OX"));
+                    assertThat("GN not found", keyValPairs.contains("GN"));
+                    assertThat("PE not found", keyValPairs.contains("PE"));
+                    assertThat("SV not found", keyValPairs.contains("SV"));
+                    String sequence = headSeq[1].trim();
+                    assertThat("seq null", sequence != null);
                 };
-        resultMatchers.add(sortResultMatcher);
+        resultMatchers.add(fieldsResultMatcher);
 
         return resultMatchers;
     }
@@ -128,7 +146,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                                                     accTag.substring(
                                                             "  <accession>".length(),
                                                             accTag.indexOf("</")))
-                                    .collect(Collectors.toList());
+                                    .collect(toList());
                     assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
 
@@ -183,7 +201,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                                     .map(acc -> acc.split(";"))
                                     .flatMap(Arrays::stream)
                                     .filter(part -> !";".equals(part))
-                                    .collect(Collectors.toList());
+                                    .collect(toList());
                     assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
         resultMatchers.add(sortResultMatcher);
@@ -227,7 +245,15 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                         expectedFields);
 
         ResultMatcher sortResultMatcher =
-                result -> assertThat(ACCESSIONS, equalTo(accessionsInOrder));
+                result -> {
+                    Sheet sheet = getExcelSheet(result);
+                    List<String> headers = stream(sheet.spliterator(), false)
+                            .limit(1)
+                            .flatMap(row -> stream(row.spliterator(), false))
+                            .map(Cell::getStringCellValue)
+                            .collect(toList());
+                    assertThat("headers are not equal", expectedFields.equals(headers));
+        };
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }
@@ -254,7 +280,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                     List<String> actualAccessions =
                             Arrays.stream(resp.split("\n"))
                                     .map(row -> row.trim())
-                                    .collect(Collectors.toList());
+                                    .collect(toList());
                     assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
         resultMatchers.add(sortResultMatcher);
@@ -286,7 +312,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                             Arrays.stream(resp.split("\n"))
                                     .limit(1)
                                     .flatMap(row -> Arrays.stream(row.split("\t")))
-                                    .collect(Collectors.toList());
+                                    .collect(toList());
 
                     assertThat(fields, equalTo(expectedFields));
                 };
@@ -319,7 +345,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
         List<ResultMatcher> fieldsExist =
                 expectedFields.stream()
                         .map(field -> jsonPath("$.results[*]." + field).exists())
-                        .collect(Collectors.toList());
+                        .collect(toList());
 
         resultMatchers.addAll(fieldsExist);
         return resultMatchers;

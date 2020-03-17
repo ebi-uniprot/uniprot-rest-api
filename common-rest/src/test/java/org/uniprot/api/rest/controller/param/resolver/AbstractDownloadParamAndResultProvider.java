@@ -15,7 +15,9 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-/** class to provide common query param and result matcher */
+/**
+ * class to provide common query param and result matcher
+ */
 public abstract class AbstractDownloadParamAndResultProvider {
     public DownloadParamAndResult getDownloadParamAndResult(
             MediaType contentType, Integer entryCount) {
@@ -111,100 +113,119 @@ public abstract class AbstractDownloadParamAndResultProvider {
             List<String> expectedFields) {
 
         List<ResultMatcher> resultMatchers;
-        if (MediaType.APPLICATION_JSON.equals(contentType)) {
-            resultMatchers =
-                    getJsonResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.TSV_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getTSVResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.LIST_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getListResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.XLS_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getXLSResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.RDF_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getRDFResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.FF_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getFFResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (MediaType.APPLICATION_XML.equals(contentType)) {
-            resultMatchers =
-                    getXMLResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.FASTA_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getFastaResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.GFF_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getGFFResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else if (UniProtMediaType.OBO_MEDIA_TYPE.equals(contentType)) {
-            resultMatchers =
-                    getOBOResultMatchers(
-                            entryCount,
-                            sortFieldName,
-                            sortOrder,
-                            accessionsInOrder,
-                            requestedFields,
-                            expectedFields);
-        } else {
-            throw new IllegalArgumentException("Unknown content type " + contentType);
+        switch (contentType.toString()) {
+            case MediaType.APPLICATION_JSON_VALUE:
+                resultMatchers =
+                        getJsonResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.TSV_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getTSVResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.LIST_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getListResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.XLS_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getXLSResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.RDF_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getRDFResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.FF_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getFFResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case MediaType.APPLICATION_XML_VALUE:
+                resultMatchers =
+                        getXMLResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.FASTA_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getFastaResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.GFF_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getGFFResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            case UniProtMediaType.OBO_MEDIA_TYPE_VALUE:
+                resultMatchers =
+                        getOBOResultMatchers(
+                                entryCount,
+                                sortFieldName,
+                                sortOrder,
+                                accessionsInOrder,
+                                requestedFields,
+                                expectedFields);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown content type " + contentType);
         }
         return resultMatchers;
+    }
+
+    protected Sheet getExcelSheet(MvcResult result) throws IOException {
+        byte[] xlsBin = result.getResponse().getContentAsByteArray();
+        InputStream excelFile = new ByteArrayInputStream(xlsBin);
+        Workbook workbook = new XSSFWorkbook(excelFile);
+        Sheet sheet = workbook.getSheetAt(0);
+        return sheet;
     }
 
     protected Integer getExcelRowCountAndVerifyContent(MvcResult result) throws IOException {

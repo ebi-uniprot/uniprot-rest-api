@@ -1,8 +1,5 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -26,12 +23,24 @@ import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSortParamResolver;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniprotKBController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
+    public static List<String> SORTED_BY_LENGTH = Arrays.asList(ACC3, ACC2, ACC1);
+    public static List<String> SORTED_BY_MASS_DESC = Arrays.asList(ACC1, ACC2, ACC3);
+    public static List<String> SORTED_BY_ACCESSION = Arrays.asList(ACC1, ACC2, ACC3);
+    public static List<String> SORTED_BY_ACCESSION_DESC = Arrays.asList(ACC3, ACC2, ACC1);
+    public static List<String> SORTED_BY_ANNOTATION_SCORE = Arrays.asList(ACC2, ACC3, ACC1);
+    public static List<String> SORTED_BY_MNEMONIC = Arrays.asList(ACC2, ACC1, ACC3);
+    public static List<String> SORTED_BY_GENE = Arrays.asList(ACC2, ACC3, ACC1);
+    public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
 
     @RegisterExtension
     static UniProtKBDownloadSortParamResolver paramResolver =
