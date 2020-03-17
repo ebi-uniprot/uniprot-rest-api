@@ -1,15 +1,9 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,8 +25,16 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
-import org.uniprot.api.uniprotkb.controller.download.resolver.UniprotKBDownloadFieldsParamResolver;
+import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadFieldsParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
@@ -41,8 +43,8 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 @ExtendWith(value = {SpringExtension.class})
 public class UniProtKBDownloadFieldsIT extends BaseUniprotKBDownloadIT {
     @RegisterExtension
-    static UniprotKBDownloadFieldsParamResolver paramResolver =
-            new UniprotKBDownloadFieldsParamResolver();
+    static UniProtKBDownloadFieldsParamAndResultProvider paramAndResultProvider =
+            new UniProtKBDownloadFieldsParamAndResultProvider();
 
     private static final String RDF_TEST_FILE = "src/test/resources/downloadIT/P12345.rdf";
 
@@ -95,66 +97,43 @@ public class UniProtKBDownloadFieldsIT extends BaseUniprotKBDownloadIT {
 
     private static Stream<Arguments> paramAndResultByTypeForDefault() {
         return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_JSON, MANDATORY_JSON_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE, TSV_DEFAULT_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_XML, MANDATORY_JSON_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE, DEFAULT_XLS_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
-                Arguments.of(
-                        paramResolver.getDownloadDefaultFieldsParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE, MANDATORY_JSON_FIELDS)),
-                Arguments.of(paramResolver.getDownloadDefaultFieldsParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE,
-                        MANDATORY_JSON_FIELDS))
+                Arguments.of(getParamAndResult(MediaType.APPLICATION_JSON, null, MANDATORY_JSON_FIELDS)),
+                Arguments.of(getParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, null, DEFAULT_TSV_FIELDS)),
+                Arguments.of(getParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, null, null)),
+                Arguments.of(getParamAndResult(MediaType.APPLICATION_XML, null, null)),
+                Arguments.of(getParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE, null, DEFAULT_XLS_FIELDS)),
+                Arguments.of(getParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE, null, null)),
+                Arguments.of(getParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE, null, null)),
+                Arguments.of(getParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE, null, null))
                 );
+    }
+
+    private static DownloadParamAndResult getParamAndResult(MediaType mediaType, List<String> reqFields, List<String> respFields) {
+        return getParamAndResult(mediaType,  Arrays.asList(BaseUniprotKBDownloadIT.ACC1), reqFields, respFields);
+    }
+
+    private static DownloadParamAndResult getParamAndResult(MediaType mediaType, List<String> accessions, List<String> reqFields, List<String> respFields) {
+        return paramAndResultProvider.getDownloadParamAndResultForFields(
+                mediaType, 1, accessions, reqFields, respFields);
     }
 
     private static Stream<Arguments> paramAndResultByTypeForNonDefault() {
         return Stream.of(
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_JSON, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE, REQUESTED_JSON_FIELDS, TSV_RETURNED_HEADERS)),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                MediaType.APPLICATION_XML, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.XLS_MEDIA_TYPE, REQUESTED_JSON_FIELDS, XLS_RETURNED_HEADERS)),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.FASTA_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
-                Arguments.of(
-                        paramResolver.getDownloadNonDefaultFieldsParamAndResult(
-                                UniProtMediaType.GFF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())) //,
-//                Arguments.of(paramResolver.getDownloadNonDefaultFieldsParamAndResult(UniProtMediaType.RDF_MEDIA_TYPE,
+                Arguments.of(getParamAndResult(MediaType.APPLICATION_JSON, REQUESTED_JSON_FIELDS, RETURNED_JSON_FIELDS)),
+                Arguments.of(getParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, REQUESTED_JSON_FIELDS, TSV_RETURNED_HEADERS)),
+                Arguments.of(getParamAndResult(UniProtMediaType.XLS_MEDIA_TYPE, REQUESTED_JSON_FIELDS, XLS_RETURNED_HEADERS)),
+                Arguments.of(getParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
+                Arguments.of(getParamAndResult(MediaType.APPLICATION_XML, REQUESTED_JSON_FIELDS, Collections.emptyList())),
+                Arguments.of(getParamAndResult(UniProtMediaType.FASTA_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList())),
+                Arguments.of(getParamAndResult(UniProtMediaType.GFF_MEDIA_TYPE, REQUESTED_JSON_FIELDS, Collections.emptyList()))
+//                Arguments.of(paramAndResultProvider.getDownloadParamAndResultForFields(UniProtMediaType.RDF_MEDIA_TYPE,
 //                        MANDATORY_JSON_FIELDS, Collections.emptyList()))
         );
     }
 
     private static Stream<Arguments> paramAndResultByTypeForInvalid() {
         return getSupportedContentTypes().stream()
-                .map(
-                        type ->
-                                paramResolver.getDownloadInvalidFieldsParamAndResult(
-                                        type, INVALID_RETURN_FIELDS))
+                .map(type -> getParamAndResult(type, null, INVALID_RETURN_FIELDS, Collections.emptyList()))
                 .map(paramAndResult -> Arguments.of(paramAndResult));
     }
 }

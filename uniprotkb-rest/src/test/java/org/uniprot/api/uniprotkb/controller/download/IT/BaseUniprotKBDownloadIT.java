@@ -48,15 +48,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static final String MNEMONIC2 = "MNEMONIC_B";
     public static final String MNEMONIC3 = "MNEMONIC_C";
 
-    public static List<String> TSV_DEFAULT_FIELDS =
-            Arrays.asList(
-                    "Entry",
-                    "Entry Name",
-                    "Reviewed",
-                    "Protein names",
-                    "Gene Names",
-                    "Organism",
-                    "Length");
+
 
     public static List<String> MANDATORY_JSON_FIELDS =
             Arrays.asList(
@@ -68,6 +60,15 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
 
     public static List<String> DEFAULT_XLS_FIELDS =
             Arrays.asList("Entry", "Entry Name", "Reviewed", "Protein names", "Gene Names", "Organism", "Length");
+    public static List<String> DEFAULT_TSV_FIELDS =
+            Arrays.asList(
+                    "Entry",
+                    "Entry Name",
+                    "Reviewed",
+                    "Protein names",
+                    "Gene Names",
+                    "Organism",
+                    "Length");
     public static List<String> TSV_RETURNED_HEADERS = Arrays.asList(new String[]{"Protein existence", "Organism", "Protein names"});
     public static List<String> XLS_RETURNED_HEADERS = Arrays.asList(new String[]{"Protein existence", "Organism", "Protein names"});
 

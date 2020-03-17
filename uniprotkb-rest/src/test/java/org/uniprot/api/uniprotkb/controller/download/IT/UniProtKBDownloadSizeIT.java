@@ -20,9 +20,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
+import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
-import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSizeParamResolver;
+import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadParamAndResultProvider;
+import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSizeParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 
 import java.io.File;
@@ -37,9 +39,14 @@ import java.util.stream.Stream;
 @WebMvcTest(UniprotKBController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
+    private static final Integer LESS_THAN_BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
+    private static final Integer BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE;
+    private static final Integer MORE_THAN_BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
+    private static final Integer LESS_THAN_ZERO_SIZE = -1;
+
     @RegisterExtension
-    static UniProtKBDownloadSizeParamResolver paramResolver =
-            new UniProtKBDownloadSizeParamResolver();
+    static UniProtKBDownloadSizeParamAndResultProvider paramAndResultProvider =
+            new UniProtKBDownloadSizeParamAndResultProvider();
 
     private static final String RDF_TEST_FILE = "src/test/resources/downloadIT/P12345.rdf";
 
@@ -94,25 +101,25 @@ public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
 
     private static Stream<Arguments> provideRequestResponseByTypeNegativeBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramResolver.getDownloadSizeLessThanZeroParamAndResult(type))
+                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, LESS_THAN_ZERO_SIZE))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramResolver.getDownloadDefaultBatchSizeParamAndResult(type))
+                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, BATCH_SIZE))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeMoreBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramResolver.getDownloadMoreThanBatchSizeParamAndResult(type))
+                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, MORE_THAN_BATCH_SIZE))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeLessBatchSize() {
         return getSupportedContentTypes().stream()
-                .map(type -> paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(type))
+                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, LESS_THAN_BATCH_SIZE))
                 .map(param -> Arguments.of(param));
     }
 }
