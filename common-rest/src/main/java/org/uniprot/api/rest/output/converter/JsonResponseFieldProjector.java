@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.comment.Comment;
 import org.uniprot.core.uniprotkb.feature.Feature;
-import org.uniprot.core.uniprotkb.xdb.UniProtkbCrossReference;
+import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.ReturnField;
 
@@ -112,7 +112,7 @@ public class JsonResponseFieldProjector {
                 Object fieldValue =
                         sourceField.get(
                                 source); // extract the value of sourceField from source object
-                if (source instanceof UniProtkbEntry) { // check the values for UniProtkbEntry
+                if (source instanceof UniProtKBEntry) { // check the values for UniProtKBEntry
                     fieldValue = getObjectsWithValues(fieldValue, neededFieldValues);
                 }
                 return fieldValue;
@@ -149,23 +149,23 @@ public class JsonResponseFieldProjector {
             if (((List<?>) fieldValue).get(0)
                     instanceof Comment) { // check one to decide the type of list items
                 Predicate<Comment> filter =
-                        UniProtkbEntryFilters.createCommentFilter(neededFieldValues);
+                        UniProtKBEntryFilters.createCommentFilter(neededFieldValues);
                 List<Comment> comments = (List<Comment>) fieldValue;
                 comments.removeIf(comment -> !filter.test(comment));
                 return comments;
             } else if (((List<?>) fieldValue).get(0) instanceof Feature) { // feature
                 Predicate<Feature> filter =
-                        UniProtkbEntryFilters.createFeatureFilter(neededFieldValues);
+                        UniProtKBEntryFilters.createFeatureFilter(neededFieldValues);
                 List<Feature> features = (List<Feature>) fieldValue;
                 features.removeIf(feature -> !filter.test(feature));
                 return features;
 
             } else if (((List<?>) fieldValue).get(0)
-                    instanceof UniProtkbCrossReference) { // cross ref
-                Predicate<UniProtkbCrossReference> filter =
-                        UniProtkbEntryFilters.createDbReferenceFilter(neededFieldValues);
-                List<UniProtkbCrossReference> crossReferences =
-                        (List<UniProtkbCrossReference>) fieldValue;
+                    instanceof UniProtKBCrossReference) { // cross ref
+                Predicate<UniProtKBCrossReference> filter =
+                        UniProtKBEntryFilters.createDbReferenceFilter(neededFieldValues);
+                List<UniProtKBCrossReference> crossReferences =
+                        (List<UniProtKBCrossReference>) fieldValue;
                 crossReferences.removeIf(xref -> !filter.test(xref));
                 return crossReferences;
             }

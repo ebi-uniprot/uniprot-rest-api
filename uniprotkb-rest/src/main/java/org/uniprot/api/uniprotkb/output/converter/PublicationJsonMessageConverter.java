@@ -12,9 +12,9 @@ import org.uniprot.core.json.parser.serializer.AuthorSerializer;
 import org.uniprot.core.json.parser.serializer.JournalSerializer;
 import org.uniprot.core.json.parser.serializer.PublicationDateSerializer;
 import org.uniprot.core.json.parser.uniprot.serializer.EvidenceSerializer;
-import org.uniprot.core.json.parser.uniprot.serializer.UniProtkbAccessionSerializer;
+import org.uniprot.core.json.parser.uniprot.serializer.UniProtKBAccessionSerializer;
 import org.uniprot.core.uniprotkb.evidence.impl.EvidenceImpl;
-import org.uniprot.core.uniprotkb.impl.UniProtkbAccessionImpl;
+import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionImpl;
 import org.uniprot.store.search.field.ReturnField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,7 +82,7 @@ public class PublicationJsonMessageConverter extends JsonMessageConverter<Public
             simpleMod.addSerializer(JournalImpl.class, new JournalSerializer());
             simpleMod.addSerializer(AuthorImpl.class, new AuthorSerializer());
             simpleMod.addSerializer(
-                    UniProtkbAccessionImpl.class, new UniProtkbAccessionSerializer());
+                    UniProtKBAccessionImpl.class, new UniProtKBAccessionSerializer());
             simpleMod.addSerializer(PublicationDateImpl.class, new PublicationDateSerializer());
             simpleMod.addSerializer(EvidenceImpl.class, new EvidenceSerializer());
 

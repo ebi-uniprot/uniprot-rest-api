@@ -32,7 +32,7 @@ public class ProteomeEntryConverter implements Function<ProteomeDocument, Proteo
                             org.uniprot.core.proteome.ProteomeEntry.class);
             return entry;
         } catch (Exception e) {
-            LOGGER.info("Error converting solr avro_binary default UniProtkbEntry", e);
+            LOGGER.info("Error converting solr avro_binary default UniProtKBEntry", e);
         }
         return null;
     }

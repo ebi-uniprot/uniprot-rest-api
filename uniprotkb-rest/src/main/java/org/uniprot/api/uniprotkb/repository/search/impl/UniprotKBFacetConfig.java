@@ -26,7 +26,7 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 @Setter
 @PropertySource("classpath:facet.properties")
 @ConfigurationProperties(prefix = "facet")
-public class UniprotFacetConfig extends FacetConfig {
+public class UniprotKBFacetConfig extends FacetConfig {
 
     private Map<String, FacetProperty> uniprot = new HashMap<>();
 

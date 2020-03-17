@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import org.uniprot.core.flatfile.parser.SupportingDataMap;
 import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
 import org.uniprot.core.flatfile.parser.impl.entry.EntryObjectConverter;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /** Contains utility methods that aid in testing */
 final class TestUtils {
@@ -19,7 +19,7 @@ final class TestUtils {
 
     private TestUtils() {}
 
-    static UniProtkbEntry convertToUniProtEntry(UniProtEntryObjectProxy objectProxy) {
+    static UniProtKBEntry convertToUniProtEntry(UniProtEntryObjectProxy objectProxy) {
         return objectProxy.convertToUniProtEntry(entryObjectConverter);
     }
 

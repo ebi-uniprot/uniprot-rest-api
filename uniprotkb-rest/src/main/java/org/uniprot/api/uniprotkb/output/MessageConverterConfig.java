@@ -26,7 +26,7 @@ import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.RDFMessageConverter;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.output.converter.*;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /**
  * Created 21/08/18
@@ -84,8 +84,8 @@ public class MessageConverterConfig {
     }
 
     @Bean("uniprotMessageConverterContextFactory")
-    public MessageConverterContextFactory<UniProtkbEntry> messageConverterContextFactory() {
-        MessageConverterContextFactory<UniProtkbEntry> contextFactory =
+    public MessageConverterContextFactory<UniProtKBEntry> messageConverterContextFactory() {
+        MessageConverterContextFactory<UniProtKBEntry> contextFactory =
                 new MessageConverterContextFactory<>();
 
         asList(
@@ -119,8 +119,8 @@ public class MessageConverterConfig {
         return contextFactory;
     }
 
-    private MessageConverterContext<UniProtkbEntry> context(MediaType contentType) {
-        return MessageConverterContext.<UniProtkbEntry>builder()
+    private MessageConverterContext<UniProtKBEntry> context(MediaType contentType) {
+        return MessageConverterContext.<UniProtKBEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPROT)
                 .contentType(contentType)
                 .build();

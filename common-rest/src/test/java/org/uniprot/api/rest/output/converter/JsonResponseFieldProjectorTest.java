@@ -16,12 +16,12 @@ import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.uniprot.*;
 import org.uniprot.core.json.parser.uniprot.comment.*;
 import org.uniprot.core.uniprotkb.ProteinExistence;
-import org.uniprot.core.uniprotkb.UniProtkbEntry;
-import org.uniprot.core.uniprotkb.UniProtkbEntryType;
-import org.uniprot.core.uniprotkb.UniProtkbId;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.UniProtKBId;
 import org.uniprot.core.uniprotkb.comment.Comment;
-import org.uniprot.core.uniprotkb.impl.UniProtkbEntryBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtkbIdBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBIdBuilder;
 import org.uniprot.store.search.field.DiseaseField;
 import org.uniprot.store.search.field.UniProtField;
 
@@ -213,14 +213,14 @@ class JsonResponseFieldProjectorTest {
         comments.add(SubcellularLocationCommentTest.getSubcellularLocationComment());
         comments.add(WebResourceCommentTest.getWebResourceComment());
 
-        UniProtkbId uniProtkbId = new UniProtkbIdBuilder("uniprot id").build();
-        UniProtkbEntryBuilder builder =
-                new UniProtkbEntryBuilder(
-                        UniProtkbAccessionTest.getUniProtAccession(),
+        UniProtKBId uniProtkbId = new UniProtKBIdBuilder("uniprot id").build();
+        UniProtKBEntryBuilder builder =
+                new UniProtKBEntryBuilder(
+                        UniProtKBAccessionTest.getUniProtAccession(),
                         uniProtkbId,
-                        UniProtkbEntryType.SWISSPROT);
-        UniProtkbEntry entry =
-                builder.secondaryAccessionsAdd(UniProtkbAccessionTest.getUniProtAccession())
+                        UniProtKBEntryType.SWISSPROT);
+        UniProtKBEntry entry =
+                builder.secondaryAccessionsAdd(UniProtKBAccessionTest.getUniProtAccession())
                         .entryAudit(EntryAuditTest.getEntryAudit())
                         .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
                         .proteinDescription(ProteinDescriptionTest.getProteinDescription())
@@ -235,10 +235,10 @@ class JsonResponseFieldProjectorTest {
                         .keywordsSet(Collections.singletonList(KeywordTest.getKeyword()))
                         .geneLocationsSet(
                                 Collections.singletonList(GeneLocationTest.getGeneLocation()))
-                        .referencesSet(UniProtkbReferenceTest.getUniProtReferences())
+                        .referencesSet(UniProtKBReferenceTest.getUniProtReferences())
                         .uniProtCrossReferencesSet(
                                 Collections.singletonList(
-                                        UniProtkbCrossReferenceTest.getUniProtDBCrossReference()))
+                                        UniProtKBCrossReferenceTest.getUniProtDBCrossReference()))
                         .sequence(SequenceTest.getSequence())
                         .build();
 
