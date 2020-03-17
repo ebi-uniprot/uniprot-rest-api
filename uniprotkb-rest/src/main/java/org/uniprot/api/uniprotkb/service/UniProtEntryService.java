@@ -44,17 +44,17 @@ public class UniProtEntryService
     private final SearchFieldConfig searchFieldConfig;
 
     public UniProtEntryService(
-        UniprotQueryRepository repository,
-        UniprotKBFacetConfig uniprotKBFacetConfig,
-        UniProtTermsConfig uniProtTermsConfig,
-        UniProtSolrSortClause uniProtSolrSortClause,
-        QueryBoosts uniProtKBQueryBoosts,
-        UniProtKBStoreClient entryStore,
-        StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
-        TaxonomyService taxService) {
+            UniprotQueryRepository repository,
+            UniprotKBFacetConfig uniprotKBFacetConfig,
+            UniProtTermsConfig uniProtTermsConfig,
+            UniProtSolrSortClause uniProtSolrSortClause,
+            QueryBoosts uniProtKBQueryBoosts,
+            UniProtKBStoreClient entryStore,
+            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
+            TaxonomyService taxService) {
         super(
                 repository,
-            uniprotKBFacetConfig,
+                uniprotKBFacetConfig,
                 uniProtSolrSortClause,
                 uniProtEntryStoreStreamer,
                 uniProtKBQueryBoosts);
