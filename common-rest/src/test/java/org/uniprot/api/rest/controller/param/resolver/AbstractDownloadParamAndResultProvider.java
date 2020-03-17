@@ -15,9 +15,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-/**
- * class to provide common query param and result matcher
- */
+/** class to provide common query param and result matcher */
 public abstract class AbstractDownloadParamAndResultProvider {
     public DownloadParamAndResult getDownloadParamAndResult(
             MediaType contentType, Integer entryCount) {

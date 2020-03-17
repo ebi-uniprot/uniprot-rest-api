@@ -1,5 +1,9 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,10 +26,6 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSortParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
@@ -172,11 +172,30 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     private static Stream<Arguments> requestResponseForSort(
             String fieldName, String sortOrder, List<String> accessionsOrder) {
         return Stream.of(
-                Arguments.of(getParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, fieldName, sortOrder, accessionsOrder)),
-                Arguments.of(getParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, fieldName, sortOrder, accessionsOrder)),
-                Arguments.of(getParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE, fieldName, sortOrder, accessionsOrder)),
-                Arguments.of(getParamAndResult(MediaType.APPLICATION_XML, fieldName, sortOrder, accessionsOrder)),
-                Arguments.of(getParamAndResult(MediaType.APPLICATION_JSON, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.TSV_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.FF_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.LIST_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                MediaType.APPLICATION_XML, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                MediaType.APPLICATION_JSON, fieldName, sortOrder, accessionsOrder)),
                 Arguments.of(
                         getParamAndResult(
                                 UniProtMediaType.XLS_MEDIA_TYPE,
@@ -204,12 +223,9 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
                 );
     }
 
-    private static DownloadParamAndResult getParamAndResult(MediaType mediaType, String fieldName, String sortOrder, List<String> accessionsOrder) {
+    private static DownloadParamAndResult getParamAndResult(
+            MediaType mediaType, String fieldName, String sortOrder, List<String> accessionsOrder) {
         return paramAndResultProvider.getDownloadParamAndResultForSort(
-                mediaType,
-                fieldName,
-                sortOrder,
-                3,
-                accessionsOrder);
+                mediaType, fieldName, sortOrder, 3, accessionsOrder);
     }
 }
