@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -296,14 +297,13 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
             List<String> accessionsInOrder,
             List<String> requestedFields,
             List<String> expectedFields) {
-        List<ResultMatcher> resultMatchers =
-                super.getTSVResultMatchers(
-                        entryCount,
-                        sortFieldName,
-                        sortOrder,
-                        accessionsInOrder,
-                        requestedFields,
-                        expectedFields);
+        List<ResultMatcher> resultMatchers = new ArrayList<>();
+        resultMatchers.add(
+                result ->
+                        assertThat(
+                                "The number of entries does not match",
+                                result.getResponse().getContentAsString().split("\n").length,
+                                is(entryCount + 1)));
 
         ResultMatcher fieldsResultMatcher =
                 result -> {
@@ -356,7 +356,6 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
     @Override
     protected void verifyExcelData(Sheet sheet) {
         ACCESSIONS = new ArrayList<>();
-        super.verifyExcelData(sheet);
         for (Row row : sheet) {
             ACCESSIONS.add(row.getCell(0).getStringCellValue());
         }

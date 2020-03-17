@@ -1,14 +1,8 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.stream.Stream;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +24,11 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSizeParamResolver;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.stream.Stream;
 
 /** Class to test download api with certain size.. */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -65,30 +64,6 @@ public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
                 .thenReturn(rdfString);
     }
 
-    @Test
-    protected void testDownloadLessThanDefaultBatchSizeJSON(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    @Test
-    protected void testDownloadDefaultBatchSizeJSON(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    @Test
-    protected void testDownloadMoreThanDefaultBatchSizeJSON(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
-
-    @Test
-    protected void testDownloadSizeLessThanZeroJSON(DownloadParamAndResult paramAndResult)
-            throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
-    }
-
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByTypeLessBatchSize")
     void testDownloadLessThanBatchSize(DownloadParamAndResult paramAndResult) throws Exception {
@@ -118,25 +93,25 @@ public class UniProtKBDownloadSizeIT extends BaseUniprotKBDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeNegativeBatchSize() {
-        return getNonJSONSupportedContentTypes().stream()
+        return getSupportedContentTypes().stream()
                 .map(type -> paramResolver.getDownloadSizeLessThanZeroParamAndResult(type))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeBatchSize() {
-        return getNonJSONSupportedContentTypes().stream()
+        return getSupportedContentTypes().stream()
                 .map(type -> paramResolver.getDownloadDefaultBatchSizeParamAndResult(type))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeMoreBatchSize() {
-        return getNonJSONSupportedContentTypes().stream()
+        return getSupportedContentTypes().stream()
                 .map(type -> paramResolver.getDownloadMoreThanBatchSizeParamAndResult(type))
                 .map(param -> Arguments.of(param));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeLessBatchSize() {
-        return getNonJSONSupportedContentTypes().stream()
+        return getSupportedContentTypes().stream()
                 .map(type -> paramResolver.getDownloadLessThanDefaultBatchSizeParamAndResult(type))
                 .map(param -> Arguments.of(param));
     }

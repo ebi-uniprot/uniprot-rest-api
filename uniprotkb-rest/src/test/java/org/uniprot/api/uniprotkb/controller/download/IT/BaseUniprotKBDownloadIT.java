@@ -68,6 +68,8 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
 
     public static List<String> DEFAULT_XLS_FIELDS =
             Arrays.asList("Entry", "Entry Name", "Reviewed", "Protein names", "Gene Names", "Organism", "Length");
+    public static List<String> TSV_RETURNED_HEADERS = Arrays.asList(new String[]{"Protein existence", "Organism", "Protein names"});
+    public static List<String> XLS_RETURNED_HEADERS = Arrays.asList(new String[]{"Protein existence", "Organism", "Protein names"});
 
     public static List<String> REQUESTED_JSON_FIELDS =
             Arrays.asList("protein_existence", "organism", "protein_name");
@@ -163,7 +165,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
         this.getStoreManager().save(DataStoreManager.StoreType.UNIPROT, builder.build());
     }
 
-    protected static List<MediaType> getNonJSONSupportedContentTypes() {
+    protected static List<MediaType> getSupportedContentTypes() {
         return Arrays.asList(
                 MediaType.APPLICATION_JSON,
                 UniProtMediaType.TSV_MEDIA_TYPE,
