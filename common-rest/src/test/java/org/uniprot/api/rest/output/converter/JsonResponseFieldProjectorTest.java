@@ -267,7 +267,7 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertNotNull(result.get("genes"));
         Assertions.assertNotNull(result.get("organism"));
         Assertions.assertNotNull(result.get("features"));
-        Assertions.assertNotNull(result.get("uniProtkbCrossReferences"));
+        Assertions.assertNotNull(result.get("uniProtKBCrossReferences"));
         Assertions.assertNotNull(result.get("keywords"));
         Assertions.assertNotNull(result.get("comments"));
         Assertions.assertEquals(cTypes.size(), ((List<?>) result.get("comments")).size());
