@@ -75,7 +75,7 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByType() {
-        return getNonJSONSupportedContentTypes().stream()
+        return getSupportedContentTypes().stream()
                 .map(type -> Arguments.of(paramAndResultProvider.getDownloadParamAndResult(type, ENTRY_COUNT)));
     }
 }
