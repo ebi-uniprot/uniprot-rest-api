@@ -9,9 +9,6 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.UniParcField;
-
-import com.google.common.base.Strings;
 
 /**
  * @author jluo

@@ -19,6 +19,9 @@ import com.google.common.base.Strings;
  */
 @Data
 public class UniRefRequest implements SearchRequest {
+
+    public static final String DEFAULT_FIELDS = "id,name,common_taxon,count,created";
+
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
@@ -38,16 +41,4 @@ public class UniRefRequest implements SearchRequest {
     @Positive(message = "{search.positive}")
     private Integer size;
 
-    public static final String DEFAULT_FIELDS = "id,name,common_taxon,count,created";
-
-    @Override
-    public String getFields() {
-        if (Strings.isNullOrEmpty(fields)) {
-            fields = DEFAULT_FIELDS;
-        } else if (!fields.contains(UniRefField.Return.id.name())) {
-            String temp = "id," + fields;
-            this.fields = temp;
-        }
-        return fields;
-    }
 }

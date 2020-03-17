@@ -364,11 +364,14 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("name"))
+                    .queryParam("fields", Collections.singletonList("id,name"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.id",
+                                    "$.results[*].id",
                                     contains("UniRef50_P03911", "UniRef50_P03920")))
+                    .resultMatcher(jsonPath("$.results[*].name").hasJsonPath())
+                    .resultMatcher(jsonPath("$.results[*].members").doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].representativeMember").doesNotExist())
                     .build();
         }
 

@@ -232,11 +232,13 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
         Sequence sequence = new SequenceBuilder(seq).build();
         List<UniParcCrossReference> xrefs = getXrefs(i);
-        
+
         List<SequenceFeature> seqFeatures = new ArrayList<>();
-        Arrays.stream(SignatureDbType.values()).forEach(signatureType ->{
-            seqFeatures.add(getSeqFeature(i, signatureType));
-        });
+        Arrays.stream(SignatureDbType.values())
+                .forEach(
+                        signatureType -> {
+                            seqFeatures.add(getSeqFeature(i, signatureType));
+                        });
         List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
                 .uniParcId(new UniParcIdBuilder(getName(UPI_PREF, i)).build())
@@ -254,7 +256,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         return Arrays.asList(taxonomy, taxonomy2);
     }
 
-    private SequenceFeature getSeqFeature(int i,SignatureDbType signatureDbType) {
+    private SequenceFeature getSeqFeature(int i, SignatureDbType signatureDbType) {
         List<Location> locations = Arrays.asList(new Location(12, 23), new Location(45, 89));
         InterProGroup domain =
                 new InterProGroupBuilder()
@@ -262,11 +264,11 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         .id(getName("IP0000", i))
                         .build();
         return new SequenceFeatureBuilder()
-                        .interproGroup(domain)
-                        .signatureDbType(signatureDbType)
-                        .signatureDbId(getName("SIG0000", i))
-                        .locationsSet(locations)
-                        .build();
+                .interproGroup(domain)
+                .signatureDbType(signatureDbType)
+                .signatureDbId(getName("SIG0000", i))
+                .locationsSet(locations)
+                .build();
     }
 
     private List<UniParcCrossReference> getXrefs(int i) {
@@ -279,7 +281,9 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         properties.add(
                 new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, getName("proteomeId", i)));
         properties.add(
-                new Property(UniParcCrossReference.PROPERTY_UNIPROT_KB_ACCESSION, getName("accession", i)));
+                new Property(
+                        UniParcCrossReference.PROPERTY_UNIPROT_KB_ACCESSION,
+                        getName("accession", i)));
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
                         .versionI(3)
@@ -397,7 +401,10 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
-                    .resultMatcher(jsonPath("$.results[*].uniParcCrossReferences[*].properties[?(@.key=='gene_name')]").hasJsonPath())
+                    .resultMatcher(
+                            jsonPath(
+                                            "$.results[*].uniParcCrossReferences[*].properties[?(@.key=='gene_name')]")
+                                    .hasJsonPath())
                     .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].taxonomies").doesNotExist())
