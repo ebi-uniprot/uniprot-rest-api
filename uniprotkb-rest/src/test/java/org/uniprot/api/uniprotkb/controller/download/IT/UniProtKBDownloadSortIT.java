@@ -20,7 +20,7 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
-import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSortParamResolver;
+import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSortParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 
 import java.util.Arrays;
@@ -43,8 +43,8 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     public static List<String> SORTED_BY_ORGANISM = Arrays.asList(ACC2, ACC3, ACC1);
 
     @RegisterExtension
-    static UniProtKBDownloadSortParamResolver paramResolver =
-            new UniProtKBDownloadSortParamResolver();
+    static UniProtKBDownloadSortParamAndResultProvider paramAndResultProvider =
+            new UniProtKBDownloadSortParamAndResultProvider();
 
     @Qualifier("rdfRestTemplate")
     @Autowired
@@ -172,54 +172,44 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     private static Stream<Arguments> requestResponseForSort(
             String fieldName, String sortOrder, List<String> accessionsOrder) {
         return Stream.of(
+                Arguments.of(getParamAndResult(UniProtMediaType.TSV_MEDIA_TYPE, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(getParamAndResult(UniProtMediaType.FF_MEDIA_TYPE, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(getParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(getParamAndResult(MediaType.APPLICATION_XML, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(getParamAndResult(MediaType.APPLICATION_JSON, fieldName, sortOrder, accessionsOrder)),
                 Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
-                                UniProtMediaType.TSV_MEDIA_TYPE,
-                                fieldName,
-                                sortOrder,
-                                accessionsOrder)),
-                Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
-                                UniProtMediaType.FF_MEDIA_TYPE,
-                                fieldName,
-                                sortOrder,
-                                accessionsOrder)),
-                Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
-                                UniProtMediaType.LIST_MEDIA_TYPE,
-                                fieldName,
-                                sortOrder,
-                                accessionsOrder)),
-                Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
-                                MediaType.APPLICATION_XML, fieldName, sortOrder, accessionsOrder)),
-                Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
-                                MediaType.APPLICATION_JSON, fieldName, sortOrder, accessionsOrder)),
-                Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
+                        getParamAndResult(
                                 UniProtMediaType.XLS_MEDIA_TYPE,
                                 fieldName,
                                 sortOrder,
                                 accessionsOrder)),
                 Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
+                        getParamAndResult(
                                 UniProtMediaType.FASTA_MEDIA_TYPE,
                                 fieldName,
                                 sortOrder,
                                 accessionsOrder)),
                 Arguments.of(
-                        paramResolver.getDownloadWithSortParamAndResult(
+                        getParamAndResult(
                                 UniProtMediaType.GFF_MEDIA_TYPE,
                                 fieldName,
                                 sortOrder,
                                 accessionsOrder)) // ,
                 //                Arguments.of(
-                //                        paramResolver.getDownloadWithSortParamAndResult(
+                //                        getParamAndResult(
                 //                                UniProtMediaType.RDF_MEDIA_TYPE,
                 //                                fieldName,
                 //                                sortOrder,
                 //                                accessionsOrder))
                 );
+    }
+
+    private static DownloadParamAndResult getParamAndResult(MediaType mediaType, String fieldName, String sortOrder, List<String> accessionsOrder) {
+        return paramAndResultProvider.getDownloadParamAndResultForSort(
+                mediaType,
+                fieldName,
+                sortOrder,
+                3,
+                accessionsOrder);
     }
 }
