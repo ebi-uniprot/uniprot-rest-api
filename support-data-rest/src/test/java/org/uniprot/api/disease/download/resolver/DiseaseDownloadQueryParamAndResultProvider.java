@@ -1,20 +1,23 @@
 package org.uniprot.api.disease.download.resolver;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
+
 public class DiseaseDownloadQueryParamAndResultProvider
         extends DiseaseDownloadParamAndResultProvider {
 
     public DownloadParamAndResult getDownloadParamAndResultForQuery(
-            MediaType contentType, Integer entryCount, String solrQuery, List<String> expectedAccession) {
+            MediaType contentType,
+            Integer entryCount,
+            String solrQuery,
+            List<String> expectedAccession) {
         // add the common param and result matcher
         DownloadParamAndResult.DownloadParamAndResultBuilder builder =
                 DownloadParamAndResult.builder().contentType(contentType);
@@ -22,7 +25,7 @@ public class DiseaseDownloadQueryParamAndResultProvider
                 getResultMatchers(contentType, entryCount, null, null, null, null, null);
         builder.resultMatchers(resultMatchers);
         DownloadParamAndResult paramAndResult = builder.build();
-        if(StringUtils.isNotEmpty(solrQuery)) {
+        if (StringUtils.isNotEmpty(solrQuery)) {
             // add param
             Map<String, List<String>> updatedQueryParams =
                     addQueryParam(

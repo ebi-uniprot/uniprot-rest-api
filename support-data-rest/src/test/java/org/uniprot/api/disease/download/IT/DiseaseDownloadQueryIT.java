@@ -1,6 +1,7 @@
 package org.uniprot.api.disease.download.IT;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -19,11 +20,9 @@ import org.uniprot.api.disease.download.resolver.DiseaseDownloadQueryParamAndRes
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.support_data.SupportDataApplication;
 
-import java.util.stream.Stream;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
-/**
- * Class to test download api with query
- */
+/** Class to test download api with query */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
@@ -47,44 +46,49 @@ public class DiseaseDownloadQueryIT extends BaseDiseaseDownloadIT {
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByType")
-    void testDownloadByAccession(DownloadParamAndResult paramAndResult)
-            throws Exception {
+    void testDownloadByAccession(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByTypeWithoutQuery")
-    void testDownloadWithoutQuery(DownloadParamAndResult paramAndResult)
-            throws Exception {
+    void testDownloadWithoutQuery(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByTypeWithBadQuery")
-    void testDownloadWithBadQuery(DownloadParamAndResult paramAndResult)
-            throws Exception {
+    void testDownloadWithBadQuery(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
     private static Stream<Arguments> provideRequestResponseByType() {
         return getSupportedContentTypes().stream()
-                .map(type ->
-                        Arguments.of(paramAndResultProvider
-                                .getDownloadParamAndResultForQuery(type, 1, SOLR_QUERY, Arrays.asList(new String[]{ACC2}))));
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramAndResultProvider.getDownloadParamAndResultForQuery(
+                                                type,
+                                                1,
+                                                SOLR_QUERY,
+                                                Arrays.asList(new String[] {ACC2}))));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeWithoutQuery() {
         return getSupportedContentTypes().stream()
-                .map(type ->
-                        Arguments.of(paramAndResultProvider
-                                .getDownloadParamAndResultForQuery(type, null, null,null)));
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramAndResultProvider.getDownloadParamAndResultForQuery(
+                                                type, null, null, null)));
     }
 
     private static Stream<Arguments> provideRequestResponseByTypeWithBadQuery() {
         return getSupportedContentTypes().stream()
-                .map(type ->
-                        Arguments.of(paramAndResultProvider
-                                .getDownloadParamAndResultForQuery(type, null, BAD_SOLR_QUERY,null)));
+                .map(
+                        type ->
+                                Arguments.of(
+                                        paramAndResultProvider.getDownloadParamAndResultForQuery(
+                                                type, null, BAD_SOLR_QUERY, null)));
     }
 }

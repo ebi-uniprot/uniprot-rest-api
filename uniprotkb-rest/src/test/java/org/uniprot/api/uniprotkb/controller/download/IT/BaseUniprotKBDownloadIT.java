@@ -36,7 +36,6 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
 /** Class to keep things common to all disease download tests */
-
 public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static final String ACC1 = "O12345";
     public static final String ACC2 = "P12345";

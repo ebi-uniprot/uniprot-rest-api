@@ -1,9 +1,13 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,11 +29,6 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.stream.Stream;
 
 /**
  * Class to test download api without any filter.. kind of download everything for each type of
@@ -64,11 +63,11 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
         DefaultUriBuilderFactory urilBuilderFactory = new DefaultUriBuilderFactory();
         Mockito.when(this.restTemplate.getUriTemplateHandler()).thenReturn(urilBuilderFactory);
         Mockito.when(
-                this.restTemplate.getForObject(
-                        Mockito.any(URI.class), Mockito.eq(String.class)))
+                        this.restTemplate.getForObject(
+                                Mockito.any(URI.class), Mockito.eq(String.class)))
                 .thenReturn(rdfString);
     }
-    
+
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByType")
     void testDownloadAll(DownloadParamAndResult paramAndResult) throws Exception {
