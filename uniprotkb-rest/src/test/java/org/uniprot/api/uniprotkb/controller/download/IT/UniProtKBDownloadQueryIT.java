@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,7 +24,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniprotKBController;
-import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadParamAndResultProvider;
+import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadQueryParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 
 import java.io.File;
@@ -32,19 +33,20 @@ import java.net.URI;
 import java.util.stream.Stream;
 
 /**
- * Class to test download api without any filter.. kind of download everything for each type of
- * content type
+ * Class to test download api with query
  */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniprotKBController.class)
 @ExtendWith(value = {SpringExtension.class})
-public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
+public class UniProtKBDownloadQueryIT extends BaseUniprotKBDownloadIT {
+    private static final String SOLR_QUERY = "accession:" + ACC2;
+    private static final String BAD_SOLR_QUERY = "random_field:protein";
 
     @RegisterExtension
-    static UniProtKBDownloadParamAndResultProvider paramAndResultProvider =
-            new UniProtKBDownloadParamAndResultProvider();
+    static UniProtKBDownloadQueryParamAndResultProvider paramAndResultProvider =
+            new UniProtKBDownloadQueryParamAndResultProvider();
 
     private static final String RDF_TEST_FILE = "src/test/resources/downloadIT/P12345.rdf";
 
@@ -64,23 +66,59 @@ public class UniProtKBDownloadAllIT extends BaseUniprotKBDownloadIT {
         DefaultUriBuilderFactory urilBuilderFactory = new DefaultUriBuilderFactory();
         Mockito.when(this.restTemplate.getUriTemplateHandler()).thenReturn(urilBuilderFactory);
         Mockito.when(
-                this.restTemplate.getForObject(
-                        Mockito.any(URI.class), Mockito.eq(String.class)))
+                        this.restTemplate.getForObject(
+                                Mockito.any(URI.class), Mockito.eq(String.class)))
                 .thenReturn(rdfString);
     }
-    
+
+    @BeforeEach
+    public void setUpData() {
+        // when
+        saveEntry(ACC1, 1);
+        saveEntry(ACC2, 2);
+        saveEntry(ACC3, 3);
+    }
+
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByType")
-    void testDownloadAll(DownloadParamAndResult paramAndResult) throws Exception {
+    void testDownloadByAccession(DownloadParamAndResult paramAndResult)
+            throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
+    }
+
+
+    @ParameterizedTest(name = "[{index}]~/download?{0}")
+    @MethodSource("provideRequestResponseByTypeWithoutQuery")
+    void testDownloadWithoutQuery(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest(name = "[{index}]~/download?{0}")
+    @MethodSource("provideRequestResponseByTypeWithBadQuery")
+    void testDownloadWithBadQuery(DownloadParamAndResult paramAndResult)
+            throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
     }
 
     private static Stream<Arguments> provideRequestResponseByType() {
         return getSupportedContentTypes().stream()
-                .map(
-                        type ->
-                                Arguments.of(
-                                        paramAndResultProvider.getDownloadParamAndResult(
-                                                type, ENTRY_COUNT)));
+                .map(type ->
+                        Arguments.of(paramAndResultProvider
+                                .getDownloadParamAndResultForQuery(type, 1, SOLR_QUERY, Arrays.asList(new String[]{ACC2}))));
+    }
+
+    private static Stream<Arguments> provideRequestResponseByTypeWithoutQuery() {
+        return getSupportedContentTypes().stream()
+                .map(type ->
+                        Arguments.of(paramAndResultProvider
+                                .getDownloadParamAndResultForQuery(type, null, null,null)));
+    }
+
+    private static Stream<Arguments> provideRequestResponseByTypeWithBadQuery() {
+        return getSupportedContentTypes().stream()
+                .map(type ->
+                        Arguments.of(paramAndResultProvider
+                                .getDownloadParamAndResultForQuery(type, null, BAD_SOLR_QUERY,null)));
     }
 }

@@ -1,12 +1,12 @@
 package org.uniprot.api.disease.download.resolver;
 
-import org.springframework.http.MediaType;
-import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.MediaType;
+import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 
 public class DiseaseDownloadSizeParamAndResultProvider
         extends DiseaseDownloadParamAndResultProvider {

@@ -1,5 +1,7 @@
 package org.uniprot.api.disease.download.IT;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,8 +17,6 @@ import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.download.resolver.DiseaseDownloadParamAndResultProvider;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.support_data.SupportDataApplication;
-
-import java.util.stream.Stream;
 
 /** Class to test download api without any filter.. kind of download everything */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
