@@ -276,7 +276,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                         accessionsInOrder,
                         requestedFields,
                         expectedFields);
-        ResultMatcher sortResultMatcher =
+        ResultMatcher resultMatcher =
                 result -> {
                     String resp = result.getResponse().getContentAsString();
                     List<String> actualAccessions =
@@ -285,7 +285,7 @@ public class UniProtKBDownloadFieldsParamAndResultProvider
                                     .collect(toList());
                     assertThat(actualAccessions, equalTo(accessionsInOrder));
                 };
-        resultMatchers.add(sortResultMatcher);
+        resultMatchers.add(resultMatcher);
 
         return resultMatchers;
     }

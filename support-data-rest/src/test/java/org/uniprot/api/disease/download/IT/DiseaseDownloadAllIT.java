@@ -1,8 +1,5 @@
 package org.uniprot.api.disease.download.IT;
 
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,9 +12,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
-import org.uniprot.api.disease.download.resolver.DiseaseDownloadAllParamResolver;
+import org.uniprot.api.disease.download.resolver.DiseaseDownloadParamAndResultProvider;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.support_data.SupportDataApplication;
+
+import java.util.stream.Stream;
 
 /** Class to test download api without any filter.. kind of download everything */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
@@ -26,12 +25,8 @@ import org.uniprot.api.support_data.SupportDataApplication;
 @ExtendWith(value = {SpringExtension.class})
 public class DiseaseDownloadAllIT extends BaseDiseaseDownloadIT {
     @RegisterExtension
-    static DiseaseDownloadAllParamResolver paramResolver = new DiseaseDownloadAllParamResolver();
-
-    @Test
-    protected void testDownloadAllJSON(DownloadParamAndResult paramAndResult) throws Exception {
-        sendAndVerify(paramAndResult, HttpStatus.OK);
-    }
+    static DiseaseDownloadParamAndResultProvider paramAndResultProvider =
+            new DiseaseDownloadParamAndResultProvider();
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByType")
@@ -40,8 +35,8 @@ public class DiseaseDownloadAllIT extends BaseDiseaseDownloadIT {
     }
 
     private static Stream<Arguments> provideRequestResponseByType() {
-        return getNonJSONSupportedContentTypes().stream()
-                .map(type -> paramResolver.getDownloadAllParamAndResult(type))
+        return getSupportedContentTypes().stream()
+                .map(type -> paramAndResultProvider.getDownloadParamAndResult(type, ENTRY_COUNT))
                 .map(paramAndResult -> Arguments.of(paramAndResult));
     }
 }

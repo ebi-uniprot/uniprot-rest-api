@@ -59,8 +59,9 @@ public class BaseDiseaseDownloadIT extends AbstractDownloadControllerIT {
         DiseaseSolrDocumentHelper.createDiseaseDocuments(this.getStoreManager(), accession, suffix);
     }
 
-    protected static List<MediaType> getNonJSONSupportedContentTypes() {
+    protected static List<MediaType> getSupportedContentTypes() {
         return Arrays.asList(
+                MediaType.APPLICATION_JSON,
                 UniProtMediaType.TSV_MEDIA_TYPE,
                 UniProtMediaType.LIST_MEDIA_TYPE,
                 UniProtMediaType.XLS_MEDIA_TYPE,
