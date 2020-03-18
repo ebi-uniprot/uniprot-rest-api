@@ -1,5 +1,10 @@
 package org.uniprot.api.disease.download.IT;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -19,26 +24,30 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(DiseaseController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class DiseaseDownloadFieldsIT extends BaseDiseaseDownloadIT {
-    private static final List<String> TSV_DEFAULT_FIELDS = Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description");
-    private static final List<String> XLS_DEFAULT_FIELDS = Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description");
-    private static final List<String> INVALID_RETURN_FIELDS = Collections.singletonList("embl,ebi,cross_references,reviewed_protein_count");
-    private static final List<String> NON_DEFAULT_FIELDS = Arrays.asList("alternative_names", "cross_references", "keywords", "reviewed_protein_count");
-    private static final List<String> NON_DEFAULT_RETURNED_FIELDS = Arrays.asList("Alternative Names",	"Cross Reference",	"Keywords",	"Reviewed Protein Count");
-    private static final List<String> NON_DEFAULT_RETURNED_FIELDS_JSON = Arrays.asList("alternativeNames",	"crossReferences",	"keywords",	"reviewedProteinCount");
-
+    private static final List<String> TSV_DEFAULT_FIELDS =
+            Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description");
+    private static final List<String> XLS_DEFAULT_FIELDS =
+            Arrays.asList("Name", "DiseaseEntry ID", "Mnemonic", "Description");
+    private static final List<String> INVALID_RETURN_FIELDS =
+            Collections.singletonList("embl,ebi,cross_references,reviewed_protein_count");
+    private static final List<String> NON_DEFAULT_FIELDS =
+            Arrays.asList(
+                    "alternative_names", "cross_references", "keywords", "reviewed_protein_count");
+    private static final List<String> NON_DEFAULT_RETURNED_FIELDS =
+            Arrays.asList(
+                    "Alternative Names", "Cross Reference", "Keywords", "Reviewed Protein Count");
+    private static final List<String> NON_DEFAULT_RETURNED_FIELDS_JSON =
+            Arrays.asList(
+                    "alternativeNames", "crossReferences", "keywords", "reviewedProteinCount");
 
     @RegisterExtension
-    static DiseaseDownloadFieldsParamAndResultProvider paramAndResultProvider = new DiseaseDownloadFieldsParamAndResultProvider();
+    static DiseaseDownloadFieldsParamAndResultProvider paramAndResultProvider =
+            new DiseaseDownloadFieldsParamAndResultProvider();
 
     @BeforeEach
     public void setUpData() {
@@ -82,18 +91,20 @@ public class DiseaseDownloadFieldsIT extends BaseDiseaseDownloadIT {
                         getParamAndResult(
                                 MediaType.APPLICATION_JSON,
                                 NON_DEFAULT_FIELDS,
-                                NON_DEFAULT_RETURNED_FIELDS_JSON))
-        );
+                                NON_DEFAULT_RETURNED_FIELDS_JSON)));
     }
 
     private static Stream<Arguments> provideRequestResponseDefaultFields() {
         return Stream.of(
                 Arguments.of(
-                        getParamAndResult(UniProtMediaType.LIST_MEDIA_TYPE, null, Collections.emptyList())),
+                        getParamAndResult(
+                                UniProtMediaType.LIST_MEDIA_TYPE, null, Collections.emptyList())),
                 Arguments.of(
-                        getParamAndResult(UniProtMediaType.OBO_MEDIA_TYPE, null, Collections.emptyList())),
+                        getParamAndResult(
+                                UniProtMediaType.OBO_MEDIA_TYPE, null, Collections.emptyList())),
                 Arguments.of(
-                        getParamAndResult(MediaType.APPLICATION_JSON, null, Collections.emptyList())),
+                        getParamAndResult(
+                                MediaType.APPLICATION_JSON, null, Collections.emptyList())),
                 Arguments.of(
                         getParamAndResult(
                                 UniProtMediaType.TSV_MEDIA_TYPE, null, TSV_DEFAULT_FIELDS)),
@@ -104,8 +115,7 @@ public class DiseaseDownloadFieldsIT extends BaseDiseaseDownloadIT {
 
     private static DownloadParamAndResult getParamAndResult(
             MediaType mediaType, List<String> reqFields, List<String> respFields) {
-        return getParamAndResult(
-                mediaType, Arrays.asList(ACC1), reqFields, respFields);
+        return getParamAndResult(mediaType, Arrays.asList(ACC1), reqFields, respFields);
     }
 
     private static DownloadParamAndResult getParamAndResult(

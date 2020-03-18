@@ -1,5 +1,9 @@
 package org.uniprot.api.disease.download.IT;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -19,10 +23,6 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
-
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(DiseaseController.class)
@@ -31,7 +31,8 @@ public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
     public static List<String> SORTED_BY_ACCESSION = Arrays.asList(ACC2, ACC1, ACC3);
 
     @RegisterExtension
-    static DiseaseDownloadSortParamAndResultProvider paramAndResultProvider = new DiseaseDownloadSortParamAndResultProvider();
+    static DiseaseDownloadSortParamAndResultProvider paramAndResultProvider =
+            new DiseaseDownloadSortParamAndResultProvider();
 
     @BeforeEach
     public void setUpData() {
@@ -80,8 +81,7 @@ public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
                                 UniProtMediaType.OBO_MEDIA_TYPE,
                                 fieldName,
                                 sortOrder,
-                                accessionsOrder))
-        );
+                                accessionsOrder)));
     }
 
     private static DownloadParamAndResult getParamAndResult(

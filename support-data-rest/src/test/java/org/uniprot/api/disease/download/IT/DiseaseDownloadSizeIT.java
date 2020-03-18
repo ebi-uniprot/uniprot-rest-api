@@ -1,5 +1,7 @@
 package org.uniprot.api.disease.download.IT;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,8 +19,6 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.support_data.SupportDataApplication;
 
-import java.util.stream.Stream;
-
 /** Class to test download api with certain size.. */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -35,7 +35,6 @@ public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
     @RegisterExtension
     static DiseaseDownloadSizeParamAndResultProvider paramAndResultProvider =
             new DiseaseDownloadSizeParamAndResultProvider();
-
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
     @MethodSource("provideRequestResponseByTypeLessBatchSize")
@@ -98,6 +97,6 @@ public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
                         type ->
                                 Arguments.of(
                                         paramAndResultProvider.getDownloadParamAndResult(
-                                                        type, LESS_THAN_ZERO_SIZE)));
+                                                type, LESS_THAN_ZERO_SIZE)));
     }
 }

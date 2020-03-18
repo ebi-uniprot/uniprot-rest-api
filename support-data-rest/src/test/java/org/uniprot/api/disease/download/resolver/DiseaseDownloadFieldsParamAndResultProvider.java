@@ -1,18 +1,5 @@
 package org.uniprot.api.disease.download.resolver;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.test.web.servlet.ResultMatcher;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import static java.util.stream.Collectors.*;
 import static java.util.stream.StreamSupport.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +7,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 public class DiseaseDownloadFieldsParamAndResultProvider
         extends DiseaseDownloadParamAndResultProvider {
@@ -41,20 +40,22 @@ public class DiseaseDownloadFieldsParamAndResultProvider
                         requestedFields,
                         expectedFields);
 
-        ResultMatcher oboValueMatcher = result -> {
-            String oboResp = result.getResponse().getContentAsString();
-            String oboTerm = oboResp.substring(oboResp.indexOf("[Term]")+7);
-            Map<String, Long> fieldCountMap = Stream.of(oboTerm.split("\n"))
-                    .map(line -> line.split(":"))
-                    .map(lp -> ImmutablePair.of(lp[0], lp[1]))
-                    .collect(groupingBy(ImmutablePair::getLeft, counting()));
-            assertTrue(fieldCountMap.size() == 5);
-            assertTrue(fieldCountMap.containsKey("id"));
-            assertTrue(fieldCountMap.containsKey("synonym"));
-            assertTrue(fieldCountMap.containsKey("xref"));
-            assertTrue(fieldCountMap.containsKey("def"));
-            assertTrue(fieldCountMap.containsKey("name"));
-        };
+        ResultMatcher oboValueMatcher =
+                result -> {
+                    String oboResp = result.getResponse().getContentAsString();
+                    String oboTerm = oboResp.substring(oboResp.indexOf("[Term]") + 7);
+                    Map<String, Long> fieldCountMap =
+                            Stream.of(oboTerm.split("\n"))
+                                    .map(line -> line.split(":"))
+                                    .map(lp -> ImmutablePair.of(lp[0], lp[1]))
+                                    .collect(groupingBy(ImmutablePair::getLeft, counting()));
+                    assertTrue(fieldCountMap.size() == 5);
+                    assertTrue(fieldCountMap.containsKey("id"));
+                    assertTrue(fieldCountMap.containsKey("synonym"));
+                    assertTrue(fieldCountMap.containsKey("xref"));
+                    assertTrue(fieldCountMap.containsKey("def"));
+                    assertTrue(fieldCountMap.containsKey("name"));
+                };
 
         resultMatchers.add(oboValueMatcher);
 
@@ -170,7 +171,9 @@ public class DiseaseDownloadFieldsParamAndResultProvider
                         accessionsInOrder,
                         requestedFields,
                         expectedFields);
-        if(requestedFields == null || requestedFields.isEmpty() || requestedFields.contains("accession")) {
+        if (requestedFields == null
+                || requestedFields.isEmpty()
+                || requestedFields.contains("accession")) {
             ResultMatcher accessionResultMatcher =
                     jsonPath("$.results[*].accession", equalTo(accessionsInOrder));
             resultMatchers.add(accessionResultMatcher);

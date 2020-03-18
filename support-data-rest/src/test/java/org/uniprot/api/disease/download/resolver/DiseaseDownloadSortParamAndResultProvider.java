@@ -1,17 +1,17 @@
 package org.uniprot.api.disease.download.resolver;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.test.web.servlet.ResultMatcher;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 public class DiseaseDownloadSortParamAndResultProvider
         extends DiseaseDownloadParamAndResultProvider {
@@ -144,7 +144,8 @@ public class DiseaseDownloadSortParamAndResultProvider
                         accessionsInOrder,
                         requestedFields,
                         expectedFields);
-        ResultMatcher sortResultMatcher = jsonPath("$.results[*].accession", equalTo(accessionsInOrder));
+        ResultMatcher sortResultMatcher =
+                jsonPath("$.results[*].accession", equalTo(accessionsInOrder));
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }
