@@ -1,9 +1,6 @@
 package org.uniprot.api.uniprotkb.controller.download.IT;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
@@ -48,12 +45,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static final String MNEMONIC3 = "MNEMONIC_C";
 
     public static List<String> MANDATORY_JSON_FIELDS =
-            Arrays.asList(
-                    "entryType",
-                    "primaryAccession",
-                    "uniProtkbId",
-                    "entryAudit",
-                    "annotationScore");
+            Collections.singletonList("primaryAccession");
 
     public static List<String> DEFAULT_XLS_FIELDS =
             Arrays.asList(

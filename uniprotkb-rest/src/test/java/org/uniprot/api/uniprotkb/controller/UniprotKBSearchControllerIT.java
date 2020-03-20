@@ -46,37 +46,28 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.uniprotkb.UniProtKBEntryType;
-import org.uniprot.core.uniprotkb.comment.CommentType;
-import org.uniprot.core.uniprotkb.feature.FeatureCategory;
-import org.uniprot.core.uniprotkb.feature.FeatureType;
-import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.core.uniprotkb.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
-import org.uniprot.core.json.parser.uniprot.UniProtEntryIT;
+import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.UniProtEntryType;
-import org.uniprot.core.uniprot.comment.Comment;
-import org.uniprot.core.uniprot.comment.CommentType;
-import org.uniprot.core.uniprot.comment.FreeTextComment;
-import org.uniprot.core.uniprot.comment.impl.FreeTextCommentBuilder;
-import org.uniprot.core.uniprot.comment.impl.FreeTextCommentImpl;
-import org.uniprot.core.uniprot.feature.Feature;
-import org.uniprot.core.uniprot.feature.FeatureCategory;
-import org.uniprot.core.uniprot.feature.FeatureType;
-import org.uniprot.core.uniprot.feature.impl.FeatureBuilder;
-import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.xdb.UniProtCrossReference;
-import org.uniprot.core.uniprot.xdb.impl.UniProtCrossReferenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.comment.Comment;
+import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.comment.FreeTextComment;
+import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentBuilder;
+import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentImpl;
+import org.uniprot.core.uniprotkb.feature.Feature;
+import org.uniprot.core.uniprotkb.feature.FeatureCategory;
+import org.uniprot.core.uniprotkb.feature.FeatureType;
+import org.uniprot.core.uniprotkb.feature.impl.FeatureBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
+import org.uniprot.core.uniprotkb.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
@@ -716,7 +707,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
 
-            List<UniProtCrossReference> xrefs = new ArrayList<>();
+            List<UniProtKBCrossReference> xrefs = new ArrayList<>();
             UniProtDatabaseTypes.INSTANCE
                     .getAllDbTypes()
                     .forEach(
@@ -724,9 +715,9 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                 doc.xrefCountMap.put(
                                         "xref_count_" + db.getName().toLowerCase(), 0L);
 
-                                UniProtCrossReference xref =
+                                UniProtKBCrossReference xref =
                                         new UniProtCrossReferenceBuilder()
-                                                .database(new UniProtDatabaseImpl(db.getName()))
+                                                .database(new UniProtKBDatabaseImpl(db.getName()))
                                                 .id("id_" + db.getName())
                                                 .build();
                                 xrefs.add(xref);
@@ -799,7 +790,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.goWithEvidenceMaps.put(
                                     "go_" + code, Collections.singleton("Search All")));
 
-            UniProtEntry completeEntry = UniProtEntryIT.getCompleteUniProtEntry();
+            UniProtKBEntry completeEntry = UniProtKBEntryIT.getCompleteUniProtEntry();
             comments.addAll(completeEntry.getComments());
             entry =
                     UniProtKBEntryBuilder.from(completeEntry)

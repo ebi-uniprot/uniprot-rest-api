@@ -23,9 +23,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.output.converter.*;
+import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.json.parser.uniprot.UniprotJsonConfig;
-import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
@@ -65,10 +64,10 @@ public class MessageConverterConfig {
      */
     @Bean
     public WebMvcConfigurer extendedMessageConverters() {
-        JsonMessageConverter<UniProtEntry> jsonMessageConverter =
+        JsonMessageConverter<UniProtKBEntry> jsonMessageConverter =
                 new JsonMessageConverter<>(
-                        UniprotJsonConfig.getInstance().getSimpleObjectMapper(),
-                        UniProtEntry.class,
+                        UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
+                        UniProtKBEntry.class,
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB)
                                 .getReturnFields());
 
