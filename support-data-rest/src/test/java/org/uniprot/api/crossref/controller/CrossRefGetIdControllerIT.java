@@ -3,10 +3,8 @@ package org.uniprot.api.crossref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.io.IOException;
 import java.util.*;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,8 +28,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 import org.uniprot.store.search.field.CrossRefField;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -156,7 +152,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("accession,category,unreviewed_protein_count")
+                    .fields("id,category,unreviewed_protein_count")
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
                     .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
@@ -175,29 +171,6 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
-                    .build();
-        }
-
-        @Override
-        public GetIdParameter withValidResponseFieldsOrderParameter() {
-            return GetIdParameter.builder()
-                    .id(ACCESSION)
-                    .resultMatcher(
-                            result -> {
-                                String contentAsString = result.getResponse().getContentAsString();
-                                try {
-                                    Map<String, Object> responseMap =
-                                            new ObjectMapper()
-                                                    .readValue(
-                                                            contentAsString, LinkedHashMap.class);
-                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    List<String> expectedList = getExpectedFieldsOrder();
-                                    Assertions.assertEquals(expectedList.size(), actualList.size());
-                                    Assertions.assertEquals(expectedList, actualList);
-                                } catch (IOException e) {
-                                    Assertions.fail(e.getMessage());
-                                }
-                            })
                     .build();
         }
 

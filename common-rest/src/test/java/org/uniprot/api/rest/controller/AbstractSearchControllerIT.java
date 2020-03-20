@@ -33,7 +33,6 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -479,7 +478,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(returnFields, not(emptyIterable()));
 
         for (ReturnField returnField : returnFields) {
-            assertThat(returnField.getPath(), notNullValue());
+            assertThat(returnField.getPaths(), notNullValue());
             // when
             ResultActions response =
                     mockMvc.perform(
@@ -488,22 +487,25 @@ public abstract class AbstractSearchControllerIT {
                                     .param("fields", returnField.getName())
                                     .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-            String returnFieldValidatePath = "$.results[*]." + returnField.getPath();
-            if (Utils.notNullNotEmpty(returnField.getFilter())) {
-                returnFieldValidatePath += returnField.getFilter();
-            }
-            log.info(
-                    "ReturnField:"
-                            + returnField.getName()
-                            + " Validation Path: "
-                            + returnFieldValidatePath);
-
             // then
-            response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.size()", greaterThan(0)))
-                    .andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
+            ResultActions resultActions =
+                    response.andDo(print())
+                            .andExpect(status().is(HttpStatus.OK.value()))
+                            .andExpect(
+                                    header().string(
+                                                    HttpHeaders.CONTENT_TYPE,
+                                                    APPLICATION_JSON_VALUE))
+                            .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+
+            for (String path : returnField.getPaths()) {
+                String returnFieldValidatePath = "$.results[*]." + path;
+                log.info(
+                        "ReturnField:"
+                                + returnField.getName()
+                                + " Validation Path: "
+                                + returnFieldValidatePath);
+                resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
+            }
         }
     }
 

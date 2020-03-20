@@ -4,11 +4,9 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,10 +35,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentricDocumentBuilder;
-import org.uniprot.store.search.field.GeneCentricField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo
@@ -147,12 +143,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .resultMatcher(jsonPath("$.*.accession.value", contains(ACCESSION)))
-                    //
-                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                    //		                    .resultMatcher(jsonPath("$.commonName",is("common")))
-                    //		                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                    //		                    .resultMatcher(jsonPath("$.links",contains("link")))
+                    .resultMatcher(jsonPath("$.canonicalProtein.accession", is(ACCESSION)))
                     .build();
         }
 
@@ -182,13 +173,8 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("accession_id")
-                    .resultMatcher(jsonPath("$.*.accession.value", contains(ACCESSION)))
-                    //
-                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                    //		                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
-                    //		                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
-                    //		                    .resultMatcher(jsonPath("$.links").doesNotExist())
+                    .fields("accession")
+                    .resultMatcher(jsonPath("$.canonicalProtein.accession", is(ACCESSION)))
                     .build();
         }
 
@@ -204,36 +190,6 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
-
-        @Override
-        public GetIdParameter withValidResponseFieldsOrderParameter() {
-            return GetIdParameter.builder()
-                    .id(ACCESSION)
-                    .resultMatcher(
-                            result -> {
-                                String contentAsString = result.getResponse().getContentAsString();
-                                try {
-                                    Map<String, Object> responseMap =
-                                            new ObjectMapper()
-                                                    .readValue(
-                                                            contentAsString, LinkedHashMap.class);
-                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    List<String> expectedList = getFieldsInOrder();
-                                    Assertions.assertEquals(expectedList.size(), actualList.size());
-                                    Assertions.assertEquals(expectedList, actualList);
-                                } catch (IOException e) {
-                                    Assertions.fail(e.getMessage());
-                                }
-                            })
-                    .build();
-        }
-
-        private List<String> getFieldsInOrder() {
-            List<String> fields = new LinkedList<>();
-            fields.add(GeneCentricField.ResultFields.accession_id.getJavaFieldName());
-            fields.add(GeneCentricField.ResultFields.related_accession.getJavaFieldName());
-            return fields;
-        }
     }
 
     static class GeneCentricGetIdContentTypeParamResolver
@@ -247,15 +203,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
-                                            jsonPath("$.*.accession.value", contains(ACCESSION)))
-                                    //
-                                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.commonName",is("common")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.links",contains("link")))
+                                            jsonPath("$.canonicalProtein.accession", is(ACCESSION)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -267,14 +215,6 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                                     "accession=\""
                                                                             + ACCESSION
                                                                             + "\"")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.commonName",is("common")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.links",contains("link")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

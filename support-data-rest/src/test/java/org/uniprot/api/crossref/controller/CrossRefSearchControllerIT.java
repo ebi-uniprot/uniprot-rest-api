@@ -242,13 +242,14 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("accession,name"))
+                    .queryParam("fields", Collections.singletonList("id,name"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.accession",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
+                    .resultMatcher(jsonPath("$.results.*.accession", notNullValue()))
                     .build();
         }
 

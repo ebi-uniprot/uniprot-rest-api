@@ -9,9 +9,6 @@ import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.ProteomeField;
-
-import com.google.common.base.Strings;
 
 /**
  * @author jluo
@@ -41,15 +38,4 @@ public class ProteomeRequest implements SearchRequest {
     private Integer size;
 
     public static final String DEFAULT_FIELDS = "upid,organism,organism_id,protein_count";
-
-    @Override
-    public String getFields() {
-        if (Strings.isNullOrEmpty(fields)) {
-            fields = DEFAULT_FIELDS;
-        } else if (!fields.contains(ProteomeField.Return.upid.name())) {
-            String temp = "upid," + fields;
-            this.fields = temp;
-        }
-        return fields;
-    }
 }

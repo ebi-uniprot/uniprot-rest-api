@@ -41,6 +41,7 @@ import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
 import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -153,13 +154,22 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                 new LiteratureBuilder()
                         .citationCrossReferencesAdd(pubmed)
                         .citationCrossReferencesAdd(doi)
+                        .authoringGroupsAdd("group value")
                         .title("title " + pubMedId)
                         .authorsAdd(new AuthorBuilder("author " + pubMedId).build())
                         .journalName("journal " + pubMedId)
+                        .firstPage("firstPage value")
+                        .lastPage("lastPage value")
+                        .volume("volume value")
+                        .literatureAbstract("literatureAbstract value")
                         .publicationDate(new PublicationDateBuilder("2019").build())
                         .build();
 
-        LiteratureEntry entry = new LiteratureEntryBuilder().citation(literature).build();
+        LiteratureEntry entry =
+                new LiteratureEntryBuilder()
+                        .citation(literature)
+                        .statistics(new LiteratureStatisticsBuilder().build())
+                        .build();
 
         LiteratureStoreEntry storeEntry =
                 new LiteratureStoreEntryBuilder().literatureEntry(entry).build();
@@ -288,7 +298,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,title"))
+                    .queryParam("fields", Collections.singletonList("pubmed_id,title"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.citation.citationCrossReferences[0].id",
@@ -361,12 +371,12 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "10\ttitle 10\tjournal 10:(2019)")))
+                                                                    "10\ttitle 10\tjournal 10 volume value:firstPage value-lastPage value(2019)\tliteratureAbstract value")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "20\ttitle 20\tjournal 20:(2019)")))
+                                                                    "20\ttitle 20\tjournal 20 volume value:firstPage value-lastPage value(2019)\tliteratureAbstract value")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

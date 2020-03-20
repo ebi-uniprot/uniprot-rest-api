@@ -247,10 +247,12 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("gene:*"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*..accession.value",
-                                    contains(
-                                            "P00123", "P20123", "P30123", "P00124", "P20124",
-                                            "P30124")))
+                                    "$.results[*].canonicalProtein.accession",
+                                    contains("P00123", "P00124")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results[*].relatedProteins[*].accession",
+                                    contains("P20123", "P30123", "P20124", "P30124")))
                     .build();
         }
 
@@ -267,7 +269,9 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("gene:*"))
                     .resultMatcher(
-                            jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
+                            jsonPath(
+                                    "$.results[*].canonicalProtein.accession",
+                                    hasItems("P00123", "P00124")))
                     .build();
         }
 
@@ -308,7 +312,9 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("accession_id asc"))
                     .resultMatcher(
-                            jsonPath("$.results.*..accession.value", hasItems("P00123", "P00124")))
+                            jsonPath(
+                                    "$.results[*].canonicalProtein.accession",
+                                    hasItems("P00123", "P00124")))
                     .build();
         }
 
@@ -316,16 +322,11 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("accession_id"))
+                    .queryParam("fields", Collections.singletonList("accession"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*..accession.value",
-                                    contains(
-                                            "P00123", "P20123", "P30123", "P00124", "P20124",
-                                            "P30124")))
-
-                    //
-                    // .resultMatcher(jsonPath("$.results.*.description",contains("Description231","Description520")))
+                                    "$.results[*].canonicalProtein.accession",
+                                    contains("P00123", "P00124")))
                     .build();
         }
 
@@ -336,7 +337,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("facets", Collections.singletonList("reviewed"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*..accession.value",
+                                    "$.results[*].canonicalProtein.accession",
                                     contains(
                                             "P00123", "P20123", "P30123", "P00124", "P20124",
                                             "P30124")))
@@ -356,7 +357,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*..accession.value",
+                                                    "$.results[*].canonicalProtein.accession",
                                                     hasItems("P00123", "P00124")))
                                     .build())
                     .contentTypeParam(
@@ -371,23 +372,6 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                                     .resultMatcher(content().string(containsString("P00123")))
                                     .resultMatcher(content().string(containsString("P00124")))
                                     .build())
-                    //	                    .contentTypeParam(ContentTypeParam.builder()
-                    //	                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                    //
-                    // .resultMatcher(content().string(containsString("\tOrganism\tOrganism
-                    // ID\tProtein count")))
-                    //
-                    // .resultMatcher(content().string(containsString("UP000005231\tHomo
-                    // sapiens\t9606\t0")))
-                    //
-                    // .resultMatcher(content().string(containsString("UP000005520\tHomo
-                    // sapiens\t9606\t0")))
-                    //	                            .build())
-                    //	                    .contentTypeParam(ContentTypeParam.builder()
-                    //	                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                    //
-                    // .resultMatcher(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                    //	                            .build())
                     .build();
         }
 
@@ -419,14 +403,6 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(content().string(isEmptyString()))
                                     .build())
-                    //	                    .contentTypeParam(ContentTypeParam.builder()
-                    //	                            .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                    //	                            .resultMatcher(content().string(isEmptyString()))
-                    //	                            .build())
-                    //	                    .contentTypeParam(ContentTypeParam.builder()
-                    //	                            .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                    //	                            .resultMatcher(content().string(isEmptyString()))
-                    //	                            .build())
                     .build();
         }
     }

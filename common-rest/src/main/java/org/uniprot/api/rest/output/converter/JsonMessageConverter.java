@@ -138,6 +138,9 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                         .findFirst()
                         .ifPresent(filters::add);
             }
+            allFields.stream()
+                    .filter(ReturnField::getIsRequired)
+                    .forEach(filters::add); // add required fields
             return filters;
         } else {
             return Collections.emptyList();
@@ -155,7 +158,15 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     private SimpleFilterProvider getFieldsFilterProvider(List<ReturnField> fields) {
         String fieldsPath =
                 fields.stream()
-                        .map(ReturnField::getPath) //
+                        .flatMap(returnField -> returnField.getPaths().stream())
+                        .map(
+                                path -> {
+                                    if (path.contains("[?")) {
+                                        return path.substring(0, path.indexOf("[?"));
+                                    } else {
+                                        return path;
+                                    }
+                                })
                         .map(path -> path.replaceAll("\\[\\*]", ""))
                         .map(path -> path += ".*")
                         .collect(Collectors.joining(","));
@@ -169,23 +180,31 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
     private Map<String, String> getFieldsWithFilterMap(List<ReturnField> fields) {
         Map<String, String> filters = new HashMap<>();
-        for (ReturnField resultField : fields) {
-            if (Utils.notNullNotEmpty(resultField.getFilter())) {
-                if (filters.containsKey(resultField.getPath())) {
-                    String currentFilter = filters.get(resultField.getPath());
-                    Pattern p = Pattern.compile("\\((.*?)\\)");
-                    Matcher existingMatch = p.matcher(currentFilter);
-                    Matcher newMatch = p.matcher(resultField.getFilter());
-                    if (existingMatch.find() && newMatch.find()) {
-                        String newFilter =
-                                "[?(" + existingMatch.group(1) + " || " + newMatch.group(1) + ")]";
-                        filters.put(resultField.getPath(), newFilter);
-                    }
-                } else {
-                    filters.put(resultField.getPath(), resultField.getFilter());
-                }
-            }
-        }
+        fields.stream()
+                .flatMap(returnField -> returnField.getPaths().stream())
+                .filter(path -> path.contains("[?"))
+                .forEach(
+                        fullPath -> {
+                            String path = fullPath.substring(0, fullPath.indexOf("[?"));
+                            String filter = fullPath.substring(fullPath.indexOf("[?"));
+                            if (filters.containsKey(path)) {
+                                String currentFilter = filters.get(path);
+                                Pattern p = Pattern.compile("\\((.*?)\\)");
+                                Matcher existingMatch = p.matcher(currentFilter);
+                                Matcher newMatch = p.matcher(filter);
+                                if (existingMatch.find() && newMatch.find()) {
+                                    String newFilter =
+                                            "[?("
+                                                    + existingMatch.group(1)
+                                                    + " || "
+                                                    + newMatch.group(1)
+                                                    + ")]";
+                                    filters.put(path, newFilter);
+                                }
+                            } else {
+                                filters.put(path, filter);
+                            }
+                        });
         return filters;
     }
 }

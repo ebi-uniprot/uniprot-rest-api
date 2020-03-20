@@ -4,13 +4,11 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,10 +36,8 @@ import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
-import org.uniprot.store.search.field.DiseaseField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -211,7 +207,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("id,accession,reviewed_protein_count")
+                    .fields("id,name,reviewed_protein_count")
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
@@ -232,43 +228,6 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
-        }
-
-        @Override
-        public GetIdParameter withValidResponseFieldsOrderParameter() {
-            return GetIdParameter.builder()
-                    .id(ACCESSION)
-                    .resultMatcher(
-                            result -> {
-                                String contentAsString = result.getResponse().getContentAsString();
-                                try {
-                                    Map<String, Object> responseMap =
-                                            new ObjectMapper()
-                                                    .readValue(
-                                                            contentAsString, LinkedHashMap.class);
-                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    List<String> expectedList = getFieldsInOrder();
-                                    Assertions.assertEquals(expectedList.size(), actualList.size());
-                                    Assertions.assertEquals(expectedList, actualList);
-                                } catch (IOException e) {
-                                    Assertions.fail(e.getMessage());
-                                }
-                            })
-                    .build();
-        }
-
-        private List<String> getFieldsInOrder() {
-            List<String> fields = new LinkedList<>();
-            fields.add(DiseaseField.ResultFields.id.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.accession.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.acronym.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.definition.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.alternative_names.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.cross_references.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.keywords.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.reviewed_protein_count.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName());
-            return fields;
         }
     }
 

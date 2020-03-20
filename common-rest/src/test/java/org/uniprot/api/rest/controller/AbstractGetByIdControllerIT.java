@@ -80,11 +80,6 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    void withValidResponseFieldsOrder(GetIdParameter idParameter) throws Exception {
-        validIdReturnSuccess(idParameter);
-    }
-
-    @Test
     void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when

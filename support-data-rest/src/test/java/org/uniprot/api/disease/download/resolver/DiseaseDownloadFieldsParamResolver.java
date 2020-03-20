@@ -59,7 +59,7 @@ public class DiseaseDownloadFieldsParamResolver extends AbstractDownloadFieldsRe
         ResultMatcher fieldM2 = jsonPath("$.results[*].reviewedProteinCount").exists();
         // FIXME accession should be returned and exist.  See
         // https://www.ebi.ac.uk/panda/jira/browse/TRM-23245
-        ResultMatcher fieldM3 = jsonPath("$.results[*].accession").doesNotExist();
+        ResultMatcher fieldM3 = jsonPath("$.results[*].accession").exists();
         List<ResultMatcher> fieldMatchers = Arrays.asList(fieldM1, fieldM2, fieldM3);
         List<ResultMatcher> matchers = new ArrayList<>(paramAndResult.getResultMatchers());
         matchers.addAll(fieldMatchers);

@@ -32,7 +32,9 @@ import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.TaxonomyRank;
+import org.uniprot.core.taxonomy.impl.*;
+import org.uniprot.core.uniprot.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
@@ -134,7 +136,16 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                         .mnemonic("mnemonic" + taxId)
                         .commonName("common" + taxId)
                         .synonymsAdd("synonym" + taxId)
+                        .otherNamesAdd("other names" + taxId)
+                        .rank(TaxonomyRank.FAMILY)
                         .parentId(taxId - 1)
+                        .statistics(new TaxonomyStatisticsBuilder().build())
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
+                        .strainsAdd(new TaxonomyStrainBuilder().name("str name").build())
+                        .hostsAdd(new TaxonomyBuilder().taxonId(taxId + 2).build())
+                        .linksAdd("link value")
+                        .active(true)
+                        .inactiveReason(new TaxonomyInactiveReasonBuilder().build())
                         .build();
 
         TaxonomyDocument document =
@@ -333,12 +344,12 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "10\tmnemonic10\tscientific10\tcommon10\t\t\t\t\t9")))
+                                                                    "10\tmnemonic10\tscientific10\tcommon10\tother names10\t\tfamily\t\t9")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "20\tmnemonic20\tscientific20\tcommon20\t\t\t\t\t19")))
+                                                                    "20\tmnemonic20\tscientific20\tcommon20\tother names20\t\tfamily\t\t19")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

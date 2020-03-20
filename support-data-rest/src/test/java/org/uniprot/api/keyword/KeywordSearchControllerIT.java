@@ -28,10 +28,12 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.core.cv.go.impl.GoTermBuilder;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -132,6 +134,13 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                         .definition("Definition value")
                         .keyword(keyword)
                         .category(category)
+                        .synonymsAdd("synonyms")
+                        .parentsAdd(new KeywordEntryBuilder().keyword(keyword).build())
+                        .childrenAdd(new KeywordEntryBuilder().keyword(keyword).build())
+                        .geneOntologiesAdd(
+                                new GoTermBuilder().id("idValue").name("nameValue").build())
+                        .sitesAdd("siteValue")
+                        .statistics(new StatisticsBuilder().build())
                         .build();
 
         KeywordDocument document =
