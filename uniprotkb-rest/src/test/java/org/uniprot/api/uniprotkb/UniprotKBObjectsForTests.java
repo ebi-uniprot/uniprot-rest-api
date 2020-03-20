@@ -22,12 +22,12 @@ import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.core.literature.impl.LiteratureMappedReferenceBuilder;
 import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
 import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
-import org.uniprot.core.uniprot.UniProtAccession;
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.UniProtEntryType;
-import org.uniprot.core.uniprot.UniProtReference;
-import org.uniprot.core.uniprot.impl.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.impl.UniProtReferenceBuilder;
+import org.uniprot.core.uniprotkb.UniProtKBAccession;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.UniProtKBReference;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBReferenceBuilder;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,21 +36,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * @author lgonzales
  * @since 2019-12-18
  */
-public class UniprotKbObjectsForTests {
+public class UniprotKBObjectsForTests {
 
-    public static UniProtEntry getUniprotEntryForPublication(
+    public static UniProtKBEntry getUniprotEntryForPublication(
             String accession, String... pubmedIds) {
-        return new UniProtEntryBuilder(accession, "ID_" + accession, UniProtEntryType.SWISSPROT)
+        return new UniProtKBEntryBuilder(accession, "ID_" + accession, UniProtKBEntryType.SWISSPROT)
                 .referencesSet(getUniProtReferencesForPublication(pubmedIds))
                 .build();
     }
 
-    public static List<UniProtReference> getUniProtReferencesForPublication(String... pubmedIds) {
-        List<UniProtReference> references =
+    public static List<UniProtKBReference> getUniProtReferencesForPublication(String... pubmedIds) {
+        List<UniProtKBReference> references =
                 Arrays.stream(pubmedIds)
                         .map(
                                 pubmedId -> {
-                                    return new UniProtReferenceBuilder()
+                                    return new UniProtKBReferenceBuilder()
                                             .referencePositionsAdd(
                                                     "Position MUTAGENESIS pathol " + pubmedId)
                                             .referencePositionsAdd(
@@ -71,7 +71,7 @@ public class UniprotKbObjectsForTests {
                         .collect(Collectors.toList());
 
         references.add(
-                new UniProtReferenceBuilder()
+                new UniProtKBReferenceBuilder()
                         .referencePositionsAdd("Position INTERACTION ")
                         .citation(
                                 new SubmissionBuilder()
@@ -86,7 +86,7 @@ public class UniprotKbObjectsForTests {
     public static List<LiteratureMappedReference> getLiteratureMappedReferences(
             String... accessions) {
         return Arrays.stream(accessions)
-                .map(UniprotKbObjectsForTests::getLiteratureMappedReference)
+                .map(UniprotKBObjectsForTests::getLiteratureMappedReference)
                 .collect(Collectors.toList());
     }
 
@@ -118,9 +118,9 @@ public class UniprotKbObjectsForTests {
                 .mappedProteins(
                         storeEntry.getLiteratureMappedReferences().stream()
                                 .map(LiteratureMappedReference::getUniprotAccession)
-                                .map(UniProtAccession::getValue)
+                                .map(UniProtKBAccession::getValue)
                                 .collect(Collectors.toSet()))
-                .literatureObj(UniprotKbObjectsForTests.getLiteratureBinary(storeEntry))
+                .literatureObj(UniprotKBObjectsForTests.getLiteratureBinary(storeEntry))
                 .build();
     }
 
@@ -129,7 +129,7 @@ public class UniprotKbObjectsForTests {
         return new LiteratureStoreEntryBuilder()
                 .literatureEntry(getLiteratureEntry(pubMedId))
                 .literatureMappedReferencesSet(
-                        UniprotKbObjectsForTests.getLiteratureMappedReferences(accessions))
+                        UniprotKBObjectsForTests.getLiteratureMappedReferences(accessions))
                 .build();
     }
 

@@ -10,9 +10,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.core.uniprot.ProteinExistence;
-import org.uniprot.core.uniprot.comment.CommentType;
-import org.uniprot.core.uniprot.feature.FeatureType;
+import org.uniprot.core.uniprotkb.ProteinExistence;
+import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.feature.FeatureType;
 import org.uniprot.cv.xdb.UniProtCrossReferenceDisplayOrder;
 
 /**

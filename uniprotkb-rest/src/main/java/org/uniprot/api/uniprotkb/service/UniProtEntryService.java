@@ -21,9 +21,10 @@ import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprot.UniProtEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -33,27 +34,28 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
-public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocument, UniProtEntry> {
+public class UniProtEntryService
+        extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
     private static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final QueryBoosts queryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
-    private StoreStreamer<UniProtDocument, UniProtEntry> storeStreamer;
+    private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
-            UniprotFacetConfig uniprotFacetConfig,
+            UniprotKBFacetConfig uniprotKBFacetConfig,
             UniProtTermsConfig uniProtTermsConfig,
             UniProtSolrSortClause uniProtSolrSortClause,
             QueryBoosts uniProtKBQueryBoosts,
             UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtDocument, UniProtEntry> uniProtEntryStoreStreamer,
+            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService) {
         super(
                 repository,
-                uniprotFacetConfig,
+                uniprotKBFacetConfig,
                 uniProtSolrSortClause,
                 uniProtEntryStoreStreamer,
                 uniProtKBQueryBoosts);
@@ -67,7 +69,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     }
 
     @Override
-    public QueryResult<UniProtEntry> search(SearchRequest request) {
+    public QueryResult<UniProtKBEntry> search(SearchRequest request) {
 
         SolrRequest solrRequest = createSearchSolrRequest(request, true);
 
@@ -79,7 +81,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     }
 
     @Override
-    public UniProtEntry findByUniqueId(String accession) {
+    public UniProtKBEntry findByUniqueId(String accession) {
         return findByUniqueId(accession, null);
     }
 
@@ -89,7 +91,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
     }
 
     @Override
-    public UniProtEntry findByUniqueId(String accession, String fields) {
+    public UniProtKBEntry findByUniqueId(String accession, String fields) {
         try {
             Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
             SolrRequest solrRequest =
@@ -98,7 +100,7 @@ public class UniProtEntryService extends StoreStreamerSearchService<UniProtDocum
                             .rows(NumberUtils.INTEGER_ONE)
                             .build();
             Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
-            Optional<UniProtEntry> optionalUniProtEntry =
+            Optional<UniProtKBEntry> optionalUniProtEntry =
                     optionalDoc
                             .map(doc -> resultsConverter.convertDoc(doc, filters))
                             .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));

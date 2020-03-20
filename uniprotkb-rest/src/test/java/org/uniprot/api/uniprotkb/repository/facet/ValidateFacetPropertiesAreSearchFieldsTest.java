@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
@@ -20,7 +20,7 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
  */
 @SpringBootTest
 class ValidateFacetPropertiesAreSearchFieldsTest {
-    @Autowired private UniprotFacetConfig config;
+    @Autowired private UniprotKBFacetConfig config;
     private SearchFieldConfig searchFieldConfig =
             SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
 
@@ -35,6 +35,6 @@ class ValidateFacetPropertiesAreSearchFieldsTest {
     }
 
     @TestConfiguration
-    @Import(UniprotFacetConfig.class)
+    @Import(UniprotKBFacetConfig.class)
     static class TestFacetConfig {}
 }

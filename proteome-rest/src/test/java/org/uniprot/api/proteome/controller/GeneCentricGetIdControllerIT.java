@@ -30,7 +30,7 @@ import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.proteome.Protein;
 import org.uniprot.core.proteome.impl.CanonicalProteinBuilder;
 import org.uniprot.core.proteome.impl.ProteinBuilder;
-import org.uniprot.core.uniprot.UniProtEntryType;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
@@ -102,7 +102,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         Protein protein =
                 new ProteinBuilder()
                         .accession(ACCESSION)
-                        .entryType(UniProtEntryType.SWISSPROT)
+                        .entryType(UniProtKBEntryType.SWISSPROT)
                         .geneName("some gene")
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
                         .sequenceLength(324)
@@ -111,7 +111,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         Protein protein2 =
                 new ProteinBuilder()
                         .accession("P21912")
-                        .entryType(UniProtEntryType.SWISSPROT)
+                        .entryType(UniProtKBEntryType.SWISSPROT)
                         .geneName("some gene1")
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
                         .sequenceLength(334)
@@ -119,7 +119,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         Protein protein3 =
                 new ProteinBuilder()
                         .accession("P31912")
-                        .entryType(UniProtEntryType.TREMBL)
+                        .entryType(UniProtKBEntryType.TREMBL)
                         .geneName("some gene3")
                         .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
                         .sequenceLength(434)
