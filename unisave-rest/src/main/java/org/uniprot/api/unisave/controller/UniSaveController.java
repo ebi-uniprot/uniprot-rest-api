@@ -47,6 +47,20 @@ public class UniSaveController {
      * http://www.ebi.ac.uk/uniprot/unisave/rest/json/entry/Q00001/1
      *
      * <p>entryinfo is the same as entry, but without content
+     *
+     * <p>============================================== looks like we can reduce end-points, by
+     * using content type instead of raw/json
+     *
+     * <p>here are hte underlying calls to the service: cat
+     * /home/edd/working/intellij/unisave/unp.fw.unisave_web/restful/src/main/scala/uk/ac/ebi/unisave/UnisaveServlet.scala
+     * | grep -o 'service\.[a-zA-Z]\+' |sort -u
+     * service.adaptFasta
+     * service.getAccessionStatus
+     * service.getDiff
+     * service.getEntries
+     * service.getEntryInfos
+     * service.getEntryInfoWithVersion
+     * service.getEntryWithVersion
      */
     private final UniSaveService service;
 
