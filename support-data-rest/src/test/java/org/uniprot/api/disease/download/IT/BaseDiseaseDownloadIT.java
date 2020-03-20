@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.disease.DiseaseRepository;
 import org.uniprot.api.disease.DiseaseSolrDocumentHelper;
 import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 
@@ -55,5 +57,14 @@ public class BaseDiseaseDownloadIT extends AbstractDownloadControllerIT {
     @Override
     protected void saveEntry(String accession, long suffix) {
         DiseaseSolrDocumentHelper.createDiseaseDocuments(this.getStoreManager(), accession, suffix);
+    }
+
+    protected static List<MediaType> getSupportedContentTypes() {
+        return Arrays.asList(
+                MediaType.APPLICATION_JSON,
+                UniProtMediaType.TSV_MEDIA_TYPE,
+                UniProtMediaType.LIST_MEDIA_TYPE,
+                UniProtMediaType.XLS_MEDIA_TYPE,
+                UniProtMediaType.OBO_MEDIA_TYPE);
     }
 }

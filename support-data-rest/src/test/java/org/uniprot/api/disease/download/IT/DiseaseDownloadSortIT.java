@@ -1,24 +1,38 @@
 package org.uniprot.api.disease.download.IT;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
-import org.uniprot.api.disease.download.resolver.DiseaseDownloadSortParamResolver;
+import org.uniprot.api.disease.download.resolver.DiseaseDownloadSortParamAndResultProvider;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(DiseaseController.class)
-@ExtendWith(value = {SpringExtension.class, DiseaseDownloadSortParamResolver.class})
+@ExtendWith(value = {SpringExtension.class})
 public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
+    public static List<String> SORTED_BY_ACCESSION = Arrays.asList(ACC2, ACC1, ACC3);
+
+    @RegisterExtension
+    static DiseaseDownloadSortParamAndResultProvider paramAndResultProvider =
+            new DiseaseDownloadSortParamAndResultProvider();
 
     @BeforeEach
     public void setUpData() {
@@ -28,38 +42,51 @@ public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
         saveEntry(ACC3, 3);
     }
 
-    @Test
-    protected void testDownloadWithSortJSON(DownloadParamAndResult parameterAndResult)
-            throws Exception {
-        // then
-        sendAndVerify(parameterAndResult, HttpStatus.OK);
+    @ParameterizedTest(name = "[{index}]~/download?{0}")
+    @MethodSource("accession")
+    void testDownloadSortByAccession(DownloadParamAndResult paramAndResult) throws Exception {
+        sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
-    @Test
-    protected void testDownloadWithSortList(DownloadParamAndResult parameterAndResult)
-            throws Exception {
-        // then
-        sendAndVerify(parameterAndResult, HttpStatus.OK);
+    private static Stream<Arguments> accession() {
+        return requestResponseForSort("accession", "asc", SORTED_BY_ACCESSION);
     }
 
-    @Test
-    protected void testDownloadWithSortTSV(DownloadParamAndResult parameterAndResult)
-            throws Exception {
-        // then
-        sendAndVerify(parameterAndResult, HttpStatus.OK);
+    private static Stream<Arguments> requestResponseForSort(
+            String fieldName, String sortOrder, List<String> accessionsOrder) {
+        return Stream.of(
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.TSV_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.LIST_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                MediaType.APPLICATION_JSON, fieldName, sortOrder, accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.XLS_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)),
+                Arguments.of(
+                        getParamAndResult(
+                                UniProtMediaType.OBO_MEDIA_TYPE,
+                                fieldName,
+                                sortOrder,
+                                accessionsOrder)));
     }
 
-    @Test
-    protected void testDownloadWithSortXLS(DownloadParamAndResult parameterAndResult)
-            throws Exception {
-        // then
-        sendAndVerify(parameterAndResult, HttpStatus.OK);
-    }
-
-    @Test
-    protected void testDownloadWithSortOBO(DownloadParamAndResult parameterAndResult)
-            throws Exception {
-        // then
-        sendAndVerify(parameterAndResult, HttpStatus.OK);
+    private static DownloadParamAndResult getParamAndResult(
+            MediaType mediaType, String fieldName, String sortOrder, List<String> accessionsOrder) {
+        return paramAndResultProvider.getDownloadParamAndResultForSort(
+                mediaType, fieldName, sortOrder, 3, accessionsOrder);
     }
 }
