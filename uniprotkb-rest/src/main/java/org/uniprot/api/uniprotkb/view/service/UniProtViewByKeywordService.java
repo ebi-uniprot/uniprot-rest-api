@@ -14,21 +14,21 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.cv.keyword.KeywordService;
+import org.uniprot.cv.keyword.KeywordRepo;
 
 import com.google.common.base.Strings;
 
 public class UniProtViewByKeywordService implements UniProtViewByService {
     private final SolrClient solrClient;
     private final String uniprotCollection;
-    private final KeywordService keywordService;
+    private final KeywordRepo keywordRepo;
     public static final String URL_PREFIX = "https://www.uniprot.org/keywords/";
 
     public UniProtViewByKeywordService(
-            SolrClient solrClient, String uniprotCollection, KeywordService keywordService) {
+            SolrClient solrClient, String uniprotCollection, KeywordRepo keywordRepo) {
         this.solrClient = solrClient;
         this.uniprotCollection = uniprotCollection;
-        this.keywordService = keywordService;
+        this.keywordRepo = keywordRepo;
     }
 
     @Override
@@ -81,10 +81,10 @@ public class UniProtViewByKeywordService implements UniProtViewByService {
 
     private List<KeywordEntry> getKeywordsFromParent(String parent) {
         if (Strings.isNullOrEmpty(parent)) {
-            return keywordService.getAllCategories();
+            return keywordRepo.getAllCategories();
         }
-        KeywordEntry keyword = keywordService.getByAccession(parent);
-        if (keyword == null) return keywordService.getAllCategories();
+        KeywordEntry keyword = keywordRepo.getByAccession(parent);
+        if (keyword == null) return keywordRepo.getAllCategories();
         return keyword.getChildren();
     }
 }
