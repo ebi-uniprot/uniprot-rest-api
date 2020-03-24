@@ -16,7 +16,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -31,9 +30,9 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
  * @author lgonzales
  * @since 2019-12-09
  */
-@Validated
-@RestController
-@RequestMapping(value = "/uniprotkb/accession")
+// @Validated
+// @RestController
+// @RequestMapping(value = "/uniprotkb/accession")
 public class UniprotKBEntryController extends BasicSearchController<PublicationEntry> {
 
     private final PublicationService publicationService;
