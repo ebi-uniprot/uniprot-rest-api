@@ -36,7 +36,6 @@ import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -170,10 +169,7 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ModelFieldMeta(
-                            path =
-                                    "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
+            @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")

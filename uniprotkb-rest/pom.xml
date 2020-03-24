@@ -281,12 +281,24 @@
 						<configuration>
 							<packageLocations>
 								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
-								<packageLocation>org.uniprot.api.keyword</packageLocation>
 							</packageLocations>
 							<openApiDirectory>generated/swagger</openApiDirectory>
 							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
 							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.uniprot</groupId>
+								<artifactId>uniprot-config</artifactId>
+								<version>1.0-SNAPSHOT</version>
+								<exclusions>
+									<exclusion>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>*</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
 						<executions>
 							<execution>
 								<phase>compile</phase>
