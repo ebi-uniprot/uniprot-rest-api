@@ -21,7 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.literature.request.LiteratureRequestDTO;
+import org.uniprot.api.literature.request.LiteratureRequest;
 import org.uniprot.api.literature.service.LiteratureService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -91,7 +91,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> search(
-            @Valid LiteratureRequestDTO searchRequest,
+            @Valid LiteratureRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
@@ -108,7 +108,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> download(
-            @Valid LiteratureRequestDTO searchRequest,
+            @Valid LiteratureRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

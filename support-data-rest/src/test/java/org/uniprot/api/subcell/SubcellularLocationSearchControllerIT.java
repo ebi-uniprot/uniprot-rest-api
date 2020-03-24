@@ -280,7 +280,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("name,category"))
+                    .queryParam("fields", Collections.singletonList("id,category"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",

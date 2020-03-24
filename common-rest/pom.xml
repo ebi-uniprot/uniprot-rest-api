@@ -27,6 +27,11 @@
 			<version>${uniprot-store.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>core-parser</artifactId>
+			<version>${uniprot-core.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-datastore</artifactId>
 			<version>${uniprot-store.version}</version>

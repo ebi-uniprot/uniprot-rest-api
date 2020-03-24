@@ -20,14 +20,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniparc.output.converter.*;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
+import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
@@ -67,17 +66,27 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
+
+                ReturnFieldConfig returnFieldConfig =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC);
+
                 converters.add(new UniParcFastaMessageConverter());
-                converters.add(new UniParcTsvMessageConverter());
-                converters.add(new UniParcXslMessageConverter());
+                converters.add(
+                        new TsvMessageConverter<>(
+                                UniParcEntry.class,
+                                returnFieldConfig,
+                                new UniParcEntryValueMapper()));
+                converters.add(
+                        new XslMessageConverter<>(
+                                UniParcEntry.class,
+                                returnFieldConfig,
+                                new UniParcEntryValueMapper()));
 
                 JsonMessageConverter<UniParcEntry> uniparcJsonConverter =
                         new JsonMessageConverter<>(
                                 UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniParcEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.UNIPARC)
-                                        .getReturnFields());
+                                returnFieldConfig);
                 converters.add(0, uniparcJsonConverter);
                 converters.add(1, new UniParcXmlMessageConverter(""));
             }

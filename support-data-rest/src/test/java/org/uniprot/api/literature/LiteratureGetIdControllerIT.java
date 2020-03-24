@@ -161,7 +161,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
-                    .fields("pubmed_id,title")
+                    .fields("id,title")
                     .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .resultMatcher(jsonPath("$.citation.authors").doesNotExist())

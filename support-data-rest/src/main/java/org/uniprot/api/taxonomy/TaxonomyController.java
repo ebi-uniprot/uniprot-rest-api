@@ -25,7 +25,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.taxonomy.request.TaxonomyRequestDTO;
+import org.uniprot.api.taxonomy.request.TaxonomyRequest;
 import org.uniprot.api.taxonomy.service.TaxonomyService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
@@ -87,7 +87,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> search(
-            @Valid TaxonomyRequestDTO searchRequest,
+            @Valid TaxonomyRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<TaxonomyEntry> results = taxonomyService.search(searchRequest);
@@ -104,7 +104,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> download(
-            @Valid TaxonomyRequestDTO searchRequest,
+            @Valid TaxonomyRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

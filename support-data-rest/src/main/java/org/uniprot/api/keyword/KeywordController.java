@@ -20,7 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.keyword.request.KeywordRequestDTO;
+import org.uniprot.api.keyword.request.KeywordRequest;
 import org.uniprot.api.keyword.service.KeywordService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -132,7 +132,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(
-            @Valid @ModelAttribute KeywordRequestDTO searchRequest,
+            @Valid @ModelAttribute KeywordRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<KeywordEntry> results = keywordService.search(searchRequest);
@@ -167,7 +167,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> download(
-            @Valid @ModelAttribute KeywordRequestDTO searchRequest,
+            @Valid @ModelAttribute KeywordRequest searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         Stream<KeywordEntry> result = keywordService.download(searchRequest);

@@ -303,13 +303,14 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,name"))
+                    .queryParam("fields", Collections.singletonList("id,definition"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.accession",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.id").exists())
+                    .resultMatcher(jsonPath("$.results.*.definition").exists())
                     .resultMatcher(jsonPath("$.results.*.accession").exists())
                     .build();
         }

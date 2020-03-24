@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
 import com.fasterxml.jackson.core.JsonEncoding;
@@ -34,15 +35,15 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     private final ObjectMapper objectMapper;
     private ThreadLocal<List<ReturnField>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
-    private List<ReturnField> allFields;
+    private ReturnFieldConfig returnFieldConfig;
 
     public JsonMessageConverter(
             ObjectMapper objectMapper,
             Class<T> messageConverterEntryClass,
-            List<ReturnField> allFields) {
+            ReturnFieldConfig returnFieldConfig) {
         super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
         this.objectMapper = objectMapper;
-        this.allFields = allFields;
+        this.returnFieldConfig = returnFieldConfig;
     }
 
     @Override
@@ -133,14 +134,9 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         if (Utils.notNullNotEmpty(fields)) {
             List<ReturnField> filters = new ArrayList<>();
             for (String field : fields.split(COMMA)) {
-                allFields.stream()
-                        .filter(fieldItem -> fieldItem.getName().equals(field))
-                        .findFirst()
-                        .ifPresent(filters::add);
+                filters.add(returnFieldConfig.getReturnFieldByName(field));
             }
-            allFields.stream()
-                    .filter(ReturnField::getIsRequired)
-                    .forEach(filters::add); // add required fields
+            filters.addAll(returnFieldConfig.getRequiredReturnFields());
             return filters;
         } else {
             return Collections.emptyList();

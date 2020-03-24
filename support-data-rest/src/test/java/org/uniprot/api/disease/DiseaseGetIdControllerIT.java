@@ -207,7 +207,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("id,name,reviewed_protein_count")
+                    .fields("id,reviewed_protein_count")
                     .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))

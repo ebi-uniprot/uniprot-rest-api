@@ -71,7 +71,7 @@ class ReturnFieldsValidatorImplTest {
 
         FakeReturnFieldsValidatorImpl validator = new FakeReturnFieldsValidatorImpl();
         validator.initialize(validReturnFields);
-        boolean result = validator.isValid("gene_names,kinetics, entry_type ,accession", null);
+        boolean result = validator.isValid("gene_names,kinetics, reviewed ,accession", null);
         assertTrue(result);
     }
 

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.configure.service.UniRefConfigureService;
-import org.uniprot.store.search.domain.FieldGroup;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 
 /**
  * @author jluo
@@ -22,7 +22,7 @@ public class UniRefConfigureController {
     }
 
     @GetMapping("/resultfields")
-    public List<FieldGroup> getResultFields() {
+    public List<ReturnField> getResultFields() {
         return service.getResultFields();
     }
 }

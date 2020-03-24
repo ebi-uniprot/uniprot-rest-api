@@ -200,8 +200,9 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(UPID)
-                    .fields("id,taxonomy")
+                    .fields("upid,organism")
                     .resultMatcher(jsonPath("$.id", is(UPID)))
+                    .resultMatcher(jsonPath("$.taxonomy.taxonId", is(9606)))
                     .build();
         }
 
@@ -248,7 +249,7 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Proteome ID\tOrganism\tOrganism ID\tProtein count")))
+                                                                    "Proteome Id\tOrganism\tOrganism Id\tProtein count")))
                                     .resultMatcher(
                                             content()
                                                     .string(

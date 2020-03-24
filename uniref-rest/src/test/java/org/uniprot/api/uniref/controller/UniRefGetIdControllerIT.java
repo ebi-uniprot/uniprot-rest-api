@@ -231,7 +231,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ID)
-                    .fields("id,name,size")
+                    .fields("name,count")
                     .resultMatcher(jsonPath("$.id", is(ID)))
                     .build();
         }

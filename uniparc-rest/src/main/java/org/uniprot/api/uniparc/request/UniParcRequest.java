@@ -36,7 +36,4 @@ public class UniParcRequest implements SearchRequest {
 
     @Positive(message = "{search.positive}")
     private Integer size;
-
-    public static final String DEFAULT_FIELDS =
-            "upi,organism,accession,first_seen,last_seen,length";
 }

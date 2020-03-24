@@ -13,7 +13,7 @@ import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
 @Data
-public class SubcellularLocationRequestDTO implements SearchRequest {
+public class SubcellularLocationRequest implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")

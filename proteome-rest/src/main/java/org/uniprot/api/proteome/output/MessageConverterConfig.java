@@ -21,14 +21,13 @@ import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.proteome.output.converter.*;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
+import org.uniprot.core.parser.tsv.proteome.ProteomeEntryMapper;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
@@ -69,16 +68,20 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
 
-                converters.add(new ProteomeTsvMessageConverter());
-                converters.add(new ProteomeXslMessageConverter());
+                ReturnFieldConfig returnFieldConfig =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PROTEOME);
+                converters.add(
+                        new TsvMessageConverter<>(
+                                ProteomeEntry.class, returnFieldConfig, new ProteomeEntryMapper()));
+                converters.add(
+                        new XslMessageConverter<>(
+                                ProteomeEntry.class, returnFieldConfig, new ProteomeEntryMapper()));
 
                 JsonMessageConverter<ProteomeEntry> proteomeJsonConverter =
                         new JsonMessageConverter<>(
                                 ProteomeJsonConfig.getInstance().getSimpleObjectMapper(),
                                 ProteomeEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.PROTEOME)
-                                        .getReturnFields());
+                                returnFieldConfig);
                 converters.add(0, proteomeJsonConverter);
                 converters.add(1, new ProteomeXmlMessageConverter());
 
@@ -87,8 +90,7 @@ public class MessageConverterConfig {
                                 ProteomeJsonConfig.getInstance().getSimpleObjectMapper(),
                                 CanonicalProtein.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.GENECENTRIC)
-                                        .getReturnFields());
+                                        UniProtDataType.GENECENTRIC));
                 converters.add(0, geneCentricJsonConverter);
                 converters.add(1, new GeneCentricXmlMessageConverter());
             }

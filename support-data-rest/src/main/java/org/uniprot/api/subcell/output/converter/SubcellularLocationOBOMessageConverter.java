@@ -6,7 +6,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
-import org.uniprot.api.rest.output.converter.AbstractOBOMessagerConverter;
+import org.uniprot.api.rest.output.converter.AbstractOBOMessageConverter;
 import org.uniprot.core.cv.go.GoTerm;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.util.Utils;
@@ -16,7 +16,7 @@ import org.uniprot.core.util.Utils;
  * @since 2019-08-29
  */
 public class SubcellularLocationOBOMessageConverter
-        extends AbstractOBOMessagerConverter<SubcellularLocationEntry> {
+        extends AbstractOBOMessageConverter<SubcellularLocationEntry> {
     private static final String SUBCELLULAR_LOCATION_NAMESPACE = "uniprot:locations";
 
     public SubcellularLocationOBOMessageConverter() {

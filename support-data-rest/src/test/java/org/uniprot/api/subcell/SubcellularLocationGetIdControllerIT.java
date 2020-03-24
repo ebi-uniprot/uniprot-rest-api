@@ -141,7 +141,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(SUBCELL_ACCESSION)
-                    .fields("name,definition,category")
+                    .fields("id,definition,category")
                     .resultMatcher(jsonPath("$.id", is("the id")))
                     .resultMatcher(jsonPath("$.definition", is("Definition value")))
                     .resultMatcher(jsonPath("$.category", is("Cellular component")))

@@ -13,12 +13,11 @@ import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
-public abstract class AbstractOBOMessagerConverter<T>
-        extends AbstractEntityHttpMessageConverter<T> {
+public abstract class AbstractOBOMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
     private final OBOFormatWriter oboFormatWriter;
 
-    public AbstractOBOMessagerConverter(Class<T> messageConverterEntryClass) {
+    public AbstractOBOMessageConverter(Class<T> messageConverterEntryClass) {
         super(UniProtMediaType.OBO_MEDIA_TYPE, messageConverterEntryClass);
         this.oboFormatWriter = new OBOFormatWriter();
     }

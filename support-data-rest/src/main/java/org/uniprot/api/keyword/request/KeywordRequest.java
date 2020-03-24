@@ -16,7 +16,7 @@ import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
-public class KeywordRequestDTO implements SearchRequest {
+public class KeywordRequest implements SearchRequest {
 
     @Parameter(description = "Criteria to search the keywords. It can take any valid solr query.")
     @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_query_param_meta.json")

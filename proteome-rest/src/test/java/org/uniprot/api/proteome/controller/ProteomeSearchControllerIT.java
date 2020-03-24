@@ -343,7 +343,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("taxonomy"))
+                    .queryParam("fields", Collections.singletonList("organism"))
                     .resultMatcher(
                             jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
                     .resultMatcher(jsonPath("$.results.*.taxonomy.taxonId", contains(9606, 9606)))
@@ -395,7 +395,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "\tOrganism\tOrganism ID\tProtein count")))
+                                                                    "Proteome Id\tOrganism\tOrganism Id\tProtein count")))
                                     .resultMatcher(
                                             content()
                                                     .string(

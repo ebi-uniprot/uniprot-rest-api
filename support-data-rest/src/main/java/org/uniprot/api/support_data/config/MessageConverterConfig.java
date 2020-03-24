@@ -10,20 +10,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.disease.response.converter.DiseaseOBOMessageConverter;
-import org.uniprot.api.disease.response.converter.DiseaseTsvMessageConverter;
-import org.uniprot.api.disease.response.converter.DiseaseXlsMessageConverter;
-import org.uniprot.api.keyword.output.converter.KeywordTsvMessageConverter;
-import org.uniprot.api.keyword.output.converter.KeywordXlsMessageConverter;
-import org.uniprot.api.literature.output.converter.LiteratureTsvMessageConverter;
-import org.uniprot.api.literature.output.converter.LiteratureXlsMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.subcell.output.converter.SubcellularLocationOBOMessageConverter;
-import org.uniprot.api.subcell.output.converter.SubcellularLocationTsvMessageConverter;
-import org.uniprot.api.subcell.output.converter.SubcellularLocationXlsMessageConverter;
-import org.uniprot.api.taxonomy.output.converter.TaxonomyTsvMessageConverter;
-import org.uniprot.api.taxonomy.output.converter.TaxonomyXlsMessageConverter;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
@@ -35,10 +23,15 @@ import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
+import org.uniprot.core.parser.tsv.disease.DiseaseEntryMapper;
+import org.uniprot.core.parser.tsv.keyword.KeywordEntryMapper;
+import org.uniprot.core.parser.tsv.literature.LiteratureEntryMapper;
+import org.uniprot.core.parser.tsv.subcell.SubcellularLocationEntryMapper;
+import org.uniprot.core.parser.tsv.taxonomy.TaxonomyEntryValueMapper;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.search.field.*;
 
 @Configuration
 @ConfigurationProperties(prefix = "download")
@@ -71,21 +64,64 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ListMessageConverter());
 
-                converters.add(new LiteratureXlsMessageConverter());
-                converters.add(new LiteratureTsvMessageConverter());
+                ReturnFieldConfig litReturnConfig =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.LITERATURE);
+                converters.add(
+                        new XslMessageConverter<>(
+                                LiteratureEntry.class,
+                                litReturnConfig,
+                                new LiteratureEntryMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
+                                LiteratureEntry.class,
+                                litReturnConfig,
+                                new LiteratureEntryMapper()));
 
-                converters.add(new TaxonomyXlsMessageConverter());
-                converters.add(new TaxonomyTsvMessageConverter());
+                ReturnFieldConfig taxReturnConfig =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.TAXONOMY);
+                converters.add(
+                        new XslMessageConverter<>(
+                                TaxonomyEntry.class,
+                                taxReturnConfig,
+                                new TaxonomyEntryValueMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
+                                TaxonomyEntry.class,
+                                taxReturnConfig,
+                                new TaxonomyEntryValueMapper()));
 
-                converters.add(new KeywordXlsMessageConverter());
-                converters.add(new KeywordTsvMessageConverter());
+                ReturnFieldConfig kwReturnFields =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
+                converters.add(
+                        new XslMessageConverter<>(
+                                KeywordEntry.class, kwReturnFields, new KeywordEntryMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
+                                KeywordEntry.class, kwReturnFields, new KeywordEntryMapper()));
 
-                converters.add(new SubcellularLocationXlsMessageConverter());
-                converters.add(new SubcellularLocationTsvMessageConverter());
+                ReturnFieldConfig subcellReturnFields =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(
+                                UniProtDataType.SUBCELLLOCATION);
+                converters.add(
+                        new XslMessageConverter<>(
+                                SubcellularLocationEntry.class,
+                                subcellReturnFields,
+                                new SubcellularLocationEntryMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
+                                SubcellularLocationEntry.class,
+                                subcellReturnFields,
+                                new SubcellularLocationEntryMapper()));
                 converters.add(new SubcellularLocationOBOMessageConverter());
 
-                converters.add(new DiseaseXlsMessageConverter());
-                converters.add(new DiseaseTsvMessageConverter());
+                ReturnFieldConfig diseaseReturnFields =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.DISEASE);
+                converters.add(
+                        new XslMessageConverter<>(
+                                DiseaseEntry.class, diseaseReturnFields, new DiseaseEntryMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
+                                DiseaseEntry.class, diseaseReturnFields, new DiseaseEntryMapper()));
                 converters.add(new DiseaseOBOMessageConverter());
 
                 // add Json message converter first in the list because it is the most used
@@ -93,45 +129,35 @@ public class MessageConverterConfig {
                         new JsonMessageConverter<>(
                                 LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
                                 LiteratureEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.LITERATURE)
-                                        .getReturnFields());
+                                litReturnConfig);
                 converters.add(0, litJsonConverter);
 
                 JsonMessageConverter<KeywordEntry> keywordJsonConverter =
                         new JsonMessageConverter<>(
                                 KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
                                 KeywordEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.KEYWORD)
-                                        .getReturnFields());
+                                kwReturnFields);
                 converters.add(0, keywordJsonConverter);
 
                 JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
                         new JsonMessageConverter<>(
                                 TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
                                 TaxonomyEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.TAXONOMY)
-                                        .getReturnFields());
+                                taxReturnConfig);
                 converters.add(0, taxonomyJsonConverter);
 
                 JsonMessageConverter<SubcellularLocationEntry> subcellJsonConverter =
                         new JsonMessageConverter<>(
                                 SubcellularLocationJsonConfig.getInstance().getSimpleObjectMapper(),
                                 SubcellularLocationEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.SUBCELLLOCATION)
-                                        .getReturnFields());
+                                subcellReturnFields);
                 converters.add(0, subcellJsonConverter);
 
                 JsonMessageConverter<DiseaseEntry> diseaseJsonConverter =
                         new JsonMessageConverter<>(
                                 DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
                                 DiseaseEntry.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.DISEASE)
-                                        .getReturnFields());
+                                diseaseReturnFields);
                 converters.add(0, diseaseJsonConverter);
 
                 JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
@@ -139,8 +165,7 @@ public class MessageConverterConfig {
                                 CrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
                                 CrossRefEntry.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
-                                                UniProtDataType.CROSSREF)
-                                        .getReturnFields());
+                                        UniProtDataType.CROSSREF));
                 converters.add(0, xrefJsonConverter);
             }
         };

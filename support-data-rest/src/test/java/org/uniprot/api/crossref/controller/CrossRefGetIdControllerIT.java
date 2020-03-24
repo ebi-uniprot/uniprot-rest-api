@@ -27,7 +27,6 @@ import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
-import org.uniprot.store.search.field.CrossRefField;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -172,25 +171,6 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
-        }
-
-        private List<String> getExpectedFieldsOrder() {
-            List<String> jsonFieldsOrder = new LinkedList<>();
-            jsonFieldsOrder.add(CrossRefField.ResultFields.name.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.accession.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.abbrev.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.pub_med_id.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.doi_id.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.link_type.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.server.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.db_url.getJavaFieldName());
-            jsonFieldsOrder.add(CrossRefField.ResultFields.category.getJavaFieldName());
-            jsonFieldsOrder.add(
-                    CrossRefField.ResultFields.reviewed_protein_count.getJavaFieldName());
-            jsonFieldsOrder.add(
-                    CrossRefField.ResultFields.unreviewed_protein_count.getJavaFieldName());
-
-            return jsonFieldsOrder;
         }
     }
 
