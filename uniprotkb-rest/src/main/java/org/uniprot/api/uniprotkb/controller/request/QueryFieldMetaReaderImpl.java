@@ -1,9 +1,6 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -26,6 +23,8 @@ public class QueryFieldMetaReaderImpl implements ModelFieldMetaReader {
             SearchFieldConfig config = SearchFieldConfigFactory.getSearchFieldConfig(upDataType);
             metaList =
                     config.getSearchFieldItems().stream()
+                            .filter(searchFieldItem -> searchFieldItem.isIncludeInSwagger())
+                            .sorted(Comparator.comparing(SearchFieldItem::getFieldName))
                             .map(this::convertToMap)
                             .collect(Collectors.toList());
         }
