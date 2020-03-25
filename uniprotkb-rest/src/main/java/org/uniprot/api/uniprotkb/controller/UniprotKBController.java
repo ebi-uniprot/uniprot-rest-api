@@ -169,7 +169,7 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")

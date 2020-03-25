@@ -35,7 +35,6 @@ public class UniProtKBRequest implements SearchRequest {
     public static String DEFAULT_FIELDS =
             "accession,id,reviewed,protein_name,gene_names,organism,length";
 
-    @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_query_param_meta.json")
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")

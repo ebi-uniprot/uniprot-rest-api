@@ -1,7 +1,10 @@
 package org.uniprot.api.keyword.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
@@ -9,8 +12,7 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
 public class KeywordRequest implements SearchRequest {
@@ -31,12 +33,7 @@ public class KeywordRequest implements SearchRequest {
     private String cursor;
 
     @Parameter(description = "Comma separated list of fields to be returned in response")
-<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/keyword/request/KeywordRequest.java
-    @ModelFieldMeta(path = "support-data-rest/src/main/resources/keyword_return_field_meta.json")
     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
-=======
-    @ValidReturnFields(fieldValidatorClazz = KeywordField.ResultFields.class)
->>>>>>> initial commit towards use of flat config files to geenerate open api swagger:support-data-rest/src/main/java/org/uniprot/api/keyword/request/KeywordRequestDTO.java
     private String fields;
 
     @Parameter(description = "Size of the result. Defaults to 25")
