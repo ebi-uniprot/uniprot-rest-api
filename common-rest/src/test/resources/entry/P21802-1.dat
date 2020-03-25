@@ -814,8 +814,8 @@ RT   "A human laterality disorder caused by a homozygous deleterious mutation in
 RT   MMP21.";
 RL   J. Med. Genet. 52:840-847(2015).
 CC   -!- INTERACTION:
-CC       P19174:PLCG1; NbExp=9; IntAct=EBI-15489960, EBI-79387;
-CC       P05230-1:FGF1; NbExp=2; IntAct=EBI-15489960, EBI-15489950;
+CC       P21802-1; P19174: PLCG1; NbExp=9; IntAct=EBI-15489960, EBI-79387;
+CC       P21802-1; P05230-1: FGF1; NbExp=2; IntAct=EBI-15489960, EBI-15489950;
 CC   -!- SUBCELLULAR LOCATION: [Isoform 1]: Cell membrane; Single-pass type I
 CC       membrane protein. Note=After ligand binding, the activated receptor is
 CC       rapidly internalized and degraded.

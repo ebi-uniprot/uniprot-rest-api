@@ -15,21 +15,21 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.pathway.UniPathway;
-import org.uniprot.cv.pathway.UniPathwayService;
+import org.uniprot.cv.pathway.UniPathwayRepo;
 
 import com.google.common.base.Strings;
 
 public class UniProtViewByPathwayService implements UniProtViewByService {
     private final SolrClient solrClient;
     private final String uniprotCollection;
-    private final UniPathwayService unipathwayService;
+    private final UniPathwayRepo unipathwayRepo;
     // private final static String URL_PREFIX ="https://www.uniprot.org/keywords/";
 
     public UniProtViewByPathwayService(
-            SolrClient solrClient, String uniprotCollection, UniPathwayService unipathwayService) {
+            SolrClient solrClient, String uniprotCollection, UniPathwayRepo unipathwayRepo) {
         this.solrClient = solrClient;
         this.uniprotCollection = uniprotCollection;
-        this.unipathwayService = unipathwayService;
+        this.unipathwayRepo = unipathwayRepo;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
                                 .collect(
                                         Collectors.toMap(
                                                 FacetField.Count::getName, Function.identity()));
-                List<UniPathway> pathways = unipathwayService.getChildrenById(parent);
+                List<UniPathway> pathways = unipathwayRepo.getChildrenById(parent);
 
                 return pathways.stream()
                         .map(val -> getRightLevelPathway(val, idCountMap))
