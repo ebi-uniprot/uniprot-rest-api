@@ -27,6 +27,7 @@ public class SortFieldMetaReaderImpl implements ModelFieldMetaReader {
                                     item ->
                                             config.correspondingSortFieldExists(
                                                     item.getFieldName()))
+                            .sorted(Comparator.comparing(SearchFieldItem::getFieldName))
                             .map(this::convertToMap)
                             .collect(Collectors.toList());
         }
