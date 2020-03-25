@@ -29,13 +29,13 @@ public class DiseaseSearchContentTypeParamResolver extends AbstractSearchContent
                         + "xref: MIM20:61714020 \"phenotype20\"";
 
         return SearchContentTypeParam.builder()
-                .query("accession:" + SEARCH_ACCESSION1 + " OR accession:" + SEARCH_ACCESSION2)
+                .query("id:" + SEARCH_ACCESSION1 + " OR id:" + SEARCH_ACCESSION2)
                 .contentTypeParam(
                         ContentTypeParam.builder()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .resultMatcher(
                                         jsonPath(
-                                                "$.results.*.accession",
+                                                "$.results.*.id",
                                                 containsInAnyOrder(
                                                         SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                                 .build())

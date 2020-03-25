@@ -73,8 +73,8 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
     protected void saveEntry() {
         SubcellularLocationEntry subcellularLocationEntry =
                 new SubcellularLocationEntryBuilder()
-                        .id("the id")
-                        .accession(SUBCELL_ACCESSION)
+                        .name("subcell name")
+                        .id(SUBCELL_ACCESSION)
                         .category(SubcellLocationCategory.LOCATION)
                         .definition("Definition value")
                         .build();
@@ -112,8 +112,8 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(SUBCELL_ACCESSION)
-                    .resultMatcher(jsonPath("$.accession", is(SUBCELL_ACCESSION)))
-                    .resultMatcher(jsonPath("$.id", is("the id")))
+                    .resultMatcher(jsonPath("$.id", is(SUBCELL_ACCESSION)))
+                    .resultMatcher(jsonPath("$.name", is("subcell name")))
                     .resultMatcher(jsonPath("$.definition", is("Definition value")))
                     .resultMatcher(jsonPath("$.category", is("Cellular component")))
                     .build();
@@ -145,11 +145,11 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(SUBCELL_ACCESSION)
-                    .fields("id,definition,category")
-                    .resultMatcher(jsonPath("$.id", is("the id")))
+                    .fields("name,definition,category")
+                    .resultMatcher(jsonPath("$.name", is("subcell name")))
                     .resultMatcher(jsonPath("$.definition", is("Definition value")))
                     .resultMatcher(jsonPath("$.category", is("Cellular component")))
-                    .resultMatcher(jsonPath("$.accession").doesNotExist())
+                    .resultMatcher(jsonPath("$.id").doesNotExist())
                     .build();
         }
 
@@ -192,7 +192,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         private List<String> getFieldsInOrder() {
             List<String> fields = new LinkedList<>();
             fields.add(SubcellularLocationField.ResultFields.id.getJavaFieldName());
-            fields.add(SubcellularLocationField.ResultFields.accession.getJavaFieldName());
+            fields.add(SubcellularLocationField.ResultFields.name.getJavaFieldName());
             fields.add(SubcellularLocationField.ResultFields.definition.getJavaFieldName());
             fields.add(SubcellularLocationField.ResultFields.category.getJavaFieldName());
             return fields;
@@ -209,8 +209,8 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.accession", is(SUBCELL_ACCESSION)))
-                                    .resultMatcher(jsonPath("$.id", is("the id")))
+                                    .resultMatcher(jsonPath("$.id", is(SUBCELL_ACCESSION)))
+                                    .resultMatcher(jsonPath("$.name", is("subcell name")))
                                     .resultMatcher(jsonPath("$.definition", is("Definition value")))
                                     .resultMatcher(jsonPath("$.category", is("Cellular component")))
                                     .build())
@@ -227,12 +227,12 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Subcellular location ID\tDescription\tCategory\tAlias")))
+                                                                    "Subcellular location ID\tDescription\tCategory\tName")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "SL-0005\tDefinition value\tCellular component\tthe id")))
+                                                                    "SL-0005\tDefinition value\tCellular component\tsubcell name")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -259,7 +259,8 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                                     .resultMatcher(
                                             content().string(containsString("id: SL-0005\n")))
                                     .resultMatcher(
-                                            content().string(containsString("name: the id\n")))
+                                            content()
+                                                    .string(containsString("name: subcell name\n")))
                                     .resultMatcher(
                                             content()
                                                     .string(

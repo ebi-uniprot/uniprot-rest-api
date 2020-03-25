@@ -34,8 +34,7 @@ class JsonResponseFieldProjectorTest {
     @BeforeEach
     void setUp() {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
-        KeywordId keyword =
-                new KeywordIdBuilder().id("Mental retardation").accession("KW-0991").build();
+        KeywordId keyword = new KeywordIdBuilder().name("Mental retardation").id("KW-0991").build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
                         .databaseType("MIM")
@@ -50,8 +49,8 @@ class JsonResponseFieldProjectorTest {
                 new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
         this.disease =
                 diseaseBuilder
-                        .id("ZTTK syndrome")
-                        .accession("DI-04860")
+                        .name("ZTTK syndrome")
+                        .id("DI-04860")
                         .acronym("ZTTKS")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
@@ -74,8 +73,8 @@ class JsonResponseFieldProjectorTest {
         Assertions.assertEquals(DiseaseField.ResultFields.values().length, returnMap.size());
         Assertions.assertTrue(returnMap.containsKey("id"));
         Assertions.assertNotNull(returnMap.get("id"));
-        Assertions.assertTrue(returnMap.containsKey("accession"));
-        Assertions.assertNotNull(returnMap.get("accession"));
+        Assertions.assertTrue(returnMap.containsKey("name"));
+        Assertions.assertNotNull(returnMap.get("name"));
         Assertions.assertTrue(returnMap.containsKey("acronym"));
         Assertions.assertNotNull(returnMap.get("acronym"));
         Assertions.assertTrue(returnMap.containsKey("definition"));
@@ -95,10 +94,9 @@ class JsonResponseFieldProjectorTest {
         Object[] orderedEntry = returnMap.entrySet().toArray();
         Assertions.assertEquals(DiseaseField.ResultFields.values().length, orderedEntry.length);
         String idKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
-        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), idKey);
+        Assertions.assertEquals(DiseaseField.ResultFields.name.getJavaFieldName(), idKey);
         String accessionKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
-        Assertions.assertEquals(
-                DiseaseField.ResultFields.accession.getJavaFieldName(), accessionKey);
+        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), accessionKey);
         String acronymKey = (String) ((Map.Entry) orderedEntry[2]).getKey();
         Assertions.assertEquals(DiseaseField.ResultFields.acronym.getJavaFieldName(), acronymKey);
         String definitionKey = (String) ((Map.Entry) orderedEntry[3]).getKey();
@@ -126,7 +124,7 @@ class JsonResponseFieldProjectorTest {
     @Test
     void testProjectFewValidFields() {
         List<String> returnFields =
-                Stream.of("keywords", "alternative_names", "id").collect(Collectors.toList());
+                Stream.of("keywords", "alternative_names", "name").collect(Collectors.toList());
         Map<String, List<String>> filterFieldMap =
                 returnFields.stream()
                         .collect(Collectors.toMap(f -> f, f -> Collections.emptyList()));
@@ -139,20 +137,20 @@ class JsonResponseFieldProjectorTest {
 
         Assertions.assertEquals(returnFields.size(), returnMap.size());
 
-        Assertions.assertTrue(returnMap.containsKey("id"));
-        Assertions.assertNotNull(returnMap.get("id"));
+        Assertions.assertTrue(returnMap.containsKey("name"));
+        Assertions.assertNotNull(returnMap.get("name"));
         Assertions.assertTrue(returnMap.containsKey("alternativeNames"));
         Assertions.assertNotNull(returnMap.get("alternativeNames"));
         Assertions.assertTrue(returnMap.containsKey("keywords"));
         Assertions.assertNotNull(returnMap.get("keywords"));
-        Assertions.assertFalse(returnMap.containsKey("accession"));
+        Assertions.assertFalse(returnMap.containsKey("id"));
 
         // test the return map in order of fields defined in DiseaseField.ResultFields even
         // filterFieldMap is passed
         Object[] orderedEntry = returnMap.entrySet().toArray();
         Assertions.assertEquals(returnFields.size(), orderedEntry.length);
         String idKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
-        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), idKey);
+        Assertions.assertEquals(DiseaseField.ResultFields.name.getJavaFieldName(), idKey);
         String alternativeNamesKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
         Assertions.assertEquals(
                 DiseaseField.ResultFields.alternative_names.getJavaFieldName(),
@@ -165,7 +163,7 @@ class JsonResponseFieldProjectorTest {
     void testProjectFewValidOneInvalidFields() { // it should ignore invalid fields and return
         // only valid fields
         List<String> returnFields =
-                Stream.of("unreviewed_protein_count", "invalid_field_name", "id")
+                Stream.of("unreviewed_protein_count", "invalid_field_name", "name")
                         .collect(Collectors.toList());
         Map<String, List<String>> filterFieldMap =
                 returnFields.stream()
@@ -179,8 +177,8 @@ class JsonResponseFieldProjectorTest {
 
         Assertions.assertEquals(returnFields.size() - 1, returnMap.size());
 
-        Assertions.assertTrue(returnMap.containsKey("id"));
-        Assertions.assertNotNull(returnMap.get("id"));
+        Assertions.assertTrue(returnMap.containsKey("name"));
+        Assertions.assertNotNull(returnMap.get("name"));
         Assertions.assertTrue(returnMap.containsKey("unreviewedProteinCount"));
         Assertions.assertNotNull(returnMap.get("unreviewedProteinCount"));
         Assertions.assertFalse(returnMap.containsKey("invalid_field_name"));
@@ -190,7 +188,7 @@ class JsonResponseFieldProjectorTest {
         Object[] orderedEntry = returnMap.entrySet().toArray();
         Assertions.assertEquals(2, orderedEntry.length);
         String idKey = (String) ((Map.Entry) orderedEntry[0]).getKey();
-        Assertions.assertEquals(DiseaseField.ResultFields.id.getJavaFieldName(), idKey);
+        Assertions.assertEquals(DiseaseField.ResultFields.name.getJavaFieldName(), idKey);
         String unreviewedProteinCountKey = (String) ((Map.Entry) orderedEntry[1]).getKey();
         Assertions.assertEquals(
                 DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName(),

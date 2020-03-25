@@ -49,7 +49,7 @@ public class DiseaseDownloadSortIT extends BaseDiseaseDownloadIT {
     }
 
     private static Stream<Arguments> accession() {
-        return requestResponseForSort("accession", "asc", SORTED_BY_ACCESSION);
+        return requestResponseForSort("id", "asc", SORTED_BY_ACCESSION);
     }
 
     private static Stream<Arguments> requestResponseForSort(

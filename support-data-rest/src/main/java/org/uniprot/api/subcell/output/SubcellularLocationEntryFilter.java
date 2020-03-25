@@ -14,7 +14,7 @@ import org.uniprot.store.search.field.SubcellularLocationField;
  */
 public class SubcellularLocationEntryFilter {
 
-    private static String DEFAULT_FIELDS = "accession,definition,category,id";
+    private static String DEFAULT_FIELDS = "id,definition,category,name";
     private static final String COMMA = "\\s*,\\s*";
 
     public static List<String> parse(String fields) {
@@ -42,7 +42,6 @@ public class SubcellularLocationEntryFilter {
             SubcellularLocationEntryBuilder entry, SubcellularLocationField.ResultFields field) {
         switch (field) {
             case id:
-            case accession:
                 break;
             case definition:
                 entry.definition(null);
@@ -79,6 +78,9 @@ public class SubcellularLocationEntryFilter {
                 break;
             case statistics:
                 entry.statistics(null);
+                break;
+            case name:
+                entry.name(null);
                 break;
         }
     }

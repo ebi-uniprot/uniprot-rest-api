@@ -29,7 +29,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 @WebMvcTest(DiseaseController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class DiseaseDownloadQueryIT extends BaseDiseaseDownloadIT {
-    private static final String SOLR_QUERY = "accession:" + ACC1;
+    private static final String SOLR_QUERY = "id:" + ACC1;
     private static final String BAD_SOLR_QUERY = "random_field:disease";
 
     @RegisterExtension

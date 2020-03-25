@@ -173,9 +173,9 @@ public class DiseaseDownloadFieldsParamAndResultProvider
                         expectedFields);
         if (requestedFields == null
                 || requestedFields.isEmpty()
-                || requestedFields.contains("accession")) {
+                || requestedFields.contains("id")) {
             ResultMatcher accessionResultMatcher =
-                    jsonPath("$.results[*].accession", equalTo(accessionsInOrder));
+                    jsonPath("$.results[*].id", equalTo(accessionsInOrder));
             resultMatchers.add(accessionResultMatcher);
         }
         ResultMatcher fieldNotNull = result -> assertTrue(expectedFields != null);
