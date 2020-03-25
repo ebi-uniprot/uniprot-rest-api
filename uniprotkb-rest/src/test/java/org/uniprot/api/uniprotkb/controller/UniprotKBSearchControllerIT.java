@@ -56,22 +56,13 @@ import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
-import org.uniprot.core.uniprotkb.comment.Comment;
 import org.uniprot.core.uniprotkb.comment.CommentType;
-import org.uniprot.core.uniprotkb.comment.FreeTextComment;
-import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentBuilder;
-import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentImpl;
-import org.uniprot.core.uniprotkb.feature.Feature;
 import org.uniprot.core.uniprotkb.feature.FeatureCategory;
 import org.uniprot.core.uniprotkb.feature.FeatureType;
-import org.uniprot.core.uniprotkb.feature.impl.FeatureBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
-import org.uniprot.core.uniprotkb.xdb.impl.UniProtCrossReferenceBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
-import org.uniprot.cv.xdb.UniProtKBDatabaseImpl;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
@@ -706,24 +697,14 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMisc.add("Search All");
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
-
-            List<UniProtKBCrossReference> xrefs = new ArrayList<>();
             UniProtDatabaseTypes.INSTANCE
                     .getAllDbTypes()
                     .forEach(
                             db -> {
                                 doc.xrefCountMap.put(
                                         "xref_count_" + db.getName().toLowerCase(), 0L);
-
-                                UniProtKBCrossReference xref =
-                                        new UniProtCrossReferenceBuilder()
-                                                .database(new UniProtKBDatabaseImpl(db.getName()))
-                                                .id("id_" + db.getName())
-                                                .build();
-                                xrefs.add(xref);
                             });
 
-            List<Feature> features = new ArrayList<>();
             Arrays.stream(FeatureType.values())
                     .forEach(
                             type -> {
@@ -734,13 +715,6 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         "ftev_" + typeName, Collections.singleton("Search All"));
                                 doc.featureLengthMap.put(
                                         "ftlen_" + typeName, Collections.singleton(10));
-
-                                Feature feature =
-                                        new FeatureBuilder()
-                                                .type(type)
-                                                .description("Type description")
-                                                .build();
-                                features.add(feature);
                             });
 
             Arrays.stream(FeatureCategory.values())
@@ -755,7 +729,6 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         "ftlen_" + type, Collections.singleton(10));
                             });
 
-            List<Comment> comments = new ArrayList<>();
             Arrays.stream(CommentType.values())
                     .forEach(
                             type -> {
@@ -764,14 +737,6 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         "cc_" + typeName, Collections.singleton("Search All"));
                                 doc.commentEvMap.put(
                                         "ccev_" + typeName, Collections.singleton("Search All"));
-                                if (FreeTextCommentImpl.isFreeTextCommentType(type)) {
-                                    FreeTextComment freeText =
-                                            new FreeTextCommentBuilder()
-                                                    .commentType(type)
-                                                    .molecule(type + " molecule")
-                                                    .build();
-                                    comments.add(freeText);
-                                }
                             });
 
             List<String> goAssertionCodes =
@@ -790,15 +755,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             doc.goWithEvidenceMaps.put(
                                     "go_" + code, Collections.singleton("Search All")));
 
-            UniProtKBEntry completeEntry = UniProtKBEntryIT.getCompleteUniProtEntry();
-            comments.addAll(completeEntry.getComments());
-            entry =
-                    UniProtKBEntryBuilder.from(completeEntry)
-                            .primaryAccession("P00001")
-                            .uniProtCrossReferencesSet(xrefs)
-                            .featuresSet(features)
-                            .commentsSet(comments)
-                            .build();
+            entry = UniProtKBEntryIT.getCompleteColumnsUniProtEntry();
 
             TaxonomyEntry taxonomyEntry = TaxonomyEntryTest.getCompleteTaxonomyEntry();
             TaxonomyDocument taxDoc =
