@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniProtKBRequest implements SearchRequest {
+    @Parameter(hidden = true)
     public static String DEFAULT_FIELDS =
             "accession,id,reviewed,protein_name,gene_names,organism,length";
 
@@ -44,6 +45,7 @@ public class UniProtKBRequest implements SearchRequest {
             messagePrefix = "search.uniprot")
     private String query;
 
+    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
