@@ -27,6 +27,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.uniprotkb.controller.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
@@ -36,6 +37,7 @@ import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -169,7 +171,10 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
+            @ModelFieldMeta(
+                            reader = ReturnFieldMetaReaderImpl.class,
+                            path = "uniprotkb-return-fields.json")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")
