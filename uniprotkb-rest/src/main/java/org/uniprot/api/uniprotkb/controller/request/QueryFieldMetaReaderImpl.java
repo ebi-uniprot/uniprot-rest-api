@@ -36,15 +36,13 @@ public class QueryFieldMetaReaderImpl implements ModelFieldMetaReader {
         Map<String, Object> keyValueMap = new LinkedHashMap<>();
         keyValueMap.put("name", searchFieldItem.getFieldName());
         keyValueMap.put("description", searchFieldItem.getDescription());
+        keyValueMap.put("dataType", searchFieldItem.getDataType().name().toLowerCase());
+        keyValueMap.put("example", searchFieldItem.getExample());
         if (searchFieldItem.getValidRegex() == null) {
             keyValueMap.put("regex", "");
         } else {
             keyValueMap.put("regex", searchFieldItem.getValidRegex());
         }
-        keyValueMap.put("dataType", searchFieldItem.getDataType().name().toLowerCase());
-        keyValueMap.put("fieldType", searchFieldItem.getFieldType().name().toLowerCase());
-        keyValueMap.put("example", searchFieldItem.getExample());
-
         return keyValueMap;
     }
 }
