@@ -12,13 +12,14 @@ import lombok.Data;
 @Builder
 public class FullEntry {
     private String accession;
-    private String name;
-    private int entryVersion;
-    private int sequenceVersion;
     private String database;
+    private int entryVersion;
     private String firstRelease;
     private String firstReleaseDate;
     private String lastRelease;
     private String lastReleaseDate;
+    private String md5;
+    private String name;
+    private int sequenceVersion;
     private String content;
 }

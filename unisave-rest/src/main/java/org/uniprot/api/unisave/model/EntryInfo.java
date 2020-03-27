@@ -14,16 +14,17 @@ import java.util.List;
 @Builder
 public class EntryInfo {
     private String accession;
-    private int entryVersion;
-    private int sequenceVersion;
-    private String entryMD5;
     private String database;
+    private int entryVersion;
     private String firstRelease;
     private String firstReleaseDate;
     private String lastRelease;
     private String lastReleaseDate;
-    private List<String> replacingAcc;
+    private String md5;
+    private String name;
+    private int sequenceVersion;
     private boolean deleted;
     private String deletedReason;
     private List<String> mergedTo;
+    private List<String> replacingAcc;
 }
