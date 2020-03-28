@@ -4,20 +4,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.uniprot.core.uniprot.UniProtEntry;
-import org.uniprot.core.uniprot.builder.UniProtEntryBuilder;
-import org.uniprot.core.uniprot.comment.Comment;
-import org.uniprot.core.uniprot.feature.Feature;
-import org.uniprot.core.uniprot.xdb.UniProtDBCrossReference;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.comment.Comment;
+import org.uniprot.core.uniprotkb.feature.Feature;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
 import org.uniprot.store.search.field.UniProtField;
 
-public class UniProtEntryFilters {
+public class UniProtKBEntryFilters {
     private static final String ALL = "all";
 
-    public static UniProtEntry filterEntry(
-            UniProtEntry entry, Map<String, List<String>> filterParams) {
+    public static UniProtKBEntry filterEntry(
+            UniProtKBEntry entry, Map<String, List<String>> filterParams) {
         if ((filterParams != null) && !filterParams.isEmpty()) {
-            UniProtEntryBuilder builder = UniProtEntryBuilder.from(entry);
+            UniProtKBEntryBuilder builder = UniProtKBEntryBuilder.from(entry);
             for (UniProtField.ResultFields component : UniProtField.ResultFields.values()) {
                 if (component.isMandatoryJsonField() == false
                         && !filterParams.containsKey(component.name())) {
@@ -34,13 +34,13 @@ public class UniProtEntryFilters {
                     List<Feature> features = entry.getFeatures();
                     features.removeIf(feature -> !filter.test(feature));
                     builder.featuresSet(features);
-                } else if (component == UniProtField.ResultFields.xref) {
+                } else if (component == UniProtField.ResultFields.crossReference) {
                     List<String> values = filterParams.get(component.name().toLowerCase());
-                    Predicate<UniProtDBCrossReference> filter = createDbReferenceFilter(values);
-                    List<UniProtDBCrossReference> crossReferences =
-                            entry.getDatabaseCrossReferences();
+                    Predicate<UniProtKBCrossReference> filter = createDbReferenceFilter(values);
+                    List<UniProtKBCrossReference> crossReferences =
+                            entry.getUniProtKBCrossReferences();
                     crossReferences.removeIf(xref -> !filter.test(xref));
-                    builder.databaseCrossReferencesSet(crossReferences);
+                    builder.uniProtCrossReferencesSet(crossReferences);
                 }
             }
             return builder.build();
@@ -49,15 +49,15 @@ public class UniProtEntryFilters {
         }
     }
 
-    public static Predicate<UniProtDBCrossReference> createDbReferenceFilter(List<String> values) {
+    public static Predicate<UniProtKBCrossReference> createDbReferenceFilter(List<String> values) {
         return v -> createXrefPredicate(v, values);
     }
 
-    private static boolean createXrefPredicate(UniProtDBCrossReference v, List<String> values) {
+    private static boolean createXrefPredicate(UniProtKBCrossReference v, List<String> values) {
         if (values.contains(ALL)) {
             return true;
         }
-        return values.contains(v.getDatabaseType().getName().toLowerCase());
+        return values.contains(v.getDatabase().getName().toLowerCase());
     }
 
     public static Predicate<Feature> createFeatureFilter(List<String> values) {
@@ -82,7 +82,7 @@ public class UniProtEntryFilters {
         return values.contains(v.getCommentType().name().toLowerCase());
     }
 
-    private static void remove(UniProtEntryBuilder builder, UniProtField.ResultFields type) {
+    private static void remove(UniProtKBEntryBuilder builder, UniProtField.ResultFields type) {
         switch (type) {
             case protein_existence:
                 builder.proteinExistence(null);
@@ -117,8 +117,8 @@ public class UniProtEntryFilters {
             case sequence:
                 builder.sequence(null);
                 break;
-            case xref:
-                builder.databaseCrossReferencesSet(null);
+            case crossReference:
+                builder.uniProtCrossReferencesSet(null);
                 break;
             case reference:
                 builder.referencesSet(null);

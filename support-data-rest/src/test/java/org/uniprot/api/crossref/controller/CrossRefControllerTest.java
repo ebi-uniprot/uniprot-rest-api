@@ -23,7 +23,7 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.crossref.service.CrossRefService;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.core.cv.xdb.builder.CrossRefEntryBuilder;
+import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})

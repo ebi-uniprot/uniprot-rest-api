@@ -28,8 +28,8 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -72,12 +72,8 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
         KeywordId keyword =
-                new KeywordEntryKeywordBuilder()
-                        .id("my keyword")
-                        .accession(KEYWORD_ACCESSION)
-                        .build();
-        KeywordId category =
-                new KeywordEntryKeywordBuilder().id("Ligand").accession("KW-9993").build();
+                new KeywordIdBuilder().id("my keyword").accession(KEYWORD_ACCESSION).build();
+        KeywordId category = new KeywordIdBuilder().id("Ligand").accession("KW-9993").build();
 
         KeywordEntry keywordEntry =
                 new KeywordEntryBuilder()
@@ -114,8 +110,8 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(KEYWORD_ACCESSION)
-                    .resultMatcher(jsonPath("$.keyword.accession", is(KEYWORD_ACCESSION)))
-                    .resultMatcher(jsonPath("$.keyword.id", is("my keyword")))
+                    .resultMatcher(jsonPath("$.keyword.id", is(KEYWORD_ACCESSION)))
+                    .resultMatcher(jsonPath("$.keyword.name", is("my keyword")))
                     .resultMatcher(jsonPath("$.definition", is("Definition value")))
                     .build();
         }
@@ -147,8 +143,8 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(KEYWORD_ACCESSION)
                     .fields("id,name,category")
-                    .resultMatcher(jsonPath("$.keyword.accession", is(KEYWORD_ACCESSION)))
-                    .resultMatcher(jsonPath("$.keyword.id", is("my keyword")))
+                    .resultMatcher(jsonPath("$.keyword.id", is(KEYWORD_ACCESSION)))
+                    .resultMatcher(jsonPath("$.keyword.name", is("my keyword")))
                     .resultMatcher(jsonPath("$.category").exists())
                     .resultMatcher(jsonPath("$.definition").doesNotExist())
                     .build();
@@ -209,9 +205,8 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(
-                                            jsonPath("$.keyword.accession", is(KEYWORD_ACCESSION)))
-                                    .resultMatcher(jsonPath("$.keyword.id", is("my keyword")))
+                                    .resultMatcher(jsonPath("$.keyword.id", is(KEYWORD_ACCESSION)))
+                                    .resultMatcher(jsonPath("$.keyword.name", is("my keyword")))
                                     .resultMatcher(jsonPath("$.definition", is("Definition value")))
                                     .build())
                     .contentTypeParam(

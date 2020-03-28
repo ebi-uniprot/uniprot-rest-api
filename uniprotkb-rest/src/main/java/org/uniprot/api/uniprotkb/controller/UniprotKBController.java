@@ -29,8 +29,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.core.uniprot.InactiveReasonType;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.InactiveReasonType;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
@@ -53,18 +53,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
-public class UniprotKBController extends BasicSearchController<UniProtEntry> {
+public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
 
     private final UniProtEntryService entryService;
-    private final MessageConverterContextFactory<UniProtEntry> converterContextFactory;
+    private final MessageConverterContextFactory<UniProtKBEntry> converterContextFactory;
 
     @Autowired
     public UniprotKBController(
             ApplicationEventPublisher eventPublisher,
             UniProtEntryService entryService,
-            MessageConverterContextFactory<UniProtEntry> converterContextFactory,
+            MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROT);
         this.entryService = entryService;
@@ -100,7 +100,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            UniProtEntry.class))),
+                                                                            UniProtKBEntry.class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -117,7 +117,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniProtEntry>> searchCursor(
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> searchCursor(
             @Valid @ModelAttribute UniProtKBRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
@@ -125,7 +125,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
-        QueryResult<UniProtEntry> result = entryService.search(searchRequest);
+        QueryResult<UniProtKBEntry> result = entryService.search(searchRequest);
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
@@ -150,7 +150,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = UniProtEntry.class)),
+                                    schema = @Schema(implementation = UniProtKBEntry.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     schema = @Schema(implementation = Entry.class)),
@@ -162,7 +162,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniProtEntry>> getByAccession(
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
             @Parameter(description = "Unique identifier for the UniProt entry")
                     @PathVariable("accession")
                     @Pattern(
@@ -180,7 +180,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        UniProtEntry entry = entryService.findByUniqueId(accession, fields);
+        UniProtKBEntry entry = entryService.findByUniqueId(accession, fields);
         return super.getEntityResponse(entry, fields, request);
     }
 
@@ -217,7 +217,7 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            UniProtEntry.class))),
+                                                                            UniProtKBEntry.class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -234,13 +234,13 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtEntry>>> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> download(
             @Valid @ModelAttribute UniProtKBRequest searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
-        MessageConverterContext<UniProtEntry> context =
+        MessageConverterContext<UniProtKBEntry> context =
                 converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
         context.setFields(searchRequest.getFields());
@@ -256,12 +256,12 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
     }
 
     @Override
-    protected String getEntityId(UniProtEntry entity) {
+    protected String getEntityId(UniProtKBEntry entity) {
         return entity.getPrimaryAccession().getValue();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtEntry entity) {
+    protected Optional<String> getEntityRedirectId(UniProtKBEntry entity) {
         if (isInactiveAndMergedEntry(entity)) {
             return Optional.of(
                     String.valueOf(entity.getInactiveReason().getMergeDemergeTos().get(0)));
@@ -270,14 +270,14 @@ public class UniprotKBController extends BasicSearchController<UniProtEntry> {
         }
     }
 
-    private boolean isInactiveAndMergedEntry(UniProtEntry uniProtEntry) {
-        return !uniProtEntry.isActive()
-                && uniProtEntry.getInactiveReason() != null
-                && uniProtEntry
+    private boolean isInactiveAndMergedEntry(UniProtKBEntry uniProtkbEntry) {
+        return !uniProtkbEntry.isActive()
+                && uniProtkbEntry.getInactiveReason() != null
+                && uniProtkbEntry
                         .getInactiveReason()
                         .getInactiveReasonType()
                         .equals(InactiveReasonType.MERGED)
-                && Utils.notNullNotEmpty(uniProtEntry.getInactiveReason().getMergeDemergeTos());
+                && Utils.notNullNotEmpty(uniProtkbEntry.getInactiveReason().getMergeDemergeTos());
     }
 
     private void setPreviewInfo(UniProtKBRequest searchRequest, boolean preview) {

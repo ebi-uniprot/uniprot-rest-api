@@ -27,18 +27,16 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
-import org.uniprot.core.DBCrossReference;
-import org.uniprot.core.builder.DBCrossReferenceBuilder;
-import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
-import org.uniprot.core.citation.builder.LiteratureBuilder;
-import org.uniprot.core.citation.impl.AuthorImpl;
-import org.uniprot.core.citation.impl.PublicationDateImpl;
+import org.uniprot.core.citation.impl.*;
+import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureStoreEntry;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
-import org.uniprot.core.literature.builder.LiteratureStoreEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
@@ -84,19 +82,19 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
 
-        DBCrossReference<CitationXrefType> pubmed =
-                new DBCrossReferenceBuilder<CitationXrefType>()
-                        .databaseType(CitationXrefType.PUBMED)
+        CrossReference<CitationDatabase> pubmed =
+                new CrossReferenceBuilder<CitationDatabase>()
+                        .database(CitationDatabase.PUBMED)
                         .id(String.valueOf(PUBMED_ID))
                         .build();
 
         Literature literature =
                 new LiteratureBuilder()
-                        .citationXrefsAdd(pubmed)
+                        .citationCrossReferencesAdd(pubmed)
                         .title("The Title")
-                        .authorsAdd(new AuthorImpl("The Author"))
+                        .authorsAdd(new AuthorBuilder("The Author").build())
                         .literatureAbstract("literature abstract")
-                        .publicationDate(new PublicationDateImpl("2019"))
+                        .publicationDate(new PublicationDateBuilder("2019").build())
                         .firstPage("10")
                         .build();
 
@@ -136,7 +134,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
-                    .resultMatcher(jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .build();
@@ -168,7 +166,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("id,title")
-                    .resultMatcher(jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .resultMatcher(jsonPath("$.citation.authors").doesNotExist())
                     .build();
@@ -234,7 +232,9 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
-                                            jsonPath("$.citation.citationXrefs[0].id", is("100")))
+                                            jsonPath(
+                                                    "$.citation.citationCrossReferences[0].id",
+                                                    is("100")))
                                     .resultMatcher(
                                             jsonPath("$.citation.authors", contains("The Author")))
                                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))

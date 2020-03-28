@@ -1,5 +1,7 @@
 package org.uniprot.api.crossref.service;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -7,33 +9,16 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 
 @Component
 public class CrossRefSolrSortClause extends AbstractSolrSortClause {
+    private static final String DOC_ID = "accession";
 
-    @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        Sort defaultSort =
-                new Sort(
-                        Sort.Direction.ASC,
-                        getSearchFieldConfig(getUniProtDataType())
-                                .getSearchFieldItemByName("accession")
-                                .getFieldName());
-
-        if (hasScore) {
-            defaultSort = new Sort(Sort.Direction.DESC, "score").and(defaultSort);
-        }
-
-        return defaultSort;
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName("accession")
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return DOC_ID;
     }
 
     @Override

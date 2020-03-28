@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.store.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
 
@@ -32,7 +32,7 @@ public class UniProtStoreConfig {
     @Profile("live")
     public UniProtKBStoreClient uniProtStoreClient(
             UniProtStoreConfigProperties uniProtStoreConfigProperties) {
-        VoldemortClient<UniProtEntry> client =
+        VoldemortClient<UniProtKBEntry> client =
                 new VoldemortRemoteUniProtKBEntryStore(
                         uniProtStoreConfigProperties.getNumberOfConnections(),
                         uniProtStoreConfigProperties.getStoreName(),

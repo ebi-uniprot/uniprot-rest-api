@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.service;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,8 +69,9 @@ public class RDFService<T> implements StoreService<T> {
 
         UriBuilder uriBuilder =
                 handler.builder().queryParam(QUERY_STR, idQuery).queryParam(FORMAT_STR, RDF_STR);
+        URI requestUri = uriBuilder.build();
 
-        T rdfXML = restTemplate.getForObject(uriBuilder.build(), this.clazz);
+        T rdfXML = restTemplate.getForObject(requestUri, this.clazz);
 
         return rdfXML;
     }
@@ -90,7 +92,7 @@ public class RDFService<T> implements StoreService<T> {
      * <p>End Tag </rdf:RDF> Logic- Convert RDF/XML response for streaming so that it is transmitted
      * as one big xml string. In the every batch, pass everything between RDF_PROLOG and
      * RDF_CLOSE_TAG(both exclusive) in any of the responses . The RDF_PROLOG will be added in the
-     * begining of stream and RDF_CLOSE_TAG will be added in the end of the stream. see
+     * beginning of stream and RDF_CLOSE_TAG will be added in the end of the stream. see
      * Stream.concat in StoreStreamer
      *
      * @param rdfXML

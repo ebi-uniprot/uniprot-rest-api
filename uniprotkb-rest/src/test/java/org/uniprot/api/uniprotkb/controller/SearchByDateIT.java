@@ -37,7 +37,7 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.flatfile.writer.LineType;
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -129,7 +129,7 @@ class SearchByDateIT {
         entryProxy.updateEntryObject(LineType.AC, String.format(ACC_LINE, ACCESSION1));
         entryProxy.updateEntryObject(
                 LineType.DT, String.format(DT_LINE, CREATE_DATE1, CREATE_DATE1, UPDATE_DATE1));
-        UniProtEntry entry1 = TestUtils.convertToUniProtEntry(entryProxy);
+        UniProtKBEntry entry1 = TestUtils.convertToUniProtEntry(entryProxy);
         //     storeManager.save(DataStoreManager.StoreType.UNIPROT,
         // TestUtils.convertToUniProtEntry(entryProxy));
 
@@ -137,7 +137,7 @@ class SearchByDateIT {
         entryProxy.updateEntryObject(LineType.AC, String.format(ACC_LINE, ACCESSION2));
         entryProxy.updateEntryObject(
                 LineType.DT, String.format(DT_LINE, CREATE_DATE2, CREATE_DATE2, UPDATE_DATE2));
-        UniProtEntry entry2 = TestUtils.convertToUniProtEntry(entryProxy);
+        UniProtKBEntry entry2 = TestUtils.convertToUniProtEntry(entryProxy);
         //      storeManager.save(DataStoreManager.StoreType.UNIPROT,
         // TestUtils.convertToUniProtEntry(entryProxy));
 
@@ -145,7 +145,7 @@ class SearchByDateIT {
         entryProxy.updateEntryObject(LineType.AC, String.format(ACC_LINE, ACCESSION3));
         entryProxy.updateEntryObject(
                 LineType.DT, String.format(DT_LINE, CREATE_DATE3, CREATE_DATE3, UPDATE_DATE3));
-        UniProtEntry entry3 = TestUtils.convertToUniProtEntry(entryProxy);
+        UniProtKBEntry entry3 = TestUtils.convertToUniProtEntry(entryProxy);
         //     storeManager.save(DataStoreManager.StoreType.UNIPROT,
         // TestUtils.convertToUniProtEntry(entryProxy));
 
@@ -154,7 +154,7 @@ class SearchByDateIT {
         entryProxy.updateEntryObject(
                 LineType.DT,
                 String.format(DT_LINE, CREATE_DATE_BST, CREATE_DATE_BST, UPDATE_DATE_BST));
-        UniProtEntry entry4 = TestUtils.convertToUniProtEntry(entryProxy);
+        UniProtKBEntry entry4 = TestUtils.convertToUniProtEntry(entryProxy);
         //    storeManager.save(DataStoreManager.StoreType.UNIPROT,
         // TestUtils.convertToUniProtEntry(entryProxy));
 
@@ -163,7 +163,7 @@ class SearchByDateIT {
         entryProxy.updateEntryObject(
                 LineType.DT,
                 String.format(DT_LINE, CREATE_DATE_GMT, CREATE_DATE_GMT, UPDATE_DATE_GMT));
-        UniProtEntry entry5 = TestUtils.convertToUniProtEntry(entryProxy);
+        UniProtKBEntry entry5 = TestUtils.convertToUniProtEntry(entryProxy);
         storeManager.save(
                 DataStoreManager.StoreType.UNIPROT, entry1, entry2, entry3, entry4, entry5);
     }

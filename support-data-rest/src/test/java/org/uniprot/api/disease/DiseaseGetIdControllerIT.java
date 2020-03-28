@@ -30,10 +30,10 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.core.cv.disease.builder.DiseaseCrossReferenceBuilder;
-import org.uniprot.core.cv.disease.builder.DiseaseEntryBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
+import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -83,10 +83,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         KeywordId keyword =
-                new KeywordEntryKeywordBuilder()
-                        .id("Mental retardation")
-                        .accession("KW-0991")
-                        .build();
+                new KeywordIdBuilder().id("Mental retardation").accession("KW-0991").build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
                         .databaseType("MIM")
@@ -175,8 +172,8 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.keywords.length()", is(1)))
-                    .resultMatcher(jsonPath("$.keywords[0].id", is("Mental retardation")))
-                    .resultMatcher(jsonPath("$.keywords[0].accession", is("KW-0991")))
+                    .resultMatcher(jsonPath("$.keywords[0].name", is("Mental retardation")))
+                    .resultMatcher(jsonPath("$.keywords[0].id", is("KW-0991")))
                     .resultMatcher(jsonPath("$.alternativeNames.length()", is(2)))
                     .resultMatcher(
                             jsonPath(

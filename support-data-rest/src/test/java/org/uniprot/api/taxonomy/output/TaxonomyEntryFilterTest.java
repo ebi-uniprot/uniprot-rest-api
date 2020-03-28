@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
-import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
-import org.uniprot.core.taxonomy.builder.TaxonomyLineageBuilder;
-import org.uniprot.core.taxonomy.builder.TaxonomyStatisticsBuilder;
-import org.uniprot.core.taxonomy.builder.TaxonomyStrainBuilder;
-import org.uniprot.core.uniprot.taxonomy.Taxonomy;
-import org.uniprot.core.uniprot.taxonomy.builder.TaxonomyBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyStatisticsBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyStrainBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
+import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.search.field.TaxonomyField;
 
 /** @author lgonzales */

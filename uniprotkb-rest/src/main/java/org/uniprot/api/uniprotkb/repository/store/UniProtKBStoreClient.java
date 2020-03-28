@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
-import org.uniprot.core.uniprot.UniProtEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 
@@ -9,8 +9,8 @@ import org.uniprot.store.datastore.voldemort.VoldemortClient;
  *
  * @author Edd
  */
-public class UniProtKBStoreClient extends UniProtStoreClient<UniProtEntry> {
-    public UniProtKBStoreClient(VoldemortClient<UniProtEntry> client) {
+public class UniProtKBStoreClient extends UniProtStoreClient<UniProtKBEntry> {
+    public UniProtKBStoreClient(VoldemortClient<UniProtKBEntry> client) {
         super(client);
     }
 }

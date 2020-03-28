@@ -5,14 +5,14 @@ import static org.uniprot.core.util.Utils.modifiableList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.uniprot.core.DBCrossReference;
+import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.Author;
-import org.uniprot.core.citation.CitationXrefType;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.PublicationDate;
-import org.uniprot.core.citation.builder.LiteratureBuilder;
+import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.builder.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.LiteratureField;
 
@@ -54,10 +54,10 @@ public class LiteratureEntryFilter {
             case author_and_group:
                 break;
             case doi:
-                List<DBCrossReference<CitationXrefType>> xrefs =
-                        modifiableList(literature.getCitationXrefs());
-                xrefs.removeIf(xref -> xref.getDatabaseType().equals(CitationXrefType.DOI));
-                litBuilder.citationXrefsSet(xrefs);
+                List<CrossReference<CitationDatabase>> xrefs =
+                        modifiableList(literature.getCitationCrossReferences());
+                xrefs.removeIf(xref -> xref.getDatabase().equals(CitationDatabase.DOI));
+                litBuilder.citationCrossReferencesSet(xrefs);
                 break;
             case title:
                 litBuilder.title(null);

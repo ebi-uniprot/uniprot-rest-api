@@ -25,7 +25,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.core.cv.xdb.builder.CrossRefEntryBuilder;
+import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;

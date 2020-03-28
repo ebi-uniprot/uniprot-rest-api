@@ -32,13 +32,16 @@ import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.Sequence;
-import org.uniprot.core.builder.SequenceBuilder;
 import org.uniprot.core.cv.go.GoAspect;
-import org.uniprot.core.cv.go.builder.GeneOntologyEntryBuilder;
-import org.uniprot.core.uniparc.builder.UniParcIdBuilder;
-import org.uniprot.core.uniprot.builder.UniProtAccessionBuilder;
+import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
+import org.uniprot.core.impl.SequenceBuilder;
+import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.builder.*;
+import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
+import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
@@ -166,7 +169,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtAccessionBuilder("P12345").build())
+                .accessionsAdd(new UniProtKBAccessionBuilder("P12345").build())
                 .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
                 .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
                 .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
@@ -191,7 +194,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtAccessionBuilder("P12345").build())
+                .accessionsAdd(new UniProtKBAccessionBuilder("P12345").build())
                 .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
                 .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
                 .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())

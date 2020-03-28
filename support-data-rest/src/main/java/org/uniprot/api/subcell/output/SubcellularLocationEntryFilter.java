@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
+import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
@@ -26,59 +26,59 @@ public class SubcellularLocationEntryFilter {
 
     public static SubcellularLocationEntry filterEntry(
             SubcellularLocationEntry entry, List<String> fields) {
-        SubcellularLocationEntryImpl entryImpl = (SubcellularLocationEntryImpl) entry;
+        SubcellularLocationEntryBuilder entryBuilder = SubcellularLocationEntryBuilder.from(entry);
         if (Utils.notNullNotEmpty(fields)) {
             for (SubcellularLocationField.ResultFields field :
                     SubcellularLocationField.ResultFields.values()) {
                 if (!fields.contains(field.name())) {
-                    remove(entryImpl, field);
+                    remove(entryBuilder, field);
                 }
             }
         }
-        return entryImpl;
+        return entryBuilder.build();
     }
 
     private static void remove(
-            SubcellularLocationEntryImpl entry, SubcellularLocationField.ResultFields field) {
+            SubcellularLocationEntryBuilder entry, SubcellularLocationField.ResultFields field) {
         switch (field) {
             case id:
             case accession:
                 break;
             case definition:
-                entry.setDefinition(null);
+                entry.definition(null);
                 break;
             case category:
-                entry.setCategory(null);
+                entry.category(null);
                 break;
             case keyword:
-                entry.setKeyword(null);
+                entry.keyword(null);
                 break;
             case synonyms:
-                entry.setSynonyms(null);
+                entry.synonymsSet(null);
                 break;
             case content:
-                entry.setContent(null);
+                entry.content(null);
                 break;
             case gene_ontologies:
-                entry.setGeneOntologies(null);
+                entry.geneOntologiesSet(null);
                 break;
             case note:
-                entry.setNote(null);
+                entry.note(null);
                 break;
             case references:
-                entry.setReferences(null);
+                entry.referencesSet(null);
                 break;
             case links:
-                entry.setLinks(null);
+                entry.linksSet(null);
                 break;
             case is_a:
-                entry.setIsA(null);
+                entry.isASet(null);
                 break;
             case part_of:
-                entry.setPartOf(null);
+                entry.partOfSet(null);
                 break;
             case statistics:
-                entry.setStatistics(null);
+                entry.statistics(null);
                 break;
         }
     }

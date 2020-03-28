@@ -3,18 +3,17 @@ package org.uniprot.api.subcell.output;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.Statistics;
-import org.uniprot.core.builder.StatisticsBuilder;
-import org.uniprot.core.cv.go.builder.GeneOntologyEntryBuilder;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
+import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.cv.subcell.SubcellLocationCategory;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryImpl;
+import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.store.search.field.SubcellularLocationField;
 
 /**
@@ -73,29 +72,23 @@ class SubcellularLocationEntryFilterTest {
     private SubcellularLocationEntry getCompleteSubcellularLocationEntry(boolean hasChild) {
         Statistics statistics =
                 new StatisticsBuilder().reviewedProteinCount(10).unreviewedProteinCount(20).build();
-        SubcellularLocationEntryImpl entry = new SubcellularLocationEntryImpl();
-        entry.setAccession("accession");
-        entry.setContent("content");
-        entry.setDefinition("definition");
-        entry.setGeneOntologies(
-                Collections.singletonList(
-                        new GeneOntologyEntryBuilder().id("goId").name("goTerm").build()));
-        entry.setId("id");
-        entry.setKeyword(
-                new KeywordEntryKeywordBuilder()
-                        .id("keywordId")
-                        .accession("keywordAccession")
-                        .build());
-        entry.setLinks(Collections.singletonList("link"));
-        entry.setNote("note");
-        entry.setReferences(Collections.singletonList("synonym"));
-        entry.setStatistics(statistics);
-        entry.setSynonyms(Collections.singletonList("synonym"));
-        entry.setCategory(SubcellLocationCategory.LOCATION);
+        SubcellularLocationEntryBuilder entry = new SubcellularLocationEntryBuilder();
+        entry.accession("accession");
+        entry.content("content");
+        entry.definition("definition");
+        entry.geneOntologiesAdd(new GeneOntologyEntryBuilder().id("goId").name("goTerm").build());
+        entry.id("id");
+        entry.keyword(new KeywordIdBuilder().id("keywordId").accession("keywordAccession").build());
+        entry.linksAdd("link");
+        entry.note("note");
+        entry.referencesAdd("synonym");
+        entry.statistics(statistics);
+        entry.synonymsAdd("synonym");
+        entry.category(SubcellLocationCategory.LOCATION);
         if (hasChild) {
-            entry.setIsA(Collections.singletonList(getCompleteSubcellularLocationEntry(false)));
-            entry.setPartOf(Collections.singletonList(getCompleteSubcellularLocationEntry(false)));
+            entry.isAAdd(getCompleteSubcellularLocationEntry(false));
+            entry.partOfAdd(getCompleteSubcellularLocationEntry(false));
         }
-        return entry;
+        return entry.build();
     }
 }

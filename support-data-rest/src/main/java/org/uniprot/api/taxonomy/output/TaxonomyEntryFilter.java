@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.taxonomy.builder.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.TaxonomyField;
 

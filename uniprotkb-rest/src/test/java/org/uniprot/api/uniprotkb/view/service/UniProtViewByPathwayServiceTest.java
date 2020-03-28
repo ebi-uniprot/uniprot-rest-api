@@ -21,21 +21,21 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.pathway.UniPathway;
-import org.uniprot.cv.pathway.UniPathwayService;
+import org.uniprot.cv.pathway.UniPathwayRepo;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByPathwayServiceTest {
     @Mock private SolrClient solrClient;
 
-    @Mock private UniPathwayService unipathwayService;
+    @Mock private UniPathwayRepo unipathwayRepo;
     private UniProtViewByPathwayService service;
 
     @BeforeEach
     void setup() {
         solrClient = Mockito.mock(SolrClient.class);
-        unipathwayService = Mockito.mock(UniPathwayService.class);
+        unipathwayRepo = Mockito.mock(UniPathwayRepo.class);
         mockPathwayService();
-        service = new UniProtViewByPathwayService(solrClient, "uniprot", unipathwayService);
+        service = new UniProtViewByPathwayService(solrClient, "uniprot", unipathwayRepo);
     }
 
     @Test
@@ -63,6 +63,6 @@ class UniProtViewByPathwayServiceTest {
         nodes.add(node1);
         nodes.add(node2);
 
-        when(unipathwayService.getChildrenById(any())).thenReturn(nodes);
+        when(unipathwayRepo.getChildrenById(any())).thenReturn(nodes);
     }
 }

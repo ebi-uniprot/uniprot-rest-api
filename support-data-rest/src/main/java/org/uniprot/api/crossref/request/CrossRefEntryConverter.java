@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.core.cv.xdb.builder.CrossRefEntryBuilder;
+import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
 @Slf4j
