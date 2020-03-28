@@ -32,7 +32,7 @@ public class GeneCentricEntryConverter implements Function<GeneCentricDocument, 
                             org.uniprot.core.proteome.CanonicalProtein.class);
             return entry;
         } catch (Exception e) {
-            LOGGER.info("Error converting solr avro_binary default UniProtEntry", e);
+            LOGGER.info("Error converting solr avro_binary default UniProtKBEntry", e);
         }
         return null;
     }

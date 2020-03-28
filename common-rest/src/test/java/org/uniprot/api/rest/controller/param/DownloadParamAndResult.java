@@ -21,4 +21,9 @@ public class DownloadParamAndResult {
     private MediaType contentType;
 
     @Singular private List<ResultMatcher> resultMatchers = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "{" + "queryParams=" + queryParams + ", contentType=" + contentType + '}';
+    }
 }

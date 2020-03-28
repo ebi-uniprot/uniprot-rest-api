@@ -13,7 +13,7 @@ import lombok.Data;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotFacetConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.domain.impl.UniProtResultFields;
@@ -62,7 +62,7 @@ public class UniProtKBRequest implements SearchRequest {
     private String includeIsoform;
 
     @Parameter(description = "Name of the facet search")
-    @ValidFacets(facetConfig = UniprotFacetConfig.class)
+    @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 

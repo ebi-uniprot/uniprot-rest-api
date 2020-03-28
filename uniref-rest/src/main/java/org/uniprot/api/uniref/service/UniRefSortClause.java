@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.service;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -11,26 +13,16 @@ import org.uniprot.store.config.searchfield.factory.UniProtDataType;
  */
 @Component
 public class UniRefSortClause extends AbstractSolrSortClause {
+    private static final String DOC_ID = "id";
 
-    @Override
-    protected Sort createDefaultSort(boolean hasScore) {
-        return new Sort(
-                Sort.Direction.ASC,
-                getSearchFieldConfig(getUniProtDataType())
-                        .getCorrespondingSortField("id")
-                        .getFieldName());
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
     }
 
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItemByName("id")
-                .getFieldName();
-    }
-
-    @Override
-    protected String getSolrSortFieldName(String name) {
-        return name;
+        return DOC_ID;
     }
 
     @Override

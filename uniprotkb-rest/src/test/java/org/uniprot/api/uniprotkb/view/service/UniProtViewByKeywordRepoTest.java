@@ -19,23 +19,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryBuilder;
-import org.uniprot.core.cv.keyword.builder.KeywordEntryKeywordBuilder;
-import org.uniprot.cv.keyword.KeywordService;
+import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
+import org.uniprot.cv.keyword.KeywordRepo;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtViewByKeywordServiceTest {
+class UniProtViewByKeywordRepoTest {
     @Mock private SolrClient solrClient;
 
-    @Mock private KeywordService keywordService;
+    @Mock private KeywordRepo keywordRepo;
     private UniProtViewByKeywordService service;
 
     @BeforeEach
     void setup() {
         solrClient = Mockito.mock(SolrClient.class);
-        keywordService = Mockito.mock(KeywordService.class);
+        keywordRepo = Mockito.mock(KeywordRepo.class);
         mockKeywordService();
-        service = new UniProtViewByKeywordService(solrClient, "uniprot", keywordService);
+        service = new UniProtViewByKeywordService(solrClient, "uniprot", keywordRepo);
     }
 
     @Test
@@ -113,10 +113,10 @@ class UniProtViewByKeywordServiceTest {
                 Arrays.asList(catecholamineMetabolism, cellAdhesion, cellCycle);
         parent = KeywordEntryBuilder.from(parent).childrenSet(children).build();
 
-        when(keywordService.getByAccession(any())).thenReturn(parent);
+        when(keywordRepo.getByAccession(any())).thenReturn(parent);
     }
 
     private KeywordId kw(String id, String accession) {
-        return new KeywordEntryKeywordBuilder().id(id).accession(accession).build();
+        return new KeywordIdBuilder().id(id).accession(accession).build();
     }
 }

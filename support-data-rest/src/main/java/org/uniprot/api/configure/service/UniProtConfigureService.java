@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
-import org.uniprot.core.cv.xdb.DatabaseCategory;
-import org.uniprot.core.cv.xdb.UniProtXDbTypeDetail;
-import org.uniprot.cv.xdb.UniProtXDbTypes;
+import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
@@ -28,7 +28,7 @@ public class UniProtConfigureService {
     // By loading these enums at startup, there is no pause on first request
     private static final AnnotationEvidences ANNOTATION_EVIDENCES = AnnotationEvidences.INSTANCE;
     private static final GoEvidences GO_EVIDENCES = GoEvidences.INSTANCE;
-    private static final UniProtXDbTypes DBX_TYPES = UniProtXDbTypes.INSTANCE;
+    private static final UniProtDatabaseTypes DBX_TYPES = UniProtDatabaseTypes.INSTANCE;
 
     public List<AdvanceUniProtKBSearchTerm> getUniProtSearchItems() {
         return AdvanceUniProtKBSearchTerm.getUniProtKBSearchTerms();
@@ -44,8 +44,8 @@ public class UniProtConfigureService {
 
     public List<DatabaseGroup> getDatabases() {
         List<DatabaseGroup> databases =
-                Arrays.stream(DatabaseCategory.values())
-                        .filter(dbCat -> dbCat != DatabaseCategory.UNKNOWN)
+                Arrays.stream(UniProtDatabaseCategory.values())
+                        .filter(dbCat -> dbCat != UniProtDatabaseCategory.UNKNOWN)
                         .map(this::getDatabaseGroup)
                         .filter(dbGroup -> !dbGroup.getItems().isEmpty())
                         .collect(Collectors.toList());
@@ -63,12 +63,12 @@ public class UniProtConfigureService {
         return results;
     }
 
-    private Tuple convertToTuple(UniProtXDbTypeDetail dbType) {
+    private Tuple convertToTuple(UniProtDatabaseDetail dbType) {
         return new TupleImpl(dbType.getName(), dbType.getName().toLowerCase());
     }
 
-    private DatabaseGroup getDatabaseGroup(DatabaseCategory dbCategory) {
-        List<UniProtXDbTypeDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
+    private DatabaseGroup getDatabaseGroup(UniProtDatabaseCategory dbCategory) {
+        List<UniProtDatabaseDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
         List<Tuple> databaseTypes =
                 dbTypes.stream()
                         .filter(val -> !val.isImplicit())
@@ -77,7 +77,7 @@ public class UniProtConfigureService {
         return new DatabaseGroupImpl(dbCategory.getDisplayName(), databaseTypes);
     }
 
-    public List<UniProtXDbTypeDetail> getAllDatabases() {
-        return DBX_TYPES.getAllDBXRefTypes();
+    public List<UniProtDatabaseDetail> getAllDatabases() {
+        return DBX_TYPES.getAllDbTypes();
     }
 }

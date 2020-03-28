@@ -31,7 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.UniprotKbObjectsForTests;
+import org.uniprot.api.uniprotkb.UniprotKBObjectsForTests;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
@@ -103,13 +103,19 @@ class UniprotKBEntryControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(4)))
                 .andExpect(
-                        jsonPath("$.results[0].reference.citation.citationXrefs[0].id", is("11")))
+                        jsonPath(
+                                "$.results[0].reference.citation.citationCrossReferences[0].id",
+                                is("11")))
                 .andExpect(
                         jsonPath("$.results[1].reference.citation.citationType", is("submission")))
                 .andExpect(
-                        jsonPath("$.results[2].reference.citation.citationXrefs[0].id", is("12")))
+                        jsonPath(
+                                "$.results[2].reference.citation.citationCrossReferences[0].id",
+                                is("12")))
                 .andExpect(
-                        jsonPath("$.results[3].reference.citation.citationXrefs[0].id", is("13")))
+                        jsonPath(
+                                "$.results[3].reference.citation.citationCrossReferences[0].id",
+                                is("13")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.reference.citation.title",
@@ -319,13 +325,13 @@ class UniprotKBEntryControllerIT {
     private void saveEntry(long pubMedId, String... accessions) {
         System.out.println("Document for PUBMED_ID: " + pubMedId);
         LiteratureDocument document =
-                UniprotKbObjectsForTests.getLiteratureDocument(pubMedId, accessions);
+                UniprotKBObjectsForTests.getLiteratureDocument(pubMedId, accessions);
 
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
 
     private void saveUniprotEntryInStore(String accession, String... pubmedIds) {
         storeClient.saveEntry(
-                UniprotKbObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
+                UniprotKBObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
     }
 }

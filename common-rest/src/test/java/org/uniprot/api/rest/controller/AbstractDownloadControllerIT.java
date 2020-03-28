@@ -48,6 +48,7 @@ public abstract class AbstractDownloadControllerIT {
 
     @AfterEach
     public void cleanData() {
+        storeManager.cleanStore(getStoreType());
         storeManager.cleanSolr(getStoreType());
     }
 
@@ -71,19 +72,6 @@ public abstract class AbstractDownloadControllerIT {
         return storeManager;
     }
 
-    private ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
-        ResultActions resultActions = mockMvc.perform(builder);
-        if (resultActions.andReturn().getRequest().isAsyncStarted()) {
-            return mockMvc.perform(
-                    asyncDispatch(
-                            resultActions
-                                    .andExpect(request().asyncResult(anything()))
-                                    .andReturn()));
-        } else {
-            return resultActions;
-        }
-    }
-
     protected void sendAndVerify(DownloadParamAndResult paramAndResult, HttpStatus httpStatus)
             throws Exception {
         // when
@@ -105,8 +93,23 @@ public abstract class AbstractDownloadControllerIT {
                                                 HttpHeaders.CONTENT_TYPE,
                                                 paramAndResult.getContentType().toString()));
 
-        for (ResultMatcher resultMatcher : paramAndResult.getResultMatchers()) {
-            resultActions.andExpect(resultMatcher);
+        if (HttpStatus.OK.equals(httpStatus)) {
+            for (ResultMatcher resultMatcher : paramAndResult.getResultMatchers()) {
+                resultActions.andExpect(resultMatcher);
+            }
+        }
+    }
+
+    private ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
+        ResultActions resultActions = mockMvc.perform(builder);
+        if (resultActions.andReturn().getRequest().isAsyncStarted()) {
+            return mockMvc.perform(
+                    asyncDispatch(
+                            resultActions
+                                    .andExpect(request().asyncResult(anything()))
+                                    .andReturn()));
+        } else {
+            return resultActions;
         }
     }
 }
