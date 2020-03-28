@@ -23,7 +23,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
-import org.uniprot.core.parser.tsv.proteome.ProteomeEntryMapper;
+import org.uniprot.core.parser.tsv.proteome.ProteomeEntryValueMapper;
 import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -72,10 +72,14 @@ public class MessageConverterConfig {
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PROTEOME);
                 converters.add(
                         new TsvMessageConverter<>(
-                                ProteomeEntry.class, returnFieldConfig, new ProteomeEntryMapper()));
+                                ProteomeEntry.class,
+                                returnFieldConfig,
+                                new ProteomeEntryValueMapper()));
                 converters.add(
                         new XslMessageConverter<>(
-                                ProteomeEntry.class, returnFieldConfig, new ProteomeEntryMapper()));
+                                ProteomeEntry.class,
+                                returnFieldConfig,
+                                new ProteomeEntryValueMapper()));
 
                 JsonMessageConverter<ProteomeEntry> proteomeJsonConverter =
                         new JsonMessageConverter<>(

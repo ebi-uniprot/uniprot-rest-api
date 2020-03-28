@@ -32,7 +32,6 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.core.CrossReference;
-import org.uniprot.core.citation.Citation;
 import org.uniprot.core.citation.impl.JournalArticleBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
@@ -205,14 +204,18 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         ProteomeId proteomeId = new ProteomeIdBuilder(getName(UPID_PREF, i)).build();
         String description = getName("Description", i);
         Taxonomy taxonomy =
-                new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
+                new TaxonomyBuilder()
+                        .taxonId(9606)
+                        .scientificName("Homo sapiens")
+                        .mnemonic("HUMAN")
+                        .build();
         LocalDate modified = LocalDate.of(2015, 11, 5);
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
         List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
         CrossReference<ProteomeDatabase> xref1 =
                 new CrossReferenceBuilder<ProteomeDatabase>()
-                        .database(ProteomeDatabase.GENOME_ACCESSION)
+                        .database(ProteomeDatabase.GENOME_ASSEMBLY)
                         .id(getName("ACA", i))
                         .build();
         xrefs.add(xref1);
@@ -233,7 +236,6 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
         components.add(component1);
         components.add(component2);
-        List<Citation> citations = new ArrayList<>();
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)

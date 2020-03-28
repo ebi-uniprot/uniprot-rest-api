@@ -23,10 +23,10 @@ import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.parser.tsv.disease.DiseaseEntryMapper;
-import org.uniprot.core.parser.tsv.keyword.KeywordEntryMapper;
-import org.uniprot.core.parser.tsv.literature.LiteratureEntryMapper;
-import org.uniprot.core.parser.tsv.subcell.SubcellularLocationEntryMapper;
+import org.uniprot.core.parser.tsv.disease.DiseaseEntryValueMapper;
+import org.uniprot.core.parser.tsv.keyword.KeywordEntryValueMapper;
+import org.uniprot.core.parser.tsv.literature.LiteratureEntryValueMapper;
+import org.uniprot.core.parser.tsv.subcell.SubcellularLocationEntryValueMapper;
 import org.uniprot.core.parser.tsv.taxonomy.TaxonomyEntryValueMapper;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -70,12 +70,12 @@ public class MessageConverterConfig {
                         new XslMessageConverter<>(
                                 LiteratureEntry.class,
                                 litReturnConfig,
-                                new LiteratureEntryMapper()));
+                                new LiteratureEntryValueMapper()));
                 converters.add(
                         new TsvMessageConverter<>(
                                 LiteratureEntry.class,
                                 litReturnConfig,
-                                new LiteratureEntryMapper()));
+                                new LiteratureEntryValueMapper()));
 
                 ReturnFieldConfig taxReturnConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.TAXONOMY);
@@ -94,10 +94,10 @@ public class MessageConverterConfig {
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
                 converters.add(
                         new XslMessageConverter<>(
-                                KeywordEntry.class, kwReturnFields, new KeywordEntryMapper()));
+                                KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
                 converters.add(
                         new TsvMessageConverter<>(
-                                KeywordEntry.class, kwReturnFields, new KeywordEntryMapper()));
+                                KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
 
                 ReturnFieldConfig subcellReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(
@@ -106,22 +106,26 @@ public class MessageConverterConfig {
                         new XslMessageConverter<>(
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields,
-                                new SubcellularLocationEntryMapper()));
+                                new SubcellularLocationEntryValueMapper()));
                 converters.add(
                         new TsvMessageConverter<>(
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields,
-                                new SubcellularLocationEntryMapper()));
+                                new SubcellularLocationEntryValueMapper()));
                 converters.add(new SubcellularLocationOBOMessageConverter());
 
                 ReturnFieldConfig diseaseReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.DISEASE);
                 converters.add(
                         new XslMessageConverter<>(
-                                DiseaseEntry.class, diseaseReturnFields, new DiseaseEntryMapper()));
+                                DiseaseEntry.class,
+                                diseaseReturnFields,
+                                new DiseaseEntryValueMapper()));
                 converters.add(
                         new TsvMessageConverter<>(
-                                DiseaseEntry.class, diseaseReturnFields, new DiseaseEntryMapper()));
+                                DiseaseEntry.class,
+                                diseaseReturnFields,
+                                new DiseaseEntryValueMapper()));
                 converters.add(new DiseaseOBOMessageConverter());
 
                 // add Json message converter first in the list because it is the most used
