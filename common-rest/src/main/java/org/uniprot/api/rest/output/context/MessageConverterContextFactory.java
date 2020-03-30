@@ -1,12 +1,11 @@
 package org.uniprot.api.rest.output.context;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import lombok.Builder;
 import lombok.Data;
-
 import org.springframework.http.MediaType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created 10/09/18
@@ -44,6 +43,7 @@ public class MessageConverterContextFactory<T> {
         UNIPROT,
         UNIPROT_PUBLICATION,
         UNIREF,
+        UNISAVE,
         UNIPARC,
         PROTEOME,
         TAXONOMY,

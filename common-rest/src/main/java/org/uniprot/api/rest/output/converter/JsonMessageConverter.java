@@ -1,20 +1,19 @@
 package org.uniprot.api.rest.output.converter;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.field.ReturnField;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.http.MediaType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.search.field.ReturnField;
-
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @param <T> instance of the object that is being written.
@@ -23,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
     private static final String COMMA = "\\s*,\\s*";
-    private final ObjectMapper objectMapper;
+    protected final ObjectMapper objectMapper;
     private ThreadLocal<Map<String, List<String>>> tlFilters = new ThreadLocal<>();
     private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
     private List<ReturnField> allFields;
