@@ -34,32 +34,8 @@ public class UniSaveRepository {
         return Optional.ofNullable(getEntryImpl(accession, version));
     }
 
-    private Entry getEntryImpl(String accession, int version) {
-        try {
-            TypedQuery<EntryImpl> q =
-                    session.createNamedQuery(
-                            EntryImpl.Query.findEntryByAccessionAndVersion.query(),
-                            EntryImpl.class);
-
-            q.setParameter("acc", accession);
-            q.setParameter("version", version);
-            // Exception handling.
-            EntryImpl singleResult = q.getSingleResult();
-
-            setContent(singleResult, session);
-            return singleResult;
-        } catch (NoResultException e) {
-            return null;
-        } catch (NonUniqueResultException e) {
-            LOGGER.error("", e);
-            return null;
-        } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return null;
-        }
+    public Entry retrieveEntry2(String accession, int version) {
+        return getEntryImpl(accession, version);
     }
 
     private void setContent(EntryImpl e, EntityManager session) {
@@ -163,6 +139,59 @@ public class UniSaveRepository {
         } catch (Exception e) {
             LOGGER.warn("", e);
             return Collections.emptyList();
+        }
+    }
+
+    private Entry getEntryImpl(String accession, int version) {
+        try {
+            TypedQuery<EntryImpl> q =
+                    session.createNamedQuery(
+                            EntryImpl.Query.findEntryByAccessionAndVersion.query(),
+                            EntryImpl.class);
+
+            q.setParameter("acc", accession);
+            q.setParameter("version", version);
+            // Exception handling.
+            EntryImpl singleResult = q.getSingleResult();
+
+            setContent(singleResult, session);
+            return singleResult;
+        } catch (NoResultException e) {
+            return null;
+        } catch (NonUniqueResultException e) {
+            LOGGER.error("", e);
+            return null;
+        } catch (PersistenceException e) {
+            LOGGER.error("", e);
+            throw new RuntimeException("DBERROR", e);
+        } catch (Exception e) {
+            LOGGER.warn("", e);
+            return null;
+        }
+    }
+
+    public EntryInfo retrieveEntryInfo2(String accession, int version) {
+        try {
+            Query q =
+                    session.createNamedQuery(
+                            EntryImpl.Query.findEntryInfoByAccessionAndVersion.query());
+
+            q.setParameter("acc", accession);
+            q.setParameter("version", version);
+            // Exception handling.
+            Object[] singleResult = (Object[]) q.getSingleResult();
+            return convertFromObjectArray(singleResult);
+        } catch (NoResultException e) {
+            return null;
+        } catch (NonUniqueResultException e) {
+            LOGGER.error("", e);
+            return null;
+        } catch (PersistenceException e) {
+            LOGGER.error("", e);
+            throw new RuntimeException("DBERROR", e);
+        } catch (Exception e) {
+            LOGGER.warn("", e);
+            return null;
         }
     }
 
@@ -364,7 +393,11 @@ public class UniSaveRepository {
     }
 
     private LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
-        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        if (dateToConvert instanceof java.sql.Date) {
+            return ((java.sql.Date) dateToConvert).toLocalDate();
+        } else {
+            return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
     }
 
     private List<String> findReplacingAcc(List<IdentifierStatus> status, Release rel) {
@@ -415,7 +448,7 @@ public class UniSaveRepository {
         }
     }
 
-    public Optional<AccessionStatusInfo> retrieveEntryStatusInfo(String accession) {
+    public AccessionStatusInfoImpl retrieveEntryStatusInfo(String accession) {
         try {
             ArrayList<AccessionStatusInfo> accessionStatusInfos =
                     new ArrayList<AccessionStatusInfo>();
@@ -436,33 +469,33 @@ public class UniSaveRepository {
                 accessionStatusInfo.getEvents().add(status);
             }
 
-            return Optional.of(accessionStatusInfo);
+            return accessionStatusInfo;
         } catch (PersistenceException e) {
             LOGGER.error("", e);
             throw new RuntimeException("DBERROR", e);
         } catch (Exception e) {
             LOGGER.warn("", e);
-            return Optional.empty();
+            return null;
         }
     }
 
     public Diff diff(String accession, int v1, int v2) {
-            Entry e1 = this.getEntryImpl(accession, v1);
-            Entry e2 = this.getEntryImpl(accession, v2);
+        Entry e1 = this.getEntryImpl(accession, v1);
+        Entry e2 = this.getEntryImpl(accession, v2);
 
-            if (e1 == null || e2 == null) return null;
+        if (e1 == null || e2 == null) return null;
 
-            String ce1 = e1.getEntryContent().getFullcontent();
-            String ce2 = e2.getEntryContent().getFullcontent();
-            String diff = diffpatch.diff(ce1, ce2);
+        String ce1 = e1.getEntryContent().getFullcontent();
+        String ce2 = e2.getEntryContent().getFullcontent();
+        String diff = diffpatch.diff(ce1, ce2);
 
-            DiffImpl diffImpl = new DiffImpl();
-            diffImpl.setAccession(accession);
-            diffImpl.setEntryOne(e1);
-            diffImpl.setEntryTwo(e2);
-            diffImpl.setDiff(diff);
+        DiffImpl diffImpl = new DiffImpl();
+        diffImpl.setAccession(accession);
+        diffImpl.setEntryOne(e1);
+        diffImpl.setEntryTwo(e2);
+        diffImpl.setDiff(diff);
 
-            return diffImpl;
+        return diffImpl;
     }
 
     public Release getLatestRelease() {

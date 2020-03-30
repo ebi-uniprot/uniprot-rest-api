@@ -15,21 +15,29 @@ package org.uniprot.api.unisave.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.unisave.model.AccessionStatus;
 import org.uniprot.api.unisave.model.EntryInfo;
-import org.uniprot.api.unisave.model.FullEntry;
-import org.uniprot.api.unisave.repository.domain.Diff;
+import org.uniprot.api.unisave.model.UniSaveEntry;
+import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
 
 /**
  * Created 20/03/20
@@ -40,123 +48,122 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/unisave")
 @Slf4j
 public class UniSaveController {
+    private final MessageConverterContextFactory<UniSaveEntry> converterContextFactory;
     private final UniSaveService service;
-    //    /**
-    //     * get("/json/status/:acc", operation(getAccessionStatus)){ EntryStatus <- status/acc
-    // (json)
-    //     * get("/json/entryinfo/:acc/:ver", operation(findEntryInfoByAccessionAndVersion) -
-    //     * get("/json/entryinfos/:acc", List<Entry> <- entries/acc -> all
-    // get("/json/entry/:acc/:ver",
-    //     * operation(findEntryByAccessionAndVersion) - get("/json/entries/:acc",
-    //     * operation(findEntriesByAccession) - get("/raw/:acc", operation(findRawEntryByAccession)
-    // Entry
-    //     * <- get("/raw/:acc/:ver", operation(findRawEntryByAccessionAndVersion) Entry <-
-    //     * get("/raws/:acc/:verlist", operation(findRawEntriesByAccessionAndVersionList)
-    //     * get("/raws/:attach/:acc/:verlist") { List<Entry> <- download/entries/acc/csv_versions
-    //     * get("/json/diff/:acc/:v1/:v2") { Diff <- diff/acc/v1/v2
-    //     *
-    //     * <p>entry/acc?includeFFWithJSON=true (json, flatfile)
-    //     *
-    //     * <p>entry/acc/version?includeFFWithJSON=true (json, flatfile, fasta)
-    //     *
-    //     * <p>versions?includeFFWithJSON=true (json, flatfile, fasta)
-    //     *
-    //     * <p>List<Entry> <- entries/acc/csv_versions?includeFFWithJSON=true -> only specified
-    // versions
-    //     * (json, flatfile, fasta)
-    //     *
-    //     * <p>(fasta, flatfile)
-    //     *
-    //     * <p>====================== notes ==============
-    //     * http://www.ebi.ac.uk/uniprot/unisave/rest/json/entryinfo/Q00001/1
-    //     * http://www.ebi.ac.uk/uniprot/unisave/rest/json/entry/Q00001/1
-    //     *
-    //     * <p>entryinfo is the same as entry, but without content
-    //     *
-    //     * <p>============================================== looks like we can reduce end-points,
-    // by
-    //     * using content type instead of raw/json
-    //     *
-    //     * <p>here are hte underlying calls to the service: cat
-    //     *
-    // /home/edd/working/intellij/unisave/unp.fw.unisave_web/restful/src/main/scala/uk/ac/ebi/unisave/UnisaveServlet.scala
-    //     * | grep -o 'service\.[a-zA-Z]\+' |sort -u
-    //     * service.adaptFasta
-    //     * service.getAccessionStatus
-    //     * service.getDiff
-    //     * service.getEntries
-    //     * service.getEntryInfos
-    //     * service.getEntryInfoWithVersion
-    //     * service.getEntryWithVersion
-    //     */
-    //    private final UniSaveService service;
-    //
-    //    @Autowired
-    //    public UniSaveController(UniSaveService service) {
-    //        this.service = service;
-    //    }
 
     @Autowired
-    public UniSaveController(UniSaveService service) {
+    public UniSaveController(
+            MessageConverterContextFactory<UniSaveEntry> converterContextFactory,
+            UniSaveService service) {
+        this.converterContextFactory = converterContextFactory;
         this.service = service;
     }
 
     @GetMapping(
-            value = "/{accession}/{version}",
+            value = "/{accession}",
+            produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
+    public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
+            @Valid UniSaveRequest uniSaveRequest, HttpServletRequest servletRequest) {
+
+        HttpHeaders httpHeaders =
+                addDownloadHeaderIfRequired(
+                        uniSaveRequest,
+                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)),
+                        servletRequest);
+        MessageConverterContext<UniSaveEntry> context =
+                converterContextFactory.get(
+                        MessageConverterContextFactory.Resource.UNISAVE,
+                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+        context.setEntities(service.getEntries(uniSaveRequest).stream());
+
+        return ResponseEntity.ok().headers(httpHeaders).body(context);
+    }
+
+    @GetMapping(
+            value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<String> getEntryStatus(
-            @PathVariable String accession, @PathVariable int version) {
-//        service.retrieveEntry(accession, version);
-        //service.retrieveEntry(accession, "release");
-//        service.retrieveEntries(accession);
-//        service.retrieveEntries(accession, DatabaseEnum.Swissprot);
-//        service.retrieveEntries(accession, DatabaseEnum.Trembl);
-//        service.retrieveEntryInfo(accession, version);
-//        service.retrieveEntryInfo(accession, "release");
-//        service.retrieveIdentifier(accession);
-//        return ResponseEntity.ok(
-//                service.retrieveEntry(accession, version).getEntryContent().getFullcontent());
-        return null;
+    public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
+            @PathVariable String accession,
+            // TODO: 29/03/20 add separate request object
+            @RequestParam int version1,
+            @RequestParam int version2,
+            HttpServletRequest servletRequest) {
+        MessageConverterContext<UniSaveEntry> context =
+                converterContextFactory.get(
+                        MessageConverterContextFactory.Resource.UNISAVE,
+                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+        context.setEntities(Stream.of(service.getDiff2(accession, version1, version2)));
+
+        return ResponseEntity.ok(context);
+    }
+
+    @GetMapping(
+            value = "/{accession}/status",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
+            @PathVariable String accession,
+            HttpServletRequest servletRequest) {
+        MessageConverterContext<UniSaveEntry> context =
+                converterContextFactory.get(
+                        MessageConverterContextFactory.Resource.UNISAVE,
+                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+        context.setEntities(Stream.of(service.getAccessionStatus2(accession)));
+
+        return ResponseEntity.ok(context);
+    }
+
+    private HttpHeaders addDownloadHeaderIfRequired(
+            UniSaveRequest request, MediaType contentType, HttpServletRequest servletRequest) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        if (request.isDownload()) {
+            String queryString = servletRequest.getQueryString();
+            String suffix = "." + UniProtMediaType.getFileExtension(contentType);
+            httpHeaders.setContentDispositionFormData(
+                    "attachment", "unisave-entries-" + queryString + suffix);
+            // used so that gate-way caching uses accept/accept-encoding headers as a key
+            httpHeaders.add(VARY, ACCEPT);
+            httpHeaders.add(VARY, ACCEPT_ENCODING);
+        }
+        return httpHeaders;
     }
 
     //
     //    // ---------------------
     //    // get("/json/status/:acc", operation(getAccessionStatus)){ EntryStatus <- status/acc
     // (json)
-        @GetMapping(
-                value = "/json/status/{accession}",
-                produces = {APPLICATION_JSON_VALUE})
-        public ResponseEntity<Optional<AccessionStatus>> getEntryStatus(
-                @PathVariable String accession) {
+    @GetMapping(
+            value = "/json/status/{accession}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<Optional<AccessionStatus>> getEntryStatus(
+            @PathVariable String accession) {
         return ResponseEntity.ok(service.getAccessionStatus(accession));
-        }
+    }
     //
     //    // get("/json/entryinfo/:acc/:ver", operation(findEntryInfoByAccessionAndVersion) -
-        @GetMapping(
-                value = "/json/entryinfo/{accession}/{version}",
-                produces = {APPLICATION_JSON_VALUE})
-        public ResponseEntity<Optional<EntryInfo>> getEntryInfoWithVersion(
-                @PathVariable String accession, @PathVariable int version) {
+    @GetMapping(
+            value = "/json/entryinfo/{accession}/{version}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<Optional<EntryInfo>> getEntryInfoWithVersion(
+            @PathVariable String accession, @PathVariable int version) {
         return ResponseEntity.ok(service.getEntryInfoWithVersion(accession, version));
-        }
+    }
     //
     //    // get("/json/entryinfos/:acc", List<Entry> <- entries/acc -> all
-        @GetMapping(
-                value = "/entryinfos/{accession}",
-                produces = {APPLICATION_JSON_VALUE})
-        public ResponseEntity<List<EntryInfo>> getEntryInfos(
-                @PathVariable String accession) {
+    @GetMapping(
+            value = "/entryinfos/{accession}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<List<EntryInfo>> getEntryInfos(@PathVariable String accession) {
         return ResponseEntity.ok(service.getEntryInfos(accession));
-        }
+    }
     //
     //    // get("/json/entry/:acc/:ver", operation(findEntryByAccessionAndVersion) -
-        @GetMapping(
-                value = "/entry/{accession}/{version}",
-                produces = {APPLICATION_JSON_VALUE})
-        public ResponseEntity<Optional<FullEntry>> getEntryVersionAsJSON(
-                @PathVariable String accession, @PathVariable int version) {
-            return ResponseEntity.ok(service.getEntryWithVersion(accession, version));
-        }
+    @GetMapping(
+            value = "/entry/{accession}/{version}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<Optional<UniSaveEntry>> getEntryVersionAsJSON(
+            @PathVariable String accession, @PathVariable int version) {
+        return ResponseEntity.ok(service.getEntryWithVersion(accession, version));
+    }
 
     //
     //    // get("/json/entries/:acc", operation(findEntriesByAccession) -
@@ -208,13 +215,4 @@ public class UniSaveController {
     //    }
     //
     //    // get("/json/diff/:acc/:v1/:v2") { Diff <- diff/acc/v1/v2
-        @GetMapping(
-                value = "/json/diff/{accession}/{version1}/{version2}",
-                produces = {APPLICATION_JSON_VALUE})
-        public ResponseEntity<Diff> getDiffBetween(
-                @PathVariable String accession,
-                @PathVariable int version1,
-                @PathVariable int version2) {
-        return ResponseEntity.ok(service.getDiff(accession, version1, version2));
-        }
 }
