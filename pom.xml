@@ -12,7 +12,7 @@
 
 	<artifactId>uniprot-rest-api</artifactId>
 	<groupId>org.uniprot</groupId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0-covid-19-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>UniProt REST API Aggregator</name>
 	<description>
@@ -53,8 +53,8 @@
 		<!-- Integration test report path -->
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</jacoco.itReportPath>
-		<uniprot-store.version>1.0-SNAPSHOT</uniprot-store.version>
-		<uniprot-core.version>0.1-SNAPSHOT</uniprot-core.version>
+		<uniprot-store.version>1.0-covid-19-SNAPSHOT</uniprot-store.version>
+		<uniprot-core.version>0.1-covid-19-SNAPSHOT</uniprot-core.version>
 
 		<!-- Auto-formatting -->
 		<spotless.version>1.24.1</spotless.version>
