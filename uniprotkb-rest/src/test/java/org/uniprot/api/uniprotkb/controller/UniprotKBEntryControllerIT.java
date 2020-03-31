@@ -132,8 +132,8 @@ class UniprotKBEntryControllerIT {
                         jsonPath(
                                 "$.results.*.publicationSource",
                                 contains(
-                                        "Swiss-Prot",
-                                        "Swiss-Prot",
+                                        "UniProtKB reviewed (Swiss-Prot)",
+                                        "UniProtKB reviewed (Swiss-Prot)",
                                         "Computationally mapped",
                                         "Computationally mapped")))
                 .andExpect(
@@ -157,7 +157,7 @@ class UniprotKBEntryControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12312/publications")
-                                .param("facets", "source,category,scale")
+                                .param("facets", "source,category,study_type")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -165,19 +165,37 @@ class UniprotKBEntryControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(5)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Source", "Category", "Scale")))
-                .andExpect(jsonPath("$.facets.*.name", contains("source", "category", "scale")))
+                .andExpect(
+                        jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
+                .andExpect(
+                        jsonPath("$.facets.*.name", contains("source", "category", "study_type")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.label",
+                                contains(
+                                        "UniProtKB reviewed (Swiss-Prot)",
+                                        "Computationally mapped")))
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.value",
-                                contains("Swiss-Prot", "Computationally mapped")))
+                                contains("uniprotkbreviewedswissprot", "computationallymapped")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 2)))
                 .andExpect(
                         jsonPath(
-                                "$.facets[1].values.*.value",
+                                "$.facets[1].values.*.label",
                                 contains("Interaction", "Function", "Pathol")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[1].values.*.value",
+                                contains("interaction", "function", "pathol")))
                 .andExpect(jsonPath("$.facets[1].values.*.count", contains(3, 2, 2)))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("Large", "Small")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values.*.label",
+                                contains("Large scale", "Small scale")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values.*.value", contains("largescale", "smallscale")))
                 .andExpect(jsonPath("$.facets[2].values.*.count", contains(4, 1)));
     }
 
@@ -196,7 +214,7 @@ class UniprotKBEntryControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12312/publications")
-                                .param("facets", "source,category,scale")
+                                .param("facets", "source,category,study_type")
                                 .param("query", "category:Interaction")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -205,14 +223,31 @@ class UniprotKBEntryControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(3)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Source", "Category", "Scale")))
-                .andExpect(jsonPath("$.facets.*.name", contains("source", "category", "scale")))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("Swiss-Prot")))
+                .andExpect(
+                        jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
+                .andExpect(
+                        jsonPath("$.facets.*.name", contains("source", "category", "study_type")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.label",
+                                contains("UniProtKB reviewed (Swiss-Prot)")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.value",
+                                contains("uniprotkbreviewedswissprot")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3)))
                 .andExpect(
-                        jsonPath("$.facets[1].values.*.value", contains("Interaction", "Pathol")))
+                        jsonPath("$.facets[1].values.*.label", contains("Interaction", "Pathol")))
+                .andExpect(
+                        jsonPath("$.facets[1].values.*.value", contains("interaction", "pathol")))
                 .andExpect(jsonPath("$.facets[1].values.*.count", contains(3, 2)))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("Large", "Small")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values.*.label",
+                                contains("Large scale", "Small scale")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values.*.value", contains("largescale", "smallscale")))
                 .andExpect(jsonPath("$.facets[2].values.*.count", contains(2, 1)));
     }
 
@@ -235,7 +270,7 @@ class UniprotKBEntryControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'invalid'. Expected value can be [source, category, scale].")));
+                                        "Invalid facet name 'invalid'. Expected value can be [source, category, study_type].")));
     }
 
     @Test
@@ -286,7 +321,7 @@ class UniprotKBEntryControllerIT {
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12345/publications")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("facets", "scale")
+                                .param("facets", "study_type")
                                 .param("size", "5"));
 
         // then first page

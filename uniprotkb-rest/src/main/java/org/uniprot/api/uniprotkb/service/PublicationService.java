@@ -42,6 +42,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Service
 public class PublicationService {
 
+    private static final String COMPUTATIONALLY_MAPPED = "Computationally mapped";
     private final UniProtKBStoreClient uniProtKBStore;
     private final LiteratureRepository repository;
     private final LiteratureStoreEntryConverter entryStoreConverter;
@@ -226,7 +227,7 @@ public class PublicationService {
                 .reference(reference)
                 .statistics(literatureEntry.getLiteratureEntry().getStatistics())
                 .literatureMappedReference(mappedReference)
-                .publicationSource("Computationally mapped")
+                .publicationSource(COMPUTATIONALLY_MAPPED)
                 .categories(categories)
                 .build();
     }
