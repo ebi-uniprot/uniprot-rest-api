@@ -76,6 +76,19 @@ class AllowAllOriginsResponseFilterIT {
                 result.getResponse().getHeader(ACCESS_CONTROL_ALLOW_ORIGIN), is(ALLOW_ALL_ORIGINS));
     }
 
+    @Test
+    void requestHasXReleaseHeader() throws Exception {
+        MvcResult result =
+                mockMvc.perform(get(RESOURCE_1_URL))
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andReturn();
+
+        assertThat(
+                result.getResponse().getHeader(HttpCommonHeaderConfig.X_RELEASE),
+                is("2020_02 stub release file"));
+    }
+
     private HttpHeaders originHeader(String origin) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setOrigin(origin);
