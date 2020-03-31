@@ -25,5 +25,5 @@ public interface UniSaveService {
 
     ReleaseInfo getLatestRelease();
 
-    List<UniSaveEntry> getEntries(UniSaveRequest request);
+    List<UniSaveEntry> getEntries(UniSaveRequest.Entries request);
 }

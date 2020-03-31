@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -63,7 +66,7 @@ public class UniSaveController {
             value = "/{accession}",
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
-            @Valid UniSaveRequest uniSaveRequest, HttpServletRequest servletRequest) {
+            @Valid UniSaveRequest.Entries uniSaveRequest, HttpServletRequest servletRequest) {
 
         HttpHeaders httpHeaders =
                 addDownloadHeaderIfRequired(
@@ -83,16 +86,18 @@ public class UniSaveController {
             value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
-            @PathVariable String accession,
-            // TODO: 29/03/20 add separate request object
-            @RequestParam int version1,
-            @RequestParam int version2,
-            HttpServletRequest servletRequest) {
+            @Valid UniSaveRequest.Diff unisaveRequest, HttpServletRequest servletRequest) {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
                         UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
-        context.setEntities(Stream.of(service.getDiff2(accession, version1, version2)));
+        context.setEntityOnly(true);
+        context.setEntities(
+                Stream.of(
+                        service.getDiff2(
+                                unisaveRequest.getAccession(),
+                                unisaveRequest.getVersion1(),
+                                unisaveRequest.getVersion2())));
 
         return ResponseEntity.ok(context);
     }
@@ -101,19 +106,21 @@ public class UniSaveController {
             value = "/{accession}/status",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
-            @PathVariable String accession,
-            HttpServletRequest servletRequest) {
+            @PathVariable String accession, HttpServletRequest servletRequest) {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
                         UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+        context.setEntityOnly(true);
         context.setEntities(Stream.of(service.getAccessionStatus2(accession)));
 
         return ResponseEntity.ok(context);
     }
 
     private HttpHeaders addDownloadHeaderIfRequired(
-            UniSaveRequest request, MediaType contentType, HttpServletRequest servletRequest) {
+            UniSaveRequest.Entries request,
+            MediaType contentType,
+            HttpServletRequest servletRequest) {
         HttpHeaders httpHeaders = new HttpHeaders();
         if (request.isDownload()) {
             String queryString = servletRequest.getQueryString();

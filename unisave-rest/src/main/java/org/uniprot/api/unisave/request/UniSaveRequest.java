@@ -7,10 +7,19 @@ import lombok.Data;
  *
  * @author Edd
  */
-@Data
 public class UniSaveRequest {
-    private String accession;
-    private boolean download;
-    private boolean includeContent;
-    private String versions;
+    @Data
+    public static class Entries {
+        private String accession;
+        private boolean download;
+        private boolean includeContent;
+        private String versions;
+    }
+
+    @Data
+    public static class Diff {
+        private String accession;
+        private Integer version1;
+        private Integer version2;
+    }
 }

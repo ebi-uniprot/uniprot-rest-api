@@ -177,12 +177,24 @@ public class UniSaveServiceImpl implements UniSaveService {
         if (Objects.nonNull(statusInfo)) {
             return UniSaveEntry.builder()
                     .accession(accession)
-                    .status(entryStatusInfoToAccessionStatus(statusInfo))
+                    .events(entryStatusInfoToEvents(statusInfo))
                     .build();
         } else {
             throw new RetrievalException(
                     "Error occurred when retrieving access status for: " + accession);
         }
+    }
+
+    private List<AccessionEvent> entryStatusInfoToEvents(AccessionStatusInfo statusInfo) {
+        return statusInfo.getEvents().stream()
+                .map(
+                        event ->
+                                AccessionEvent.builder()
+                                        .eventType(event.getEventType().name())
+                                        .release(event.getEventRelease().getReleaseNumber())
+                                        .targetAccession(event.getTargetAcc())
+                                        .build())
+                .collect(Collectors.toList());
     }
 
     private AccessionStatus entryStatusInfoToAccessionStatus(AccessionStatusInfo statusInfo) {
@@ -196,10 +208,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                                                 .targetAccession(event.getTargetAcc())
                                                 .build())
                         .collect(Collectors.toList());
-        return AccessionStatus.builder()
-                .accession(statusInfo.getAccession())
-                .events(accessionEvents)
-                .build();
+        return AccessionStatus.builder().events(accessionEvents).build();
     }
 
     //
@@ -254,7 +263,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .lastRelease(repoEntryInfo.getLastRelease().getReleaseNumber())
                 .lastReleaseDate(
                         formatReleaseDate(repoEntryInfo.getLastRelease().getReleaseDate()));
-//                .build();
+        //                .build();
     }
 
     //
@@ -361,7 +370,7 @@ public class UniSaveServiceImpl implements UniSaveService {
     // TODO: 28/03/20 change this so that a full entry with all info in full entry + entry info, is
     // returned. it's only small, so no point optimising it.
     @Override
-    public List<UniSaveEntry> getEntries(UniSaveRequest entryRequest) {
+    public List<UniSaveEntry> getEntries(UniSaveRequest.Entries entryRequest) {
         if (entryRequest.isIncludeContent()) {
             // get entry including content
             if (Utils.notNullNotEmpty(entryRequest.getVersions())) {
@@ -458,7 +467,8 @@ public class UniSaveServiceImpl implements UniSaveService {
     //      }else x
     //  }
 
-    private UniSaveEntry.UniSaveEntryBuilder changeReleaseDate(UniSaveEntry.UniSaveEntryBuilder entryBuilder) {
+    private UniSaveEntry.UniSaveEntryBuilder changeReleaseDate(
+            UniSaveEntry.UniSaveEntryBuilder entryBuilder) {
         if (entryBuilder.getLastRelease().equalsIgnoreCase("LATEST_RELEASE")) {
             ReleaseInfo latestRelease = getLatestRelease();
             return entryBuilder
@@ -470,8 +480,8 @@ public class UniSaveServiceImpl implements UniSaveService {
                     //                    .firstReleaseDate(entryBuilder.getFirstReleaseDate())
                     .lastRelease(latestRelease.getReleaseNumber())
                     .lastReleaseDate(latestRelease.getReleaseDate());
-//                    .content(entryBuilder.getContent())
-//                    .build();
+            //                    .content(entryBuilder.getContent())
+            //                    .build();
         } else {
             return entryBuilder;
         }
@@ -562,7 +572,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .lastRelease(entry.getLastRelease())
                 //                .lastReleaseDate(entry.getLastReleaseDate())
                 .content(contentBuilder.toString());
-//                .build();
+        //                .build();
     }
     //
     //    Full_Entry(x.accession,x.name, x.entry_version,  x.sequence_version,

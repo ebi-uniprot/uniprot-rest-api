@@ -32,6 +32,7 @@ public class UniSaveEntry {
     private List<String> replacingAcc;
     private DiffInfo diffInfo;
     private AccessionStatus status;
+    private List<AccessionEvent> events;
 
     public static class UniSaveEntryBuilder {
         public String getLastRelease() {
