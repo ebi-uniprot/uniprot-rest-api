@@ -126,8 +126,8 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     private void saveEntry(String keywordId, boolean facet) {
         KeywordId keyword =
-                new KeywordIdBuilder().id("my keyword " + keywordId).accession(keywordId).build();
-        KeywordId category = new KeywordIdBuilder().id("Ligand").accession("KW-9993").build();
+                new KeywordIdBuilder().name("my keyword " + keywordId).id(keywordId).build();
+        KeywordId category = new KeywordIdBuilder().name("Ligand").id("KW-9993").build();
 
         KeywordEntry keywordEntry =
                 new KeywordEntryBuilder()

@@ -67,8 +67,8 @@ public class DiseaseSolrDocumentHelper {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         KeywordId keyword =
                 new KeywordIdBuilder()
-                        .id("Mental retardation" + suffix)
-                        .accession("KW-0991" + suffix)
+                        .name("Mental retardation" + suffix)
+                        .id("KW-0991" + suffix)
                         .build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
@@ -90,8 +90,8 @@ public class DiseaseSolrDocumentHelper {
                 new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
-                        .id("ZTTK syndrome" + suffix)
-                        .accession(accession)
+                        .name("ZTTK syndrome" + suffix)
+                        .id(accession)
                         .acronym("ZTTKS" + suffix)
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
@@ -119,7 +119,7 @@ public class DiseaseSolrDocumentHelper {
                 Stream.concat(
                                 Stream.concat(
                                         Stream.of(
-                                                diseaseEntry.getId(),
+                                                diseaseEntry.getName(),
                                                 diseaseEntry.getAcronym(),
                                                 diseaseEntry.getDefinition()),
                                         kwIds.stream()),
@@ -127,10 +127,10 @@ public class DiseaseSolrDocumentHelper {
                         .collect(Collectors.toList());
         // content is name + accession
         List<String> content = new ArrayList<>(name);
-        content.add(diseaseEntry.getAccession());
+        content.add(diseaseEntry.getId());
         DiseaseDocument document =
                 DiseaseDocument.builder()
-                        .accession(accession)
+                        .id(accession)
                         .name(name)
                         .content(content)
                         .diseaseObj(getDiseaseBinary(diseaseEntry))

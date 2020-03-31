@@ -78,10 +78,10 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
     }
 
     private ViewBy convert(UniPathway pathway, Map<String, FacetField.Count> idCountMap) {
-        FacetField.Count count = idCountMap.get(pathway.getAccession());
+        FacetField.Count count = idCountMap.get(pathway.getId());
         if (count == null) return null;
         ViewBy viewBy = new ViewBy();
-        FacetField.Count validCount = idCountMap.get(pathway.getAccession());
+        FacetField.Count validCount = idCountMap.get(pathway.getId());
         String id = validCount.getName();
         viewBy.setId(id);
         viewBy.setCount(validCount.getCount());
@@ -94,16 +94,16 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
             UniPathway pathway, Map<String, FacetField.Count> idCountMap) {
         List<UniPathway> children = pathway.getChildren();
         if (children.isEmpty()) return pathway;
-        FacetField.Count count = idCountMap.get(pathway.getAccession());
+        FacetField.Count count = idCountMap.get(pathway.getId());
         List<UniPathway> validChildren =
                 children.stream()
-                        .filter(val -> idCountMap.containsKey(val.getAccession()))
+                        .filter(val -> idCountMap.containsKey(val.getId()))
                         .collect(Collectors.toList());
         if (validChildren.isEmpty() || validChildren.size() > 1) {
             return pathway;
         } else {
             UniPathway child = validChildren.get(0);
-            FacetField.Count childCount = idCountMap.get(child.getAccession());
+            FacetField.Count childCount = idCountMap.get(child.getId());
             if (childCount.getCount() == count.getCount()) {
                 return getRightLevelPathway(child, idCountMap);
             } else return pathway;

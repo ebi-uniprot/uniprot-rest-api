@@ -98,7 +98,7 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].id", Matchers.containsString(searchString)));
+                .andExpect(jsonPath("$.results[0].name", Matchers.containsString(searchString)));
     }
 
     // search by acronym
@@ -234,7 +234,7 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].accession", Matchers.equalTo(searchString)));
+                .andExpect(jsonPath("$.results[0].id", Matchers.equalTo(searchString)));
     }
     // search by cross reference
     @Test
@@ -279,7 +279,7 @@ class DiseaseControllerSearchTestIT {
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[0].id", Matchers.containsString(searchString)));
+                .andExpect(jsonPath("$.results[0].name", Matchers.containsString(searchString)));
     }
 
     @Test
@@ -442,13 +442,13 @@ class DiseaseControllerSearchTestIT {
                 mockMvc.perform(
                         MockMvcRequestBuilders.get("/disease/search/")
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                                .param("query", "accession:" + accession));
+                                .param("query", "id:" + accession));
 
         // then
         response.andDo(MockMvcResultHandlers.print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.accession", Matchers.contains(accession)));
+                .andExpect(jsonPath("$.results.*.id", Matchers.contains(accession)));
     }
 
     private List<DiseaseDocument> convertToDocs(List<DiseaseEntry> diseases) {
@@ -464,7 +464,7 @@ class DiseaseControllerSearchTestIT {
             }
             // name is a combination of id, acronym, definition, synonyms, keywords
             List<String> name = new ArrayList<>();
-            name.add(disease.getId());
+            name.add(disease.getName());
             name.add(disease.getAcronym());
             name.add(disease.getDefinition());
             name.addAll(kwIds);
@@ -472,11 +472,11 @@ class DiseaseControllerSearchTestIT {
 
             // content is name + accession
             List<String> content = new ArrayList<>(name);
-            content.add(disease.getAccession());
+            content.add(disease.getId());
 
             // create disease document
             DiseaseDocument.DiseaseDocumentBuilder builder = DiseaseDocument.builder();
-            builder.accession(disease.getAccession());
+            builder.id(disease.getId());
             builder.name(name).content(content);
             byte[] diseaseByte = getDiseaseObjectBinary(disease);
             builder.diseaseObj(ByteBuffer.wrap(diseaseByte));

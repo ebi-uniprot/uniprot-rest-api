@@ -54,10 +54,10 @@ class DiseaseDocumentToDiseaseConverterTest {
         // keyword
         String kId = "Sample Keyword";
         String kwAC = "KW-1234";
-        KeywordId keyword = new KeywordIdBuilder().id(kId).accession(kwAC).build();
+        KeywordId keyword = new KeywordIdBuilder().name(kId).id(kwAC).build();
 
         DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
-        builder.id(id).accession(accession).acronym(acronym).definition(def);
+        builder.name(id).id(accession).acronym(acronym).definition(def);
         builder.alternativeNamesSet(altNames).crossReferencesAdd(cr);
         builder.keywordsAdd(keyword)
                 .reviewedProteinCount(reviwedProteinCount)
@@ -69,15 +69,15 @@ class DiseaseDocumentToDiseaseConverterTest {
         byte[] diseaseObj = this.diseaseObjectMapper.writeValueAsBytes(disease);
 
         DiseaseDocument.DiseaseDocumentBuilder docBuilder = DiseaseDocument.builder();
-        docBuilder.accession(accession);
+        docBuilder.id(accession);
         docBuilder.diseaseObj(ByteBuffer.wrap(diseaseObj));
 
         DiseaseDocument diseaseDocument = docBuilder.build();
         DiseaseEntry convertedDisease = this.toDiseaseConverter.apply(diseaseDocument);
 
         // verify the result
+        Assertions.assertEquals(disease.getName(), convertedDisease.getName());
         Assertions.assertEquals(disease.getId(), convertedDisease.getId());
-        Assertions.assertEquals(disease.getAccession(), convertedDisease.getAccession());
         Assertions.assertEquals(disease.getAcronym(), convertedDisease.getAcronym());
         Assertions.assertEquals(disease.getDefinition(), convertedDisease.getDefinition());
         Assertions.assertEquals(
