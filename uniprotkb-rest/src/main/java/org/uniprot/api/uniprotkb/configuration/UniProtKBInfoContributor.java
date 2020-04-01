@@ -8,14 +8,18 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 /**
- * Created 31/03/20
+ * This class is responsible for adding descriptive service information to the Spring Actuator
+ * 'info' end-point. It is configured to load its contents from a file, see {@link
+ * ServiceInfoConfig}. This file must contain a 'release' key and value.
+ *
+ * <p>Created 31/03/20
  *
  * @author Edd
  */
 @Component
 @Import(ServiceInfoConfig.class)
 public class UniProtKBInfoContributor implements InfoContributor {
-    private static final String SERVICE_INFO_KEY = "service-info";
+    static final String SERVICE_INFO_KEY = "service-info";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
 
     @Autowired
