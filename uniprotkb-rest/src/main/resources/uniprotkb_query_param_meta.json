@@ -80,7 +80,7 @@
     "type": "String"
   },
   {
-    "name": "popular_organism",
+    "name": "model_organism",
     "type": "String"
   },
   {
