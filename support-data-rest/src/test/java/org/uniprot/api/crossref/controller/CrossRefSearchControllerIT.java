@@ -171,8 +171,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam(
-                            "query", Collections.singletonList("id:" + SEARCH_ACCESSION1))
+                    .queryParam("query", Collections.singletonList("id:" + SEARCH_ACCESSION1))
                     .resultMatcher(jsonPath("$.results.*.id", contains(SEARCH_ACCESSION1)))
                     .resultMatcher(jsonPath("$.results.length()", is(1)))
                     .build();
@@ -216,8 +215,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
             return SearchParameter.builder()
                     .queryParam(
                             "query",
-                            Collections.singletonList(
-                                    "id:[INVALID to INVALID123] OR name:123"))
+                            Collections.singletonList("id:[INVALID to INVALID123] OR name:123"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(

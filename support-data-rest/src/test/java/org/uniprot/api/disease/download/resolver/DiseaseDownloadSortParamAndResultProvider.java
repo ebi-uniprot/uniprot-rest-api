@@ -144,8 +144,7 @@ public class DiseaseDownloadSortParamAndResultProvider
                         accessionsInOrder,
                         requestedFields,
                         expectedFields);
-        ResultMatcher sortResultMatcher =
-                jsonPath("$.results[*].id", equalTo(accessionsInOrder));
+        ResultMatcher sortResultMatcher = jsonPath("$.results[*].id", equalTo(accessionsInOrder));
         resultMatchers.add(sortResultMatcher);
         return resultMatchers;
     }
