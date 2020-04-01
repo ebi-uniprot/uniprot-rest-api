@@ -1,11 +1,10 @@
 package org.uniprot.api.rest.request;
 
-import java.util.*;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-
-import org.springframework.web.servlet.HandlerMapping;
+import java.util.*;
 
 /**
  * Represents a mutable {@link HttpServletRequest}. Override methods of super class {@link
@@ -79,6 +78,19 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         }
         // else return from into the original wrapped object
         return ((HttpServletRequest) getRequest()).getHeader(name);
+    }
+
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        // check the custom headers first
+        String headerValue = customHeaders.get(name);
+
+        if (!Objects.isNull(headerValue)) {
+            return Collections.enumeration(Collections.singletonList(headerValue));
+        }
+
+        // else return from into the original wrapped object
+        return ((HttpServletRequest) getRequest()).getHeaders(name);
     }
 
     @SuppressWarnings("unchecked")
