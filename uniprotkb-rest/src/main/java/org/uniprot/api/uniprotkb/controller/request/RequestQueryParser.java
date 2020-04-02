@@ -612,7 +612,7 @@ public class RequestQueryParser {
                                     commentType.name().toLowerCase(),
                                     commentType.name().toLowerCase());
                             commentMappingType.put(
-                                    commentType.toDisplayName().toLowerCase(),
+                                    commentType.getDisplayName().toLowerCase(),
                                     commentType.name().toLowerCase());
                             commentMappingType.put(
                                     commentType.toXmlDisplayName().toLowerCase(),

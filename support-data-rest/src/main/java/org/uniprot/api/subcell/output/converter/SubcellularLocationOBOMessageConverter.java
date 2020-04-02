@@ -99,7 +99,7 @@ public class SubcellularLocationOBOMessageConverter
                         + ":"
                         + subcellularLocationEntry
                                 .getCategory()
-                                .toDisplayName()
+                                .getDisplayName()
                                 .toLowerCase()
                                 .replace(' ', '_');
         return new Clause(OBOFormatConstants.OboFormatTag.TAG_NAMESPACE, nameSpace);
