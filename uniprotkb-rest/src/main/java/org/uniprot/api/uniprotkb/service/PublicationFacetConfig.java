@@ -80,7 +80,12 @@ public class PublicationFacetConfig extends FacetConfig {
         String query = request.getQuery();
         if (Utils.notNullNotEmpty(query)) {
             if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.source.name())) {
-                String value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.source.name());
+                String value;
+                if (query.toLowerCase().contains("swiss")) {
+                    value = "Swiss-Prot"; // //temporary work around
+                } else {
+                    value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.source.name());
+                }
                 publications.removeIf(
                         entry -> !entry.getPublicationSource().equalsIgnoreCase(value.trim()));
             }
