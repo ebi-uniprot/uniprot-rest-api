@@ -92,11 +92,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniprotKBSearchControllerIT.UniprotKBSearchParameterResolver.class,
-            UniprotKBSearchControllerIT.UniprotKBSearchContentTypeParamResolver.class
+            UniProtKBSearchControllerIT.UniprotKBSearchParameterResolver.class,
+            UniProtKBSearchControllerIT.UniprotKBSearchContentTypeParamResolver.class
         })
 @Slf4j
-class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
