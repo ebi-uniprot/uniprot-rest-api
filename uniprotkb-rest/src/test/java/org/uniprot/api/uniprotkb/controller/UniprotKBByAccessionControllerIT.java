@@ -411,7 +411,10 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
-                                    .resultMatcher(jsonPath("$.entryType", is("Swiss-Prot")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.entryType",
+                                                    is("UniProtKB reviewed (Swiss-Prot)")))
                                     .resultMatcher(jsonPath("$.uniProtkbId", is("PURL_THEEB")))
                                     .build())
                     .contentTypeParam(
