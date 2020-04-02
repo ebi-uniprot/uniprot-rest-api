@@ -35,9 +35,9 @@ public class FakeFacetConfig extends FacetConfig {
         result.put("reviewed", reviewed);
 
         FacetProperty organism = new FacetProperty();
-        organism.setLabel("Popular organisms");
+        organism.setLabel("Model organisms");
         organism.setAllowmultipleselection(true);
-        result.put("popular_organism", organism);
+        result.put("model_organism", organism);
 
         // Interval facet
         FacetProperty length = new FacetProperty();
