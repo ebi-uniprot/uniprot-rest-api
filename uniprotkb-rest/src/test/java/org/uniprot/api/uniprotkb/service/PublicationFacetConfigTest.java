@@ -101,12 +101,12 @@ class PublicationFacetConfigTest {
 
         FacetItem first = items.get(0);
         assertEquals("UniProtKB unreviewed (TrEMBL)", first.getLabel());
-        assertEquals("uniprotkbunreviewedtrembl", first.getValue());
+        assertEquals("uniprotkb_unreviewed_trembl", first.getValue());
         assertEquals(new Long(2L), first.getCount());
 
         FacetItem second = items.get(1);
         assertEquals("UniProtKB reviewed (Swiss-Prot)", second.getLabel());
-        assertEquals("uniprotkbreviewedswissprot", second.getValue());
+        assertEquals("uniprotkb_reviewed_swissprot", second.getValue());
         assertEquals(new Long(1L), second.getCount());
     }
 
@@ -115,7 +115,7 @@ class PublicationFacetConfigTest {
         List<PublicationEntry> publications = getSourcePublicationEntries();
         PublicationRequest request = new PublicationRequest();
         request.setFacets("source");
-        request.setQuery("source:uniprotkbreviewedswissprot");
+        request.setQuery("source:uniprotkb_reviewed_swissprot");
 
         PublicationFacetConfig.applyFacetFilters(publications, request);
 
@@ -143,12 +143,12 @@ class PublicationFacetConfigTest {
 
         FacetItem first = items.get(0);
         assertEquals("Small scale", first.getLabel());
-        assertEquals("smallscale", first.getValue());
+        assertEquals("small_scale", first.getValue());
         assertEquals(new Long(2L), first.getCount());
 
         FacetItem second = items.get(1);
         assertEquals("Large scale", second.getLabel());
-        assertEquals("largescale", second.getValue());
+        assertEquals("large_scale", second.getValue());
         assertEquals(new Long(1L), second.getCount());
     }
 
@@ -157,7 +157,7 @@ class PublicationFacetConfigTest {
         List<PublicationEntry> publications = getScalePublicationEntries();
         PublicationRequest request = new PublicationRequest();
         request.setFacets("study_type");
-        request.setQuery("study_type:smallscale");
+        request.setQuery("study_type:small_scale");
 
         PublicationFacetConfig.applyFacetFilters(publications, request);
 
@@ -219,6 +219,7 @@ class PublicationFacetConfigTest {
                 PublicationEntry.builder()
                         .categories(Arrays.asList("Interation", "Function"))
                         .build());
+        publications.add(PublicationEntry.builder().build());
         return publications;
     }
 

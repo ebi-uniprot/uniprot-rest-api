@@ -25,54 +25,60 @@ public class PublicationFacetConfig extends FacetConfig {
 
     private static final String SMALL_SCALE = "Small scale";
     private static final String LARGE_SCALE = "Large scale";
-    private static final Pattern cleanValueRegex = Pattern.compile("[a-zA-Z]");
+    private static final Pattern CLEAN_VALUE_REGEX = Pattern.compile("[a-zA-Z_]");
 
-    private enum PUBLICATION_FACETS {
-        source("Source"),
-        category("Category"),
-        study_type("Study type");
+    private enum PublicationFacet {
+        SOURCE("source", "Source"),
+        CATEGORY("category", "Category"),
+        STUDY_TYPE("study_type", "Study type");
 
         private String label;
+        private String facetName;
 
-        PUBLICATION_FACETS(String label) {
+        PublicationFacet(String facetName, String label) {
+            this.facetName = facetName;
             this.label = label;
         }
 
         public String getLabel() {
             return label;
         }
+
+        public String getFacetName() {
+            return facetName;
+        }
     }
 
     static List<Facet> getFacets(List<PublicationEntry> publications, String requestFacets) {
         List<Facet> facets = new ArrayList<>();
         if (Utils.notNullNotEmpty(requestFacets)) {
-            if (requestFacets.contains(PUBLICATION_FACETS.source.name())) {
+            if (requestFacets.contains(PublicationFacet.SOURCE.getFacetName())) {
                 Facet source =
                         Facet.builder()
-                                .label(PUBLICATION_FACETS.source.getLabel())
-                                .name(PUBLICATION_FACETS.source.name())
+                                .label(PublicationFacet.SOURCE.getLabel())
+                                .name(PublicationFacet.SOURCE.getFacetName())
                                 .allowMultipleSelection(false)
                                 .values(getSourceFacetValues(publications))
                                 .build();
                 facets.add(source);
             }
 
-            if (requestFacets.contains(PUBLICATION_FACETS.category.name())) {
+            if (requestFacets.contains(PublicationFacet.CATEGORY.getFacetName())) {
                 Facet category =
                         Facet.builder()
-                                .label(PUBLICATION_FACETS.category.getLabel())
-                                .name(PUBLICATION_FACETS.category.name())
+                                .label(PublicationFacet.CATEGORY.getLabel())
+                                .name(PublicationFacet.CATEGORY.getFacetName())
                                 .allowMultipleSelection(false)
                                 .values(getCategoryFacetValues(publications))
                                 .build();
                 facets.add(category);
             }
 
-            if (requestFacets.contains(PUBLICATION_FACETS.study_type.name())) {
+            if (requestFacets.contains(PublicationFacet.STUDY_TYPE.getFacetName())) {
                 Facet studyType =
                         Facet.builder()
-                                .label(PUBLICATION_FACETS.study_type.getLabel())
-                                .name(PUBLICATION_FACETS.study_type.name())
+                                .label(PublicationFacet.STUDY_TYPE.getLabel())
+                                .name(PublicationFacet.STUDY_TYPE.getFacetName())
                                 .allowMultipleSelection(false)
                                 .values(getStudyTypeFacetValues(publications))
                                 .build();
@@ -85,18 +91,20 @@ public class PublicationFacetConfig extends FacetConfig {
     static void applyFacetFilters(List<PublicationEntry> publications, PublicationRequest request) {
         String query = request.getQuery();
         if (Utils.notNullNotEmpty(query)) {
-            if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.source.name())) {
-                String value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.source.name());
+            if (SolrQueryUtil.hasFieldTerms(query, PublicationFacet.SOURCE.getFacetName())) {
+                String value =
+                        SolrQueryUtil.getTermValue(query, PublicationFacet.SOURCE.getFacetName());
                 publications.removeIf(entry -> filterSourceValues(value, entry));
             }
-            if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.category.name())) {
+            if (SolrQueryUtil.hasFieldTerms(query, PublicationFacet.CATEGORY.getFacetName())) {
                 String value =
-                        SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.category.name());
+                        SolrQueryUtil.getTermValue(query, PublicationFacet.CATEGORY.getFacetName());
                 publications.removeIf(entry -> filterCategoryValues(value, entry));
             }
-            if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.study_type.name())) {
+            if (SolrQueryUtil.hasFieldTerms(query, PublicationFacet.STUDY_TYPE.getFacetName())) {
                 String value =
-                        SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.study_type.name());
+                        SolrQueryUtil.getTermValue(
+                                query, PublicationFacet.STUDY_TYPE.getFacetName());
                 publications.removeIf(entry -> filterStudyTypeValues(value, entry));
             }
         }
@@ -108,12 +116,13 @@ public class PublicationFacetConfig extends FacetConfig {
     }
 
     private static boolean filterCategoryValues(String value, PublicationEntry entry) {
-        return entry.getCategories().stream()
-                .noneMatch(
-                        cat -> {
-                            String cleanCategory = getCleanFacetValue(cat);
-                            return cleanCategory.equalsIgnoreCase(value.trim());
-                        });
+        if (Utils.notNullNotEmpty(entry.getCategories())) {
+            return entry.getCategories().stream()
+                    .map(PublicationFacetConfig::getCleanFacetValue)
+                    .noneMatch(category -> category.equalsIgnoreCase(value.trim()));
+        } else {
+            return true;
+        }
     }
 
     private static boolean filterSourceValues(String value, PublicationEntry entry) {
@@ -180,7 +189,8 @@ public class PublicationFacetConfig extends FacetConfig {
 
     private static String getCleanFacetValue(String value) {
         StringBuilder result = new StringBuilder();
-        Matcher m = cleanValueRegex.matcher(value);
+        value = value.replaceAll(" ", "_");
+        Matcher m = CLEAN_VALUE_REGEX.matcher(value);
         while (m.find()) {
             result.append(m.group());
         }
@@ -189,8 +199,8 @@ public class PublicationFacetConfig extends FacetConfig {
 
     @Override
     public Collection<String> getFacetNames() {
-        return Arrays.stream(PUBLICATION_FACETS.values())
-                .map(PUBLICATION_FACETS::name)
+        return Arrays.stream(PublicationFacet.values())
+                .map(PublicationFacet::getFacetName)
                 .collect(Collectors.toList());
     }
 

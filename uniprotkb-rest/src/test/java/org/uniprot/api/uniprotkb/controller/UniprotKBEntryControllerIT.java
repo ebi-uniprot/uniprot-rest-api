@@ -178,7 +178,7 @@ class UniprotKBEntryControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.value",
-                                contains("uniprotkbreviewedswissprot", "computationallymapped")))
+                                contains("uniprotkb_reviewed_swissprot", "computationally_mapped")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 2)))
                 .andExpect(
                         jsonPath(
@@ -195,7 +195,8 @@ class UniprotKBEntryControllerIT {
                                 contains("Large scale", "Small scale")))
                 .andExpect(
                         jsonPath(
-                                "$.facets[2].values.*.value", contains("largescale", "smallscale")))
+                                "$.facets[2].values.*.value",
+                                contains("large_scale", "small_scale")))
                 .andExpect(jsonPath("$.facets[2].values.*.count", contains(4, 1)));
     }
 
@@ -234,7 +235,7 @@ class UniprotKBEntryControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.value",
-                                contains("uniprotkbreviewedswissprot")))
+                                contains("uniprotkb_reviewed_swissprot")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3)))
                 .andExpect(
                         jsonPath("$.facets[1].values.*.label", contains("Interaction", "Pathol")))
@@ -247,7 +248,8 @@ class UniprotKBEntryControllerIT {
                                 contains("Large scale", "Small scale")))
                 .andExpect(
                         jsonPath(
-                                "$.facets[2].values.*.value", contains("largescale", "smallscale")))
+                                "$.facets[2].values.*.value",
+                                contains("large_scale", "small_scale")))
                 .andExpect(jsonPath("$.facets[2].values.*.count", contains(2, 1)));
     }
 
