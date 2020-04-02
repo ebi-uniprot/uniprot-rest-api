@@ -109,6 +109,19 @@ class UniProtConfigureControllerIT {
         validateResponse(response);
     }
 
+    @Test
+    void canGetResultFields2() throws Exception {
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(BASIC_RESOURCE + "/result-fields")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        validateResponse(response);
+    }
+
     private void validateResponse(ResultActions response) throws Exception {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
