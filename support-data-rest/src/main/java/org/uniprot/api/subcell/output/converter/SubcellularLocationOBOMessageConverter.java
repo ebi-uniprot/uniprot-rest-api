@@ -27,7 +27,7 @@ public class SubcellularLocationOBOMessageConverter
     public Frame getTermFrame(SubcellularLocationEntry subcellularLocationEntry) {
         Frame frame = new Frame(Frame.FrameType.TERM);
 
-        frame.setId(subcellularLocationEntry.getAccession());
+        frame.setId(subcellularLocationEntry.getId());
         frame.addClause(getIdClause(subcellularLocationEntry));
         frame.addClause(getNameClause(subcellularLocationEntry));
 
@@ -99,7 +99,7 @@ public class SubcellularLocationOBOMessageConverter
                         + ":"
                         + subcellularLocationEntry
                                 .getCategory()
-                                .toDisplayName()
+                                .getDisplayName()
                                 .toLowerCase()
                                 .replace(' ', '_');
         return new Clause(OBOFormatConstants.OboFormatTag.TAG_NAMESPACE, nameSpace);
@@ -111,22 +111,21 @@ public class SubcellularLocationOBOMessageConverter
     }
 
     private Clause getIdClause(SubcellularLocationEntry subcellularLocationEntry) {
-        return new Clause(
-                OBOFormatConstants.OboFormatTag.TAG_ID, subcellularLocationEntry.getAccession());
+        return new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, subcellularLocationEntry.getId());
     }
 
     private Clause getNameClause(SubcellularLocationEntry subcellularLocationEntry) {
         return new Clause(
-                OBOFormatConstants.OboFormatTag.TAG_NAME, subcellularLocationEntry.getId());
+                OBOFormatConstants.OboFormatTag.TAG_NAME, subcellularLocationEntry.getName());
     }
 
     private Clause getIsAClause(SubcellularLocationEntry isA) {
-        return new Clause(OBOFormatConstants.OboFormatTag.TAG_IS_A, isA.getAccession());
+        return new Clause(OBOFormatConstants.OboFormatTag.TAG_IS_A, isA.getId());
     }
 
     private Clause getRelationshipClause(SubcellularLocationEntry partOf) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, "part_of");
-        clause.addValue(partOf.getAccession());
+        clause.addValue(partOf.getId());
         return clause;
     }
 }

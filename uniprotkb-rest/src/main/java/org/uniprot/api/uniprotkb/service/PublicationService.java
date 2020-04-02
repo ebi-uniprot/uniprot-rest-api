@@ -96,7 +96,7 @@ public class PublicationService {
                             getPublicationEntry(
                                     literatureEntryMap.get(pubmedId),
                                     uniProtkbReference,
-                                    entry.getEntryType().toDisplayName()));
+                                    entry.getEntryType().getDisplayName()));
                 }
             }
         }

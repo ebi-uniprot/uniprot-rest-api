@@ -91,7 +91,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if ("accession".equalsIgnoreCase(searchField)) {
+        if ("id".equalsIgnoreCase(searchField)) {
             return SEARCH_ACCESSION1;
         }
         return value;
@@ -132,8 +132,8 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         KeywordId keyword =
                 new KeywordIdBuilder()
-                        .id("Mental retardation" + suffix)
-                        .accession("KW-0991" + suffix)
+                        .name("Mental retardation" + suffix)
+                        .id("KW-0991" + suffix)
                         .build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
@@ -158,8 +158,8 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                         .build();
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
-                        .id("ZTTK syndrome" + suffix)
-                        .accession(accession)
+                        .name("ZTTK syndrome" + suffix)
+                        .id(accession)
                         .acronym("ZTTKS" + suffix)
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
@@ -187,7 +187,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                 Stream.concat(
                                 Stream.concat(
                                         Stream.of(
-                                                diseaseEntry.getId(),
+                                                diseaseEntry.getName(),
                                                 diseaseEntry.getAcronym(),
                                                 diseaseEntry.getDefinition()),
                                         kwIds.stream()),
@@ -195,10 +195,10 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                         .collect(Collectors.toList());
         // content is name + accession
         List<String> content = new ArrayList<>(name);
-        content.add(diseaseEntry.getAccession());
+        content.add(diseaseEntry.getId());
         DiseaseDocument document =
                 DiseaseDocument.builder()
-                        .accession(accession)
+                        .id(accession)
                         .name(name)
                         .content(content)
                         .diseaseObj(getDiseaseBinary(diseaseEntry))
@@ -231,9 +231,8 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam(
-                            "query", Collections.singletonList("accession:" + SEARCH_ACCESSION1))
-                    .resultMatcher(jsonPath("$.results.*.accession", contains(SEARCH_ACCESSION1)))
+                    .queryParam("query", Collections.singletonList("id:" + SEARCH_ACCESSION1))
+                    .resultMatcher(jsonPath("$.results.*.id", contains(SEARCH_ACCESSION1)))
                     .resultMatcher(jsonPath("$.results.length()", is(1)))
                     .build();
         }
@@ -241,7 +240,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchCanReturnNotFoundParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("accession:DI-00000"))
+                    .queryParam("query", Collections.singletonList("id:DI-00000"))
                     .resultMatcher(jsonPath("$.results.size()", is(0)))
                     .build();
         }
@@ -249,10 +248,10 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("accession:*"))
+                    .queryParam("query", Collections.singletonList("id:*"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.size()", is(2)))
                     .build();
@@ -276,8 +275,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
             return SearchParameter.builder()
                     .queryParam(
                             "query",
-                            Collections.singletonList(
-                                    "accession:[INVALID to INVALID123] OR name:123"))
+                            Collections.singletonList("id:[INVALID to INVALID123] OR name:123"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -291,10 +289,10 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
             Collections.sort(SORTED_ACCESSIONS);
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("sort", Collections.singletonList("accession asc"))
+                    .queryParam("sort", Collections.singletonList("id asc"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     contains(SORTED_ACCESSIONS.get(0), SORTED_ACCESSIONS.get(1))))
                     .build();
         }
@@ -303,13 +301,13 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("accession,id"))
+                    .queryParam("fields", Collections.singletonList("name,id"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
+                    .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();
         }
 
@@ -318,13 +316,13 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("reviewed"))
-                    .queryParam("fields", Collections.singletonList("accession,id"))
+                    .queryParam("fields", Collections.singletonList("name,id"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
+                    .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();
         }
     }

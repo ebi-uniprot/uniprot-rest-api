@@ -15,7 +15,7 @@ public class CrossRefEntryConverter implements Function<CrossRefDocument, CrossR
     @Override
     public CrossRefEntry apply(CrossRefDocument crossRefDocument) {
         CrossRefEntryBuilder builder = new CrossRefEntryBuilder();
-        return builder.accession(crossRefDocument.getAccession())
+        return builder.id(crossRefDocument.getId())
                 .abbrev(crossRefDocument.getAbbrev())
                 .name(crossRefDocument.getName())
                 .pubMedId(crossRefDocument.getPubMedId())

@@ -45,7 +45,7 @@ class CrossRefControllerTest {
                                 .header(HttpHeaders.ACCEPT, APPLICATION_JSON_VALUE));
 
         response.andDo(MockMvcResultHandlers.print())
-                .andExpect(jsonPath("$.accession", equalTo(crossRef.getAccession())))
+                .andExpect(jsonPath("$.id", equalTo(crossRef.getId())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
                 .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))
                 .andExpect(jsonPath("$.pubMedId", equalTo(crossRef.getPubMedId())))
@@ -81,7 +81,7 @@ class CrossRefControllerTest {
         String ct = random + "-CT-";
 
         CrossRefEntryBuilder builder = new CrossRefEntryBuilder();
-        builder.abbrev(ab).accession(ac).category(ct).dbUrl(du);
+        builder.abbrev(ab).id(ac).category(ct).dbUrl(du);
         builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
         builder.reviewedProteinCount(2L).unreviewedProteinCount(3L);
         return builder.build();
