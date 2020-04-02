@@ -1,8 +1,14 @@
 package org.uniprot.api.rest.request;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.createUnknownMediaTypeForFileExtension;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.MimeType;
+import org.springframework.web.servlet.HandlerMapping;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.core.util.Utils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,16 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.MimeType;
-import org.springframework.web.servlet.HandlerMapping;
-import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.core.util.Utils;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.createUnknownMediaTypeForFileExtension;
 
 /**
  * A helper class that mutates an {@link HttpServletRequest} based on its values, and if necessary

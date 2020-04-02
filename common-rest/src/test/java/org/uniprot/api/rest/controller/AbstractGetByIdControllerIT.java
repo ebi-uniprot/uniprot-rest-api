@@ -320,9 +320,13 @@ public abstract class AbstractGetByIdControllerIT {
 
         // then
         response.andDo(print())
-                .andExpect(status().is(HttpStatus.NOT_ACCEPTABLE.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, nullValue()))
-                .andExpect(content().string(isEmptyString()));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid request received. Unknown format requested: 'xxxx'")));
     }
 
     protected DataStoreManager getStoreManager() {
