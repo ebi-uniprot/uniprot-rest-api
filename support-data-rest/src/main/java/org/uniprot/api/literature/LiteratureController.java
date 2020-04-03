@@ -21,7 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.literature.request.LiteratureRequestDTO;
+import org.uniprot.api.literature.request.LiteratureRequest;
 import org.uniprot.api.literature.service.LiteratureService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -29,7 +29,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.store.search.field.LiteratureField;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author lgonzales
@@ -73,7 +73,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.literature.invalid.id}")
                     String literatureId,
-            @ValidReturnFields(fieldValidatorClazz = LiteratureField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -91,7 +91,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> search(
-            @Valid LiteratureRequestDTO searchRequest,
+            @Valid LiteratureRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
@@ -108,7 +108,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> download(
-            @Valid LiteratureRequestDTO searchRequest,
+            @Valid LiteratureRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

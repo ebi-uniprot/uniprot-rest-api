@@ -40,7 +40,10 @@ public class DiseaseDownloadFieldsIT extends BaseDiseaseDownloadIT {
                     "alternative_names", "cross_references", "keywords", "reviewed_protein_count");
     private static final List<String> NON_DEFAULT_RETURNED_FIELDS =
             Arrays.asList(
-                    "Alternative Names", "Cross Reference", "Keywords", "Reviewed Protein Count");
+                    "Alternative Names",
+                    "Cross Reference",
+                    "Keywords",
+                    "UniProtKB reviewed (Swiss-Prot) protein count");
     private static final List<String> NON_DEFAULT_RETURNED_FIELDS_JSON =
             Arrays.asList(
                     "alternativeNames", "crossReferences", "keywords", "reviewedProteinCount");

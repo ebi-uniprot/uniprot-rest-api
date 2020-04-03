@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,13 +31,14 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.support_data.SupportDataApplication;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
-import org.uniprot.store.search.field.CrossRefField;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -107,10 +107,9 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Arrays.stream(CrossRefField.ResultFields.values())
-                .map(CrossRefField.ResultFields::name)
-                .collect(Collectors.toList());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.CROSSREF)
+                .getReturnFields();
     }
 
     @Override
@@ -247,6 +246,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                                     "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();
         }

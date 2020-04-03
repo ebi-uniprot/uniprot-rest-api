@@ -27,6 +27,11 @@
 			<version>${uniprot-store.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>core-parser</artifactId>
+			<version>${uniprot-core.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-datastore</artifactId>
 			<version>${uniprot-store.version}</version>
@@ -149,6 +154,13 @@
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-oboformat</artifactId>
 			<version>5.1.11</version>
+		</dependency>
+
+		<!-- json filter content by json path -->
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<version>2.4.0</version>
 		</dependency>
 		<!-- Tests -->
 

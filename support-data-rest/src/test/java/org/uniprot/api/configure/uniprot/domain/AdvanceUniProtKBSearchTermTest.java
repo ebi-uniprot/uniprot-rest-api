@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
-public class AdvanceUniProtKBSearchTermTest {
+class AdvanceUniProtKBSearchTermTest {
 
     private static SearchFieldConfig fieldConfig;
 

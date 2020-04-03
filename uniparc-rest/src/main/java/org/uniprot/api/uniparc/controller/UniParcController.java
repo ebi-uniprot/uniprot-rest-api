@@ -29,7 +29,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.request.UniParcRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.store.search.field.UniParcResultFields;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
@@ -94,7 +94,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upi.value}")
                     String upi,
-            @ValidReturnFields(fieldValidatorClazz = UniParcResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

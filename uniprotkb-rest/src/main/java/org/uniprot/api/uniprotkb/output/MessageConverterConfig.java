@@ -20,13 +20,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.RDFMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.output.converter.*;
+import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
  * Created 21/08/18
@@ -64,6 +66,14 @@ public class MessageConverterConfig {
      */
     @Bean
     public WebMvcConfigurer extendedMessageConverters() {
+        ReturnFieldConfig returnConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+        JsonMessageConverter<UniProtKBEntry> jsonMessageConverter =
+                new JsonMessageConverter<>(
+                        UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
+                        UniProtKBEntry.class,
+                        returnConfig);
+
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -72,12 +82,20 @@ public class MessageConverterConfig {
                 converters.add(new ListMessageConverter());
                 converters.add(new RDFMessageConverter());
                 converters.add(new UniProtKBGffMessageConverter());
-                converters.add(new UniProtKBTsvMessageConverter());
-                converters.add(new UniProtKBXslMessageConverter());
+                converters.add(
+                        new TsvMessageConverter<>(
+                                UniProtKBEntry.class,
+                                returnConfig,
+                                new UniProtKBEntryValueMapper()));
+                converters.add(
+                        new XslMessageConverter<>(
+                                UniProtKBEntry.class,
+                                returnConfig,
+                                new UniProtKBEntryValueMapper()));
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(0, new UniProtKBXmlMessageConverter());
-                converters.add(1, new UniProtKBJsonMessageConverter());
+                converters.add(1, jsonMessageConverter);
                 converters.add(2, new PublicationJsonMessageConverter());
             }
         };

@@ -45,17 +45,16 @@ import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.UniParcResultFields;
-
-import com.beust.jcommander.internal.Lists;
 
 /**
  * @author jluo
@@ -145,8 +144,9 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Lists.newArrayList(UniParcResultFields.INSTANCE.getAllFields().keySet());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC)
+                .getReturnFields();
     }
 
     @BeforeAll
@@ -197,7 +197,13 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
         Sequence sequence = new SequenceBuilder(seq).build();
         List<UniParcCrossReference> xrefs = getXrefs(i);
-        List<SequenceFeature> seqFeatures = getSeqFeatures(i);
+
+        List<SequenceFeature> seqFeatures = new ArrayList<>();
+        Arrays.stream(SignatureDbType.values())
+                .forEach(
+                        signatureType -> {
+                            seqFeatures.add(getSeqFeature(i, signatureType));
+                        });
         List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
                 .uniParcId(new UniParcIdBuilder(getName(UPI_PREF, i)).build())
@@ -215,23 +221,19 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         return Arrays.asList(taxonomy, taxonomy2);
     }
 
-    private List<SequenceFeature> getSeqFeatures(int i) {
+    private SequenceFeature getSeqFeature(int i, SignatureDbType signatureDbType) {
         List<Location> locations = Arrays.asList(new Location(12, 23), new Location(45, 89));
         InterProGroup domain =
                 new InterProGroupBuilder()
                         .name(getName("Inter Pro Name", i))
                         .id(getName("IP0000", i))
                         .build();
-        SequenceFeature sf =
-                new SequenceFeatureBuilder()
-                        .interproGroup(domain)
-                        .signatureDbType(SignatureDbType.PFAM)
-                        .signatureDbId(getName("SIG0000", i))
-                        .locationsSet(locations)
-                        .build();
-        SequenceFeature sf3 =
-                SequenceFeatureBuilder.from(sf).signatureDbType(SignatureDbType.PROSITE).build();
-        return Arrays.asList(sf, sf3);
+        return new SequenceFeatureBuilder()
+                .interproGroup(domain)
+                .signatureDbType(signatureDbType)
+                .signatureDbId(getName("SIG0000", i))
+                .locationsSet(locations)
+                .build();
     }
 
     private List<UniParcCrossReference> getXrefs(int i) {
@@ -241,6 +243,12 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                         UniParcCrossReference.PROPERTY_PROTEIN_NAME, getName("proteinName", i)));
         properties.add(
                 new Property(UniParcCrossReference.PROPERTY_GENE_NAME, getName("geneName", i)));
+        properties.add(
+                new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, getName("proteomeId", i)));
+        properties.add(
+                new Property(
+                        UniParcCrossReference.PROPERTY_UNIPROT_KB_ACCESSION,
+                        getName("accession", i)));
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
                         .versionI(3)
@@ -354,11 +362,18 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("organism"))
+                    .queryParam("fields", Collections.singletonList("upi,gene"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
+                    .resultMatcher(
+                            jsonPath(
+                                            "$.results[*].uniParcCrossReferences[*].properties[?(@.key=='gene_name')]")
+                                    .hasJsonPath())
+                    .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].taxonomies").doesNotExist())
                     .build();
         }
 

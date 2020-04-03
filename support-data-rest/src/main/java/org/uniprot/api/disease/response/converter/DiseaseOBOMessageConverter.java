@@ -6,12 +6,12 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
-import org.uniprot.api.rest.output.converter.AbstractOBOMessagerConverter;
+import org.uniprot.api.rest.output.converter.AbstractOBOMessageConverter;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.util.Utils;
 
-public class DiseaseOBOMessageConverter extends AbstractOBOMessagerConverter<DiseaseEntry> {
+public class DiseaseOBOMessageConverter extends AbstractOBOMessageConverter<DiseaseEntry> {
     private static final String DISEASE_NAMESPACE = "uniprot:diseases";
 
     public DiseaseOBOMessageConverter() {

@@ -10,8 +10,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.search.field.DiseaseField;
+import org.uniprot.store.config.UniProtDataType;
 
 @Data
 public class DiseaseSearchRequest implements SearchRequest {
@@ -30,7 +29,7 @@ public class DiseaseSearchRequest implements SearchRequest {
     @Positive(message = "{search.positive}")
     private Integer size;
 
-    @ValidReturnFields(fieldValidatorClazz = DiseaseField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
     private String fields;
 
     @Override

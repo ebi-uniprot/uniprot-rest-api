@@ -30,10 +30,9 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.search.field.GeneCentricField;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
@@ -102,7 +101,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ValidReturnFields(fieldValidatorClazz = GeneCentricField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

@@ -6,10 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,17 +28,21 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.core.cv.go.impl.GoTermBuilder;
+import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.cv.subcell.SubcellLocationCategory;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.core.cv.subcell.impl.SubcellularLocationEntryBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.subcell.SubcellularLocationJsonConfig;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
-import org.uniprot.store.search.field.SubcellularLocationField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -109,10 +111,9 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Arrays.stream(SubcellularLocationField.ResultFields.values())
-                .map(SubcellularLocationField.ResultFields::name)
-                .collect(Collectors.toList());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.SUBCELLLOCATION)
+                .getReturnFields();
     }
 
     @Override
@@ -133,6 +134,24 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                         .id(accession)
                         .category(SubcellLocationCategory.LOCATION)
                         .definition("Definition value " + accession)
+                        .synonymsAdd("syn value")
+                        .content("content value")
+                        .note("note value")
+                        .referencesAdd("reference value")
+                        .linksAdd("link value")
+                        .isAAdd(
+                                new SubcellularLocationEntryBuilder()
+                                        .name("is a id")
+                                        .id("SL-0002")
+                                        .build())
+                        .partOfAdd(
+                                (new SubcellularLocationEntryBuilder()
+                                        .name("part id id")
+                                        .id("SL-0003")
+                                        .build()))
+                        .geneOntologiesAdd(new GoTermBuilder().id("goId").name("goName").build())
+                        .keyword(new KeywordIdBuilder().id("kaccession").name("kid").build())
+                        .statistics(new StatisticsBuilder().build())
                         .build();
 
         SubcellularLocationDocument document =
@@ -259,12 +278,12 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,category"))
+                    .queryParam("fields", Collections.singletonList("id,name,category"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.name",
                                     contains("Name value SL-0001", "Name value SL-0002")))
-                    .resultMatcher(jsonPath("$.results.*.id").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.id").exists()) // required
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.category",

@@ -20,11 +20,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniref.output.converter.*;
+import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
+import org.uniprot.core.parser.tsv.uniref.UniRefEntryValueMapper;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
  * @author jluo
@@ -60,14 +63,26 @@ public class UniRefMessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+                ReturnFieldConfig returnConfig =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF);
+
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
                 converters.add(new UniRefFastaMessageConverter());
-                converters.add(new UniRefTsvMessageConverter());
-                converters.add(new UniRefXslMessageConverter());
+                converters.add(
+                        new TsvMessageConverter<>(
+                                UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
+                converters.add(
+                        new XslMessageConverter<>(
+                                UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
 
-                converters.add(0, new UniRefJsonMessageConverter());
+                JsonMessageConverter<UniRefEntry> unirefJsonMessageConverter =
+                        new JsonMessageConverter<>(
+                                UniRefEntryJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniRefEntry.class,
+                                returnConfig);
+                converters.add(0, unirefJsonMessageConverter);
                 converters.add(1, new UniRefXmlMessageConverter("", ""));
             }
         };

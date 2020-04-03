@@ -8,11 +8,7 @@ import lombok.Data;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.search.field.ProteomeField;
-import org.uniprot.store.search.field.ProteomeResultFields;
-
-import com.google.common.base.Strings;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author jluo
@@ -32,7 +28,7 @@ public class ProteomeRequest implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = ProteomeResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String fields;
 
     @ValidFacets(facetConfig = ProteomeFacetConfig.class)
@@ -40,17 +36,4 @@ public class ProteomeRequest implements SearchRequest {
 
     @Positive(message = "{search.positive}")
     private Integer size;
-
-    public static final String DEFAULT_FIELDS = "upid,organism,organism_id,protein_count";
-
-    @Override
-    public String getFields() {
-        if (Strings.isNullOrEmpty(fields)) {
-            fields = DEFAULT_FIELDS;
-        } else if (!fields.contains(ProteomeField.Return.upid.name())) {
-            String temp = "upid," + fields;
-            this.fields = temp;
-        }
-        return fields;
-    }
 }

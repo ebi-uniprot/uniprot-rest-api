@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,14 +41,16 @@ import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
+import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
 import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-import org.uniprot.store.search.field.LiteratureField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -119,10 +120,9 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Arrays.stream(LiteratureField.ResultFields.values())
-                .map(LiteratureField.ResultFields::name)
-                .collect(Collectors.toList());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.LITERATURE)
+                .getReturnFields();
     }
 
     @Override
@@ -154,13 +154,22 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                 new LiteratureBuilder()
                         .citationCrossReferencesAdd(pubmed)
                         .citationCrossReferencesAdd(doi)
+                        .authoringGroupsAdd("group value")
                         .title("title " + pubMedId)
                         .authorsAdd(new AuthorBuilder("author " + pubMedId).build())
                         .journalName("journal " + pubMedId)
+                        .firstPage("firstPage value")
+                        .lastPage("lastPage value")
+                        .volume("volume value")
+                        .literatureAbstract("literatureAbstract value")
                         .publicationDate(new PublicationDateBuilder("2019").build())
                         .build();
 
-        LiteratureEntry entry = new LiteratureEntryBuilder().citation(literature).build();
+        LiteratureEntry entry =
+                new LiteratureEntryBuilder()
+                        .citation(literature)
+                        .statistics(new LiteratureStatisticsBuilder().build())
+                        .build();
 
         LiteratureStoreEntry storeEntry =
                 new LiteratureStoreEntryBuilder().literatureEntry(entry).build();
@@ -362,12 +371,12 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "10\ttitle 10\tjournal 10:(2019)")))
+                                                                    "10\ttitle 10\tjournal 10 volume value:firstPage value-lastPage value(2019)\tliteratureAbstract value")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "20\ttitle 20\tjournal 20:(2019)")))
+                                                                    "20\ttitle 20\tjournal 20 volume value:firstPage value-lastPage value(2019)\tliteratureAbstract value")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

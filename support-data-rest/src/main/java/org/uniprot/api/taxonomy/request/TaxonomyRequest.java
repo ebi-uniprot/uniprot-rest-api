@@ -8,11 +8,10 @@ import lombok.Data;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.search.field.TaxonomyField;
+import org.uniprot.store.config.UniProtDataType;
 
 @Data
-public class TaxonomyRequestDTO implements SearchRequest {
+public class TaxonomyRequest implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
@@ -26,7 +25,7 @@ public class TaxonomyRequestDTO implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = TaxonomyField.ResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)

@@ -4,12 +4,10 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.*;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,10 +40,8 @@ import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-import org.uniprot.store.search.field.ProteomeField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo
@@ -174,12 +170,7 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(UPID)
-                    .resultMatcher(jsonPath("$.id.value", is(UPID)))
-                    //
-                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                    //	                    .resultMatcher(jsonPath("$.commonName",is("common")))
-                    //	                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                    //	                    .resultMatcher(jsonPath("$.links",contains("link")))
+                    .resultMatcher(jsonPath("$.id", is(UPID)))
                     .build();
         }
 
@@ -210,12 +201,8 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(UPID)
                     .fields("upid,organism")
-                    .resultMatcher(jsonPath("$.id.value", is(UPID)))
-                    //
-                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                    //	                    .resultMatcher(jsonPath("$.commonName").doesNotExist())
-                    //	                    .resultMatcher(jsonPath("$.mnemonic").doesNotExist())
-                    //	                    .resultMatcher(jsonPath("$.links").doesNotExist())
+                    .resultMatcher(jsonPath("$.id", is(UPID)))
+                    .resultMatcher(jsonPath("$.taxonomy.taxonId", is(9606)))
                     .build();
         }
 
@@ -231,44 +218,6 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
-
-        @Override
-        public GetIdParameter withValidResponseFieldsOrderParameter() {
-            return GetIdParameter.builder()
-                    .id(UPID)
-                    .resultMatcher(
-                            result -> {
-                                String contentAsString = result.getResponse().getContentAsString();
-                                try {
-                                    Map<String, Object> responseMap =
-                                            new ObjectMapper()
-                                                    .readValue(
-                                                            contentAsString, LinkedHashMap.class);
-                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    List<String> expectedList = getFieldsInOrder();
-                                    Assertions.assertEquals(expectedList.size(), actualList.size());
-                                    Assertions.assertEquals(expectedList, actualList);
-                                } catch (IOException e) {
-                                    Assertions.fail(e.getMessage());
-                                }
-                            })
-                    .build();
-        }
-
-        private List<String> getFieldsInOrder() {
-            List<String> fields = new LinkedList<>();
-            fields.add(ProteomeField.ResultFields.id.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.description.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.taxonomy.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.modified.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.proteomeType.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.dbXReferences.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.components.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.annotationScore.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.superkingdom.getJavaFieldName());
-            fields.add(ProteomeField.ResultFields.geneCount.getJavaFieldName());
-            return fields;
-        }
     }
 
     static class ProteomeGetIdContentTypeParamResolver
@@ -281,28 +230,12 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.id.value", is(UPID)))
-                                    //
-                                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.commonName",is("common")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.links",contains("link")))
+                                    .resultMatcher(jsonPath("$.id", is(UPID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(content().string(containsString(UPID)))
-                                    //
-                                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.commonName",is("common")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                                    //
-                                    // .resultMatcher(jsonPath("$.links",contains("link")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -316,7 +249,7 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Proteome ID\tOrganism\tOrganism ID\tProtein count")))
+                                                                    "Proteome Id\tOrganism\tOrganism Id\tProtein count")))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -340,9 +273,6 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
-                                    //      .resultMatcher(jsonPath("$.messages.*",contains("The
-                                    // 'upid' value has invalid format. It should be a valid
-                                    // Proteome UPID")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

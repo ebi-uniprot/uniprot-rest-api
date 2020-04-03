@@ -5,7 +5,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,31 +16,35 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.parser.tsv.EntityValueMapper;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 
 /**
  * @author jluo
  * @date: 1 May 2019
  */
-public abstract class AbstractXslMessegerConverter<T>
-        extends AbstractEntityHttpMessageConverter<T> {
-    private static final Logger LOGGER = getLogger(AbstractXslMessegerConverter.class);
+public class XslMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
+    private static final Logger LOGGER = getLogger(XslMessageConverter.class);
     private ThreadLocal<SXSSFWorkbook> tlWorkBook = new ThreadLocal<>();
     private ThreadLocal<SXSSFSheet> tlSheet = new ThreadLocal<>();
     private ThreadLocal<AtomicInteger> tlCounter = new ThreadLocal<>();
+    private ReturnFieldConfig fieldConfig;
+    private EntityValueMapper<T> entityMapper;
+    private ThreadLocal<List<ReturnField>> tlFields = new ThreadLocal<>();
 
-    public AbstractXslMessegerConverter(Class<T> messageConverterEntryClass) {
+    public XslMessageConverter(
+            Class<T> messageConverterEntryClass,
+            ReturnFieldConfig fieldConfig,
+            EntityValueMapper<T> entityMapper) {
         super(UniProtMediaType.XLS_MEDIA_TYPE, messageConverterEntryClass);
+        this.fieldConfig = fieldConfig;
+        this.entityMapper = entityMapper;
     }
-
-    protected abstract List<String> entry2TsvStrings(T entity);
-
-    protected abstract List<String> getHeader();
-
-    protected abstract void initBefore(MessageConverterContext<T> context);
 
     @Override
     protected void before(MessageConverterContext<T> context, OutputStream outputStream) {
-        initBefore(context);
+        tlFields.set(OutputFieldsParser.parse(context.getFields(), fieldConfig));
         SXSSFWorkbook workbook = new SXSSFWorkbook(500);
         tlWorkBook.set(workbook);
         tlSheet.set(workbook.createSheet());
@@ -66,10 +72,22 @@ public abstract class AbstractXslMessegerConverter<T>
 
     @Override
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
-        List<String> result = entry2TsvStrings(entity);
+        Map<String, String> resultMap = getMappedEntity(entity);
+        List<String> result = OutputFieldsParser.getData(resultMap, tlFields.get());
 
         Row row = tlSheet.get().createRow(tlCounter.get().incrementAndGet());
         updateRow(row, result);
+    }
+
+    private Map<String, String> getMappedEntity(T entity) {
+        List<String> fieldNames =
+                tlFields.get().stream().map(ReturnField::getName).collect(Collectors.toList());
+        return entityMapper.mapEntity(entity, fieldNames);
+    }
+
+    protected List<String> getHeader() {
+        List<ReturnField> fields = tlFields.get();
+        return fields.stream().map(ReturnField::getLabel).collect(Collectors.toList());
     }
 
     private void updateRow(Row row, List<String> result) {

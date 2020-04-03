@@ -35,13 +35,14 @@ import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
-import org.uniprot.store.search.field.DiseaseField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -103,10 +104,9 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Arrays.stream(DiseaseField.ResultFields.values())
-                .map(DiseaseField.ResultFields::name)
-                .collect(Collectors.toList());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.DISEASE)
+                .getReturnFields();
     }
 
     @Override
@@ -301,13 +301,15 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("name,id"))
+                    .queryParam("fields", Collections.singletonList("id,name,definition"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
+                    .resultMatcher(jsonPath("$.results.*.id").exists())
+                    .resultMatcher(jsonPath("$.results.*.name").exists())
+                    .resultMatcher(jsonPath("$.results.*.definition").exists())
                     .build();
         }
 
@@ -316,12 +318,10 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("reviewed"))
-                    .queryParam("fields", Collections.singletonList("name,id"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
-                    .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();
         }

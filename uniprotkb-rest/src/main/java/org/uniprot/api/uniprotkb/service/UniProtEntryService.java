@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -15,9 +14,9 @@ import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
-import org.uniprot.api.uniprotkb.controller.request.FieldsParser;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
@@ -25,9 +24,12 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -42,6 +44,7 @@ public class UniProtEntryService
     private UniprotQueryRepository repository;
     private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
+    private final ReturnFieldConfig returnFieldConfig;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -65,6 +68,8 @@ public class UniProtEntryService
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+        this.returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @Override
@@ -74,9 +79,8 @@ public class UniProtEntryService
 
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
-
-        return resultsConverter.convertQueryResult(
-                results, FieldsParser.parseForFilters(request.getFields()));
+        List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
+        return resultsConverter.convertQueryResult(results, fields);
     }
 
     @Override
@@ -92,7 +96,7 @@ public class UniProtEntryService
     @Override
     public UniProtKBEntry findByUniqueId(String accession, String fields) {
         try {
-            Map<String, List<String>> filters = FieldsParser.parseForFilters(fields);
+            List<ReturnField> fieldList = OutputFieldsParser.parse(fields, returnFieldConfig);
             SolrRequest solrRequest =
                     SolrRequest.builder()
                             .query(ACCESSION + ":" + accession.toUpperCase())
@@ -101,7 +105,7 @@ public class UniProtEntryService
             Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
             Optional<UniProtKBEntry> optionalUniProtEntry =
                     optionalDoc
-                            .map(doc -> resultsConverter.convertDoc(doc, filters))
+                            .map(doc -> resultsConverter.convertDoc(doc, fieldList))
                             .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
 
             return optionalUniProtEntry.orElseThrow(

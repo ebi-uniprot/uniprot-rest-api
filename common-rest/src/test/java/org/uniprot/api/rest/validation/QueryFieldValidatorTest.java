@@ -11,7 +11,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.model.SearchFieldType;
 
 /**

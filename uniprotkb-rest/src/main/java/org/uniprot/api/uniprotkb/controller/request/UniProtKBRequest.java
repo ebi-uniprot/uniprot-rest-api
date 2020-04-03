@@ -15,8 +15,7 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.search.domain.impl.UniProtResultFields;
+import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +32,9 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniProtKBRequest implements SearchRequest {
+    public static String DEFAULT_FIELDS =
+            "accession,id,reviewed,protein_name,gene_names,organism,length";
+
     @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_query_param_meta.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
@@ -44,7 +46,7 @@ public class UniProtKBRequest implements SearchRequest {
 
     @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
-    @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
     @Parameter(description = "Name of the field to be sorted on")

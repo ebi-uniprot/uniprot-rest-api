@@ -29,7 +29,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniref.request.UniRefRequest;
 import org.uniprot.api.uniref.service.UniRefQueryService;
 import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.store.search.field.UniRefResultFields;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
@@ -75,7 +75,7 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.id.value}")
                     String id,
-            @ValidReturnFields(fieldValidatorClazz = UniRefResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
