@@ -95,7 +95,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if ("accession".equalsIgnoreCase(searchField)) {
+        if ("id".equalsIgnoreCase(searchField)) {
             return SEARCH_ACCESSION1;
         }
         return value;
@@ -134,7 +134,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
         CrossRefEntry crossRefEntry =
                 entryBuilder
-                        .accession(accession)
+                        .id(accession)
                         .abbrev("TIGRFAMs" + suffix)
                         .name("TIGRFAMs; a protein family database" + suffix)
                         .pubMedId("17151080" + suffix)
@@ -149,7 +149,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
         CrossRefDocument document =
                 CrossRefDocument.builder()
-                        .accession(crossRefEntry.getAccession())
+                        .id(crossRefEntry.getId())
                         .abbrev(crossRefEntry.getAbbrev())
                         .name(crossRefEntry.getName())
                         .pubMedId(crossRefEntry.getPubMedId())
@@ -170,9 +170,8 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam(
-                            "query", Collections.singletonList("accession:" + SEARCH_ACCESSION1))
-                    .resultMatcher(jsonPath("$.results.*.accession", contains(SEARCH_ACCESSION1)))
+                    .queryParam("query", Collections.singletonList("id:" + SEARCH_ACCESSION1))
+                    .resultMatcher(jsonPath("$.results.*.id", contains(SEARCH_ACCESSION1)))
                     .resultMatcher(jsonPath("$.results.length()", is(1)))
                     .build();
         }
@@ -180,7 +179,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         @Override
         protected SearchParameter searchCanReturnNotFoundParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("accession:DB-0000"))
+                    .queryParam("query", Collections.singletonList("id:DB-0000"))
                     .resultMatcher(jsonPath("$.results.size()", is(0)))
                     .build();
         }
@@ -188,10 +187,10 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         @Override
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("accession:*"))
+                    .queryParam("query", Collections.singletonList("id:*"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.size()", is(2)))
                     .build();
@@ -215,8 +214,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
             return SearchParameter.builder()
                     .queryParam(
                             "query",
-                            Collections.singletonList(
-                                    "accession:[INVALID to INVALID123] OR name:123"))
+                            Collections.singletonList("id:[INVALID to INVALID123] OR name:123"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -230,10 +228,10 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
             Collections.sort(SORTED_ACCESSIONS);
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("sort", Collections.singletonList("accession asc"))
+                    .queryParam("sort", Collections.singletonList("id asc"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     contains(SORTED_ACCESSIONS.get(0), SORTED_ACCESSIONS.get(1))))
                     .build();
         }
@@ -245,11 +243,11 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                     .queryParam("fields", Collections.singletonList("id,name"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
-                    .resultMatcher(jsonPath("$.results.*.accession", notNullValue()))
+                    .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();
         }
 
@@ -266,7 +264,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                                             "Family and domain databases10")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.accession",
+                                    "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
@@ -281,13 +279,13 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("accession:" + SEARCH_ACCESSION1 + " OR accession:" + SEARCH_ACCESSION2)
+                    .query("id:" + SEARCH_ACCESSION1 + " OR id:" + SEARCH_ACCESSION2)
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.accession",
+                                                    "$.results.*.id",
                                                     containsInAnyOrder(
                                                             SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                                     .build())

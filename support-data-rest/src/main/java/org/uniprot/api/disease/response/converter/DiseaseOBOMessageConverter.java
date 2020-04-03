@@ -22,7 +22,7 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessageConverter<Dise
     public Frame getTermFrame(DiseaseEntry diseaseEntry) {
         Frame frame = new Frame(Frame.FrameType.TERM);
 
-        frame.setId(diseaseEntry.getAccession());
+        frame.setId(diseaseEntry.getId());
         frame.addClause(getIdClause(diseaseEntry));
         frame.addClause(getNameClause(diseaseEntry));
 
@@ -61,12 +61,12 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessageConverter<Dise
     }
 
     public Clause getIdClause(DiseaseEntry disease) {
-        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, disease.getAccession());
+        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, disease.getId());
         return clause;
     }
 
     public Clause getNameClause(DiseaseEntry disease) {
-        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, disease.getId());
+        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, disease.getName());
         return clause;
     }
 

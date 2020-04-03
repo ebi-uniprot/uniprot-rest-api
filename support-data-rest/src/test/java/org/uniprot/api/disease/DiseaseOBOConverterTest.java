@@ -68,8 +68,8 @@ class DiseaseOBOConverterTest {
                 new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
         DiseaseEntry diseaseEntry1 =
                 diseaseBuilder
-                        .id("ZTTK syndrome")
-                        .accession("DI-04860")
+                        .name("ZTTK syndrome")
+                        .id("DI-04860")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
                         .alternativeNamesSet(
@@ -93,8 +93,8 @@ class DiseaseOBOConverterTest {
                 new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000592").build();
         DiseaseEntry diseaseEntry2 =
                 diseaseBuilder
-                        .id("2-aminoadipic 2-oxoadipic aciduria")
-                        .accession("DI-03673")
+                        .name("2-aminoadipic 2-oxoadipic aciduria")
+                        .id("DI-03673")
                         .definition(
                                 "A metabolic disorder characterized by increased levels of 2-oxoadipate and 2-hydroxyadipate in the urine, and elevated 2-aminoadipate in the plasma. Patients can have mild to severe intellectual disability, muscular hypotonia, developmental delay, ataxia, and epilepsy. Most cases are asymptomatic.")
                         .crossReferencesSet(Arrays.asList(xref11, xref22, xref33))

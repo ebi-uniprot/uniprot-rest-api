@@ -58,12 +58,12 @@ class PublicationFacetConfigTest {
         assertEquals(3, items.size());
 
         FacetItem first = items.get(0);
-        assertNull(first.getLabel());
+        assertEquals("Function", first.getLabel());
         assertEquals("function", first.getValue());
         assertEquals(new Long(2L), first.getCount());
 
         FacetItem second = items.get(1);
-        assertNull(second.getLabel());
+        assertEquals("Interation", second.getLabel());
         assertEquals("interation", second.getValue());
         assertEquals(new Long(1L), second.getCount());
     }
@@ -81,7 +81,7 @@ class PublicationFacetConfigTest {
         assertEquals(1, publications.size());
 
         PublicationEntry entry = publications.get(0);
-        assertTrue(entry.getCategories().contains("ptm"));
+        assertTrue(entry.getCategories().contains("PTM"));
     }
 
     @Test
@@ -100,13 +100,13 @@ class PublicationFacetConfigTest {
         assertEquals(2, items.size());
 
         FacetItem first = items.get(0);
-        assertNull(first.getLabel());
-        assertEquals("source2", first.getValue());
+        assertEquals("UniProtKB unreviewed (TrEMBL)", first.getLabel());
+        assertEquals("uniprotkb_unreviewed_trembl", first.getValue());
         assertEquals(new Long(2L), first.getCount());
 
         FacetItem second = items.get(1);
-        assertNull(second.getLabel());
-        assertEquals("source1", second.getValue());
+        assertEquals("UniProtKB reviewed (Swiss-Prot)", second.getLabel());
+        assertEquals("uniprotkb_reviewed_swissprot", second.getValue());
         assertEquals(new Long(1L), second.getCount());
     }
 
@@ -115,7 +115,7 @@ class PublicationFacetConfigTest {
         List<PublicationEntry> publications = getSourcePublicationEntries();
         PublicationRequest request = new PublicationRequest();
         request.setFacets("source");
-        request.setQuery("source:source1");
+        request.setQuery("source:uniprotkb_reviewed_swissprot");
 
         PublicationFacetConfig.applyFacetFilters(publications, request);
 
@@ -123,32 +123,32 @@ class PublicationFacetConfigTest {
         assertEquals(1, publications.size());
 
         PublicationEntry entry = publications.get(0);
-        assertEquals("source1", entry.getPublicationSource());
+        assertEquals("UniProtKB reviewed (Swiss-Prot)", entry.getPublicationSource());
     }
 
     @Test
     void getFacetsForScale() {
         List<PublicationEntry> publications = getScalePublicationEntries();
 
-        List<Facet> result = PublicationFacetConfig.getFacets(publications, "scale");
+        List<Facet> result = PublicationFacetConfig.getFacets(publications, "study_type");
         assertNotNull(result);
         assertEquals(1, result.size());
         Facet category = result.get(0);
-        assertEquals("scale", category.getName());
-        assertEquals("Scale", category.getLabel());
+        assertEquals("study_type", category.getName());
+        assertEquals("Study type", category.getLabel());
         assertNotNull(category.getValues());
 
         List<FacetItem> items = category.getValues();
         assertEquals(2, items.size());
 
         FacetItem first = items.get(0);
-        assertNull(first.getLabel());
-        assertEquals("Small", first.getValue());
+        assertEquals("Small scale", first.getLabel());
+        assertEquals("small_scale", first.getValue());
         assertEquals(new Long(2L), first.getCount());
 
         FacetItem second = items.get(1);
-        assertNull(second.getLabel());
-        assertEquals("Large", second.getValue());
+        assertEquals("Large scale", second.getLabel());
+        assertEquals("large_scale", second.getValue());
         assertEquals(new Long(1L), second.getCount());
     }
 
@@ -156,8 +156,8 @@ class PublicationFacetConfigTest {
     void applyFacetFiltersForScale() {
         List<PublicationEntry> publications = getScalePublicationEntries();
         PublicationRequest request = new PublicationRequest();
-        request.setFacets("scale");
-        request.setQuery("scale:Small");
+        request.setFacets("study_type");
+        request.setQuery("study_type:small_scale");
 
         PublicationFacetConfig.applyFacetFilters(publications, request);
 
@@ -185,7 +185,7 @@ class PublicationFacetConfigTest {
         assertEquals(3, facetNames.size());
         assertEquals("source", facetNames.get(0));
         assertEquals("category", facetNames.get(1));
-        assertEquals("scale", facetNames.get(2));
+        assertEquals("study_type", facetNames.get(2));
     }
 
     @Test
@@ -196,20 +196,30 @@ class PublicationFacetConfigTest {
 
     private List<PublicationEntry> getSourcePublicationEntries() {
         List<PublicationEntry> publications = new ArrayList<>();
-        publications.add(PublicationEntry.builder().publicationSource("source2").build());
-        publications.add(PublicationEntry.builder().publicationSource("source1").build());
-        publications.add(PublicationEntry.builder().publicationSource("source2").build());
+        publications.add(
+                PublicationEntry.builder()
+                        .publicationSource("UniProtKB unreviewed (TrEMBL)")
+                        .build());
+        publications.add(
+                PublicationEntry.builder()
+                        .publicationSource("UniProtKB reviewed (Swiss-Prot)")
+                        .build());
+        publications.add(
+                PublicationEntry.builder()
+                        .publicationSource("UniProtKB unreviewed (TrEMBL)")
+                        .build());
         return publications;
     }
 
     private List<PublicationEntry> getCategoryPublicationEntries() {
         List<PublicationEntry> publications = new ArrayList<>();
         publications.add(
-                PublicationEntry.builder().categories(Arrays.asList("function", "ptm")).build());
+                PublicationEntry.builder().categories(Arrays.asList("Function", "PTM")).build());
         publications.add(
                 PublicationEntry.builder()
-                        .categories(Arrays.asList("interation", "function"))
+                        .categories(Arrays.asList("Interation", "Function"))
                         .build());
+        publications.add(PublicationEntry.builder().build());
         return publications;
     }
 

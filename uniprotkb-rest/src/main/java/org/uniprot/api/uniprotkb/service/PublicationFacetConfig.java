@@ -2,6 +2,8 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -21,56 +23,66 @@ import org.uniprot.store.search.SolrQueryUtil;
 @Component
 public class PublicationFacetConfig extends FacetConfig {
 
-    private enum PUBLICATION_FACETS {
-        source("Source"),
-        category("Category"),
-        scale("Scale");
+    private static final String SMALL_SCALE = "Small scale";
+    private static final String LARGE_SCALE = "Large scale";
+    private static final Pattern CLEAN_VALUE_REGEX = Pattern.compile("[a-zA-Z_]");
+
+    private enum PublicationFacet {
+        SOURCE("source", "Source"),
+        CATEGORY("category", "Category"),
+        STUDY_TYPE("study_type", "Study type");
 
         private String label;
+        private String facetName;
 
-        PUBLICATION_FACETS(String label) {
+        PublicationFacet(String facetName, String label) {
+            this.facetName = facetName;
             this.label = label;
         }
 
         public String getLabel() {
             return label;
         }
+
+        public String getFacetName() {
+            return facetName;
+        }
     }
 
     static List<Facet> getFacets(List<PublicationEntry> publications, String requestFacets) {
         List<Facet> facets = new ArrayList<>();
         if (Utils.notNullNotEmpty(requestFacets)) {
-            if (requestFacets.contains(PUBLICATION_FACETS.source.name())) {
+            if (requestFacets.contains(PublicationFacet.SOURCE.getFacetName())) {
                 Facet source =
                         Facet.builder()
-                                .label(PUBLICATION_FACETS.source.getLabel())
-                                .name(PUBLICATION_FACETS.source.name())
+                                .label(PublicationFacet.SOURCE.getLabel())
+                                .name(PublicationFacet.SOURCE.getFacetName())
                                 .allowMultipleSelection(false)
                                 .values(getSourceFacetValues(publications))
                                 .build();
                 facets.add(source);
             }
 
-            if (requestFacets.contains(PUBLICATION_FACETS.category.name())) {
+            if (requestFacets.contains(PublicationFacet.CATEGORY.getFacetName())) {
                 Facet category =
                         Facet.builder()
-                                .label(PUBLICATION_FACETS.category.getLabel())
-                                .name(PUBLICATION_FACETS.category.name())
+                                .label(PublicationFacet.CATEGORY.getLabel())
+                                .name(PublicationFacet.CATEGORY.getFacetName())
                                 .allowMultipleSelection(false)
                                 .values(getCategoryFacetValues(publications))
                                 .build();
                 facets.add(category);
             }
 
-            if (requestFacets.contains(PUBLICATION_FACETS.scale.name())) {
-                Facet scale =
+            if (requestFacets.contains(PublicationFacet.STUDY_TYPE.getFacetName())) {
+                Facet studyType =
                         Facet.builder()
-                                .label(PUBLICATION_FACETS.scale.getLabel())
-                                .name(PUBLICATION_FACETS.scale.name())
+                                .label(PublicationFacet.STUDY_TYPE.getLabel())
+                                .name(PublicationFacet.STUDY_TYPE.getFacetName())
                                 .allowMultipleSelection(false)
-                                .values(getScaleFacetValues(publications))
+                                .values(getStudyTypeFacetValues(publications))
                                 .build();
-                facets.add(scale);
+                facets.add(studyType);
             }
         }
         return facets;
@@ -79,31 +91,46 @@ public class PublicationFacetConfig extends FacetConfig {
     static void applyFacetFilters(List<PublicationEntry> publications, PublicationRequest request) {
         String query = request.getQuery();
         if (Utils.notNullNotEmpty(query)) {
-            if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.source.name())) {
-                String value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.source.name());
-                publications.removeIf(
-                        entry -> !entry.getPublicationSource().equalsIgnoreCase(value.trim()));
-            }
-            if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.category.name())) {
+            if (SolrQueryUtil.hasFieldTerms(query, PublicationFacet.SOURCE.getFacetName())) {
                 String value =
-                        SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.category.name());
-                publications.removeIf(
-                        entry ->
-                                entry.getCategories().stream()
-                                        .noneMatch(
-                                                cat -> {
-                                                    return cat.equalsIgnoreCase(value.trim());
-                                                }));
+                        SolrQueryUtil.getTermValue(query, PublicationFacet.SOURCE.getFacetName());
+                publications.removeIf(entry -> filterSourceValues(value, entry));
             }
-            if (SolrQueryUtil.hasFieldTerms(query, PUBLICATION_FACETS.scale.name())) {
-                String value = SolrQueryUtil.getTermValue(query, PUBLICATION_FACETS.scale.name());
-                boolean isLargeScale = value.equalsIgnoreCase("Large");
-                publications.removeIf(entry -> entry.isLargeScale() != isLargeScale);
+            if (SolrQueryUtil.hasFieldTerms(query, PublicationFacet.CATEGORY.getFacetName())) {
+                String value =
+                        SolrQueryUtil.getTermValue(query, PublicationFacet.CATEGORY.getFacetName());
+                publications.removeIf(entry -> filterCategoryValues(value, entry));
+            }
+            if (SolrQueryUtil.hasFieldTerms(query, PublicationFacet.STUDY_TYPE.getFacetName())) {
+                String value =
+                        SolrQueryUtil.getTermValue(
+                                query, PublicationFacet.STUDY_TYPE.getFacetName());
+                publications.removeIf(entry -> filterStudyTypeValues(value, entry));
             }
         }
     }
 
-    private static List<FacetItem> getScaleFacetValues(List<PublicationEntry> publications) {
+    private static boolean filterStudyTypeValues(String value, PublicationEntry entry) {
+        boolean isLargeScale = value.equalsIgnoreCase(getCleanFacetValue(LARGE_SCALE));
+        return entry.isLargeScale() != isLargeScale;
+    }
+
+    private static boolean filterCategoryValues(String value, PublicationEntry entry) {
+        if (Utils.notNullNotEmpty(entry.getCategories())) {
+            return entry.getCategories().stream()
+                    .map(PublicationFacetConfig::getCleanFacetValue)
+                    .noneMatch(category -> category.equalsIgnoreCase(value.trim()));
+        } else {
+            return true;
+        }
+    }
+
+    private static boolean filterSourceValues(String value, PublicationEntry entry) {
+        String cleanSource = getCleanFacetValue(entry.getPublicationSource());
+        return !cleanSource.equalsIgnoreCase(value.trim());
+    }
+
+    private static List<FacetItem> getStudyTypeFacetValues(List<PublicationEntry> publications) {
         Map<String, Long> scaleCountMap =
                 publications.stream()
                         .map(PublicationFacetConfig::getPublicationScale)
@@ -113,9 +140,9 @@ public class PublicationFacetConfig extends FacetConfig {
     }
 
     private static String getPublicationScale(PublicationEntry publicationEntry) {
-        String value = "Small";
+        String value = SMALL_SCALE;
         if (publicationEntry.isLargeScale()) {
-            value = "Large";
+            value = LARGE_SCALE;
         }
         return value;
     }
@@ -147,9 +174,11 @@ public class PublicationFacetConfig extends FacetConfig {
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEachOrdered(
                         (entry) -> {
+                            String value = getCleanFacetValue(entry.getKey());
                             FacetItem item =
                                     FacetItem.builder()
-                                            .value(entry.getKey())
+                                            .label(entry.getKey())
+                                            .value(value)
                                             .count(entry.getValue())
                                             .build();
                             result.add(item);
@@ -158,10 +187,20 @@ public class PublicationFacetConfig extends FacetConfig {
         return result;
     }
 
+    private static String getCleanFacetValue(String value) {
+        StringBuilder result = new StringBuilder();
+        value = value.replaceAll(" ", "_");
+        Matcher m = CLEAN_VALUE_REGEX.matcher(value);
+        while (m.find()) {
+            result.append(m.group());
+        }
+        return result.toString().toLowerCase();
+    }
+
     @Override
     public Collection<String> getFacetNames() {
-        return Arrays.stream(PUBLICATION_FACETS.values())
-                .map(PUBLICATION_FACETS::name)
+        return Arrays.stream(PublicationFacet.values())
+                .map(PublicationFacet::getFacetName)
                 .collect(Collectors.toList());
     }
 

@@ -67,9 +67,8 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        KeywordId keyword =
-                new KeywordIdBuilder().id("my keyword").accession(KEYWORD_ACCESSION).build();
-        KeywordId category = new KeywordIdBuilder().id("Ligand").accession("KW-9993").build();
+        KeywordId keyword = new KeywordIdBuilder().name("my keyword").id(KEYWORD_ACCESSION).build();
+        KeywordId category = new KeywordIdBuilder().name("Ligand").id("KW-9993").build();
 
         KeywordEntry keywordEntry =
                 new KeywordEntryBuilder()

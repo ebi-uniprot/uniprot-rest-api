@@ -72,7 +72,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
     @Override
     protected String getEntityId(CrossRefEntry entity) {
-        return entity.getAccession();
+        return entity.getId();
     }
 
     @Override

@@ -125,7 +125,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
 
     @Override
     protected String getEntityId(SubcellularLocationEntry entity) {
-        return entity.getAccession();
+        return entity.getId();
     }
 
     @Override

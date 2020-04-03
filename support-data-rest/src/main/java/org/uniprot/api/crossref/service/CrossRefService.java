@@ -36,6 +36,6 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
 
     @Override
     protected String getIdField() {
-        return fieldConfig.getSearchFieldItemByName("accession").getFieldName();
+        return fieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 }

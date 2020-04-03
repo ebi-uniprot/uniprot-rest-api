@@ -4,7 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
-import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -19,18 +20,25 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  */
 @Service
 @Import(UniParcQueryBoostsConfig.class)
-public class UniParcQueryService extends BasicSearchService<UniParcDocument, UniParcEntry> {
+public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private SearchFieldConfig searchFieldConfig;
 
     @Autowired
     public UniParcQueryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
-            UniParcEntryConverter uniParcEntryConverter,
             UniParcSortClause solrSortClause,
+            UniParcQueryResultConverter uniParcQueryResultConverter,
+            StoreStreamer<UniParcDocument, UniParcEntry> storeStreamer,
             QueryBoosts uniParcQueryBoosts) {
 
-        super(repository, uniParcEntryConverter, solrSortClause, uniParcQueryBoosts, facetConfig);
+        super(
+                repository,
+                uniParcQueryResultConverter,
+                solrSortClause,
+                facetConfig,
+                storeStreamer,
+                uniParcQueryBoosts);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
     }
@@ -38,5 +46,10 @@ public class UniParcQueryService extends BasicSearchService<UniParcDocument, Uni
     @Override
     protected String getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName("upi").getFieldName();
+    }
+
+    @Override
+    public UniParcEntry findByUniqueId(String uniqueId, String filters) {
+        return findByUniqueId(uniqueId);
     }
 }

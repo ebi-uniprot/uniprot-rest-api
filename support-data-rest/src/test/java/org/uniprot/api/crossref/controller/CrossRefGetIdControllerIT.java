@@ -69,7 +69,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
         CrossRefEntry crossRefEntry =
                 entryBuilder
-                        .accession(ACCESSION)
+                        .id(ACCESSION)
                         .abbrev("TIGRFAMs")
                         .name("TIGRFAMs; a protein family database")
                         .pubMedId("17151080")
@@ -84,7 +84,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         CrossRefDocument document =
                 CrossRefDocument.builder()
-                        .accession(crossRefEntry.getAccession())
+                        .id(crossRefEntry.getId())
                         .abbrev(crossRefEntry.getAbbrev())
                         .name(crossRefEntry.getName())
                         .pubMedId(crossRefEntry.getPubMedId())
@@ -117,7 +117,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     is(
                                             "http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
                     .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
-                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(10)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
@@ -152,7 +152,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(ACCESSION)
                     .fields("id,category,unreviewed_protein_count")
-                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
                     .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name").doesNotExist())
@@ -201,7 +201,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     is(
                                                             "http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
                                     .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
-                                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
+                                    .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                                     .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
                                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(10)))
                                     .resultMatcher(

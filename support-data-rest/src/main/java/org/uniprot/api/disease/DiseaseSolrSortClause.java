@@ -9,7 +9,7 @@ import org.uniprot.store.config.UniProtDataType;
 
 @Component
 public class DiseaseSolrSortClause extends AbstractSolrSortClause {
-    private static final String DOC_ID = "accession";
+    private static final String DOC_ID = "id";
 
     @PostConstruct
     public void init() {

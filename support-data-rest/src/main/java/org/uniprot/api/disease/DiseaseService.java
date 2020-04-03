@@ -33,6 +33,6 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
 
     @Override
     protected String getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName("accession").getFieldName();
+        return searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 }

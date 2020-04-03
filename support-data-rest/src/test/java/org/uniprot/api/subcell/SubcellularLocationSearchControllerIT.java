@@ -130,8 +130,8 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
     private void saveEntry(String accession) {
         SubcellularLocationEntry subcellularLocationEntry =
                 new SubcellularLocationEntryBuilder()
-                        .id("Name value " + accession)
-                        .accession(accession)
+                        .name("Name value " + accession)
+                        .id(accession)
                         .category(SubcellLocationCategory.LOCATION)
                         .definition("Definition value " + accession)
                         .synonymsAdd("syn value")
@@ -158,7 +158,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                 SubcellularLocationDocument.builder()
                         .id(accession)
                         .name("Name value " + accession)
-                        .category(SubcellLocationCategory.LOCATION.getCategory())
+                        .category(SubcellLocationCategory.LOCATION.getName())
                         .content(Collections.singletonList("Content value " + accession))
                         .subcellularlocationObj(
                                 getSubcellularLocationBinary(subcellularLocationEntry))
@@ -186,8 +186,8 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("id:SL-0001"))
-                    .resultMatcher(jsonPath("$.results.*.id", contains("Name value SL-0001")))
-                    .resultMatcher(jsonPath("$.results.*.accession", contains("SL-0001")))
+                    .resultMatcher(jsonPath("$.results.*.name", contains("Name value SL-0001")))
+                    .resultMatcher(jsonPath("$.results.*.id", contains("SL-0001")))
                     .resultMatcher(jsonPath("$.results.*.category", contains("Cellular component")))
                     .resultMatcher(
                             jsonPath(
@@ -209,10 +209,9 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                     .queryParam("query", Collections.singletonList("definition:*"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.id",
+                                    "$.results.*.name",
                                     contains("Name value SL-0001", "Name value SL-0002")))
-                    .resultMatcher(
-                            jsonPath("$.results.*.accession", contains("SL-0001", "SL-0002")))
+                    .resultMatcher(jsonPath("$.results.*.id", contains("SL-0001", "SL-0002")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.category",
@@ -259,10 +258,9 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                     .queryParam("sort", Collections.singletonList("name desc"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.id",
+                                    "$.results.*.name",
                                     contains("Name value SL-0002", "Name value SL-0001")))
-                    .resultMatcher(
-                            jsonPath("$.results.*.accession", contains("SL-0002", "SL-0001")))
+                    .resultMatcher(jsonPath("$.results.*.id", contains("SL-0002", "SL-0001")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.category",
@@ -283,9 +281,9 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                     .queryParam("fields", Collections.singletonList("id,category"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.id",
+                                    "$.results.*.name",
                                     contains("Name value SL-0001", "Name value SL-0002")))
-                    .resultMatcher(jsonPath("$.results.*.accession").exists()) // required
+                    .resultMatcher(jsonPath("$.results.*.id").exists()) // required
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.category",
@@ -312,11 +310,11 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.accession",
+                                                    "$.results.*.id",
                                                     containsInAnyOrder("SL-0001", "SL-0002")))
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.id",
+                                                    "$.results.*.name",
                                                     containsInAnyOrder(
                                                             "Name value SL-0001",
                                                             "Name value SL-0002")))
@@ -346,7 +344,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Subcellular location ID\tDescription\tCategory\tAlias")))
+                                                                    "Subcellular location ID\tDescription\tCategory\tName")))
                                     .resultMatcher(
                                             content()
                                                     .string(

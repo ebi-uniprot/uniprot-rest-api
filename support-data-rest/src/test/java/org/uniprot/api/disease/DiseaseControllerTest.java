@@ -51,8 +51,8 @@ class DiseaseControllerTest {
                                 .param("accessionId", accession));
 
         response.andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.name", equalTo(disease.getName())))
                 .andExpect(jsonPath("$.id", equalTo(disease.getId())))
-                .andExpect(jsonPath("$.accession", equalTo(disease.getAccession())))
                 .andExpect(jsonPath("$.acronym", equalTo(disease.getAcronym())))
                 .andExpect(jsonPath("$.definition", equalTo(disease.getDefinition())))
                 .andExpect(
@@ -146,15 +146,15 @@ class DiseaseControllerTest {
         List<DiseaseCrossReference> xrefs = Arrays.asList(xr1, xr2);
         List<KeywordId> keywords =
                 Arrays.asList(
-                        new KeywordIdBuilder().id("keyword1").accession("kw-1").build(),
-                        new KeywordIdBuilder().id("keyword2").accession("kw-2").build());
+                        new KeywordIdBuilder().name("keyword1").id("kw-1").build(),
+                        new KeywordIdBuilder().name("keyword2").id("kw-2").build());
 
         Long reviewedProteinCount = 10L;
         Long unreviewedProteinCount = 20L;
 
         DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
-        builder.id(id)
-                .accession(accession)
+        builder.name(id)
+                .id(accession)
                 .acronym(acronym)
                 .definition(definition)
                 .alternativeNamesSet(alternativeNames);
