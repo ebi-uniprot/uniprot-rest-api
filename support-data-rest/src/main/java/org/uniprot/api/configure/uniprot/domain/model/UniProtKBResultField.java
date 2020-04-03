@@ -104,11 +104,4 @@ public class UniProtKBResultField {
                 .sorted(GROUP_ORDER_COMPARATOR)
                 .collect(Collectors.toList());
     }
-
-    public static void main(String[] args) throws JsonProcessingException {
-        List<UniProtKBResultField> resultFields = UniProtKBResultField.getResultFields();
-
-        ObjectMapper om = new ObjectMapper();
-        System.out.println(om.writerWithDefaultPrettyPrinter().writeValueAsString(resultFields));
-    }
 }
