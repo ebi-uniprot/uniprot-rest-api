@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.output.converter;
 
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -23,9 +25,6 @@ import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
 import com.github.bohnman.squiggly.parser.SquigglyParser;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-
-import static org.uniprot.core.util.Utils.notNull;
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 /**
  * @param <T> instance of the object that is being written.
@@ -57,10 +56,9 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     @Override
     protected void before(MessageConverterContext<T> context, OutputStream outputStream)
             throws IOException {
+        List<ReturnField> fieldList = getFilterFieldMap(context.getFields());
+        tlFilters.set(fieldList);
         if (notNullNotEmpty(context.getFields())) {
-            List<ReturnField> fieldList = getFilterFieldMap(context.getFields());
-            tlFilters.set(fieldList);
-
             ObjectMapper filterMapper = objectMapper.copy();
             FilterProvider filterProvider = getFieldsFilterProvider(fieldList);
             filterMapper.setFilterProvider(filterProvider);

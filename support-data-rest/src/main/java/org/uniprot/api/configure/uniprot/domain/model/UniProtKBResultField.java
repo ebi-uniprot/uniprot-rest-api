@@ -18,8 +18,6 @@ import org.uniprot.store.config.returnfield.model.ReturnFieldItemType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 10/03/2020

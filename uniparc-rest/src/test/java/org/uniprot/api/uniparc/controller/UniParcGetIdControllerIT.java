@@ -4,13 +4,10 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +44,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
-import org.uniprot.store.search.field.UniParcField;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo

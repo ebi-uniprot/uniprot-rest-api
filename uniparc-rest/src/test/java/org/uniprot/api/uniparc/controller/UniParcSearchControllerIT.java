@@ -43,25 +43,18 @@ import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.impl.*;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
+import org.uniprot.core.xml.jaxb.uniparc.Entry;
+import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.document.uniparc.UniParcDocument.UniParcDocumentBuilder;
-import org.uniprot.store.search.field.UniParcResultFields;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.beust.jcommander.internal.Lists;
 
 /**
  * @author jluo

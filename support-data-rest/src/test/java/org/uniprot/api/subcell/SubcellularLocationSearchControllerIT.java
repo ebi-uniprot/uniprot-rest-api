@@ -141,16 +141,16 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                         .linksAdd("link value")
                         .isAAdd(
                                 new SubcellularLocationEntryBuilder()
-                                        .id("is a id")
-                                        .accession("SL-0002")
+                                        .name("is a id")
+                                        .id("SL-0002")
                                         .build())
                         .partOfAdd(
                                 (new SubcellularLocationEntryBuilder()
-                                        .id("part id id")
-                                        .accession("SL-0003")
+                                        .name("part id id")
+                                        .id("SL-0003")
                                         .build()))
                         .geneOntologiesAdd(new GoTermBuilder().id("goId").name("goName").build())
-                        .keyword(new KeywordIdBuilder().accession("kaccession").id("kid").build())
+                        .keyword(new KeywordIdBuilder().id("kaccession").name("kid").build())
                         .statistics(new StatisticsBuilder().build())
                         .build();
 
@@ -278,7 +278,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,category"))
+                    .queryParam("fields", Collections.singletonList("id,name,category"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.name",

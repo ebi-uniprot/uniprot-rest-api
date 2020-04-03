@@ -322,7 +322,6 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
-                    .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();
         }
