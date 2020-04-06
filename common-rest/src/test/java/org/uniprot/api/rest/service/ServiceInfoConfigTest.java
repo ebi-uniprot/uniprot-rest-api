@@ -1,13 +1,13 @@
 package org.uniprot.api.rest.service;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.uniprot.api.rest.service.ServiceInfoConfig.ServiceInfo.RELEASE;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.uniprot.api.rest.service.ServiceInfoConfig.ServiceInfo.RELEASE;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created 01/04/20
