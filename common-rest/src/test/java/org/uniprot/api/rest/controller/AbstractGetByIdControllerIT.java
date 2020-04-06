@@ -11,7 +11,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VA
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -81,12 +80,6 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    @Disabled // @lgonzales: TRM-23571
-    void withValidResponseFieldsOrder(GetIdParameter idParameter) throws Exception {
-        validIdReturnSuccess(idParameter);
-    }
-
-    @Test
     void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
         checkParameterInput(idParameter);
         // when
@@ -135,7 +128,6 @@ public abstract class AbstractGetByIdControllerIT {
     }
 
     @Test
-    @Disabled // @lgonzales: TRM-23571
     void withFilterFieldsReturnSuccess(GetIdParameter idParameter) throws Exception {
         assertThat(idParameter, notNullValue());
         if (Utils.notNullNotEmpty(idParameter.getFields())) {

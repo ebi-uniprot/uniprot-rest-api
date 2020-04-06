@@ -4,8 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -16,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.core.util.Utils;
-import org.uniprot.store.search.field.ReturnField;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 /**
  * This Return Fields Constraint Validator class is responsible to verify if the inputted return
@@ -31,7 +31,7 @@ import org.uniprot.store.search.field.ReturnField;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidReturnFields {
 
-    Class<? extends Enum<? extends ReturnField>> fieldValidatorClazz();
+    UniProtDataType uniProtDataType();
 
     String message() default "{search.invalid.return.field}";
 
@@ -42,20 +42,13 @@ public @interface ValidReturnFields {
     @Slf4j
     class ReturnFieldsValidatorImpl implements ConstraintValidator<ValidReturnFields, String> {
 
-        private List<ReturnField> returnFieldList;
+        private ReturnFieldConfig returnFieldConfig;
 
         @Override
         public void initialize(ValidReturnFields constraintAnnotation) {
             try {
-                returnFieldList = new ArrayList<>();
-                Class<? extends Enum<? extends ReturnField>> enumClass =
-                        constraintAnnotation.fieldValidatorClazz();
-
-                Enum[] enumValArr = enumClass.getEnumConstants();
-
-                for (Enum enumVal : enumValArr) {
-                    returnFieldList.add((ReturnField) enumVal);
-                }
+                UniProtDataType uniProtDataType = constraintAnnotation.uniProtDataType();
+                returnFieldConfig = ReturnFieldConfigFactory.getReturnFieldConfig(uniProtDataType);
             } catch (Exception e) {
                 log.error("Error initializing ReturnFieldsValidator", e);
             }
@@ -92,8 +85,7 @@ public @interface ValidReturnFields {
         }
 
         private boolean hasValidReturnField(String fieldName) {
-            return returnFieldList.stream()
-                    .anyMatch(returnField -> returnField.hasReturnField(fieldName));
+            return returnFieldConfig.returnFieldExists(fieldName);
         }
     }
 }

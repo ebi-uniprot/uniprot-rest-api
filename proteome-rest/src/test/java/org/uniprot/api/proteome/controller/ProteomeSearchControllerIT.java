@@ -32,24 +32,26 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.core.CrossReference;
-import org.uniprot.core.citation.Citation;
+import org.uniprot.core.citation.impl.JournalArticleBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.*;
+import org.uniprot.core.proteome.impl.*;
 import org.uniprot.core.proteome.impl.ComponentBuilder;
 import org.uniprot.core.proteome.impl.ProteomeEntryBuilder;
 import org.uniprot.core.proteome.impl.ProteomeIdBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-import org.uniprot.store.search.field.ProteomeResultFields;
 
-import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
@@ -138,8 +140,9 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Lists.newArrayList(ProteomeResultFields.INSTANCE.getAllFields().keySet());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PROTEOME)
+                .getReturnFields();
     }
 
     @Override
@@ -201,14 +204,18 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         ProteomeId proteomeId = new ProteomeIdBuilder(getName(UPID_PREF, i)).build();
         String description = getName("Description", i);
         Taxonomy taxonomy =
-                new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
+                new TaxonomyBuilder()
+                        .taxonId(9606)
+                        .scientificName("Homo sapiens")
+                        .mnemonic("HUMAN")
+                        .build();
         LocalDate modified = LocalDate.of(2015, 11, 5);
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
         List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
         CrossReference<ProteomeDatabase> xref1 =
                 new CrossReferenceBuilder<ProteomeDatabase>()
-                        .database(ProteomeDatabase.GENOME_ACCESSION)
+                        .database(ProteomeDatabase.GENOME_ASSEMBLY)
                         .id(getName("ACA", i))
                         .build();
         xrefs.add(xref1);
@@ -229,7 +236,6 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
         components.add(component1);
         components.add(component2);
-        List<Citation> citations = new ArrayList<>();
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
@@ -237,11 +243,30 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                         .taxonomy(taxonomy)
                         .modified(modified)
                         .proteomeType(ProteomeType.NORMAL)
-                        //	.redundantTo(redId)
+                        .redundantTo(new ProteomeIdBuilder("UP000000001").build())
+                        .strain("strain value")
+                        .isolate("isolate value")
+                        .citationsAdd(
+                                new JournalArticleBuilder()
+                                        .title("citation title")
+                                        .journalName("journalName value")
+                                        .build())
                         .proteomeCrossReferencesSet(xrefs)
+                        .redundantProteomesAdd(
+                                new RedundantProteomeBuilder().proteomeId("UP0000000002").build())
+                        .panproteome(new ProteomeIdBuilder("UP000000003").build())
                         .componentsSet(components)
+                        .taxonLineagesAdd(new TaxonomyLineageBuilder().taxonId(10L).build())
                         .superkingdom(Superkingdom.EUKARYOTA)
-                        .citationsSet(citations)
+                        .sourceDb("sourceDb value")
+                        .canonicalProteinsAdd(
+                                new CanonicalProteinBuilder()
+                                        .canonicalProtein(
+                                                new ProteinBuilder()
+                                                        .accession("P00001")
+                                                        .geneNameType(GeneNameType.GENE_NAME)
+                                                        .build())
+                                        .build())
                         .annotationScore(15);
 
         return builder.build();
@@ -253,7 +278,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upid:UP000005231"))
-                    .resultMatcher(jsonPath("$.results.*.id.value", contains("UP000005231")))
+                    .resultMatcher(jsonPath("$.results.*.id", contains("UP000005231")))
                     .build();
         }
 
@@ -270,8 +295,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upid:*"))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
                     .build();
         }
 
@@ -313,8 +337,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("annotation_score desc"))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
                     .build();
         }
 
@@ -324,12 +347,8 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("organism"))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.description",
-                                    contains("Description231", "Description520")))
+                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
+                    .resultMatcher(jsonPath("$.results.*.taxonomy.taxonId", contains(9606, 9606)))
                     .build();
         }
 
@@ -339,8 +358,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("reference"))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.id.value", contains("UP000005231", "UP000005520")))
+                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
                     .build();
         }
     }
@@ -357,7 +375,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.results.*.id.value",
+                                                    "$.results.*.id",
                                                     contains("UP000005231", "UP000005520")))
                                     .build())
                     .contentTypeParam(
@@ -379,7 +397,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "\tOrganism\tOrganism ID\tProtein count")))
+                                                                    "Proteome Id\tOrganism\tOrganism Id\tProtein count")))
                                     .resultMatcher(
                                             content()
                                                     .string(

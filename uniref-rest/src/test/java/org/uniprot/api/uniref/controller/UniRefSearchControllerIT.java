@@ -47,17 +47,16 @@ import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.UniRefResultFields;
-
-import com.beust.jcommander.internal.Lists;
 
 /**
  * @author jluo
@@ -172,8 +171,9 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected List<String> getAllReturnedFields() {
-        return Lists.newArrayList(UniRefResultFields.INSTANCE.getAllFields().keySet());
+    protected List<ReturnField> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF)
+                .getReturnFields();
     }
 
     @Override
@@ -364,11 +364,14 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("name"))
+                    .queryParam("fields", Collections.singletonList("id,name"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.id",
+                                    "$.results[*].id",
                                     contains("UniRef50_P03911", "UniRef50_P03920")))
+                    .resultMatcher(jsonPath("$.results[*].name").hasJsonPath())
+                    .resultMatcher(jsonPath("$.results[*].members").doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].representativeMember").doesNotExist())
                     .build();
         }
 

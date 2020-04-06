@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.configure.service.UniProtConfigureService;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
+import org.uniprot.api.configure.uniprot.domain.model.UniProtReturnField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
@@ -71,6 +72,11 @@ public class UniProtConfigureController {
     @GetMapping("/resultfields")
     public List<FieldGroup> getResultFields() {
         return service.getResultFields();
+    }
+
+    @GetMapping("/result-fields")
+    public List<UniProtReturnField> getResultFields2() {
+        return service.getResultFields2();
     }
 
     @GetMapping("/allDatabases")

@@ -33,7 +33,7 @@ import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
-import org.uniprot.store.search.domain.impl.UniProtResultFields;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -173,7 +173,7 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
             @ModelFieldMeta(
                             path =
                                     "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
-                    @ValidReturnFields(fieldValidatorClazz = UniProtResultFields.class)
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")

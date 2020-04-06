@@ -49,9 +49,6 @@ public abstract class AbstractGetIdParameterResolver implements ParameterResolve
             case "withInvalidFilterFieldsReturnBadRequest":
                 result = withInvalidFilterParameter();
                 break;
-            case "withValidResponseFieldsOrder":
-                result = withValidResponseFieldsOrderParameter();
-                break;
         }
         return result;
     }
@@ -65,6 +62,4 @@ public abstract class AbstractGetIdParameterResolver implements ParameterResolve
     protected abstract GetIdParameter withFilterFieldsParameter();
 
     protected abstract GetIdParameter withInvalidFilterParameter();
-
-    protected abstract GetIdParameter withValidResponseFieldsOrderParameter();
 }

@@ -7,9 +7,9 @@
 	<parent>
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.uniprot</groupId>
+
 	<artifactId>uniref-rest</artifactId>
 	<version>${project.parent.version}</version>
 	<name>uniref-rest</name>

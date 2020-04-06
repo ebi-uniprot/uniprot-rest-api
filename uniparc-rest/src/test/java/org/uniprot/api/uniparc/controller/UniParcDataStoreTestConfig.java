@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
+import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 
 /**
  * @author jluo
@@ -28,6 +30,12 @@ public class UniParcDataStoreTestConfig {
     @Profile("offline")
     public SolrClient uniparcSolrClient() {
         return mock(SolrClient.class);
+    }
+
+    @Bean
+    @Profile("offline")
+    public UniParcStoreClient uniparcStoreClient() {
+        return new UniParcStoreClient(VoldemortInMemoryUniParcEntryStore.getInstance("uniparc"));
     }
 
     @Bean

@@ -15,21 +15,21 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.pathway.UniPathway;
-import org.uniprot.cv.pathway.UniPathwayService;
+import org.uniprot.cv.pathway.UniPathwayRepo;
 
 import com.google.common.base.Strings;
 
 public class UniProtViewByPathwayService implements UniProtViewByService {
     private final SolrClient solrClient;
     private final String uniprotCollection;
-    private final UniPathwayService unipathwayService;
+    private final UniPathwayRepo unipathwayRepo;
     // private final static String URL_PREFIX ="https://www.uniprot.org/keywords/";
 
     public UniProtViewByPathwayService(
-            SolrClient solrClient, String uniprotCollection, UniPathwayService unipathwayService) {
+            SolrClient solrClient, String uniprotCollection, UniPathwayRepo unipathwayRepo) {
         this.solrClient = solrClient;
         this.uniprotCollection = uniprotCollection;
-        this.unipathwayService = unipathwayService;
+        this.unipathwayRepo = unipathwayRepo;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
                                 .collect(
                                         Collectors.toMap(
                                                 FacetField.Count::getName, Function.identity()));
-                List<UniPathway> pathways = unipathwayService.getChildrenById(parent);
+                List<UniPathway> pathways = unipathwayRepo.getChildrenById(parent);
 
                 return pathways.stream()
                         .map(val -> getRightLevelPathway(val, idCountMap))
@@ -78,10 +78,10 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
     }
 
     private ViewBy convert(UniPathway pathway, Map<String, FacetField.Count> idCountMap) {
-        FacetField.Count count = idCountMap.get(pathway.getAccession());
+        FacetField.Count count = idCountMap.get(pathway.getId());
         if (count == null) return null;
         ViewBy viewBy = new ViewBy();
-        FacetField.Count validCount = idCountMap.get(pathway.getAccession());
+        FacetField.Count validCount = idCountMap.get(pathway.getId());
         String id = validCount.getName();
         viewBy.setId(id);
         viewBy.setCount(validCount.getCount());
@@ -94,16 +94,16 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
             UniPathway pathway, Map<String, FacetField.Count> idCountMap) {
         List<UniPathway> children = pathway.getChildren();
         if (children.isEmpty()) return pathway;
-        FacetField.Count count = idCountMap.get(pathway.getAccession());
+        FacetField.Count count = idCountMap.get(pathway.getId());
         List<UniPathway> validChildren =
                 children.stream()
-                        .filter(val -> idCountMap.containsKey(val.getAccession()))
+                        .filter(val -> idCountMap.containsKey(val.getId()))
                         .collect(Collectors.toList());
         if (validChildren.isEmpty() || validChildren.size() > 1) {
             return pathway;
         } else {
             UniPathway child = validChildren.get(0);
-            FacetField.Count childCount = idCountMap.get(child.getAccession());
+            FacetField.Count childCount = idCountMap.get(child.getId());
             if (childCount.getCount() == count.getCount()) {
                 return getRightLevelPathway(child, idCountMap);
             } else return pathway;

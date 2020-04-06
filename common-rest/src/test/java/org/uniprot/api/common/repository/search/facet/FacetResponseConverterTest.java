@@ -57,7 +57,7 @@ class FacetResponseConverterTest {
 
     @Test
     void convertFacetWithoutLabel() {
-        List<FacetField> fieldList = getFacetFields("popular_organism");
+        List<FacetField> fieldList = getFacetFields("model_organism");
 
         when(queryResponse.getFacetFields()).thenReturn(fieldList);
 
@@ -65,14 +65,14 @@ class FacetResponseConverterTest {
         List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
 
-        Facet popularOrganism = facets.get(0);
-        assertEquals("Popular organisms", popularOrganism.getLabel());
-        assertEquals("popular_organism", popularOrganism.getName());
-        assertTrue(popularOrganism.isAllowMultipleSelection());
-        assertNotNull(popularOrganism.getValues());
-        assertEquals(3, popularOrganism.getValues().size());
+        Facet modelOrganism = facets.get(0);
+        assertEquals("Model organisms", modelOrganism.getLabel());
+        assertEquals("model_organism", modelOrganism.getName());
+        assertTrue(modelOrganism.isAllowMultipleSelection());
+        assertNotNull(modelOrganism.getValues());
+        assertEquals(3, modelOrganism.getValues().size());
 
-        FacetItem itemValue = popularOrganism.getValues().get(0);
+        FacetItem itemValue = modelOrganism.getValues().get(0);
         assertNotNull(itemValue);
         assertNull(itemValue.getLabel());
         assertEquals("Human", itemValue.getValue());
@@ -117,8 +117,8 @@ class FacetResponseConverterTest {
             ffield.add("true", 11L);
             fieldList.add(ffield);
         }
-        if (Arrays.binarySearch(name, "popular_organism") >= 0) {
-            FacetField ffield = new FacetField("popular_organism");
+        if (Arrays.binarySearch(name, "model_organism") >= 0) {
+            FacetField ffield = new FacetField("model_organism");
             ffield.add("Human", 11L);
             ffield.add("Mouse", 21L);
             ffield.add("Rat", 31L);

@@ -8,7 +8,7 @@ import java.util.List;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * Unit Test class to validate SortFieldValidatorImpl class behaviour

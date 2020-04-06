@@ -4,13 +4,11 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,10 +36,8 @@ import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
-import org.uniprot.store.search.field.DiseaseField;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -82,8 +78,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
     protected void saveEntry() {
 
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
-        KeywordId keyword =
-                new KeywordIdBuilder().id("Mental retardation").accession("KW-0991").build();
+        KeywordId keyword = new KeywordIdBuilder().name("Mental retardation").id("KW-0991").build();
         DiseaseCrossReference xref1 =
                 new DiseaseCrossReferenceBuilder()
                         .databaseType("MIM")
@@ -98,8 +93,8 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 DiseaseCrossReferenceBuilder.from(xref3).id("D008607").build();
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
-                        .id("ZTTK syndrome")
-                        .accession(ACCESSION)
+                        .name("ZTTK syndrome")
+                        .id(ACCESSION)
                         .acronym("ZTTKS")
                         .definition(
                                 "An autosomal dominant syndrome characterized by intellectual disability, developmental delay, malformations of the cerebral cortex, epilepsy, vision problems, musculo-skeletal abnormalities, and congenital malformations.")
@@ -127,7 +122,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 Stream.concat(
                                 Stream.concat(
                                         Stream.of(
-                                                diseaseEntry.getId(),
+                                                diseaseEntry.getName(),
                                                 diseaseEntry.getAcronym(),
                                                 diseaseEntry.getDefinition()),
                                         kwIds.stream()),
@@ -135,10 +130,10 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .collect(Collectors.toList());
         // content is name + accession
         List<String> content = new ArrayList<>(name);
-        content.add(diseaseEntry.getAccession());
+        content.add(diseaseEntry.getId());
         DiseaseDocument document =
                 DiseaseDocument.builder()
-                        .accession(ACCESSION)
+                        .id(ACCESSION)
                         .name(name)
                         .content(content)
                         .diseaseObj(getDiseaseBinary(diseaseEntry))
@@ -162,9 +157,9 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
-                    .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
+                    .resultMatcher(jsonPath("$.name", is("ZTTK syndrome")))
                     .resultMatcher(
                             jsonPath(
                                     "$.definition",
@@ -211,9 +206,9 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("id,accession,reviewed_protein_count")
-                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
-                    .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
+                    .fields("name,id,reviewed_protein_count")
+                    .resultMatcher(jsonPath("$.id", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.name", is("ZTTK syndrome")))
                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.alternativeNames").doesNotExist())
                     .resultMatcher(jsonPath("$.unreviewedProteinCount").doesNotExist())
@@ -232,43 +227,6 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
-        }
-
-        @Override
-        public GetIdParameter withValidResponseFieldsOrderParameter() {
-            return GetIdParameter.builder()
-                    .id(ACCESSION)
-                    .resultMatcher(
-                            result -> {
-                                String contentAsString = result.getResponse().getContentAsString();
-                                try {
-                                    Map<String, Object> responseMap =
-                                            new ObjectMapper()
-                                                    .readValue(
-                                                            contentAsString, LinkedHashMap.class);
-                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    List<String> expectedList = getFieldsInOrder();
-                                    Assertions.assertEquals(expectedList.size(), actualList.size());
-                                    Assertions.assertEquals(expectedList, actualList);
-                                } catch (IOException e) {
-                                    Assertions.fail(e.getMessage());
-                                }
-                            })
-                    .build();
-        }
-
-        private List<String> getFieldsInOrder() {
-            List<String> fields = new LinkedList<>();
-            fields.add(DiseaseField.ResultFields.id.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.accession.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.acronym.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.definition.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.alternative_names.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.cross_references.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.keywords.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.reviewed_protein_count.getJavaFieldName());
-            fields.add(DiseaseField.ResultFields.unreviewed_protein_count.getJavaFieldName());
-            return fields;
         }
     }
 
@@ -297,8 +255,8 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.accession", is(ACCESSION)))
-                                    .resultMatcher(jsonPath("$.id", is("ZTTK syndrome")))
+                                    .resultMatcher(jsonPath("$.id", is(ACCESSION)))
+                                    .resultMatcher(jsonPath("$.name", is("ZTTK syndrome")))
                                     .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
                                     .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
                                     .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))

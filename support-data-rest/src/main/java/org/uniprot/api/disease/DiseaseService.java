@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.cv.disease.DiseaseEntry;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 @Service
@@ -33,6 +33,6 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
 
     @Override
     protected String getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName("accession").getFieldName();
+        return searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 }

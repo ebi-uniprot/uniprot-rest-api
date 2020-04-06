@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>uniprot-rest-api</artifactId>
 		<groupId>org.uniprot</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>common-rest</artifactId>
@@ -25,6 +25,11 @@
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-search</artifactId>
 			<version>${uniprot-store.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>core-parser</artifactId>
+			<version>${uniprot-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
@@ -149,6 +154,13 @@
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-oboformat</artifactId>
 			<version>5.1.11</version>
+		</dependency>
+
+		<!-- json filter content by json path -->
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<version>2.4.0</version>
 		</dependency>
 		<!-- Tests -->
 

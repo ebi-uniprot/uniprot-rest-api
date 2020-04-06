@@ -8,11 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +47,6 @@ import org.uniprot.store.indexer.uniprot.mockers.*;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.field.UniProtField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -170,7 +167,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + "P21802-2")
-                                        .param("fields", "organism")
+                                        .param("fields", "accession,organism")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -199,7 +196,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + "P21802-1")
-                                        .param("fields", "organism")
+                                        .param("fields", "accession,organism")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -335,11 +332,15 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION_ID)
-                    .fields("gene_primary")
+                    .fields("gene_primary,cc_function,cc_pathway")
                     .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
                     .resultMatcher(jsonPath("$.genes").exists())
+                    .resultMatcher(jsonPath("$.comments[?(@.commentType=='FUNCTION')]").exists())
+                    .resultMatcher(jsonPath("$.comments[?(@.commentType=='PATHWAY')]").exists())
                     // ensure other parts of the entry were not returned (using one example)
                     .resultMatcher(jsonPath("$.organism").doesNotExist())
+                    .resultMatcher(
+                            jsonPath("$.comments[?(@.commentType=='SIMILARITY')]").doesNotExist())
                     .build();
         }
 
@@ -355,50 +356,6 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
         }
-
-        @Override
-        public GetIdParameter withValidResponseFieldsOrderParameter() {
-            return GetIdParameter.builder()
-                    .id(ACCESSION_ID)
-                    .resultMatcher(
-                            result -> {
-                                String contentAsString = result.getResponse().getContentAsString();
-                                try {
-                                    Map<String, Object> responseMap =
-                                            new ObjectMapper()
-                                                    .readValue(
-                                                            contentAsString, LinkedHashMap.class);
-                                    List<String> actualList = new ArrayList<>(responseMap.keySet());
-                                    List<String> expectedList = getFieldsInOrder();
-                                    Assertions.assertEquals(expectedList.size(), actualList.size());
-                                    Assertions.assertEquals(expectedList, actualList);
-                                } catch (IOException e) {
-                                    Assertions.fail(e.getMessage());
-                                }
-                            })
-                    .build();
-        }
-
-        private List<String> getFieldsInOrder() {
-            // init the expected list of json response fields order
-            List<String> fields = new LinkedList<>();
-            fields.add(UniProtField.ResultFields.entryType.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.primaryAccession.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.uniProtkbId.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.entryAudit.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.annotationScore.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.organism.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.protein_existence.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.protein_name.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.gene.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.comment.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.feature.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.keyword.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.reference.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.crossReference.getJavaFieldName());
-            fields.add(UniProtField.ResultFields.sequence.getJavaFieldName());
-            return fields;
-        }
     }
 
     static class UniprotKBGetIdContentTypeParamResolver
@@ -411,7 +368,10 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
-                                    .resultMatcher(jsonPath("$.entryType", is("Swiss-Prot")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.entryType",
+                                                    is("UniProtKB reviewed (Swiss-Prot)")))
                                     .resultMatcher(jsonPath("$.uniProtkbId", is("PURL_THEEB")))
                                     .build())
                     .contentTypeParam(

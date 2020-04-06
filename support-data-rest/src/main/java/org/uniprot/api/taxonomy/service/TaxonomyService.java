@@ -7,9 +7,9 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 @Service

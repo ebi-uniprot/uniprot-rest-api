@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.ec.ECRepoFactory;
-import org.uniprot.cv.keyword.KeywordService;
-import org.uniprot.cv.keyword.impl.KeywordServiceImpl;
-import org.uniprot.cv.pathway.UniPathwayService;
-import org.uniprot.cv.pathway.impl.UniPathwayServiceImpl;
+import org.uniprot.cv.keyword.KeywordRepo;
+import org.uniprot.cv.keyword.impl.KeywordRepoImpl;
+import org.uniprot.cv.pathway.UniPathwayRepo;
+import org.uniprot.cv.pathway.impl.UniPathwayRepoImpl;
 
 @Configuration
 public class ViewByServiceConfig {
@@ -20,8 +20,8 @@ public class ViewByServiceConfig {
     }
 
     @Bean
-    public KeywordService keywordService(ViewByConfigProperties configProperties) {
-        return new KeywordServiceImpl(configProperties.getKeywordFile());
+    public KeywordRepo keywordService(ViewByConfigProperties configProperties) {
+        return new KeywordRepoImpl(configProperties.getKeywordFile());
     }
 
     @Bean
@@ -30,8 +30,8 @@ public class ViewByServiceConfig {
     }
 
     @Bean
-    public UniPathwayService pathwayService(ViewByConfigProperties configProperties) {
-        return new UniPathwayServiceImpl(configProperties.getUniPathWayFile());
+    public UniPathwayRepo pathwayService(ViewByConfigProperties configProperties) {
+        return new UniPathwayRepoImpl(configProperties.getUniPathWayFile());
     }
 
     @Bean
@@ -55,18 +55,18 @@ public class ViewByServiceConfig {
     public UniProtViewByKeywordService uniprotViewByKeywordService(
             SolrClient solrClient,
             ViewByConfigProperties configProperties,
-            KeywordService keywordService) {
+            KeywordRepo keywordRepo) {
         return new UniProtViewByKeywordService(
-                solrClient, configProperties.getUniprotCollection(), keywordService);
+                solrClient, configProperties.getUniprotCollection(), keywordRepo);
     }
 
     @Bean
     public UniProtViewByPathwayService uniprotViewByPathwayService(
             SolrClient solrClient,
             ViewByConfigProperties configProperties,
-            UniPathwayService unipathwayService) {
+            UniPathwayRepo unipathwayRepo) {
         return new UniProtViewByPathwayService(
-                solrClient, configProperties.getUniprotCollection(), unipathwayService);
+                solrClient, configProperties.getUniprotCollection(), unipathwayRepo);
     }
 
     @Bean

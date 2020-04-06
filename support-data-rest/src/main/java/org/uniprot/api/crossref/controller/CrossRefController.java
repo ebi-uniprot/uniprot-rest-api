@@ -23,7 +23,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.store.search.field.CrossRefField;
+import org.uniprot.store.config.UniProtDataType;
 
 @RestController
 @RequestMapping("/xref")
@@ -48,7 +48,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.crossref.invalid.id}")
                     String accession,
-            @ValidReturnFields(fieldValidatorClazz = CrossRefField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -72,7 +72,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
     @Override
     protected String getEntityId(CrossRefEntry entity) {
-        return entity.getAccession();
+        return entity.getId();
     }
 
     @Override

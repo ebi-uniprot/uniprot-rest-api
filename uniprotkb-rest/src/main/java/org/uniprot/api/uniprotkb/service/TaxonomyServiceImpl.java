@@ -11,9 +11,9 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

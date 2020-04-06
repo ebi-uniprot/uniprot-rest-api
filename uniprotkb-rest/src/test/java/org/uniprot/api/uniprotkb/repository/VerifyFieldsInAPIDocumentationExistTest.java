@@ -14,10 +14,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.uniprot.store.config.searchfield.common.JsonLoader;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.common.JsonLoader;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 import com.fasterxml.jackson.databind.JavaType;

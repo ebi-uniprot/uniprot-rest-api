@@ -1,13 +1,17 @@
 package org.uniprot.api.configure.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
+import org.uniprot.api.configure.uniprot.domain.model.UniProtReturnField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
@@ -63,7 +67,12 @@ public class UniProtConfigureService {
         return results;
     }
 
+    public List<UniProtReturnField> getResultFields2() {
+        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPROTKB);
+    }
+
     private Tuple convertToTuple(UniProtDatabaseDetail dbType) {
+
         return new TupleImpl(dbType.getName(), dbType.getName().toLowerCase());
     }
 

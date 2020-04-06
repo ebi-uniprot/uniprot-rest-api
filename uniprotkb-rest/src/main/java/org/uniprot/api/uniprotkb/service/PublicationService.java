@@ -30,9 +30,9 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBReference;
 import org.uniprot.core.uniprotkb.impl.UniProtKBReferenceBuilder;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 /**
@@ -42,6 +42,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Service
 public class PublicationService {
 
+    private static final String COMPUTATIONALLY_MAPPED = "Computationally mapped";
     private final UniProtKBStoreClient uniProtKBStore;
     private final LiteratureRepository repository;
     private final LiteratureStoreEntryConverter entryStoreConverter;
@@ -95,7 +96,7 @@ public class PublicationService {
                             getPublicationEntry(
                                     literatureEntryMap.get(pubmedId),
                                     uniProtkbReference,
-                                    entry.getEntryType().toDisplayName()));
+                                    entry.getEntryType().getDisplayName()));
                 }
             }
         }
@@ -226,7 +227,7 @@ public class PublicationService {
                 .reference(reference)
                 .statistics(literatureEntry.getLiteratureEntry().getStatistics())
                 .literatureMappedReference(mappedReference)
-                .publicationSource("Computationally mapped")
+                .publicationSource(COMPUTATIONALLY_MAPPED)
                 .categories(categories)
                 .build();
     }

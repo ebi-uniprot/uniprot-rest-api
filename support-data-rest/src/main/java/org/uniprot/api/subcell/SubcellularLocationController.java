@@ -25,10 +25,10 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.subcell.request.SubcellularLocationRequestDTO;
+import org.uniprot.api.subcell.request.SubcellularLocationRequest;
 import org.uniprot.api.subcell.service.SubcellularLocationService;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.store.search.field.SubcellularLocationField;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author lgonzales
@@ -73,7 +73,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.subcellularLocation.invalid.id}")
                     String subcellularLocationId,
-            @ValidReturnFields(fieldValidatorClazz = SubcellularLocationField.ResultFields.class)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -93,7 +93,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 OBO_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> search(
-            @Valid SubcellularLocationRequestDTO searchRequest,
+            @Valid SubcellularLocationRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<SubcellularLocationEntry> results =
@@ -113,7 +113,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>>
             download(
-                    @Valid SubcellularLocationRequestDTO searchRequest,
+                    @Valid SubcellularLocationRequest searchRequest,
                     @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                             MediaType contentType,
                     @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
@@ -125,7 +125,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
 
     @Override
     protected String getEntityId(SubcellularLocationEntry entity) {
-        return entity.getAccession();
+        return entity.getId();
     }
 
     @Override

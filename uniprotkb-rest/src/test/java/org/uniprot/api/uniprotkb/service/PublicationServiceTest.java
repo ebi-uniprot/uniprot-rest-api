@@ -68,7 +68,7 @@ class PublicationServiceTest {
         assertNotNull(journal.getReference().getCitation());
         assertTrue(journal.getReference().getCitation() instanceof Literature);
         assertNull(journal.getLiteratureMappedReference());
-        assertEquals("Swiss-Prot", journal.getPublicationSource());
+        assertEquals("UniProtKB reviewed (Swiss-Prot)", journal.getPublicationSource());
         assertTrue(journal.getCategories().containsAll(Arrays.asList("Pathol", "Interaction")));
 
         PublicationEntry submission = entries.get(1);
@@ -77,7 +77,7 @@ class PublicationServiceTest {
         assertNotNull(submission.getReference());
         assertNotNull(submission.getReference().getCitation());
         assertTrue(submission.getReference().getCitation() instanceof Submission);
-        assertEquals("Swiss-Prot", submission.getPublicationSource());
+        assertEquals("UniProtKB reviewed (Swiss-Prot)", submission.getPublicationSource());
         assertEquals(1, submission.getCategories().size());
         assertTrue(submission.getCategories().contains("Interaction"));
     }
@@ -139,7 +139,7 @@ class PublicationServiceTest {
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
         PublicationRequest request = new PublicationRequest();
-        request.setFacets("category,source,scale");
+        request.setFacets("category,source,study_type");
         request.setQuery("category:Interaction");
         QueryResult<PublicationEntry> result =
                 service.getPublicationsByUniprotAccession("P12345", request);
@@ -154,7 +154,7 @@ class PublicationServiceTest {
 
         assertEquals("source", facets.get(0).getName());
         assertEquals("category", facets.get(1).getName());
-        assertEquals("scale", facets.get(2).getName());
+        assertEquals("study_type", facets.get(2).getName());
     }
 
     @Test
@@ -168,7 +168,7 @@ class PublicationServiceTest {
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
         PublicationRequest request = new PublicationRequest();
-        request.setFacets("category,source,scale");
+        request.setFacets("category,source,study_type");
         request.setSize(3);
         QueryResult<PublicationEntry> result =
                 service.getPublicationsByUniprotAccession("P12345", request);
@@ -205,7 +205,7 @@ class PublicationServiceTest {
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
         PublicationRequest request = new PublicationRequest();
-        request.setFacets("category,source,scale");
+        request.setFacets("category,source,study_type");
         request.setSize(3);
         request.setCursor("jxzylcj10");
 
@@ -242,7 +242,7 @@ class PublicationServiceTest {
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
         PublicationRequest request = new PublicationRequest();
-        request.setFacets("category,source,scale");
+        request.setFacets("category,source,study_type");
         request.setSize(3);
         request.setCursor("l43abuo2c");
 

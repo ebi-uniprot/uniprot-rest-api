@@ -8,11 +8,7 @@ import lombok.Data;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
-import org.uniprot.store.search.field.UniParcField;
-import org.uniprot.store.search.field.UniParcResultFields;
-
-import com.google.common.base.Strings;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author jluo
@@ -32,7 +28,7 @@ public class UniParcRequest implements SearchRequest {
 
     private String cursor;
 
-    @ValidReturnFields(fieldValidatorClazz = UniParcResultFields.class)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 
     @ValidFacets(facetConfig = UniParcFacetConfig.class)
@@ -40,18 +36,4 @@ public class UniParcRequest implements SearchRequest {
 
     @Positive(message = "{search.positive}")
     private Integer size;
-
-    public static final String DEFAULT_FIELDS =
-            "upi,organism,accession,first_seen,last_seen,length";
-
-    @Override
-    public String getFields() {
-        if (Strings.isNullOrEmpty(fields)) {
-            fields = DEFAULT_FIELDS;
-        } else if (!fields.contains(UniParcField.Return.upi.name())) {
-            String temp = "upi," + fields;
-            this.fields = temp;
-        }
-        return fields;
-    }
 }

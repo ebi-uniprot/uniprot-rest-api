@@ -7,9 +7,9 @@ import org.uniprot.api.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.literature.repository.LiteratureRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.core.literature.LiteratureEntry;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.factory.UniProtDataType;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 /**

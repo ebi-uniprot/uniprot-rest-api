@@ -100,7 +100,7 @@ public class UniProtKBDownloadParamAndResultProvider
                             xmlStr.substring(
                                     UniProtKBXmlMessageConverter.HEADER.length(),
                                     xmlStr.indexOf(UniProtKBXmlMessageConverter.FOOTER));
-                    String[] entryTags = entries.split("<entry dataset=\"Swiss-Prot\"");
+                    String[] entryTags = entries.split("<entry dataset=\"UniProtKB reviewed");
                     assertThat(
                             "Expected entry count doesn't match",
                             entryTags.length,
