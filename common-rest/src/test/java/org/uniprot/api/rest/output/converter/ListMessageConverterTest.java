@@ -2,10 +2,10 @@ package org.uniprot.api.rest.output.converter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author lgonzales
@@ -25,5 +25,4 @@ class ListMessageConverterTest {
         assertNotNull(result);
         assertEquals("entity\n", result);
     }
-
 }
