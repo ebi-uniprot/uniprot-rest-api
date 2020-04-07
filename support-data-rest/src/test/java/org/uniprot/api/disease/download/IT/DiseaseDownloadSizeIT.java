@@ -16,7 +16,6 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.download.resolver.DiseaseDownloadSizeParamAndResultProvider;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.support_data.SupportDataApplication;
 
 /** Class to test download api with certain size.. */
@@ -25,12 +24,6 @@ import org.uniprot.api.support_data.SupportDataApplication;
 @WebMvcTest(DiseaseController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
-    private static final Integer LESS_THAN_BATCH_SIZE =
-            BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 40;
-    private static final Integer BATCH_SIZE = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE;
-    private static final Integer MORE_THAN_BATCH_SIZE =
-            BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 3;
-    private static final Integer LESS_THAN_ZERO_SIZE = -1;
 
     @RegisterExtension
     static DiseaseDownloadSizeParamAndResultProvider paramAndResultProvider =
@@ -40,7 +33,7 @@ public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
     @MethodSource("provideRequestResponseByTypeLessBatchSize")
     void testDownloadLessThanBatchSize(DownloadParamAndResult paramAndResult) throws Exception {
 
-        sendAndVerify(paramAndResult, HttpStatus.BAD_REQUEST);
+        sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
@@ -97,6 +90,6 @@ public class DiseaseDownloadSizeIT extends BaseDiseaseDownloadIT {
                         type ->
                                 Arguments.of(
                                         paramAndResultProvider.getDownloadParamAndResult(
-                                                type, LESS_THAN_ZERO_SIZE)));
+                                                type, LESS_THAN_BATCH_SIZE)));
     }
 }

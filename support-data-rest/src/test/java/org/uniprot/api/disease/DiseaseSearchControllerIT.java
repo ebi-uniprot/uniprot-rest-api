@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -59,6 +60,9 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Autowired private DiseaseRepository repository;
 
+    @Value("${solr.query.batchSize:#{null}}")
+    private Integer solrBatchSize;
+
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.DISEASE;
@@ -81,7 +85,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return solrBatchSize;
     }
 
     @Override
