@@ -244,7 +244,7 @@ public class ResponseExceptionHandler {
             this("", Collections.emptyList());
         }
 
-        ErrorInfo(String url, List<String> messages) {
+        public ErrorInfo(String url, List<String> messages) {
             assert url != null : "Error URL cannot be null";
             assert messages != null : "Error messages cannot be null";
 
