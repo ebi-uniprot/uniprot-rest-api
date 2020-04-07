@@ -19,7 +19,7 @@
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
 	</properties>
 
-    <dependencies>
+	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
