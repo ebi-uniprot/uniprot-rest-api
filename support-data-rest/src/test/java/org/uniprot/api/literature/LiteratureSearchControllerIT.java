@@ -13,6 +13,7 @@ import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -73,6 +74,9 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Autowired private LiteratureRepository repository;
 
+    @Value("${solr.query.batchSize:#{null}}")
+    private Integer solrBatchSize;
+
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.LITERATURE;
@@ -95,7 +99,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return solrBatchSize;
     }
 
     @Override

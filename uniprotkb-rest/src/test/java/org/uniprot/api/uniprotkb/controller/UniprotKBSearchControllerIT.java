@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -105,6 +106,9 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Autowired private UniprotQueryRepository repository;
 
     @Autowired private TaxonomyRepository taxRepository;
+
+    @Value("${solr.query.batchSize:#{null}}")
+    private Integer solrBatchSize;
 
     private UniProtKBStoreClient storeClient;
 
@@ -577,7 +581,7 @@ class UniprotKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return solrBatchSize;
     }
 
     @Override

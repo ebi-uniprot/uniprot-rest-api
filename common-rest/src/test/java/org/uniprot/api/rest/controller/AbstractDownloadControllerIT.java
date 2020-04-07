@@ -29,7 +29,12 @@ import org.uniprot.store.search.SolrCollection;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT {
-    public static final Integer ENTRY_COUNT = 500;
+    public static final Integer ENTRY_COUNT = 50;
+    public static final Integer DEFAULT_BATCH_SIZE_TEST = 10;
+    public static final Integer LESS_THAN_BATCH_SIZE = DEFAULT_BATCH_SIZE_TEST - 4;
+    public static final Integer BATCH_SIZE = DEFAULT_BATCH_SIZE_TEST;
+    public static final Integer MORE_THAN_BATCH_SIZE = DEFAULT_BATCH_SIZE_TEST * 3;
+    public static final Integer LESS_THAN_ZERO_SIZE = -1;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
