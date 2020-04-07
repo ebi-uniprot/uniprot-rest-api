@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.uniprot.domain.model;
+package org.uniprot.api.support_data.configure.uniprot.domain.model;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -44,6 +44,7 @@ public class UniProtReturnField {
     @JsonIgnore private Integer childNumber;
     private String label;
     private String name;
+    private String sortField;
     private String groupName;
     private Boolean isDatabaseGroup;
     private String id;
@@ -95,6 +96,7 @@ public class UniProtReturnField {
                                         .label(field.getLabel())
                                         .name(field.getName())
                                         .id(field.getId())
+                                        .sortField(field.getSortField())
                                         .parentId(field.getParentId())
                                         .childNumber(field.getChildNumber())
                                         .build())

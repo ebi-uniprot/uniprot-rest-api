@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.controller;
+package org.uniprot.api.support_data.configure.controller;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;

@@ -1,11 +1,11 @@
-package org.uniprot.api.configure.uniprot.domain;
+package org.uniprot.api.support_data.configure.uniprot.domain;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
+import org.uniprot.api.support_data.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;

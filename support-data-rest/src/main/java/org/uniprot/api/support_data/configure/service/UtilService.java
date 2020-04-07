@@ -1,11 +1,11 @@
-package org.uniprot.api.configure.service;
+package org.uniprot.api.support_data.configure.service;
 
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
-import org.uniprot.api.configure.util.SolrQueryConverter;
+import org.uniprot.api.support_data.configure.uniprot.domain.query.SolrJsonQuery;
+import org.uniprot.api.support_data.configure.util.SolrQueryConverter;
 import org.uniprot.core.util.Utils;
 
 @Service

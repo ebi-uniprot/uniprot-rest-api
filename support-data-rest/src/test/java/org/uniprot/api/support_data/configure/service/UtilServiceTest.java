@@ -1,9 +1,9 @@
-package org.uniprot.api.configure.service;
+package org.uniprot.api.support_data.configure.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
+import org.uniprot.api.support_data.configure.uniprot.domain.query.SolrJsonQuery;
 
 /** @author lgonzales */
 class UtilServiceTest {

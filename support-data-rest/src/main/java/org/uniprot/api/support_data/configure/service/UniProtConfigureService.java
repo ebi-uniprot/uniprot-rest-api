@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.service;
+package org.uniprot.api.support_data.configure.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
-import org.uniprot.api.configure.uniprot.domain.model.UniProtReturnField;
+import org.uniprot.api.support_data.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
+import org.uniprot.api.support_data.configure.uniprot.domain.model.UniProtReturnField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;

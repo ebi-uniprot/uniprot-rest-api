@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.uniprot.domain.query;
+package org.uniprot.api.support_data.configure.uniprot.domain.query;
 
 import java.util.List;
 

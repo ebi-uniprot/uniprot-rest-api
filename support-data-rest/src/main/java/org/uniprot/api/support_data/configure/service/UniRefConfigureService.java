@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.service;
+package org.uniprot.api.support_data.configure.service;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.uniprot.domain.model;
+package org.uniprot.api.support_data.configure.uniprot.domain.model;
 
 import java.io.Serializable;
 import java.util.Comparator;

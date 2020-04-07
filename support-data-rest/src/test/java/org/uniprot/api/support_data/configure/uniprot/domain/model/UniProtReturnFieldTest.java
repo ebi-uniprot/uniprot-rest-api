@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.uniprot.domain.model;
+package org.uniprot.api.support_data.configure.uniprot.domain.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -7,6 +7,7 @@ import static org.hamcrest.core.Is.is;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,7 +24,18 @@ class UniProtReturnFieldTest {
     @MethodSource("provideValidUniProtDataTypes")
     void getReturnFieldsForValidUniProtDataTypeParameter(UniProtDataType validType) {
         List<UniProtReturnField> fields = UniProtReturnField.getReturnFieldsForClients(validType);
+
+        // root
         fields.forEach(this::validField);
+
+        // fields
+        fields.stream().flatMap(field -> field.getFields().stream()).forEach(this::validField);
+
+        boolean hasAtLeastOneFilter =
+                fields.stream()
+                        .flatMap(field -> field.getFields().stream())
+                        .anyMatch(field -> Utils.notNullNotEmpty(field.getSortField()));
+        Assertions.assertTrue(hasAtLeastOneFilter);
     }
 
     private static Stream<Arguments> provideValidUniProtDataTypes() {

@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.uniprot.domain;
+package org.uniprot.api.support_data.configure.uniprot.domain;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.uniprot.api.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
+import org.uniprot.api.support_data.configure.uniprot.domain.model.AdvanceUniProtKBSearchTerm;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 

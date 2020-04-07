@@ -1,4 +1,4 @@
-package org.uniprot.api.configure.util;
+package org.uniprot.api.support_data.configure.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
-import org.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
+import org.uniprot.api.support_data.configure.uniprot.domain.query.SolrJsonQuery;
 
 /**
  * This class convert Solr {@link Query} to {@link SolrJsonQuery}.
