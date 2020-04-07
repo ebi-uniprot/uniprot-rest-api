@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 @Service
 public class UniSaveServiceImpl implements UniSaveService {
     private static final String copyright =
-            "CC   -----------------------------------------------------------------------"
-                    + "CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms"
-                    + "CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License"
-                    + "CC   -----------------------------------------------------------------------"
-                    + "".replace("\r", "");
+            "CC   -----------------------------------------------------------------------\n"
+                    + "CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms\n"
+                    + "CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License\n"
+                    + "CC   -----------------------------------------------------------------------\n"
+                            .replace("\r", "");
     private static final String RELEASE_DATE_FORMAT = "dd-MMM-yyyy";
     private static final DateTimeFormatter RELEASE_DATE_FORMATTER =
             DateTimeFormatter.ofPattern(RELEASE_DATE_FORMAT);
@@ -263,7 +263,6 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .lastRelease(repoEntryInfo.getLastRelease().getReleaseNumber())
                 .lastReleaseDate(
                         formatReleaseDate(repoEntryInfo.getLastRelease().getReleaseDate()));
-        //                .build();
     }
 
     //
@@ -380,7 +379,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                         versions.add(Integer.parseInt(versionString));
                     } catch (NumberFormatException nfe) {
                         throw new InvalidRequestException(
-                                "Version list must only contain non-zero integers, found: "
+                                "Comma separated version list must only contain non-zero integers, found: "
                                         + versionString);
                     }
                 }
@@ -414,7 +413,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                         versions.add(Integer.parseInt(versionString));
                     } catch (NumberFormatException nfe) {
                         throw new InvalidRequestException(
-                                "Version list must only contain non-zero integers, found: "
+                                "Comma separated version list must only contain non-zero integers, found: "
                                         + versionString);
                     }
                 }

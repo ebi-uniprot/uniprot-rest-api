@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
+@Profile("online")
 @Service
 @Import(ServiceConfig.class)
 public class UniSaveRepository {
@@ -102,11 +105,17 @@ public class UniSaveRepository {
             // Exception handling.
             List<EntryImpl> resultList = q.getResultList();
 
+            if (resultList.isEmpty()) {
+                throw new ResourceNotFoundException("No entries for " + accession + " were found");
+            }
+
             for (EntryImpl entryImpl : resultList) {
                 setContent(entryImpl, session);
             }
 
             return resultList;
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (PersistenceException e) {
             LOGGER.error("", e);
             throw new RuntimeException("DBERROR", e);
@@ -157,7 +166,7 @@ public class UniSaveRepository {
             setContent(singleResult, session);
             return singleResult;
         } catch (NoResultException e) {
-            return null;
+            throw new ResourceNotFoundException("No entry for " + accession + " wasNoRes found");
         } catch (NonUniqueResultException e) {
             LOGGER.error("", e);
             return null;
@@ -182,7 +191,7 @@ public class UniSaveRepository {
             Object[] singleResult = (Object[]) q.getSingleResult();
             return convertFromObjectArray(singleResult);
         } catch (NoResultException e) {
-            return null;
+            throw new ResourceNotFoundException("No entry for " + accession + " was found");
         } catch (NonUniqueResultException e) {
             LOGGER.error("", e);
             return null;
@@ -323,6 +332,11 @@ public class UniSaveRepository {
 
             // Exception handling.
             List<?> resultList = q.getResultList();
+
+            if (resultList.isEmpty()) {
+                throw new ResourceNotFoundException("No entries for " + accession + " were found");
+            }
+
             List<EntryInfo> r = new ArrayList<>();
 
             TypedQuery<IdentifierStatus> q2 =
@@ -383,6 +397,8 @@ public class UniSaveRepository {
             }
 
             return r;
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (PersistenceException e) {
             LOGGER.error("", e);
             throw new RuntimeException("DBERROR", e);
@@ -460,7 +476,9 @@ public class UniSaveRepository {
 
             q.setParameter("acc", accession);
             List<IdentifierStatus> resultList = q.getResultList();
-            if (resultList.size() == 0) return null;
+            if (resultList.isEmpty())
+                throw new ResourceNotFoundException(
+                        "Accession " + accession + " could not be found");
 
             AccessionStatusInfoImpl accessionStatusInfo = new AccessionStatusInfoImpl();
             accessionStatusInfo.setAccession(accession);

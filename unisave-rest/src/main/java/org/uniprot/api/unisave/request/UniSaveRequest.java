@@ -2,6 +2,9 @@ package org.uniprot.api.unisave.request;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 /**
  * Created 27/03/20
  *
@@ -19,7 +22,11 @@ public class UniSaveRequest {
     @Data
     public static class Diff {
         private String accession;
+        @NotNull(message = "{search.required}")
+        @Positive(message = "{search.positive}")
         private Integer version1;
+        @NotNull(message = "{search.required}")
+        @Positive(message = "{search.positive}")
         private Integer version2;
     }
 }
