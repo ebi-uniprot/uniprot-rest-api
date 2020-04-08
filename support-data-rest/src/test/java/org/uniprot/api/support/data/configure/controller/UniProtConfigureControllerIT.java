@@ -110,7 +110,7 @@ class UniProtConfigureControllerIT {
     }
 
     @Test
-    void canGetResultFields2() throws Exception {
+    void canGetResultFieldsByNewAPI() throws Exception {
 
         // when
         ResultActions response =
