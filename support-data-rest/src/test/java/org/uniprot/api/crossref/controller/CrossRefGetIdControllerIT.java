@@ -3,8 +3,6 @@ package org.uniprot.api.crossref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.util.*;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +19,7 @@ import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;

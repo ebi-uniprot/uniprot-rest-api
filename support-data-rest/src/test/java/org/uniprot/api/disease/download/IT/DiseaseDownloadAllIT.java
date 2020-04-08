@@ -16,7 +16,7 @@ import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.download.resolver.DiseaseDownloadParamAndResultProvider;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 
 /** Class to test download api without any filter.. kind of download everything */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})

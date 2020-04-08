@@ -76,7 +76,7 @@ public class MessageConverterConfig {
                                 returnFieldConfig,
                                 new ProteomeEntryValueMapper()));
                 converters.add(
-                        new XslMessageConverter<>(
+                        new XlsMessageConverter<>(
                                 ProteomeEntry.class,
                                 returnFieldConfig,
                                 new ProteomeEntryValueMapper()));

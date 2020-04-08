@@ -31,7 +31,7 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;

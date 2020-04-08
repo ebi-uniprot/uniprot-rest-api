@@ -74,7 +74,7 @@ public class UniRefMessageConverterConfig {
                         new TsvMessageConverter<>(
                                 UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
                 converters.add(
-                        new XslMessageConverter<>(
+                        new XlsMessageConverter<>(
                                 UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
 
                 JsonMessageConverter<UniRefEntry> unirefJsonMessageConverter =
