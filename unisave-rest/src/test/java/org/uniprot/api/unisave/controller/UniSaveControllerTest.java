@@ -17,13 +17,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.unisave.UniSaveRESTApplication;
 import org.uniprot.api.unisave.repository.UniSaveRepository;
-import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
-import org.uniprot.api.unisave.repository.domain.impl.*;
+import org.uniprot.api.unisave.repository.domain.impl.AccessionStatusInfoImpl;
+import org.uniprot.api.unisave.repository.domain.impl.DiffImpl;
+import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
+import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
 
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -36,13 +37,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntry;
+import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntryInfo;
 
 /**
  * Created 06/04/20
  *
  * @author Edd
  */
-@ActiveProfiles("xxxx")
+@ActiveProfiles("unisave-controller-test")
 @ExtendWith(SpringExtension.class)
 @AutoConfigureWebClient
 @ContextConfiguration(
@@ -76,33 +79,6 @@ class UniSaveControllerTest {
                 .andExpect(jsonPath("$.results[*].content").doesNotExist());
     }
 
-    private EntryInfoImpl mockEntryInfo(String accession, int entryVersion) {
-        EntryInfoImpl entryInfo = new EntryInfoImpl();
-        entryInfo.setEntryVersion(entryVersion);
-        ReleaseImpl lastRelease = new ReleaseImpl();
-        lastRelease.setDatabase(DatabaseEnum.Swissprot);
-        lastRelease.setId(2);
-        lastRelease.setReleaseNumber("2");
-        lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        lastRelease.setReleaseURI("some URI");
-        lastRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
-
-        entryInfo.setLastRelease(lastRelease);
-        entryInfo.setAccession(accession);
-        entryInfo.setDatabase(DatabaseEnum.Swissprot);
-        entryInfo.setEntryMD5("someMd5");
-        ReleaseImpl firstRelease = new ReleaseImpl();
-        firstRelease.setDatabase(DatabaseEnum.Swissprot);
-        firstRelease.setId(1);
-        firstRelease.setReleaseNumber("1");
-        firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        firstRelease.setReleaseURI("some URI");
-        firstRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
-        entryInfo.setFirstRelease(firstRelease);
-
-        return entryInfo;
-    }
-
     @Test
     void canRetrieveEntriesWithContent() throws Exception {
         // given
@@ -125,69 +101,6 @@ class UniSaveControllerTest {
                 .andExpect(jsonPath("$.results[*].content", hasSize(2)))
                 .andExpect(jsonPath("$.results[0].content").isNotEmpty())
                 .andExpect(jsonPath("$.results[1].content").isNotEmpty());
-    }
-
-    private EntryImpl mockEntry(String accession, int entryVersion) {
-        EntryImpl entry = new EntryImpl();
-        EntryContentImpl content = new EntryContentImpl();
-        content.setFullcontent(
-                "ID   "
-                        + accession
-                        + "_ID        Unreviewed;        60 AA.\n"
-                        + "AC   "
-                        + accession
-                        + ";\n"
-                        + "DT   13-FEB-2019, integrated into UniProtKB/TrEMBL.\n"
-                        + "DT   13-FEB-2019, sequence version 1.\n"
-                        + "DT   11-DEC-2019, entry version "
-                        + entryVersion
-                        + ".\n"
-                        + "DE   SubName: Full=Uncharacterized protein {ECO:0000313|EMBL:AYX10384.1};\n"
-                        + "GN   ORFNames=EGX52_05955 {ECO:0000313|EMBL:AYX10384.1};\n"
-                        + "OS   Yersinia pseudotuberculosis.\n"
-                        + "OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;\n"
-                        + "OC   Yersiniaceae; Yersinia.\n"
-                        + "OX   NCBI_TaxID=633 {ECO:0000313|EMBL:AYX10384.1, ECO:0000313|Proteomes:UP000277634};\n"
-                        + "RN   [1] {ECO:0000313|Proteomes:UP000277634}\n"
-                        + "RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].\n"
-                        + "RC   STRAIN=FDAARGOS_580 {ECO:0000313|Proteomes:UP000277634};\n"
-                        + "RA   Goldberg B., Campos J., Tallon L., Sadzewicz L., Zhao X., Vavikolanu K.,\n"
-                        + "RA   Mehta A., Aluvathingal J., Nadendla S., Geyer C., Nandy P., Yan Y.,\n"
-                        + "RA   Sichtig H.;\n"
-                        + "RT   \"FDA dAtabase for Regulatory Grade micrObial Sequences (FDA-ARGOS):\n"
-                        + "RT   Supporting development and validation of Infectious Disease Dx tests.\";\n"
-                        + "RL   Submitted (NOV-2018) to the EMBL/GenBank/DDBJ databases.\n"
-                        + "DR   EMBL; CP033715; AYX10384.1; -; Genomic_DNA.\n"
-                        + "DR   RefSeq; WP_072092108.1; NZ_PDEJ01000002.1.\n"
-                        + "DR   Proteomes; UP000277634; Chromosome.\n"
-                        + "PE   4: Predicted;\n"
-                        + "SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;\n"
-                        + "     MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC\n"
-                        + "//\n");
-        entry.setEntryContent(content);
-        entry.setEntryVersion(entryVersion);
-        ReleaseImpl lastRelease = new ReleaseImpl();
-        lastRelease.setDatabase(DatabaseEnum.Swissprot);
-        lastRelease.setId(2);
-        lastRelease.setReleaseNumber("2");
-        lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        lastRelease.setReleaseURI("some URI");
-        lastRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
-
-        entry.setLastRelease(lastRelease);
-        entry.setAccession(accession);
-        entry.setDatabase(DatabaseEnum.Swissprot);
-        entry.setEntryMD5("someMd5");
-        ReleaseImpl firstRelease = new ReleaseImpl();
-        firstRelease.setDatabase(DatabaseEnum.Swissprot);
-        firstRelease.setId(1);
-        firstRelease.setReleaseNumber("1");
-        firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        firstRelease.setReleaseURI("some URI");
-        firstRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
-        entry.setFirstRelease(firstRelease);
-
-        return entry;
     }
 
     @Test
@@ -290,7 +203,11 @@ class UniSaveControllerTest {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.messages[*]", contains("Invalid request received. Comma separated version list must only contain non-zero integers, found: XXXX")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                contains(
+                                        "Invalid request received. Comma separated version list must only contain non-zero integers, found: XXXX")));
     }
 
     // resource /{accession}/diff
@@ -306,7 +223,7 @@ class UniSaveControllerTest {
         diff.setEntryOne(mockEntry(accession, version1));
         diff.setEntryTwo(mockEntry(accession, version2));
 
-        when(uniSaveRepository.diff(accession, version1, version2)).thenReturn(diff);
+        when(uniSaveRepository.getDiff(accession, version1, version2)).thenReturn(diff);
 
         // when
         ResultActions response =
@@ -326,10 +243,10 @@ class UniSaveControllerTest {
     }
 
     @Test
-    void diffForNonExistingEntryCauses404() throws Exception {
+    void diffForNonExistentEntryCauses404() throws Exception {
         // given
         String accession = "P12345";
-        doThrow(ResourceNotFoundException.class).when(uniSaveRepository).diff(accession, 1, 2);
+        doThrow(ResourceNotFoundException.class).when(uniSaveRepository).getDiff(accession, 1, 2);
 
         // when
         ResultActions response =
@@ -387,14 +304,6 @@ class UniSaveControllerTest {
     @Test
     void canGetStatus() throws Exception { // given
         String accession = "P12345";
-        DiffImpl diff = new DiffImpl();
-        diff.setAccession(accession);
-        diff.setDiff("mock diff");
-        int version1 = 1;
-        int version2 = 2;
-        diff.setEntryOne(mockEntry(accession, version1));
-        diff.setEntryTwo(mockEntry(accession, version2));
-
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
         status.setAccession(accession);
         when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
@@ -412,9 +321,28 @@ class UniSaveControllerTest {
     }
 
     @Test
-    void statusForNonExistingEntryCauses404() throws Exception {
+    void getStatusWhenRepositoryExceptionCauses500() throws Exception { // given
+        String accession = "P12346";
+        doThrow(QueryRetrievalException.class)
+                .when(uniSaveRepository)
+                .retrieveEntryStatusInfo(accession);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get("/unisave/" + accession + "/status")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+                .andExpect(jsonPath("$.messages[*]", contains("Internal server error")));
+    }
+
+    @Test
+    void statusForNonExistentEntryCauses404() throws Exception {
         // given
-        String accession = "P12345";
+        String accession = "P12347";
         doThrow(ResourceNotFoundException.class)
                 .when(uniSaveRepository)
                 .retrieveEntryStatusInfo(accession);
@@ -431,7 +359,7 @@ class UniSaveControllerTest {
                 .andExpect(jsonPath("$.messages[*]", contains("Resource not found")));
     }
 
-    @Profile("xxxx")
+    @Profile("unisave-controller-test")
     @Configuration
     static class TestConfig {
         @Primary

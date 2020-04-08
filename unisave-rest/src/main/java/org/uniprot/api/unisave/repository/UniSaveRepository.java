@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
@@ -117,11 +118,8 @@ public class UniSaveRepository {
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return Collections.emptyList();
+            LOGGER.error("Could not retrieve query results", e);
+            throw new QueryRetrievalException("Could not retrieve query results", e);
         }
     }
 
@@ -167,15 +165,9 @@ public class UniSaveRepository {
             return singleResult;
         } catch (NoResultException e) {
             throw new ResourceNotFoundException("No entry for " + accession + " wasNoRes found");
-        } catch (NonUniqueResultException e) {
-            LOGGER.error("", e);
-            return null;
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return null;
+            LOGGER.error("Could not retrieve query results", e);
+            throw new QueryRetrievalException("Could not retrieve query results", e);
         }
     }
 
@@ -192,15 +184,9 @@ public class UniSaveRepository {
             return convertFromObjectArray(singleResult);
         } catch (NoResultException e) {
             throw new ResourceNotFoundException("No entry for " + accession + " was found");
-        } catch (NonUniqueResultException e) {
-            LOGGER.error("", e);
-            return null;
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return null;
+            LOGGER.error("Could not retrieve query results", e);
+            throw new QueryRetrievalException("Could not retrieve query results", e);
         }
     }
 
@@ -217,15 +203,9 @@ public class UniSaveRepository {
             return Optional.ofNullable(convertFromObjectArray(singleResult));
         } catch (NoResultException e) {
             return Optional.empty();
-        } catch (NonUniqueResultException e) {
-            LOGGER.error("", e);
-            return Optional.empty();
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return Optional.empty();
+            LOGGER.error("Could not retrieve query results", e);
+            throw new QueryRetrievalException("Could not retrieve query results", e);
         }
     }
 
@@ -400,11 +380,8 @@ public class UniSaveRepository {
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return Collections.emptyList();
+            LOGGER.error("Could not retrieve query results", e);
+            throw new QueryRetrievalException("Could not retrieve query results", e);
         }
     }
 
@@ -489,15 +466,12 @@ public class UniSaveRepository {
 
             return accessionStatusInfo;
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new RuntimeException("DBERROR", e);
-        } catch (Exception e) {
-            LOGGER.warn("", e);
-            return null;
+            LOGGER.error("Could not retrieve query results", e);
+            throw new QueryRetrievalException("Could not retrieve query results", e);
         }
     }
 
-    public Diff diff(String accession, int v1, int v2) {
+    public Diff getDiff(String accession, int v1, int v2) {
         Entry e1 = this.getEntryImpl(accession, v1);
         Entry e2 = this.getEntryImpl(accession, v2);
 

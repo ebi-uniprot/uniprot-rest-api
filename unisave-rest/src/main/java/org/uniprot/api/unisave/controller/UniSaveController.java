@@ -77,7 +77,7 @@ public class UniSaveController {
         context.setEntityOnly(true);
         context.setEntities(
                 Stream.of(
-                        service.getDiff2(
+                        service.getDiff(
                                 unisaveRequest.getAccession(),
                                 unisaveRequest.getVersion1(),
                                 unisaveRequest.getVersion2())));
@@ -95,7 +95,7 @@ public class UniSaveController {
                         MessageConverterContextFactory.Resource.UNISAVE,
                         UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
         context.setEntityOnly(true);
-        context.setEntities(Stream.of(service.getAccessionStatus2(accession)));
+        context.setEntities(Stream.of(service.getAccessionStatus(accession)));
 
         return ResponseEntity.ok(context);
     }
