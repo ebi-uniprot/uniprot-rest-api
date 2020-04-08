@@ -22,7 +22,7 @@ import org.uniprot.api.disease.DiseaseController;
 import org.uniprot.api.disease.download.resolver.DiseaseDownloadFieldsParamAndResultProvider;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
 @ActiveProfiles(profiles = "offline")

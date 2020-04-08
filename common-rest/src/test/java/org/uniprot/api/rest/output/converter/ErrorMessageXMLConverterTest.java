@@ -21,14 +21,14 @@ import org.uniprot.api.rest.validation.error.ResponseExceptionHandler;
 class ErrorMessageXMLConverterTest {
 
     @Test
-    void readReturnNull() throws IOException {
+    void readReturnNull() {
         ErrorMessageXMLConverter converter = new ErrorMessageXMLConverter();
         ResponseExceptionHandler.ErrorInfo result = converter.read(null, null, null);
         assertNull(result);
     }
 
     @Test
-    void readInternalReturnNull() throws IOException {
+    void readInternalReturnNull() {
         ErrorMessageXMLConverter converter = new ErrorMessageXMLConverter();
         ResponseExceptionHandler.ErrorInfo result = converter.readInternal(null, null);
         assertNull(result);
@@ -44,7 +44,6 @@ class ErrorMessageXMLConverterTest {
         converter.writeInternal(errorInfo, null, httpOutputMessage);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertTrue(result.contains("<errorInfo>"));
@@ -63,7 +62,6 @@ class ErrorMessageXMLConverterTest {
         converter.writeInternal(errorInfo, null, httpOutputMessage);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertTrue(result.contains("<errorInfo>"));
@@ -75,7 +73,7 @@ class ErrorMessageXMLConverterTest {
     private HttpOutputMessage getHttpOutputMessage(ByteArrayOutputStream outputStream) {
         return new HttpOutputMessage() {
             @Override
-            public OutputStream getBody() throws IOException {
+            public OutputStream getBody() {
                 return outputStream;
             }
 

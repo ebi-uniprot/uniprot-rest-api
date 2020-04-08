@@ -21,7 +21,7 @@ class RDFMessageConverterTest {
         rdfMessageConverter.writeEntity("entity", outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+
         assertNotNull(result);
         assertEquals("entity\n", result);
     }

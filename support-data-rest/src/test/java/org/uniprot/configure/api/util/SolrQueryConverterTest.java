@@ -11,8 +11,8 @@ import org.apache.lucene.search.Query;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uniprot.api.support_data.configure.uniprot.domain.query.SolrJsonQuery;
-import org.uniprot.api.support_data.configure.util.SolrQueryConverter;
+import org.uniprot.api.support.data.configure.uniprot.domain.query.SolrJsonQuery;
+import org.uniprot.api.support.data.configure.util.SolrQueryConverter;
 
 /** @author lgonzales */
 class SolrQueryConverterTest {

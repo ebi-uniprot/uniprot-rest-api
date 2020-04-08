@@ -88,7 +88,7 @@ public class MessageConverterConfig {
                                 returnConfig,
                                 new UniProtKBEntryValueMapper()));
                 converters.add(
-                        new XslMessageConverter<>(
+                        new XlsMessageConverter<>(
                                 UniProtKBEntry.class,
                                 returnConfig,
                                 new UniProtKBEntryValueMapper()));
