@@ -77,7 +77,7 @@ public class MessageConverterConfig {
                                 returnFieldConfig,
                                 new UniParcEntryValueMapper()));
                 converters.add(
-                        new XslMessageConverter<>(
+                        new XlsMessageConverter<>(
                                 UniParcEntry.class,
                                 returnFieldConfig,
                                 new UniParcEntryValueMapper()));
