@@ -418,7 +418,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=accession:Q14301&fields=accession,organism")
+                                                + "?query=accession:Q14301&fields=accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -480,7 +480,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=mnemonic:I8FBX2_YERPE")
+                                get(SEARCH_RESOURCE + "?query=id:I8FBX2_YERPE")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -592,7 +592,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
+        if (searchField.startsWith("ftlen_") || searchField.startsWith("cross_ref_count_")) {
             value = "[* TO *]";
         } else {
             switch (searchField) {
@@ -706,7 +706,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .forEach(
                             db -> {
                                 doc.xrefCountMap.put(
-                                        "xref_count_" + db.getName().toLowerCase(), 0L);
+                                        "cross_ref_count_" + db.getName().toLowerCase(), 0L);
                             });
 
             Arrays.stream(FeatureType.values())
@@ -845,7 +845,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         @Override
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("organism:*"))
+                    .queryParam("query", Collections.singletonList("organism_name:*"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.primaryAccession",

@@ -55,7 +55,7 @@ class SortFieldValidatorImplTest {
 
         boolean result =
                 validator.isValid(
-                        "accession desc,mnemonic DESC, name DesC , annotation_score dESc", null);
+                        "accession desc,id DESC, name DesC , annotation_score dESc", null);
         assertTrue(result);
     }
 

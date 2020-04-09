@@ -166,7 +166,7 @@ public class UniProtEntryService
                 SolrQueryUtil.hasFieldTerms(
                         request.getQuery(),
                         searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName(),
-                        searchFieldConfig.getSearchFieldItemByName("mnemonic").getFieldName(),
+                        searchFieldConfig.getSearchFieldItemByName("id").getFieldName(),
                         searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName());
 
         if (!hasIdFieldTerms) {

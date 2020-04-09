@@ -77,7 +77,7 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     }
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
-    @MethodSource("mnemonic")
+    @MethodSource("id")
     void testDownloadSortByMnemonic(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
@@ -145,8 +145,8 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
         return requestResponseForSort("accession", "desc", SORTED_BY_ACCESSION_DESC);
     }
 
-    private static Stream<Arguments> mnemonic() {
-        return requestResponseForSort("mnemonic", "asc", SORTED_BY_MNEMONIC);
+    private static Stream<Arguments> id() {
+        return requestResponseForSort("id", "asc", SORTED_BY_MNEMONIC);
     }
 
     private static Stream<Arguments> name() {

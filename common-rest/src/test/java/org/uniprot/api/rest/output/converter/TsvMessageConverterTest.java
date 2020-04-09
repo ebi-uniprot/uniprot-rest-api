@@ -37,7 +37,7 @@ class TsvMessageConverterTest {
     void canWriteHeader() throws IOException {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
-                        .fields("accession,organism,gene_orf")
+                        .fields("accession,organism_name,gene_orf")
                         .build();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

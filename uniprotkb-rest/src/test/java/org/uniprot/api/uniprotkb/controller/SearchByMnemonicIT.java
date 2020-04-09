@@ -122,7 +122,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic:" + TARGET_ID));
+                                .param("query", "id:" + TARGET_ID));
 
         // then
         response.andDo(print())
@@ -139,7 +139,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic:cYc_Human"));
+                                .param("query", "id:cYc_Human"));
 
         // then
         response.andDo(print())
@@ -156,7 +156,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic_default:AATM_RABIT"));
+                                .param("query", "id_default:AATM_RABIT"));
 
         // then
         response.andDo(print())
@@ -173,7 +173,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic:AATM"));
+                                .param("query", "id:AATM"));
 
         // then
         response.andDo(print())

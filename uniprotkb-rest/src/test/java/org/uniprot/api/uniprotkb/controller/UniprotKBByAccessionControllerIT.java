@@ -136,7 +136,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + ACCESSION_ID)
-                                        .param("fields", "invalid, organism, invalid2")
+                                        .param("fields", "invalid, organism_name, invalid2")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -167,7 +167,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + "P21802-2")
-                                        .param("fields", "accession,organism")
+                                        .param("fields", "accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -196,7 +196,7 @@ class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE + "P21802-1")
-                                        .param("fields", "accession,organism")
+                                        .param("fields", "accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

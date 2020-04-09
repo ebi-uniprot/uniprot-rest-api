@@ -8,11 +8,11 @@
     "type": "String"
   },
   {
-    "name": "mnemonic",
+    "name": "id",
     "type": "String"
   },
   {
-    "name": "mnemonic_default",
+    "name": "id_default",
     "type": "String"
   },
   {
@@ -640,7 +640,7 @@
     "type": "String"
   },
   {
-    "name": "xref",
+    "name": "cross_ref",
     "type": "String"
   },
   {
