@@ -328,7 +328,7 @@ class UniSaveServiceImplTest {
                 UniSaveEntry.builder().lastRelease(LATEST_RELEASE);
         ReleaseImpl release = new ReleaseImpl();
         LocalDate localDate = LocalDate.of(1967, 6, 22);
-        Date date = Date.valueOf(localDate); // Magic happens here!
+        Date date = Date.valueOf(localDate);
         release.setReleaseDate(date);
         String releaseNumber = "1";
         release.setReleaseNumber(releaseNumber);
