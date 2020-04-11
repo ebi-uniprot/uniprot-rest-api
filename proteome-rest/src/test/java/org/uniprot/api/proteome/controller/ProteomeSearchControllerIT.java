@@ -22,7 +22,7 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -44,10 +44,6 @@ import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
@@ -72,7 +68,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             ProteomeSearchControllerIT.ProteomeSearchContentTypeParamResolver.class,
             ProteomeSearchControllerIT.ProteomeSearchParameterResolver.class
         })
-public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
+public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String UPID_PREF = "UP000005";
 
     @Autowired private ProteomeQueryRepository repository;
@@ -105,8 +101,8 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.PROTEOME;
     }
 
     @Override
@@ -137,12 +133,6 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
-    }
-
-    @Override
-    protected List<ReturnField> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PROTEOME)
-                .getReturnFields();
     }
 
     @Override
