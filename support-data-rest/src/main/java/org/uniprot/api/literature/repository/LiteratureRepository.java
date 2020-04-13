@@ -1,6 +1,6 @@
 package org.uniprot.api.literature.repository;
 
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -15,11 +15,11 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 public class LiteratureRepository extends SolrQueryRepository<LiteratureDocument> {
 
     protected LiteratureRepository(
-            SolrTemplate solrTemplate,
+            SolrClient solrClient,
             LiteratureFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(
-                solrTemplate,
+                solrClient,
                 SolrCollection.literature,
                 LiteratureDocument.class,
                 facetConfig,

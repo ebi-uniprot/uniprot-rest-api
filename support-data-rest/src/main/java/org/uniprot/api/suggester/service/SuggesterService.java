@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.data.solr.core.SolrTemplate;
-import org.springframework.data.solr.core.query.SimpleQuery;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.suggester.Suggestion;
@@ -30,7 +30,7 @@ import org.uniprot.store.search.field.QueryBuilder;
 @Slf4j
 public class SuggesterService {
     private static final String SUGGEST_SEARCH_HANDLER = "/search";
-    private static String errorFormat;
+    private static final String ERROR_FORMAT;
 
     static {
         String dicts =
@@ -38,30 +38,28 @@ public class SuggesterService {
                         .map(Enum::name)
                         .map(String::toLowerCase)
                         .collect(Collectors.joining(", ", "[", "]"));
-        errorFormat = "Unknown dictionary: '%s'. Expected one of " + dicts + ".";
+        ERROR_FORMAT = "Unknown dictionary: '%s'. Expected one of " + dicts + ".";
     }
 
-    private final SolrTemplate solrTemplate;
+    private final SolrClient solrClient;
     private final SolrCollection collection;
     private final SearchFieldConfig searchFieldConfig;
 
-    public SuggesterService(SolrTemplate solrTemplate, SolrCollection collection) {
-        this.solrTemplate = solrTemplate;
+    public SuggesterService(SolrClient solrClient, SolrCollection collection) {
+        this.solrClient = solrClient;
         this.collection = collection;
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUGGEST);
     }
 
     public Suggestions findSuggestions(String dictionaryStr, String queryStr) {
-        SimpleQuery query =
-                new SimpleQuery(createQueryString(getDictionary(dictionaryStr), queryStr));
-        query.setRequestHandler(SUGGEST_SEARCH_HANDLER);
+        SolrQuery solrQuery =
+                new SolrQuery(createQueryString(getDictionary(dictionaryStr), queryStr));
+        solrQuery.setRequestHandler(SUGGEST_SEARCH_HANDLER);
 
         try {
             List<SuggestDocument> content =
-                    solrTemplate
-                            .query(collection.name(), query, SuggestDocument.class)
-                            .getContent();
+                    solrClient.query(collection.name(), solrQuery).getBeans(SuggestDocument.class);
             return Suggestions.builder()
                     .dictionary(dictionaryStr)
                     .query(queryStr)
@@ -78,7 +76,7 @@ public class SuggesterService {
         try {
             return SuggestDictionary.valueOf(dictionaryStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new InvalidRequestException(String.format(errorFormat, dictionaryStr));
+            throw new InvalidRequestException(String.format(ERROR_FORMAT, dictionaryStr));
         }
     }
 

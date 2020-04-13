@@ -20,7 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,9 +61,8 @@ public abstract class AbstractSearchControllerIT {
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(getStoreType(), getSolrCollection());
-        SolrTemplate template = new SolrTemplate(getStoreManager().getSolrClient(getStoreType()));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                getRepository(), "solrClient", storeManager.getSolrClient(getStoreType()));
     }
 
     @Test

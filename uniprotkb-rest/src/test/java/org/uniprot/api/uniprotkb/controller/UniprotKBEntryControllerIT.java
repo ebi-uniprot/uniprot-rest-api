@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -66,12 +65,11 @@ class UniprotKBEntryControllerIT {
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(
                 DataStoreManager.StoreType.LITERATURE, SolrCollection.literature);
-        SolrTemplate template =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.LITERATURE));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(repository, "solrTemplate", template);
-
         storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.LITERATURE));
     }
 
     @BeforeEach

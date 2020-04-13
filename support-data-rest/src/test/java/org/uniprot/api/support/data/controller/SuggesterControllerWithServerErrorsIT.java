@@ -54,7 +54,7 @@ import org.uniprot.api.support.data.SupportDataApplication;
 class SuggesterControllerWithServerErrorsIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
-    @Autowired private SolrClient uniProtSolrClient;
+    @Autowired private SolrClient solrClient;
 
     @Autowired private WebApplicationContext webApplicationContext;
 
@@ -69,7 +69,7 @@ class SuggesterControllerWithServerErrorsIT {
     void solrErrorCauses500() throws Exception {
         // given
         doThrow(IllegalStateException.class)
-                .when(uniProtSolrClient)
+                .when(solrClient)
                 .query(anyString(), any(SolrQuery.class));
 
         // when
@@ -91,7 +91,7 @@ class SuggesterControllerWithServerErrorsIT {
     static class OtherConfig {
         @Bean
         @Primary
-        public SolrClient uniProtSolrClient() {
+        public SolrClient solrClient() {
             return mock(SolrClient.class);
         }
 

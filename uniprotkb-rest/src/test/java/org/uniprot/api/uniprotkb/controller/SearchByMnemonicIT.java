@@ -20,7 +20,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -71,10 +70,10 @@ class SearchByMnemonicIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-        SolrTemplate template =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(

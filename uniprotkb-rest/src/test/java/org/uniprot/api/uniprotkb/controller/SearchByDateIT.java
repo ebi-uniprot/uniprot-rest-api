@@ -22,9 +22,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -52,6 +52,7 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles(profiles = "offline")
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -100,10 +101,10 @@ class SearchByDateIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-        SolrTemplate template =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(

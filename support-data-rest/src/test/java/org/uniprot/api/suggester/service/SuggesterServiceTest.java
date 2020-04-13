@@ -10,9 +10,9 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.suggester.Suggestion;
 import org.uniprot.store.search.SolrCollection;
@@ -29,7 +29,7 @@ class SuggesterServiceTest {
 
     @BeforeEach
     void setup() {
-        this.service = new SuggesterService(mock(SolrTemplate.class), SolrCollection.suggest);
+        this.service = new SuggesterService(mock(SolrClient.class), SolrCollection.suggest);
     }
 
     @Test

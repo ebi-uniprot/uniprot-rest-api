@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -133,11 +132,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
         // Add taxonomy to the repo and and solr template injection..
         dsm.addSolrClient(DataStoreManager.StoreType.TAXONOMY, SolrCollection.taxonomy);
-        SolrTemplate template =
-                new SolrTemplate(
-                        getStoreManager().getSolrClient(DataStoreManager.StoreType.TAXONOMY));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(taxRepository, "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                taxRepository,
+                "solrClient",
+                dsm.getSolrClient(DataStoreManager.StoreType.TAXONOMY));
     }
 
     @AfterEach

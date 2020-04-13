@@ -1,16 +1,17 @@
 package org.uniprot.api.common.repository.search;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.solr.core.SolrCallback;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
@@ -18,7 +19,6 @@ import org.uniprot.api.common.repository.search.facet.FacetResponseConverter;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.common.repository.search.term.TermInfoConverter;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
 
@@ -36,18 +36,18 @@ public abstract class SolrQueryRepository<T extends Document> {
     private final TermInfoConverter termInfoConverter;
     private final SolrRequestConverter requestConverter;
 
-    private SolrTemplate solrTemplate;
-    private SolrCollection collection;
-    private Class<T> tClass;
-    private FacetResponseConverter facetConverter;
+    private final SolrClient solrClient;
+    private final SolrCollection collection;
+    private final Class<T> tClass;
+    private final FacetResponseConverter facetConverter;
 
     protected SolrQueryRepository(
-            SolrTemplate solrTemplate,
+            SolrClient solrClient,
             SolrCollection collection,
             Class<T> tClass,
             FacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
-        this.solrTemplate = solrTemplate;
+        this.solrClient = solrClient;
         this.collection = collection;
         this.tClass = tClass;
         this.facetConverter = new FacetResponseConverter(facetConfig);
@@ -58,20 +58,18 @@ public abstract class SolrQueryRepository<T extends Document> {
     public QueryResult<T> searchPage(SolrRequest request, String cursor) {
         try {
             CursorPage page = CursorPage.of(cursor, request.getRows());
-            QueryResponse solrResponse =
-                    solrTemplate.execute(getSolrCursorCallback(request, page.getCursor()));
+            QueryResponse solrResponse = search(request, page.getCursor());
 
-            List<T> resultList = solrTemplate.convertQueryResponseToBeans(solrResponse, tClass);
+            List<T> resultList = solrResponse.getBeans(tClass);
             page.setNextCursor(solrResponse.getNextCursorMark());
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
-            List<Facet> facets = new ArrayList<>();
-            if (Utils.notNull(facetConverter)) {
-                facets = facetConverter.convert(solrResponse);
-            }
+            List<Facet> facets = facetConverter.convert(solrResponse);
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
 
             return QueryResult.of(resultList, page, facets, termInfos);
+        } catch (InvalidRequestException ire) {
+            throw ire;
         } catch (Throwable e) {
             if (e.getCause() instanceof InvalidRequestException) {
                 throw (InvalidRequestException) e.getCause();
@@ -85,14 +83,14 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public Optional<T> getEntry(SolrRequest request) {
         try {
-            QueryResponse response = solrTemplate.execute(getSolrEntryCallback(request));
+            SolrQuery solrQuery = requestConverter.toSolrQuery(request, true);
+            QueryResponse response = solrClient.query(collection.toString(), solrQuery);
             if (!response.getResults().isEmpty()) {
                 if (response.getResults().size() > 1) {
                     LOGGER.warn(
                             "More than 1 result found for a single result query, returning first entry in list");
                 }
-                return Optional.ofNullable(
-                        solrTemplate.convertQueryResponseToBeans(response, tClass).get(0));
+                return Optional.ofNullable(response.getBeans(tClass).get(0));
             } else {
                 return Optional.empty();
             }
@@ -106,34 +104,22 @@ public abstract class SolrQueryRepository<T extends Document> {
     public Stream<T> getAll(SolrRequest request) {
         SolrResultsIterator<T> resultsIterator =
                 new SolrResultsIterator<>(
-                        solrTemplate.getSolrClient(),
-                        collection,
-                        requestConverter.toSolrQuery(request),
-                        tClass);
+                        solrClient, collection, requestConverter.toSolrQuery(request), tClass);
         return StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
                         false)
                 .flatMap(Collection::stream);
     }
 
-    private SolrCallback<QueryResponse> getSolrCursorCallback(SolrRequest request, String cursor) {
-        return solrClient -> {
-            SolrQuery solrQuery = requestConverter.toSolrQuery(request);
-            if (cursor != null && !cursor.isEmpty()) {
-                solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
-            } else {
-                solrQuery.set(
-                        CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
-            }
-
-            return solrClient.query(collection.toString(), solrQuery);
-        };
-    }
-
-    private SolrCallback<QueryResponse> getSolrEntryCallback(SolrRequest request) {
-        return solrClient ->
-                solrClient.query(
-                        collection.toString(), requestConverter.toSolrQuery(request, true));
+    private QueryResponse search(SolrRequest request, String cursor)
+            throws IOException, SolrServerException {
+        SolrQuery solrQuery = requestConverter.toSolrQuery(request);
+        if (cursor != null && !cursor.isEmpty()) {
+            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+        } else {
+            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+        }
+        return solrClient.query(collection.toString(), solrQuery);
     }
 
     private void logSolrQuery(SolrRequest request) {

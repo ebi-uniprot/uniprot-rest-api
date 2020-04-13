@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.Query;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -45,11 +45,8 @@ class SolrQueryRepositoryIT {
     static void setUp() {
         try {
             storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-            SolrTemplate template =
-                    new SolrTemplate(
-                            storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
-            template.afterPropertiesSet();
-            queryRepo = new GeneralSolrQueryRepository(template);
+            SolrClient solrClient = storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT);
+            queryRepo = new GeneralSolrQueryRepository(solrClient);
         } catch (Exception e) {
             fail("Error to setup SolrQueryRepositoryTest", e);
         }
@@ -378,9 +375,9 @@ class SolrQueryRepositoryIT {
     }
 
     private static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
-        GeneralSolrQueryRepository(SolrTemplate template) {
+        GeneralSolrQueryRepository(SolrClient solrClient) {
             super(
-                    template,
+                    solrClient,
                     SolrCollection.uniprot,
                     UniProtDocument.class,
                     new FakeFacetConfig(),
