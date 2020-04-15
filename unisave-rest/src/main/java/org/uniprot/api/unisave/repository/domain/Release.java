@@ -10,20 +10,6 @@ import java.util.Date;
 public interface Release {
 
     /**
-     * The entry iterator on all the entries in the release.
-     *
-     * @return
-     */
-    // Iterator<Entry> getEntryIterator();
-
-    /**
-     * The number of entry in the release.
-     *
-     * @return
-     */
-    // long getEntryCount();
-
-    /**
      * The release number.
      *
      * @return
@@ -38,23 +24,9 @@ public interface Release {
     Date getReleaseDate();
 
     /**
-     * The URI of the release, normally it will be the path to the release files.
-     *
-     * @return
-     */
-    String getReleaseURI();
-
-    /**
      * What database this release belong to.
      *
      * @return
      */
     DatabaseEnum getDatabase();
-
-    /**
-     * The release's stats, which can only be obtained after the release finished.
-     *
-     * @return
-     */
-    ReleaseStats getStatus();
 }

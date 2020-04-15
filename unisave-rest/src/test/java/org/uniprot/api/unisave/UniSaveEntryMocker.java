@@ -1,13 +1,13 @@
 package org.uniprot.api.unisave;
 
-import java.sql.Date;
-import java.util.Calendar;
-
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.impl.EntryContentImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
 import org.uniprot.api.unisave.repository.domain.impl.ReleaseImpl;
+
+import java.sql.Date;
+import java.util.Calendar;
 
 /**
  * Created 08/04/20
@@ -20,11 +20,8 @@ public class UniSaveEntryMocker {
         entryInfo.setEntryVersion(entryVersion);
         ReleaseImpl lastRelease = new ReleaseImpl();
         lastRelease.setDatabase(DatabaseEnum.Swissprot);
-        lastRelease.setId(2);
         lastRelease.setReleaseNumber("2");
         lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        lastRelease.setReleaseURI("some URI");
-        lastRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
 
         entryInfo.setLastRelease(lastRelease);
         entryInfo.setAccession(accession);
@@ -32,11 +29,8 @@ public class UniSaveEntryMocker {
         entryInfo.setEntryMD5("someMd5");
         ReleaseImpl firstRelease = new ReleaseImpl();
         firstRelease.setDatabase(DatabaseEnum.Swissprot);
-        firstRelease.setId(1);
         firstRelease.setReleaseNumber("1");
         firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        firstRelease.setReleaseURI("some URI");
-        firstRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
         entryInfo.setFirstRelease(firstRelease);
 
         return entryInfo;
@@ -84,11 +78,8 @@ public class UniSaveEntryMocker {
         entry.setEntryVersion(entryVersion);
         ReleaseImpl lastRelease = new ReleaseImpl();
         lastRelease.setDatabase(DatabaseEnum.Swissprot);
-        lastRelease.setId(2);
         lastRelease.setReleaseNumber("2");
         lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        lastRelease.setReleaseURI("some URI");
-        lastRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
 
         entry.setLastRelease(lastRelease);
         entry.setAccession(accession);
@@ -96,11 +87,8 @@ public class UniSaveEntryMocker {
         entry.setEntryMD5("someMd5");
         ReleaseImpl firstRelease = new ReleaseImpl();
         firstRelease.setDatabase(DatabaseEnum.Swissprot);
-        firstRelease.setId(1);
         firstRelease.setReleaseNumber("1");
         firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        firstRelease.setReleaseURI("some URI");
-        firstRelease.setTimeStamp(new Date(Calendar.getInstance().getTime().getTime()));
         entry.setFirstRelease(firstRelease);
 
         return entry;
