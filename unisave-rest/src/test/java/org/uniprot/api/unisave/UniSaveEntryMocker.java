@@ -78,6 +78,7 @@ public class UniSaveEntryMocker {
                         + "PE   4: Predicted;\n"
                         + "SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;\n"
                         + "     MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC\n"
+                        + "     FQIIGETVSS TNRG\n"
                         + "//\n");
         entry.setEntryContent(content);
         entry.setEntryVersion(entryVersion);
@@ -105,4 +106,3 @@ public class UniSaveEntryMocker {
         return entry;
     }
 }
-

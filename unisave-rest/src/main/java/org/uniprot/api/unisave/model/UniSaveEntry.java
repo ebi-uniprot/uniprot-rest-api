@@ -47,9 +47,4 @@ public class UniSaveEntry {
             return content;
         }
     }
-
-    public static void main(String[] args) {
-        String thing = UniSaveEntry.builder().lastRelease("thing").getLastRelease();
-        System.out.println(thing);
-    }
 }

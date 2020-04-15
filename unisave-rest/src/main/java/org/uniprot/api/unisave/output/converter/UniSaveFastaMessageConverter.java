@@ -1,7 +1,9 @@
 package org.uniprot.api.unisave.output.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
+import org.uniprot.api.rest.output.converter.StopStreamException;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 
 import java.io.BufferedReader;
@@ -10,7 +12,10 @@ import java.io.OutputStream;
 import java.io.StringReader;
 
 /** @author Edd */
+@Slf4j
 public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniSaveEntry> {
+
+    private static final int MAX_COLUMNS = 60;
 
     public UniSaveFastaMessageConverter() {
         super(UniProtMediaType.FASTA_MEDIA_TYPE, UniSaveEntry.class);
@@ -26,16 +31,34 @@ public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConve
                 if (line.startsWith("SQ")) {
                     String sequenceLine;
                     while ((sequenceLine = br.readLine()) != null && !sequenceLine.equals("//")) {
-                        sequenceStringBuilder.append(sequenceLine.trim());
+                        addSequenceWithoutSpaces(sequenceStringBuilder, sequenceLine);
                     }
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error in parse the content", e);
+            log.error("Error parsing entry content", e);
+            throw new StopStreamException("Error parsing entry content", e);
         }
         String sequence = sequenceStringBuilder.toString();
 
         StringBuilder fastaStringBuilder = new StringBuilder();
+        addFastaHeader(entity, fastaStringBuilder);
+        addSequence(sequence, fastaStringBuilder);
+
+        outputStream.write(fastaStringBuilder.toString().getBytes());
+    }
+
+    private void addSequence(String sequence, StringBuilder fastaStringBuilder) {
+        int columnCounter = 0;
+        for (char seqChar : sequence.toCharArray()) {
+            fastaStringBuilder.append(seqChar);
+            if ((++columnCounter % MAX_COLUMNS == 0) && (columnCounter < sequence.length())) {
+                fastaStringBuilder.append("\n");
+            }
+        }
+    }
+
+    private void addFastaHeader(UniSaveEntry entity, StringBuilder fastaStringBuilder) {
         fastaStringBuilder
                 .append('>')
                 .append(entity.getDatabase())
@@ -47,13 +70,14 @@ public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConve
                 .append('|')
                 .append(entity.getFirstReleaseDate())
                 .append('\n');
-        for (int i = 1; i < sequence.length(); i++) {
-            fastaStringBuilder.append(sequence.charAt(i - 1));
-            if (i % fastaStringBuilder.length() == 0) {
-                fastaStringBuilder.append('\n');
+    }
+
+    private void addSequenceWithoutSpaces(StringBuilder sequenceStringBuilder, String sequenceLine) {
+        for (char seqChar : sequenceLine.trim().toCharArray()) {
+            // remove spaces from within sequence line
+            if (seqChar != ' ') {
+                sequenceStringBuilder.append(seqChar);
             }
         }
-        fastaStringBuilder.append('\n');
-        outputStream.write(fastaStringBuilder.toString().getBytes());
     }
 }
