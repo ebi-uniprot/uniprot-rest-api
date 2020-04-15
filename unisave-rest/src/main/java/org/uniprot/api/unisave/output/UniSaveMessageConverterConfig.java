@@ -14,7 +14,7 @@ import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.output.converter.UniSaveFastaMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveFlatFileMessageConverter;
-import org.uniprot.api.unisave.output.converter.UniSaveJSONMessageConverter;
+import org.uniprot.api.unisave.output.converter.UniSaveJsonMessageConverter;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class UniSaveMessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new UniSaveFastaMessageConverter());
                 converters.add(new UniSaveFlatFileMessageConverter());
-                converters.add(0, new UniSaveJSONMessageConverter());
+                converters.add(0, new UniSaveJsonMessageConverter());
             }
         };
     }

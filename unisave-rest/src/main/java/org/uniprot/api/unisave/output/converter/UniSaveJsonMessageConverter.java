@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /** @author eddturner */
-public class UniSaveJSONMessageConverter extends JsonMessageConverter<UniSaveEntry> {
+public class UniSaveJsonMessageConverter extends JsonMessageConverter<UniSaveEntry> {
 
-    public UniSaveJSONMessageConverter() {
+    public UniSaveJsonMessageConverter() {
         super(new ObjectMapper(), UniSaveEntry.class, null);
     }
 
