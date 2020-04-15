@@ -7,16 +7,15 @@ package org.uniprot.api.unisave.repository.domain;
  */
 public interface ReleaseStats {
 
-	long getUpdated();
+    long getUpdated();
 
-	long getNew();
+    long getNew();
 
-	long getDeleted();
+    long getDeleted();
 
-	long getMerged();
+    long getMerged();
 
-	long getNoChange();
+    long getNoChange();
 
-	long getTotalNumber();
-
+    long getTotalNumber();
 }

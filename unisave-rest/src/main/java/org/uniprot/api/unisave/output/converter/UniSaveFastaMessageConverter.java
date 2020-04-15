@@ -72,7 +72,8 @@ public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConve
                 .append('\n');
     }
 
-    private void addSequenceWithoutSpaces(StringBuilder sequenceStringBuilder, String sequenceLine) {
+    private void addSequenceWithoutSpaces(
+            StringBuilder sequenceStringBuilder, String sequenceLine) {
         for (char seqChar : sequenceLine.trim().toCharArray()) {
             // remove spaces from within sequence line
             if (seqChar != ' ') {

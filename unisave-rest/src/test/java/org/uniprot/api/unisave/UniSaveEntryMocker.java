@@ -1,13 +1,13 @@
 package org.uniprot.api.unisave;
 
+import java.sql.Date;
+import java.util.Calendar;
+
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.impl.EntryContentImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
 import org.uniprot.api.unisave.repository.domain.impl.ReleaseImpl;
-
-import java.sql.Date;
-import java.util.Calendar;
 
 /**
  * Created 08/04/20

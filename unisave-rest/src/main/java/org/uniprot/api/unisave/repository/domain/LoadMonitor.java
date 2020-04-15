@@ -5,6 +5,4 @@ package org.uniprot.api.unisave.repository.domain;
  *
  * @author wudong
  */
-public interface LoadMonitor {
-
-}
+public interface LoadMonitor {}

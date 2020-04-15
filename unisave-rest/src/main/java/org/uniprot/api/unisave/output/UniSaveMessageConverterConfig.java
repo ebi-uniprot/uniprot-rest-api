@@ -1,7 +1,15 @@
 package org.uniprot.api.unisave.output;
 
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
+
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -15,13 +23,6 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.output.converter.UniSaveFastaMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveFlatFileMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveJsonMessageConverter;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
 
 /** @author Edd */
 @Configuration

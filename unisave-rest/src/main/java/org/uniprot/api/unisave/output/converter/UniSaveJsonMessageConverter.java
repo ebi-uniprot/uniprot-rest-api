@@ -1,12 +1,13 @@
 package org.uniprot.api.unisave.output.converter;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author eddturner */
 public class UniSaveJsonMessageConverter extends JsonMessageConverter<UniSaveEntry> {

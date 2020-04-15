@@ -1,17 +1,20 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import com.google.common.base.MoreObjects;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.*;
+
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.EntryIndex;
 import org.uniprot.api.unisave.repository.domain.EntryIndexStatus;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.MoreObjects;
 
 @Entity(name = "EntryIndex")
 @Table(name = "FF_ENTRY_SUMMARY")
-//@NamedQueries({@NamedQuery(name = "EntryIndexImpl.truncateTable", query = "DELETE FROM EntryIndex ind")})
+// @NamedQueries({@NamedQuery(name = "EntryIndexImpl.truncateTable", query = "DELETE FROM EntryIndex
+// ind")})
 public class EntryIndexImpl implements EntryIndex {
 
     public static enum Query {
@@ -53,13 +56,13 @@ public class EntryIndexImpl implements EntryIndex {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "SEC_ACC", nullable = false)
-    @CollectionTable(name = "FF_ENTRY_SUMMARY_SEC_ACC", joinColumns = {@JoinColumn(name = "accession")})
+    @CollectionTable(
+            name = "FF_ENTRY_SUMMARY_SEC_ACC",
+            joinColumns = {@JoinColumn(name = "accession")})
     @Transient
     private List<String> secondaryAcc = new ArrayList<>();
 
-    /**
-     * The default is set to null, which means it need update.
-     */
+    /** The default is set to null, which means it need update. */
     @Column
     @Enumerated(EnumType.STRING)
     private EntryIndexStatus status = null;
@@ -166,21 +169,24 @@ public class EntryIndexImpl implements EntryIndex {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("Accession", this.accession)
-                .add("MD5", this.md5).add("SecAcc", this.secondaryAcc)
-                .add("Start", this.startPosition).add("Length", this.length)
+        return MoreObjects.toStringHelper(this)
+                .add("Accession", this.accession)
+                .add("MD5", this.md5)
+                .add("SecAcc", this.secondaryAcc)
+                .add("Start", this.startPosition)
+                .add("Length", this.length)
                 .toString();
     }
 
-    /**
-     * Convert the object into a format compatiable to the SQL*Loader.
-     */
+    /** Convert the object into a format compatiable to the SQL*Loader. */
     @Override
     public String toCSVString() {
         StringBuffer sb = new StringBuffer();
 
-        String format = String.format("%1d%6s%32s%10d%15d%n", 1,
-                this.accession, this.md5, this.length, this.startPosition);
+        String format =
+                String.format(
+                        "%1d%6s%32s%10d%15d%n",
+                        1, this.accession, this.md5, this.length, this.startPosition);
         sb.append(format);
 
         for (String s : this.secondaryAcc) {

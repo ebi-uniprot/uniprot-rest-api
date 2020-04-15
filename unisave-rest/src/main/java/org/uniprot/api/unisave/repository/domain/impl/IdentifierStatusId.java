@@ -1,9 +1,8 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-
 import java.io.Serializable;
 
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 
 public class IdentifierStatusId implements Serializable {
 
@@ -46,7 +45,9 @@ public class IdentifierStatusId implements Serializable {
 
         if (!firstColumn.equals(that.firstColumn)) return false;
         if (getType != that.getType) return false;
-        if (secondColumn != null ? !secondColumn.equals(that.secondColumn) : that.secondColumn != null) return false;
+        if (secondColumn != null
+                ? !secondColumn.equals(that.secondColumn)
+                : that.secondColumn != null) return false;
 
         return true;
     }

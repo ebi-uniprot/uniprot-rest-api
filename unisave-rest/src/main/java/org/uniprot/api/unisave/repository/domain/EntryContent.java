@@ -2,19 +2,20 @@ package org.uniprot.api.unisave.repository.domain;
 
 /**
  * An Entry's Content.
- * <p/>
- * <p/>
+ *
+ * <p>
+ *
+ * <p>
  *
  * @author wudong
  */
 public interface EntryContent {
 
-	ContentTypeEnum getType();
+    ContentTypeEnum getType();
 
-	String getFullcontent();
+    String getFullcontent();
 
-	String getDiffcontent();
+    String getDiffcontent();
 
-	Long getReferenceEntryId();
-
+    Long getReferenceEntryId();
 }

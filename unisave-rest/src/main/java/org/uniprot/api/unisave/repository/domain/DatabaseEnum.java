@@ -1,30 +1,30 @@
 package org.uniprot.api.unisave.repository.domain;
 
 public enum DatabaseEnum {
-	Swissprot {
+    Swissprot {
         @Override
         public String toString() {
             return "Swiss-Prot";
         }
-    }, Trembl {
+    },
+    Trembl {
         @Override
         public String toString() {
             return "TrEMBL";
         }
-    }, WrongTrembl {
+    },
+    WrongTrembl {
         @Override
         public String toString() {
             return "TrEMBL-Depreciated";
         }
     };
 
-	public static DatabaseEnum parse(String s) {
-		if (s.equalsIgnoreCase("Swiss-Prot") || s.equalsIgnoreCase("Swissprot")) {
-			return DatabaseEnum.Swissprot;
-		} else if (s.equalsIgnoreCase("Trembl")) {
-			return DatabaseEnum.Trembl;
-		} else
-			throw new IllegalArgumentException(s);
-	}
-
+    public static DatabaseEnum parse(String s) {
+        if (s.equalsIgnoreCase("Swiss-Prot") || s.equalsIgnoreCase("Swissprot")) {
+            return DatabaseEnum.Swissprot;
+        } else if (s.equalsIgnoreCase("Trembl")) {
+            return DatabaseEnum.Trembl;
+        } else throw new IllegalArgumentException(s);
+    }
 }

@@ -1,21 +1,5 @@
 package org.uniprot.api.unisave.service.impl;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.unisave.model.AccessionEvent;
-import org.uniprot.api.unisave.model.UniSaveEntry;
-import org.uniprot.api.unisave.repository.UniSaveRepository;
-import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-import org.uniprot.api.unisave.repository.domain.impl.*;
-import org.uniprot.api.unisave.request.UniSaveRequest;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -28,6 +12,22 @@ import static org.mockito.Mockito.*;
 import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntry;
 import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntryInfo;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
+
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.unisave.model.AccessionEvent;
+import org.uniprot.api.unisave.model.UniSaveEntry;
+import org.uniprot.api.unisave.repository.UniSaveRepository;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+import org.uniprot.api.unisave.repository.domain.impl.*;
+import org.uniprot.api.unisave.request.UniSaveRequest;
 
 /**
  * Created 08/04/20

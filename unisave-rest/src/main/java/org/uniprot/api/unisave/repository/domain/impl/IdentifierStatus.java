@@ -1,24 +1,22 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
+import javax.persistence.*;
+
 import org.uniprot.api.unisave.repository.domain.AccessionEvent;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 import org.uniprot.api.unisave.repository.domain.Release;
 
-import javax.persistence.*;
-
 /**
- * Created with IntelliJ IDEA.
- * User: wudong
- * Date: 12/11/2013
- * Time: 14:24
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 To change this template use
+ * File | Settings | File Templates.
  */
-
-@Entity(name="IdentifierStatus")
+@Entity(name = "IdentifierStatus")
 @IdClass(IdentifierStatusId.class)
-@Table(name="DELETED_MERGED_ACCESSION_VIEW")
+@Table(name = "DELETED_MERGED_ACCESSION_VIEW")
 @NamedQueries({
-        @NamedQuery(name="IdentifierStatus.findByFirstColumn", query = "select i from IdentifierStatus i where i.firstColumn =:acc")
+    @NamedQuery(
+            name = "IdentifierStatus.findByFirstColumn",
+            query = "select i from IdentifierStatus i where i.firstColumn =:acc")
 })
 public class IdentifierStatus implements AccessionEvent {
 
@@ -31,27 +29,27 @@ public class IdentifierStatus implements AccessionEvent {
     }
 
     @Id
-    @Column(name="OPERATION", nullable=false)
+    @Column(name = "OPERATION", nullable = false)
     @Enumerated(EnumType.STRING)
     private EventTypeEnum getType;
 
     @Id
-    @Column(name= "ACCESSION_SUBJECT", nullable = false)
+    @Column(name = "ACCESSION_SUBJECT", nullable = false)
     private String firstColumn;
 
     @Id
-    @Column(name="ACCESSION_OBJECT")
+    @Column(name = "ACCESSION_OBJECT")
     private String secondColumn;
 
-    //When this status change happen.
+    // When this status change happen.
     @ManyToOne
-    @JoinColumn(name="RELEASE_ID")
+    @JoinColumn(name = "RELEASE_ID")
     private ReleaseImpl release;
 
-    @Column(name="WITHDRAWN")
+    @Column(name = "WITHDRAWN")
     private String withdrawn_flag;
 
-    @Column(name="DELETION_REASON")
+    @Column(name = "DELETION_REASON")
     private String deletion_reason;
 
     public String getDeletion_reason() {
@@ -68,12 +66,12 @@ public class IdentifierStatus implements AccessionEvent {
         return secondColumn;
     }
 
-    public String getSourceAcc(){
+    public String getSourceAcc() {
         return this.firstColumn;
     }
 
-    public boolean isWithdrawn(){
-        return withdrawn_flag!=null;
+    public boolean isWithdrawn() {
+        return withdrawn_flag != null;
     }
 
     @Override

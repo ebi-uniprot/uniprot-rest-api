@@ -7,28 +7,26 @@ package org.uniprot.api.unisave.repository.domain;
  */
 public interface BasicEntryInfo {
 
-	/**
-	 * The database of this entry, either swissprot or trembl.
-	 *
-	 * @return
-	 */
-	DatabaseEnum getDatabase();
+    /**
+     * The database of this entry, either swissprot or trembl.
+     *
+     * @return
+     */
+    DatabaseEnum getDatabase();
 
-	String getAccession();
+    String getAccession();
 
-	String getName();
+    String getName();
 
-	int getSequenceVersion();
+    int getSequenceVersion();
 
-	int getEntryVersion();
+    int getEntryVersion();
 
-	String getEntryMD5();
+    String getEntryMD5();
 
-	String getSequenceMD5();
+    String getSequenceMD5();
 
-	Release getFirstRelease();
+    Release getFirstRelease();
 
-	Release getLastRelease();
-
-
+    Release getLastRelease();
 }
