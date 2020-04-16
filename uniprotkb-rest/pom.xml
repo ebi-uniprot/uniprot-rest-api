@@ -290,7 +290,7 @@
 							<dependency>
 								<groupId>org.uniprot</groupId>
 								<artifactId>uniprot-config</artifactId>
-								<version>1.0-SNAPSHOT</version>
+								<version>${uniprot-store.version}</version>
 								<exclusions>
 									<exclusion>
 										<groupId>com.fasterxml.jackson.core</groupId>
