@@ -107,7 +107,7 @@ class UniSaveControllerTest {
     void canRetrieveSpecificVersionsOfEntriesWithoutContent() throws Exception {
         // given
         String accession = "P12345";
-        when(uniSaveRepository.retrieveEntryInfo2(accession, 1))
+        when(uniSaveRepository.retrieveEntryInfo(accession, 1))
                 .thenReturn(mockEntryInfo(accession, 1));
 
         // when
@@ -129,7 +129,7 @@ class UniSaveControllerTest {
     void canRetrieveSpecificVersionsOfEntriesWithContent() throws Exception {
         // given
         String accession = "P12345";
-        when(uniSaveRepository.retrieveEntry2(accession, 1)).thenReturn(mockEntry(accession, 1));
+        when(uniSaveRepository.retrieveEntry(accession, 1)).thenReturn(mockEntry(accession, 1));
 
         // when
         ResultActions response =

@@ -150,7 +150,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                                 AccessionEvent.builder()
                                         .eventType(event.getEventType().name())
                                         .release(event.getEventRelease().getReleaseNumber())
-                                        .targetAccession(event.getTargetAcc())
+                                        .targetAccession(event.getTargetAccession())
                                         .build())
                 .collect(Collectors.toList());
     }
@@ -218,7 +218,7 @@ public class UniSaveServiceImpl implements UniSaveService {
     private List<UniSaveEntry> getEntryVersionsWithoutContent(UniSaveRequest.Entries entryRequest) {
         List<Integer> versions = extractVersionsFromRequest(entryRequest);
         return versions.stream()
-                .map(version -> repository.retrieveEntryInfo2(entryRequest.getAccession(), version))
+                .map(version -> repository.retrieveEntryInfo(entryRequest.getAccession(), version))
                 .map(this::entryInfo2UniSaveEntryBuilder)
                 .map(this::changeReleaseDate)
                 .filter(this::filterWithDate)
@@ -229,7 +229,7 @@ public class UniSaveServiceImpl implements UniSaveService {
     private List<UniSaveEntry> getEntryVersionsWithContent(UniSaveRequest.Entries entryRequest) {
         List<Integer> versions = extractVersionsFromRequest(entryRequest);
         return versions.stream()
-                .map(version -> repository.retrieveEntry2(entryRequest.getAccession(), version))
+                .map(version -> repository.retrieveEntry(entryRequest.getAccession(), version))
                 .map(this::entry2UniSaveEntryBuilder)
                 .map(this::changeReleaseDate)
                 .map(this::addCopyright)

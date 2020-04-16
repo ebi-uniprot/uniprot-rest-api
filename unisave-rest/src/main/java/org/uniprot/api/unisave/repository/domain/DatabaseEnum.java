@@ -19,12 +19,4 @@ public enum DatabaseEnum {
             return "TrEMBL-Depreciated";
         }
     };
-
-    public static DatabaseEnum parse(String s) {
-        if (s.equalsIgnoreCase("Swiss-Prot") || s.equalsIgnoreCase("Swissprot")) {
-            return DatabaseEnum.Swissprot;
-        } else if (s.equalsIgnoreCase("Trembl")) {
-            return DatabaseEnum.Trembl;
-        } else throw new IllegalArgumentException(s);
-    }
 }

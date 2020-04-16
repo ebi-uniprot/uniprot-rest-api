@@ -53,7 +53,7 @@ class UniSaveServiceImplTest {
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
         status.setAccession(accession);
         IdentifierStatus identifierStatus = mock(IdentifierStatus.class);
-        when(identifierStatus.getTargetAcc()).thenReturn(targetAcc);
+        when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
         ReleaseImpl release = new ReleaseImpl();
         release.setReleaseNumber(releaseNumber);
         when(identifierStatus.getEventRelease()).thenReturn(release);
@@ -154,9 +154,9 @@ class UniSaveServiceImplTest {
     void canGetEntryVersionsWithContent() {
         // given
         String accession = "P12345";
-        when(uniSaveRepository.retrieveEntry2(accession, 3)).thenReturn(mockEntry(accession, 3));
-        when(uniSaveRepository.retrieveEntry2(accession, 2)).thenReturn(mockEntry(accession, 2));
-        when(uniSaveRepository.retrieveEntry2(accession, 1)).thenReturn(mockEntry(accession, 1));
+        when(uniSaveRepository.retrieveEntry(accession, 3)).thenReturn(mockEntry(accession, 3));
+        when(uniSaveRepository.retrieveEntry(accession, 2)).thenReturn(mockEntry(accession, 2));
+        when(uniSaveRepository.retrieveEntry(accession, 1)).thenReturn(mockEntry(accession, 1));
 
         // when
         UniSaveRequest.Entries request = entriesRequest(accession, "3,1", false, true);
@@ -205,11 +205,11 @@ class UniSaveServiceImplTest {
     void canGetEntryInfoVersions() {
         // given
         String accession = "P12345";
-        when(uniSaveRepository.retrieveEntryInfo2(accession, 3))
+        when(uniSaveRepository.retrieveEntryInfo(accession, 3))
                 .thenReturn(mockEntryInfo(accession, 3));
-        when(uniSaveRepository.retrieveEntryInfo2(accession, 2))
+        when(uniSaveRepository.retrieveEntryInfo(accession, 2))
                 .thenReturn(mockEntryInfo(accession, 2));
-        when(uniSaveRepository.retrieveEntryInfo2(accession, 1))
+        when(uniSaveRepository.retrieveEntryInfo(accession, 1))
                 .thenReturn(mockEntryInfo(accession, 1));
 
         // when

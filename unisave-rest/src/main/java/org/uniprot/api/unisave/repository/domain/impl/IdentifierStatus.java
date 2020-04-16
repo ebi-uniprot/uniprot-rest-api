@@ -1,10 +1,10 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import javax.persistence.*;
-
+import lombok.Data;
 import org.uniprot.api.unisave.repository.domain.AccessionEvent;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-import org.uniprot.api.unisave.repository.domain.Release;
+
+import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 To change this template use
@@ -16,11 +16,12 @@ import org.uniprot.api.unisave.repository.domain.Release;
 @NamedQueries({
     @NamedQuery(
             name = "IdentifierStatus.findByFirstColumn",
-            query = "select i from IdentifierStatus i where i.firstColumn =:acc")
+            query = "select i from IdentifierStatus i where i.sourceAccession =:acc")
 })
+@Data
 public class IdentifierStatus implements AccessionEvent {
 
-    public static enum Query {
+    public enum Query {
         findByFirstColumn;
 
         public String query() {
@@ -31,20 +32,20 @@ public class IdentifierStatus implements AccessionEvent {
     @Id
     @Column(name = "OPERATION", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EventTypeEnum getType;
+    private EventTypeEnum eventType;
 
     @Id
     @Column(name = "ACCESSION_SUBJECT", nullable = false)
-    private String firstColumn;
+    private String sourceAccession;
 
     @Id
     @Column(name = "ACCESSION_OBJECT")
-    private String secondColumn;
+    private String targetAccession;
 
     // When this status change happen.
     @ManyToOne
     @JoinColumn(name = "RELEASE_ID")
-    private ReleaseImpl release;
+    private ReleaseImpl eventRelease;
 
     @Column(name = "WITHDRAWN")
     private String withdrawn_flag;
@@ -52,30 +53,7 @@ public class IdentifierStatus implements AccessionEvent {
     @Column(name = "DELETION_REASON")
     private String deletion_reason;
 
-    public String getDeletion_reason() {
-        return deletion_reason;
-    }
-
-    @Override
-    public EventTypeEnum getEventType() {
-        return getType;
-    }
-
-    @Override
-    public String getTargetAcc() {
-        return secondColumn;
-    }
-
-    public String getSourceAcc() {
-        return this.firstColumn;
-    }
-
     public boolean isWithdrawn() {
         return withdrawn_flag != null;
-    }
-
-    @Override
-    public Release getEventRelease() {
-        return release;
     }
 }

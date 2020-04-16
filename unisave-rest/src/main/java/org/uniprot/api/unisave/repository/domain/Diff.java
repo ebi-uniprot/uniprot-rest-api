@@ -1,12 +1,11 @@
 package org.uniprot.api.unisave.repository.domain;
 
 public interface Diff {
+    String getAccession();
 
-    public String getAccession();
+    Entry getEntryOne();
 
-    public Entry getEntryOne();
+    Entry getEntryTwo();
 
-    public Entry getEntryTwo();
-
-    public String getDiff();
+    String getDiff();
 }

@@ -8,9 +8,9 @@ import java.io.Serializable;
 @Data
 public class IdentifierStatusId implements Serializable {
 
-    private EventTypeEnum getType;
+    private EventTypeEnum eventType;
 
-    private String firstColumn;
+    private String sourceAccession;
 
-    private String secondColumn;
+    private String targetAccession;
 }

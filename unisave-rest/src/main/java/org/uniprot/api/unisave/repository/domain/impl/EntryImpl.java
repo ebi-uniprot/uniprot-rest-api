@@ -1,11 +1,10 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import javax.persistence.*;
-
+import lombok.Data;
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.Entry;
-import org.uniprot.api.unisave.repository.domain.EntryContent;
-import org.uniprot.api.unisave.repository.domain.Release;
+
+import javax.persistence.*;
 
 // org.uniprot.api.unisave.repository.domain
 // org.uniprot.api.unisave.repository.domain.DatabaseEnum
@@ -72,9 +71,10 @@ import org.uniprot.api.unisave.repository.domain.Release;
                     "SELECT e.database, e.accession, e.name, e.entryVersion, e.entryMD5, e.sequenceVersion, e.sequenceMD5, "
                             + "r1, r2 from Entry e left join e.firstRelease r1 left join e.lastRelease r2 WHERE e.accession=:acc and e.database =:db ORDER BY e.entryVersion DESC")
 })
+@Data
 public class EntryImpl implements Entry {
 
-    public static enum Query {
+    public enum Query {
         findEntryByAccessionAndEntryId,
         findEntryByAccessionAndVersion,
         findEntryByAccessionAndRelease,
@@ -132,10 +132,6 @@ public class EntryImpl implements Entry {
     @JoinColumn(name = "Last_Release_Id")
     private ReleaseImpl lastRelease;
 
-    //	@Column
-    //	@Temporal(TemporalType.TIMESTAMP)
-    //	private Date timeStamp = new Date();
-
     /**
      * The year in which the entry is released. this is mainly for the purpose of partition in
      * oracle, which is based on this column.
@@ -146,115 +142,107 @@ public class EntryImpl implements Entry {
     @Column(name = "last_release_Year")
     private int release_year = 0;
 
-    public int getRelease_year() {
-        return release_year;
-    }
-
-    public void setRelease_year(int release_year) {
-        this.release_year = release_year;
-    }
-
-    //	public Date getTimeStamp() {
-    //		return timeStamp;
-    //	}
-    //
-    //	public void setTimeStamp(Date timeStamp) {
-    //		this.timeStamp = timeStamp;
-    //	}
-
-    @Override
-    public Release getFirstRelease() {
-        return firstRelease;
-    }
-
-    public void setFirstRelease(Release release) {
-        if (release instanceof ReleaseImpl) this.firstRelease = (ReleaseImpl) release;
-    }
-
-    @Override
-    public Release getLastRelease() {
-        return lastRelease;
-    }
-
-    public void setLastRelease(Release release) {
-        if (release instanceof ReleaseImpl) this.lastRelease = (ReleaseImpl) release;
-    }
-
-    public void setDatabase(DatabaseEnum database) {
-        this.database = database;
-    }
-
-    public void setAccession(String identifier) {
-        this.accession = identifier;
-    }
-
-    public void setSequenceVersion(int sequenceVersion) {
-        this.sequenceVersion = sequenceVersion;
-    }
-
-    public void setEntryVersion(int entryVersion) {
-        this.entryVersion = entryVersion;
-    }
-
-    public void setEntryMD5(String entryMD5) {
-        this.entryMD5 = entryMD5;
-    }
-
-    public void setSequenceMD5(String sequenceMD5) {
-        this.sequenceMD5 = sequenceMD5;
-    }
-
-    public void setEntryContent(EntryContent entryContent) {
-        this.entryContent = (EntryContentImpl) entryContent;
-    }
-
-    @Override
-    public DatabaseEnum getDatabase() {
-        return database;
-    }
-
-    @Override
-    public String getAccession() {
-        return accession;
-    }
-
-    @Override
-    public int getSequenceVersion() {
-        return sequenceVersion;
-    }
-
-    @Override
-    public int getEntryVersion() {
-        return entryVersion;
-    }
-
-    @Override
-    public String getEntryMD5() {
-        return entryMD5;
-    }
-
-    @Override
-    public String getSequenceMD5() {
-        return sequenceMD5;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public EntryContent getEntryContent() {
-        return entryContent;
-    }
-
-    public String toCsvString() {
-        return null;
-    }
+//    public int getRelease_year() {
+//        return release_year;
+//    }
+//
+//    public void setRelease_year(int release_year) {
+//        this.release_year = release_year;
+//    }
+//
+//    @Override
+//    public Release getFirstRelease() {
+//        return firstRelease;
+//    }
+//
+//    public void setFirstRelease(Release release) {
+//        if (release instanceof ReleaseImpl) this.firstRelease = (ReleaseImpl) release;
+//    }
+//
+//    @Override
+//    public Release getLastRelease() {
+//        return lastRelease;
+//    }
+//
+//    public void setLastRelease(Release release) {
+//        if (release instanceof ReleaseImpl) this.lastRelease = (ReleaseImpl) release;
+//    }
+//
+//    public void setDatabase(DatabaseEnum database) {
+//        this.database = database;
+//    }
+//
+//    public void setAccession(String identifier) {
+//        this.accession = identifier;
+//    }
+//
+//    public void setSequenceVersion(int sequenceVersion) {
+//        this.sequenceVersion = sequenceVersion;
+//    }
+//
+//    public void setEntryVersion(int entryVersion) {
+//        this.entryVersion = entryVersion;
+//    }
+//
+//    public void setEntryMD5(String entryMD5) {
+//        this.entryMD5 = entryMD5;
+//    }
+//
+//    public void setSequenceMD5(String sequenceMD5) {
+//        this.sequenceMD5 = sequenceMD5;
+//    }
+//
+//    public void setEntryContent(EntryContent entryContent) {
+//        this.entryContent = (EntryContentImpl) entryContent;
+//    }
+//
+//    @Override
+//    public DatabaseEnum getDatabase() {
+//        return database;
+//    }
+//
+//    @Override
+//    public String getAccession() {
+//        return accession;
+//    }
+//
+//    @Override
+//    public int getSequenceVersion() {
+//        return sequenceVersion;
+//    }
+//
+//    @Override
+//    public int getEntryVersion() {
+//        return entryVersion;
+//    }
+//
+//    @Override
+//    public String getEntryMD5() {
+//        return entryMD5;
+//    }
+//
+//    @Override
+//    public String getSequenceMD5() {
+//        return sequenceMD5;
+//    }
+//
+//    @Override
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    @Override
+//    public EntryContent getEntryContent() {
+//        return entryContent;
+//    }
+//
+//    public String toCsvString() {
+//        return null;
+//    }
 
     @Override
     public String toString() {

@@ -7,6 +7,5 @@ package org.uniprot.api.unisave.repository.domain;
  * @author wudong
  */
 public interface Entry extends BasicEntryInfo {
-
     EntryContent getEntryContent();
 }

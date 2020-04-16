@@ -27,5 +27,5 @@ public interface DiffPatch {
      * @param patch
      * @return
      */
-    public String patch(String entry, String patch);
+    String patch(String entry, String patch);
 }
