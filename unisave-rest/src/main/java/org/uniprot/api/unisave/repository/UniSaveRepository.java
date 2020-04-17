@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Profile("online")
+@Profile({"online", "offline"})
 @Service
 @Import(ServiceConfig.class)
 public class UniSaveRepository {
@@ -195,18 +194,18 @@ public class UniSaveRepository {
         }
     }
 
-    public Diff getDiff(String accession, int v1, int v2) {
-        Entry e1 = this.getEntryImpl(accession, v1);
-        Entry e2 = this.getEntryImpl(accession, v2);
+    public Diff getDiff(String accession, int version1, int version2) {
+        Entry entry1 = this.getEntryImpl(accession, version1);
+        Entry entry2 = this.getEntryImpl(accession, version2);
 
-        String ce1 = e1.getEntryContent().getFullcontent();
-        String ce2 = e2.getEntryContent().getFullcontent();
-        String diff = diffPatch.diff(ce1, ce2);
+        String entryContent1 = entry1.getEntryContent().getFullcontent();
+        String entryContent2 = entry2.getEntryContent().getFullcontent();
+        String diff = diffPatch.diff(entryContent1, entryContent2);
 
         DiffImpl diffImpl = new DiffImpl();
         diffImpl.setAccession(accession);
-        diffImpl.setEntryOne(e1);
-        diffImpl.setEntryTwo(e2);
+        diffImpl.setEntryOne(entry1);
+        diffImpl.setEntryTwo(entry2);
         diffImpl.setDiff(diff);
 
         return diffImpl;
@@ -220,35 +219,34 @@ public class UniSaveRepository {
 
             namedQuery.setMaxResults(1);
 
-            // Exception handling.
-            List<ReleaseImpl> resultList = namedQuery.getResultList();
-            return resultList.get(0);
+            List<ReleaseImpl> releases = namedQuery.getResultList();
+            return releases.get(0);
         } catch (PersistenceException e) {
-            LOGGER.error("", e);
-            throw new ServiceException("DBERROR", e);
+            String message = "Could not get all releases";
+            LOGGER.error(message, e);
+            throw new QueryRetrievalException(message, e);
         }
     }
 
-    private void setContent(EntryImpl e, EntityManager session) {
-        if (e.getEntryContent().getType() == ContentTypeEnum.Diff) {
-
+    private void setContent(EntryImpl entry, EntityManager session) {
+        if (entry.getEntryContent().getType() == ContentTypeEnum.Diff) {
             final TypedQuery<EntryImpl> query =
                     session.createNamedQuery(
                             EntryImpl.Query.findEntryByAccessionAndEntryId.query(),
                             EntryImpl.class);
-            query.setParameter("acc", e.getAccession());
-            query.setParameter("id", e.getEntryContent().getReferenceEntryId());
-            final EntryImpl result = query.getSingleResult();
+            query.setParameter("acc", entry.getAccession());
+            query.setParameter("id", entry.getEntryContent().getReferenceEntryId());
+            final EntryImpl referenceEntry = query.getSingleResult();
 
             final String content =
                     diffPatch.patch(
-                            result.getEntryContent().getFullcontent(),
-                            e.getEntryContent().getDiffcontent());
+                            referenceEntry.getEntryContent().getFullcontent(),
+                            entry.getEntryContent().getDiffcontent());
 
-            EntryContentImpl ee = new EntryContentImpl();
-            ee.setFullcontent(content);
+            EntryContentImpl entryContent = new EntryContentImpl();
+            entryContent.setFullcontent(content);
 
-            e.setEntryContent(ee);
+            entry.setEntryContent(entryContent);
         }
     }
 
@@ -258,16 +256,15 @@ public class UniSaveRepository {
                     session.createNamedQuery(
                             EntryImpl.Query.findEntryByAccessionAndVersion.query(),
                             EntryImpl.class);
-
             q.setParameter("acc", accession);
             q.setParameter("version", version);
-            // Exception handling.
-            EntryImpl singleResult = q.getSingleResult();
 
-            setContent(singleResult, session);
-            return singleResult;
+            EntryImpl entry = q.getSingleResult();
+
+            setContent(entry, session);
+            return entry;
         } catch (NoResultException e) {
-            throw new ResourceNotFoundException("No entry for " + accession + " wasNoRes found");
+            throw new ResourceNotFoundException("No entry for " + accession + " was found");
         } catch (PersistenceException e) {
             LOGGER.error("Could not retrieve query results", e);
             throw new QueryRetrievalException("Could not retrieve query results", e);
