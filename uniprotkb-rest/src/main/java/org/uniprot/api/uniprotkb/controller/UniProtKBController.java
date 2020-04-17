@@ -4,7 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
-public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
+public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
 
@@ -62,7 +62,7 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
     private final MessageConverterContextFactory<UniProtKBEntry> converterContextFactory;
 
     @Autowired
-    public UniprotKBController(
+    public UniProtKBController(
             ApplicationEventPublisher eventPublisher,
             UniProtEntryService entryService,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,

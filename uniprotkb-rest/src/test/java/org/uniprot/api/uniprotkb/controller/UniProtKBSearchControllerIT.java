@@ -7,7 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -88,7 +88,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
-@WebMvcTest(UniprotKBController.class)
+@WebMvcTest(UniProtKBController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
