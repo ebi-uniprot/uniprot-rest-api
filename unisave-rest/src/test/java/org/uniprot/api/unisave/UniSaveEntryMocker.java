@@ -1,13 +1,12 @@
 package org.uniprot.api.unisave;
 
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
-import org.uniprot.api.unisave.repository.domain.impl.EntryContentImpl;
-import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
-import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
-import org.uniprot.api.unisave.repository.domain.impl.ReleaseImpl;
+import org.uniprot.api.unisave.repository.domain.impl.*;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created 08/04/20
@@ -15,6 +14,10 @@ import java.util.Calendar;
  * @author Edd
  */
 public class UniSaveEntryMocker {
+    private static final DiffPatchImpl DIFF_PATCH = new DiffPatchImpl();
+
+    private static final Map<String, ReleaseImpl> RELEASE_MAP = new HashMap<>();
+
     public static EntryInfoImpl mockEntryInfo(String accession, int entryVersion) {
         EntryInfoImpl entryInfo = new EntryInfoImpl();
         entryInfo.setEntryVersion(entryVersion);
@@ -36,10 +39,47 @@ public class UniSaveEntryMocker {
         return entryInfo;
     }
 
-    public static EntryImpl mockEntry(String accession, int entryVersion) {
+    public static ReleaseImpl mockRelease(String releaseNumber) {
+        ReleaseImpl release = new ReleaseImpl();
+        release.setDatabase(DatabaseEnum.Swissprot);
+        release.setReleaseNumber(releaseNumber);
+//        release.setId(Long.parseLong(releaseNumber));
+        release.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
+
+        return release;
+    }
+
+    public static EntryImpl mockEntry(String accession, int entryVersion, String entryContent) {
         EntryImpl entry = new EntryImpl();
         EntryContentImpl content = new EntryContentImpl();
-        content.setFullcontent(
+        content.setFullcontent(entryContent);
+        entry.setEntryContent(content);
+        entry.setEntryVersion(entryVersion);
+        entry.setAccession(accession);
+        entry.setName(accession + "_name");
+        entry.setDatabase(DatabaseEnum.Swissprot);
+        entry.setEntryMD5("someEntryMd5");
+        entry.setSequenceMD5("someSequenceMd5");
+
+        entry.setFirstRelease(getCachedRelease("1"));
+        entry.setLastRelease(getCachedRelease("2"));
+
+        return entry;
+    }
+
+    private static ReleaseImpl getCachedRelease(String releaseNumber) {
+        ReleaseImpl release;
+        if (RELEASE_MAP.containsKey(releaseNumber)) {
+            release = RELEASE_MAP.get(releaseNumber);
+        } else {
+            release = mockRelease(releaseNumber);
+            RELEASE_MAP.put(releaseNumber, release);
+        }
+        return release;
+    }
+
+    public static EntryImpl mockEntry(String accession, int entryVersion) {
+        String fullContent =
                 "ID   "
                         + accession
                         + "_ID        Unreviewed;        60 AA.\n"
@@ -73,23 +113,28 @@ public class UniSaveEntryMocker {
                         + "SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;\n"
                         + "     MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC\n"
                         + "     FQIIGETVSS TNRG\n"
-                        + "//\n");
-        entry.setEntryContent(content);
-        entry.setEntryVersion(entryVersion);
-        ReleaseImpl lastRelease = new ReleaseImpl();
-        lastRelease.setDatabase(DatabaseEnum.Swissprot);
-        lastRelease.setReleaseNumber("2");
-        lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
+                        + "//\n";
+        return mockEntry(accession, entryVersion, fullContent);
+    }
 
-        entry.setLastRelease(lastRelease);
-        entry.setAccession(accession);
+    public static EntryImpl mockDiffEntryFor(EntryImpl refEntry, int diffEntryVersion) {
+        EntryImpl entry = new EntryImpl();
+        EntryContentImpl content = new EntryContentImpl();
+        content.setReferenceEntryId(refEntry.getEntryid());
+
+        String refEntryContent = refEntry.getEntryContent().getFullcontent();
+        String newEntryContent = refEntryContent + " ";
+        content.setDiffcontent(DIFF_PATCH.diff(refEntryContent, newEntryContent));
+        entry.setEntryContent(content);
+        entry.setEntryVersion(diffEntryVersion);
+
+        entry.setLastRelease(refEntry.getLastRelease());
+        entry.setAccession(refEntry.getAccession());
+        entry.setName(refEntry.getAccession() + "_name");
         entry.setDatabase(DatabaseEnum.Swissprot);
-        entry.setEntryMD5("someMd5");
-        ReleaseImpl firstRelease = new ReleaseImpl();
-        firstRelease.setDatabase(DatabaseEnum.Swissprot);
-        firstRelease.setReleaseNumber("1");
-        firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
-        entry.setFirstRelease(firstRelease);
+        entry.setEntryMD5("someEntryMd5");
+        entry.setSequenceMD5("someSequenceMd5");
+        entry.setFirstRelease(refEntry.getFirstRelease());
 
         return entry;
     }
