@@ -23,8 +23,8 @@ import java.util.List;
 @Service
 @Import(ServiceConfig.class)
 public class UniSaveRepository {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UniSaveRepository.class);
+    private static final String QUERY_RESULTS_ERROR_MESSAGE = "Could not retrieve query results";
     private final EntityManager session;
     private final DiffPatch diffPatch;
 
@@ -61,8 +61,8 @@ public class UniSaveRepository {
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (PersistenceException e) {
-            LOGGER.error("Could not retrieve query results", e);
-            throw new QueryRetrievalException("Could not retrieve query results", e);
+            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
 
@@ -80,8 +80,8 @@ public class UniSaveRepository {
         } catch (NoResultException e) {
             throw new ResourceNotFoundException("No entry for " + accession + " was found");
         } catch (PersistenceException e) {
-            LOGGER.error("Could not retrieve query results", e);
-            throw new QueryRetrievalException("Could not retrieve query results", e);
+            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
 
@@ -162,8 +162,8 @@ public class UniSaveRepository {
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (PersistenceException e) {
-            LOGGER.error("Could not retrieve query results", e);
-            throw new QueryRetrievalException("Could not retrieve query results", e);
+            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
 
@@ -189,8 +189,8 @@ public class UniSaveRepository {
 
             return accessionStatusInfo;
         } catch (PersistenceException e) {
-            LOGGER.error("Could not retrieve query results", e);
-            throw new QueryRetrievalException("Could not retrieve query results", e);
+            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
 
@@ -266,8 +266,8 @@ public class UniSaveRepository {
         } catch (NoResultException e) {
             throw new ResourceNotFoundException("No entry for " + accession + " was found");
         } catch (PersistenceException e) {
-            LOGGER.error("Could not retrieve query results", e);
-            throw new QueryRetrievalException("Could not retrieve query results", e);
+            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
 
