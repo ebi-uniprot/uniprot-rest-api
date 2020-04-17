@@ -236,6 +236,41 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
 
         components.add(component1);
         components.add(component2);
+
+        BuscoReport buscoReport =
+                new BuscoReportBuilder()
+                        .total(100)
+                        .fragmented(110)
+                        .missing(120)
+                        .complete(130)
+                        .completeSingle(140)
+                        .completeDuplicated(150)
+                        .lineageDb("lineage value")
+                        .build();
+
+        CPDReport cpdReport =
+                new CPDReportBuilder()
+                        .averageCdss(100)
+                        .confidence(110)
+                        .proteomeCount(120)
+                        .status(CPDStatus.CLOSE_TO_STANDARD)
+                        .stdCdss(12.3d)
+                        .build();
+
+        ProteomeCompletenessReport completenessReport =
+                new ProteomeCompletenessReportBuilder()
+                        .buscoReport(buscoReport)
+                        .cpdReport(cpdReport)
+                        .build();
+
+        GenomeAssembly genomeAssembly =
+                new GenomeAssemblyBuilder()
+                        .assemblyId("assembly id")
+                        .genomeAssemblyUrl("assembly url")
+                        .source(GenomeAssemblySource.ENSEMBL)
+                        .level(GenomeAssemblyLevel.PARTIAL)
+                        .build();
+
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
@@ -267,6 +302,8 @@ public class ProteomeSearchControllerIT extends AbstractSearchControllerIT {
                                                         .geneNameType(GeneNameType.GENE_NAME)
                                                         .build())
                                         .build())
+                        .genomeAssembly(genomeAssembly)
+                        .proteomeCompletenessReport(completenessReport)
                         .annotationScore(15);
 
         return builder.build();
