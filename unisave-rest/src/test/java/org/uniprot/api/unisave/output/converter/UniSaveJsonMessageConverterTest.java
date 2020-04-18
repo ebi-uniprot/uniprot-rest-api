@@ -1,14 +1,7 @@
 package org.uniprot.api.unisave.output.converter;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.Swissprot;
-
-import java.io.IOException;
-import java.io.OutputStream;
-
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,8 +10,14 @@ import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.Swissprot;
 
 /**
  * Created 15/04/20
@@ -43,7 +42,7 @@ class UniSaveJsonMessageConverterTest {
                 UniSaveEntry.builder()
                         .database(Swissprot.name())
                         .accession(mockEntry.getAccession())
-                        .content(mockEntry.getEntryContent().getFullcontent())
+                        .content(mockEntry.getEntryContent().getFullContent())
                         .firstRelease("1111")
                         .firstReleaseDate("DATE")
                         .build();

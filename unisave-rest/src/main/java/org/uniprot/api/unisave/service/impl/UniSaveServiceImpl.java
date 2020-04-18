@@ -1,12 +1,5 @@
 package org.uniprot.api.unisave.service.impl;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -21,6 +14,13 @@ import org.uniprot.api.unisave.repository.domain.Release;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 import org.uniprot.core.util.Utils;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UniSaveServiceImpl implements UniSaveService {
@@ -53,7 +53,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                                         .content(
                                                 diff.getEntryOne()
                                                         .getEntryContent()
-                                                        .getFullcontent())
+                                                        .getFullContent())
                                         .build())
                         .entry2(
                                 UniSaveEntry.builder()
@@ -61,7 +61,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                                         .content(
                                                 diff.getEntryOne()
                                                         .getEntryContent()
-                                                        .getFullcontent())
+                                                        .getFullContent())
                                         .build())
                         .diff(diff.getDiff())
                         .build();
@@ -140,7 +140,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .firstReleaseDate(formatReleaseDate(entry.getFirstRelease().getReleaseDate()))
                 .lastRelease(entry.getLastRelease().getReleaseNumber())
                 .lastReleaseDate(formatReleaseDate(entry.getLastRelease().getReleaseDate()))
-                .content(entry.getEntryContent().getFullcontent());
+                .content(entry.getEntryContent().getFullContent());
     }
 
     private List<AccessionEvent> entryStatusInfoToEvents(AccessionStatusInfo statusInfo) {

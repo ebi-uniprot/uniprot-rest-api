@@ -72,7 +72,7 @@ class UniSaveRepositoryIT {
                 mockIdentifierStatus(
                         EventTypeEnum.deleted, entry.getAccession(), "does not matter");
         String deletedReason = "a hurricane";
-        identifierStatus.setDeletion_reason(deletedReason);
+        identifierStatus.setDeletionReason(deletedReason);
         testEntityManager.persist(identifierStatus);
 
         // when
@@ -98,8 +98,8 @@ class UniSaveRepositoryIT {
                 mockIdentifierStatus(
                         EventTypeEnum.deleted, entry.getAccession(), "does not matter");
         String deletedReason = "a hurricane";
-        identifierStatus.setDeletion_reason(deletedReason);
-        identifierStatus.setWithdrawn_flag("any value means it's withdrawn");
+        identifierStatus.setDeletionReason(deletedReason);
+        identifierStatus.setWithdrawnFlag("any value means it's withdrawn");
         testEntityManager.persist(identifierStatus);
 
         // when
@@ -217,15 +217,15 @@ class UniSaveRepositoryIT {
         EntryImpl entryDiff = createEntry(2);
         entryDiff.setAccession(refEntry.getAccession());
         EntryContentImpl content = new EntryContentImpl();
-        content.setReferenceEntryId(refEntry.getEntryid());
-        String refEntryContent = refEntry.getEntryContent().getFullcontent();
+        content.setReferenceEntryId(refEntry.getEntryId());
+        String refEntryContent = refEntry.getEntryContent().getFullContent();
         String newEntryContent = refEntryContent + " ";
-        content.setDiffcontent(diffPatch.diff(refEntryContent, newEntryContent));
+        content.setDiffContent(diffPatch.diff(refEntryContent, newEntryContent));
         entryDiff.setEntryContent(content);
         testEntityManager.persist(entryDiff);
 
-        assertThat(entryDiff.getEntryContent().getDiffcontent(), is(notNullValue()));
-        assertThat(entryDiff.getEntryContent().getFullcontent(), is(nullValue()));
+        assertThat(entryDiff.getEntryContent().getDiffContent(), is(notNullValue()));
+        assertThat(entryDiff.getEntryContent().getFullContent(), is(nullValue()));
 
         // when
         // ... fetch it
@@ -234,7 +234,7 @@ class UniSaveRepositoryIT {
 
         // then
         // ... full content is computed at time at retrieval time, based on the reference entry.
-        assertThat(diffEntry.getEntryContent().getFullcontent(), is(notNullValue()));
+        assertThat(diffEntry.getEntryContent().getFullContent(), is(notNullValue()));
     }
 
     @Test

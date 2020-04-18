@@ -34,7 +34,7 @@ class UniSaveFlatFileMessageConverterTest {
                 UniSaveEntry.builder()
                         .database(Swissprot.name())
                         .accession(mockEntry.getAccession())
-                        .content(mockEntry.getEntryContent().getFullcontent())
+                        .content(mockEntry.getEntryContent().getFullContent())
                         .firstRelease("1111")
                         .firstReleaseDate("DATE")
                         .build();

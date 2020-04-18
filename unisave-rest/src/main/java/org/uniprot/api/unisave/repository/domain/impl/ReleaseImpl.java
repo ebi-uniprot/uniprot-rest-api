@@ -31,7 +31,7 @@ public class ReleaseImpl implements Release {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "release_seq")
     @SequenceGenerator(name = "release_seq", sequenceName = "RELEASE_SEQ", allocationSize = 1)
-    @Column(name = "Release_id")
+    @Column(name = "release_id")
     private long id;
 
     @Column(name = "release_number", nullable = false, unique = true)

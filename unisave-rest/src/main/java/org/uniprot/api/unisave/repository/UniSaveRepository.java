@@ -1,13 +1,5 @@
 package org.uniprot.api.unisave.repository;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +11,13 @@ import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Profile({"online", "offline"})
 @Service
@@ -140,7 +139,7 @@ public class UniSaveRepository {
                     EntryInfoImpl entryInfo = new EntryInfoImpl();
                     entryInfo.setAccession(accession);
                     entryInfo.setDeleted(true);
-                    entryInfo.setDeletionReason(deletedStatus.getDeletion_reason());
+                    entryInfo.setDeletionReason(deletedStatus.getDeletionReason());
                     entryInfo.setFirstRelease(deletedStatus.getEventRelease());
                     entryInfo.setLastRelease(deletedStatus.getEventRelease());
                     entryInfos.add(0, entryInfo);
@@ -203,8 +202,8 @@ public class UniSaveRepository {
         Entry entry1 = this.getEntryImpl(accession, version1);
         Entry entry2 = this.getEntryImpl(accession, version2);
 
-        String entryContent1 = entry1.getEntryContent().getFullcontent();
-        String entryContent2 = entry2.getEntryContent().getFullcontent();
+        String entryContent1 = entry1.getEntryContent().getFullContent();
+        String entryContent2 = entry2.getEntryContent().getFullContent();
         String diff = diffPatch.diff(entryContent1, entryContent2);
 
         DiffImpl diffImpl = new DiffImpl();
@@ -245,11 +244,11 @@ public class UniSaveRepository {
 
             final String content =
                     diffPatch.patch(
-                            referenceEntry.getEntryContent().getFullcontent(),
-                            entry.getEntryContent().getDiffcontent());
+                            referenceEntry.getEntryContent().getFullContent(),
+                            entry.getEntryContent().getDiffContent());
 
             EntryContentImpl entryContent = new EntryContentImpl();
-            entryContent.setFullcontent(content);
+            entryContent.setFullContent(content);
 
             entry.setEntryContent(entryContent);
         }

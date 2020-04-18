@@ -1,15 +1,13 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
+import javax.persistence.*;
+
 import lombok.Data;
+
 import org.uniprot.api.unisave.repository.domain.AccessionEvent;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 
-import javax.persistence.*;
-
-/**
- * Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 To change this template use
- * File | Settings | File Templates.
- */
+/** Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 */
 @Entity(name = "IdentifierStatus")
 @IdClass(IdentifierStatusId.class)
 @Table(name = "DELETED_MERGED_ACCESSION_VIEW")
@@ -48,12 +46,12 @@ public class IdentifierStatus implements AccessionEvent {
     private ReleaseImpl eventRelease;
 
     @Column(name = "WITHDRAWN")
-    private String withdrawn_flag;
+    private String withdrawnFlag;
 
     @Column(name = "DELETION_REASON")
-    private String deletion_reason;
+    private String deletionReason;
 
     public boolean isWithdrawn() {
-        return withdrawn_flag != null;
+        return withdrawnFlag != null;
     }
 }

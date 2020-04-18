@@ -19,7 +19,7 @@ import javax.persistence.Lob;
 public class EntryContentImpl implements EntryContent {
     /** The diff content stored in a vchar. */
     @Column(name = "diff_content", nullable = true)
-    private String diffcontent;
+    private String diffContent;
 
     /** The diff content's reference entry. */
     @Column(name = "full_content_entry_id", nullable = true)
@@ -28,16 +28,16 @@ public class EntryContentImpl implements EntryContent {
     /** The full content stored in a full content. */
     @Lob
     @Column(name = "full_content", nullable = true)
-    private String fullcontent;
+    private String fullContent;
 
     @Override
     public ContentTypeEnum getType() {
         Preconditions.checkState(
-                referenceEntryId != null || fullcontent != null,
+                referenceEntryId != null || fullContent != null,
                 "entrycontent cannot have both diff content and full content.");
 
         Preconditions.checkState(
-                (referenceEntryId == null || fullcontent == null),
+                (referenceEntryId == null || fullContent == null),
                 "entrycontent cannot be both full and diff.");
 
         if (referenceEntryId != null) return ContentTypeEnum.Diff;

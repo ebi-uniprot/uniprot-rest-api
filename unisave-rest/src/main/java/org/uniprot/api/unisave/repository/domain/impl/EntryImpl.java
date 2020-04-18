@@ -1,10 +1,11 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
+import javax.persistence.*;
+
 import lombok.Data;
+
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.Entry;
-
-import javax.persistence.*;
 
 @Entity(name = "Entry")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "entry_version"}))
@@ -19,7 +20,7 @@ import javax.persistence.*;
                             + " ORDER BY e.entryVersion DESC"),
     @NamedQuery(
             name = "EntryImpl.findEntryByAccessionAndEntryId",
-            query = "SELECT e from Entry e WHERE e.accession=:acc AND e.entryid=:id"),
+            query = "SELECT e from Entry e WHERE e.accession=:acc AND e.entryId=:id"),
     @NamedQuery(
             name = "EntryImpl.findEntryInfoByAccessionAndVersion",
             query =
@@ -51,7 +52,7 @@ public class EntryImpl implements Entry {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entrySeq")
     @SequenceGenerator(name = "entrySeq", sequenceName = "ENTRY_SEQ", allocationSize = 1)
     @Column(name = "entry_id")
-    private long entryid;
+    private long entryId;
 
     @Column
     @Enumerated(value = EnumType.ORDINAL)
@@ -63,13 +64,13 @@ public class EntryImpl implements Entry {
     @Column(name = "entry_name", nullable = false)
     private String name;
 
-    @Column(nullable = false, name = "sequence_Version")
+    @Column(nullable = false, name = "sequence_version")
     private int sequenceVersion;
 
-    @Column(name = "entry_Version", nullable = false)
+    @Column(name = "entry_version", nullable = false)
     private int entryVersion;
 
-    @Column(name = "entry_MD5", nullable = false)
+    @Column(name = "entry_md5", nullable = false)
     private String entryMD5;
 
     @Column(name = "sequence_md5", nullable = false)
@@ -78,11 +79,11 @@ public class EntryImpl implements Entry {
     @Embedded private EntryContentImpl entryContent;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "First_Release_Id")
+    @JoinColumn(name = "first_release_id")
     private ReleaseImpl firstRelease;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "Last_Release_Id")
+    @JoinColumn(name = "last_release_id")
     private ReleaseImpl lastRelease;
 
     /**
@@ -92,8 +93,8 @@ public class EntryImpl implements Entry {
      * <p>Value of zero means it is in the latest release. it's value is only updated when the entry
      * is not in the latest release anymore.
      */
-    @Column(name = "last_release_Year")
-    private int release_year = 0;
+    @Column(name = "last_release_year")
+    private int releaseYear = 0;
 
     @Override
     public String toString() {

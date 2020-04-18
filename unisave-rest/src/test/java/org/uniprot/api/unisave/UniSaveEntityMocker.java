@@ -64,7 +64,7 @@ public class UniSaveEntityMocker {
     public static EntryImpl mockEntry(String accession, int entryVersion, String entryContent) {
         EntryImpl entry = new EntryImpl();
         EntryContentImpl content = new EntryContentImpl();
-        content.setFullcontent(entryContent);
+        content.setFullContent(entryContent);
         entry.setEntryContent(content);
         entry.setEntryVersion(entryVersion);
         entry.setAccession(accession);
@@ -127,27 +127,5 @@ public class UniSaveEntityMocker {
                         + "     FQIIGETVSS TNRG\n"
                         + "//\n";
         return mockEntry(accession, entryVersion, fullContent);
-    }
-
-    public static EntryImpl mockDiffEntryFor(EntryImpl refEntry, int diffEntryVersion) {
-        EntryImpl entry = new EntryImpl();
-        EntryContentImpl content = new EntryContentImpl();
-        content.setReferenceEntryId(refEntry.getEntryid());
-
-        String refEntryContent = refEntry.getEntryContent().getFullcontent();
-        String newEntryContent = refEntryContent + " ";
-        content.setDiffcontent(DIFF_PATCH.diff(refEntryContent, newEntryContent));
-        entry.setEntryContent(content);
-        entry.setEntryVersion(diffEntryVersion);
-
-        entry.setLastRelease(refEntry.getLastRelease());
-        entry.setAccession(refEntry.getAccession());
-        entry.setName(refEntry.getAccession() + "_name");
-        entry.setDatabase(DatabaseEnum.Swissprot);
-        entry.setEntryMD5("someEntryMd5");
-        entry.setSequenceMD5("someSequenceMd5");
-        entry.setFirstRelease(refEntry.getFirstRelease());
-
-        return entry;
     }
 }
