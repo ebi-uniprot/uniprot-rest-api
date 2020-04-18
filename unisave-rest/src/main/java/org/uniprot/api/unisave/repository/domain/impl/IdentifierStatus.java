@@ -42,7 +42,7 @@ public class IdentifierStatus implements AccessionEvent {
     @Column(name = "ACCESSION_OBJECT")
     private String targetAccession;
 
-    // When this status change happen.
+    // when the status change happened
     @ManyToOne
     @JoinColumn(name = "RELEASE_ID")
     private ReleaseImpl eventRelease;

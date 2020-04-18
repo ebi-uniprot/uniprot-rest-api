@@ -1,6 +1,7 @@
 package org.uniprot.api.unisave;
 
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 
 import java.sql.Date;
@@ -13,10 +14,21 @@ import java.util.Map;
  *
  * @author Edd
  */
-public class UniSaveEntryMocker {
+public class UniSaveEntityMocker {
     private static final DiffPatchImpl DIFF_PATCH = new DiffPatchImpl();
 
     private static final Map<String, ReleaseImpl> RELEASE_MAP = new HashMap<>();
+
+    public static IdentifierStatus mockIdentifierStatus(
+            EventTypeEnum eventType, String sourceAccession, String targetAccession) {
+        IdentifierStatus status = new IdentifierStatus();
+
+        status.setSourceAccession(sourceAccession);
+        status.setTargetAccession(targetAccession);
+        status.setEventType(eventType);
+
+        return status;
+    }
 
     public static EntryInfoImpl mockEntryInfo(String accession, int entryVersion) {
         EntryInfoImpl entryInfo = new EntryInfoImpl();

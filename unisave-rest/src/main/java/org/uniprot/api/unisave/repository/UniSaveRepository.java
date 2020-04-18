@@ -74,7 +74,7 @@ public class UniSaveRepository {
 
             q.setParameter("acc", accession);
             q.setParameter("version", version);
-            // Exception handling.
+
             Object[] singleResult = (Object[]) q.getSingleResult();
             return convertFromObjectArray(singleResult);
         } catch (NoResultException e) {
@@ -87,79 +87,82 @@ public class UniSaveRepository {
 
     public List<? extends EntryInfo> retrieveEntryInfos(String accession) {
         try {
-            Query q = session.createNamedQuery(EntryImpl.Query.findEntryInfosByAccession.query());
+            Query entryQuery =
+                    session.createNamedQuery(EntryImpl.Query.findEntryInfosByAccession.query());
 
-            q.setParameter("acc", accession);
+            entryQuery.setParameter("acc", accession);
 
             // Exception handling.
-            List<?> resultList = q.getResultList();
+            List<?> entryQueryResultList = entryQuery.getResultList();
 
-            if (resultList.isEmpty()) {
+            if (entryQueryResultList.isEmpty()) {
                 throw new ResourceNotFoundException("No entries for " + accession + " were found");
             }
 
-            List<EntryInfo> r = new ArrayList<>();
+            List<EntryInfo> entryInfos = new ArrayList<>();
 
-            TypedQuery<IdentifierStatus> q2 =
+            TypedQuery<IdentifierStatus> idQuery =
                     session.createNamedQuery(
                             IdentifierStatus.Query.findByFirstColumn.query(),
                             IdentifierStatus.class);
 
-            q2.setParameter("acc", accession);
-            List<IdentifierStatus> resultList2 = q2.getResultList();
+            idQuery.setParameter("acc", accession);
+            List<IdentifierStatus> idQueryResultList = idQuery.getResultList();
 
             List<IdentifierStatus> replacing = new ArrayList<>();
             List<IdentifierStatus> merged = new ArrayList<>();
             List<IdentifierStatus> deleted = new ArrayList<>();
 
-            for (IdentifierStatus s : resultList2) {
-                if (s.getEventType() == EventTypeEnum.deleted) deleted.add(s);
-                else if (s.getEventType() == EventTypeEnum.merged) merged.add(s);
-                else if (s.getEventType() == EventTypeEnum.replacing) replacing.add(s);
+            for (IdentifierStatus status : idQueryResultList) {
+                if (status.getEventType() == EventTypeEnum.deleted) deleted.add(status);
+                else if (status.getEventType() == EventTypeEnum.merged) merged.add(status);
+                else if (status.getEventType() == EventTypeEnum.replacing) replacing.add(status);
             }
 
-            // find the replacing.
-            for (Object objects : resultList) {
-                EntryInfoImpl c = convertFromObjectArray((Object[]) objects);
+            // find the replacing accession
+            for (Object entryQueryResult : entryQueryResultList) {
+                EntryInfoImpl entryInfo = convertFromObjectArray((Object[]) entryQueryResult);
 
                 if (!replacing.isEmpty()) {
-                    List<String> replacingAcc = findReplacingAcc(replacing, c.getFirstRelease());
-                    c.setReplacingAccession(replacingAcc);
+                    List<String> replacingAcc =
+                            findReplacingAcc(replacing, entryInfo.getFirstRelease());
+                    entryInfo.setReplacingAccession(replacingAcc);
                 }
 
-                r.add(c);
+                entryInfos.add(entryInfo);
             }
 
             if (deleted.size() == 1) {
-                IdentifierStatus s = deleted.get(0);
+                IdentifierStatus deletedStatus = deleted.get(0);
 
-                if (!s.isWithdrawn()) {
+                if (!deletedStatus.isWithdrawn()) {
                     EntryInfoImpl entryInfo = new EntryInfoImpl();
                     entryInfo.setAccession(accession);
                     entryInfo.setDeleted(true);
-                    entryInfo.setDeletionReason(s.getDeletion_reason());
-                    entryInfo.setFirstRelease(s.getEventRelease());
-                    entryInfo.setLastRelease(s.getEventRelease());
-                    r.add(0, entryInfo);
+                    entryInfo.setDeletionReason(deletedStatus.getDeletion_reason());
+                    entryInfo.setFirstRelease(deletedStatus.getEventRelease());
+                    entryInfo.setLastRelease(deletedStatus.getEventRelease());
+                    entryInfos.add(0, entryInfo);
                 } else {
-                    r.clear();
+                    entryInfos.clear();
                 }
             } else if (!merged.isEmpty()) {
-
                 IdentifierStatus s = merged.get(0);
                 EntryInfoImpl entryInfo = new EntryInfoImpl();
                 entryInfo.setAccession(accession);
                 entryInfo.setFirstRelease(s.getEventRelease());
                 entryInfo.setLastRelease(s.getEventRelease());
 
-                for (IdentifierStatus is : merged)
+                for (IdentifierStatus is : merged) {
                     entryInfo.getMergingTo().add(is.getTargetAccession());
+                }
 
-                r.add(0, entryInfo);
+                entryInfos.add(0, entryInfo);
             }
 
-            return r;
+            return entryInfos;
         } catch (ResourceNotFoundException e) {
+            LOGGER.error(e.getMessage());
             throw e;
         } catch (PersistenceException e) {
             LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
@@ -176,9 +179,10 @@ public class UniSaveRepository {
 
             q.setParameter("acc", accession);
             List<IdentifierStatus> resultList = q.getResultList();
-            if (resultList.isEmpty())
+            if (resultList.isEmpty()) {
                 throw new ResourceNotFoundException(
                         "Accession " + accession + " could not be found");
+            }
 
             AccessionStatusInfoImpl accessionStatusInfo = new AccessionStatusInfoImpl();
             accessionStatusInfo.setAccession(accession);
@@ -297,9 +301,9 @@ public class UniSaveRepository {
     }
 
     private List<String> findReplacingAcc(List<IdentifierStatus> status, Release rel) {
-        ArrayList<String> strings = new ArrayList<String>();
+        ArrayList<String> accessions = new ArrayList<>();
         for (IdentifierStatus is : status) {
-            // NOTE: it is possbile to have the null release here.
+            // NOTE: it is possible to have the null release here.
             if (is.getEventType() == EventTypeEnum.replacing && is.getEventRelease() != null) {
                 // check if the release is on the same day.
                 LocalDate date1 =
@@ -308,11 +312,11 @@ public class UniSaveRepository {
 
                 if (date1.getYear() == date2.getYear()
                         && date1.getDayOfYear() == date2.getDayOfYear()) {
-                    strings.add(is.getTargetAccession());
+                    accessions.add(is.getTargetAccession());
                 }
             }
         }
 
-        return strings;
+        return accessions;
     }
 }

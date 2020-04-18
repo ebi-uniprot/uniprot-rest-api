@@ -9,8 +9,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntry;
-import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntryInfo;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntry;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntryInfo;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
 
 import java.sql.Date;

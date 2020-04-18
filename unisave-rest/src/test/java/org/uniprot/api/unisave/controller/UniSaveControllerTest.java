@@ -37,8 +37,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntry;
-import static org.uniprot.api.unisave.UniSaveEntryMocker.mockEntryInfo;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntry;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntryInfo;
 
 /**
  * Created 06/04/20

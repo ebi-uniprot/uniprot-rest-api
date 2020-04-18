@@ -9,7 +9,7 @@ import java.io.OutputStream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.unisave.UniSaveEntryMocker;
+import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 
@@ -28,7 +28,7 @@ class UniSaveFastaMessageConverterTest {
 
     @Test
     void canConvertEntryToFasta() throws IOException {
-        EntryImpl mockEntry = UniSaveEntryMocker.mockEntry("P12345", 1);
+        EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
                         .database(Swissprot.name())

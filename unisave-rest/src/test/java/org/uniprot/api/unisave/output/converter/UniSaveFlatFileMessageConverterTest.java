@@ -1,17 +1,17 @@
 package org.uniprot.api.unisave.output.converter;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.Swissprot;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.unisave.UniSaveEntityMocker;
+import org.uniprot.api.unisave.model.UniSaveEntry;
+import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.unisave.UniSaveEntryMocker;
-import org.uniprot.api.unisave.model.UniSaveEntry;
-import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.Swissprot;
 
 /**
  * Created 15/04/20
@@ -29,7 +29,7 @@ class UniSaveFlatFileMessageConverterTest {
 
     @Test
     void canWriteFlatFile() throws IOException {
-        EntryImpl mockEntry = UniSaveEntryMocker.mockEntry("P12345", 1);
+        EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
                         .database(Swissprot.name())
