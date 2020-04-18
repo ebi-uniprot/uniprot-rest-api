@@ -17,17 +17,9 @@ import javax.persistence.Lob;
 @Embeddable
 @Data
 public class EntryContentImpl implements EntryContent {
-
     /** The diff content stored in a vchar. */
     @Column(name = "diff_content", nullable = true)
     private String diffcontent;
-
-    /** The diff content's reference entry. */
-    // @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    // @JoinColumn(name = "full_content_entry_id", referencedColumnName = "entry_id", updatable =
-    // false, insertable = false)
-    // @Transient;
-    // private EntryImpl referenceEntry;
 
     /** The diff content's reference entry. */
     @Column(name = "full_content_entry_id", nullable = true)

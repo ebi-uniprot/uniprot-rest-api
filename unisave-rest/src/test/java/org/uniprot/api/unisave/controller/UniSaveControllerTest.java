@@ -302,7 +302,8 @@ class UniSaveControllerTest {
 
     // resource /{accession}/status
     @Test
-    void canGetStatus() throws Exception { // given
+    void canGetStatus() throws Exception {
+        // given
         String accession = "P12345";
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
         status.setAccession(accession);

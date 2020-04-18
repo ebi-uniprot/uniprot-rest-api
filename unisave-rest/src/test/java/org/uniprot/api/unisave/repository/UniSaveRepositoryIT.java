@@ -315,10 +315,6 @@ class UniSaveRepositoryIT {
         assertThrows(ResourceNotFoundException.class, () -> repository.retrieveEntryInfos("XXXX"));
     }
 
-    // given
-    // when
-    // then
-
     private EntryImpl createEntry(int entryVersion) {
         EntryImpl entry = mockEntry("ACC_" + ENTRY_COUNTER.getAndIncrement(), entryVersion);
         entry.setFirstRelease(mockRelease("" + RELEASE_COUNTER.getAndIncrement()));

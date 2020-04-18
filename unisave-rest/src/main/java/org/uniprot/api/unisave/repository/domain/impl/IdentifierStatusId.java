@@ -7,10 +7,7 @@ import java.io.Serializable;
 
 @Data
 public class IdentifierStatusId implements Serializable {
-
     private EventTypeEnum eventType;
-
     private String sourceAccession;
-
     private String targetAccession;
 }
