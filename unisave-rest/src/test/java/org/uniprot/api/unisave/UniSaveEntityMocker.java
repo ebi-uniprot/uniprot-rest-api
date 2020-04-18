@@ -55,7 +55,7 @@ public class UniSaveEntityMocker {
         ReleaseImpl release = new ReleaseImpl();
         release.setDatabase(DatabaseEnum.Swissprot);
         release.setReleaseNumber(releaseNumber);
-//        release.setId(Long.parseLong(releaseNumber));
+        //        release.setId(Long.parseLong(releaseNumber));
         release.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
 
         return release;

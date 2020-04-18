@@ -9,7 +9,6 @@ import java.util.List;
 public class DiffPatchImpl implements DiffPatch {
 
     private diff_match_patch diffService = new diff_match_patch();
-    
 
     @Override
     public String diff(String entry1, String entry2) {

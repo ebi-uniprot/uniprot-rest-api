@@ -36,10 +36,10 @@ public class EntryInfoImpl implements EntryInfo {
     private List<String> mergingTo = new ArrayList<>();
     private boolean isDeleted = false;
 
-//    public void setMergingTo(List<String> mergingTo) {
-//        this.mergingTo.clear();
-//        this.mergingTo.addAll(mergingTo);
-//    }
+    //    public void setMergingTo(List<String> mergingTo) {
+    //        this.mergingTo.clear();
+    //        this.mergingTo.addAll(mergingTo);
+    //    }
 
     public void setReplacingAccession(List<String> ac) {
         this.replacingAccession.clear();

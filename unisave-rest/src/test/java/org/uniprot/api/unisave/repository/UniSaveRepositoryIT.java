@@ -189,7 +189,8 @@ class UniSaveRepositoryIT {
 
     @Test
     void retrieveEntryStatusInfoThrowsExceptionWhenEntryNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> repository.retrieveEntryStatusInfo("XXXX"));
+        assertThrows(
+                ResourceNotFoundException.class, () -> repository.retrieveEntryStatusInfo("XXXX"));
     }
 
     @Test
