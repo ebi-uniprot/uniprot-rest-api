@@ -432,7 +432,6 @@
 			<url>${http-uniprot-private-url}/release</url>
 		</pluginRepository>
 	</pluginRepositories>
-
 	<profiles>
 		<!-- active when running on jenkins -->
 		<profile>
@@ -455,35 +454,6 @@
 					<url>${http-uniprot-private-url}/snapshot</url>
 				</snapshotRepository>
 			</distributionManagement>
-		</profile>
-		<profile>
-			<id>openapi</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>uk.ac.ebi.uniprot</groupId>
-						<artifactId>openapi-maven-plugin</artifactId>
-						<version>master</version>
-						<configuration>
-							<packageLocations>
-								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
-								<packageLocation>org.uniprot.api.keyword</packageLocation>
-							</packageLocations>
-							<openApiDirectory>generated/swagger</openApiDirectory>
-							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>compile</phase>
-								<goals>
-									<goal>oas-generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 	</profiles>
 </project>

@@ -32,10 +32,11 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniProtKBRequest implements SearchRequest {
+    @Parameter(hidden = true)
     public static String DEFAULT_FIELDS =
             "accession,id,reviewed,protein_name,gene_names,organism,length";
 
-    @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_query_param_meta.json")
+    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
@@ -44,11 +45,12 @@ public class UniProtKBRequest implements SearchRequest {
             messagePrefix = "search.uniprot")
     private String query;
 
-    @ModelFieldMeta(path = "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
+    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
+    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;

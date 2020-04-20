@@ -1,16 +1,15 @@
 package org.uniprot.api.support.data.controller;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,16 +31,13 @@ public class UniProtConfigureController {
         this.service = service;
     }
 
-    // FIXME Delete this method once UI team starts consuming response of getUniProtSearchTerms
+    // FIXME Delete this method once UI team starts consuming response of api search-terms.
+    //  See method getUniProtSearchTerms
     @GetMapping("/search_terms")
-    public ResponseEntity<String> getUniProtSearchTermsTemp()
-            throws IOException, URISyntaxException {
+    public ResponseEntity<String> getUniProtSearchTermsTemp() throws IOException {
         if (searchTermResponse == null) {
-            URI uri =
-                    UniProtConfigureController.class
-                            .getResource("/search_terms-response.json")
-                            .toURI();
-            searchTermResponse = new String(Files.readAllBytes(Paths.get(uri)));
+            InputStream in = getClass().getResourceAsStream("/search_terms-response.json");
+            searchTermResponse = StreamUtils.copyToString(in, Charset.defaultCharset());
         }
 
         final HttpHeaders httpHeaders = new HttpHeaders();
