@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
@@ -180,8 +181,10 @@ public class UniSaveRepository {
             q.setParameter("acc", accession);
             List<IdentifierStatus> resultList = q.getResultList();
             if (resultList.isEmpty()) {
-                throw new ResourceNotFoundException(
-                        "Accession " + accession + " could not be found");
+                throw new UniSaveEntryNotFoundException(
+                        "Accession "
+                                + accession
+                                + " could not be found, or the accession is active");
             }
 
             AccessionStatusInfoImpl accessionStatusInfo = new AccessionStatusInfoImpl();

@@ -1,24 +1,20 @@
 package org.uniprot.api.rest.validation.error;
 
 import static java.util.Collections.singletonList;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -31,7 +27,6 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
-import org.uniprot.core.util.Utils;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -188,78 +183,5 @@ public class ResponseExceptionHandler {
         addDebugError(request, ex, messages);
 
         return getBadRequestResponseEntity(request, messages);
-    }
-
-    /**
-     * If there is debugError in the request, this method also print exception causes to help in the
-     * debug error
-     *
-     * @param request Request Object.
-     * @param exception the exception that was captured.
-     * @param error List of existing message.
-     */
-    private static void addDebugError(
-            HttpServletRequest request, Throwable exception, List<String> error) {
-        if (request.getParameter("debugError") != null
-                && request.getParameter("debugError").equalsIgnoreCase("true")) {
-
-            Throwable cause = exception.getCause();
-            while (cause != null) {
-                if (cause.getMessage() != null && !cause.getMessage().isEmpty()) {
-                    error.add("Caused by: " + cause.getMessage());
-                }
-                cause = cause.getCause();
-            }
-        }
-    }
-
-    private MediaType getContentTypeFromRequest(HttpServletRequest request) {
-        MediaType result = MediaType.APPLICATION_JSON;
-        String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        if (Utils.notNullNotEmpty(acceptHeader)) {
-            result = MediaType.valueOf(acceptHeader);
-        }
-        return result;
-    }
-
-    private ResponseEntity<ErrorInfo> getBadRequestResponseEntity(
-            HttpServletRequest request, List<String> messages) {
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .contentType(getContentTypeFromRequest(request))
-                .body(error);
-    }
-
-    /**
-     * Error response entity that provide error message details
-     *
-     * @author lgonzales
-     */
-    @XmlRootElement
-    public static class ErrorInfo {
-        private final String url;
-        private final List<String> messages;
-
-        private ErrorInfo() {
-            this("", Collections.emptyList());
-        }
-
-        ErrorInfo(String url, List<String> messages) {
-            assert url != null : "Error URL cannot be null";
-            assert messages != null : "Error messages cannot be null";
-
-            this.url = url;
-            this.messages = messages;
-        }
-
-        @XmlElement
-        public String getUrl() {
-            return url;
-        }
-
-        @XmlElement
-        public List<String> getMessages() {
-            return messages;
-        }
     }
 }

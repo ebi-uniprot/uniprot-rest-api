@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 
@@ -190,7 +191,8 @@ class UniSaveRepositoryIT {
     @Test
     void retrieveEntryStatusInfoThrowsExceptionWhenEntryNotFound() {
         assertThrows(
-                ResourceNotFoundException.class, () -> repository.retrieveEntryStatusInfo("XXXX"));
+                UniSaveEntryNotFoundException.class,
+                () -> repository.retrieveEntryStatusInfo("XXXX"));
     }
 
     @Test
