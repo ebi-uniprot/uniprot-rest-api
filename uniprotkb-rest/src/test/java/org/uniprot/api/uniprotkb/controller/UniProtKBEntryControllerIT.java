@@ -45,11 +45,11 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Slf4j
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniprotKBEntryController.class)
+@WebMvcTest(UniProtKBEntryController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniprotKBEntryControllerIT {
+class UniProtKBEntryControllerIT {
 
     private static final String MAPPED_PROTEIN_PATH = "/uniprotkb/accession/";
 

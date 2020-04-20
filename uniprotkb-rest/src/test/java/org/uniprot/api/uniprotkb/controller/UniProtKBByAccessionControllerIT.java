@@ -6,7 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.*;
 
@@ -54,14 +54,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
-@WebMvcTest(UniprotKBController.class)
+@WebMvcTest(UniProtKBController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniprotKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
-            UniprotKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
+            UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
+            UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
         })
-class UniprotKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
+class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Autowired private ObjectMapper objectMapper;
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";

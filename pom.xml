@@ -3,7 +3,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -12,7 +11,7 @@
 
 	<artifactId>uniprot-rest-api</artifactId>
 	<groupId>org.uniprot</groupId>
-	<version>${build.version}</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>UniProt REST API Aggregator</name>
 	<description>
@@ -22,7 +21,6 @@
 	</description>
 
 	<properties>
-		<build.version>1.0.0-SNAPSHOT</build.version>
 		<uniprot-store.version>${project.version}</uniprot-store.version>
 		<uniprot-core.version>${project.version}</uniprot-core.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -434,7 +432,6 @@
 			<url>${http-uniprot-private-url}/release</url>
 		</pluginRepository>
 	</pluginRepositories>
-
 	<profiles>
 		<!-- active when running on jenkins -->
 		<profile>
@@ -457,35 +454,6 @@
 					<url>${http-uniprot-private-url}/snapshot</url>
 				</snapshotRepository>
 			</distributionManagement>
-		</profile>
-		<profile>
-			<id>openapi</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>uk.ac.ebi.uniprot</groupId>
-						<artifactId>openapi-maven-plugin</artifactId>
-						<version>master</version>
-						<configuration>
-							<packageLocations>
-								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
-								<packageLocation>org.uniprot.api.keyword</packageLocation>
-							</packageLocations>
-							<openApiDirectory>generated/swagger</openApiDirectory>
-							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>compile</phase>
-								<goals>
-									<goal>oas-generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 	</profiles>
 </project>

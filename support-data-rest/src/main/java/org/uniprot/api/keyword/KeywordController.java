@@ -29,7 +29,6 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -89,12 +88,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.keyword.invalid.id}")
                     String keywordId,
-            @ModelFieldMeta(
-                            path =
-                                    "support-data-rest/src/main/resources/keyword_return_field_meta.json")
-                    @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
+            @Parameter(description = "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
                     @RequestParam(value = "fields", required = false)
                     String fields,

@@ -3,16 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
-
 	<artifactId>uniprotkb-rest</artifactId>
-	<version>${project.parent.version}</version>
 
 	<properties>
 		<!-- Plugin versions -->
@@ -22,7 +19,7 @@
 		<logback.version>1.2.3</logback.version>
 		<commons-codec.version>1.11</commons-codec.version>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-		<openapi-maven-plugin.version>master</openapi-maven-plugin.version>
+		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 	</properties>
 
 	<repositories>
@@ -284,12 +281,24 @@
 						<configuration>
 							<packageLocations>
 								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
-								<packageLocation>org.uniprot.api.keyword</packageLocation>
 							</packageLocations>
 							<openApiDirectory>generated/swagger</openApiDirectory>
 							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
 							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.uniprot</groupId>
+								<artifactId>uniprot-config</artifactId>
+								<version>${uniprot-store.version}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>*</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
 						<executions>
 							<execution>
 								<phase>compile</phase>

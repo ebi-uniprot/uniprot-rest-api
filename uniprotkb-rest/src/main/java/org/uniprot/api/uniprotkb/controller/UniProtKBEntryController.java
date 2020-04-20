@@ -34,11 +34,11 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb/accession")
-public class UniprotKBEntryController extends BasicSearchController<PublicationEntry> {
+public class UniProtKBEntryController extends BasicSearchController<PublicationEntry> {
 
     private final PublicationService publicationService;
 
-    protected UniprotKBEntryController(
+    protected UniProtKBEntryController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<PublicationEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,

@@ -8,10 +8,9 @@
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
-
 	<artifactId>uniref-rest</artifactId>
-	<version>${project.parent.version}</version>
 	<name>uniref-rest</name>
 	<description>UniRef Rest API</description>
 
