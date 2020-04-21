@@ -1,16 +1,15 @@
 package org.uniprot.api.unisave.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.unisave.model.AccessionEvent;
 import org.uniprot.api.unisave.model.DiffInfo;
-import org.uniprot.api.unisave.model.ReleaseInfo;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.UniSaveRepository;
 import org.uniprot.api.unisave.repository.domain.AccessionStatusInfo;
 import org.uniprot.api.unisave.repository.domain.Entry;
-import org.uniprot.api.unisave.repository.domain.Release;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 import org.uniprot.core.util.Utils;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UniSaveServiceImpl implements UniSaveService {
     static final String LATEST_RELEASE = "LATEST_RELEASE";
     private static final String COPYRIGHT =
@@ -34,6 +34,7 @@ public class UniSaveServiceImpl implements UniSaveService {
     private static final String RELEASE_DATE_FORMAT = "dd-MMM-yyyy";
     private static final DateTimeFormatter RELEASE_DATE_FORMATTER =
             DateTimeFormatter.ofPattern(RELEASE_DATE_FORMAT);
+    private static final int CURRENT_DATE_UPDATE_FREQUENCY = 3600 * 12;
     private final UniSaveRepository repository;
 
     @Autowired
@@ -119,10 +120,10 @@ public class UniSaveServiceImpl implements UniSaveService {
     UniSaveEntry.UniSaveEntryBuilder changeReleaseDate(
             UniSaveEntry.UniSaveEntryBuilder entryBuilder) {
         if (entryBuilder.getLastRelease().equalsIgnoreCase(LATEST_RELEASE)) {
-            ReleaseInfo latestRelease = getLatestRelease();
+            log.debug("Replacing LATEST_RELEASE with first release date");
             return entryBuilder
-                    .lastRelease(latestRelease.getReleaseNumber())
-                    .lastReleaseDate(latestRelease.getReleaseDate());
+                    .lastReleaseDate(entryBuilder.getFirstReleaseDate())
+                    .lastRelease(entryBuilder.getFirstRelease());
         } else {
             return entryBuilder;
         }
@@ -176,16 +177,13 @@ public class UniSaveServiceImpl implements UniSaveService {
                         formatReleaseDate(repoEntryInfo.getLastRelease().getReleaseDate()));
     }
 
-    private ReleaseInfo getLatestRelease() {
+    private static void updateLatestReleaseCache() {
         long currentTimeMillis = System.currentTimeMillis();
-        // only update every 12 hours
-        if (LatestReleaseCache.release == null
-                || currentTimeMillis - LatestReleaseCache.lastUpdated > 3600 * 12) {
+        // update every 12 hours
+        if (currentTimeMillis - LatestReleaseCache.lastUpdated > CURRENT_DATE_UPDATE_FREQUENCY) {
             LatestReleaseCache.lastUpdated = currentTimeMillis;
             LatestReleaseCache.currentDate = LocalDate.now();
-            LatestReleaseCache.release = getLatestReleaseInfo();
         }
-        return LatestReleaseCache.release;
     }
 
     private List<UniSaveEntry> getEntriesWithoutContent(UniSaveRequest.Entries entryRequest) {
@@ -238,14 +236,6 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .collect(Collectors.toList());
     }
 
-    private ReleaseInfo getLatestReleaseInfo() {
-        Release latestRelease = repository.getLatestRelease();
-        return ReleaseInfo.builder()
-                .releaseDate(formatReleaseDate(latestRelease.getReleaseDate()))
-                .releaseNumber(latestRelease.getReleaseNumber())
-                .build();
-    }
-
     private String formatReleaseDate(Date releaseDate) {
         LocalDate releaseLocalDate = ((java.sql.Date) releaseDate).toLocalDate();
         return releaseLocalDate.format(RELEASE_DATE_FORMATTER);
@@ -253,6 +243,7 @@ public class UniSaveServiceImpl implements UniSaveService {
 
     private boolean filterWithDate(UniSaveEntry.UniSaveEntryBuilder entry) {
         LocalDate date = LocalDate.parse(entry.getFirstReleaseDate(), RELEASE_DATE_FORMATTER);
+        updateLatestReleaseCache();
         return date.compareTo(LatestReleaseCache.currentDate) <= 0;
     }
 
@@ -273,7 +264,6 @@ public class UniSaveServiceImpl implements UniSaveService {
     static class LatestReleaseCache {
         static long lastUpdated = System.currentTimeMillis();
         static LocalDate currentDate = LocalDate.now();
-        static ReleaseInfo release = null;
 
         private LatestReleaseCache() {}
     }
