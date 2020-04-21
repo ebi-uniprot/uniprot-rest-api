@@ -599,9 +599,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 case "taxonomy_id":
                     value = "9606";
                     break;
-                case "modified":
-                case "created":
-                case "sequence_modified":
+                case "date_modified":
+                case "date_created":
+                case "date_sequence_modified":
                 case "lit_pubdate":
                 case "length":
                 case "mass":

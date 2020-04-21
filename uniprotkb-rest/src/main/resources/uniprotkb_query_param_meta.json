@@ -92,15 +92,15 @@
     "type": "String"
   },
   {
-    "name": "modified",
+    "name": "date_modified",
     "type": "String"
   },
   {
-    "name": "created",
+    "name": "date_created",
     "type": "String"
   },
   {
-    "name": "sequence_modified",
+    "name": "date_sequence_modified",
     "type": "String"
   },
   {
