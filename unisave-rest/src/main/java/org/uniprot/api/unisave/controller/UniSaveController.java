@@ -51,15 +51,15 @@ public class UniSaveController {
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
             @Valid UniSaveRequest.Entries uniSaveRequest, HttpServletRequest servletRequest) {
 
+        String acceptHeader = getHeader(servletRequest);
+        setContentIfRequired(uniSaveRequest, acceptHeader);
         HttpHeaders httpHeaders =
                 addDownloadHeaderIfRequired(
-                        uniSaveRequest,
-                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)),
-                        servletRequest);
+                        uniSaveRequest, UniProtMediaType.valueOf(acceptHeader), servletRequest);
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
-                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+                        UniProtMediaType.valueOf(acceptHeader));
         context.setEntities(service.getEntries(uniSaveRequest).stream());
 
         return ResponseEntity.ok().headers(httpHeaders).body(context);
@@ -73,7 +73,7 @@ public class UniSaveController {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
-                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+                        UniProtMediaType.valueOf(getHeader(servletRequest)));
         context.setEntityOnly(true);
         context.setEntities(
                 Stream.of(
@@ -93,11 +93,24 @@ public class UniSaveController {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
-                        UniProtMediaType.valueOf(servletRequest.getHeader(HttpHeaders.ACCEPT)));
+                        UniProtMediaType.valueOf(getHeader(servletRequest)));
         context.setEntityOnly(true);
         context.setEntities(Stream.of(service.getAccessionStatus(accession)));
 
         return ResponseEntity.ok(context);
+    }
+
+    // responses in fasta/flatfile format will require fetching
+    // content regardless of what user specifies, so set it
+    private void setContentIfRequired(UniSaveRequest.Entries uniSaveRequest, String acceptHeader) {
+        if (acceptHeader.equals(FASTA_MEDIA_TYPE_VALUE)
+                || acceptHeader.equals(FF_MEDIA_TYPE_VALUE)) {
+            uniSaveRequest.setIncludeContent(true);
+        }
+    }
+
+    private String getHeader(HttpServletRequest servletRequest) {
+        return servletRequest.getHeader(HttpHeaders.ACCEPT);
     }
 
     private HttpHeaders addDownloadHeaderIfRequired(

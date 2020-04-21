@@ -36,6 +36,7 @@ public class UniSaveServiceImpl implements UniSaveService {
             DateTimeFormatter.ofPattern(RELEASE_DATE_FORMAT);
     private static final int CURRENT_DATE_UPDATE_FREQUENCY = 3600 * 12;
     private final UniSaveRepository repository;
+    private String currentReleaseDate;
 
     @Autowired
     UniSaveServiceImpl(UniSaveRepository repository) {
@@ -81,6 +82,7 @@ public class UniSaveServiceImpl implements UniSaveService {
 
     @Override
     public List<UniSaveEntry> getEntries(UniSaveRequest.Entries entryRequest) {
+        currentReleaseDate = formatReleaseDate(repository.getCurrentRelease().getReleaseDate());
         if (entryRequest.isIncludeContent()) {
             return getEntriesWithContent(entryRequest);
         } else {
@@ -119,10 +121,14 @@ public class UniSaveServiceImpl implements UniSaveService {
 
     UniSaveEntry.UniSaveEntryBuilder changeReleaseDate(
             UniSaveEntry.UniSaveEntryBuilder entryBuilder) {
+        // set whether or not this entry is the current release
+        if (currentReleaseDate.equals(entryBuilder.getFirstReleaseDate())) {
+            entryBuilder.isCurrentRelease(true);
+        }
+
         if (entryBuilder.getLastRelease().equalsIgnoreCase(LATEST_RELEASE)) {
             log.debug("Replacing LATEST_RELEASE with first release date");
             return entryBuilder
-                    .isLatestRelease(true)
                     .lastReleaseDate(entryBuilder.getFirstReleaseDate())
                     .lastRelease(entryBuilder.getFirstRelease());
         } else {
@@ -192,6 +198,7 @@ public class UniSaveServiceImpl implements UniSaveService {
             return getEntryVersionsWithoutContent(entryRequest);
         } else {
             return repository.retrieveEntryInfos(entryRequest.getAccession()).stream()
+                    .filter(entry -> Utils.nullOrEmpty(entry.getMergingTo()) && !entry.isDeleted())
                     .map(this::entryInfo2UniSaveEntryBuilder)
                     .map(this::changeReleaseDate)
                     .filter(this::filterWithDate)

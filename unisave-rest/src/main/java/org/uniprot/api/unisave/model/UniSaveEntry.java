@@ -1,5 +1,6 @@
 package org.uniprot.api.unisave.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +34,12 @@ public class UniSaveEntry {
     private DiffInfo diffInfo;
     private AccessionStatus status;
     private List<AccessionEvent> events;
+    private boolean isCurrentRelease;
+
+    @JsonIgnore
+    public boolean isCurrentRelease() {
+        return isCurrentRelease;
+    }
 
     public static class UniSaveEntryBuilder {
         public String getLastRelease() {
@@ -41,6 +48,10 @@ public class UniSaveEntry {
 
         public String getFirstReleaseDate() {
             return firstReleaseDate;
+        }
+
+        public String getFirstRelease() {
+            return firstRelease;
         }
 
         public String getContent() {

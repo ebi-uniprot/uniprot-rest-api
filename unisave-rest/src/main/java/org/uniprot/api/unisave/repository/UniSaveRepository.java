@@ -79,7 +79,8 @@ public class UniSaveRepository {
             Object[] singleResult = (Object[]) q.getSingleResult();
             return convertFromObjectArray(singleResult);
         } catch (NoResultException e) {
-            throw new ResourceNotFoundException("No entry for " + accession + " was found");
+            throw new UniSaveEntryNotFoundException(
+                    "No entry for " + accession + ", version " + version + " was found");
         } catch (PersistenceException e) {
             LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
@@ -97,7 +98,8 @@ public class UniSaveRepository {
             List<?> entryQueryResultList = entryQuery.getResultList();
 
             if (entryQueryResultList.isEmpty()) {
-                throw new ResourceNotFoundException("No entries for " + accession + " were found");
+                throw new UniSaveEntryNotFoundException(
+                        "No entries for " + accession + " were found");
             }
 
             List<EntryInfo> entryInfos = new ArrayList<>();
@@ -162,7 +164,7 @@ public class UniSaveRepository {
             }
 
             return entryInfos;
-        } catch (ResourceNotFoundException e) {
+        } catch (UniSaveEntryNotFoundException e) {
             LOGGER.error(e.getMessage());
             throw e;
         } catch (PersistenceException e) {
@@ -235,6 +237,25 @@ public class UniSaveRepository {
         }
     }
 
+    public Release getCurrentRelease() {
+        try {
+            TypedQuery<ReleaseImpl> namedQuery =
+                    session.createNamedQuery(
+                            ReleaseImpl.Query.findPastReleasesInOrder.query(), ReleaseImpl.class);
+
+            namedQuery.setMaxResults(1);
+
+            namedQuery.setParameter("date", java.sql.Date.valueOf(LocalDate.now()));
+
+            List<ReleaseImpl> releases = namedQuery.getResultList();
+            return releases.get(0);
+        } catch (PersistenceException e) {
+            String message = "Could not get all releases";
+            LOGGER.error(message, e);
+            throw new QueryRetrievalException(message, e);
+        }
+    }
+
     private void setContent(EntryImpl entry, EntityManager session) {
         if (entry.getEntryContent().getType() == ContentTypeEnum.Diff) {
             final TypedQuery<EntryImpl> query =
@@ -271,7 +292,8 @@ public class UniSaveRepository {
             setContent(entry, session);
             return entry;
         } catch (NoResultException e) {
-            throw new ResourceNotFoundException("No entry for " + accession + " was found");
+            throw new UniSaveEntryNotFoundException(
+                    "No entry for " + accession + ", version " + version + " was found");
         } catch (PersistenceException e) {
             LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
