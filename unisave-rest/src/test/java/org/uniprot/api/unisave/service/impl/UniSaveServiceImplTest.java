@@ -1,5 +1,19 @@
 package org.uniprot.api.unisave.service.impl;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.unisave.model.AccessionEvent;
+import org.uniprot.api.unisave.model.UniSaveEntry;
+import org.uniprot.api.unisave.repository.UniSaveRepository;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+import org.uniprot.api.unisave.repository.domain.impl.*;
+import org.uniprot.api.unisave.request.UniSaveRequest;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,22 +26,6 @@ import static org.mockito.Mockito.*;
 import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntry;
 import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntryInfo;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.unisave.model.AccessionEvent;
-import org.uniprot.api.unisave.model.UniSaveEntry;
-import org.uniprot.api.unisave.repository.UniSaveRepository;
-import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-import org.uniprot.api.unisave.repository.domain.impl.*;
-import org.uniprot.api.unisave.request.UniSaveRequest;
 
 /**
  * Created 08/04/20
@@ -282,10 +280,10 @@ class UniSaveServiceImplTest {
                                 + "RT   \"FDA dAtabase for Regulatory Grade micrObial Sequences (FDA-ARGOS):\n"
                                 + "RT   Supporting development and validation of Infectious Disease Dx tests.\";\n"
                                 + "RL   Submitted (NOV-2018) to the EMBL/GenBank/DDBJ databases.\n"
-                                + "CC   -----------------------------------------------------------------------\n"
+                                + "CC   ---------------------------------------------------------------------------\n"
                                 + "CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms\n"
                                 + "CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License\n"
-                                + "CC   -----------------------------------------------------------------------\n"
+                                + "CC   ---------------------------------------------------------------------------\n"
                                 + "DR   EMBL; CP033715; AYX10384.1; -; Genomic_DNA.\n"
                                 + "DR   RefSeq; WP_072092108.1; NZ_PDEJ01000002.1.\n"
                                 + "DR   Proteomes; UP000277634; Chromosome.\n"
@@ -324,21 +322,19 @@ class UniSaveServiceImplTest {
     @Test
     void releaseDateChangedCorrectly() {
         // given
+        String firstRelease = "first release";
+        String firstReleaseDate = "first release date";
         UniSaveEntry.UniSaveEntryBuilder entryBuilder =
-                UniSaveEntry.builder().lastRelease(LATEST_RELEASE);
-        ReleaseImpl release = new ReleaseImpl();
-        LocalDate localDate = LocalDate.of(1967, 6, 22);
-        Date date = Date.valueOf(localDate);
-        release.setReleaseDate(date);
-        String releaseNumber = "1";
-        release.setReleaseNumber(releaseNumber);
-        when(uniSaveRepository.getLatestRelease()).thenReturn(release);
+                UniSaveEntry.builder()
+                        .lastRelease(LATEST_RELEASE)
+                        .firstRelease(firstRelease)
+                        .firstReleaseDate(firstReleaseDate);
 
         // when
         uniSaveService.changeReleaseDate(entryBuilder);
 
         // then
-        assertThat(entryBuilder.build().getLastRelease(), is(releaseNumber));
-        assertThat(entryBuilder.build().getLastReleaseDate(), is("22-Jun-1967"));
+        assertThat(entryBuilder.build().getLastRelease(), is(firstRelease));
+        assertThat(entryBuilder.build().getLastReleaseDate(), is(firstReleaseDate));
     }
 }
