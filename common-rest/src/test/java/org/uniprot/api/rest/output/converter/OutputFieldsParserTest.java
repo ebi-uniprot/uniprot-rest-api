@@ -2,15 +2,15 @@ package org.uniprot.api.rest.output.converter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author lgonzales
@@ -20,35 +20,37 @@ class OutputFieldsParserTest {
 
     @Test
     void canParseEmptyFieldsReturnDefaultSearch() {
-        ReturnFieldConfig returnFieldConfig = ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
         List<ReturnField> returnField = OutputFieldsParser.parse("", returnFieldConfig);
 
         assertNotNull(returnField);
-        assertEquals(returnFieldConfig.getDefaultReturnFields(),returnField);
+        assertEquals(returnFieldConfig.getDefaultReturnFields(), returnField);
     }
 
     @Test
     void canParseFieldsReturnSelectedReturnedField() {
-        ReturnFieldConfig returnFieldConfig = ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
         List<ReturnField> returnField = OutputFieldsParser.parse("id,name", returnFieldConfig);
 
         assertNotNull(returnField);
         assertEquals(2, returnField.size());
         assertEquals("id", returnField.get(0).getName());
         assertEquals("name", returnField.get(1).getName());
-
     }
 
     @Test
     void canGetData() {
 
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
+        List<ReturnField> returnField =
+                OutputFieldsParser.parse("id,name,description", returnFieldConfig);
 
-        ReturnFieldConfig returnFieldConfig = ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
-        List<ReturnField> returnField = OutputFieldsParser.parse("id,name,description", returnFieldConfig);
-
-        Map<String,String> mappedFields = new HashMap<>();
-        mappedFields.put("id","idValue");
-        mappedFields.put("name","nameValue");
+        Map<String, String> mappedFields = new HashMap<>();
+        mappedFields.put("id", "idValue");
+        mappedFields.put("name", "nameValue");
         List<String> result = OutputFieldsParser.getData(mappedFields, returnField);
 
         assertNotNull(result);

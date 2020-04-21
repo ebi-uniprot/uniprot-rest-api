@@ -4,7 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.Optional;
 
@@ -27,6 +27,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.uniprotkb.controller.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
@@ -53,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
-public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
+public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
 
@@ -61,7 +62,7 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
     private final MessageConverterContextFactory<UniProtKBEntry> converterContextFactory;
 
     @Autowired
-    public UniprotKBController(
+    public UniProtKBController(
             ApplicationEventPublisher eventPublisher,
             UniProtEntryService entryService,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
@@ -171,8 +172,8 @@ public class UniprotKBController extends BasicSearchController<UniProtKBEntry> {
                             message = "{search.invalid.accession.value}")
                     String accession,
             @ModelFieldMeta(
-                            path =
-                                    "uniprotkb-rest/src/main/resources/uniprotkb_return_field_meta.json")
+                            reader = ReturnFieldMetaReaderImpl.class,
+                            path = "uniprotkb-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
                             description =

@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.controller.UniprotKBController;
+import org.uniprot.api.uniprotkb.controller.UniProtKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadQueryParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 
@@ -37,7 +37,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
-@WebMvcTest(UniprotKBController.class)
+@WebMvcTest(UniProtKBController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class UniProtKBDownloadQueryIT extends BaseUniprotKBDownloadIT {
     private static final String SOLR_QUERY = "accession:" + ACC2;
