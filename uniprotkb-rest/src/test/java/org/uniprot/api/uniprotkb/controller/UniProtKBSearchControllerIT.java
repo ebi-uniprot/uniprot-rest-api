@@ -595,7 +595,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     value = "P21802";
                     break;
                 case "organism_id":
-                case "host_id":
+                case "virus_host_id":
                 case "taxonomy_id":
                     value = "9606";
                     break;
@@ -865,7 +865,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             "query",
                             Collections.singletonList(
                                     "accession:INVALID OR accession_id:INVALID "
-                                            + "OR reviewed:INVALID OR organism_id:invalid OR host_id:invalid OR taxonomy_id:invalid "
+                                            + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
                                             + "OR is_isoform:invalid OR d3structure:invalid OR active:invalid OR proteome:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
@@ -881,7 +881,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             "The 'd3structure' filter value can only be true or false",
                                             "The 'taxonomy_id' filter value should be a number",
                                             "The 'accession_id' filter value 'INVALID' has invalid format. It should be a valid UniProtKB accession",
-                                            "The 'host_id' filter value should be a number")))
+                                            "The 'virus_host_id' filter value should be a number")))
                     .build();
         }
 

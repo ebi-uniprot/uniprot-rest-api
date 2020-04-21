@@ -49,7 +49,7 @@
   },
   {
     "label": "Virus hosts",
-    "name": "organism_host"
+    "name": "virus_hosts"
   },
   {
     "label": "Alternative products (isoforms)",

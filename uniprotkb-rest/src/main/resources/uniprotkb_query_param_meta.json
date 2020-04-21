@@ -64,11 +64,11 @@
     "type": "String"
   },
   {
-    "name": "host_name",
+    "name": "virus_host_name",
     "type": "String"
   },
   {
-    "name": "host_id",
+    "name": "virus_host_id",
     "type": "String"
   },
   {
