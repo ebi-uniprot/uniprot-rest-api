@@ -26,10 +26,10 @@ import java.util.stream.Collectors;
 public class UniSaveServiceImpl implements UniSaveService {
     static final String LATEST_RELEASE = "LATEST_RELEASE";
     private static final String COPYRIGHT =
-            "CC   -----------------------------------------------------------------------\n"
+            "CC   ---------------------------------------------------------------------------\n"
                     + "CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms\n"
                     + "CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License\n"
-                    + "CC   -----------------------------------------------------------------------\n"
+                    + "CC   ---------------------------------------------------------------------------\n"
                             .replace("\r", "");
     private static final String RELEASE_DATE_FORMAT = "dd-MMM-yyyy";
     private static final DateTimeFormatter RELEASE_DATE_FORMATTER =
@@ -122,6 +122,7 @@ public class UniSaveServiceImpl implements UniSaveService {
         if (entryBuilder.getLastRelease().equalsIgnoreCase(LATEST_RELEASE)) {
             log.debug("Replacing LATEST_RELEASE with first release date");
             return entryBuilder
+                    .isLatestRelease(true)
                     .lastReleaseDate(entryBuilder.getFirstReleaseDate())
                     .lastRelease(entryBuilder.getFirstRelease());
         } else {
