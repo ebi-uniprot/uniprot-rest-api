@@ -16,7 +16,7 @@ cache:
     - .m2/repository
     - .sonar/cache
 
-deploy:jdk8:
+rest-api:deploy:
   stage: deploy
   before_script:
     - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
