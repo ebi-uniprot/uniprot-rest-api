@@ -89,8 +89,8 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     }
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
-    @MethodSource("name")
-    void testDownloadSortByName(DownloadParamAndResult paramAndResult) throws Exception {
+    @MethodSource("protein_name")
+    void testDownloadSortByProteinName(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
@@ -149,8 +149,8 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
         return requestResponseForSort("id", "asc", SORTED_BY_MNEMONIC);
     }
 
-    private static Stream<Arguments> name() {
-        return requestResponseForSort("name", "asc", SORTED_BY_ACCESSION);
+    private static Stream<Arguments> protein_name() {
+        return requestResponseForSort("protein_name", "asc", SORTED_BY_ACCESSION);
     }
 
     private static Stream<Arguments> gene() {

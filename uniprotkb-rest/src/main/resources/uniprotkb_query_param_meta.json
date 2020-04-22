@@ -20,7 +20,7 @@
     "type": "String"
   },
   {
-    "name": "name",
+    "name": "protein_name",
     "type": "String"
   },
   {

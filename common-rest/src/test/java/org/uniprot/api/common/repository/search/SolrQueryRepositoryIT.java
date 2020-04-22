@@ -368,7 +368,7 @@ class SolrQueryRepositoryIT {
                 .query(query)
                 .termQuery(query)
                 .termField("keyword")
-                .termField("name")
+                .termField("protein_name")
                 .sort(new Sort(Sort.Direction.ASC, "accession_id"))
                 .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
                 .build();
