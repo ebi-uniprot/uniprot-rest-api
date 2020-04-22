@@ -866,7 +866,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             Collections.singletonList(
                                     "accession:INVALID OR accession_id:INVALID "
                                             + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
-                                            + "OR is_isoform:invalid OR d3structure:invalid OR active:invalid OR proteome:INVALID"))
+                                            + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -878,7 +878,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             "The 'reviewed' filter value can only be true or false",
                                             "The 'active' parameter can only be true or false",
                                             "The 'organism_id' filter value should be a number",
-                                            "The 'd3structure' filter value can only be true or false",
+                                            "The 'structure_3d' filter value can only be true or false",
                                             "The 'taxonomy_id' filter value should be a number",
                                             "The 'accession_id' filter value 'INVALID' has invalid format. It should be a valid UniProtKB accession",
                                             "The 'virus_host_id' filter value should be a number")))
