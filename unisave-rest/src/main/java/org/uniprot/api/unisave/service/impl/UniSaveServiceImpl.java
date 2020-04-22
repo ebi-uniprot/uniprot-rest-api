@@ -148,13 +148,21 @@ public class UniSaveServiceImpl implements UniSaveService {
         }
     }
 
+    private static void updateLatestReleaseCache() {
+        long currentTimeMillis = System.currentTimeMillis();
+        // update every 12 hours
+        if (currentTimeMillis - LatestReleaseCache.lastUpdated > CURRENT_DATE_UPDATE_FREQUENCY) {
+            LatestReleaseCache.lastUpdated = currentTimeMillis;
+            LatestReleaseCache.currentDate = LocalDate.now();
+        }
+    }
+
     private UniSaveEntry.UniSaveEntryBuilder entry2UniSaveEntryBuilder(Entry entry) {
         return UniSaveEntry.builder()
                 .accession(entry.getAccession())
                 .name(entry.getName())
                 .entryVersion(entry.getEntryVersion())
                 .sequenceVersion(entry.getSequenceVersion())
-                .md5(entry.getEntryMD5())
                 .database(entry.getDatabase().toString())
                 .firstRelease(entry.getFirstRelease().getReleaseNumber())
                 .firstReleaseDate(formatReleaseDate(entry.getFirstRelease().getReleaseDate()))
@@ -183,7 +191,6 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .entryVersion(repoEntryInfo.getEntryVersion())
                 .sequenceVersion(repoEntryInfo.getSequenceVersion())
                 .deleted(repoEntryInfo.isDeleted())
-                .md5(repoEntryInfo.getEntryMD5())
                 .deletedReason(repoEntryInfo.getDeletionReason())
                 .replacingAcc(repoEntryInfo.getReplacingAccession())
                 .mergedTo(repoEntryInfo.getMergingTo())
@@ -194,15 +201,6 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .lastRelease(repoEntryInfo.getLastRelease().getReleaseNumber())
                 .lastReleaseDate(
                         formatReleaseDate(repoEntryInfo.getLastRelease().getReleaseDate()));
-    }
-
-    private static void updateLatestReleaseCache() {
-        long currentTimeMillis = System.currentTimeMillis();
-        // update every 12 hours
-        if (currentTimeMillis - LatestReleaseCache.lastUpdated > CURRENT_DATE_UPDATE_FREQUENCY) {
-            LatestReleaseCache.lastUpdated = currentTimeMillis;
-            LatestReleaseCache.currentDate = LocalDate.now();
-        }
     }
 
     private List<UniSaveEntry> getEntriesWithoutContent(UniSaveRequest.Entries entryRequest) {

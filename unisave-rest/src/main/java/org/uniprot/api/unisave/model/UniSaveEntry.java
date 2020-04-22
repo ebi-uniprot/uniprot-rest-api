@@ -23,7 +23,6 @@ public class UniSaveEntry {
     private String firstReleaseDate;
     private String lastRelease;
     private String lastReleaseDate;
-    private String md5;
     private String name;
     private Integer sequenceVersion;
     private String content;
