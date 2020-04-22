@@ -9,8 +9,10 @@ import java.util.Date;
 
 @Entity(name = "Release")
 @NamedQueries({
-        @NamedQuery(name = "ReleaseImpl.findPastReleasesInOrder",
-        query = "select r from Release r where r.releaseDate <= :date order by r.releaseDate desc"),
+    @NamedQuery(
+            name = "ReleaseImpl.findPastReleasesInOrder",
+            query =
+                    "select r from Release r where r.releaseDate <= :date order by r.releaseDate desc"),
     @NamedQuery(
             name = "ReleaseImpl.findReleaseByReleaseNumber",
             query = "SELECT r from Release r where r.releaseNumber=:rel"),

@@ -43,8 +43,16 @@ public class UniSaveServiceImpl implements UniSaveService {
         this.repository = repository;
     }
 
+    //    public void initCurrentReleaseDate() {
+    //        if (Objects.isNull(currentReleaseDate)) {
+    //            currentReleaseDate =
+    // formatReleaseDate(repository.getCurrentRelease().getReleaseDate());
+    //        }
+    //    }
+
     @Override
     public UniSaveEntry getDiff(String accession, int version1, int version2) {
+
         org.uniprot.api.unisave.repository.domain.Diff diff =
                 repository.getDiff(accession, version1, version2);
         DiffInfo modelDiffInfo =
@@ -80,9 +88,13 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .build();
     }
 
+    public void updateCurrentReleaseDate() {
+        currentReleaseDate = formatReleaseDate(repository.getCurrentRelease().getReleaseDate());
+    }
+
     @Override
     public List<UniSaveEntry> getEntries(UniSaveRequest.Entries entryRequest) {
-        currentReleaseDate = formatReleaseDate(repository.getCurrentRelease().getReleaseDate());
+        updateCurrentReleaseDate();
         if (entryRequest.isIncludeContent()) {
             return getEntriesWithContent(entryRequest);
         } else {

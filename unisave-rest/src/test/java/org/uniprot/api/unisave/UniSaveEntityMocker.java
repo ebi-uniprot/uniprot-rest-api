@@ -15,8 +15,6 @@ import java.util.Map;
  * @author Edd
  */
 public class UniSaveEntityMocker {
-    private static final DiffPatchImpl DIFF_PATCH = new DiffPatchImpl();
-
     private static final Map<String, ReleaseImpl> RELEASE_MAP = new HashMap<>();
 
     public static IdentifierStatus mockIdentifierStatus(
@@ -55,7 +53,6 @@ public class UniSaveEntityMocker {
         ReleaseImpl release = new ReleaseImpl();
         release.setDatabase(DatabaseEnum.Swissprot);
         release.setReleaseNumber(releaseNumber);
-        //        release.setId(Long.parseLong(releaseNumber));
         release.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
 
         return release;

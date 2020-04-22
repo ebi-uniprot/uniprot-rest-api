@@ -23,8 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntry;
-import static org.uniprot.api.unisave.UniSaveEntityMocker.mockEntryInfo;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
 
 /**
@@ -134,6 +133,7 @@ class UniSaveServiceImplTest {
     void canGetEntriesWithContent() {
         // given
         String accession = "P12345";
+        when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         List<EntryImpl> repositoryEntries =
                 asList(mockEntry(accession, 3), mockEntry(accession, 2), mockEntry(accession, 1));
         doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntries(accession);
@@ -152,6 +152,7 @@ class UniSaveServiceImplTest {
     void canGetEntryVersionsWithContent() {
         // given
         String accession = "P12345";
+        when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         when(uniSaveRepository.retrieveEntry(accession, 3)).thenReturn(mockEntry(accession, 3));
         when(uniSaveRepository.retrieveEntry(accession, 2)).thenReturn(mockEntry(accession, 2));
         when(uniSaveRepository.retrieveEntry(accession, 1)).thenReturn(mockEntry(accession, 1));
@@ -182,6 +183,7 @@ class UniSaveServiceImplTest {
     void canGetEntryInfos() {
         // given
         String accession = "P12345";
+        when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         List<EntryInfoImpl> repositoryEntries =
                 asList(
                         mockEntryInfo(accession, 3),
@@ -203,6 +205,7 @@ class UniSaveServiceImplTest {
     void canGetEntryInfoVersions() {
         // given
         String accession = "P12345";
+        when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         when(uniSaveRepository.retrieveEntryInfo(accession, 3))
                 .thenReturn(mockEntryInfo(accession, 3));
         when(uniSaveRepository.retrieveEntryInfo(accession, 2))
@@ -329,6 +332,8 @@ class UniSaveServiceImplTest {
                         .lastRelease(LATEST_RELEASE)
                         .firstRelease(firstRelease)
                         .firstReleaseDate(firstReleaseDate);
+        when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
+        uniSaveService.updateCurrentReleaseDate();
 
         // when
         uniSaveService.changeReleaseDate(entryBuilder);

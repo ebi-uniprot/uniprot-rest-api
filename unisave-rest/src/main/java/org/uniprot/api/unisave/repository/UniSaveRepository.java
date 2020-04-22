@@ -1,7 +1,6 @@
 package org.uniprot.api.unisave.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
@@ -23,8 +22,8 @@ import java.util.List;
 @Profile({"online", "offline"})
 @Service
 @Import(ServiceConfig.class)
+@Slf4j
 public class UniSaveRepository {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UniSaveRepository.class);
     private static final String QUERY_RESULTS_ERROR_MESSAGE = "Could not retrieve query results";
     private final EntityManager session;
     private final DiffPatch diffPatch;
@@ -62,7 +61,7 @@ public class UniSaveRepository {
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (PersistenceException e) {
-            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
@@ -82,7 +81,7 @@ public class UniSaveRepository {
             throw new UniSaveEntryNotFoundException(
                     "No entry for " + accession + ", version " + version + " was found");
         } catch (PersistenceException e) {
-            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
@@ -165,10 +164,10 @@ public class UniSaveRepository {
 
             return entryInfos;
         } catch (UniSaveEntryNotFoundException e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
             throw e;
         } catch (PersistenceException e) {
-            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
@@ -198,7 +197,7 @@ public class UniSaveRepository {
 
             return accessionStatusInfo;
         } catch (PersistenceException e) {
-            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }
@@ -232,7 +231,7 @@ public class UniSaveRepository {
             return releases.get(0);
         } catch (PersistenceException e) {
             String message = "Could not get all releases";
-            LOGGER.error(message, e);
+            log.error(message, e);
             throw new QueryRetrievalException(message, e);
         }
     }
@@ -250,8 +249,8 @@ public class UniSaveRepository {
             List<ReleaseImpl> releases = namedQuery.getResultList();
             return releases.get(0);
         } catch (PersistenceException e) {
-            String message = "Could not get all releases";
-            LOGGER.error(message, e);
+            String message = "Could not get current release";
+            log.error(message, e);
             throw new QueryRetrievalException(message, e);
         }
     }
@@ -295,7 +294,7 @@ public class UniSaveRepository {
             throw new UniSaveEntryNotFoundException(
                     "No entry for " + accession + ", version " + version + " was found");
         } catch (PersistenceException e) {
-            LOGGER.error(QUERY_RESULTS_ERROR_MESSAGE, e);
+            log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
     }

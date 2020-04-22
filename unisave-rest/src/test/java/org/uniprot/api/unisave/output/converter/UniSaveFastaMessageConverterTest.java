@@ -27,7 +27,7 @@ class UniSaveFastaMessageConverterTest {
     }
 
     @Test
-    void canConvertEntryToFasta() throws IOException {
+    void canConvertOldEntryToSimpleFasta() throws IOException {
         EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
@@ -36,12 +36,37 @@ class UniSaveFastaMessageConverterTest {
                         .content(mockEntry.getEntryContent().getFullContent())
                         .firstRelease("1111")
                         .firstReleaseDate("DATE")
+                        .isCurrentRelease(false)
                         .build();
         OutputStream outputStream = mock(OutputStream.class);
         converter.writeEntity(entry, outputStream);
         verify(outputStream)
                 .write(
-                        ">Swissprot|P12345|Release 1111|DATE\nMASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\nFQIIGETVSSTNRG"
+                        (">tr|P12345|Release 1111|DATE\n"
+                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                        + "FQIIGETVSSTNRG\n")
+                                .getBytes());
+    }
+
+    @Test
+    void canConvertCurrentReleaseEntryToFullFasta() throws IOException {
+        EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
+        UniSaveEntry entry =
+                UniSaveEntry.builder()
+                        .database(Swissprot.name())
+                        .accession(mockEntry.getAccession())
+                        .content(mockEntry.getEntryContent().getFullContent())
+                        .firstRelease("1111")
+                        .firstReleaseDate("DATE")
+                        .isCurrentRelease(true)
+                        .build();
+        OutputStream outputStream = mock(OutputStream.class);
+        converter.writeEntity(entry, outputStream);
+        verify(outputStream)
+                .write(
+                        (">tr|P12345|P12345_ID Uncharacterized protein OS=Yersinia pseudotuberculosis OX=633 GN=EGX52_05955 PE=4 SV=1\n"
+                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                        + "FQIIGETVSSTNRG\n")
                                 .getBytes());
     }
 }

@@ -82,7 +82,7 @@ public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConve
     private void addFastaHeader(UniSaveEntry entity, StringBuilder fastaStringBuilder) {
         fastaStringBuilder
                 .append('>')
-                .append(entity.getDatabase().equalsIgnoreCase("swiss-prot")? "sp" : "tr")
+                .append(entity.getDatabase().equalsIgnoreCase("swiss-prot") ? "sp" : "tr")
                 .append('|')
                 .append(entity.getAccession())
                 .append('|')

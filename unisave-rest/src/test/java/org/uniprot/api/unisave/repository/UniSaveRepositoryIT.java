@@ -1,5 +1,6 @@
 package org.uniprot.api.unisave.repository;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,7 @@ import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,13 @@ class UniSaveRepositoryIT {
     private static final AtomicInteger RELEASE_COUNTER = new AtomicInteger();
     @Autowired private UniSaveRepository repository;
     @Autowired private TestEntityManager testEntityManager;
+
+    @BeforeEach
+    void setUpCurrentRelease() {
+        ReleaseImpl veryOldRelease = mockRelease("FIRST EVER RELEASE");
+        veryOldRelease.setReleaseDate(new GregorianCalendar(1900, Calendar.FEBRUARY, 11).getTime());
+        testEntityManager.persist(veryOldRelease);
+    }
 
     @Test
     void getEntryWithVersionSucceeds() {
@@ -197,13 +203,14 @@ class UniSaveRepositoryIT {
 
     @Test
     void getEntryWithVersionThrowsExceptionWhenEntryNotFound() {
-        assertThrows(ResourceNotFoundException.class, () -> repository.retrieveEntry("XXXX", 1));
+        assertThrows(
+                UniSaveEntryNotFoundException.class, () -> repository.retrieveEntry("XXXX", 1));
     }
 
     @Test
     void getEntryInfoWithVersionThrowsExceptionWhenEntryNotFound() {
         assertThrows(
-                ResourceNotFoundException.class, () -> repository.retrieveEntryInfo("XXXX", 1));
+                UniSaveEntryNotFoundException.class, () -> repository.retrieveEntryInfo("XXXX", 1));
     }
 
     @Test
@@ -251,6 +258,32 @@ class UniSaveRepositoryIT {
 
         // then
         assertThat(fetchedLastRelease, is(lastRelease));
+    }
+
+    @Test
+    void fetchingCurrentReleasesSucceeds() {
+        // given
+        // ... create and persist previous + future releases
+        ReleaseImpl oldRelease1 = mockRelease("1");
+        oldRelease1.setReleaseDate(new GregorianCalendar(1950, Calendar.FEBRUARY, 11).getTime());
+        ReleaseImpl oldRelease2 = mockRelease("2");
+        oldRelease2.setReleaseDate(new GregorianCalendar(1960, Calendar.FEBRUARY, 11).getTime());
+        ReleaseImpl expectedCurrentRelease = mockRelease("3");
+        expectedCurrentRelease.setReleaseDate(
+                new GregorianCalendar(1988, Calendar.FEBRUARY, 11).getTime());
+        ReleaseImpl futureRelease = mockRelease("4");
+        futureRelease.setReleaseDate(new GregorianCalendar(3000, Calendar.FEBRUARY, 11).getTime());
+
+        testEntityManager.persist(oldRelease1);
+        testEntityManager.persist(oldRelease2);
+        testEntityManager.persist(expectedCurrentRelease);
+        testEntityManager.persist(futureRelease);
+
+        // when
+        Release fetchedCurrentRelease = repository.getCurrentRelease();
+
+        // then
+        assertThat(fetchedCurrentRelease, is(expectedCurrentRelease));
     }
 
     @Test
@@ -314,7 +347,8 @@ class UniSaveRepositoryIT {
 
     @Test
     void retrievingAllEntryInfosWhenNotExistsCausesException() {
-        assertThrows(ResourceNotFoundException.class, () -> repository.retrieveEntryInfos("XXXX"));
+        assertThrows(
+                UniSaveEntryNotFoundException.class, () -> repository.retrieveEntryInfos("XXXX"));
     }
 
     private EntryImpl createEntry(int entryVersion) {
