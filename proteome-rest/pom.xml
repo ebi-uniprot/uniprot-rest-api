@@ -9,7 +9,6 @@
 		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>proteome-rest</artifactId>
-	<version>${project.parent.version}</version>
 	<name>proteome-rest</name>
 	<description>Proteome Rest API</description>
 
