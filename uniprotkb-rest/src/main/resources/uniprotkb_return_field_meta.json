@@ -393,11 +393,11 @@
   },
   {
     "label": "Mapped PubMed ID",
-    "name": "mapped_pm_id"
+    "name": "mapped_pubmed_id"
   },
   {
     "label": "PubMed ID",
-    "name": "pm_id"
+    "name": "lit_pubmed_id"
   },
   {
     "label": "Date of creation",
