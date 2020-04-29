@@ -34,7 +34,10 @@ import java.util.Locale;
 
 import static java.util.Collections.singletonList;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -200,17 +203,18 @@ public class ResponseExceptionHandler {
         if (Utils.notNull(request) && request instanceof MutableHttpServletRequest) {
             MutableHttpServletRequest mutableRequest = (MutableHttpServletRequest) request;
             MediaType contentType = getContentTypeFromRequest(request);
-            if (contentType.getType().equals(UNKNOWN_MEDIA_TYPE_TYPE)) {
+            if (contentType.equals(UNKNOWN_MEDIA_TYPE)) {
                 mutableRequest.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
+                String errorMessage = (String) mutableRequest.getAttribute(ERROR_MESSAGE_ATTRIBUTE);
+
+                if (nullOrEmpty(errorMessage)) {
+                    errorMessage = "Media type not acceptable";
+                }
                 List<String> messages =
                         singletonList(
                                 messageSource.getMessage(
                                         INVALID_REQUEST,
-                                        new Object[] {
-                                            "Unknown format requested: '"
-                                                    + contentType.getSubtype()
-                                                    + "'"
-                                        },
+                                        new Object[] {errorMessage},
                                         Locale.getDefault()));
 
                 addDebugError(request, ex, messages);
@@ -250,7 +254,7 @@ public class ResponseExceptionHandler {
     private MediaType getContentTypeFromRequest(HttpServletRequest request) {
         MediaType result = MediaType.APPLICATION_JSON;
         String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        if (Utils.notNullNotEmpty(acceptHeader)) {
+        if (notNullNotEmpty(acceptHeader)) {
             result = MediaType.valueOf(acceptHeader);
         }
         return result;

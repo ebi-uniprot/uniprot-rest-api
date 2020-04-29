@@ -11,6 +11,7 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.HandlerMapping;
  *
  * @author Edd
  */
+@Disabled
 class MutableHttpServletRequestTest {
 
     @Test
