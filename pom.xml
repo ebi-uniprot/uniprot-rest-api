@@ -11,7 +11,7 @@
 
 	<artifactId>uniprot-rest-api</artifactId>
 	<groupId>org.uniprot</groupId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>UniProt REST API Aggregator</name>
 	<description>
@@ -66,6 +66,7 @@
 		<module>proteome-rest</module>
 		<module>uniparc-rest</module>
 		<module>uniref-rest</module>
+		<module>benchmark-rest</module>
 	</modules>
 
 	<dependencyManagement>
@@ -255,62 +256,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<!-- Exclude integration tests from unit test run -->
-					<excludes>
-						<skipITs>${skipUTs}</skipITs>
-						<exclude>**/*IT.java</exclude>
-					</excludes>
-					<argLine>${jacoco.agent.ut.arg}</argLine>
+					<includes>
+						<include>*</include>
+					</includes>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<configuration>
-					<skipITs>${skipITs}</skipITs>
-					<argLine>${jacoco.agent.it.arg}</argLine>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<executions>
-					<!-- Sets up jacaco for unit test coverage analysis (jacoco.agent.ut.arg) -->
-					<execution>
-						<id>prepare-ut-agent</id>
-						<phase>process-test-classes</phase>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<destFile>${jacoco.reportPath}</destFile>
-							<propertyName>jacoco.agent.ut.arg</propertyName>
-							<append>true</append>
-						</configuration>
-					</execution>
-					<!-- Sets up jacaco for integration test coverage analysis (jacoco.agent.it.arg) -->
-					<execution>
-						<id>prepare-it-agent</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<destFile>${jacoco.itReportPath}</destFile>
-							<propertyName>jacoco.agent.it.arg</propertyName>
-							<append>true</append>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<!-- Auto-format code when built for consistency amongst developers' contributions -->
 			<plugin>
@@ -396,6 +345,19 @@
 			<url>${http-uniprot-private-url}/snapshot</url>
 		</repository>
 	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>uniprot-artifactory-deploy-release</id>
+			<name>Deploy Uniprot Maven Release</name>
+			<url>${http-uniprot-private-url}/release</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>uniprot-artifactory-deploy-snapshot</id>
+			<name>Deploy Uniprot Maven Snapshot</name>
+			<url>${http-uniprot-private-url}/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -441,19 +403,97 @@
 					<name>env.BUILD_NUMBER</name>
 				</property>
 			</activation>
-			<distributionManagement>
-				<repository>
-					<id>uniprot-artifactory-deploy-release</id>
-					<name>Deploy Uniprot Maven Release</name>
-					<url>${http-uniprot-private-url}/release</url>
-				</repository>
-				<snapshotRepository>
-					<uniqueVersion>false</uniqueVersion>
-					<id>uniprot-artifactory-deploy-snapshot</id>
-					<name>Deploy Uniprot Maven Snapshot</name>
-					<url>${http-uniprot-private-url}/snapshot</url>
-				</snapshotRepository>
-			</distributionManagement>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<!-- Exclude integration tests from unit test run -->
+							<excludes>
+								<skipITs>${skipUTs}</skipITs>
+								<exclude>**/*IT.java</exclude>
+							</excludes>
+							<argLine>${jacoco.agent.ut.arg}</argLine>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<skipITs>${skipITs}</skipITs>
+							<argLine>${jacoco.agent.it.arg}</argLine>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<executions>
+							<!-- Sets up jacaco for unit test coverage analysis (jacoco.agent.ut.arg) -->
+							<execution>
+								<id>prepare-ut-agent</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<destFile>${jacoco.reportPath}</destFile>
+									<propertyName>jacoco.agent.ut.arg</propertyName>
+									<append>true</append>
+								</configuration>
+							</execution>
+							<!-- Sets up jacaco for integration test coverage analysis (jacoco.agent.it.arg) -->
+							<execution>
+								<id>prepare-it-agent</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<destFile>${jacoco.itReportPath}</destFile>
+									<propertyName>jacoco.agent.it.arg</propertyName>
+									<append>true</append>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.4</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>

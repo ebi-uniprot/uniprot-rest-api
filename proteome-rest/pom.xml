@@ -5,11 +5,10 @@
 	<parent>
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>proteome-rest</artifactId>
-	<version>${project.parent.version}</version>
 	<name>proteome-rest</name>
 	<description>Proteome Rest API</description>
 

@@ -147,7 +147,7 @@ DR   PDB; 1MJE; X-ray; 3.50 A; A=2378-3113.
 DR   PDBsum; 1MIU; -.
 DR   PDBsum; 1MJE; -.
 DR   SMR; P97929; -.
-DR   BioGrid; 198384; 7.
+DR   BioGRID; 198384; 7.
 DR   ComplexPortal; CPX-972; BRCC ubiquitin ligase complex.
 DR   IntAct; P97929; 2.
 DR   MINT; P97929; -.

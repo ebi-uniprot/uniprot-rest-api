@@ -1,0 +1,36 @@
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  SONAR_PROPS: "-Dsonar.projectKey=uniprot-rest-api -Dsonar.organization=ebi-uniprot"
+  SONAR_HOST_URL: "https://sonarcloud.io"
+  MAVEN_SETTINGS: "maven-settings.xml"
+  URL_MAVEN_SETTINGS: "https://gitlab.ebi.ac.uk/api/v4/projects/${CONFIG_PROJECT_ID}/repository/files/${MAVEN_SETTINGS}/raw?ref=master&private_token=${GITLAB_USER_API_TOKEN}"
+  UNIPROT_RESOURCES: "-Dcv.db.types.location=ftp://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebase/complete/docs/dbxref.txt"
+  GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+
+image: maven:3.3.9-jdk-8
+cache:
+  key: "${CI_JOB_NAME}"
+  paths:
+    - .m2/repository
+    - .sonar/cache
+
+rest-api:deploy:
+  stage: deploy
+  before_script:
+    - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
+  script:
+    - if [ ! -f ${MAVEN_SETTINGS} ];
+        then echo "CI settings missing";
+      fi
+    - 'mvn $MAVEN_CLI_OPTS -P coverage clean deploy -s ${MAVEN_SETTINGS} sonar:sonar -Dsonar.qualitygate.wait=true ${SONAR_PROPS}'
+  after_script:
+    - 'pwd'
+    - 'ls -al'
+    - 'ls -al */'
+    - 'ls -al */*/'
+    - 'ls -al */*/*/'
+    - 'rm ${MAVEN_SETTINGS}'
+  only:
+    - master

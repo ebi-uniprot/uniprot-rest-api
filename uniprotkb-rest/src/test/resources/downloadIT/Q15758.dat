@@ -369,7 +369,7 @@ DR   PDBsum; 6GCT; -.
 DR   PDBsum; 6RVX; -.
 DR   PDBsum; 6RVY; -.
 DR   SMR; Q15758; -.
-DR   BioGrid; 112401; 92.
+DR   BioGRID; 112401; 92.
 DR   IntAct; Q15758; 73.
 DR   MINT; Q15758; -.
 DR   STRING; 9606.ENSP00000444408; -.
