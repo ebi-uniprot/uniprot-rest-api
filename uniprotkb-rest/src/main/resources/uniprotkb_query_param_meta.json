@@ -640,7 +640,7 @@
     "type": "String"
   },
   {
-    "name": "cross_ref",
+    "name": "xref",
     "type": "String"
   },
   {

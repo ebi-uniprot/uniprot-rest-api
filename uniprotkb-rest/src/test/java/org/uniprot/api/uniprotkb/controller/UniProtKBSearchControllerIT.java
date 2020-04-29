@@ -586,7 +586,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        if (searchField.startsWith("ftlen_") || searchField.startsWith("cross_ref_count_")) {
+        if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
             switch (searchField) {
@@ -694,7 +694,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .forEach(
                             db -> {
                                 doc.xrefCountMap.put(
-                                        "cross_ref_count_" + db.getName().toLowerCase(), 0L);
+                                        "xref_count_" + db.getName().toLowerCase(), 0L);
                             });
 
             Arrays.stream(FeatureType.values())

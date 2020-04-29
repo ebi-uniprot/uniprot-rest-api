@@ -51,7 +51,7 @@ class VerifyFieldsInAPIDocumentationExistTest {
     static {
         // predicates to match fields not to be documented in JSON_FILE
         DOCUMENTED_FIELD_EXCLUSIONS = new ArrayList<>();
-        DOCUMENTED_FIELD_EXCLUSIONS.add(f -> !f.startsWith("cross_ref_count"));
+        DOCUMENTED_FIELD_EXCLUSIONS.add(f -> !f.startsWith("xref_count"));
     }
 
     @BeforeAll
