@@ -630,7 +630,7 @@ public abstract class AbstractSearchControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Unknown format requested: 'xxxx'")));
+                                        "Invalid request received. Requested media type/format not accepted: 'xxxx'.")));
     }
 
     // ----------------------------------------- TEST PAGINATION

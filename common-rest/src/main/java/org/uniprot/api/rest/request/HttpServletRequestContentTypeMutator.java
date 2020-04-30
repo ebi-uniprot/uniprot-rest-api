@@ -48,7 +48,6 @@ public class HttpServletRequestContentTypeMutator {
             MutableHttpServletRequest request,
             RequestMappingHandlerMapping requestMappingHandlerMapping) {
         initResourcePath2MediaTypesMap(requestMappingHandlerMapping);
-
         Collection<MediaType> validMediaTypes = getValidMediaTypesForPath(request);
         if (validMediaTypes.isEmpty()) {
             return;
