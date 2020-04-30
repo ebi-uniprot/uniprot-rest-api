@@ -612,27 +612,6 @@ public abstract class AbstractSearchControllerIT {
                                                 .toString()));
     }
 
-    // if format parameter for content type present for search, but is invalid, show error in json
-    @Test
-    void searchWithInvalidFormatParameterMeansBadRequestInDefaultContentType() throws Exception {
-        // given
-        saveEntry(SaveScenario.SEARCH_SUCCESS);
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getSearchRequestPath()).param("query", "*:*").param("format", "xxxx"));
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                contains(
-                                        "Invalid request received. Requested media type/format not accepted: 'xxxx'.")));
-    }
-
     // ----------------------------------------- TEST PAGINATION
     // -----------------------------------------------
 

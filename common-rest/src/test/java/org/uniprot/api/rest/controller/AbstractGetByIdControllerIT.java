@@ -304,30 +304,6 @@ public abstract class AbstractGetByIdControllerIT {
                                                 .toString()));
     }
 
-    // if format parameter for content type present for search, but is invalid, show error in json
-    @Test
-    void idWithInvalidExtensionMeansBadRequestInDefaultContentType(GetIdParameter idParameter)
-            throws Exception {
-        checkParameterInput(idParameter);
-
-        // given
-        saveEntry();
-
-        // when
-        ResultActions response =
-                mockMvc.perform(get(getIdRequestPath() + idParameter.getId() + ".xxxx"));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                contains(
-                                        "Invalid request received. Requested media type/format not accepted: 'xxxx'.")));
-    }
-
     protected DataStoreManager getStoreManager() {
         return storeManager;
     }
