@@ -65,11 +65,7 @@ public class FakeController {
             value = "/resource/number/{id}",
             produces = {APPLICATION_JSON_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<String> getResourceByNumberId(
-            @PathVariable
-                            @Pattern(
-                                    regexp = "^[0-9]+$",
-                                    message = EXPECTED_NUMBER)
-                    String id) {
+            @PathVariable @Pattern(regexp = "^[0-9]+$", message = EXPECTED_NUMBER) String id) {
         return ResponseEntity.ok("Hello World from /resource/number/" + id);
     }
 }

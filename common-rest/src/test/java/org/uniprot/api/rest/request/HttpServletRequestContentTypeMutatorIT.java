@@ -203,8 +203,7 @@ public class HttpServletRequestContentTypeMutatorIT {
     void validNumberButInvalidFormatCausesError() throws Exception {
         ResultActions response =
                 mockMvc.perform(
-                        get(FAKE_RESOURCE_BASE + "/resource/number/12")
-                                .param(FORMAT, "xxxx"));
+                        get(FAKE_RESOURCE_BASE + "/resource/number/12").param(FORMAT, "xxxx"));
 
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
