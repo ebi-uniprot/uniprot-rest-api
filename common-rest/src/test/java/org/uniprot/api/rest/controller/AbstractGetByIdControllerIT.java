@@ -306,7 +306,7 @@ public abstract class AbstractGetByIdControllerIT {
 
     // if format parameter for content type present for search, but is invalid, show error in json
     @Test
-    void idWithInvalidExtensionMean sBadRequestInDefaultContentType(GetIdParameter idParameter)
+    void idWithInvalidExtensionMeansBadRequestInDefaultContentType(GetIdParameter idParameter)
             throws Exception {
         checkParameterInput(idParameter);
 
