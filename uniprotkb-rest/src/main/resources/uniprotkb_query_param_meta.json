@@ -8,11 +8,11 @@
     "type": "String"
   },
   {
-    "name": "mnemonic",
+    "name": "id",
     "type": "String"
   },
   {
-    "name": "mnemonic_default",
+    "name": "id_default",
     "type": "String"
   },
   {
@@ -20,7 +20,7 @@
     "type": "String"
   },
   {
-    "name": "name",
+    "name": "protein_name",
     "type": "String"
   },
   {
@@ -64,11 +64,11 @@
     "type": "String"
   },
   {
-    "name": "host_name",
+    "name": "virus_host_name",
     "type": "String"
   },
   {
-    "name": "host_id",
+    "name": "virus_host_id",
     "type": "String"
   },
   {
@@ -92,15 +92,15 @@
     "type": "String"
   },
   {
-    "name": "modified",
+    "name": "date_modified",
     "type": "String"
   },
   {
-    "name": "created",
+    "name": "date_created",
     "type": "String"
   },
   {
-    "name": "sequence_modified",
+    "name": "date_sequence_modified",
     "type": "String"
   },
   {
@@ -696,7 +696,7 @@
     "type": "String"
   },
   {
-    "name": "d3structure",
+    "name": "structure_3d",
     "type": "String"
   },
   {

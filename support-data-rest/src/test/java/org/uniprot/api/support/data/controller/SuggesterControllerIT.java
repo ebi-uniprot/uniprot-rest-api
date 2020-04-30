@@ -16,7 +16,6 @@ import static org.uniprot.store.search.field.SuggestField.Importance.medium;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -59,8 +57,6 @@ class SuggesterControllerIT {
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    private SolrTemplate solrTemplate;
-
     @Autowired SuggesterService suggesterService;
 
     @Autowired private WebApplicationContext webApplicationContext;
@@ -70,10 +66,10 @@ class SuggesterControllerIT {
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(DataStoreManager.StoreType.SUGGEST, SolrCollection.suggest);
-        solrTemplate =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.SUGGEST));
-        solrTemplate.afterPropertiesSet();
-        ReflectionTestUtils.setField(suggesterService, "solrTemplate", solrTemplate);
+        ReflectionTestUtils.setField(
+                suggesterService,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.SUGGEST));
     }
 
     @BeforeEach
@@ -213,19 +209,15 @@ class SuggesterControllerIT {
             String value,
             List<String> altValues,
             SuggestDictionary dict,
-            SuggestField.Importance importance)
-            throws IOException, SolrServerException {
-        SolrClient solrClient = solrTemplate.getSolrClient();
-        String collection = SolrCollection.suggest.name();
-        solrClient.addBean(
-                collection,
+            SuggestField.Importance importance) {
+        SuggestDocument doc =
                 SuggestDocument.builder()
                         .dictionary(dict.name())
                         .id(id)
                         .value(value)
                         .altValues(altValues)
                         .importance(importance.name())
-                        .build());
-        solrClient.commit(collection);
+                        .build();
+        storeManager.saveDocs(DataStoreManager.StoreType.SUGGEST, doc);
     }
 }

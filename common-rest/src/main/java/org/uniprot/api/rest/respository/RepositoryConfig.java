@@ -14,7 +14,6 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 
 /**
@@ -71,10 +70,5 @@ public class RepositoryConfig {
     @Profile("live")
     public SolrRequestConverter requestConverter() {
         return new SolrRequestConverter();
-    }
-
-    @Bean
-    public SolrTemplate solrTemplate(SolrClient uniProtSolrClient) {
-        return new SolrTemplate(uniProtSolrClient);
     }
 }

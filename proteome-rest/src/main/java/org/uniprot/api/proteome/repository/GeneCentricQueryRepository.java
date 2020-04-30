@@ -1,6 +1,6 @@
 package org.uniprot.api.proteome.repository;
 
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -15,11 +15,11 @@ import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 public class GeneCentricQueryRepository extends SolrQueryRepository<GeneCentricDocument> {
 
     public GeneCentricQueryRepository(
-            SolrTemplate solrTemplate,
+            SolrClient solrClient,
             GeneCentricFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(
-                solrTemplate,
+                solrClient,
                 SolrCollection.genecentric,
                 GeneCentricDocument.class,
                 facetConfig,

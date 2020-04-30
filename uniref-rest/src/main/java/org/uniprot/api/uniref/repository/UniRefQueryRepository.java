@@ -1,6 +1,6 @@
 package org.uniprot.api.uniref.repository;
 
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -14,11 +14,11 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 @Repository
 public class UniRefQueryRepository extends SolrQueryRepository<UniRefDocument> {
     public UniRefQueryRepository(
-            SolrTemplate solrTemplate,
+            SolrClient solrClient,
             UniRefFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(
-                solrTemplate,
+                solrClient,
                 SolrCollection.uniref,
                 UniRefDocument.class,
                 facetConfig,

@@ -49,7 +49,7 @@
   },
   {
     "label": "Virus hosts",
-    "name": "organism_host"
+    "name": "virus_hosts"
   },
   {
     "label": "Alternative products (isoforms)",
@@ -377,7 +377,7 @@
   },
   {
     "label": "3D",
-    "name": "3d"
+    "name": "structure_3d"
   },
   {
     "label": "Beta strand",
@@ -393,11 +393,11 @@
   },
   {
     "label": "Mapped PubMed ID",
-    "name": "mapped_pm_id"
+    "name": "mapped_pubmed_id"
   },
   {
     "label": "PubMed ID",
-    "name": "pm_id"
+    "name": "lit_pubmed_id"
   },
   {
     "label": "Date of creation",

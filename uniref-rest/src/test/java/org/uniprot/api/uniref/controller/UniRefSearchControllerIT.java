@@ -20,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -48,10 +48,6 @@ import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
@@ -76,7 +72,7 @@ import org.uniprot.store.search.SolrCollection;
             UniRefSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
             UniRefSearchControllerIT.UniRefSearchParameterResolver.class
         })
-public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
+public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String ID_PREF = "UniRef50_P039";
     private static final String NAME_PREF = "Cluster: MoeK5 ";
     private static final String ACC_PREF = "P123";
@@ -131,6 +127,11 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIREF;
+    }
+
+    @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "*";
         switch (searchField) {
@@ -161,19 +162,8 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
-    }
-
-    @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
-    }
-
-    @Override
-    protected List<ReturnField> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF)
-                .getReturnFields();
     }
 
     @Override
@@ -379,7 +369,7 @@ public class UniRefSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    //    .queryParam("facets", Collections.singletonList("reference"))
+                    .queryParam("facets", Collections.singletonList("identity"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",

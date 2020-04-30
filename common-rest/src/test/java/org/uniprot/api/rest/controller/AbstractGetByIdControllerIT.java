@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,9 +42,8 @@ public abstract class AbstractGetByIdControllerIT {
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(getStoreType(), getSolrCollection());
-        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(getStoreType()));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                getRepository(), "solrClient", storeManager.getSolrClient(getStoreType()));
     }
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;

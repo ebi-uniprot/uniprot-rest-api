@@ -1,8 +1,8 @@
 package org.uniprot.api.suggester.service;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -15,7 +15,7 @@ import org.uniprot.store.search.SolrCollection;
 @Configuration
 public class SuggesterServiceConfig {
     @Bean
-    public SuggesterService suggesterService(SolrTemplate solrTemplate) {
-        return new SuggesterService(solrTemplate, SolrCollection.suggest);
+    public SuggesterService suggesterService(SolrClient solrClient) {
+        return new SuggesterService(solrClient, SolrCollection.suggest);
     }
 }

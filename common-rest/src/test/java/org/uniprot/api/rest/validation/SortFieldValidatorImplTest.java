@@ -43,7 +43,7 @@ class SortFieldValidatorImplTest {
         FakeSortFieldValidatorImpl validator = new FakeSortFieldValidatorImpl();
         validator.initialize(validSolrSortFields);
 
-        boolean result = validator.isValid("name DESC", null);
+        boolean result = validator.isValid("protein_name DESC", null);
         assertTrue(result);
     }
 
@@ -55,7 +55,7 @@ class SortFieldValidatorImplTest {
 
         boolean result =
                 validator.isValid(
-                        "accession desc,mnemonic DESC, name DesC , annotation_score dESc", null);
+                        "accession desc,id DESC, protein_name DesC , annotation_score dESc", null);
         assertTrue(result);
     }
 

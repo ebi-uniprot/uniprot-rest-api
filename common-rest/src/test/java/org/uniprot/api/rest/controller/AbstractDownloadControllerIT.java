@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -41,9 +40,8 @@ public abstract class AbstractDownloadControllerIT {
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(getStoreType(), getSolrCollection());
-        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(getStoreType()));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                getRepository(), "solrClient", storeManager.getSolrClient(getStoreType()));
     }
 
     @BeforeEach

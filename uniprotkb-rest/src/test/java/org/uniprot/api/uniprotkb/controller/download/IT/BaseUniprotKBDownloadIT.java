@@ -79,7 +79,7 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
     public static List<String> REQUESTED_JSON_FIELDS =
             Arrays.asList(
                     "protein_existence",
-                    "organism",
+                    "organism_name",
                     "protein_name",
                     "comment_count",
                     "feature_count");

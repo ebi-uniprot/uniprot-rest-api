@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -65,10 +64,6 @@ import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -137,11 +132,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
         // Add taxonomy to the repo and and solr template injection..
         dsm.addSolrClient(DataStoreManager.StoreType.TAXONOMY, SolrCollection.taxonomy);
-        SolrTemplate template =
-                new SolrTemplate(
-                        getStoreManager().getSolrClient(DataStoreManager.StoreType.TAXONOMY));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(taxRepository, "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                taxRepository,
+                "solrClient",
+                dsm.getSolrClient(DataStoreManager.StoreType.TAXONOMY));
     }
 
     @AfterEach
@@ -418,7 +412,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=accession:Q14301&fields=accession,organism")
+                                                + "?query=accession:Q14301&fields=accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -480,7 +474,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=mnemonic:I8FBX2_YERPE")
+                                get(SEARCH_RESOURCE + "?query=id:I8FBX2_YERPE")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -585,8 +579,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Override
-    protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPROTKB;
     }
 
     @Override
@@ -601,13 +595,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     value = "P21802";
                     break;
                 case "organism_id":
-                case "host_id":
+                case "virus_host_id":
                 case "taxonomy_id":
                     value = "9606";
                     break;
-                case "modified":
-                case "created":
-                case "sequence_modified":
+                case "date_modified":
+                case "date_created":
+                case "date_sequence_modified":
                 case "lit_pubdate":
                 case "length":
                 case "mass":
@@ -627,12 +621,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
-    }
-
-    @Override
-    protected List<ReturnField> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB)
-                .getReturnFields();
     }
 
     @Override
@@ -845,7 +833,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         @Override
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("organism:*"))
+                    .queryParam("query", Collections.singletonList("organism_name:*"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.primaryAccession",
@@ -877,8 +865,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             "query",
                             Collections.singletonList(
                                     "accession:INVALID OR accession_id:INVALID "
-                                            + "OR reviewed:INVALID OR organism_id:invalid OR host_id:invalid OR taxonomy_id:invalid "
-                                            + "OR is_isoform:invalid OR d3structure:invalid OR active:invalid OR proteome:INVALID"))
+                                            + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
+                                            + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -890,10 +878,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             "The 'reviewed' filter value can only be true or false",
                                             "The 'active' parameter can only be true or false",
                                             "The 'organism_id' filter value should be a number",
-                                            "The 'd3structure' filter value can only be true or false",
+                                            "The 'structure_3d' filter value can only be true or false",
                                             "The 'taxonomy_id' filter value should be a number",
                                             "The 'accession_id' filter value 'INVALID' has invalid format. It should be a valid UniProtKB accession",
-                                            "The 'host_id' filter value should be a number")))
+                                            "The 'virus_host_id' filter value should be a number")))
                     .build();
         }
 
