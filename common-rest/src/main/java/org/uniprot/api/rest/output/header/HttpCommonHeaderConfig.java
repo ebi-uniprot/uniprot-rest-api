@@ -27,7 +27,7 @@ import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS
  * @author Edd
  */
 @Configuration
- @Import({ServiceInfoConfig.class})
+@Import({ServiceInfoConfig.class})
 public class HttpCommonHeaderConfig {
     public static final String X_RELEASE = "X-Release";
     static final String ALLOW_ALL_ORIGINS = "*";
@@ -48,7 +48,7 @@ public class HttpCommonHeaderConfig {
      *
      * @return
      */
-    @Bean
+    @Bean("oncePerRequestFilter")
     public OncePerRequestFilter oncePerRequestFilter(
             RequestMappingHandlerMapping requestMappingHandlerMapping) {
         return new OncePerRequestFilter() {
