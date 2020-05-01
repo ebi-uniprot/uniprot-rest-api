@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.configuration;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.actuate.info.Info;
-import org.uniprot.api.rest.service.ServiceInfoConfig;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.uniprot.api.uniprotkb.configuration.UniProtKBInfoContributor.SERVICE_INFO_KEY;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.uniprot.api.uniprotkb.configuration.UniProtKBInfoContributor.SERVICE_INFO_KEY;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.actuate.info.Info;
+import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 /**
  * Created 01/04/20

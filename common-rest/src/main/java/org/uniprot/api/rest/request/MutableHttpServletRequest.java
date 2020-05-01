@@ -1,10 +1,11 @@
 package org.uniprot.api.rest.request;
 
-import org.springframework.web.servlet.HandlerMapping;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.util.*;
+
+import org.springframework.web.servlet.HandlerMapping;
 
 /**
  * Represents a mutable {@link HttpServletRequest}. Override methods of super class {@link
