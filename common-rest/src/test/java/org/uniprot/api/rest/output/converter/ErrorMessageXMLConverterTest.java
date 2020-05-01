@@ -1,6 +1,9 @@
 package org.uniprot.api.rest.output.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpOutputMessage;
+import org.uniprot.api.rest.validation.error.ErrorInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,10 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpOutputMessage;
-import org.uniprot.api.rest.validation.error.ResponseExceptionHandler;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -23,14 +23,14 @@ class ErrorMessageXMLConverterTest {
     @Test
     void readReturnNull() {
         ErrorMessageXMLConverter converter = new ErrorMessageXMLConverter();
-        ResponseExceptionHandler.ErrorInfo result = converter.read(null, null, null);
+        ErrorInfo result = converter.read(null, null, null);
         assertNull(result);
     }
 
     @Test
     void readInternalReturnNull() {
         ErrorMessageXMLConverter converter = new ErrorMessageXMLConverter();
-        ResponseExceptionHandler.ErrorInfo result = converter.readInternal(null, null);
+        ErrorInfo result = converter.readInternal(null, null);
         assertNull(result);
     }
 
@@ -38,8 +38,7 @@ class ErrorMessageXMLConverterTest {
     void canWriteErrorMessage() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         HttpOutputMessage httpOutputMessage = getHttpOutputMessage(outputStream);
-        ResponseExceptionHandler.ErrorInfo errorInfo =
-                new ResponseExceptionHandler.ErrorInfo("url", Collections.singletonList("message"));
+        ErrorInfo errorInfo = new ErrorInfo("url", Collections.singletonList("message"));
         ErrorMessageXMLConverter converter = new ErrorMessageXMLConverter();
         converter.writeInternal(errorInfo, null, httpOutputMessage);
 
@@ -56,8 +55,7 @@ class ErrorMessageXMLConverterTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         HttpOutputMessage httpOutputMessage = getHttpOutputMessage(outputStream);
         List<String> messages = Arrays.asList("errorMessage1", "errorMessage2");
-        ResponseExceptionHandler.ErrorInfo errorInfo =
-                new ResponseExceptionHandler.ErrorInfo("url", messages);
+        ErrorInfo errorInfo = new ErrorInfo("url", messages);
         ErrorMessageXMLConverter converter = new ErrorMessageXMLConverter();
         converter.writeInternal(errorInfo, null, httpOutputMessage);
 
