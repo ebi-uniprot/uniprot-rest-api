@@ -11,8 +11,8 @@ import org.apache.lucene.search.Query;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uniprot.api.configure.uniprot.domain.query.SolrJsonQuery;
-import org.uniprot.api.configure.util.SolrQueryConverter;
+import org.uniprot.api.support.data.configure.uniprot.domain.query.SolrJsonQuery;
+import org.uniprot.api.support.data.configure.util.SolrQueryConverter;
 
 /** @author lgonzales */
 class SolrQueryConverterTest {
@@ -83,18 +83,18 @@ class SolrQueryConverterTest {
 
     @Test
     void convertSimpleTermQuery() {
-        Query allDocumentsQuery = getQueryFromString("(mnemonic:blah)");
+        Query allDocumentsQuery = getQueryFromString("(id:blah)");
         SolrJsonQuery jsonQuery = SolrQueryConverter.convert(allDocumentsQuery);
 
         assertNotNull(jsonQuery);
         assertEquals("termQuery", jsonQuery.getType());
         assertEquals("blah", jsonQuery.getValue());
-        assertEquals("mnemonic", jsonQuery.getField());
+        assertEquals("id", jsonQuery.getField());
     }
 
     @Test
     void convertNotTermQuery() {
-        Query allDocumentsQuery = getQueryFromString("NOT (mnemonic:blah)");
+        Query allDocumentsQuery = getQueryFromString("NOT (id:blah)");
         SolrJsonQuery jsonQuery = SolrQueryConverter.convert(allDocumentsQuery);
 
         assertNotNull(jsonQuery);
@@ -108,7 +108,7 @@ class SolrQueryConverterTest {
         assertNotNull(booleanQueryItem);
         assertEquals("termQuery", booleanQueryItem.getType());
         assertEquals("NOT", booleanQueryItem.getQueryOperator());
-        assertEquals("mnemonic", booleanQueryItem.getField());
+        assertEquals("id", booleanQueryItem.getField());
         assertEquals("blah", booleanQueryItem.getValue());
     }
 
@@ -181,7 +181,7 @@ class SolrQueryConverterTest {
 
     @Test
     void convertOrBooleanQuery() {
-        Query allDocumentsQuery = getQueryFromString("(mnemonic:blah) OR (mnemonic:foo)");
+        Query allDocumentsQuery = getQueryFromString("(id:blah) OR (id:foo)");
         SolrJsonQuery jsonQuery = SolrQueryConverter.convert(allDocumentsQuery);
 
         assertNotNull(jsonQuery);
@@ -196,19 +196,19 @@ class SolrQueryConverterTest {
         assertEquals("OR", booleanQueryItem.getQueryOperator());
         assertEquals("termQuery", booleanQueryItem.getType());
         assertEquals("blah", booleanQueryItem.getValue());
-        assertEquals("mnemonic", booleanQueryItem.getField());
+        assertEquals("id", booleanQueryItem.getField());
 
         booleanQueryItem = solrJsonQueries.get(1);
         assertNotNull(booleanQueryItem);
         assertEquals("termQuery", booleanQueryItem.getType());
-        assertEquals("mnemonic", booleanQueryItem.getField());
+        assertEquals("id", booleanQueryItem.getField());
         assertEquals("foo", booleanQueryItem.getValue());
         assertEquals("OR", booleanQueryItem.getQueryOperator());
     }
 
     @Test
     void convertNotBooleanQuery() {
-        Query allDocumentsQuery = getQueryFromString("(mnemonic:blah) NOT (mnemonic:foo)");
+        Query allDocumentsQuery = getQueryFromString("(id:blah) NOT (id:foo)");
         SolrJsonQuery jsonQuery = SolrQueryConverter.convert(allDocumentsQuery);
 
         assertNotNull(jsonQuery);
@@ -221,14 +221,14 @@ class SolrQueryConverterTest {
         SolrJsonQuery booleanQueryItem = solrJsonQueries.get(0);
         assertNotNull(booleanQueryItem);
         assertEquals("termQuery", booleanQueryItem.getType());
-        assertEquals("mnemonic", booleanQueryItem.getField());
+        assertEquals("id", booleanQueryItem.getField());
         assertEquals("blah", booleanQueryItem.getValue());
         assertEquals("OR", booleanQueryItem.getQueryOperator());
 
         booleanQueryItem = solrJsonQueries.get(1);
         assertNotNull(booleanQueryItem);
         assertEquals("termQuery", booleanQueryItem.getType());
-        assertEquals("mnemonic", booleanQueryItem.getField());
+        assertEquals("id", booleanQueryItem.getField());
         assertEquals("NOT", booleanQueryItem.getQueryOperator());
         assertEquals("foo", booleanQueryItem.getValue());
     }

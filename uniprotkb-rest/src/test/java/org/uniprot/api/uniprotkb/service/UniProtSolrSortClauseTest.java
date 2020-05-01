@@ -43,7 +43,7 @@ class UniProtSolrSortClauseTest {
 
     @Test
     void testCreateSingleMnemonicSortDescAlsoAddAccessionAsc() {
-        Sort sort = uniProtSolrSortClause.getSort("mnemonic desc");
+        Sort sort = uniProtSolrSortClause.getSort("id desc");
         assertNotNull(sort);
 
         Iterator<Sort.Order> sortIterator = sort.iterator();
@@ -51,7 +51,7 @@ class UniProtSolrSortClauseTest {
 
         assertTrue(sortIterator.hasNext());
         Sort.Order order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("mnemonic"), order.getProperty());
+        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("id"), order.getProperty());
         assertEquals(Sort.Direction.DESC, order.getDirection());
 
         assertTrue(sortIterator.hasNext());

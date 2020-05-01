@@ -22,7 +22,7 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -38,10 +38,6 @@ import org.uniprot.core.proteome.impl.CanonicalProteinBuilder;
 import org.uniprot.core.proteome.impl.ProteinBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
@@ -67,7 +63,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             GeneCentricSearchControllerIT.GeneCentricSearchParameterResolver.class,
             GeneCentricSearchControllerIT.GeneCentricSearchContentTypeParamResolver.class
         })
-public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
+public class GeneCentricSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String ACCESSION_PREF = "P00";
     private static final String RELATED_ACCESSION_PREF_1 = "P20";
     private static final String RELATED_ACCESSION_PREF_2 = "P30";
@@ -104,8 +100,8 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     @Override
-    protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.GENECENTRIC;
     }
 
     @Override
@@ -135,12 +131,6 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
-    }
-
-    @Override
-    protected List<ReturnField> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.GENECENTRIC)
-                .getReturnFields();
     }
 
     @Override
@@ -334,14 +324,12 @@ public class GeneCentricSearchControllerIT extends AbstractSearchControllerIT {
         @Override
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("reviewed:true"))
+                    .queryParam("query", Collections.singletonList("*"))
                     .queryParam("facets", Collections.singletonList("reviewed"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].canonicalProtein.accession",
-                                    contains(
-                                            "P00123", "P20123", "P30123", "P00124", "P20124",
-                                            "P30124")))
+                                    contains("P00123", "P00124")))
                     .build();
         }
     }

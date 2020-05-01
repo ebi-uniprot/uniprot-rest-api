@@ -15,7 +15,6 @@ import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
  * @author lgonzales
  */
 @SpringBootApplication
-// @EnableSolrRepositories(basePackages = {"org.uniprot.api.uniprotkb.repository.search.impl"})
 @Import({
     HttpCommonHeaderConfig.class,
     RepositoryConfig.class,

@@ -1,6 +1,6 @@
 package org.uniprot.api.keyword;
 
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -11,7 +11,7 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 @Repository
 public class KeywordRepository extends SolrQueryRepository<KeywordDocument> {
 
-    protected KeywordRepository(SolrTemplate solrTemplate, SolrRequestConverter requestConverter) {
-        super(solrTemplate, SolrCollection.keyword, KeywordDocument.class, null, requestConverter);
+    protected KeywordRepository(SolrClient solrClient, SolrRequestConverter requestConverter) {
+        super(solrClient, SolrCollection.keyword, KeywordDocument.class, null, requestConverter);
     }
 }

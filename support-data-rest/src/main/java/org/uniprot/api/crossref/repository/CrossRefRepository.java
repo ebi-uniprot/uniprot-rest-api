@@ -1,6 +1,6 @@
 package org.uniprot.api.crossref.repository;
 
-import org.springframework.data.solr.core.SolrTemplate;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -11,11 +11,11 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 @Repository
 public class CrossRefRepository extends SolrQueryRepository<CrossRefDocument> {
     public CrossRefRepository(
-            SolrTemplate solrTemplate,
+            SolrClient solrClient,
             SolrRequestConverter requestConverter,
             CrossRefFacetConfig facetConfig) {
         super(
-                solrTemplate,
+                solrClient,
                 SolrCollection.crossref,
                 CrossRefDocument.class,
                 facetConfig,

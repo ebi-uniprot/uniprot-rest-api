@@ -9,16 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,8 +34,10 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.store.config.returnfield.model.ReturnField;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -58,9 +61,8 @@ public abstract class AbstractSearchControllerIT {
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(getStoreType(), getSolrCollection());
-        SolrTemplate template = new SolrTemplate(getStoreManager().getSolrClient(getStoreType()));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                getRepository(), "solrClient", storeManager.getSolrClient(getStoreType()));
     }
 
     @Test
@@ -214,30 +216,27 @@ public abstract class AbstractSearchControllerIT {
                                         "'invalidfield2' is not a valid search field")));
     }
 
-    @Test
-    void searchCanSearchWithAllSearchFields() throws Exception {
+    @ParameterizedTest(name = "[{index}] search fieldName {0}")
+    @MethodSource("getAllSearchFields")
+    void searchCanSearchWithAllSearchFields(String searchField) throws Exception {
         // given
         saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
 
-        Collection<String> searchFields = getAllSearchFields();
-        assertThat(searchFields, notNullValue());
-        assertThat(searchFields, not(emptyIterable()));
+        assertThat(searchField, notNullValue());
 
-        for (String searchField : searchFields) {
-            // when
-            String fieldValue = getFieldValueForField(searchField);
-            ResultActions response =
-                    mockMvc.perform(
-                            get(getSearchRequestPath())
-                                    .param("query", searchField + ":" + fieldValue)
-                                    .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // when
+        String fieldValue = getFieldValueForField(searchField);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", searchField + ":" + fieldValue)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-            // then
-            response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.size()", greaterThan(0)));
-        }
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
     }
 
     @Test
@@ -385,30 +384,27 @@ public abstract class AbstractSearchControllerIT {
                                         "Invalid sort field 'invalidfield'")));
     }
 
-    @Test
-    void searchCanSearchWithAllAvailableSortFields() throws Exception {
+    @ParameterizedTest(name = "[{index}] sort {0}")
+    @MethodSource("getAllSortFields")
+    void searchCanSearchWithAllAvailableSortFields(String sortField) throws Exception {
         // given
         saveEntry(SaveScenario.SORT_SUCCESS);
 
-        Collection<String> sortFields = getAllSortFields();
-        assertThat(sortFields, notNullValue());
-        assertThat(sortFields, not(emptyIterable()));
+        assertThat(sortField, notNullValue());
 
-        for (String sortField : sortFields) {
-            // when
-            ResultActions response =
-                    mockMvc.perform(
-                            get(getSearchRequestPath())
-                                    .param("query", "*:*")
-                                    .param("sort", sortField + " asc")
-                                    .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .param("sort", sortField + " asc")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-            // then
-            response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.size()", greaterThan(0)));
-        }
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
     }
 
     // ----------------------------------------- TEST RETURNED FIELDS
@@ -467,45 +463,36 @@ public abstract class AbstractSearchControllerIT {
                                         "Invalid fields parameter value 'otherInvalid'")));
     }
 
-    @Test
-    void searchCanSearchWithAllAvailableReturnedFields() throws Exception {
+    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
+    @MethodSource("getAllReturnedFields")
+    void searchCanSearchWithAllAvailableReturnedFields(String name, List<String> paths)
+            throws Exception {
 
         // given
         saveEntry(SaveScenario.SEARCH_ALL_RETURN_FIELDS);
 
-        List<ReturnField> returnFields = getAllReturnedFields();
-        assertThat(returnFields, notNullValue());
-        assertThat(returnFields, not(emptyIterable()));
+        assertThat(name, notNullValue());
+        assertThat(paths, notNullValue());
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "*:*")
+                                .param("fields", name)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-        for (ReturnField returnField : returnFields) {
-            assertThat(returnField.getPaths(), notNullValue());
-            // when
-            ResultActions response =
-                    mockMvc.perform(
-                            get(getSearchRequestPath())
-                                    .param("query", "*:*")
-                                    .param("fields", returnField.getName())
-                                    .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                        .andExpect(jsonPath("$.results.size()", greaterThan(0)));
 
-            // then
-            ResultActions resultActions =
-                    response.andDo(print())
-                            .andExpect(status().is(HttpStatus.OK.value()))
-                            .andExpect(
-                                    header().string(
-                                                    HttpHeaders.CONTENT_TYPE,
-                                                    APPLICATION_JSON_VALUE))
-                            .andExpect(jsonPath("$.results.size()", greaterThan(0)));
-
-            for (String path : returnField.getPaths()) {
-                String returnFieldValidatePath = "$.results[*]." + path;
-                log.info(
-                        "ReturnField:"
-                                + returnField.getName()
-                                + " Validation Path: "
-                                + returnFieldValidatePath);
-                resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
-            }
+        for (String path : paths) {
+            String returnFieldValidatePath = "$.results[*]." + path;
+            log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
+            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
     }
 
@@ -780,34 +767,40 @@ public abstract class AbstractSearchControllerIT {
 
     protected abstract int getDefaultPageSize();
 
-    protected abstract SearchFieldConfig getSearchFieldConfig();
-
-    protected abstract List<String> getAllFacetFields();
-
-    protected abstract List<ReturnField> getAllReturnedFields();
+    protected abstract UniProtDataType getUniProtDataType();
 
     protected abstract void saveEntry(SaveScenario saveContext);
 
     protected abstract void saveEntries(int numberOfEntries);
 
-    protected Collection<String> getAllSearchFields() {
-        return getSearchFieldConfig().getSearchFieldItems().stream()
-                .map(SearchFieldItem::getFieldName)
-                .collect(Collectors.toSet());
-    }
-
     protected abstract String getFieldValueForValidatedField(String searchField);
 
-    protected Collection<String> getAllSortFields() {
+    private Stream<Arguments> getAllSearchFields() {
+        return getSearchFieldConfig().getSearchFieldItems().stream()
+                .map(SearchFieldItem::getFieldName)
+                .map(Arguments::of);
+    }
+
+    private Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+                .stream()
+                .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
+    }
+
+    private Stream<Arguments> getAllSortFields() {
         SearchFieldConfig fieldConfig = getSearchFieldConfig();
         return fieldConfig.getSearchFieldItems().stream()
                 .map(SearchFieldItem::getFieldName)
                 .filter(fieldConfig::correspondingSortFieldExists)
-                .collect(Collectors.toList());
+                .map(Arguments::of);
     }
 
-    protected boolean fieldValueIsValid(String field, String value) {
+    boolean fieldValueIsValid(String field, String value) {
         return getSearchFieldConfig().isSearchFieldValueValid(field, value);
+    }
+
+    private SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
     }
 
     private String getFieldValueForField(String searchField) {

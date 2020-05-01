@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.*;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;

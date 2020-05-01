@@ -6,7 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,9 +22,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -52,6 +52,7 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles(profiles = "offline")
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -100,10 +101,10 @@ class SearchByDateIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-        SolrTemplate template =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(
@@ -189,7 +190,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         "*",
                         false,
                         creationDate.atStartOfDay().format(DATE_FORMAT),
@@ -223,7 +224,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(1989, 10, 1);
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         "*",
                         false,
                         creationDate.atStartOfDay().format(DATE_FORMAT),
@@ -236,7 +237,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(1999, 3, 15);
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         "*",
                         false,
                         creationDate.atStartOfDay().format(DATE_FORMAT),
@@ -249,7 +250,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2004, 10, 26);
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         "*",
                         false,
                         updateDate.atStartOfDay().format(DATE_FORMAT),
@@ -263,7 +264,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2004, 10, 27);
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         "*",
                         false,
                         updateDate.atStartOfDay().format(DATE_FORMAT),
@@ -277,7 +278,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2006, 2, 8);
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         "*",
                         false,
                         updateDate.atStartOfDay().format(DATE_FORMAT),
@@ -291,7 +292,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(2014, 3, 30);
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         creationDate.atStartOfDay().format(DATE_FORMAT),
                         false,
                         "*",
@@ -304,7 +305,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(2003, 7, 29);
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         creationDate.atStartOfDay().format(DATE_FORMAT),
                         false,
                         "*",
@@ -318,7 +319,7 @@ class SearchByDateIT {
         LocalDate creationDate = LocalDate.of(1999, 3, 15);
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         creationDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -331,7 +332,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2014, 4, 1);
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         updateDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -344,7 +345,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2012, 12, 31);
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         updateDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -357,7 +358,7 @@ class SearchByDateIT {
         LocalDate updateDate = LocalDate.of(2006, 2, 6);
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         updateDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         "*",
@@ -372,7 +373,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -387,7 +388,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -402,7 +403,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -417,7 +418,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("modified"),
+                        getSearchField("date_modified"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -436,7 +437,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -451,7 +452,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -466,7 +467,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -481,7 +482,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -501,7 +502,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -516,7 +517,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -531,7 +532,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),
@@ -546,7 +547,7 @@ class SearchByDateIT {
 
         String query =
                 buildQuery(
-                        getSearchField("created"),
+                        getSearchField("date_created"),
                         startDate.atStartOfDay().format(DATE_FORMAT),
                         true,
                         endDate.atStartOfDay().format(DATE_FORMAT),

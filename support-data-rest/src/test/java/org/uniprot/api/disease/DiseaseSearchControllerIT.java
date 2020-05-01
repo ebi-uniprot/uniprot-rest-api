@@ -14,20 +14,20 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.DataStoreTestConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
@@ -36,10 +36,6 @@ import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
@@ -55,9 +51,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             DiseaseSearchContentTypeParamResolver.class,
             DiseaseSearchControllerIT.DiseaseSearchParameterResolver.class
         })
-public class DiseaseSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class DiseaseSearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired private DiseaseRepository repository;
+
+    @Value("${solr.query.batchSize:#{null}}")
+    private Integer solrBatchSize;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -81,12 +80,12 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return solrBatchSize;
     }
 
     @Override
-    protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.DISEASE;
     }
 
     @Override
@@ -96,17 +95,6 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
             return SEARCH_ACCESSION1;
         }
         return value;
-    }
-
-    @Override
-    protected List<String> getAllFacetFields() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    protected List<ReturnField> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.DISEASE)
-                .getReturnFields();
     }
 
     @Override
@@ -214,16 +202,6 @@ public class DiseaseSearchControllerIT extends AbstractSearchWithFacetController
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse DiseaseEntry entry to binary json: ", e);
         }
-    }
-
-    @Test
-    void searchFacetsWithIncorrectValuesReturnBadRequest() {
-        // do nothing.. disease doesn't have any facets
-    }
-
-    @Test
-    void searchCanSearchWithAllAvailableFacetsFields() {
-        // do nothing.. disease doesn't have any facets
     }
 
     static class DiseaseSearchParameterResolver extends AbstractSearchParameterResolver {

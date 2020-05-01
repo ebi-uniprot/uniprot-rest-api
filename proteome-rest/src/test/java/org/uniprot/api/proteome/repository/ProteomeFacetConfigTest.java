@@ -12,11 +12,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.proteome.controller.DataStoreTestConfig;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {DataStoreTestConfig.class})
+@ActiveProfiles(profiles = "offline")
 @Import(ProteomeFacetConfig.class)
 class ProteomeFacetConfigTest {
     @Autowired ProteomeFacetConfig config;

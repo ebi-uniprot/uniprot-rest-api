@@ -25,7 +25,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;

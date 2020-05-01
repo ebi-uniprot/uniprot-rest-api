@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -29,16 +28,20 @@ import org.uniprot.store.search.SolrCollection;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT {
-    public static final Integer ENTRY_COUNT = 500;
+    public static final Integer ENTRY_COUNT = 50;
+    public static final Integer DEFAULT_BATCH_SIZE_TEST = 10;
+    public static final Integer LESS_THAN_BATCH_SIZE = DEFAULT_BATCH_SIZE_TEST - 4;
+    public static final Integer BATCH_SIZE = DEFAULT_BATCH_SIZE_TEST;
+    public static final Integer MORE_THAN_BATCH_SIZE = DEFAULT_BATCH_SIZE_TEST * 3;
+    public static final Integer LESS_THAN_ZERO_SIZE = -1;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     @BeforeAll
     void initSolrAndInjectItInTheRepository() {
         storeManager.addSolrClient(getStoreType(), getSolrCollection());
-        SolrTemplate template = new SolrTemplate(storeManager.getSolrClient(getStoreType()));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(getRepository(), "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                getRepository(), "solrClient", storeManager.getSolrClient(getStoreType()));
     }
 
     @BeforeEach

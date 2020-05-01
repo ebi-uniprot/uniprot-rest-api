@@ -9,8 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -81,33 +85,34 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
                                                 "Invalid facet name 'invalid2'. Expected value can be "))));
     }
 
-    @Test
-    void searchCanSearchWithAllAvailableFacetsFields() throws Exception {
-
+    @ParameterizedTest(name = "[{index}] search with facetName {0}")
+    @MethodSource("getAllFacetFieldsArguments")
+    void searchCanSearchWithAllAvailableFacetsFields(String facetField) throws Exception {
         // given
         saveEntry(SaveScenario.FACETS_SUCCESS);
+        assertThat(facetField, notNullValue());
 
-        List<String> facetFields = getAllFacetFields();
-        assertThat(facetFields, notNullValue());
-        assertThat(facetFields, not(emptyIterable()));
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "*:*")
+                                        .param("facets", facetField)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-        for (String facetField : facetFields) {
-            // when
-            ResultActions response =
-                    getMockMvc()
-                            .perform(
-                                    get(getSearchRequestPath())
-                                            .param("query", "*:*")
-                                            .param("facets", facetField)
-                                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets.*.name", contains(facetField)));
+    }
 
-            // then
-            response.andDo(print())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.size()", greaterThan(0)))
-                    .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
-                    .andExpect(jsonPath("$.facets.*.name", contains(facetField)));
-        }
+    protected abstract List<String> getAllFacetFields();
+
+    private Stream<Arguments> getAllFacetFieldsArguments() {
+        return getAllFacetFields().stream().map(Arguments::of);
     }
 }

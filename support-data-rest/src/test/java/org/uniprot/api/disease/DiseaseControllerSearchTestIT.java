@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +30,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.DataStoreTestConfig;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
@@ -62,18 +61,17 @@ class DiseaseControllerSearchTestIT {
     @BeforeAll
     void setUp() throws IOException, SolrServerException {
         storeManager.addSolrClient(DataStoreManager.StoreType.DISEASE, SolrCollection.disease);
-        SolrTemplate solrTemplate =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.DISEASE));
-        solrTemplate.afterPropertiesSet();
-        ReflectionTestUtils.setField(repository, "solrTemplate", solrTemplate);
 
         DiseaseFileReader diseaseFileReader = new DiseaseFileReader();
         List<DiseaseEntry> diseases =
                 diseaseFileReader.parse("src/test/resources/sample-humdisease.txt");
         // convert the disease to disease document
         List<DiseaseDocument> docs = convertToDocs(diseases);
-        solrTemplate.getSolrClient().addBeans(SolrCollection.disease.name(), docs);
-        solrTemplate.getSolrClient().commit(SolrCollection.disease.name());
+        storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, docs);
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.DISEASE));
     }
 
     @Test

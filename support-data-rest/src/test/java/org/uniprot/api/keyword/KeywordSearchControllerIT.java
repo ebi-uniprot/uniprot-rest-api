@@ -5,13 +5,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,7 +26,7 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.core.cv.go.impl.GoTermBuilder;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
@@ -36,10 +35,6 @@ import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
@@ -58,6 +53,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired private KeywordRepository repository;
+
+    @Value("${solr.query.batchSize:#{null}}")
+    private Integer solrBatchSize;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -81,12 +79,12 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return solrBatchSize;
     }
 
     @Override
-    protected SearchFieldConfig getSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.KEYWORD;
     }
 
     @Override
@@ -99,17 +97,6 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                 break;
         }
         return value;
-    }
-
-    @Override
-    protected List<String> getAllFacetFields() {
-        return new ArrayList<>(); // Facets are not supported by Keyword
-    }
-
-    @Override
-    protected List<ReturnField> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD)
-                .getReturnFields();
     }
 
     @Override

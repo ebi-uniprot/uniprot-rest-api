@@ -165,7 +165,7 @@ class JsonMessageConverterTest {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .entityOnly(true)
-                        .fields("accession,organism,gene_primary,gene_synonym")
+                        .fields("accession,organism_name,gene_primary,gene_synonym")
                         .build();
         System.out.println("------- BEGIN: writeCanWriteEntityWithPathOnlyReturnField");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -225,7 +225,7 @@ class JsonMessageConverterTest {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .entityOnly(true)
-                        .fields("organism,cc_rna_editing,cc_polymorphism")
+                        .fields("organism_name,cc_rna_editing,cc_polymorphism")
                         .build();
         System.out.println(
                 "------- BEGIN: writeCanWriteEntityWithFilteredPathWithOrLogicReturnField");
@@ -260,7 +260,7 @@ class JsonMessageConverterTest {
     void writeCanWriteTenEntitiesWithFilteredPathWithOrLogicReturnField() throws IOException {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
-                        .fields("organism,cc_rna_editing,cc_polymorphism")
+                        .fields("organism_name,cc_rna_editing,cc_polymorphism")
                         .build();
         System.out.println(
                 "------- BEGIN: 10 writeCanWriteTenEntitiesWithFilteredPathWithOrLogicReturnField");

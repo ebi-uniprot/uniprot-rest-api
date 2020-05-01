@@ -6,7 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniprotKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +20,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -71,10 +70,10 @@ class SearchByMnemonicIT {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
-        SolrTemplate template =
-                new SolrTemplate(storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
-        template.afterPropertiesSet();
-        ReflectionTestUtils.setField(repository, "solrTemplate", template);
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(
@@ -122,7 +121,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic:" + TARGET_ID));
+                                .param("query", "id:" + TARGET_ID));
 
         // then
         response.andDo(print())
@@ -139,7 +138,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic:cYc_Human"));
+                                .param("query", "id:cYc_Human"));
 
         // then
         response.andDo(print())
@@ -156,7 +155,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic_default:AATM_RABIT"));
+                                .param("query", "id_default:AATM_RABIT"));
 
         // then
         response.andDo(print())
@@ -173,7 +172,7 @@ class SearchByMnemonicIT {
                 mockMvc.perform(
                         get(SEARCH_RESOURCE)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("query", "mnemonic:AATM"));
+                                .param("query", "id:AATM"));
 
         // then
         response.andDo(print())

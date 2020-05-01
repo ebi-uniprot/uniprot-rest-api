@@ -66,16 +66,33 @@ public class BaseUniprotKBDownloadIT extends AbstractDownloadControllerIT {
                     "Organism",
                     "Length");
     public static List<String> TSV_RETURNED_HEADERS =
-            Arrays.asList(new String[] {"Protein existence", "Organism", "Protein names"});
+            Arrays.asList(
+                    new String[] {
+                        "Protein existence", "Organism", "Protein names", "Comments", "Features"
+                    });
     public static List<String> XLS_RETURNED_HEADERS =
-            Arrays.asList(new String[] {"Protein existence", "Organism", "Protein names"});
+            Arrays.asList(
+                    new String[] {
+                        "Protein existence", "Organism", "Protein names", "Comments", "Features"
+                    });
 
     public static List<String> REQUESTED_JSON_FIELDS =
-            Arrays.asList("protein_existence", "organism", "protein_name");
+            Arrays.asList(
+                    "protein_existence",
+                    "organism_name",
+                    "protein_name",
+                    "comment_count",
+                    "feature_count");
     public static List<String> INVALID_RETURN_FIELDS =
             Arrays.asList("protein", "accession", "kinetic");
     public static List<String> RETURNED_JSON_FIELDS =
-            new ArrayList<>(Arrays.asList("proteinExistence", "organism", "proteinDescription"));
+            new ArrayList<>(
+                    Arrays.asList(
+                            "proteinExistence",
+                            "organism",
+                            "proteinDescription",
+                            "extraAttributes.countByCommentType",
+                            "extraAttributes.countByFeatureType"));
 
     static {
         RETURNED_JSON_FIELDS.addAll(MANDATORY_JSON_FIELDS);

@@ -23,14 +23,14 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.controller.UniprotKBController;
+import org.uniprot.api.uniprotkb.controller.UniProtKBController;
 import org.uniprot.api.uniprotkb.controller.download.resolver.UniProtKBDownloadSortParamAndResultProvider;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
-@WebMvcTest(UniprotKBController.class)
+@WebMvcTest(UniProtKBController.class)
 @ExtendWith(value = {SpringExtension.class})
 public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     public static List<String> SORTED_BY_LENGTH = Arrays.asList(ACC3, ACC2, ACC1);
@@ -77,7 +77,7 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     }
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
-    @MethodSource("mnemonic")
+    @MethodSource("id")
     void testDownloadSortByMnemonic(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
@@ -89,8 +89,8 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
     }
 
     @ParameterizedTest(name = "[{index}]~/download?{0}")
-    @MethodSource("name")
-    void testDownloadSortByName(DownloadParamAndResult paramAndResult) throws Exception {
+    @MethodSource("protein_name")
+    void testDownloadSortByProteinName(DownloadParamAndResult paramAndResult) throws Exception {
         sendAndVerify(paramAndResult, HttpStatus.OK);
     }
 
@@ -145,12 +145,12 @@ public class UniProtKBDownloadSortIT extends BaseUniprotKBDownloadIT {
         return requestResponseForSort("accession", "desc", SORTED_BY_ACCESSION_DESC);
     }
 
-    private static Stream<Arguments> mnemonic() {
-        return requestResponseForSort("mnemonic", "asc", SORTED_BY_MNEMONIC);
+    private static Stream<Arguments> id() {
+        return requestResponseForSort("id", "asc", SORTED_BY_MNEMONIC);
     }
 
-    private static Stream<Arguments> name() {
-        return requestResponseForSort("name", "asc", SORTED_BY_ACCESSION);
+    private static Stream<Arguments> protein_name() {
+        return requestResponseForSort("protein_name", "asc", SORTED_BY_ACCESSION);
     }
 
     private static Stream<Arguments> gene() {

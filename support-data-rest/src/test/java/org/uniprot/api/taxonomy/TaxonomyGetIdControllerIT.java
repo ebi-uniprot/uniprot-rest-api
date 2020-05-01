@@ -30,7 +30,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.support_data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.api.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
