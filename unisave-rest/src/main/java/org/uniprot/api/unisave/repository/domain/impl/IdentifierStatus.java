@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "DELETED_MERGED_ACCESSION_VIEW")
 @NamedQueries({
     @NamedQuery(
-            name = "IdentifierStatus.findByFirstColumn",
+            name = "IdentifierStatus.FIND_BY_FIRST_COLUMN",
             query = "select i from IdentifierStatus i where i.sourceAccession =:acc")
 })
 @Data

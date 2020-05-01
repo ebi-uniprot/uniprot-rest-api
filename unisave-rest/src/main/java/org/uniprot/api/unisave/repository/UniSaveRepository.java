@@ -242,7 +242,8 @@ public class UniSaveRepository {
         try {
             TypedQuery<ReleaseImpl> namedQuery =
                     session.createNamedQuery(
-                            ReleaseImpl.Query.FIND_PAST_RELEASES_IN_ORDER.query(), ReleaseImpl.class);
+                            ReleaseImpl.Query.FIND_PAST_RELEASES_IN_ORDER.query(),
+                            ReleaseImpl.class);
 
             namedQuery.setMaxResults(1);
 
