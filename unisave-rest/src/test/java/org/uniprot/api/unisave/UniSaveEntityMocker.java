@@ -23,7 +23,7 @@ public class UniSaveEntityMocker {
 
         status.setSourceAccession(sourceAccession);
         status.setTargetAccession(targetAccession);
-        status.setEventType(eventType);
+        status.setEventTypeEnum(eventType);
 
         return status;
     }
@@ -32,16 +32,16 @@ public class UniSaveEntityMocker {
         EntryInfoImpl entryInfo = new EntryInfoImpl();
         entryInfo.setEntryVersion(entryVersion);
         ReleaseImpl lastRelease = new ReleaseImpl();
-        lastRelease.setDatabase(DatabaseEnum.Swissprot);
+        lastRelease.setDatabase(DatabaseEnum.SWISSPROT);
         lastRelease.setReleaseNumber("2");
         lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
 
         entryInfo.setLastRelease(lastRelease);
         entryInfo.setAccession(accession);
-        entryInfo.setDatabase(DatabaseEnum.Swissprot);
+        entryInfo.setDatabase(DatabaseEnum.SWISSPROT);
         entryInfo.setEntryMD5("someMd5");
         ReleaseImpl firstRelease = new ReleaseImpl();
-        firstRelease.setDatabase(DatabaseEnum.Swissprot);
+        firstRelease.setDatabase(DatabaseEnum.SWISSPROT);
         firstRelease.setReleaseNumber("1");
         firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
         entryInfo.setFirstRelease(firstRelease);
@@ -51,7 +51,7 @@ public class UniSaveEntityMocker {
 
     public static ReleaseImpl mockRelease(String releaseNumber) {
         ReleaseImpl release = new ReleaseImpl();
-        release.setDatabase(DatabaseEnum.Swissprot);
+        release.setDatabase(DatabaseEnum.SWISSPROT);
         release.setReleaseNumber(releaseNumber);
         release.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
 
@@ -66,7 +66,7 @@ public class UniSaveEntityMocker {
         entry.setEntryVersion(entryVersion);
         entry.setAccession(accession);
         entry.setName(accession + "_name");
-        entry.setDatabase(DatabaseEnum.Swissprot);
+        entry.setDatabase(DatabaseEnum.SWISSPROT);
         entry.setEntryMD5("someEntryMd5");
         entry.setSequenceMD5("someSequenceMd5");
 

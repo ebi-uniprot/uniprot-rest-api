@@ -76,7 +76,7 @@ class UniSaveRepositoryIT {
 
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(
-                        EventTypeEnum.deleted, entry.getAccession(), "does not matter");
+                        EventTypeEnum.DELETED, entry.getAccession(), "does not matter");
         String deletedReason = "a hurricane";
         identifierStatus.setDeletionReason(deletedReason);
         testEntityManager.persist(identifierStatus);
@@ -102,7 +102,7 @@ class UniSaveRepositoryIT {
 
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(
-                        EventTypeEnum.deleted, entry.getAccession(), "does not matter");
+                        EventTypeEnum.DELETED, entry.getAccession(), "does not matter");
         String deletedReason = "a hurricane";
         identifierStatus.setDeletionReason(deletedReason);
         identifierStatus.setWithdrawnFlag("any value means it's withdrawn");
@@ -123,7 +123,7 @@ class UniSaveRepositoryIT {
 
         String mergedToAcc = "MERGED TO ACC";
         IdentifierStatus identifierStatus =
-                mockIdentifierStatus(EventTypeEnum.merged, entry.getAccession(), mergedToAcc);
+                mockIdentifierStatus(EventTypeEnum.MERGED, entry.getAccession(), mergedToAcc);
 
         testEntityManager.persist(identifierStatus);
 
@@ -149,7 +149,7 @@ class UniSaveRepositoryIT {
 
         String replacingAcc = "REPLACING ACC";
         IdentifierStatus identifierStatus =
-                mockIdentifierStatus(EventTypeEnum.replacing, entry.getAccession(), replacingAcc);
+                mockIdentifierStatus(EventTypeEnum.REPLACING, entry.getAccession(), replacingAcc);
         identifierStatus.setEventRelease(entry.getFirstRelease());
 
         testEntityManager.persist(identifierStatus);
@@ -173,7 +173,7 @@ class UniSaveRepositoryIT {
         // given
         String sourceAccession = "P11111";
         String targetAccession = "P22222";
-        EventTypeEnum eventType = EventTypeEnum.replacing;
+        EventTypeEnum eventType = EventTypeEnum.REPLACING;
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(eventType, sourceAccession, targetAccession);
         ReleaseImpl release = mockRelease("1");
@@ -189,7 +189,7 @@ class UniSaveRepositoryIT {
         assertThat(statusInfo.getAccession(), is(sourceAccession));
         assertThat(statusInfo.getEvents(), hasSize(1));
         assertThat(statusInfo.getEvents().get(0).getTargetAccession(), is(targetAccession));
-        assertThat(statusInfo.getEvents().get(0).getEventType(), is(eventType));
+        assertThat(statusInfo.getEvents().get(0).getEventTypeEnum(), is(eventType));
         assertThat(statusInfo.getEvents().get(0).getEventRelease(), is(release));
     }
 

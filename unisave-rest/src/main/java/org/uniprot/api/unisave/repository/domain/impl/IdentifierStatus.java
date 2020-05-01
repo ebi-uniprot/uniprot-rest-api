@@ -28,8 +28,16 @@ public class IdentifierStatus implements AccessionEvent {
 
     @Id
     @Column(name = "OPERATION", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EventTypeEnum eventType;
+    private String eventType;
+
+    public void setEventTypeEnum(EventTypeEnum eventType) {
+        this.eventType = eventType.toString();
+    }
+
+    @Override
+    public EventTypeEnum getEventTypeEnum() {
+        return EventTypeEnum.fromEventType(eventType);
+    }
 
     @Id
     @Column(name = "ACCESSION_SUBJECT", nullable = false)

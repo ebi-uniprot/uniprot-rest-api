@@ -1,22 +1,18 @@
 package org.uniprot.api.unisave.repository.domain;
 
 public enum DatabaseEnum {
-    Swissprot {
-        @Override
-        public String toString() {
-            return "Swiss-Prot";
-        }
-    },
-    Trembl {
-        @Override
-        public String toString() {
-            return "TrEMBL";
-        }
-    },
-    WrongTrembl {
-        @Override
-        public String toString() {
-            return "TrEMBL-Depreciated";
-        }
-    };
+    SWISSPROT("Swiss-Prot"),
+    TREMBL("TrEMBL"),
+    WRONG_TREMBL("TrEMBL-Depreciated");
+
+    private String name;
+
+    DatabaseEnum(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

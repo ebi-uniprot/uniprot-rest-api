@@ -5,7 +5,7 @@ package org.uniprot.api.unisave.repository.domain;
  * File | Settings | File Templates.
  */
 public interface AccessionEvent {
-    EventTypeEnum getEventType();
+    EventTypeEnum getEventTypeEnum();
 
     String getTargetAccession();
 

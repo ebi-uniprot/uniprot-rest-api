@@ -169,7 +169,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .map(
                         event ->
                                 AccessionEvent.builder()
-                                        .eventType(event.getEventType().name())
+                                        .eventType(event.getEventTypeEnum().toString())
                                         .release(event.getEventRelease().getReleaseNumber())
                                         .targetAccession(event.getTargetAccession())
                                         .build())
@@ -187,7 +187,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                 .deletedReason(repoEntryInfo.getDeletionReason())
                 .replacingAcc(repoEntryInfo.getReplacingAccession())
                 .mergedTo(repoEntryInfo.getMergingTo())
-                .database(repoEntryInfo.getDatabase().name())
+                .database(repoEntryInfo.getDatabase().toString())
                 .firstRelease(repoEntryInfo.getFirstRelease().getReleaseNumber())
                 .firstReleaseDate(
                         formatReleaseDate(repoEntryInfo.getFirstRelease().getReleaseDate()))

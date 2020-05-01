@@ -118,9 +118,10 @@ public class UniSaveRepository {
             List<IdentifierStatus> deleted = new ArrayList<>();
 
             for (IdentifierStatus status : idQueryResultList) {
-                if (status.getEventType() == EventTypeEnum.deleted) deleted.add(status);
-                else if (status.getEventType() == EventTypeEnum.merged) merged.add(status);
-                else if (status.getEventType() == EventTypeEnum.replacing) replacing.add(status);
+                if (status.getEventTypeEnum() == EventTypeEnum.DELETED) deleted.add(status);
+                else if (status.getEventTypeEnum() == EventTypeEnum.MERGED) merged.add(status);
+                else if (status.getEventTypeEnum() == EventTypeEnum.REPLACING)
+                    replacing.add(status);
             }
 
             // find the replacing accession
@@ -331,7 +332,7 @@ public class UniSaveRepository {
         ArrayList<String> accessions = new ArrayList<>();
         for (IdentifierStatus is : status) {
             // NOTE: it is possible to have the null release here.
-            if (is.getEventType() == EventTypeEnum.replacing && is.getEventRelease() != null) {
+            if (is.getEventTypeEnum() == EventTypeEnum.REPLACING && is.getEventRelease() != null) {
                 // check if the release is on the same day.
                 LocalDate date1 =
                         convertToLocalDateViaInstant(is.getEventRelease().getReleaseDate());

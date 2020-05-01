@@ -15,7 +15,7 @@ import javax.persistence.*;
     @NamedQuery(
             name = "EntryImpl.FIND_ENTRIES_BY_ACCESSION",
             query =
-                    "SELECT e from Entry e WHERE e.accession=:acc and e.database <> org.uniprot.api.unisave.repository.domain.DatabaseEnum.WrongTrembl"
+                    "SELECT e from Entry e WHERE e.accession=:acc and e.database <> org.uniprot.api.unisave.repository.domain.DatabaseEnum.WRONG_TREMBL"
                             + " ORDER BY e.entryVersion DESC"),
     @NamedQuery(
             name = "EntryImpl.FIND_ENTRY_BY_ACCESSION_AND_ENTRY_ID",
@@ -24,12 +24,12 @@ import javax.persistence.*;
             name = "EntryImpl.FIND_ENTRY_INFO_BY_ACCESSION_AND_VERSION",
             query =
                     "SELECT e.database, e.accession, e.name, e.entryVersion, e.entryMD5, e.sequenceVersion, e.sequenceMD5, "
-                            + "r1, r2 from Entry e left join e.firstRelease r1 left join e.lastRelease r2 WHERE e.accession=:acc AND e.entryVersion=:version  and e.database <> org.uniprot.api.unisave.repository.domain.DatabaseEnum.WrongTrembl"),
+                            + "r1, r2 from Entry e left join e.firstRelease r1 left join e.lastRelease r2 WHERE e.accession=:acc AND e.entryVersion=:version  and e.database <> org.uniprot.api.unisave.repository.domain.DatabaseEnum.WRONG_TREMBL"),
     @NamedQuery(
             name = "EntryImpl.FIND_ENTRY_INFOS_BY_ACCESSION",
             query =
                     "SELECT e.database, e.accession, e.name, e.entryVersion, e.entryMD5, e.sequenceVersion, e.sequenceMD5, "
-                            + "r1, r2 from Entry e left join e.firstRelease r1 left join e.lastRelease r2 WHERE e.accession=:acc and e.database <> org.uniprot.api.unisave.repository.domain.DatabaseEnum.WrongTrembl"
+                            + "r1, r2 from Entry e left join e.firstRelease r1 left join e.lastRelease r2 WHERE e.accession=:acc and e.database <> org.uniprot.api.unisave.repository.domain.DatabaseEnum.WRONG_TREMBL"
                             + " ORDER BY e.entryVersion DESC"),
 })
 @Data

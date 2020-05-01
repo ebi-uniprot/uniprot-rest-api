@@ -11,7 +11,7 @@ import java.io.OutputStream;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.Swissprot;
+import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
 
 /**
  * Created 15/04/20
@@ -31,7 +31,7 @@ class UniSaveFastaMessageConverterTest {
         EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
-                        .database(Swissprot.name())
+                        .database(SWISSPROT.name())
                         .accession(mockEntry.getAccession())
                         .content(mockEntry.getEntryContent().getFullContent())
                         .firstRelease("1111")
@@ -53,7 +53,7 @@ class UniSaveFastaMessageConverterTest {
         EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
-                        .database(Swissprot.name())
+                        .database(SWISSPROT.name())
                         .accession(mockEntry.getAccession())
                         .content(mockEntry.getEntryContent().getFullContent())
                         .firstRelease("1111")

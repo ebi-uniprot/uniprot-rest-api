@@ -32,6 +32,7 @@ import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_REL
  * @author Edd
  */
 class UniSaveServiceImplTest {
+    private static final String ACCESSION = "P12345";
     private UniSaveRepository uniSaveRepository;
     private UniSaveServiceImpl uniSaveService;
 
@@ -44,7 +45,7 @@ class UniSaveServiceImplTest {
     @Test
     void canGetAccessionStatus() {
         // given
-        String accession = "P12345";
+        String accession = ACCESSION;
         String targetAcc = "target acc";
         String releaseNumber = "1";
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
@@ -54,8 +55,8 @@ class UniSaveServiceImplTest {
         ReleaseImpl release = new ReleaseImpl();
         release.setReleaseNumber(releaseNumber);
         when(identifierStatus.getEventRelease()).thenReturn(release);
-        EventTypeEnum eventType = EventTypeEnum.merged;
-        when(identifierStatus.getEventType()).thenReturn(eventType);
+        EventTypeEnum eventType = EventTypeEnum.MERGED;
+        when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
         status.setEvents(singletonList(identifierStatus));
         when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
 
@@ -66,7 +67,7 @@ class UniSaveServiceImplTest {
         List<AccessionEvent> events = entry.getEvents();
         assertThat(entry.getAccession(), is(accession));
         assertThat(events, hasSize(1));
-        assertThat(events.get(0).getEventType(), is(eventType.name()));
+        assertThat(events.get(0).getEventType(), is(eventType.toString()));
         assertThat(events.get(0).getTargetAccession(), is(targetAcc));
         assertThat(events.get(0).getRelease(), is(releaseNumber));
     }
@@ -88,7 +89,7 @@ class UniSaveServiceImplTest {
     @Test
     void canGetDiff() {
         // given
-        String accession = "P12345";
+        String accession = ACCESSION;
         DiffImpl diff = new DiffImpl();
         diff.setAccession(accession);
         String mockDiff = "mock diff";
@@ -132,7 +133,7 @@ class UniSaveServiceImplTest {
     @Test
     void canGetEntriesWithContent() {
         // given
-        String accession = "P12345";
+        String accession = ACCESSION;
         when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         List<EntryImpl> repositoryEntries =
                 asList(mockEntry(accession, 3), mockEntry(accession, 2), mockEntry(accession, 1));
@@ -151,7 +152,7 @@ class UniSaveServiceImplTest {
     @Test
     void canGetEntryVersionsWithContent() {
         // given
-        String accession = "P12345";
+        String accession = ACCESSION;
         when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         when(uniSaveRepository.retrieveEntry(accession, 3)).thenReturn(mockEntry(accession, 3));
         when(uniSaveRepository.retrieveEntry(accession, 2)).thenReturn(mockEntry(accession, 2));
@@ -182,7 +183,7 @@ class UniSaveServiceImplTest {
     @Test
     void canGetEntryInfos() {
         // given
-        String accession = "P12345";
+        String accession = ACCESSION;
         when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         List<EntryInfoImpl> repositoryEntries =
                 asList(
@@ -204,7 +205,7 @@ class UniSaveServiceImplTest {
     @Test
     void canGetEntryInfoVersions() {
         // given
-        String accession = "P12345";
+        String accession = ACCESSION;
         when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
         when(uniSaveRepository.retrieveEntryInfo(accession, 3))
                 .thenReturn(mockEntryInfo(accession, 3));
