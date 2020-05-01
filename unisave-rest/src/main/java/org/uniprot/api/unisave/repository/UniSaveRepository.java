@@ -5,12 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
+import org.uniprot.core.util.Utils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -42,7 +42,7 @@ public class UniSaveRepository {
         try {
             TypedQuery<EntryImpl> q =
                     session.createNamedQuery(
-                            EntryImpl.Query.findEntriesByAccession.query(), EntryImpl.class);
+                            EntryImpl.Query.FIND_ENTRIES_BY_ACCESSION.query(), EntryImpl.class);
 
             q.setParameter("acc", accession);
 
@@ -50,7 +50,8 @@ public class UniSaveRepository {
             List<EntryImpl> resultList = q.getResultList();
 
             if (resultList.isEmpty()) {
-                throw new ResourceNotFoundException("No entries for " + accession + " were found");
+                throw new UniSaveEntryNotFoundException(
+                        "No entries for " + accession + " were found");
             }
 
             for (EntryImpl entryImpl : resultList) {
@@ -58,7 +59,8 @@ public class UniSaveRepository {
             }
 
             return resultList;
-        } catch (ResourceNotFoundException e) {
+        } catch (UniSaveEntryNotFoundException e) {
+            log.error(e.getMessage());
             throw e;
         } catch (PersistenceException e) {
             log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
@@ -70,7 +72,7 @@ public class UniSaveRepository {
         try {
             Query q =
                     session.createNamedQuery(
-                            EntryImpl.Query.findEntryInfoByAccessionAndVersion.query());
+                            EntryImpl.Query.FIND_ENTRY_INFO_BY_ACCESSION_AND_VERSION.query());
 
             q.setParameter("acc", accession);
             q.setParameter("version", version);
@@ -89,7 +91,7 @@ public class UniSaveRepository {
     public List<? extends EntryInfo> retrieveEntryInfos(String accession) {
         try {
             Query entryQuery =
-                    session.createNamedQuery(EntryImpl.Query.findEntryInfosByAccession.query());
+                    session.createNamedQuery(EntryImpl.Query.FIND_ENTRY_INFOS_BY_ACCESSION.query());
 
             entryQuery.setParameter("acc", accession);
 
@@ -105,7 +107,7 @@ public class UniSaveRepository {
 
             TypedQuery<IdentifierStatus> idQuery =
                     session.createNamedQuery(
-                            IdentifierStatus.Query.findByFirstColumn.query(),
+                            IdentifierStatus.Query.FIND_BY_FIRST_COLUMN.query(),
                             IdentifierStatus.class);
 
             idQuery.setParameter("acc", accession);
@@ -125,7 +127,7 @@ public class UniSaveRepository {
             for (Object entryQueryResult : entryQueryResultList) {
                 EntryInfoImpl entryInfo = convertFromObjectArray((Object[]) entryQueryResult);
 
-                if (!replacing.isEmpty()) {
+                if (Utils.notNullNotEmpty(replacing)) {
                     List<String> replacingAcc =
                             findReplacingAcc(replacing, entryInfo.getFirstRelease());
                     entryInfo.setReplacingAccession(replacingAcc);
@@ -148,7 +150,7 @@ public class UniSaveRepository {
                 } else {
                     entryInfos.clear();
                 }
-            } else if (!merged.isEmpty()) {
+            } else if (Utils.notNullNotEmpty(merged)) {
                 IdentifierStatus s = merged.get(0);
                 EntryInfoImpl entryInfo = new EntryInfoImpl();
                 entryInfo.setAccession(accession);
@@ -176,7 +178,7 @@ public class UniSaveRepository {
         try {
             TypedQuery<IdentifierStatus> q =
                     session.createNamedQuery(
-                            IdentifierStatus.Query.findByFirstColumn.query(),
+                            IdentifierStatus.Query.FIND_BY_FIRST_COLUMN.query(),
                             IdentifierStatus.class);
 
             q.setParameter("acc", accession);
@@ -223,7 +225,7 @@ public class UniSaveRepository {
         try {
             TypedQuery<ReleaseImpl> namedQuery =
                     session.createNamedQuery(
-                            ReleaseImpl.Query.findAllRelease.query(), ReleaseImpl.class);
+                            ReleaseImpl.Query.FIND_ALL_RELEASES.query(), ReleaseImpl.class);
 
             namedQuery.setMaxResults(1);
 
@@ -240,7 +242,7 @@ public class UniSaveRepository {
         try {
             TypedQuery<ReleaseImpl> namedQuery =
                     session.createNamedQuery(
-                            ReleaseImpl.Query.findPastReleasesInOrder.query(), ReleaseImpl.class);
+                            ReleaseImpl.Query.FIND_PAST_RELEASES_IN_ORDER.query(), ReleaseImpl.class);
 
             namedQuery.setMaxResults(1);
 
@@ -256,10 +258,10 @@ public class UniSaveRepository {
     }
 
     private void setContent(EntryImpl entry, EntityManager session) {
-        if (entry.getEntryContent().getType() == ContentTypeEnum.Diff) {
+        if (entry.getEntryContent().getType() == ContentTypeEnum.DIFF) {
             final TypedQuery<EntryImpl> query =
                     session.createNamedQuery(
-                            EntryImpl.Query.findEntryByAccessionAndEntryId.query(),
+                            EntryImpl.Query.FIND_ENTRY_BY_ACCESSION_AND_ENTRY_ID.query(),
                             EntryImpl.class);
             query.setParameter("acc", entry.getAccession());
             query.setParameter("id", entry.getEntryContent().getReferenceEntryId());
@@ -281,7 +283,7 @@ public class UniSaveRepository {
         try {
             TypedQuery<EntryImpl> q =
                     session.createNamedQuery(
-                            EntryImpl.Query.findEntryByAccessionAndVersion.query(),
+                            EntryImpl.Query.FIND_ENTRY_BY_ACCESSION_AND_VERSION.query(),
                             EntryImpl.class);
             q.setParameter("acc", accession);
             q.setParameter("version", version);

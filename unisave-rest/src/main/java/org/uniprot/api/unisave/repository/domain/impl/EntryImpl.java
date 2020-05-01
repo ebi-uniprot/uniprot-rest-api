@@ -1,11 +1,10 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import javax.persistence.*;
-
 import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.Entry;
+
+import javax.persistence.*;
 
 @Entity(name = "Entry")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "entry_version"}))
@@ -37,11 +36,11 @@ import org.uniprot.api.unisave.repository.domain.Entry;
 public class EntryImpl implements Entry {
 
     public enum Query {
-        findEntryByAccessionAndEntryId,
-        findEntryByAccessionAndVersion,
-        findEntriesByAccession,
-        findEntryInfoByAccessionAndVersion,
-        findEntryInfosByAccession;
+        FIND_ENTRY_BY_ACCESSION_AND_ENTRY_ID,
+        FIND_ENTRY_BY_ACCESSION_AND_VERSION,
+        FIND_ENTRIES_BY_ACCESSION,
+        FIND_ENTRY_INFO_BY_ACCESSION_AND_VERSION,
+        FIND_ENTRY_INFOS_BY_ACCESSION;
 
         public String query() {
             return EntryImpl.class.getSimpleName() + "." + name();

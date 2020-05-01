@@ -43,13 +43,6 @@ public class UniSaveServiceImpl implements UniSaveService {
         this.repository = repository;
     }
 
-    //    public void initCurrentReleaseDate() {
-    //        if (Objects.isNull(currentReleaseDate)) {
-    //            currentReleaseDate =
-    // formatReleaseDate(repository.getCurrentRelease().getReleaseDate());
-    //        }
-    //    }
-
     @Override
     public UniSaveEntry getDiff(String accession, int version1, int version2) {
 

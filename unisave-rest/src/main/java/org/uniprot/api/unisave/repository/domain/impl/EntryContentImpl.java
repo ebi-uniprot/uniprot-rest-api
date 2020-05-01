@@ -40,7 +40,7 @@ public class EntryContentImpl implements EntryContent {
                 (referenceEntryId == null || fullContent == null),
                 "entrycontent cannot be both full and diff.");
 
-        if (referenceEntryId != null) return ContentTypeEnum.Diff;
-        else return ContentTypeEnum.Full;
+        if (referenceEntryId != null) return ContentTypeEnum.DIFF;
+        else return ContentTypeEnum.FULL;
     }
 }

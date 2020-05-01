@@ -1,11 +1,10 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import javax.persistence.*;
-
 import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.AccessionEvent;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+
+import javax.persistence.*;
 
 /** Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 */
 @Entity(name = "IdentifierStatus")
@@ -20,7 +19,7 @@ import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 public class IdentifierStatus implements AccessionEvent {
 
     public enum Query {
-        findByFirstColumn;
+        FIND_BY_FIRST_COLUMN;
 
         public String query() {
             return IdentifierStatus.class.getSimpleName() + "." + this.name();

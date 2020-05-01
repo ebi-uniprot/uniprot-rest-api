@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
@@ -342,7 +341,7 @@ class UniSaveRepositoryIT {
 
     @Test
     void retrievingAllEntriesWhenNotExistsCausesException() {
-        assertThrows(ResourceNotFoundException.class, () -> repository.retrieveEntries("XXXX"));
+        assertThrows(UniSaveEntryNotFoundException.class, () -> repository.retrieveEntries("XXXX"));
     }
 
     @Test

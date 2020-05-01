@@ -51,7 +51,18 @@ import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
         classes = {UniSaveControllerTest.TestConfig.class, UniSaveRESTApplication.class})
 @WebMvcTest(UniSaveController.class)
 class UniSaveControllerTest {
-
+    private static final String ACCESSION = "P12345";
+    private static final String INVALID_ACCESSION_FORMAT = "WRONG-FORMAT";
+    private static final String RESOURCE_BASE = "/unisave/";
+    private static final String ENTRY_VERSION = "$.results[*].entryVersion";
+    private static final String RESULTS_CONTENT = "$.results[*].content";
+    private static final String INVALID_ACCESSION_ERROR_MESSAGE =
+            "The 'accession' value has invalid format. It should be a valid UniProtKB accession";
+    private static final String STATUS = "/status";
+    private static final String DIFF = "/diff";
+    private static final String MESSAGES = "$.messages[*]";
+    private static final String NOT_FOUND = "Resource not found";
+    private static final String VERSIONS = "versions";
     @Autowired private UniSaveRepository uniSaveRepository;
 
     @Autowired private MockMvc mockMvc;
@@ -60,36 +71,34 @@ class UniSaveControllerTest {
     @Test
     void canRetrieveEntriesWithoutContent() throws Exception {
         // given
-        String accession = "P12345";
         List<EntryInfoImpl> repositoryEntries =
-                asList(mockEntryInfo(accession, 2), mockEntryInfo(accession, 1));
-        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntryInfos(accession);
+                asList(mockEntryInfo(ACCESSION, 2), mockEntryInfo(ACCESSION, 1));
+        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntryInfos(ACCESSION);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession).header(ACCEPT, APPLICATION_JSON_VALUE));
+                        get(RESOURCE_BASE + ACCESSION).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[*].entryVersion", contains(2, 1)))
-                .andExpect(jsonPath("$.results[*].content").doesNotExist());
+                .andExpect(jsonPath(ENTRY_VERSION, contains(2, 1)))
+                .andExpect(jsonPath(RESULTS_CONTENT).doesNotExist());
     }
 
     @Test
     void canRetrieveEntriesWithContent() throws Exception {
         // given
-        String accession = "P12345";
         List<EntryImpl> repositoryEntries =
-                asList(mockEntry(accession, 2), mockEntry(accession, 1));
-        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntries(accession);
+                asList(mockEntry(ACCESSION, 2), mockEntry(ACCESSION, 1));
+        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntries(ACCESSION);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession)
+                        get(RESOURCE_BASE + ACCESSION)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("includeContent", "true"));
 
@@ -97,7 +106,7 @@ class UniSaveControllerTest {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[*].content", hasSize(2)))
+                .andExpect(jsonPath(RESULTS_CONTENT, hasSize(2)))
                 .andExpect(jsonPath("$.results[0].content").isNotEmpty())
                 .andExpect(jsonPath("$.results[1].content").isNotEmpty());
     }
@@ -105,59 +114,56 @@ class UniSaveControllerTest {
     @Test
     void canRetrieveSpecificVersionsOfEntriesWithoutContent() throws Exception {
         // given
-        String accession = "P12345";
-        when(uniSaveRepository.retrieveEntryInfo(accession, 1))
-                .thenReturn(mockEntryInfo(accession, 1));
+        when(uniSaveRepository.retrieveEntryInfo(ACCESSION, 1))
+                .thenReturn(mockEntryInfo(ACCESSION, 1));
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession)
+                        get(RESOURCE_BASE + ACCESSION)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("versions", "1"));
+                                .param(VERSIONS, "1"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[*].entryVersion", contains(1)))
-                .andExpect(jsonPath("$.results[*].content").doesNotExist());
+                .andExpect(jsonPath(ENTRY_VERSION, contains(1)))
+                .andExpect(jsonPath(RESULTS_CONTENT).doesNotExist());
     }
 
     @Test
     void canRetrieveSpecificVersionsOfEntriesWithContent() throws Exception {
         // given
-        String accession = "P12345";
-        when(uniSaveRepository.retrieveEntry(accession, 1)).thenReturn(mockEntry(accession, 1));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1));
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession)
+                        get(RESOURCE_BASE + ACCESSION)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("includeContent", "true")
-                                .param("versions", "1"));
+                                .param(VERSIONS, "1"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[*].entryVersion", contains(1)))
-                .andExpect(jsonPath("$.results[*].content").exists());
+                .andExpect(jsonPath(ENTRY_VERSION, contains(1)))
+                .andExpect(jsonPath(RESULTS_CONTENT).exists());
     }
 
     @Test
     void canDownloadEntries() throws Exception {
         // given
-        String accession = "P12345";
         List<EntryInfoImpl> repositoryEntries =
-                asList(mockEntryInfo(accession, 2), mockEntryInfo(accession, 1));
-        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntryInfos(accession);
+                asList(mockEntryInfo(ACCESSION, 2), mockEntryInfo(ACCESSION, 1));
+        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntryInfos(ACCESSION);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession)
+                        get(RESOURCE_BASE + ACCESSION)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("download", "true"));
 
@@ -171,40 +177,50 @@ class UniSaveControllerTest {
     @Test
     void nonExistentEntryCauses404() throws Exception {
         // given
-        String accession = "P12345";
         doThrow(ResourceNotFoundException.class)
                 .when(uniSaveRepository)
-                .retrieveEntryInfos(accession);
+                .retrieveEntryInfos(ACCESSION);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession).header(ACCEPT, APPLICATION_JSON_VALUE));
+                        get(RESOURCE_BASE + ACCESSION).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath("$.messages[*]", contains("Resource not found")));
+                .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
+    }
+
+    @Test
+    void invalidAccessionCausesBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + INVALID_ACCESSION_FORMAT)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
 
     @Test
     void versionsParameterWithWrongFormatCausesBadRequest() throws Exception {
-        // given
-        String accession = "P12345";
-
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession)
+                        get(RESOURCE_BASE + ACCESSION)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("versions", "XXXX"));
+                                .param(VERSIONS, "XXXX"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         jsonPath(
-                                "$.messages[*]",
+                                MESSAGES,
                                 contains(
                                         "Invalid request received. Comma separated version list must only contain non-zero integers, found: XXXX")));
     }
@@ -213,21 +229,20 @@ class UniSaveControllerTest {
     @Test
     void canGetDiffBetweenTwoVersions() throws Exception {
         // given
-        String accession = "P12345";
         DiffImpl diff = new DiffImpl();
-        diff.setAccession(accession);
+        diff.setAccession(ACCESSION);
         diff.setDiff("mock diff");
         int version1 = 1;
         int version2 = 2;
-        diff.setEntryOne(mockEntry(accession, version1));
-        diff.setEntryTwo(mockEntry(accession, version2));
+        diff.setEntryOne(mockEntry(ACCESSION, version1));
+        diff.setEntryTwo(mockEntry(ACCESSION, version2));
 
-        when(uniSaveRepository.getDiff(accession, version1, version2)).thenReturn(diff);
+        when(uniSaveRepository.getDiff(ACCESSION, version1, version2)).thenReturn(diff);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/diff")
+                        get(RESOURCE_BASE + ACCESSION + DIFF)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("version1", String.valueOf(version1))
                                 .param("version2", String.valueOf(version2)));
@@ -242,15 +257,30 @@ class UniSaveControllerTest {
     }
 
     @Test
+    void diffForInvalidAccessionCausesBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + INVALID_ACCESSION_FORMAT + DIFF)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("version1", "1")
+                                .param("version2", "2"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
+    }
+
+    @Test
     void diffForNonExistentEntryCauses404() throws Exception {
         // given
-        String accession = "P12345";
-        doThrow(ResourceNotFoundException.class).when(uniSaveRepository).getDiff(accession, 1, 2);
+        doThrow(ResourceNotFoundException.class).when(uniSaveRepository).getDiff(ACCESSION, 1, 2);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/diff")
+                        get(RESOURCE_BASE + ACCESSION + DIFF)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("version1", "1")
                                 .param("version2", "2"));
@@ -258,66 +288,57 @@ class UniSaveControllerTest {
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath("$.messages[*]", contains("Resource not found")));
+                .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
     }
 
     @Test
     void diffRequiresWithOnlyVersionOneCausesBadRequest() throws Exception {
-        // given
-        String accession = "P12345";
-
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/diff")
+                        get(RESOURCE_BASE + ACCESSION + DIFF)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("version1", "1"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        jsonPath("$.messages[*]", contains("'version2' is a required parameter")));
+                .andExpect(jsonPath(MESSAGES, contains("'version2' is a required parameter")));
     }
 
     @Test
     void diffRequiresWithOnlyVersionTwoCausesBadRequest() throws Exception {
-        // given
-        String accession = "P12345";
-
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/diff")
+                        get(RESOURCE_BASE + ACCESSION + DIFF)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("version2", "1"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        jsonPath("$.messages[*]", contains("'version1' is a required parameter")));
+                .andExpect(jsonPath(MESSAGES, contains("'version1' is a required parameter")));
     }
 
     // resource /{accession}/status
     @Test
     void canGetStatus() throws Exception {
         // given
-        String accession = "P12345";
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
-        status.setAccession(accession);
-        when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
+        status.setAccession(ACCESSION);
+        when(uniSaveRepository.retrieveEntryStatusInfo(ACCESSION)).thenReturn(status);
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/status")
+                        get(RESOURCE_BASE + ACCESSION + STATUS)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.accession", is(accession)));
+                .andExpect(jsonPath("$.accession", is(ACCESSION)));
     }
 
     @Test
@@ -330,13 +351,13 @@ class UniSaveControllerTest {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/status")
+                        get(RESOURCE_BASE + accession + STATUS)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                .andExpect(jsonPath("$.messages[*]", contains("Internal server error")));
+                .andExpect(jsonPath(MESSAGES, contains("Internal server error")));
     }
 
     @Test
@@ -350,13 +371,27 @@ class UniSaveControllerTest {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/unisave/" + accession + "/status")
+                        get(RESOURCE_BASE + accession + STATUS)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath("$.messages[*]", contains("Resource not found")));
+                .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
+    }
+
+    @Test
+    void getStatusForInvalidAccessionCausesBadRequest() throws Exception { // given
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + INVALID_ACCESSION_FORMAT + STATUS)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
 
     @Profile("unisave-controller-test")

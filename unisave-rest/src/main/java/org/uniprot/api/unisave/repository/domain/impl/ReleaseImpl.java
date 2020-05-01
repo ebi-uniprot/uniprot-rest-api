@@ -24,9 +24,9 @@ import java.util.Date;
 public class ReleaseImpl implements Release {
 
     public enum Query {
-        findReleaseByReleaseNumber,
-        findPastReleasesInOrder,
-        findAllRelease;
+        FIND_RELEASE_BY_RELEASE_NUMBER,
+        FIND_PAST_RELEASES_IN_ORDER,
+        FIND_ALL_RELEASES;
 
         public String query() {
             return ReleaseImpl.class.getSimpleName() + "." + name();

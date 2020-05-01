@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +19,14 @@ import org.uniprot.api.unisave.service.UniSaveService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.stream.Stream;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
 
 /**
  * Created 20/03/20
@@ -33,6 +36,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
 @RestController
 @RequestMapping("/unisave")
 @Slf4j
+@Validated
 public class UniSaveController {
     private final MessageConverterContextFactory<UniSaveEntry> converterContextFactory;
     private final UniSaveService service;
@@ -50,8 +54,7 @@ public class UniSaveController {
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
             @Valid UniSaveRequest.Entries uniSaveRequest, HttpServletRequest servletRequest) {
-
-        String acceptHeader = getHeader(servletRequest);
+        String acceptHeader = getAcceptHeader(servletRequest);
         setContentIfRequired(uniSaveRequest, acceptHeader);
         HttpHeaders httpHeaders =
                 addDownloadHeaderIfRequired(
@@ -73,7 +76,7 @@ public class UniSaveController {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
-                        UniProtMediaType.valueOf(getHeader(servletRequest)));
+                        UniProtMediaType.valueOf(getAcceptHeader(servletRequest)));
         context.setEntityOnly(true);
         context.setEntities(
                 Stream.of(
@@ -89,11 +92,16 @@ public class UniSaveController {
             value = "/{accession}/status",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
-            @PathVariable String accession, HttpServletRequest servletRequest) {
+            @PathVariable
+                    @Pattern(
+                            regexp = ACCESSION_PATTERN,
+                            message = "{search.invalid.accession.value}")
+                    String accession,
+            HttpServletRequest servletRequest) {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
-                        UniProtMediaType.valueOf(getHeader(servletRequest)));
+                        UniProtMediaType.valueOf(getAcceptHeader(servletRequest)));
         context.setEntityOnly(true);
         context.setEntities(Stream.of(service.getAccessionStatus(accession)));
 
@@ -109,7 +117,7 @@ public class UniSaveController {
         }
     }
 
-    private String getHeader(HttpServletRequest servletRequest) {
+    private String getAcceptHeader(HttpServletRequest servletRequest) {
         return servletRequest.getHeader(HttpHeaders.ACCEPT);
     }
 
