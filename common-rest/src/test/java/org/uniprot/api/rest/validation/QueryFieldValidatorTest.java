@@ -42,6 +42,16 @@ class QueryFieldValidatorTest {
     }
 
     @Test
+    void isValidSimpleLowerCaseAccessionQueryReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("accession:p21802-2", null);
+        assertTrue(result);
+    }
+
+    @Test
     void isValidSimpleWildcardQueryReturnTrue() {
         ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
