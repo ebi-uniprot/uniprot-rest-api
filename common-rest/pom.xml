@@ -7,6 +7,7 @@
 		<artifactId>uniprot-rest-api</artifactId>
 		<groupId>org.uniprot</groupId>
 		<version>1.0-covid-19-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
 
 	<artifactId>common-rest</artifactId>
@@ -59,6 +60,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

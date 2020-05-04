@@ -1,18 +1,17 @@
 package org.uniprot.api.rest.request;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.web.servlet.HandlerMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
-
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.web.servlet.HandlerMapping;
 
 /**
  * Created 10/12/19

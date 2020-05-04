@@ -1,14 +1,13 @@
 package org.uniprot.api.rest.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import com.google.common.collect.HashBiMap;
+import org.springframework.http.MediaType;
 
 import java.util.Collection;
 import java.util.Objects;
 
-import org.springframework.http.MediaType;
-
-import com.google.common.collect.HashBiMap;
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class UniProtMediaType {
     public static final String DEFAULT_MEDIA_TYPE_VALUE = APPLICATION_JSON_VALUE;
@@ -29,6 +28,8 @@ public class UniProtMediaType {
     public static final MediaType OBO_MEDIA_TYPE = valueOf(OBO_MEDIA_TYPE_VALUE);
     public static final String RDF_MEDIA_TYPE_VALUE = "application/rdf+xml";
     public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
+    public static final String UNKNOWN_MEDIA_TYPE_VALUE = "unknown" + "/unknown";
+    public static final MediaType UNKNOWN_MEDIA_TYPE = valueOf(UNKNOWN_MEDIA_TYPE_VALUE);
 
     public static final Collection<MediaType> ALL_TYPES =
             asList(
@@ -42,7 +43,6 @@ public class UniProtMediaType {
                     RDF_MEDIA_TYPE,
                     MediaType.APPLICATION_JSON,
                     MediaType.APPLICATION_XML);
-    public static final String UNKNOWN_MEDIA_TYPE_TYPE = "unknown";
 
     private static HashBiMap<MediaType, String> mediaTypeExtensionMap = HashBiMap.create();
 
@@ -71,9 +71,5 @@ public class UniProtMediaType {
             throw new IllegalArgumentException(
                     "Invalid extension or format supplied: " + extension);
         }
-    }
-
-    public static MediaType createUnknownMediaTypeForFileExtension(String extension) {
-        return new MediaType(UNKNOWN_MEDIA_TYPE_TYPE, extension);
     }
 }
