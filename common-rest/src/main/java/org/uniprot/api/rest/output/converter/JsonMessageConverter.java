@@ -34,10 +34,10 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
     private static final String COMMA = "\\s*,\\s*";
     private static final String PATH_PREFIX = "$..";
-    private final ObjectMapper objectMapper;
+    protected final ObjectMapper objectMapper;
 
     private ThreadLocal<List<ReturnField>> tlFilters = new ThreadLocal<>();
-    private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
+    protected ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
     private ThreadLocal<ObjectMapper> tlFilterMapper = new ThreadLocal<>();
 
     private SquigglyParser squigglyParser = new SquigglyParser();
