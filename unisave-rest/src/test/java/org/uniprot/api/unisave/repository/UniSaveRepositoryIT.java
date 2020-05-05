@@ -6,8 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
@@ -34,6 +36,7 @@ class UniSaveRepositoryIT {
     private static final AtomicInteger RELEASE_COUNTER = new AtomicInteger();
     @Autowired private UniSaveRepository repository;
     @Autowired private TestEntityManager testEntityManager;
+    @MockBean private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @BeforeEach
     void setUpCurrentRelease() {
