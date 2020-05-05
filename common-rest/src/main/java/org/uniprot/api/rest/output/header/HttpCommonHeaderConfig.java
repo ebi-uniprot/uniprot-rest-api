@@ -1,20 +1,23 @@
 package org.uniprot.api.rest.output.header;
 
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
-
-import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
+import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
-import org.uniprot.api.rest.request.MutableHttpServletRequest;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
@@ -24,8 +27,16 @@ import org.uniprot.api.rest.request.MutableHttpServletRequest;
  * @author Edd
  */
 @Configuration
+@Import({ServiceInfoConfig.class})
 public class HttpCommonHeaderConfig {
+    public static final String X_RELEASE = "X-Release";
     static final String ALLOW_ALL_ORIGINS = "*";
+    private final ServiceInfoConfig.ServiceInfo serviceInfo;
+
+    @Autowired
+    public HttpCommonHeaderConfig(ServiceInfoConfig.ServiceInfo serviceInfo) {
+        this.serviceInfo = serviceInfo;
+    }
 
     /**
      * Defines a simple request filter that adds an Access-Control-Allow-Origin header with the
@@ -37,18 +48,22 @@ public class HttpCommonHeaderConfig {
      *
      * @return
      */
-    @Bean
-    public OncePerRequestFilter originsFilter() {
+    @Bean("oncePerRequestFilter")
+    public OncePerRequestFilter oncePerRequestFilter(
+            RequestMappingHandlerMapping requestMappingHandlerMapping) {
         return new OncePerRequestFilter() {
             @Override
             protected void doFilterInternal(
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
                 MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-                HttpServletRequestContentTypeMutator.mutate(mutableRequest);
+                HttpServletRequestContentTypeMutator.mutate(
+                        mutableRequest, requestMappingHandlerMapping);
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
-                response.addHeader(ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords");
+                response.addHeader(
+                        ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords, " + X_RELEASE);
+                response.addHeader(X_RELEASE, serviceInfo.getRelease());
 
                 chain.doFilter(mutableRequest, response);
             }

@@ -81,6 +81,19 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         return ((HttpServletRequest) getRequest()).getHeader(name);
     }
 
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        // check the custom headers first
+        String headerValue = customHeaders.get(name);
+
+        if (!Objects.isNull(headerValue)) {
+            return Collections.enumeration(Collections.singletonList(headerValue));
+        }
+
+        // else return from into the original wrapped object
+        return ((HttpServletRequest) getRequest()).getHeaders(name);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public Enumeration<String> getHeaderNames() {

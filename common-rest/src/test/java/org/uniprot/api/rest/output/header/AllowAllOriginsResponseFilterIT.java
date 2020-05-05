@@ -6,13 +6,15 @@ import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.app.FakeRESTApp.RESOURCE_1_URL;
+import static org.uniprot.api.rest.app.FakeController.FAKE_RESOURCE_1_URL;
+import static org.uniprot.api.rest.app.FakeController.FAKE_RESOURCE_BASE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.ALLOW_ALL_ORIGINS;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,7 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.uniprot.api.rest.output.app.FakeRESTApp;
+import org.uniprot.api.rest.app.FakeRESTApp;
 
 /**
  * Check that a REST app that picks up an {@link HttpCommonHeaderConfig} will show explicitly the
@@ -33,14 +35,17 @@ import org.uniprot.api.rest.output.app.FakeRESTApp;
  *
  * @author Edd
  */
-@ActiveProfiles("allow-origins-integration-test")
+@ActiveProfiles("use-fake-app")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {FakeRESTApp.class})
 @WebAppConfiguration
 class AllowAllOriginsResponseFilterIT {
     @Autowired private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
-    @Autowired private OncePerRequestFilter originsFilter;
+
+    @Qualifier("oncePerRequestFilter")
+    @Autowired
+    private OncePerRequestFilter originsFilter;
 
     @BeforeEach
     void setUp() {
@@ -53,7 +58,7 @@ class AllowAllOriginsResponseFilterIT {
     @Test
     void requestWithoutAnOriginHasResponseWithAllOriginsHeader() throws Exception {
         MvcResult result =
-                mockMvc.perform(get(RESOURCE_1_URL))
+                mockMvc.perform(get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL))
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andReturn();
@@ -67,13 +72,28 @@ class AllowAllOriginsResponseFilterIT {
         String origin = "http://www.ebi.ac.uk";
 
         MvcResult result =
-                mockMvc.perform(get(RESOURCE_1_URL).headers(originHeader(origin)))
+                mockMvc.perform(
+                                get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL)
+                                        .headers(originHeader(origin)))
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andReturn();
 
         assertThat(
                 result.getResponse().getHeader(ACCESS_CONTROL_ALLOW_ORIGIN), is(ALLOW_ALL_ORIGINS));
+    }
+
+    @Test
+    void requestHasXReleaseHeader() throws Exception {
+        MvcResult result =
+                mockMvc.perform(get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL))
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andReturn();
+
+        assertThat(
+                result.getResponse().getHeader(HttpCommonHeaderConfig.X_RELEASE),
+                is("2020_02 stub release file"));
     }
 
     private HttpHeaders originHeader(String origin) {
