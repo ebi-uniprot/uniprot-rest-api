@@ -30,7 +30,6 @@ import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.
  *
  * @author Edd
  */
-@Disabled
 class HttpServletRequestContentTypeMutatorTest {
 
     private RequestMappingHandlerMapping handlerMapping;
