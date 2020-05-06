@@ -216,10 +216,7 @@ public class ResponseExceptionHandler {
 
                 addDebugError(request, ex, messages);
 
-                ErrorInfo errorInfo = new ErrorInfo(request.getRequestURL().toString(), messages);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(errorInfo);
+                return getBadRequestResponseEntity(request, messages);
             }
         }
         throw ex;
