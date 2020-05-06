@@ -1,17 +1,17 @@
 package org.uniprot.api.unisave.output.converter;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
-
-import java.io.IOException;
-import java.io.OutputStream;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
 
 /**
  * Created 15/04/20

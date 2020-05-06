@@ -1,10 +1,11 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
+import javax.persistence.*;
+
 import lombok.Data;
+
 import org.uniprot.api.unisave.repository.domain.AccessionEvent;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-
-import javax.persistence.*;
 
 /** Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 */
 @Entity(name = "IdentifierStatus")

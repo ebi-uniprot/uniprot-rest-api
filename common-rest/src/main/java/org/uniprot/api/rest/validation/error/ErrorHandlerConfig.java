@@ -1,13 +1,13 @@
 package org.uniprot.api.rest.validation.error;
 
+import javax.validation.Validator;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-import javax.validation.Validator;
 
 /**
  * This class is responsible to configure MessageSource (message.properties), it also make sure that

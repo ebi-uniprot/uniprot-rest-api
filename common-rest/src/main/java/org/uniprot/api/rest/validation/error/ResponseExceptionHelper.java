@@ -1,14 +1,15 @@
 package org.uniprot.api.rest.validation.error;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.owasp.encoder.Encode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * Created 20/04/2020

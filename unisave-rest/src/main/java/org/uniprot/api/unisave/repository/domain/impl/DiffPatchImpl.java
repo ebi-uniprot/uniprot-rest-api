@@ -1,10 +1,11 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import com.google.common.base.Strings;
-import org.uniprot.api.unisave.repository.domain.DiffPatch;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import org.uniprot.api.unisave.repository.domain.DiffPatch;
+
+import com.google.common.base.Strings;
 
 public class DiffPatchImpl implements DiffPatch {
     private final diff_match_patch diffService = new diff_match_patch();

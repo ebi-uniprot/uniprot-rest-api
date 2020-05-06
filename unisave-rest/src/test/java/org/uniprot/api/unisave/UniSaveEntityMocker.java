@@ -1,13 +1,13 @@
 package org.uniprot.api.unisave;
 
-import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
-import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-import org.uniprot.api.unisave.repository.domain.impl.*;
-
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+import org.uniprot.api.unisave.repository.domain.impl.*;
 
 /**
  * Created 08/04/20
