@@ -16,6 +16,7 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.method.HandlerMethod;
@@ -30,6 +31,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
  *
  * @author Edd
  */
+@Disabled
 class HttpServletRequestContentTypeMutatorTest {
 
     private RequestMappingHandlerMapping handlerMapping;
