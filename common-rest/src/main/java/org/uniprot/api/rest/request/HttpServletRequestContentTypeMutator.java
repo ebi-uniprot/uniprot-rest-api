@@ -1,24 +1,26 @@
 package org.uniprot.api.rest.request;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.MimeType;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.uniprot.api.rest.output.UniProtMediaType;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE_VALUE;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.MimeType;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.rest.output.UniProtMediaType;
 
 /**
  * A helper class that mutates an {@link HttpServletRequest} based on its values, and if necessary
