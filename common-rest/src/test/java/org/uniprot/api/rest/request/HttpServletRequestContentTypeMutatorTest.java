@@ -33,11 +33,12 @@ import org.uniprot.api.rest.output.UniProtMediaType;
  */
 @Disabled
 class HttpServletRequestContentTypeMutatorTest {
-
+    private HttpServletRequestContentTypeMutator requestContentTypeMutator;
     private RequestMappingHandlerMapping handlerMapping;
 
     @BeforeEach
     void setUp() {
+        requestContentTypeMutator = new HttpServletRequestContentTypeMutator();
         PatternsRequestCondition patterns = mock(PatternsRequestCondition.class);
         when(patterns.getPatterns())
                 .thenReturn(new HashSet<>(Collections.singletonList("/a/b/{d}")));
@@ -68,7 +69,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getHeader(ACCEPT)).thenReturn(mediaType.toString());
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
         assertThat(mutableRequest.getHeader(ACCEPT), is(mediaType.toString()));
     }
 
@@ -80,7 +81,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getRequestURI()).thenReturn(uri);
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(FASTA_MEDIA_TYPE_VALUE));
     }
@@ -94,7 +95,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getParameter(FORMAT)).thenReturn("fasta");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(FASTA_MEDIA_TYPE_VALUE));
     }
@@ -108,7 +109,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getParameter(FORMAT)).thenReturn("obo");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(UNKNOWN_MEDIA_TYPE_VALUE));
         verify(httpRequest)
@@ -126,7 +127,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getParameter(FORMAT)).thenReturn("WRONG");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(UNKNOWN_MEDIA_TYPE_VALUE));
         verify(httpRequest)
@@ -144,7 +145,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getHeader(ACCEPT)).thenReturn(UniProtMediaType.OBO_MEDIA_TYPE.toString());
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         String header = mutableRequest.getHeader(ACCEPT);
         assertThat(header, is(UNKNOWN_MEDIA_TYPE_VALUE));
@@ -162,7 +163,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getRequestURI()).thenReturn(uri);
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(APPLICATION_JSON_VALUE));
     }
@@ -180,7 +181,7 @@ class HttpServletRequestContentTypeMutatorTest {
 
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(APPLICATION_JSON_VALUE));
     }
@@ -195,7 +196,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getRequestURI()).thenReturn(uri);
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        HttpServletRequestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(APPLICATION_JSON_VALUE));
         verify(httpRequest, times(0)).setAttribute(anyString(), anyString());
@@ -203,35 +204,25 @@ class HttpServletRequestContentTypeMutatorTest {
 
     @Test
     void correctPathIsFoundForRequest() {
-        List<String> paths = HttpServletRequestContentTypeMutator.RESOURCE_PATH_2_MEDIA_TYPES_KEYS;
+        List<String> paths = requestContentTypeMutator.resourcePath2MediaTypesKeys;
         paths.add("/w/x/{id}");
         paths.add("/w/{id}/y");
         paths.add("/w/x/y");
         paths.add("/w/y/d");
         HttpServletRequestContentTypeMutator.orderKeysSoPathVariablesLast(paths);
 
-        assertThat(
-                HttpServletRequestContentTypeMutator.getMatchingPathPattern("/w/x/y"),
-                is("/w/x/y"));
+        assertThat(requestContentTypeMutator.getMatchingPathPattern("/w/x/y"), is("/w/x/y"));
+
+        assertThat(requestContentTypeMutator.getMatchingPathPattern("/w/x/y2"), is("/w/x/{id}"));
+
+        assertThat(requestContentTypeMutator.getMatchingPathPattern("/w/x/y.txt"), is("/w/x/{id}"));
+
+        assertThat(requestContentTypeMutator.getMatchingPathPattern("/X"), is(nullValue()));
+
+        assertThat(requestContentTypeMutator.getMatchingPathPattern("/w/y/d"), is("/w/y/d"));
 
         assertThat(
-                HttpServletRequestContentTypeMutator.getMatchingPathPattern("/w/x/y2"),
-                is("/w/x/{id}"));
-
-        assertThat(
-                HttpServletRequestContentTypeMutator.getMatchingPathPattern("/w/x/y.txt"),
-                is("/w/x/{id}"));
-
-        assertThat(
-                HttpServletRequestContentTypeMutator.getMatchingPathPattern("/X"), is(nullValue()));
-
-        assertThat(
-                HttpServletRequestContentTypeMutator.getMatchingPathPattern("/w/y/d"),
-                is("/w/y/d"));
-
-        assertThat(
-                HttpServletRequestContentTypeMutator.getMatchingPathPattern(
-                        "/w/anything.txt-thing;hello/y"),
+                requestContentTypeMutator.getMatchingPathPattern("/w/anything.txt-thing;hello/y"),
                 is("/w/{id}/y"));
     }
 

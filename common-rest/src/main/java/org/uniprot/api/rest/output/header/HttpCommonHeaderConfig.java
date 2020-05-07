@@ -33,10 +33,12 @@ public class HttpCommonHeaderConfig {
     public static final String X_RELEASE = "X-Release";
     static final String ALLOW_ALL_ORIGINS = "*";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
+    private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
     @Autowired
     public HttpCommonHeaderConfig(ServiceInfoConfig.ServiceInfo serviceInfo) {
         this.serviceInfo = serviceInfo;
+        this.requestContentTypeMutator = new HttpServletRequestContentTypeMutator();
     }
 
     /**
@@ -58,8 +60,7 @@ public class HttpCommonHeaderConfig {
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
                 MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-                HttpServletRequestContentTypeMutator.mutate(
-                        mutableRequest, requestMappingHandlerMapping);
+                requestContentTypeMutator.mutate(mutableRequest, requestMappingHandlerMapping);
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(
