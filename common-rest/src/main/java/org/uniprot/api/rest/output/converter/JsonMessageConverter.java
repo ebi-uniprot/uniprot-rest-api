@@ -63,6 +63,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             FilterProvider filterProvider = getFieldsFilterProvider(fieldList);
             filterMapper.setFilterProvider(filterProvider);
             tlFilterMapper.set(filterMapper);
+            setEntitySeparator(",");
         }
 
         JsonGenerator generator =
@@ -121,6 +122,13 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         } else {
             generator.writeObject(entity);
         }
+    }
+
+    @Override
+    protected void writeEntitySeparator(OutputStream outputStream, String entitySeparator)
+            throws IOException {
+        JsonGenerator generator = tlJsonGenerator.get();
+        generator.writeRaw(entitySeparator);
     }
 
     @Override
