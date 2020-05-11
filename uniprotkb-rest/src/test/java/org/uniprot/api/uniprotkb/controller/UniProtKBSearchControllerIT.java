@@ -58,7 +58,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.comment.CommentType;
 import org.uniprot.core.uniprotkb.feature.FeatureCategory;
-import org.uniprot.core.uniprotkb.feature.FeatureType;
+import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
@@ -697,7 +697,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         "xref_count_" + db.getName().toLowerCase(), 0L);
                             });
 
-            Arrays.stream(FeatureType.values())
+            Arrays.stream(UniprotKBFeatureType.values())
                     .forEach(
                             type -> {
                                 String typeName = type.getName().toLowerCase();
