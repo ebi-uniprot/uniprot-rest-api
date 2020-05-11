@@ -19,12 +19,14 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     private final Map<String, String> customHeaders;
     private String uri;
     private StringBuffer url;
+    private String servletPath;
 
     public MutableHttpServletRequest(HttpServletRequest request) {
         super(request);
         this.customHeaders = new HashMap<>();
         this.uri = request.getRequestURI();
         this.url = request.getRequestURL();
+        this.servletPath = request.getServletPath();
     }
 
     @SuppressWarnings("unchecked")
@@ -45,6 +47,15 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         } else {
             super.setAttribute(name, value);
         }
+    }
+
+    @Override
+    public String getServletPath() {
+        return servletPath;
+    }
+
+    public void setServletPath(String servletPath) {
+        this.servletPath = servletPath;
     }
 
     @Override

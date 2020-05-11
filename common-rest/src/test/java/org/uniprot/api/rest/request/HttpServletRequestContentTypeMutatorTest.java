@@ -60,28 +60,41 @@ class HttpServletRequestContentTypeMutatorTest {
     @Test
     void requestWithAcceptedMediaTypeHeader_retainsMediaType() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        String host = "http://localhost";
         String uri = "/a/b/ENTITY";
-        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(host + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         MediaType mediaType = UniProtMediaType.FF_MEDIA_TYPE;
         when(httpRequest.getHeader(ACCEPT)).thenReturn(mediaType.toString());
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
         requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
         assertThat(mutableRequest.getHeader(ACCEPT), is(mediaType.toString()));
+        assertThat(mutableRequest.getRequestURL().toString(), is(host + uri));
+        assertThat(mutableRequest.getRequestURI(), is(uri));
+        assertThat(mutableRequest.getServletPath(), is(uri));
     }
 
     @Test
     void requestWithAcceptedExtension_setsMediaType() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        String uri = "/a/b/ENTITY.fasta";
-        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
+        String entityPath = "/a/b/ENTITY";
+        String uri = entityPath + ".fasta";
+        String host = "http://localhost";
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(host + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
         requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(FASTA_MEDIA_TYPE_VALUE));
+        assertThat(mutableRequest.getRequestURL().toString(), is(host + entityPath));
+        assertThat(mutableRequest.getRequestURI(), is(entityPath));
+        assertThat(mutableRequest.getServletPath(), is(entityPath));
     }
 
     @Test
@@ -90,6 +103,8 @@ class HttpServletRequestContentTypeMutatorTest {
         String uri = "/a/b/ENTITY";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         when(httpRequest.getParameter(FORMAT)).thenReturn("fasta");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
@@ -104,6 +119,8 @@ class HttpServletRequestContentTypeMutatorTest {
         String uri = "/a/b/ENTITY";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         when(httpRequest.getParameter(FORMAT)).thenReturn("obo");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
@@ -122,6 +139,8 @@ class HttpServletRequestContentTypeMutatorTest {
         String uri = "/a/b/ENTITY";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         when(httpRequest.getParameter(FORMAT)).thenReturn("WRONG");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
@@ -140,6 +159,8 @@ class HttpServletRequestContentTypeMutatorTest {
         String uri = "/a/b/ENTITY";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         when(httpRequest.getHeader(ACCEPT)).thenReturn(UniProtMediaType.OBO_MEDIA_TYPE.toString());
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
@@ -159,6 +180,8 @@ class HttpServletRequestContentTypeMutatorTest {
         String uri = "/a/b/ENTITY";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
         requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
@@ -172,6 +195,8 @@ class HttpServletRequestContentTypeMutatorTest {
         String uri = "/a/b/ENTITY";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         when(httpRequest.getHeader(ACCEPT)).thenReturn("anything/at-all");
         when(httpRequest.getHeader(USER_AGENT))
                 .thenReturn(
@@ -192,6 +217,8 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getHeader(ACCEPT)).thenReturn(APPLICATION_JSON_VALUE);
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
         requestContentTypeMutator.mutate(mutableRequest, handlerMapping);

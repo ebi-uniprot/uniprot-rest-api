@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.request;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.parseMediaType;
+import static org.springframework.http.MediaType.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE_VALUE;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
@@ -21,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.core.util.Utils;
 
 /**
  * A helper class that mutates an {@link HttpServletRequest} based on its values, and if necessary
@@ -82,7 +82,9 @@ public class HttpServletRequestContentTypeMutator {
                 String requestedAcceptHeader = request.getHeader(HttpHeaders.ACCEPT);
                 String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
                 // for empty accept headers, or browsers, use JSON
-                if (nullOrEmpty(requestedAcceptHeader) || isBrowserAsFarAsWeKnow(userAgent)) {
+                if (nullOrEmpty(requestedAcceptHeader)
+                        || requestAllowsAnyMediaType(requestedAcceptHeader)
+                        || isBrowserAsFarAsWeKnow(userAgent)) {
                     request.addHeader(HttpHeaders.ACCEPT, APPLICATION_JSON_VALUE);
                 } else {
                     if (!validMediaTypes.contains(parseMediaType(requestedAcceptHeader))) {
@@ -179,10 +181,21 @@ public class HttpServletRequestContentTypeMutator {
             if (isEntryResource) {
                 setURI(request, extensionUsed);
                 setURL(request, extensionUsed);
+                setServletPath(request, extensionUsed);
             }
 
         } else {
             handleMediaTypeNotAcceptable(request, validMediaTypesForPath, extensionUsed);
+        }
+    }
+
+    private static void setServletPath(MutableHttpServletRequest request, String extension) {
+        if (Utils.notNullNotEmpty(request.getServletPath())) {
+            request.setServletPath(
+                    request.getServletPath()
+                            .substring(
+                                    0,
+                                    request.getServletPath().length() - (extension.length() + 1)));
         }
     }
 
@@ -238,13 +251,19 @@ public class HttpServletRequestContentTypeMutator {
     }
 
     private static void setURI(MutableHttpServletRequest request, String extension) {
-        request.setRequestURI(
+        String uri =
                 request.getRequestURI()
-                        .substring(0, request.getRequestURI().length() - (extension.length() + 1)));
+                        .substring(0, request.getRequestURI().length() - (extension.length() + 1));
+        request.setRequestURI(uri);
+    }
+
+    private boolean requestAllowsAnyMediaType(String requestedAcceptHeader) {
+        return requestedAcceptHeader.equals(ALL_VALUE);
     }
 
     private Collection<MediaType> getValidMediaTypesForPath(MutableHttpServletRequest request) {
-        String matchingPath = getMatchingPathPattern(request.getRequestURI());
+        String actualPath = request.getRequestURI().substring(request.getContextPath().length());
+        String matchingPath = getMatchingPathPattern(actualPath);
         return resourcePath2MediaTypes.getOrDefault(matchingPath, Collections.emptySet());
     }
 
