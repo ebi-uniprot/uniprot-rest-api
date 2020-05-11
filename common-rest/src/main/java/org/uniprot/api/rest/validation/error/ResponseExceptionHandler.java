@@ -1,17 +1,19 @@
 package org.uniprot.api.rest.validation.error;
 
 import static java.util.Collections.singletonList;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +34,7 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -190,76 +194,32 @@ public class ResponseExceptionHandler {
         return getBadRequestResponseEntity(request, messages);
     }
 
-    /**
-     * If there is debugError in the request, this method also print exception causes to help in the
-     * debug error
-     *
-     * @param request Request Object.
-     * @param exception the exception that was captured.
-     * @param error List of existing message.
-     */
-    private static void addDebugError(
-            HttpServletRequest request, Throwable exception, List<String> error) {
-        if (request.getParameter("debugError") != null
-                && request.getParameter("debugError").equalsIgnoreCase("true")) {
+    @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})
+    public ResponseEntity<ErrorInfo> handleHttpMediaTypeNotAcceptableException(
+            HttpMediaTypeNotAcceptableException ex, HttpServletRequest request)
+            throws HttpMediaTypeNotAcceptableException {
+        if (Utils.notNull(request) && request instanceof MutableHttpServletRequest) {
+            MutableHttpServletRequest mutableRequest = (MutableHttpServletRequest) request;
+            MediaType contentType = getContentTypeFromRequest(request);
+            if (contentType.equals(UNKNOWN_MEDIA_TYPE)) {
+                mutableRequest.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
+                String errorMessage = (String) mutableRequest.getAttribute(ERROR_MESSAGE_ATTRIBUTE);
 
-            Throwable cause = exception.getCause();
-            while (cause != null) {
-                if (cause.getMessage() != null && !cause.getMessage().isEmpty()) {
-                    error.add("Caused by: " + cause.getMessage());
+                if (nullOrEmpty(errorMessage)) {
+                    errorMessage = "Media type not acceptable";
                 }
-                cause = cause.getCause();
+                List<String> messages =
+                        singletonList(
+                                messageSource.getMessage(
+                                        INVALID_REQUEST,
+                                        new Object[] {errorMessage},
+                                        Locale.getDefault()));
+
+                addDebugError(request, ex, messages);
+
+                return getBadRequestResponseEntity(request, messages);
             }
         }
-    }
-
-    private MediaType getContentTypeFromRequest(HttpServletRequest request) {
-        MediaType result = MediaType.APPLICATION_JSON;
-        String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        if (Utils.notNullNotEmpty(acceptHeader)) {
-            result = MediaType.valueOf(acceptHeader);
-        }
-        return result;
-    }
-
-    private ResponseEntity<ErrorInfo> getBadRequestResponseEntity(
-            HttpServletRequest request, List<String> messages) {
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .contentType(getContentTypeFromRequest(request))
-                .body(error);
-    }
-
-    /**
-     * Error response entity that provide error message details
-     *
-     * @author lgonzales
-     */
-    @XmlRootElement
-    public static class ErrorInfo {
-        private final String url;
-        private final List<String> messages;
-
-        private ErrorInfo() {
-            this("", Collections.emptyList());
-        }
-
-        public ErrorInfo(String url, List<String> messages) {
-            assert url != null : "Error URL cannot be null";
-            assert messages != null : "Error messages cannot be null";
-
-            this.url = url;
-            this.messages = messages;
-        }
-
-        @XmlElement
-        public String getUrl() {
-            return url;
-        }
-
-        @XmlElement
-        public List<String> getMessages() {
-            return messages;
-        }
+        throw ex;
     }
 }

@@ -34,10 +34,10 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
     private static final String COMMA = "\\s*,\\s*";
     private static final String PATH_PREFIX = "$..";
-    private final ObjectMapper objectMapper;
+    protected final ObjectMapper objectMapper;
 
     private ThreadLocal<List<ReturnField>> tlFilters = new ThreadLocal<>();
-    private ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
+    protected ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
     private ThreadLocal<ObjectMapper> tlFilterMapper = new ThreadLocal<>();
 
     private SquigglyParser squigglyParser = new SquigglyParser();
@@ -63,6 +63,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             FilterProvider filterProvider = getFieldsFilterProvider(fieldList);
             filterMapper.setFilterProvider(filterProvider);
             tlFilterMapper.set(filterMapper);
+            setEntitySeparator(",");
         }
 
         JsonGenerator generator =
@@ -121,6 +122,13 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         } else {
             generator.writeObject(entity);
         }
+    }
+
+    @Override
+    protected void writeEntitySeparator(OutputStream outputStream, String entitySeparator)
+            throws IOException {
+        JsonGenerator generator = tlJsonGenerator.get();
+        generator.writeRaw(entitySeparator);
     }
 
     @Override

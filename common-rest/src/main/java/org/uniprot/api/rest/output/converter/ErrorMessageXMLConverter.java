@@ -14,11 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.uniprot.api.rest.validation.error.ResponseExceptionHandler;
+import org.uniprot.api.rest.validation.error.ErrorInfo;
 
 /** @author lgonzales */
-public class ErrorMessageXMLConverter
-        extends AbstractGenericHttpMessageConverter<ResponseExceptionHandler.ErrorInfo> {
+public class ErrorMessageXMLConverter extends AbstractGenericHttpMessageConverter<ErrorInfo> {
 
     private final Marshaller marshaller;
 
@@ -28,25 +27,20 @@ public class ErrorMessageXMLConverter
     }
 
     @Override
-    public ResponseExceptionHandler.ErrorInfo read(
-            Type type, Class<?> aClass, HttpInputMessage httpInputMessage)
+    public ErrorInfo read(Type type, Class<?> aClass, HttpInputMessage httpInputMessage)
             throws HttpMessageNotReadableException {
         return null;
     }
 
     @Override
-    protected ResponseExceptionHandler.ErrorInfo readInternal(
-            Class<? extends ResponseExceptionHandler.ErrorInfo> aClass,
-            HttpInputMessage httpInputMessage)
+    protected ErrorInfo readInternal(
+            Class<? extends ErrorInfo> aClass, HttpInputMessage httpInputMessage)
             throws HttpMessageNotReadableException {
         return null;
     }
 
     @Override
-    protected void writeInternal(
-            ResponseExceptionHandler.ErrorInfo entity,
-            Type type,
-            HttpOutputMessage httpOutputMessage)
+    protected void writeInternal(ErrorInfo entity, Type type, HttpOutputMessage httpOutputMessage)
             throws IOException, HttpMessageNotWritableException {
         try {
             OutputStream outputStream = httpOutputMessage.getBody();
@@ -58,8 +52,7 @@ public class ErrorMessageXMLConverter
 
     private Marshaller createMarshaller() {
         try {
-            JAXBContext jaxbContext =
-                    JAXBContext.newInstance(ResponseExceptionHandler.ErrorInfo.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(ErrorInfo.class);
             Marshaller contextMarshaller = jaxbContext.createMarshaller();
             contextMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             contextMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);

@@ -44,6 +44,7 @@ public class MessageConverterContextFactory<T> {
         UNIPROT,
         UNIPROT_PUBLICATION,
         UNIREF,
+        UNISAVE,
         UNIPARC,
         PROTEOME,
         TAXONOMY,

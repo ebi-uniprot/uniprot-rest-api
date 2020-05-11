@@ -138,7 +138,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
 
     protected abstract void writeEntity(T entity, OutputStream outputStream) throws IOException;
 
-    private void writeEntities(
+    protected void writeEntities(
             Stream<T> entityCollection,
             OutputStream outputStream,
             Instant start,
@@ -155,7 +155,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
                             if (firstIteration.get()) {
                                 firstIteration.set(false);
                             } else {
-                                outputStream.write(entitySeparator.getBytes());
+                                writeEntitySeparator(outputStream, entitySeparator);
                             }
                         }
 
@@ -164,6 +164,11 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
                         throw new StopStreamException("Could not write entry: " + entity, e);
                     }
                 });
+    }
+
+    protected void writeEntitySeparator(OutputStream outputStream, String separator)
+            throws IOException {
+        outputStream.write(separator.getBytes());
     }
 
     private void logWhenNecessary(Instant start, int currentCount) {

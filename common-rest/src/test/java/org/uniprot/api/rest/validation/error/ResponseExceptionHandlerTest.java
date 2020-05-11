@@ -48,7 +48,7 @@ class ResponseExceptionHandlerTest {
         NullPointerException causedBy = new NullPointerException("Null Pointer");
         Throwable error = new Throwable("Throwable error message", causedBy);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+        ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.handleInternalServerError(error, request);
 
         // then
@@ -62,7 +62,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getBody());
-        ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
+        ErrorInfo errorMessage = responseEntity.getBody();
 
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
@@ -84,7 +84,7 @@ class ResponseExceptionHandlerTest {
         error.addError(new FieldError("objectName2", "field2", "Error With field 2"));
         error.addError(new FieldError("objectName3", "field3", "Error With field 3"));
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+        ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.handleBindExceptionBadRequest(error, request);
 
         // then
@@ -97,7 +97,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
 
         assertNotNull(responseEntity.getBody());
-        ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
+        ErrorInfo errorMessage = responseEntity.getBody();
 
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
@@ -119,7 +119,7 @@ class ResponseExceptionHandlerTest {
         MissingServletRequestParameterException error =
                 new MissingServletRequestParameterException(param, "paramType");
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+        ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.handleMissingServletRequestParameter(error, request);
 
         // then
@@ -132,7 +132,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
 
         assertNotNull(responseEntity.getBody());
-        ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
+        ErrorInfo errorMessage = responseEntity.getBody();
 
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
@@ -150,7 +150,7 @@ class ResponseExceptionHandlerTest {
         String message = "message describing error";
         InvalidRequestException error = new InvalidRequestException(message, null);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+        ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.handleInvalidRequestExceptionBadRequest(error, request);
 
         // then
@@ -163,7 +163,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
 
         assertNotNull(responseEntity.getBody());
-        ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
+        ErrorInfo errorMessage = responseEntity.getBody();
 
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
@@ -197,7 +197,7 @@ class ResponseExceptionHandlerTest {
                         null));
         ConstraintViolationException error = new ConstraintViolationException(constraintViolations);
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+        ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.constraintViolationException(error, request);
 
         // then
@@ -210,7 +210,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(MediaType.APPLICATION_XML, responseEntity.getHeaders().getContentType());
 
         assertNotNull(responseEntity.getBody());
-        ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
+        ErrorInfo errorMessage = responseEntity.getBody();
 
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
@@ -229,7 +229,7 @@ class ResponseExceptionHandlerTest {
                 .thenReturn(MediaType.APPLICATION_XML_VALUE);
         ResourceNotFoundException error = new ResourceNotFoundException("Error Message");
 
-        ResponseEntity<ResponseExceptionHandler.ErrorInfo> responseEntity =
+        ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.noHandlerFoundException(error, request);
 
         // then
@@ -243,7 +243,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getBody());
-        ResponseExceptionHandler.ErrorInfo errorMessage = responseEntity.getBody();
+        ErrorInfo errorMessage = responseEntity.getBody();
 
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 

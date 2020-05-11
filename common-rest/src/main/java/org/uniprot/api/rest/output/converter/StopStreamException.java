@@ -10,10 +10,10 @@ import java.util.stream.Stream;
  *
  * @author Edd
  */
-class StopStreamException extends RuntimeException {
+public class StopStreamException extends RuntimeException {
     private static final long serialVersionUID = 457330583994736749L;
 
-    StopStreamException(String message, Throwable cause) {
+    public StopStreamException(String message, Throwable cause) {
         super(message, cause);
     }
 }
