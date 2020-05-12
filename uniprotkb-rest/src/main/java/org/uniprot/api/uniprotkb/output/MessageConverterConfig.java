@@ -15,10 +15,10 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.output.converter.*;
-import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -68,11 +68,17 @@ public class MessageConverterConfig {
     public WebMvcConfigurer extendedMessageConverters() {
         ReturnFieldConfig returnConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        JsonMessageConverter<UniProtKBEntry> jsonMessageConverter =
+        JsonMessageConverter<UniProtKBEntry> uniProtKBJsonMessageConverter =
                 new JsonMessageConverter<>(
                         UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                         UniProtKBEntry.class,
                         returnConfig);
+        JsonMessageConverter<InteractionEntry> interactionJsonMessageConverter =
+                new JsonMessageConverter<>(
+                        UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
+                        InteractionEntry.class,
+                        returnConfig);
+
 
         return new WebMvcConfigurer() {
             @Override
@@ -95,8 +101,9 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(0, new UniProtKBXmlMessageConverter());
-                converters.add(1, jsonMessageConverter);
+                converters.add(1, uniProtKBJsonMessageConverter);
                 converters.add(2, new PublicationJsonMessageConverter());
+                converters.add(3, interactionJsonMessageConverter);
             }
         };
     }
@@ -129,7 +136,7 @@ public class MessageConverterConfig {
 
         MessageConverterContext<PublicationEntry> jsonContext =
                 MessageConverterContext.<PublicationEntry>builder()
-                        .resource(MessageConverterContextFactory.Resource.UNIPROT_PUBLICATION)
+                        .resource(MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION)
                         .contentType(APPLICATION_JSON)
                         .build();
         contextFactory.addMessageConverterContext(jsonContext);
@@ -143,19 +150,23 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<InteractionEntry> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        MessageConverterContext<InteractionEntry> jsonContext =
+        contextFactory.addMessageConverterContext(
                 MessageConverterContext.<InteractionEntry>builder()
                         .resource(MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION)
                         .contentType(APPLICATION_JSON)
-                        .build();
-        contextFactory.addMessageConverterContext(jsonContext);
+                        .build());
+        contextFactory.addMessageConverterContext(
+                MessageConverterContext.<InteractionEntry>builder()
+                        .resource(MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION)
+                        .contentType(APPLICATION_XML)
+                        .build());
 
         return contextFactory;
     }
 
     private MessageConverterContext<UniProtKBEntry> context(MediaType contentType) {
         return MessageConverterContext.<UniProtKBEntry>builder()
-                .resource(MessageConverterContextFactory.Resource.UNIPROT)
+                .resource(MessageConverterContextFactory.Resource.UNIPROTKB)
                 .contentType(contentType)
                 .build();
     }

@@ -1,32 +1,32 @@
 package org.uniprot.api.uniprotkb.service;
 
-import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.stereotype.Service;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
-import org.uniprot.core.uniprotkb.interaction.InteractionMatrix;
-import org.uniprot.core.uniprotkb.interaction.impl.InteractionEntryBuilder;
-import org.uniprot.core.uniprotkb.interaction.impl.InteractionMatrixBuilder;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.uniprotkb.comment.CommentType;
-import org.uniprot.core.uniprotkb.comment.Interactant;
-import org.uniprot.core.uniprotkb.comment.Interaction;
-import org.uniprot.core.uniprotkb.comment.InteractionComment;
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.comment.Interactant;
+import org.uniprot.core.uniprotkb.comment.Interaction;
+import org.uniprot.core.uniprotkb.comment.InteractionComment;
+import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
+import org.uniprot.core.uniprotkb.interaction.InteractionMatrix;
+import org.uniprot.core.uniprotkb.interaction.impl.InteractionEntryBuilder;
+import org.uniprot.core.uniprotkb.interaction.impl.InteractionMatrixBuilder;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 
 /**
  * Created 06/05/2020

@@ -3,7 +3,7 @@ package org.uniprot.api.uniprotkb.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.Optional;
@@ -67,7 +67,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             UniProtEntryService entryService,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROT);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
         this.entryService = entryService;
         this.converterContextFactory = converterContextFactory;
     }
@@ -242,7 +242,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
         MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<UniProtKBEntry> context =
-                converterContextFactory.get(UNIPROT, contentType);
+                converterContextFactory.get(UNIPROTKB, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
         context.setFields(searchRequest.getFields());
         if (contentType.equals(LIST_MEDIA_TYPE)) {

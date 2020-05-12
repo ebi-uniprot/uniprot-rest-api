@@ -1,5 +1,14 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +24,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniprotkb.service.UniProtKBEntryInteractionService;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION;
 
 /**
  * Represents a UniSaveEntry that could not be found.
@@ -59,7 +61,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
 
     @GetMapping(
             value = "/{accession}/interactions",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     public ResponseEntity<MessageConverterContext<InteractionEntry>> getInteractions(
             @PathVariable("accession")
                     @Pattern(
