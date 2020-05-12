@@ -1,11 +1,12 @@
 package org.uniprot.api.rest.output.context;
 
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.http.MediaType;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Builder;
+import lombok.Data;
+
+import org.springframework.http.MediaType;
 
 /**
  * Created 10/09/18

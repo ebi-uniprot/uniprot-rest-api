@@ -5,7 +5,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -254,6 +258,27 @@ class JsonMessageConverterTest {
         assertThrows(
                 PathNotFoundException.class,
                 () -> resultJson.read(JsonPath.compile("$.secondaryAccessions")));
+    }
+
+    @Test
+    void writeCanWriteEntitiesWithFilteredPathAndCanPrintEntitySeparator() throws IOException {
+        List<UniProtKBEntry> entities = new ArrayList<>();
+        entities.add(getEntity());
+        entities.add(getEntity());
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder().fields("accession").build();
+        System.out.println(
+                "------- BEGIN: writeCanWriteEntitiesWithFilteredPathAndCanPrintEntitySeparator");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                entities.stream(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        System.out.println(result);
+        assertEquals(
+                "{\"results\":[{\"primaryAccession\":\"P00001\"},{\"primaryAccession\":\"P00001\"}]}",
+                result);
     }
 
     @Test

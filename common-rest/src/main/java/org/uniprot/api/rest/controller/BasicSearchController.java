@@ -1,6 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
@@ -22,15 +22,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
-import org.uniprot.api.rest.request.MutableHttpServletRequest;
-import org.uniprot.core.util.Utils;
 
 /**
  * @param <T>
@@ -57,7 +54,6 @@ public abstract class BasicSearchController<T> {
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
             T entity, String fields, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setEntityOnly(true);
@@ -86,7 +82,6 @@ public abstract class BasicSearchController<T> {
             HttpServletRequest request,
             HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
-        handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
         context.setFields(fields);
@@ -112,7 +107,6 @@ public abstract class BasicSearchController<T> {
             MediaType contentType,
             HttpServletRequest request,
             String encoding) {
-        handleUnknownMediaType(contentType, request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
@@ -158,20 +152,6 @@ public abstract class BasicSearchController<T> {
 
     protected MediaType getAcceptHeader(HttpServletRequest request) {
         return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));
-    }
-
-    private void handleUnknownMediaType(MediaType contentType, HttpServletRequest request) {
-        if (Utils.notNull(request) && request instanceof MutableHttpServletRequest) {
-            MutableHttpServletRequest mutableRequest = (MutableHttpServletRequest) request;
-
-            if (contentType.getType().equals(UNKNOWN_MEDIA_TYPE_TYPE)) {
-                mutableRequest.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
-                throw new InvalidRequestException(
-                        "Invalid format requested: '" + contentType.getSubtype() + "'");
-            }
-        } else {
-            log.debug("Unknown request: {}", request);
-        }
     }
 
     private String getLocationURLForId(String redirectId) {

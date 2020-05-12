@@ -1,11 +1,12 @@
 package org.uniprot.api.unisave.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Created 20/03/20

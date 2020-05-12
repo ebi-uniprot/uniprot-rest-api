@@ -1,6 +1,12 @@
 package org.uniprot.api.unisave.output.converter;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.StopStreamException;
@@ -10,11 +16,6 @@ import org.uniprot.core.flatfile.parser.impl.DefaultUniProtParser;
 import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
 import org.uniprot.core.parser.fasta.uniprot.UniprotKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
 
 /** @author Edd */
 @Slf4j

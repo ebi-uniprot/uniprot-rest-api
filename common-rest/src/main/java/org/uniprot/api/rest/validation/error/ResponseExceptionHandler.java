@@ -1,13 +1,31 @@
 package org.uniprot.api.rest.validation.error;
 
+import static java.util.Collections.singletonList;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,16 +34,8 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import static java.util.Collections.singletonList;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import org.uniprot.api.rest.request.MutableHttpServletRequest;
+import org.uniprot.core.util.Utils;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -182,5 +192,34 @@ public class ResponseExceptionHandler {
         addDebugError(request, ex, messages);
 
         return getBadRequestResponseEntity(request, messages);
+    }
+
+    @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})
+    public ResponseEntity<ErrorInfo> handleHttpMediaTypeNotAcceptableException(
+            HttpMediaTypeNotAcceptableException ex, HttpServletRequest request)
+            throws HttpMediaTypeNotAcceptableException {
+        if (Utils.notNull(request) && request instanceof MutableHttpServletRequest) {
+            MutableHttpServletRequest mutableRequest = (MutableHttpServletRequest) request;
+            MediaType contentType = getContentTypeFromRequest(request);
+            if (contentType.equals(UNKNOWN_MEDIA_TYPE)) {
+                mutableRequest.addHeader(HttpHeaders.ACCEPT, DEFAULT_MEDIA_TYPE_VALUE);
+                String errorMessage = (String) mutableRequest.getAttribute(ERROR_MESSAGE_ATTRIBUTE);
+
+                if (nullOrEmpty(errorMessage)) {
+                    errorMessage = "Media type not acceptable";
+                }
+                List<String> messages =
+                        singletonList(
+                                messageSource.getMessage(
+                                        INVALID_REQUEST,
+                                        new Object[] {errorMessage},
+                                        Locale.getDefault()));
+
+                addDebugError(request, ex, messages);
+
+                return getBadRequestResponseEntity(request, messages);
+            }
+        }
+        throw ex;
     }
 }

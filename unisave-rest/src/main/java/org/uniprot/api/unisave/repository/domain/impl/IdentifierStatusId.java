@@ -1,8 +1,8 @@
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import lombok.Data;
-
 import java.io.Serializable;
+
+import lombok.Data;
 
 @Data
 public class IdentifierStatusId implements Serializable {

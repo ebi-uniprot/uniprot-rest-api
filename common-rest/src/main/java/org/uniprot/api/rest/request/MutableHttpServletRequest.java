@@ -19,12 +19,14 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
     private final Map<String, String> customHeaders;
     private String uri;
     private StringBuffer url;
+    private String servletPath;
 
     public MutableHttpServletRequest(HttpServletRequest request) {
         super(request);
         this.customHeaders = new HashMap<>();
         this.uri = request.getRequestURI();
         this.url = request.getRequestURL();
+        this.servletPath = request.getServletPath();
     }
 
     @SuppressWarnings("unchecked")
@@ -45,6 +47,15 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         } else {
             super.setAttribute(name, value);
         }
+    }
+
+    @Override
+    public String getServletPath() {
+        return servletPath;
+    }
+
+    public void setServletPath(String servletPath) {
+        this.servletPath = servletPath;
     }
 
     @Override
@@ -79,6 +90,19 @@ public class MutableHttpServletRequest extends HttpServletRequestWrapper {
         }
         // else return from into the original wrapped object
         return ((HttpServletRequest) getRequest()).getHeader(name);
+    }
+
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        // check the custom headers first
+        String headerValue = customHeaders.get(name);
+
+        if (!Objects.isNull(headerValue)) {
+            return Collections.enumeration(Collections.singletonList(headerValue));
+        }
+
+        // else return from into the original wrapped object
+        return ((HttpServletRequest) getRequest()).getHeaders(name);
     }
 
     @SuppressWarnings("unchecked")
