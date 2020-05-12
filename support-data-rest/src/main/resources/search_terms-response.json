@@ -12,7 +12,7 @@
     "id": "id_mnemonic",
     "label": "Entry Name [ID]",
     "itemType": "single",
-    "term": "mnemonic",
+    "term": "id",
     "dataType": "string",
     "description": "Search by UniProtKB entry name",
     "example": "P53_HUMAN"
@@ -21,7 +21,7 @@
     "id": "id_name",
     "label": "Protein Name [DE]",
     "itemType": "single",
-    "term": "name",
+    "term": "protein_name",
     "dataType": "string",
     "description": "Search by UniProtKB Protein name",
     "example": "mas5"
@@ -61,7 +61,7 @@
     "id": "id_host",
     "label": "Virus host",
     "itemType": "single",
-    "term": "host",
+    "term": " virus_host",
     "dataType": "string",
     "autoComplete": "/uniprot/api/suggester?dict=host&query=?",
     "description": "Search by virus host",
@@ -755,7 +755,7 @@
         "id": "id_d3structure",
         "label": "3D Structure",
         "itemType": "single",
-        "term": "d3structure",
+        "term": "structure_3d",
         "dataType": "enum",
         "values": [
           {
@@ -2830,7 +2830,7 @@
         "id": "id_created",
         "label": "Date Of Creation",
         "itemType": "single",
-        "term": "created",
+        "term": "date_created",
         "dataType": "date",
         "hasRange": true,
         "description": "Search by Date of creation",
@@ -2840,7 +2840,7 @@
         "id": "id_modified",
         "label": "Date of last entry modification",
         "itemType": "single",
-        "term": "modified",
+        "term": "date_modified",
         "dataType": "date",
         "hasRange": true,
         "description": "Search by Date of last entry modification",
