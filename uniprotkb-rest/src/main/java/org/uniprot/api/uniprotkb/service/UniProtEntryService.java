@@ -1,10 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -18,12 +13,16 @@ import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
+import org.uniprot.api.uniprotkb.model.UniProtKBEntryInteraction;
+import org.uniprot.api.uniprotkb.model.UniProtKBEntryInteractions;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.comment.*;
+import org.uniprot.core.util.Utils;
+import org.uniprot.core.xml.uniprot.comment.CommentConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -33,6 +32,16 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
 @Service
 @Import(UniProtQueryBoostsConfig.class)
 public class UniProtEntryService
@@ -41,8 +50,8 @@ public class UniProtEntryService
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final QueryBoosts queryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
-    private UniprotQueryRepository repository;
-    private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
+    private final UniprotQueryRepository repository;
+    private final StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
 
@@ -52,9 +61,8 @@ public class UniProtEntryService
             UniProtTermsConfig uniProtTermsConfig,
             UniProtSolrSortClause uniProtSolrSortClause,
             QueryBoosts uniProtKBQueryBoosts,
-            UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
-            TaxonomyService taxService) {
+            UniProtEntryQueryResultsConverter resultsConverter,
+            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -64,7 +72,7 @@ public class UniProtEntryService
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
         this.queryBoosts = uniProtKBQueryBoosts;
-        this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
+        this.resultsConverter = resultsConverter;
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
@@ -118,14 +126,8 @@ public class UniProtEntryService
         }
     }
 
-    public Stream<String> streamRDF(SearchRequest searchRequest) {
-        SolrRequest solrRequest = createDownloadSolrRequest(searchRequest);
-        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
-    }
-
     @Override
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
-
         UniProtKBRequest uniProtRequest = (UniProtKBRequest) request;
         // fill the common params from the basic service class
         SolrRequest solrRequest = super.createSolrRequest(uniProtRequest, includeFacets);
@@ -149,6 +151,11 @@ public class UniProtEntryService
         }
 
         return solrRequest;
+    }
+
+    public Stream<String> streamRDF(SearchRequest searchRequest) {
+        SolrRequest solrRequest = createDownloadSolrRequest(searchRequest);
+        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     /**
