@@ -285,6 +285,7 @@ class AbstractUUWHttpMessageConverterTest {
 
         @Override
         protected void cleanUp() {
+            super.cleanUp();
             hasCleanedUp = true;
         }
     }
