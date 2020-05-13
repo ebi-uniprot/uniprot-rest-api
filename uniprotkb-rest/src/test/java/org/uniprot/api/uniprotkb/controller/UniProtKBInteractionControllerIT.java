@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,11 +42,15 @@ import org.uniprot.store.search.SolrCollection;
 
 import java.util.HashMap;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created 06/05/2020
@@ -66,11 +71,12 @@ class UniProtKBInteractionControllerIT {
     private static final String ENTRY_WITH_INTERACTION = "P00000";
     private static final String CROSS_REFERENCED_ASSOCIATION = "P00001";
     private static final String NON_EXISTENT_ENTRY = "P99999";
-    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static final DataStoreManager STORE_MANAGER = new DataStoreManager();
+    private final UniProtKBEntry entryWithNoInteractions =
+            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);;
     @Autowired private UniprotQueryRepository repository;
     @Autowired private UniProtKBStoreClient storeClient;
     @Autowired private MockMvc mockMvc;
-    private UniProtKBEntry entryWithNoInteractions = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);;
 
     @BeforeAll
     void initUniprotKbDataStore() {
@@ -83,22 +89,22 @@ class UniProtKBInteractionControllerIT {
                         Mockito.mock(ECRepo.class),
                         new HashMap<>());
 
-        storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
-        storeManager.addDocConverter(
+        STORE_MANAGER.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
+        STORE_MANAGER.addDocConverter(
                 DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
-        storeManager.addSolrClient(
+        STORE_MANAGER.addSolrClient(
                 DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
 
         storeClient =
                 new UniProtKBStoreClient(
                         VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
-        storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+        STORE_MANAGER.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
 
-        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+        STORE_MANAGER.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
         ReflectionTestUtils.setField(
                 repository,
                 "solrClient",
-                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
+                STORE_MANAGER.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
         saveScenarios();
     }
@@ -122,11 +128,57 @@ class UniProtKBInteractionControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ACCESSION_PATH + "P00000/interactions")
+                        get(UNIPROTKB_ACCESSION_PATH + ENTRY_WITH_INTERACTION + "/interactions")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print()).andExpect(status().is(HttpStatus.OK.value()));
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[*].uniProtKBAccession",
+                                contains(ENTRY_WITH_INTERACTION, CROSS_REFERENCED_ASSOCIATION)))
+                .andExpect(jsonPath("$.interactionMatrix[*].uniProtKBId").exists())
+                .andExpect(jsonPath("$.interactionMatrix[*].organism").exists())
+                .andExpect(jsonPath("$.interactionMatrix[*].proteinExistence").exists())
+                .andExpect(jsonPath("$.interactionMatrix[*].interactions.size()", contains(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[*].interactions[*].interactantOne.uniProtkbAccession",
+                                contains(ENTRY_WITH_INTERACTION)))
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[*].interactions[*].interactantOne.intActId",
+                                contains("EBI-00001")))
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[*].interactions[*].interactantTwo.uniProtkbAccession",
+                                contains(CROSS_REFERENCED_ASSOCIATION)))
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[*].interactions[*].interactantOne.intActId",
+                                contains("EBI-00001")))
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[*].interactions[*].numberOfExperiments",
+                                contains(2)))
+                .andExpect(jsonPath("$.interactionMatrix[*].subcellularLocations").exists());
+    }
+
+    @Test
+    void entryWithInteractionsInXMLSucceeds() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ACCESSION_PATH + ENTRY_WITH_INTERACTION + "/interactions")
+                                .header(ACCEPT, APPLICATION_XML_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+                .andExpect(xpath("InteractionEntry").exists());
     }
 
     @Test
@@ -158,7 +210,7 @@ class UniProtKBInteractionControllerIT {
     private void saveScenarios() {
         // ========================================================================================
         // save entry with no interactions
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entryWithNoInteractions);
+        STORE_MANAGER.save(DataStoreManager.StoreType.UNIPROT, entryWithNoInteractions);
 
         InteractionComment interactionWithSavedKBCrossReference =
                 new InteractionCommentBuilder()
@@ -192,8 +244,8 @@ class UniProtKBInteractionControllerIT {
                         .primaryAccession(CROSS_REFERENCED_ASSOCIATION)
                         .build();
 
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry_withInteraction);
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry_associatedToInteraction);
+        STORE_MANAGER.save(DataStoreManager.StoreType.UNIPROT, entry_withInteraction);
+        STORE_MANAGER.save(DataStoreManager.StoreType.UNIPROT, entry_associatedToInteraction);
 
         // ========================================================================================
         // save KB entry that has interactions, and this interaction cross-references a KB entry
@@ -222,7 +274,8 @@ class UniProtKBInteractionControllerIT {
                         .primaryAccession(ENTRY_WITH_INTERACTION_BUT_NO_ASSOCIATED_ENTRIES)
                         .commentsAdd(interactionWithUnsavedKBCrossReference)
                         .build();
-        
-        storeManager.save(DataStoreManager.StoreType.UNIPROT, entry_withInteractionButNoAssociated);
+
+        STORE_MANAGER.save(
+                DataStoreManager.StoreType.UNIPROT, entry_withInteractionButNoAssociated);
     }
 }
