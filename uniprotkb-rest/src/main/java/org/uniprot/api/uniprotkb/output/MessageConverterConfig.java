@@ -1,15 +1,7 @@
 package org.uniprot.api.uniprotkb.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +22,13 @@ import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 /**
  * Created 21/08/18
@@ -83,28 +82,32 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new UniProtKBFlatFileMessageConverter());
-                converters.add(new UniProtKBFastaMessageConverter());
-                converters.add(new ListMessageConverter());
-                converters.add(new RDFMessageConverter());
-                converters.add(new UniProtKBGffMessageConverter());
+                int index = 0;
+                converters.add(index++, new UniProtKBFlatFileMessageConverter());
+                converters.add(index++, new UniProtKBFastaMessageConverter());
+                converters.add(index++, new ListMessageConverter());
+                converters.add(index++, new RDFMessageConverter());
+                converters.add(index++, new UniProtKBGffMessageConverter());
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 UniProtKBEntry.class,
                                 returnConfig,
                                 new UniProtKBEntryValueMapper()));
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 UniProtKBEntry.class,
                                 returnConfig,
                                 new UniProtKBEntryValueMapper()));
-                converters.add(new ErrorMessageConverter());
-                converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
-                converters.add(0, new UniProtKBXmlMessageConverter());
-                converters.add(1, uniProtKBJsonMessageConverter);
-                converters.add(2, new PublicationJsonMessageConverter());
-                converters.add(3, interactionJsonMessageConverter);
-                converters.add(4, new InteractionXmlMessageConverter());
+                converters.add(index++, new ErrorMessageConverter());
+                converters.add(
+                        index++, new ErrorMessageXMLConverter()); // to handle xml error messages
+                converters.add(index++, new UniProtKBXmlMessageConverter());
+                converters.add(index++, uniProtKBJsonMessageConverter);
+                converters.add(index++, new PublicationJsonMessageConverter());
+                converters.add(index++, interactionJsonMessageConverter);
+                converters.add(index, new InteractionXmlMessageConverter());
             }
         };
     }

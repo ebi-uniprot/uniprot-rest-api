@@ -1,5 +1,16 @@
 package org.uniprot.api.rest.validation.error;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,16 +26,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.NoContentException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.*;
 
 /** @author lgonzales */
 class ResponseExceptionHandlerTest {
