@@ -63,6 +63,7 @@ public class XlsMessageConverter<T> extends AbstractEntityHttpMessageConverter<T
 
     @Override
     protected void cleanUp() {
+        super.cleanUp();
         try {
             TL_WORK_BOOK.get().close();
         } catch (IOException e) {

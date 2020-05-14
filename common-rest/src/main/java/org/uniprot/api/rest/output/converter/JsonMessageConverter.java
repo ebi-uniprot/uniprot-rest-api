@@ -150,7 +150,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         try {
             TL_JSON_GENERATOR.get().close();
         } catch (IOException e) {
-            logger.warn("Unable to close json geneator", e);
+            logger.warn("Unable to close json generator", e);
         }
         TL_JSON_GENERATOR.remove();
         TL_FILTER_MAPPER.remove();
