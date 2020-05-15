@@ -36,13 +36,13 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     private static final String PATH_PREFIX = "$..";
     protected final ObjectMapper objectMapper;
 
-    private ThreadLocal<List<ReturnField>> tlFilters = new ThreadLocal<>();
-    protected ThreadLocal<JsonGenerator> tlJsonGenerator = new ThreadLocal<>();
-    private ThreadLocal<ObjectMapper> tlFilterMapper = new ThreadLocal<>();
+    private static final ThreadLocal<List<ReturnField>> TL_FILTERS = new ThreadLocal<>();
+    protected static final ThreadLocal<JsonGenerator> TL_JSON_GENERATOR = new ThreadLocal<>();
+    private static final ThreadLocal<ObjectMapper> TL_FILTER_MAPPER = new ThreadLocal<>();
 
-    private SquigglyParser squigglyParser = new SquigglyParser();
-    private Pattern filterPattern = Pattern.compile("\\((.*?)\\)");
-    private ReturnFieldConfig returnFieldConfig;
+    private static final SquigglyParser SQUIGGLY_PARSER = new SquigglyParser();
+    private static final Pattern FILTER_PATTERN = Pattern.compile("\\((.*?)\\)");
+    private final ReturnFieldConfig returnFieldConfig;
 
     public JsonMessageConverter(
             ObjectMapper objectMapper,
@@ -54,15 +54,16 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     @Override
+    @SuppressWarnings("squid:S2095")
     protected void before(MessageConverterContext<T> context, OutputStream outputStream)
             throws IOException {
         List<ReturnField> fieldList = getFilterFieldMap(context.getFields());
-        tlFilters.set(fieldList);
+        TL_FILTERS.set(fieldList);
         if (notNullNotEmpty(context.getFields())) {
             ObjectMapper filterMapper = objectMapper.copy();
             FilterProvider filterProvider = getFieldsFilterProvider(fieldList);
             filterMapper.setFilterProvider(filterProvider);
-            tlFilterMapper.set(filterMapper);
+            TL_FILTER_MAPPER.set(filterMapper);
             setEntitySeparator(",");
         }
 
@@ -94,15 +95,15 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             generator.writeStartArray();
         }
 
-        tlJsonGenerator.set(generator);
+        TL_JSON_GENERATOR.set(generator);
     }
 
     @Override
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
-        JsonGenerator generator = tlJsonGenerator.get();
-        List<ReturnField> fields = tlFilters.get();
+        JsonGenerator generator = TL_JSON_GENERATOR.get();
+        List<ReturnField> fields = TL_FILTERS.get();
         if (Utils.notNullNotEmpty(fields)) {
-            ObjectMapper mapper = tlFilterMapper.get();
+            ObjectMapper mapper = TL_FILTER_MAPPER.get();
             String filteredJson = mapper.writeValueAsString(entity);
 
             Map<String, String> filterFields = getFieldsWithFilterMap(fields);
@@ -127,21 +128,33 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     @Override
     protected void writeEntitySeparator(OutputStream outputStream, String entitySeparator)
             throws IOException {
-        JsonGenerator generator = tlJsonGenerator.get();
+        JsonGenerator generator = TL_JSON_GENERATOR.get();
         generator.writeRaw(entitySeparator);
     }
 
     @Override
     protected void after(MessageConverterContext<T> context, OutputStream outputStream)
             throws IOException {
-        JsonGenerator generator = tlJsonGenerator.get();
+        JsonGenerator generator = TL_JSON_GENERATOR.get();
 
         if (!context.isEntityOnly()) {
             generator.writeEndArray();
             generator.writeEndObject();
         }
         generator.flush();
-        generator.close();
+    }
+
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        try {
+            TL_JSON_GENERATOR.get().close();
+        } catch (IOException e) {
+            logger.warn("Unable to close json generator", e);
+        }
+        TL_JSON_GENERATOR.remove();
+        TL_FILTER_MAPPER.remove();
+        TL_FILTERS.remove();
     }
 
     protected List<ReturnField> getFilterFieldMap(String fields) {
@@ -176,7 +189,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
         SquigglyPropertyFilter filter =
                 new SquigglyPropertyFilter(
-                        new SimpleSquigglyContextProvider(squigglyParser, fieldsPath));
+                        new SimpleSquigglyContextProvider(SQUIGGLY_PARSER, fieldsPath));
 
         return new SimpleFilterProvider().addFilter(SquigglyPropertyFilter.FILTER_ID, filter);
     }
@@ -203,8 +216,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         String filter = fullPath.substring(fullPath.indexOf("[?"));
         if (filters.containsKey(path)) {
             String currentFilter = filters.get(path);
-            Matcher match = filterPattern.matcher(currentFilter);
-            Matcher newMatch = filterPattern.matcher(filter);
+            Matcher match = FILTER_PATTERN.matcher(currentFilter);
+            Matcher newMatch = FILTER_PATTERN.matcher(filter);
             if (match.find() && newMatch.find()) {
                 String newFilter = "[?(" + match.group(1) + " || " + newMatch.group(1) + ")]";
                 filters.put(path, newFilter);

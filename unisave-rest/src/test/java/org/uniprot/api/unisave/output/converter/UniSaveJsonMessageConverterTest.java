@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.ArgumentMatchers;
 import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
@@ -51,7 +51,8 @@ class UniSaveJsonMessageConverterTest {
         converter.writeEntity(entry, outputStream);
 
         ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
-        verify(outputStream).write(byteCaptor.capture(), Mockito.anyInt(), Mockito.anyInt());
+        verify(outputStream)
+                .write(byteCaptor.capture(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
 
         byte[] bytesWritten = byteCaptor.getValue();
         String writtenValue = new String(bytesWritten, 0, findEndOfString(bytesWritten));
@@ -74,7 +75,7 @@ class UniSaveJsonMessageConverterTest {
         UniSaveJsonMessageConverterProxy(OutputStream outputStream) throws IOException {
             JsonGenerator generator =
                     objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
-            tlJsonGenerator.set(generator);
+            TL_JSON_GENERATOR.set(generator);
         }
     }
 }

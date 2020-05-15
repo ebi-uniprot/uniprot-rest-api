@@ -53,6 +53,7 @@ class XlsMessageConverterTest {
 
         xlsMessageConverter.before(messageContext, outputStream);
         xlsMessageConverter.after(messageContext, outputStream);
+        xlsMessageConverter.cleanUp();
 
         InputStream excelInput = new ByteArrayInputStream(outputStream.toByteArray());
         Workbook workbook = new XSSFWorkbook(excelInput);
@@ -88,6 +89,7 @@ class XlsMessageConverterTest {
         xlsMessageConverter.before(messageContext, outputStream);
         xlsMessageConverter.writeEntity(entity, outputStream);
         xlsMessageConverter.after(messageContext, outputStream);
+        xlsMessageConverter.cleanUp();
 
         InputStream excelInput = new ByteArrayInputStream(outputStream.toByteArray());
         Workbook workbook = new XSSFWorkbook(excelInput);

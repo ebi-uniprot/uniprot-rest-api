@@ -17,9 +17,9 @@ import org.uniprot.store.config.returnfield.model.ReturnField;
  */
 public class TsvMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
-    private ReturnFieldConfig fieldConfig;
-    private ThreadLocal<List<ReturnField>> tlFields = new ThreadLocal<>();
-    private EntityValueMapper<T> entityMapper;
+    private final ReturnFieldConfig fieldConfig;
+    private static final ThreadLocal<List<ReturnField>> TL_FIELDS = new ThreadLocal<>();
+    private final EntityValueMapper<T> entityMapper;
 
     public TsvMessageConverter(
             Class<T> messageConverterEntryClass,
@@ -33,21 +33,27 @@ public class TsvMessageConverter<T> extends AbstractEntityHttpMessageConverter<T
     @Override
     protected void before(MessageConverterContext<T> context, OutputStream outputStream)
             throws IOException {
-        tlFields.set(OutputFieldsParser.parse(context.getFields(), fieldConfig));
+        TL_FIELDS.set(OutputFieldsParser.parse(context.getFields(), fieldConfig));
         outputStream.write(getHeader().getBytes());
     }
 
     @Override
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
         List<String> fieldNames =
-                tlFields.get().stream().map(ReturnField::getName).collect(Collectors.toList());
+                TL_FIELDS.get().stream().map(ReturnField::getName).collect(Collectors.toList());
         Map<String, String> resultMap = entityMapper.mapEntity(entity, fieldNames);
-        List<String> result = OutputFieldsParser.getData(resultMap, tlFields.get());
+        List<String> result = OutputFieldsParser.getData(resultMap, TL_FIELDS.get());
         outputStream.write(result.stream().collect(Collectors.joining("\t", "", "\n")).getBytes());
     }
 
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        TL_FIELDS.remove();
+    }
+
     private String getHeader() {
-        List<ReturnField> fields = tlFields.get();
+        List<ReturnField> fields = TL_FIELDS.get();
         return fields.stream()
                 .map(ReturnField::getLabel)
                 .collect(Collectors.joining("\t", "", "\n"));
