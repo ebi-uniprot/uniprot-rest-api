@@ -1,20 +1,20 @@
 package org.uniprot.api.rest.output.converter;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Type;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.Nullable;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Type;
 
 /** @author lgonzales */
 public class ErrorMessageXMLConverter extends AbstractGenericHttpMessageConverter<ErrorInfo> {
@@ -24,6 +24,11 @@ public class ErrorMessageXMLConverter extends AbstractGenericHttpMessageConverte
     public ErrorMessageXMLConverter() {
         super(MediaType.APPLICATION_XML);
         marshaller = createMarshaller();
+    }
+
+    @Override
+    public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
+        return clazz == ErrorInfo.class && this.canWrite(mediaType);
     }
 
     @Override
