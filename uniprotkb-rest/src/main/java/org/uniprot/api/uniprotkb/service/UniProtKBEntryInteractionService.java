@@ -22,9 +22,9 @@ import org.uniprot.core.uniprotkb.comment.Interactant;
 import org.uniprot.core.uniprotkb.comment.Interaction;
 import org.uniprot.core.uniprotkb.comment.InteractionComment;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
-import org.uniprot.core.uniprotkb.interaction.InteractionMatrix;
+import org.uniprot.core.uniprotkb.interaction.InteractionMatrixItem;
 import org.uniprot.core.uniprotkb.interaction.impl.InteractionEntryBuilder;
-import org.uniprot.core.uniprotkb.interaction.impl.InteractionMatrixBuilder;
+import org.uniprot.core.uniprotkb.interaction.impl.InteractionMatrixItemBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -59,7 +59,7 @@ public class UniProtKBEntryInteractionService {
                 .build();
     }
 
-    public List<InteractionMatrix> getInteractionsForAccession(String accession) {
+    public List<InteractionMatrixItem> getInteractionsForAccession(String accession) {
         List<ReturnField> filters =
                 asList(
                         returnFieldConfig.getReturnFieldByName("cc_interaction"),
@@ -78,7 +78,7 @@ public class UniProtKBEntryInteractionService {
                         .collect(toList());
 
         if (Utils.notNullNotEmpty(interactionAccessions)) {
-            List<InteractionMatrix> interEntries = new ArrayList<>();
+            List<InteractionMatrixItem> interEntries = new ArrayList<>();
 
             // add interactions for entry
             interEntries.add(entry2Interaction(entry));
@@ -122,8 +122,8 @@ public class UniProtKBEntryInteractionService {
                 .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
     }
 
-    private InteractionMatrix entry2Interaction(UniProtKBEntry entry) {
-        return new InteractionMatrixBuilder()
+    private InteractionMatrixItem entry2Interaction(UniProtKBEntry entry) {
+        return new InteractionMatrixItemBuilder()
                 .uniProtKBAccession(entry.getPrimaryAccession())
                 .uniProtKBId(entry.getUniProtkbId())
                 .proteinExistence(entry.getProteinExistence())

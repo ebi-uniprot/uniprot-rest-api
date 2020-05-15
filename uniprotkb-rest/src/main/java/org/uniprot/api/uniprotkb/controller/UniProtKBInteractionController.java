@@ -26,9 +26,9 @@ import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
- * Represents a UniSaveEntry that could not be found.
+ * Controller for interactions.
  *
- * <p>Created 20/04/2020
+ * <p>Created 12/05/2020
  *
  * @author Edd
  */

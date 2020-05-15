@@ -1,17 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.HashMap;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -50,6 +39,16 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+
+import java.util.HashMap;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created 06/05/2020
@@ -136,33 +135,41 @@ class UniProtKBInteractionControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[*].uniProtKBAccession",
-                                contains(ENTRY_WITH_INTERACTION, CROSS_REFERENCED_ASSOCIATION)))
-                .andExpect(jsonPath("$.interactionMatrix[*].uniProtKBId").exists())
-                .andExpect(jsonPath("$.interactionMatrix[*].organism").exists())
-                .andExpect(jsonPath("$.interactionMatrix[*].proteinExistence").exists())
-                .andExpect(jsonPath("$.interactionMatrix[*].interactions.size()", contains(1)))
+                                "$.interactionMatrix[0].uniProtKBAccession",
+                                is(ENTRY_WITH_INTERACTION)))
+                .andExpect(jsonPath("$.interactionMatrix[0].uniProtKBId").exists())
+                .andExpect(jsonPath("$.interactionMatrix[0].organism").exists())
+                .andExpect(jsonPath("$.interactionMatrix[0].proteinExistence").exists())
+                .andExpect(jsonPath("$.interactionMatrix[0].interactions.size()", is(1)))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[*].interactions[*].interactantOne.uniProtkbAccession",
-                                contains(ENTRY_WITH_INTERACTION)))
+                                "$.interactionMatrix[0].interactions[0].interactantOne.uniProtkbAccession",
+                                is(ENTRY_WITH_INTERACTION)))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[*].interactions[*].interactantOne.intActId",
-                                contains("EBI-00001")))
+                                "$.interactionMatrix[0].interactions[0].interactantOne.intActId",
+                                is("EBI-00001")))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[*].interactions[*].interactantTwo.uniProtkbAccession",
-                                contains(CROSS_REFERENCED_ASSOCIATION)))
+                                "$.interactionMatrix[0].interactions[0].interactantTwo.uniProtkbAccession",
+                                is(CROSS_REFERENCED_ASSOCIATION)))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[*].interactions[*].interactantOne.intActId",
-                                contains("EBI-00001")))
+                                "$.interactionMatrix[0].interactions[0].interactantTwo.intActId",
+                                is("EBI-00001")))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[*].interactions[*].numberOfExperiments",
-                                contains(2)))
-                .andExpect(jsonPath("$.interactionMatrix[*].subcellularLocations").exists());
+                                "$.interactionMatrix[0].interactions[0].numberOfExperiments",
+                                is(2)))
+                .andExpect(jsonPath("$.interactionMatrix[0].subcellularLocations").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.interactionMatrix[1].uniProtKBAccession",
+                                is(CROSS_REFERENCED_ASSOCIATION)))
+                .andExpect(jsonPath("$.interactionMatrix[1].uniProtKBId").exists())
+                .andExpect(jsonPath("$.interactionMatrix[1].organism").exists())
+                .andExpect(jsonPath("$.interactionMatrix[1].proteinExistence").exists())
+                .andExpect(jsonPath("$.interactionMatrix[1].interactions").doesNotExist());
     }
 
     @Test
@@ -177,7 +184,43 @@ class UniProtKBInteractionControllerIT {
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
-                .andExpect(xpath("InteractionEntry").exists());
+                .andExpect(xpath("//InteractionEntry").exists())
+                .andExpect(
+                        xpath("//InteractionEntry/interactionMatrix[1]/primaryAccession")
+                                .string(ENTRY_WITH_INTERACTION))
+                .andExpect(xpath("//InteractionEntry/interactionMatrix[1]/uniProtKBId").exists())
+                .andExpect(xpath("//InteractionEntry/interactionMatrix[1]/organism").exists())
+                .andExpect(
+                        xpath("//InteractionEntry/interactionMatrix[1]/proteinExistence").exists())
+                .andExpect(
+                        xpath("count(//InteractionEntry/interactionMatrix[1]/interactions)")
+                                .string("1"))
+                .andExpect(
+                        xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantOne/uniProtKBAccession")
+                                .string(ENTRY_WITH_INTERACTION))
+                .andExpect(
+                        xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantOne/intActId")
+                                .string("EBI-00001"))
+                .andExpect(
+                        xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantTwo/uniProtKBAccession")
+                                .string(CROSS_REFERENCED_ASSOCIATION))
+                .andExpect(
+                        xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantTwo/intActId")
+                                .string("EBI-00001"))
+                .andExpect(
+                        xpath("//InteractionEntry/interactionMatrix[2]/primaryAccession")
+                                .string(CROSS_REFERENCED_ASSOCIATION))
+                .andExpect(xpath("//InteractionEntry/interactionMatrix[2]/uniProtKBId").exists())
+                .andExpect(xpath("//InteractionEntry/interactionMatrix[2]/organism").exists())
+                .andExpect(
+                        xpath("//InteractionEntry/interactionMatrix[2]/proteinExistence").exists())
+                .andExpect(
+                        xpath("//InteractionEntry/interactionMatrix[2]/interactions")
+                                .doesNotExist());
     }
 
     @Test

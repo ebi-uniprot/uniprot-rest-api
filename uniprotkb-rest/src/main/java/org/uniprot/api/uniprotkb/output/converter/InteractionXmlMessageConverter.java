@@ -8,7 +8,6 @@ import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
@@ -24,10 +23,10 @@ public class InteractionXmlMessageConverter
 
     public InteractionXmlMessageConverter() {
         super(MediaType.APPLICATION_XML, InteractionEntry.class);
-        ObjectMapper objectMapper = new XmlMapper();
-
-        objectMapper.registerModule(UniprotKBJsonConfig.getInstance().getPrettyWriterModule());
-        objectWriter = objectMapper.writer().withRootName(ROOT_NAME);
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.setDefaultUseWrapper(false);
+        xmlMapper.registerModule(UniprotKBJsonConfig.getInstance().getPrettyWriterModule());
+        objectWriter = xmlMapper.writer().withRootName(ROOT_NAME);
     }
 
     @Override
