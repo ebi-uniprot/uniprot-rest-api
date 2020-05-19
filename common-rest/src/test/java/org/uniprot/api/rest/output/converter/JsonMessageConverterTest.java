@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -188,8 +189,8 @@ class JsonMessageConverterTest {
 
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
         assertEquals("P00001", resultJson.read(JsonPath.compile("$.primaryAccession")));
-        assertEquals("scientific name",
-                resultJson.read(JsonPath.compile("$.organism.scientificName")));
+        assertEquals(
+                "scientific name", resultJson.read(JsonPath.compile("$.organism.scientificName")));
         assertEquals("some Gene", resultJson.read(JsonPath.compile("$.genes[0].geneName.value")));
         assertEquals("some Syn", resultJson.read(JsonPath.compile("$.genes[0].synonyms[0].value")));
 
@@ -233,8 +234,7 @@ class JsonMessageConverterTest {
                         .entityOnly(true)
                         .fields("organism_name,cc_rna_editing,cc_polymorphism")
                         .build();
-        log.debug(
-                "------- BEGIN: writeCanWriteEntityWithFilteredPathWithOrLogicReturnField");
+        log.debug("------- BEGIN: writeCanWriteEntityWithFilteredPathWithOrLogicReturnField");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         writeBefore(messageContext, outputStream);
@@ -248,13 +248,14 @@ class JsonMessageConverterTest {
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
-        assertEquals("P00001",
+        assertEquals(
+                "P00001",
                 resultJson.read(JsonPath.compile("$.primaryAccession"))); // required field
-        assertEquals("scientific name",
-                resultJson.read(JsonPath.compile("$.organism.scientificName")));
+        assertEquals(
+                "scientific name", resultJson.read(JsonPath.compile("$.organism.scientificName")));
         assertEquals("RNA EDITING", resultJson.read(JsonPath.compile("$.comments[0].commentType")));
-        assertEquals("POLYMORPHISM",
-                resultJson.read(JsonPath.compile("$.comments[1].commentType")));
+        assertEquals(
+                "POLYMORPHISM", resultJson.read(JsonPath.compile("$.comments[1].commentType")));
 
         assertThrows(
                 PathNotFoundException.class,
@@ -268,8 +269,7 @@ class JsonMessageConverterTest {
         entities.add(getEntity());
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder().fields("accession").build();
-        log.debug(
-                "------- BEGIN: writeCanWriteEntitiesWithFilteredPathAndCanPrintEntitySeparator");
+        log.debug("------- BEGIN: writeCanWriteEntitiesWithFilteredPathAndCanPrintEntitySeparator");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         jsonMessageConverter.writeEntities(

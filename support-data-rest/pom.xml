@@ -19,17 +19,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
-			<artifactId>openapi-maven-plugin</artifactId>
-			<version>${openapi-maven-plugin.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
 			<version>${dropwizard.metrics.version}</version>
@@ -197,11 +186,27 @@
 						<artifactId>openapi-maven-plugin</artifactId>
 						<version>${openapi-maven-plugin.version}</version>
 						<configuration>
-							<packageLocations>org.uniprot.api.keyword</packageLocations>
-							<openApiDirectory>generated/swagger</openApiDirectory>
+							<packageLocations>
+								<packageLocation>org.uniprot.api.keyword</packageLocation>
+								<packageLocation>org.uniprot.api.crossref.controller</packageLocation>
+							</packageLocations>
+							<openApiDirectory>target/generated/swagger</openApiDirectory>
 							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
 							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.uniprot</groupId>
+								<artifactId>uniprot-config</artifactId>
+								<version>${uniprot-store.version}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>*</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
 						<executions>
 							<execution>
 								<phase>compile</phase>
