@@ -100,5 +100,4 @@ public class UniProtKBRequest implements SearchRequest {
             return Collections.emptyList();
         }
     }
-
 }

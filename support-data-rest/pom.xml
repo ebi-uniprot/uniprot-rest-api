@@ -189,8 +189,9 @@
 							<packageLocations>
 								<packageLocation>org.uniprot.api.keyword</packageLocation>
 								<packageLocation>org.uniprot.api.crossref.controller</packageLocation>
+								<packageLocation>org.uniprot.api.disease</packageLocation>
 							</packageLocations>
-							<openApiDirectory>target/generated/swagger</openApiDirectory>
+							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
 							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
 							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>

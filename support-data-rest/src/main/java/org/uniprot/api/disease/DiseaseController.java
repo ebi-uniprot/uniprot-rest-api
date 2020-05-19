@@ -27,9 +27,22 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/disease")
 @Validated
+@Tag(
+        name = "Disease",
+        description =
+                "The human diseases in which proteins are involved are "
+                        + "described in UniProtKB entries with a controlled vocabulary.")
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     @Autowired private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
@@ -46,8 +59,22 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 MessageConverterContextFactory.Resource.DISEASE);
     }
 
+    @Operation(
+            summary = "Get diseases by id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = DiseaseEntry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                        })
+            })
     @GetMapping(
-            value = "/{accessionId}",
+            value = "/{id}",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -56,20 +83,41 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<DiseaseEntry>> getByAccession(
-            @PathVariable("accessionId")
+            @Parameter(description = "disease id to find")
+                    @PathVariable("id")
                     @Pattern(
                             regexp = ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.disease.invalid.id}")
-                    String accession,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
+                    String id,
+            @Parameter(description = "Comma separated list of fields to be returned in response")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        DiseaseEntry disease = this.diseaseService.findByUniqueId(accession);
+        DiseaseEntry disease = this.diseaseService.findByUniqueId(id);
         return super.getEntityResponse(disease, fields, request);
     }
 
+    @Operation(
+            summary = "Search disease by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            DiseaseEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                        })
+            })
     @GetMapping(
             value = "/search",
             produces = {
@@ -80,16 +128,34 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<DiseaseEntry>> searchCursor(
-            @Valid DiseaseSearchRequest searchRequest,
+            @Valid @ModelAttribute DiseaseSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<DiseaseEntry> results = this.diseaseService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Download disease by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            DiseaseEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -98,7 +164,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> download(
-            @Valid DiseaseSearchRequest searchRequest,
+            @Valid @ModelAttribute DiseaseSearchRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
