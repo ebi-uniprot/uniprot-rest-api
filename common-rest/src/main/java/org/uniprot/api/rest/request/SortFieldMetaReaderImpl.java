@@ -28,18 +28,20 @@ public class SortFieldMetaReaderImpl implements ModelFieldMetaReader {
                                             config.correspondingSortFieldExists(
                                                     item.getFieldName()))
                             .sorted(Comparator.comparing(SearchFieldItem::getFieldName))
-                            .map(this::convertToMap)
+                            .map(item -> convertToMap(item, config))
                             .collect(Collectors.toList());
         }
 
         return metaList;
     }
 
-    private Map<String, Object> convertToMap(SearchFieldItem searchFieldItem) {
+    private Map<String, Object> convertToMap(
+            SearchFieldItem searchFieldItem, SearchFieldConfig config) {
         Map<String, Object> keyValueMap = new LinkedHashMap<>();
         keyValueMap.put("name", searchFieldItem.getFieldName());
-        String order = (new Random().nextInt()) % 2 == 0 ? "asc" : "desc";
-        keyValueMap.put("example", searchFieldItem.getFieldName() + " " + order);
+        String example =
+                config.getCorrespondingSortField(searchFieldItem.getFieldName()).getExample();
+        keyValueMap.put("example", example);
         return keyValueMap;
     }
 }

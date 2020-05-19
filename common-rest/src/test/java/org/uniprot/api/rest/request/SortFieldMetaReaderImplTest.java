@@ -31,7 +31,7 @@ class SortFieldMetaReaderImplTest {
 
         assertEquals(2, result.size());
         assertTrue(validateFieldMap(result, "name", "category_str"));
-        assertTrue(validateFieldMap(result, "example", "category_str asc"));
+        assertTrue(validateFieldMap(result, "example", "category_str desc"));
 
         assertFalse(validateFieldMap(result, "name", "content"));
     }
