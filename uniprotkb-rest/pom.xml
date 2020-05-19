@@ -281,7 +281,7 @@
 							<packageLocations>
 								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
 							</packageLocations>
-							<openApiDirectory>generated/swagger</openApiDirectory>
+							<openApiDirectory>target/generated/swagger</openApiDirectory>
 							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
 							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>

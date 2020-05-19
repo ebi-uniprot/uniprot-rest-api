@@ -1,6 +1,7 @@
 package org.uniprot.api.crossref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
 import java.util.Optional;
@@ -25,9 +26,26 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/xref")
 @Validated
+@Tag(
+        name = "CrossReference",
+        description =
+                "The cross-references section of UniProtKB entries "
+                        + "displays explicit and implicit links to databases such as nucleotide sequence databases, "
+                        + "model organism databases and genomics and proteomics resources. A single entry can have "
+                        + "cross-references to several dozen different databases and have several hundred individual links. "
+                        + "The databases are categorized for easy user perusal and understanding of how the "
+                        + "different databases relate to both UniProtKB and to each other")
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     @Autowired private CrossRefService crossRefService;
     private static final String ACCESSION_REGEX = "DB-(\\d{4})";
@@ -38,31 +56,57 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
         super(eventPublisher, crossrefMessageConverterContextFactory, null, CROSSREF);
     }
 
+    @Operation(
+            summary = "Get cross-references by database id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = CrossRefEntry.class)),
+                        })
+            })
     @GetMapping(
-            value = "/{accessionId}",
+            value = "/{id}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
-            @PathVariable("accessionId")
+            @Parameter(description = "cross-references database id to find")
+                    @PathVariable("id")
                     @Pattern(
                             regexp = ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.crossref.invalid.id}")
-                    String accession,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
+                    String id,
+            @Parameter(description = "Comma separated list of fields to be returned in response")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(accession);
+        CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(id);
 
         return super.getEntityResponse(crossRefEntry, fields, request);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Search cross-references by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CrossRefEntry.class)))
+                        })
+            })
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> search(
-            @Valid CrossRefSearchRequest searchRequest,
+            @Valid @ModelAttribute CrossRefSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<CrossRefEntry> results = this.crossRefService.search(searchRequest);
