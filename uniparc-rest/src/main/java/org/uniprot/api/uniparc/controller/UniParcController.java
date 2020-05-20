@@ -25,12 +25,23 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.request.UniParcRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author jluo
@@ -54,6 +65,10 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         this.queryService = queryService;
     }
 
+    @Tag(
+            name = "uniparc",
+            description =
+                    "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).")
     @RequestMapping(
             value = "/search",
             method = RequestMethod.GET,
@@ -65,9 +80,37 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Search for a UniParc sequence entry (or entries) by a SOLR query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> search(
-            @Valid UniParcRequest searchRequest,
-            @RequestParam(value = "preview", required = false, defaultValue = "false")
+            @Valid @ModelAttribute UniParcRequest searchRequest,
+            @Parameter(hidden = true)
+                    @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -76,6 +119,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Tag(name = "uniparc")
     @RequestMapping(
             value = "/{upi}",
             method = RequestMethod.GET,
@@ -87,14 +131,38 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Retrieve an UniParc entry by upi.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniParcEntry.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpId(
-            @PathVariable("upi")
+            @Parameter(description = "Unique identifier for the UniParc entry")
+                    @PathVariable("upi")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upi.value}")
                     String upi,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
+            @ModelFieldMeta(
+                            reader = ReturnFieldMetaReaderImpl.class,
+                            path = "uniparc-return-fields.json")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
+                    @Parameter(
+                            description =
+                                    "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -102,6 +170,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, fields, request);
     }
 
+    @Tag(name = "uniparc")
     @RequestMapping(
             value = "/download",
             method = RequestMethod.GET,
@@ -113,8 +182,35 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Download a UniParc sequence entry (or entries) by a SOLR query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> download(
-            @Valid UniParcRequest searchRequest,
+            @Valid @ModelAttribute UniParcRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
