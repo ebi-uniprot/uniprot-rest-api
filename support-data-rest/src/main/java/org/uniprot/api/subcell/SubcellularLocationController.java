@@ -30,10 +30,22 @@ import org.uniprot.api.subcell.service.SubcellularLocationService;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * @author lgonzales
  * @since 2019-07-19
  */
+@Tag(
+        name = "Subcellular location",
+        description =
+                "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.")
 @RestController
 @RequestMapping("/subcellularlocation")
 @Validated
@@ -57,8 +69,25 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
         this.subcellularLocationService = subcellularLocationService;
     }
 
+    @Operation(
+            summary = "Get subcellular locations by id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            SubcellularLocationEntry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                        })
+            })
     @GetMapping(
-            value = "/{subcellularLocationId}",
+            value = "/{id}",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -67,24 +96,45 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 OBO_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> getById(
-            @PathVariable("subcellularLocationId")
+            @Parameter(description = "Subcellular location id to find")
+                    @PathVariable("id")
                     @Pattern(
                             regexp = SUBCELLULAR_LOCATION_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.subcellularLocation.invalid.id}")
-                    String subcellularLocationId,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
+                    String id,
+            @Parameter(description = "Comma separated list of fields to be returned in response")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
         SubcellularLocationEntry subcellularLocationEntry =
-                this.subcellularLocationService.findByUniqueId(subcellularLocationId);
+                this.subcellularLocationService.findByUniqueId(id);
         return super.getEntityResponse(subcellularLocationEntry, fields, request);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Search subcellular locations by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            SubcellularLocationEntry
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -93,7 +143,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 OBO_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> search(
-            @Valid SubcellularLocationRequest searchRequest,
+            @Valid @ModelAttribute SubcellularLocationRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<SubcellularLocationEntry> results =
@@ -101,9 +151,28 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Download subcellular locations by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            SubcellularLocationEntry
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -113,7 +182,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>>
             download(
-                    @Valid SubcellularLocationRequest searchRequest,
+                    @Valid @ModelAttribute SubcellularLocationRequest searchRequest,
                     @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                             MediaType contentType,
                     @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

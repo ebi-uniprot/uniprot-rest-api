@@ -31,6 +31,18 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(
+        name = "Taxonomy",
+        description =
+                "UniProtKB taxonomy data is manually curated: next to manually verified organism names, we provide a selection of external links, organism strains and viral host information.")
 @RestController
 @RequestMapping("/taxonomy")
 @Validated
@@ -54,6 +66,19 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
         this.taxonomyService = taxonomyService;
     }
 
+    @Operation(
+            summary = "Get taxonomy by id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = TaxonomyEntry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     @GetMapping(
             value = "/{taxonId}",
             produces = {
@@ -63,23 +88,42 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(
-            @PathVariable("taxonId")
+            @Parameter(description = "Taxon id to find")
+                    @PathVariable("taxonId")
                     @Pattern(
                             regexp = TAXONOMY_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.taxonomy.invalid.id}")
                     String taxonId,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
+            @Parameter(description = "Comma separated list of fields to be returned in response")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.valueOf(taxonId));
+        TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.parseLong(taxonId));
         return super.getEntityResponse(taxonomyEntry, fields, request);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Search taxonomies by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            TaxonomyEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -87,16 +131,33 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> search(
-            @Valid TaxonomyRequest searchRequest,
+            @Valid @ModelAttribute TaxonomyRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<TaxonomyEntry> results = taxonomyService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Download taxonomies by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            TaxonomyEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -104,7 +165,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> download(
-            @Valid TaxonomyRequest searchRequest,
+            @Valid @ModelAttribute TaxonomyRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

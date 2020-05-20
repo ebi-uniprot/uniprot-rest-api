@@ -37,6 +37,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(
+        name = "keyword",
+        description =
+                "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.")
 @RestController
 @RequestMapping("/keyword")
 @Validated
@@ -55,12 +59,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         this.keywordService = keywordService;
     }
 
-    @Tag(
-            name = "keyword",
-            description =
-                    "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.")
     @GetMapping(
-            value = "/{keywordId}",
+            value = "/{id}",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -77,28 +77,27 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                                     schema = @Schema(implementation = KeywordEntry.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(
             @Parameter(description = "Keyword id to find")
-                    @PathVariable("keywordId")
+                    @PathVariable("id")
                     @Pattern(
                             regexp = KEYWORD_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.keyword.invalid.id}")
-                    String keywordId,
+                    String id,
             @Parameter(description = "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
 
-        KeywordEntry keywordEntry = this.keywordService.findByUniqueId(keywordId);
+        KeywordEntry keywordEntry = this.keywordService.findByUniqueId(id);
         return super.getEntityResponse(keywordEntry, fields, request);
     }
 
-    @Tag(name = "keyword")
     @GetMapping(
             value = "/search",
             produces = {
@@ -122,7 +121,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                                                                             KeywordEntry.class))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(
@@ -133,7 +132,6 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "keyword")
     @GetMapping(
             value = "/download",
             produces = {
