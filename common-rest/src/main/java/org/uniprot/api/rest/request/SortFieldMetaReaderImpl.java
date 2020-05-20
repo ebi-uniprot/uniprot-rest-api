@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.controller.request;
+package org.uniprot.api.rest.request;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +17,7 @@ public class SortFieldMetaReaderImpl implements ModelFieldMetaReader {
         List<Map<String, Object>> metaList = new ArrayList<>();
         // e.g. metaFile=uniprotkb-search-fields.json
         String[] fileNameTokens = metaFile.split("-");
-        if (fileNameTokens != null && fileNameTokens.length > 1) {
+        if (fileNameTokens.length > 1) {
             String sourceName = fileNameTokens[0];
             UniProtDataType upDataType = UniProtDataType.valueOf(sourceName.toUpperCase());
             SearchFieldConfig config = SearchFieldConfigFactory.getSearchFieldConfig(upDataType);
@@ -28,18 +28,20 @@ public class SortFieldMetaReaderImpl implements ModelFieldMetaReader {
                                             config.correspondingSortFieldExists(
                                                     item.getFieldName()))
                             .sorted(Comparator.comparing(SearchFieldItem::getFieldName))
-                            .map(this::convertToMap)
+                            .map(item -> convertToMap(item, config))
                             .collect(Collectors.toList());
         }
 
         return metaList;
     }
 
-    private Map<String, Object> convertToMap(SearchFieldItem searchFieldItem) {
+    private Map<String, Object> convertToMap(
+            SearchFieldItem searchFieldItem, SearchFieldConfig config) {
         Map<String, Object> keyValueMap = new LinkedHashMap<>();
         keyValueMap.put("name", searchFieldItem.getFieldName());
-        String order = (new Random().nextInt()) % 2 == 0 ? "asc" : "desc";
-        keyValueMap.put("example", searchFieldItem.getFieldName() + " " + order);
+        String example =
+                config.getCorrespondingSortField(searchFieldItem.getFieldName()).getExample();
+        keyValueMap.put("example", example);
         return keyValueMap;
     }
 }

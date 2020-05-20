@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.controller.request;
+package org.uniprot.api.rest.request;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,13 +17,13 @@ public class ReturnFieldMetaReaderImpl implements ModelFieldMetaReader {
         // e.g. metaFile=uniprotkb-return-fields.json
         List<Map<String, Object>> metaList = new ArrayList<>();
         String[] fileNameTokens = metaFile.split("-");
-        if (fileNameTokens != null && fileNameTokens.length > 1) {
+        if (fileNameTokens.length > 1) {
             String sourceName = fileNameTokens[0];
             UniProtDataType upDataType = UniProtDataType.valueOf(sourceName.toUpperCase());
             ReturnFieldConfig config = ReturnFieldConfigFactory.getReturnFieldConfig(upDataType);
             metaList =
                     config.getReturnFields().stream()
-                            .filter(fieldItem -> fieldItem.isIncludeInSwagger())
+                            .filter(ReturnField::isIncludeInSwagger)
                             .sorted(Comparator.comparing(ReturnField::getName))
                             .map(this::convertToMap)
                             .collect(Collectors.toList());

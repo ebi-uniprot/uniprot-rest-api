@@ -11,10 +11,12 @@ import javax.validation.constraints.Positive;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -33,7 +35,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class UniProtKBRequest implements SearchRequest {
     @Parameter(hidden = true)
-    public static String DEFAULT_FIELDS =
+    public static final String DEFAULT_FIELDS =
             "accession,id,reviewed,protein_name,gene_names,organism,length";
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
@@ -90,15 +92,12 @@ public class UniProtKBRequest implements SearchRequest {
         return Boolean.valueOf(showMatchedFields);
     }
 
+    @Override
     public List<String> getFacetList() {
         if (hasFacets()) {
             return Arrays.asList(facets.split(("\\s*,\\s*")));
         } else {
             return Collections.emptyList();
         }
-    }
-
-    public boolean hasFacets() {
-        return Utils.notNullNotEmpty(facets);
     }
 }

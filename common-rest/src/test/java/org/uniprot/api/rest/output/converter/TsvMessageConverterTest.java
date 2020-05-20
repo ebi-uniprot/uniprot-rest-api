@@ -42,6 +42,7 @@ class TsvMessageConverterTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         tsvMessageConverter.before(messageContext, outputStream);
+        tsvMessageConverter.cleanUp();
 
         String result = outputStream.toString("UTF-8");
         assertNotNull(result);
@@ -59,6 +60,7 @@ class TsvMessageConverterTest {
         UniProtKBEntry entity = UniProtKBEntryIT.getCompleteColumnsUniProtEntry();
         tsvMessageConverter.before(messageContext, outputStream);
         tsvMessageConverter.writeEntity(entity, outputStream);
+        tsvMessageConverter.cleanUp();
 
         String result = outputStream.toString("UTF-8");
         assertNotNull(result);

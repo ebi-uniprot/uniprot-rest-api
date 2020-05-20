@@ -44,7 +44,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     private static final Logger LOGGER = getLogger(AbstractUUWHttpMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
     private static final int LOG_INTERVAL = 10000;
-    private String entitySeparator;
+    private static final ThreadLocal<String> ENTITY_SEPARATOR = new ThreadLocal<>();
     private final Class<C> messageConverterEntryClass;
 
     AbstractUUWHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
@@ -68,14 +68,14 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     @Override
     protected MessageConverterContext<C> readInternal(
             Class<? extends MessageConverterContext<C>> aClass, HttpInputMessage httpInputMessage)
-            throws IOException, HttpMessageNotReadableException {
+            throws HttpMessageNotReadableException {
         return null;
     }
 
     @Override
     public MessageConverterContext<C> read(
             Type type, Class<?> aClass, HttpInputMessage httpInputMessage)
-            throws IOException, HttpMessageNotReadableException {
+            throws HttpMessageNotReadableException {
         return null;
     }
 
@@ -130,10 +130,12 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         }
     }
 
-    protected void cleanUp() {}
+    protected void cleanUp() {
+        ENTITY_SEPARATOR.remove();
+    }
 
     protected void setEntitySeparator(String separator) {
-        this.entitySeparator = separator;
+        ENTITY_SEPARATOR.set(separator);
     }
 
     protected abstract void writeEntity(T entity, OutputStream outputStream) throws IOException;
@@ -151,16 +153,16 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
                         flushWhenNecessary(outputStream, currentCount);
                         logWhenNecessary(start, currentCount);
 
-                        if (Objects.nonNull(entitySeparator)) {
+                        if (Objects.nonNull(ENTITY_SEPARATOR.get())) {
                             if (firstIteration.get()) {
                                 firstIteration.set(false);
                             } else {
-                                writeEntitySeparator(outputStream, entitySeparator);
+                                writeEntitySeparator(outputStream, ENTITY_SEPARATOR.get());
                             }
                         }
 
                         writeEntity(entity, outputStream);
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         throw new StopStreamException("Could not write entry: " + entity, e);
                     }
                 });

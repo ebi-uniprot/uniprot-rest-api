@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.controller.request;
+package org.uniprot.api.rest.request;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,13 +17,13 @@ public class QueryFieldMetaReaderImpl implements ModelFieldMetaReader {
         // e.g. metaFile=uniprotkb-search-fields.json
         List<Map<String, Object>> metaList = new ArrayList<>();
         String[] fileNameTokens = metaFile.split("-");
-        if (fileNameTokens != null && fileNameTokens.length > 1) {
+        if (fileNameTokens.length > 1) {
             String sourceName = fileNameTokens[0];
             UniProtDataType upDataType = UniProtDataType.valueOf(sourceName.toUpperCase());
             SearchFieldConfig config = SearchFieldConfigFactory.getSearchFieldConfig(upDataType);
             metaList =
                     config.getSearchFieldItems().stream()
-                            .filter(searchFieldItem -> searchFieldItem.isIncludeInSwagger())
+                            .filter(SearchFieldItem::isIncludeInSwagger)
                             .sorted(Comparator.comparing(SearchFieldItem::getFieldName))
                             .map(this::convertToMap)
                             .collect(Collectors.toList());
