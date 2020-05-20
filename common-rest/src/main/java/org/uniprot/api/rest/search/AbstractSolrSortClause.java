@@ -1,14 +1,12 @@
 package org.uniprot.api.rest.search;
 
-import static java.util.stream.Collectors.reducing;
+import static java.util.Collections.singletonList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.data.domain.Sort;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -21,19 +19,20 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 public abstract class AbstractSolrSortClause {
     public static final String SCORE = "score";
 
-    private List<Pair<String, Sort.Direction>> defaultFieldSortOrderPairs = new ArrayList<>();
+    private final List<SolrQuery.SortClause> defaultFieldSortOrderPairs =
+            Utils.modifiableList(
+                    singletonList(SolrQuery.SortClause.create(SCORE, SolrQuery.ORDER.desc)));
 
-    public Sort getSort(String sortClause) {
-        return StringUtils.isEmpty(sortClause) ? createDefaultSort() : createSort(sortClause);
+    public List<SolrQuery.SortClause> getSort(String sortClause) {
+        return Utils.nullOrEmpty(sortClause) ? createDefaultSort() : createSort(sortClause);
     }
 
     protected abstract String getSolrDocumentIdFieldName();
 
     protected abstract UniProtDataType getUniProtDataType();
 
-    protected void addDefaultFieldOrderPair(String sortFieldName, Sort.Direction direction) {
-        Pair<String, Sort.Direction> fieldSortPair = new ImmutablePair<>(sortFieldName, direction);
-        this.defaultFieldSortOrderPairs.add(fieldSortPair);
+    protected void addDefaultFieldOrderPair(String sortFieldName, SolrQuery.ORDER direction) {
+        this.defaultFieldSortOrderPairs.add(SolrQuery.SortClause.create(sortFieldName, direction));
     }
 
     protected String getSolrSortFieldName(String searchFieldName) {
@@ -42,22 +41,22 @@ public abstract class AbstractSolrSortClause {
         return searchFieldConfig.getCorrespondingSortField(searchFieldName).getFieldName();
     }
 
-    protected Sort createSort(String sortClause) {
-        return convertToSolrSort(parseSortClause(sortClause));
+    protected List<SolrQuery.SortClause> createSort(String sortClause) {
+        return parseSortClause(sortClause);
     }
 
-    protected Sort createDefaultSort() {
-        return this.defaultFieldSortOrderPairs.stream()
-                .map(this::createSortObject)
-                .collect(reducing(new Sort(Sort.Direction.DESC, SCORE), Sort::and));
+    protected List<SolrQuery.SortClause> createDefaultSort() {
+        //        this.defaultFieldSortOrderPairs.add(
+        //                0, SolrQuery.SortClause.create(SCORE, SolrQuery.ORDER.desc));
+        return this.defaultFieldSortOrderPairs;
     }
 
     protected SearchFieldConfig getSearchFieldConfig(UniProtDataType dataType) {
         return SearchFieldConfigFactory.getSearchFieldConfig(dataType);
     }
 
-    protected List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
-        List<Pair<String, Sort.Direction>> fieldSortPairs = new ArrayList<>();
+    protected List<SolrQuery.SortClause> parseSortClause(String sortClause) {
+        List<SolrQuery.SortClause> fieldSortPairs = new ArrayList<>();
 
         String[] tokenizedSortClause =
                 sortClause.split("\\s*,\\s*"); // e.g. field1 asc, field2 desc, field3 asc
@@ -66,12 +65,13 @@ public abstract class AbstractSolrSortClause {
         for (String singleSortPairStr : tokenizedSortClause) {
             String[] fieldSortPairArr = singleSortPairStr.split("\\s+");
             if (fieldSortPairArr.length != 2) {
-                throw new IllegalArgumentException("You must pass field and sort value in pair.");
+                throw new IllegalArgumentException("You must pass the field and sort direction.");
             }
             String solrFieldName = getSolrSortFieldName(fieldSortPairArr[0]);
+
             fieldSortPairs.add(
-                    new ImmutablePair<>(
-                            solrFieldName, Sort.Direction.fromString(fieldSortPairArr[1])));
+                    SolrQuery.SortClause.create(
+                            solrFieldName, SolrQuery.ORDER.valueOf(fieldSortPairArr[1])));
             if (solrFieldName.equals(getSolrDocumentIdFieldName())) {
                 hasIdField = true;
             }
@@ -81,27 +81,9 @@ public abstract class AbstractSolrSortClause {
             fieldSortPairs = this.defaultFieldSortOrderPairs;
         } else if (!hasIdField) {
             fieldSortPairs.add(
-                    new ImmutablePair<>(getSolrDocumentIdFieldName(), Sort.Direction.ASC));
+                    SolrQuery.SortClause.create(getSolrDocumentIdFieldName(), SolrQuery.ORDER.asc));
         }
 
         return fieldSortPairs;
-    }
-
-    private Sort convertToSolrSort(List<Pair<String, Sort.Direction>> fieldSortPairs) {
-        Sort sort = null;
-        for (Pair<String, Sort.Direction> sField : fieldSortPairs) {
-            if (sort == null) {
-                sort = createSortObject(sField);
-            } else {
-                sort = sort.and(createSortObject(sField));
-            }
-        }
-        return sort;
-    }
-
-    private Sort createSortObject(Pair<String, Sort.Direction> fieldSortPair) {
-        String sortFieldName = fieldSortPair.getLeft();
-        Sort.Direction sortOrder = fieldSortPair.getRight();
-        return new Sort(sortOrder, sortFieldName);
     }
 }

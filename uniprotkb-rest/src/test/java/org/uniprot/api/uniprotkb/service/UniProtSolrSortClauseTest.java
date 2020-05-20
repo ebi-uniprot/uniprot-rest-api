@@ -2,14 +2,15 @@ package org.uniprot.api.uniprotkb.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Iterator;
+import java.util.List;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -27,115 +28,68 @@ class UniProtSolrSortClauseTest {
 
     @Test
     void testCreateSingleAccessionSortAsc() {
-        Sort sort = uniProtSolrSortClause.getSort("accession asc");
-        assertNotNull(sort);
+        List<SolrQuery.SortClause> sorts = uniProtSolrSortClause.getSort("accession asc");
 
-        Iterator<Sort.Order> sortIterator = sort.iterator();
-        assertNotNull(sortIterator);
-
-        assertTrue(sortIterator.hasNext());
-        Sort.Order order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("accession"), order.getProperty());
-        assertEquals(Sort.Direction.ASC, order.getDirection());
-
-        assertFalse(sortIterator.hasNext());
+        assertThat(
+                sorts,
+                contains(
+                        SolrQuery.SortClause.asc(
+                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
     }
 
     @Test
     void testCreateSingleMnemonicSortDescAlsoAddAccessionAsc() {
-        Sort sort = uniProtSolrSortClause.getSort("id desc");
-        assertNotNull(sort);
+        List<SolrQuery.SortClause> sorts = uniProtSolrSortClause.getSort("id desc");
 
-        Iterator<Sort.Order> sortIterator = sort.iterator();
-        assertNotNull(sortIterator);
-
-        assertTrue(sortIterator.hasNext());
-        Sort.Order order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("id"), order.getProperty());
-        assertEquals(Sort.Direction.DESC, order.getDirection());
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("accession"), order.getProperty());
-        assertEquals(Sort.Direction.ASC, order.getDirection());
-
-        assertFalse(sortIterator.hasNext());
+        assertThat(
+                sorts,
+                contains(
+                        SolrQuery.SortClause.desc(uniProtSolrSortClause.getSolrSortFieldName("id")),
+                        SolrQuery.SortClause.asc(
+                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
     }
 
     @Test
     void testCreateCompositeAccessionSortAscAndGeneDesc() {
-        Sort sort = uniProtSolrSortClause.getSort("accession desc,gene asc");
-        assertNotNull(sort);
+        List<SolrQuery.SortClause> sorts = uniProtSolrSortClause.getSort("accession desc,gene asc");
 
-        Iterator<Sort.Order> sortIterator = sort.iterator();
-        assertNotNull(sortIterator);
-
-        assertTrue(sortIterator.hasNext());
-        Sort.Order order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("accession"), order.getProperty());
-        assertEquals(Sort.Direction.DESC, order.getDirection());
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("gene"), order.getProperty());
-        assertEquals(Sort.Direction.ASC, order.getDirection());
-
-        assertFalse(sortIterator.hasNext());
+        assertThat(
+                sorts,
+                contains(
+                        SolrQuery.SortClause.desc(
+                                uniProtSolrSortClause.getSolrSortFieldName("accession")),
+                        SolrQuery.SortClause.asc(
+                                uniProtSolrSortClause.getSolrSortFieldName("gene"))));
     }
 
     @Test
     void testCreateCompositeMnemonicSortDescAlsoAddAccessionAsc() {
-        Sort sort = uniProtSolrSortClause.getSort("organism_name asc,mass desc , accession asc");
-        assertNotNull(sort);
+        List<SolrQuery.SortClause> sorts =
+                uniProtSolrSortClause.getSort("organism_name asc,mass desc , accession asc");
 
-        Iterator<Sort.Order> sortIterator = sort.iterator();
-        assertNotNull(sortIterator);
-
-        assertTrue(sortIterator.hasNext());
-        Sort.Order order = sortIterator.next();
-        assertEquals(
-                order.getProperty(), uniProtSolrSortClause.getSolrSortFieldName("organism_name"));
-        assertEquals(Sort.Direction.ASC, order.getDirection());
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(uniProtSolrSortClause.getSolrSortFieldName("mass"), order.getProperty());
-        assertEquals(Sort.Direction.DESC, order.getDirection());
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(order.getProperty(), uniProtSolrSortClause.getSolrSortFieldName("accession"));
-        assertEquals(Sort.Direction.ASC, order.getDirection());
-
-        assertFalse(sortIterator.hasNext());
+        assertThat(
+                sorts,
+                contains(
+                        SolrQuery.SortClause.asc(
+                                uniProtSolrSortClause.getSolrSortFieldName("organism_name")),
+                        SolrQuery.SortClause.desc(
+                                uniProtSolrSortClause.getSolrSortFieldName("mass")),
+                        SolrQuery.SortClause.asc(
+                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
     }
 
     @Test
     void testCreateDefaultSortWithScore() {
-        Sort defaultSort = uniProtSolrSortClause.getSort("");
-        assertNotNull(defaultSort);
+        List<SolrQuery.SortClause> sorts = uniProtSolrSortClause.getSort("");
 
-        Iterator<Sort.Order> sortIterator = defaultSort.iterator();
-        assertNotNull(sortIterator);
-
-        assertTrue(sortIterator.hasNext());
-        Sort.Order order = sortIterator.next();
-        assertEquals(AbstractSolrSortClause.SCORE, order.getProperty());
-        assertEquals(Sort.Direction.DESC, order.getDirection());
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(
-                order.getProperty(),
-                uniProtSolrSortClause.getSolrSortFieldName("annotation_score"));
-        assertEquals(Sort.Direction.DESC, order.getDirection());
-
-        assertTrue(sortIterator.hasNext());
-        order = sortIterator.next();
-        assertEquals(order.getProperty(), uniProtSolrSortClause.getSolrSortFieldName("accession"));
-        assertEquals(Sort.Direction.ASC, order.getDirection());
-
-        assertFalse(sortIterator.hasNext());
+        assertThat(
+                sorts,
+                contains(
+                        SolrQuery.SortClause.desc(AbstractSolrSortClause.SCORE),
+                        SolrQuery.SortClause.desc(
+                                uniProtSolrSortClause.getSolrSortFieldName("annotation_score")),
+                        SolrQuery.SortClause.asc(
+                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
     }
 
     @Test

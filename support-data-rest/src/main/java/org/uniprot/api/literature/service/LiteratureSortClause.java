@@ -2,7 +2,7 @@ package org.uniprot.api.literature.service;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.data.domain.Sort;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
@@ -17,7 +17,7 @@ public class LiteratureSortClause extends AbstractSolrSortClause {
 
     @PostConstruct
     public void init() {
-        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
+        addDefaultFieldOrderPair(DOC_ID, SolrQuery.ORDER.asc);
     }
 
     @Override

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.data.solr.core.query.SimpleQuery;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -43,10 +42,6 @@ public interface SearchRequest {
 
     default boolean hasFacets() {
         return Utils.notNullNotEmpty(getFacets());
-    }
-
-    default SimpleQuery getSimpleQuery() {
-        return new SimpleQuery(getQuery());
     }
 
     default List<String> getFacetList() {

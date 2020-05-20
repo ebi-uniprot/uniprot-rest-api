@@ -2,7 +2,7 @@ package org.uniprot.api.uniprotkb.service;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.data.domain.Sort;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
@@ -14,8 +14,8 @@ public class UniProtSolrSortClause extends AbstractSolrSortClause {
 
     @PostConstruct
     public void init() {
-        addDefaultFieldOrderPair(ANNOTATION_SCORE, Sort.Direction.DESC);
-        addDefaultFieldOrderPair(ACCESSION_ID, Sort.Direction.ASC);
+        addDefaultFieldOrderPair(ANNOTATION_SCORE, SolrQuery.ORDER.desc);
+        addDefaultFieldOrderPair(ACCESSION_ID, SolrQuery.ORDER.asc);
     }
 
     @Override

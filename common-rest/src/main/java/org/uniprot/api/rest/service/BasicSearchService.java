@@ -170,7 +170,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         requestBuilder.query(requestedQuery);
 
         if (solrSortClause != null) {
-            requestBuilder.addSort(solrSortClause.getSort(request.getSort()));
+            requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
         if (includeFacets && request.hasFacets()) {

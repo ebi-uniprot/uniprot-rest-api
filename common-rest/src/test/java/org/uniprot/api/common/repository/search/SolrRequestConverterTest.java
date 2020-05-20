@@ -9,8 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
@@ -49,7 +47,7 @@ class SolrRequestConverterTest {
             String filterQuery2 = "filter query 2";
             String sortField1 = "sortField1";
             String sortField2 = "sortField2";
-            Query.Operator defaultQueryOperator = Query.Operator.OR;
+            QueryOperator defaultQueryOperator = QueryOperator.OR;
             SolrRequest request =
                     SolrRequest.builder()
                             .query(queryString)
@@ -62,9 +60,8 @@ class SolrRequestConverterTest {
                             .termField(termField2)
                             .filterQuery(filterQuery1)
                             .filterQuery(filterQuery2)
-                            .sort(
-                                    new Sort(Sort.Direction.ASC, sortField1)
-                                            .and(new Sort(Sort.Direction.DESC, sortField2)))
+                            .sort(SolrQuery.SortClause.asc(sortField1))
+                            .sort(SolrQuery.SortClause.desc(sortField2))
                             .defaultQueryOperator(defaultQueryOperator)
                             .build();
 
@@ -93,8 +90,7 @@ class SolrRequestConverterTest {
                     contains(
                             new SolrQuery.SortClause(sortField1, SolrQuery.ORDER.asc),
                             new SolrQuery.SortClause(sortField2, SolrQuery.ORDER.desc)));
-            assertThat(
-                    solrQuery.get("q.op"), is(defaultQueryOperator.asQueryStringRepresentation()));
+            assertThat(solrQuery.get("q.op"), is(defaultQueryOperator.name()));
         }
 
         @Test
