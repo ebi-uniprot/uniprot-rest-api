@@ -23,7 +23,6 @@ class SortFieldMetaReaderImplTest {
                 () -> sortFieldMetaReaderImpl.read("invalid-invalid.json"));
     }
 
-    @Disabled
     @Test
     void testReadSortFieldsForCrossReference() {
         SortFieldMetaReaderImpl sortFieldMetaReaderImpl = new SortFieldMetaReaderImpl();
