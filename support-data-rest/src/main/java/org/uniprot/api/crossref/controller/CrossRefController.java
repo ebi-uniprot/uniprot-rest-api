@@ -63,7 +63,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = CrossRefEntry.class)),
+                                    schema = @Schema(implementation = CrossRefEntry.class))
                         })
             })
     @GetMapping(
