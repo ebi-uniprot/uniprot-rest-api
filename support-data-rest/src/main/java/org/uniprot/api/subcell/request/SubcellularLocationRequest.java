@@ -23,7 +23,7 @@ public class SubcellularLocationRequest implements SearchRequest {
 
     @ModelFieldMeta(
             reader = QueryFieldMetaReaderImpl.class,
-            path = "subcell-location-search-fields.json")
+            path = "subcelllocation-search-fields.json")
     @Parameter(
             description =
                     "Criteria to search Subcellular locations. It can take any valid solr query.")
@@ -36,7 +36,7 @@ public class SubcellularLocationRequest implements SearchRequest {
 
     @ModelFieldMeta(
             reader = SortFieldMetaReaderImpl.class,
-            path = "subcell-location-search-fields.json")
+            path = "subcelllocation-search-fields.json")
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String sort;
@@ -46,7 +46,7 @@ public class SubcellularLocationRequest implements SearchRequest {
 
     @ModelFieldMeta(
             reader = ReturnFieldMetaReaderImpl.class,
-            path = "subcell-location-return-fields.json")
+            path = "subcelllocation-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String fields;
