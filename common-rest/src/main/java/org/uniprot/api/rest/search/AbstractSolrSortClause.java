@@ -46,8 +46,6 @@ public abstract class AbstractSolrSortClause {
     }
 
     protected List<SolrQuery.SortClause> createDefaultSort() {
-        //        this.defaultFieldSortOrderPairs.add(
-        //                0, SolrQuery.SortClause.create(SCORE, SolrQuery.ORDER.desc));
         return this.defaultFieldSortOrderPairs;
     }
 
