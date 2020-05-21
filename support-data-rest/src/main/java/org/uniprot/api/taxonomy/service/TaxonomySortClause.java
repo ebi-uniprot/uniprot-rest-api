@@ -2,7 +2,7 @@ package org.uniprot.api.taxonomy.service;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.data.domain.Sort;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
@@ -14,8 +14,8 @@ public class TaxonomySortClause extends AbstractSolrSortClause {
 
     @PostConstruct
     public void init() {
-        addDefaultFieldOrderPair(TAX_ID, Sort.Direction.ASC);
-        addDefaultFieldOrderPair(DOC_ID, Sort.Direction.ASC);
+        addDefaultFieldOrderPair(TAX_ID, SolrQuery.ORDER.asc);
+        addDefaultFieldOrderPair(DOC_ID, SolrQuery.ORDER.asc);
     }
 
     @Override

@@ -6,6 +6,7 @@ import static org.uniprot.api.rest.request.MetaReaderUtil.*;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -22,6 +23,7 @@ class SortFieldMetaReaderImplTest {
                 () -> sortFieldMetaReaderImpl.read("invalid-invalid.json"));
     }
 
+    @Disabled
     @Test
     void testReadSortFieldsForCrossReference() {
         SortFieldMetaReaderImpl sortFieldMetaReaderImpl = new SortFieldMetaReaderImpl();

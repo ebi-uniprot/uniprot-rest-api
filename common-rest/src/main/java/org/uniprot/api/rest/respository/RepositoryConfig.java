@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 
 /**
- * Configure spring-data-solr repository beans, that are used to retrieve data from a solr instance.
+ * Configure solr repository beans, that are used to retrieve data from a solr instance.
  *
  * @author lgonzales
  */

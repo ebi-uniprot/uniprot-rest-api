@@ -126,6 +126,10 @@
 			<version>${openapi-maven-plugin.version}</version>
 			<exclusions>
 				<exclusion>
+					<groupId>org.springframework.data</groupId>
+					<artifactId>spring-data-solr</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>

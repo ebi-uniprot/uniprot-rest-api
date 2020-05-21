@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Query;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
@@ -43,7 +41,7 @@ public class SolrRequestConverter {
 
         solrQuery.setRows(request.getRows());
         setFilterQueries(solrQuery, request.getFilterQueries());
-        setSort(solrQuery, request.getSort());
+        setSort(solrQuery, request.getSorts());
         setQueryOperator(solrQuery, request.getDefaultQueryOperator());
         if (!request.getFacets().isEmpty()) {
             setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
@@ -124,8 +122,8 @@ public class SolrRequestConverter {
             solrQuery.setFacetMinCount(facetConfig.getMincount());
         }
 
-        static void setQueryOperator(SolrQuery solrQuery, Query.Operator defaultQueryOperator) {
-            solrQuery.set(QUERY_OPERATOR, defaultQueryOperator.asQueryStringRepresentation());
+        static void setQueryOperator(SolrQuery solrQuery, QueryOperator defaultQueryOperator) {
+            solrQuery.set(QUERY_OPERATOR, defaultQueryOperator.name());
         }
 
         static void setFilterQueries(SolrQuery solrQuery, List<String> filterQueries) {
@@ -134,14 +132,8 @@ public class SolrRequestConverter {
             solrQuery.setFilterQueries(filterQueryArr);
         }
 
-        static void setSort(SolrQuery solrQuery, Sort sort) {
-            if (notNull(sort)) {
-                for (Sort.Order order : sort) {
-                    solrQuery.addSort(
-                            order.getProperty(),
-                            order.isAscending() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
-                }
-            }
+        static void setSort(SolrQuery solrQuery, List<SolrQuery.SortClause> sorts) {
+            sorts.forEach(solrQuery::addSort);
         }
 
         static void setQueryBoosts(SolrQuery solrQuery, String query, QueryBoosts boosts) {

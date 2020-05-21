@@ -5,11 +5,10 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
 import org.uniprot.store.config.UniProtDataType;
 
 /**
@@ -27,28 +26,25 @@ class AbstractSolrSortClauseTest {
 
     @Test
     void emptySortClauseProducesDefaultSort() {
-        Sort defaultSort = fakeSolrSortClause.getSort("");
-        List<String> defaultSorts =
-                defaultSort.get().map(Sort.Order::toString).collect(Collectors.toList());
+        List<SolrQuery.SortClause> defaultSort = fakeSolrSortClause.getSort("");
         assertThat(
-                defaultSorts,
+                defaultSort,
                 contains(
-                        new Sort(Sort.Direction.DESC, "score").toString(),
-                        defaultSort().toString(),
-                        new Sort(Sort.Direction.ASC, FakeSolrSortClause.ID).toString()));
+                        SolrQuery.SortClause.desc("score"),
+                        defaultSort(),
+                        SolrQuery.SortClause.asc(FakeSolrSortClause.ID)));
     }
 
     @Test
     void singleSortClauseProducesSingleSort() {
         String name = "name";
-        Sort sort = fakeSolrSortClause.getSort(name + " asc");
+        List<SolrQuery.SortClause> sorts = fakeSolrSortClause.getSort(name + " asc");
 
-        List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
                 sorts,
                 contains(
-                        new Sort(Sort.Direction.ASC, field(name)).toString(),
-                        new Sort(Sort.Direction.ASC, FakeSolrSortClause.ID).toString()));
+                        SolrQuery.SortClause.asc(field(name)),
+                        SolrQuery.SortClause.asc(FakeSolrSortClause.ID)));
     }
 
     @Test
@@ -62,38 +58,38 @@ class AbstractSolrSortClauseTest {
     void multipleSortClausesWithIDProduceMultipleSorts() {
         String name = "name";
         String age = "age";
-        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc, id desc");
+        List<SolrQuery.SortClause> sorts =
+                fakeSolrSortClause.getSort(name + " asc, " + age + " desc, id desc");
 
-        List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
                 sorts,
                 contains(
-                        new Sort(Sort.Direction.ASC, field(name)).toString(),
-                        new Sort(Sort.Direction.DESC, field(age)).toString(),
-                        new Sort(Sort.Direction.DESC, FakeSolrSortClause.ID).toString()));
+                        SolrQuery.SortClause.asc(field(name)),
+                        SolrQuery.SortClause.desc(field(age)),
+                        SolrQuery.SortClause.desc(FakeSolrSortClause.ID)));
     }
 
     @Test
     void multipleSortClausesProduceMultipleSorts() {
         String name = "name";
         String age = "age";
-        Sort sort = fakeSolrSortClause.getSort(name + " asc, " + age + " desc");
+        List<SolrQuery.SortClause> sorts =
+                fakeSolrSortClause.getSort(name + " asc, " + age + " desc");
 
-        List<String> sorts = sort.get().map(Sort.Order::toString).collect(Collectors.toList());
         assertThat(
                 sorts,
                 contains(
-                        new Sort(Sort.Direction.ASC, field(name)).toString(),
-                        new Sort(Sort.Direction.DESC, field(age)).toString(),
-                        new Sort(Sort.Direction.ASC, FakeSolrSortClause.ID).toString()));
+                        SolrQuery.SortClause.asc(field(name)),
+                        SolrQuery.SortClause.desc(field(age)),
+                        SolrQuery.SortClause.asc(FakeSolrSortClause.ID)));
     }
 
     private static class FakeSolrSortClause extends AbstractSolrSortClause {
         private static final String ID = "id_field";
 
         FakeSolrSortClause() {
-            addDefaultFieldOrderPair("default", Sort.Direction.ASC);
-            addDefaultFieldOrderPair(FakeSolrSortClause.ID, Sort.Direction.ASC);
+            addDefaultFieldOrderPair("default", SolrQuery.ORDER.asc);
+            addDefaultFieldOrderPair(FakeSolrSortClause.ID, SolrQuery.ORDER.asc);
         }
 
         @Override
@@ -116,7 +112,7 @@ class AbstractSolrSortClauseTest {
         return name + "_field";
     }
 
-    static Sort defaultSort() {
-        return new Sort(Sort.DEFAULT_DIRECTION, "default");
+    static SolrQuery.SortClause defaultSort() {
+        return SolrQuery.SortClause.asc("default");
     }
 }

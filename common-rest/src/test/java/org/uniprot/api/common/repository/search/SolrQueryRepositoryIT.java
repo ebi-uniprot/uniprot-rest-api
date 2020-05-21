@@ -22,8 +22,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Query;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
@@ -330,7 +328,7 @@ class SolrQueryRepositoryIT {
     private SolrRequest queryAllReverseOrderedByAccession() {
         return SolrRequest.builder()
                 .query("*:*")
-                .sort(new Sort(Sort.Direction.DESC, "accession_id"))
+                .sort(SolrQuery.SortClause.desc("accession_id"))
                 .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
                 .build();
     }
@@ -342,11 +340,11 @@ class SolrQueryRepositoryIT {
     private SolrRequest queryWithFacets(String query, List<String> facets, int size) {
         return SolrRequest.builder()
                 .query(query)
-                .defaultQueryOperator(Query.Operator.AND)
+                .defaultQueryOperator(QueryOperator.AND)
                 .filterQuery("active:true")
                 .facetConfig(new FakeFacetConfig())
                 .facets(facets)
-                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .sort(SolrQuery.SortClause.asc("accession_id"))
                 .rows(size)
                 .build();
     }
@@ -358,7 +356,7 @@ class SolrQueryRepositoryIT {
     private SolrRequest queryWithoutFacets(String query, int size) {
         return SolrRequest.builder()
                 .query(query)
-                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .sort(SolrQuery.SortClause.asc("accession_id"))
                 .rows(size)
                 .build();
     }
@@ -369,7 +367,7 @@ class SolrQueryRepositoryIT {
                 .termQuery(query)
                 .termField("keyword")
                 .termField("protein_name")
-                .sort(new Sort(Sort.Direction.ASC, "accession_id"))
+                .sort(SolrQuery.SortClause.asc("accession_id"))
                 .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
                 .build();
     }
