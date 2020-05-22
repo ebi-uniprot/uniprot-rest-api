@@ -31,10 +31,22 @@ import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * @author lgonzales
  * @since 2019-07-04
  */
+@Tag(
+        name = "Literature",
+        description =
+                "Search publications that are cited in, or were computationally mapped to, UniProtKB")
 @RestController
 @RequestMapping("/literature")
 @Validated
@@ -58,8 +70,21 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
         this.literatureService = literatureService;
     }
 
+    @Operation(
+            summary = "Get literature by PubMed id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = LiteratureEntry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     @GetMapping(
-            value = "/{literatureId}",
+            value = "/{pubMedId}",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -67,23 +92,43 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
-            @PathVariable("literatureId")
+            @Parameter(description = "PubMed id to find")
+                    @PathVariable("pubMedId")
                     @Pattern(
                             regexp = LITERATURE_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.literature.invalid.id}")
-                    String literatureId,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
+                    String pubMedId,
+            @Parameter(description = "Comma separated list of fields to be returned in response")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(literatureId);
+        LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(pubMedId);
         return super.getEntityResponse(literatureEntry, fields, request);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Search literature by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            LiteratureEntry
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -91,16 +136,34 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> search(
-            @Valid LiteratureRequest searchRequest,
+            @Valid @ModelAttribute LiteratureRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @RequestMapping(
+    @Operation(
+            summary = "Download literature by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            LiteratureEntry
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -108,7 +171,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> download(
-            @Valid LiteratureRequest searchRequest,
+            @Valid @ModelAttribute LiteratureRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

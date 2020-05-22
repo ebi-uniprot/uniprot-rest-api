@@ -187,13 +187,16 @@
 						<version>${openapi-maven-plugin.version}</version>
 						<configuration>
 							<packageLocations>
-								<packageLocation>org.uniprot.api.keyword</packageLocation>
 								<packageLocation>org.uniprot.api.crossref.controller</packageLocation>
 								<packageLocation>org.uniprot.api.disease</packageLocation>
+								<packageLocation>org.uniprot.api.keyword</packageLocation>
+								<packageLocation>org.uniprot.api.literature</packageLocation>
+								<packageLocation>org.uniprot.api.subcell</packageLocation>
+								<packageLocation>org.uniprot.api.taxonomy</packageLocation>
 							</packageLocations>
 							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
-							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
+							<openApiFileName>support-data-openapi3.yaml</openApiFileName>
+							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>
 						<dependencies>
 							<dependency>
