@@ -1,10 +1,10 @@
-organism_url,organism_format
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Salmonella dublin",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Rana shuchinae",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Parthenium hysterophorus",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Pythium hypogynum",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Chlorobaculum parvum",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Chlamydia phage "1,application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Methanococcus vannielii",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Iris pallida",application/json
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:"Conus capitaneus",application/json
+organism_url#organism_format
+/uniprot/api/uniprotkb/search?query=organism_name:"Salmonella dublin"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Rana shuchinae"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Parthenium hysterophorus"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Pythium hypogynum"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Chlorobaculum parvum"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Chlamydia phage "1#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Methanococcus vannielii"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Iris pallida"#application/json
+/uniprot/api/uniprotkb/search?query=organism_name:"Conus capitaneus"#application/json
