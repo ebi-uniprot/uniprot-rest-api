@@ -187,12 +187,14 @@
 						<version>${openapi-maven-plugin.version}</version>
 						<configuration>
 							<packageLocations>
-								<packageLocation>org.uniprot.api.crossref.controller</packageLocation>
-								<packageLocation>org.uniprot.api.disease</packageLocation>
-								<packageLocation>org.uniprot.api.keyword</packageLocation>
-								<packageLocation>org.uniprot.api.literature</packageLocation>
-								<packageLocation>org.uniprot.api.subcell</packageLocation>
-								<packageLocation>org.uniprot.api.taxonomy</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.crossref.controller</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.disease</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.keyword</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.literature</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.subcell</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.taxonomy</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.suggester</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.configure.controller</packageLocation>
 							</packageLocations>
 							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
 							<openApiFileName>support-data-openapi3.yaml</openApiFileName>

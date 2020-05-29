@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
-import org.uniprot.api.support.data.configure.uniprot.domain.query.SolrJsonQuery;
+import org.uniprot.api.support.data.configure.domain.SolrJsonQuery;
 
 /**
  * This class convert Solr {@link Query} to {@link SolrJsonQuery}.
@@ -15,6 +15,8 @@ import org.uniprot.api.support.data.configure.uniprot.domain.query.SolrJsonQuery
  * @author lgonzales
  */
 public class SolrQueryConverter {
+
+    private SolrQueryConverter() {}
 
     public static SolrJsonQuery convert(Query inputQuery) {
         SolrJsonQuery result;
@@ -33,7 +35,8 @@ public class SolrQueryConverter {
         } else if (inputQuery instanceof BooleanQuery) {
             result = buildBooleanQuery((BooleanQuery) inputQuery);
         } else {
-            throw new RuntimeException("Unsupported query type" + inputQuery.getClass().getName());
+            throw new UnsupportedOperationException(
+                    "Unsupported query type" + inputQuery.getClass().getName());
         }
         return result;
     }

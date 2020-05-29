@@ -1,10 +1,14 @@
 package org.uniprot.api.support.data.configure.service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.store.search.domain.FieldGroup;
-import org.uniprot.store.search.field.UniParcResultFields;
+import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
+import org.uniprot.core.uniparc.UniParcDatabase;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author jluo
@@ -12,10 +16,33 @@ import org.uniprot.store.search.field.UniParcResultFields;
  */
 @Service
 public class UniParcConfigureService {
-    // By loading the enum at startup, there is no pause on first request
-    private static final UniParcResultFields UNIPARC_RESULT_FIELDS = UniParcResultFields.INSTANCE;
 
-    public List<FieldGroup> getResultFields() {
-        return UNIPARC_RESULT_FIELDS.getResultFieldGroups();
+    public List<UniProtReturnField> getResultFields() {
+        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPARC);
+    }
+
+    public List<AdvancedSearchTerm> getSearchItems() {
+        List<AdvancedSearchTerm.Value> values = getUniParcDatabaseValues();
+
+        List<AdvancedSearchTerm> result =
+                AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPARC);
+
+        for (int i = 0; i < result.size(); i++) {
+            AdvancedSearchTerm searchTerm = result.get(i);
+            if (searchTerm.getTerm().equalsIgnoreCase("database")
+                    || searchTerm.getTerm().equalsIgnoreCase("active")) {
+                AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
+                builder.values(values);
+                result.set(i, builder.build());
+            }
+        }
+
+        return result;
+    }
+
+    private List<AdvancedSearchTerm.Value> getUniParcDatabaseValues() {
+        return Arrays.stream(UniParcDatabase.values())
+                .map(db -> new AdvancedSearchTerm.Value(db.getDisplayName(), db.getDisplayName()))
+                .collect(Collectors.toList());
     }
 }
