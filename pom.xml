@@ -59,6 +59,7 @@
 		<!-- Auto-formatting -->
 		<spotless.version>1.24.1</spotless.version>
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
+		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
 	</properties>
 
 	<modules>
@@ -137,6 +138,11 @@
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${dropwizard.metrics.version}</version>
 		</dependency>
 		</dependencies>
 	</dependencyManagement>
