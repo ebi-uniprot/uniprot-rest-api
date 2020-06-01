@@ -58,6 +58,7 @@
 
 		<!-- Auto-formatting -->
 		<spotless.version>1.24.1</spotless.version>
+		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 	</properties>
 
 	<modules>
@@ -126,6 +127,17 @@
 				<artifactId>commons-compress</artifactId>
 				<version>${commons-compress.version}</version>
 			</dependency>
+			<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>openapi-maven-plugin</artifactId>
+			<version>${openapi-maven-plugin.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		</dependencies>
 	</dependencyManagement>
 

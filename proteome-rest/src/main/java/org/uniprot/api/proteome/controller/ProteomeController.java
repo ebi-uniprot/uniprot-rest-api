@@ -2,7 +2,9 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
 
 import java.util.Optional;
@@ -20,7 +22,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.ProteomeRequest;
@@ -28,10 +36,21 @@ import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.ProteomeEntry;
+import org.uniprot.core.xml.jaxb.proteome.Proteome;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author jluo
@@ -55,6 +74,12 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         this.queryService = queryService;
     }
 
+    @Tag(
+            name = "proteome",
+            description =
+                    "The Proteomes service provides access to UniProtKB proteomes with"
+                            + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
+                            + " proteome identifiers, species names or taxonomy identifiers")
     @RequestMapping(
             value = "/search",
             method = RequestMethod.GET,
@@ -65,9 +90,36 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Search for Proteomes.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            ProteomeEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Proteome.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> search(
-            @Valid ProteomeRequest searchRequest,
-            @RequestParam(value = "preview", required = false, defaultValue = "false")
+            @Valid @ModelAttribute ProteomeRequest searchRequest,
+            @Parameter(hidden = true)
+                    @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -75,6 +127,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Tag(name = "proteome")
     @RequestMapping(
             value = "/{upid}",
             method = RequestMethod.GET,
@@ -85,14 +138,37 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Retrieve an Proteome entry by upid.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ProteomeEntry.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Proteome.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> getByUpId(
-            @PathVariable("upid")
+            @Parameter(description = "Unique identifier for the Proteome entry")
+                    @PathVariable("upid")
                     @Pattern(
                             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
+            @ModelFieldMeta(
+                            reader = ReturnFieldMetaReaderImpl.class,
+                            path = "proteome-return-fields.json")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
+                    @Parameter(
+                            description =
+                                    "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -100,6 +176,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         return super.getEntityResponse(entry, fields, request);
     }
 
+    @Tag(name = "proteome")
     @RequestMapping(
             value = "/download",
             method = RequestMethod.GET,
@@ -110,8 +187,34 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Download proteomes entry (or entries) via search.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            ProteomeEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Proteome.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> download(
-            @Valid ProteomeRequest searchRequest,
+            @Valid @ModelAttribute ProteomeRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,

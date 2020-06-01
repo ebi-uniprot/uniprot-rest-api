@@ -28,12 +28,23 @@ import org.uniprot.api.proteome.service.GeneCentricService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.CanonicalProtein;
+import org.uniprot.core.xml.jaxb.proteome.CanonicalGene;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author jluo
@@ -57,23 +68,78 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
         this.service = service;
     }
 
+    @Tag(name = "genecentric", description = "gene centric service")
+    @Operation(
+            summary = "Search for gene centric data set.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CanonicalProtein
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CanonicalGene.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
+                        })
+            })
     @RequestMapping(
             value = "/search",
             method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> searchCursor(
-            @Valid GeneCentricRequest searchRequest,
+            @Valid @ModelAttribute GeneCentricRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<CanonicalProtein> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Tag(name = "genecentric")
+    @Operation(
+            summary = "Fetch all gene centric proteins by proteome id: upid.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CanonicalProtein
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CanonicalGene.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
+                        })
+            })
     @RequestMapping(
             value = "/upid/{upid}",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByUpId(
-            @PathVariable("upid")
+            @Parameter(description = "Unique identifier for the Proteome entry")
+                    @PathVariable("upid")
                     @Pattern(
                             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -91,17 +157,36 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Tag(name = "genecentric")
+    @Operation(
+            summary = "Retrieve an gene centric entry by uniprot accession.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = CanonicalProtein.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = CanonicalGene.class)),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
+                        })
+            })
     @RequestMapping(
             value = "/{accession}",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByAccession(
-            @PathVariable("accession")
+            @Parameter(description = "UnirotKB accession")
+                    @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
+            @ModelFieldMeta(
+                            reader = ReturnFieldMetaReaderImpl.class,
+                            path = "genecentric-return-fields.json")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -109,12 +194,39 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
         return super.getEntityResponse(entry, fields, request);
     }
 
+    @Tag(name = "genecentric")
+    @Operation(
+            summary = "Download Gene Centric data retrieved by search.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CanonicalProtein
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CanonicalGene.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
+                        })
+            })
     @RequestMapping(
             value = "/download",
             method = RequestMethod.GET,
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public DeferredResult<ResponseEntity<MessageConverterContext<CanonicalProtein>>> download(
-            @Valid GeneCentricRequest searchRequest,
+            @Valid @ModelAttribute GeneCentricRequest searchRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         Stream<CanonicalProtein> result = service.download(searchRequest);
