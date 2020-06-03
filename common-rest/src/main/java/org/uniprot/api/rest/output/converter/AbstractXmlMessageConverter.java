@@ -18,7 +18,7 @@ import com.sun.xml.bind.marshaller.DataWriter;
 public abstract class AbstractXmlMessageConverter<T, X>
         extends AbstractEntityHttpMessageConverter<T> {
 
-    private JAXBContext jaxbContext;
+    private final JAXBContext jaxbContext;
 
     public AbstractXmlMessageConverter(Class<T> messageConverterEntryClass, String context) {
         super(MediaType.APPLICATION_XML, messageConverterEntryClass);
