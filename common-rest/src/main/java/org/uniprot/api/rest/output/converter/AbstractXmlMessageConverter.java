@@ -61,7 +61,7 @@ public abstract class AbstractXmlMessageConverter<T, X>
             contextMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             return contextMarshaller;
         } catch (Exception e) {
-            throw new RuntimeException("JAXB initialisation failed", e);
+            throw new RuntimeException("JAXB marshaller creation failed", e);
         }
     }
 
