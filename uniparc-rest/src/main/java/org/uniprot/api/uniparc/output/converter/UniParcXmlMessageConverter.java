@@ -13,7 +13,6 @@ import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
  */
 public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniParcEntry, Entry> {
     private final UniParcEntryConverter converter;
-    private final Marshaller marshaller;
     private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniparc";
     private static final String HEADER_PREFIX =
             "<uniparc xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/uniparc.xsd\"";
@@ -23,9 +22,8 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
     private String header;
 
     public UniParcXmlMessageConverter(String version) {
-        super(UniParcEntry.class);
+        super(UniParcEntry.class, XML_CONTEXT);
         converter = new UniParcEntryConverter();
-        marshaller = createMarshaller(XML_CONTEXT);
         header = HEADER_PREFIX;
         if ((version != null) && (!version.isEmpty())) {
             header += " version=\"" + version + "\"";
@@ -46,7 +44,7 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
 
     @Override
     protected Marshaller getMarshaller() {
-        return marshaller;
+        return createMarshaller();
     }
 
     @Override

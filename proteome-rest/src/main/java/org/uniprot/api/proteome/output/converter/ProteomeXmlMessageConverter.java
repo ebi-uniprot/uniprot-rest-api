@@ -14,7 +14,6 @@ import org.uniprot.core.xml.proteome.ProteomeConverter;
 public class ProteomeXmlMessageConverter
         extends AbstractXmlMessageConverter<ProteomeEntry, Proteome> {
     private final ProteomeConverter converter;
-    private final Marshaller marshaller;
     private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
     private static final String HEADER =
             "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
@@ -22,9 +21,8 @@ public class ProteomeXmlMessageConverter
     private static final String FOOTER = "\n</proteomes>";
 
     public ProteomeXmlMessageConverter() {
-        super(ProteomeEntry.class);
+        super(ProteomeEntry.class, XML_CONTEXT);
         converter = new ProteomeConverter();
-        marshaller = createMarshaller(XML_CONTEXT);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class ProteomeXmlMessageConverter
 
     @Override
     protected Marshaller getMarshaller() {
-        return marshaller;
+        return createMarshaller();
     }
 
     @Override
