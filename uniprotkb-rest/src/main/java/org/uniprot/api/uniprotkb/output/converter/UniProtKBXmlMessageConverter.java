@@ -10,7 +10,6 @@ import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
 public class UniProtKBXmlMessageConverter
         extends AbstractXmlMessageConverter<UniProtKBEntry, Entry> {
     private final UniProtEntryConverter converter;
-    private final Marshaller marshaller;
     private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniprot";
 
     public static final String HEADER =
@@ -22,9 +21,8 @@ public class UniProtKBXmlMessageConverter
                     + "</uniprot>";
 
     public UniProtKBXmlMessageConverter() {
-        super(UniProtKBEntry.class);
+        super(UniProtKBEntry.class, XML_CONTEXT);
         converter = new UniProtEntryConverter();
-        marshaller = createMarshaller(XML_CONTEXT);
     }
 
     @Override
@@ -34,7 +32,7 @@ public class UniProtKBXmlMessageConverter
 
     @Override
     protected Marshaller getMarshaller() {
-        return marshaller;
+        return createMarshaller();
     }
 
     @Override

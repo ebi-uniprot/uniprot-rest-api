@@ -3,6 +3,7 @@ package org.uniprot.api.rest.output.converter;
 import java.io.*;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.springframework.http.MediaType;
@@ -17,8 +18,15 @@ import com.sun.xml.bind.marshaller.DataWriter;
 public abstract class AbstractXmlMessageConverter<T, X>
         extends AbstractEntityHttpMessageConverter<T> {
 
-    public AbstractXmlMessageConverter(Class<T> messageConverterEntryClass) {
+    private JAXBContext jaxbContext;
+
+    public AbstractXmlMessageConverter(Class<T> messageConverterEntryClass, String context) {
         super(MediaType.APPLICATION_XML, messageConverterEntryClass);
+        try {
+            jaxbContext = JAXBContext.newInstance(context);
+        } catch (JAXBException e) {
+            throw new RuntimeException("JAXB initialisation failed", e);
+        }
     }
 
     protected abstract X toXml(T entity);
@@ -46,9 +54,8 @@ public abstract class AbstractXmlMessageConverter<T, X>
         outputStream.write(getFooter().getBytes());
     }
 
-    protected Marshaller createMarshaller(String context) {
+    protected Marshaller createMarshaller() {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(context);
             Marshaller contextMarshaller = jaxbContext.createMarshaller();
             contextMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             contextMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);

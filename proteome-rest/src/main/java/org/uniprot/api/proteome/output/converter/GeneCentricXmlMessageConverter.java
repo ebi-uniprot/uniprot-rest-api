@@ -14,7 +14,6 @@ import org.uniprot.core.xml.proteome.CanonicalProteinConverter;
 public class GeneCentricXmlMessageConverter
         extends AbstractXmlMessageConverter<CanonicalProtein, CanonicalGene> {
     private final CanonicalProteinConverter converter;
-    private final Marshaller marshaller;
     private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
     private static final String HEADER =
             "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
@@ -22,9 +21,8 @@ public class GeneCentricXmlMessageConverter
     private static final String FOOTER = "\n</proteomes>";
 
     public GeneCentricXmlMessageConverter() {
-        super(CanonicalProtein.class);
+        super(CanonicalProtein.class, XML_CONTEXT);
         converter = new CanonicalProteinConverter();
-        marshaller = createMarshaller(XML_CONTEXT);
     }
 
     @Override
@@ -39,7 +37,7 @@ public class GeneCentricXmlMessageConverter
 
     @Override
     protected Marshaller getMarshaller() {
-        return marshaller;
+        return createMarshaller();
     }
 
     @Override
