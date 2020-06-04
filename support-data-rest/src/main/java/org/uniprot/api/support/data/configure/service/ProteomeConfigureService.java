@@ -3,8 +3,9 @@ package org.uniprot.api.support.data.configure.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.store.search.domain.FieldGroup;
-import org.uniprot.store.search.field.ProteomeResultFields;
+import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author jluo
@@ -12,11 +13,12 @@ import org.uniprot.store.search.field.ProteomeResultFields;
  */
 @Service
 public class ProteomeConfigureService {
-    // By loading the enum at startup, there is no pause on first request
-    private static final ProteomeResultFields PROTEOME_RESULT_FIELDS =
-            ProteomeResultFields.INSTANCE;
 
-    public List<FieldGroup> getResultFields() {
-        return PROTEOME_RESULT_FIELDS.getResultFieldGroups();
+    public List<UniProtReturnField> getResultFields() {
+        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.PROTEOME);
+    }
+
+    public List<AdvancedSearchTerm> getSearchItems() {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.PROTEOME);
     }
 }

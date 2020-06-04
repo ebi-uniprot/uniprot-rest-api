@@ -3,10 +3,9 @@ package org.uniprot.api.support.data.configure.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.returnfield.model.ReturnField;
 
 /**
  * @author jluo
@@ -14,11 +13,12 @@ import org.uniprot.store.config.returnfield.model.ReturnField;
  */
 @Service
 public class UniRefConfigureService {
-    // By loading the enum at startup, there is no pause on first request
-    private static final ReturnFieldConfig UNIREF_RESULT_FIELDS =
-            ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF);
 
-    public List<ReturnField> getResultFields() {
-        return UNIREF_RESULT_FIELDS.getReturnFields();
+    public List<UniProtReturnField> getResultFields() {
+        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIREF);
+    }
+
+    public List<AdvancedSearchTerm> getSearchItems() {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIREF);
     }
 }
