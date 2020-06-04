@@ -19,6 +19,7 @@ import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.UniProtKBConfigureService;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.uniprotkb.evidence.EvidenceDatabaseDetail;
 import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
@@ -199,12 +200,12 @@ public class UniProtKBConfigureController {
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            UniProtDatabaseDetail
+                                                                            EvidenceDatabaseDetail
                                                                                     .class)))
                         })
             })
     @GetMapping("/evidenceDatabases")
-    public List<UniProtDatabaseDetail> getUniProtEvidenceDatabase() {
-        return service.getAllDatabases();
+    public List<EvidenceDatabaseDetail> getUniProtEvidenceDatabase() {
+        return service.getEvidenceDatabases();
     }
 }
