@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(
         name = "Configuration",
-        description = "This service provides configuration data used in UniProt website")
+        description = "These services provide configuration data used in UniProt website")
 @RestController
 @RequestMapping("/configure/proteome")
 public class ProteomeConfigureController {

@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.config;
+package org.uniprot.api.support.data.common.config;
 
 import java.util.List;
 

@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.support.data.configure.domain.SolrJsonQuery;
@@ -56,6 +57,7 @@ public class UtilController {
                                     "Query string to be parsed. For example: (gene:cdc7) AND (organism_id:9606)")
                     @NotNull(message = "{query.parameter.required}")
                     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
+                    @RequestParam(name = "query")
                     String query) {
         return service.convertQuery(query);
     }
