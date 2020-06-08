@@ -4,7 +4,7 @@
 ```
 mvn test -Pbenchmark -Dgatling.simulationClass=AccessionRetrievalSimulation
 ```
-####Approach 2: Run simulation `FiltersWithDownloadSimulation`
+#### Approach 2: Run simulation `FiltersWithDownloadSimulation`
 ```
 mvn gatling:test -Dgatling.simulationClass=FiltersWithDownloadSimulation
 ```
