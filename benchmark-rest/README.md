@@ -1,4 +1,4 @@
-### Run a simulation
+### How to run a Gatling simulation
   - Below are two ways to run a simulation. You can pick one approach.
 #### Approach 1: Run simulation `AccessionRetrievalSimulation`
 ```
