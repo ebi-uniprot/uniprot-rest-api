@@ -1,15 +1,20 @@
 package org.uniprot.api.support.data.literature.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 /**
@@ -19,7 +24,9 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Service
 @Import(LiteratureQueryBoostsConfig.class)
 public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
-    private SearchFieldConfig searchFieldConfig;
+    private static final String LITERATURE_ID_FIELD = "id";
+    private final SearchFieldConfig searchFieldConfig;
+    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
 
     public LiteratureService(
             LiteratureRepository repository,
@@ -30,10 +37,21 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
         super(repository, entryConverter, literatureSortClause, literatureQueryBoosts, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
+        this.defaultSearchQueryOptimiser =
+                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
-    protected String getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return this.searchFieldConfig.getSearchFieldItemByName(LITERATURE_ID_FIELD);
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return Collections.singletonList(getIdField());
     }
 }

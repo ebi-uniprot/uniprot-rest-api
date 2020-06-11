@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,13 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.QueryBoosts;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.*;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
 
 /**
@@ -30,9 +27,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     public static final Integer DEFAULT_SOLR_BATCH_SIZE = 100;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
-    private AbstractSolrSortClause solrSortClause;
-    private QueryBoosts queryBoosts;
-    private FacetConfig facetConfig;
+    private final AbstractSolrSortClause solrSortClause;
+    private final QueryBoosts queryBoosts;
+    private final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE
@@ -57,10 +54,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public R findByUniqueId(final String uniqueId) {
-        return getEntity(getIdField(), uniqueId);
+        return getEntity(getIdField().getFieldName(), uniqueId);
     }
-
-    protected abstract String getIdField();
 
     public R getEntity(String idField, String value) {
         try {
@@ -118,6 +113,10 @@ public abstract class BasicSearchService<D extends Document, R> {
         return createSearchSolrRequest(request, true);
     }
 
+    protected abstract SearchFieldItem getIdField();
+
+    protected abstract DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser();
+
     /*
        case 1. size is not passed, use  DEFAULT_RESULTS_SIZE(25) then set rows and totalRows as DEFAULT_RESULTS_SIZE
        case 2. size is less than or equal solrBatchSize(10,000 or 100) then set SolrRequest's rows, totalRows value to size
@@ -167,7 +166,7 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         String requestedQuery = request.getQuery();
 
-        requestBuilder.query(requestedQuery);
+        requestBuilder.query(getDefaultSearchQueryOptimiser().optimiseSearchQuery(requestedQuery));
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));

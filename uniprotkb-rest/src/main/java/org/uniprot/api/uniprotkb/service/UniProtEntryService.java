@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,6 +17,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
@@ -30,6 +32,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -41,10 +44,11 @@ public class UniProtEntryService
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final QueryBoosts queryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
-    private UniprotQueryRepository repository;
-    private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
+    private final UniprotQueryRepository repository;
+    private final StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
+    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -70,6 +74,8 @@ public class UniProtEntryService
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+        this.defaultSearchQueryOptimiser =
+                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
@@ -89,8 +95,8 @@ public class UniProtEntryService
     }
 
     @Override
-    protected String getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return searchFieldConfig.getSearchFieldItemByName(ACCESSION);
     }
 
     @Override
@@ -121,6 +127,11 @@ public class UniProtEntryService
     public Stream<String> streamRDF(SearchRequest searchRequest) {
         SolrRequest solrRequest = createDownloadSolrRequest(searchRequest);
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
     }
 
     @Override
@@ -165,7 +176,7 @@ public class UniProtEntryService
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
                         request.getQuery(),
-                        searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName(),
+                        searchFieldConfig.getSearchFieldItemByName(ACCESSION).getFieldName(),
                         searchFieldConfig.getSearchFieldItemByName("id").getFieldName(),
                         searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName());
 
@@ -174,5 +185,9 @@ public class UniProtEntryService
         } else {
             return false;
         }
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return Collections.singletonList(getIdField());
     }
 }
