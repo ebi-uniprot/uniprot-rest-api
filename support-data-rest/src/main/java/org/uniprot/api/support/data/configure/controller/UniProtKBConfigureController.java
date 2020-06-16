@@ -95,7 +95,7 @@ public class UniProtKBConfigureController {
                                                                             EvidenceGroup.class)))
                         })
             })
-    @GetMapping("/annotation-evidences")
+    @GetMapping("/annotation_evidences")
     public List<EvidenceGroup> getUniProtAnnotationEvidences() {
         return service.getAnnotationEvidences();
     }
@@ -115,7 +115,7 @@ public class UniProtKBConfigureController {
                                                                             EvidenceGroup.class)))
                         })
             })
-    @GetMapping("/go-evidences")
+    @GetMapping("/go_evidences")
     public List<EvidenceGroup> getUniProtGoEvidences() {
         return service.getGoEvidences();
     }

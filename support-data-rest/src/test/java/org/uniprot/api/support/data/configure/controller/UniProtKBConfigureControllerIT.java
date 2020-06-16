@@ -63,7 +63,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/annotation-evidences")
+                        get(BASIC_RESOURCE + "/annotation_evidences")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -76,7 +76,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/go-evidences")
+                        get(BASIC_RESOURCE + "/go_evidences")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
