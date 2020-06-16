@@ -37,7 +37,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/search-terms")
+                        get(BASIC_RESOURCE + "/search_terms")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

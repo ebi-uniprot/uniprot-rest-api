@@ -47,7 +47,7 @@ public class UniProtKBConfigureController {
     // FIXME Delete this method once UI team starts consuming response of api search-terms.
     //  See method getUniProtSearchTerms
     @Operation(hidden = true)
-    @GetMapping("/search-terms")
+    @GetMapping("/search_terms")
     public ResponseEntity<String> getUniProtSearchTermsTemp() throws IOException {
         if (searchTermResponse == null) {
             InputStream in = getClass().getResourceAsStream("/search_terms-response.json");
