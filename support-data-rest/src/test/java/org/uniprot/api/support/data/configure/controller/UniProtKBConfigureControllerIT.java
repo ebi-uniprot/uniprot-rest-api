@@ -37,7 +37,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/search_terms")
+                        get(BASIC_RESOURCE + "/search-terms")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -50,7 +50,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/search-terms")
+                        get(BASIC_RESOURCE + "/search-fields")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -63,7 +63,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/annotation_evidences")
+                        get(BASIC_RESOURCE + "/annotation-evidences")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -76,7 +76,7 @@ class UniProtKBConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(BASIC_RESOURCE + "/go_evidences")
+                        get(BASIC_RESOURCE + "/go-evidences")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

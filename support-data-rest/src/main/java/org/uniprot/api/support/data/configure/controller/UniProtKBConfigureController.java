@@ -47,7 +47,7 @@ public class UniProtKBConfigureController {
     // FIXME Delete this method once UI team starts consuming response of api search-terms.
     //  See method getUniProtSearchTerms
     @Operation(hidden = true)
-    @GetMapping("/search_terms")
+    @GetMapping("/search-terms")
     public ResponseEntity<String> getUniProtSearchTermsTemp() throws IOException {
         if (searchTermResponse == null) {
             InputStream in = getClass().getResourceAsStream("/search_terms-response.json");
@@ -75,7 +75,7 @@ public class UniProtKBConfigureController {
                                                                                     .class)))
                         })
             })
-    @GetMapping("/search-terms")
+    @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getUniProtSearchTerms() {
         return service.getUniProtSearchItems();
     }
@@ -95,7 +95,7 @@ public class UniProtKBConfigureController {
                                                                             EvidenceGroup.class)))
                         })
             })
-    @GetMapping("/annotation_evidences")
+    @GetMapping("/annotation-evidences")
     public List<EvidenceGroup> getUniProtAnnotationEvidences() {
         return service.getAnnotationEvidences();
     }
@@ -115,7 +115,7 @@ public class UniProtKBConfigureController {
                                                                             EvidenceGroup.class)))
                         })
             })
-    @GetMapping("/go_evidences")
+    @GetMapping("/go-evidences")
     public List<EvidenceGroup> getUniProtGoEvidences() {
         return service.getGoEvidences();
     }
