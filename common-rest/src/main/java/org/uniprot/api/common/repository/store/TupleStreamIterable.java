@@ -1,5 +1,7 @@
 package org.uniprot.api.common.repository.store;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Iterator;
@@ -10,6 +12,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.slf4j.Logger;
 
 /**
  * This class wraps an existing {@link TupleStream}, originating from a streaming result set from
@@ -75,6 +78,7 @@ class TupleStreamIterable implements Iterable<String> {
                 try {
                     return Failsafe.with(retryPolicy).get(tupleStream::read);
                 } catch (Exception e) {
+                    LOGGER.error("Error whilst iterating through Solr results stream", e);
                     closeTupleStream();
                     throw new IllegalStateException(
                             "Error whilst iterating through Solr results stream", e);
