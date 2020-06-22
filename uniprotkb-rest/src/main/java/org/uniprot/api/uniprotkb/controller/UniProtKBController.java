@@ -31,8 +31,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
+import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -257,6 +257,17 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         }
 
         return super.getDeferredResultResponseEntity(request, context);
+    }
+
+    @GetMapping("/accessions")
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getProteinsByAccessions(
+            @Valid GetByAccessionsRequest accessionsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws IOException {
+        return null;
+//        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
+//        return super.getSearchResponse(result, accessionsRequest.getFields(), request, response);
     }
 
     @GetMapping("/proteins")

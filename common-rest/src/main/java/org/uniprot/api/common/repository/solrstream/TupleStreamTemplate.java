@@ -36,7 +36,7 @@ public class TupleStreamTemplate {
 
     public TupleStream create(SolrStreamingFacetRequest request) {
         try {
-            // create a facet function call for each facet
+            // create a solr streaming facet function call for each `facet`
             List<StreamExpression> facetExpressions =
                     request.getFacets().stream()
                             .map(
