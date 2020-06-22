@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.repository.store;
 
 import java.util.Collections;
 
+import org.apache.http.client.HttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -10,11 +11,14 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.uniprot.api.common.repository.solrstream.TupleStreamTemplate;
 import org.uniprot.api.common.repository.store.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
+import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
+import org.uniprot.store.search.SolrCollection;
 
 /**
  * Created 21/08/18
@@ -51,5 +55,15 @@ public class UniProtStoreConfig {
         restTemplate.setUriTemplateHandler(
                 new DefaultUriBuilderFactory(rdfStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
+    }
+
+    @Bean
+    public TupleStreamTemplate tupleStreamTemplate(
+            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+        return TupleStreamTemplate.builder()
+                .collection(SolrCollection.uniprot.name())
+                .zookeeperHost(configProperties.getZkHost())
+                .httpClient(httpClient)
+                .build();
     }
 }

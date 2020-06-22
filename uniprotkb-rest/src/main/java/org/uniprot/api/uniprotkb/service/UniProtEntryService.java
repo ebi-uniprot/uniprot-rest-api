@@ -1,11 +1,17 @@
 package org.uniprot.api.uniprotkb.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.solr.client.solrj.io.Tuple;
+import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -13,6 +19,8 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.solrstream.SolrStreamingFacetRequest;
+import org.uniprot.api.common.repository.solrstream.TupleStreamTemplate;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -46,6 +54,7 @@ public class UniProtEntryService
     private final StoreStreamer<UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -124,6 +133,35 @@ public class UniProtEntryService
                 createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts)
                         .build();
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+    }
+
+    public List<Tuple> getEntries(List<String> accessions) throws IOException {
+
+        //        List<String> facets = Arrays.asList("reviewed", "fragment", "structure_3d",
+        // "model_organism", "other_organism",
+        //                "existence", "annotation_score", "proteome", "proteins_with", "length");
+        List<String> facets = Arrays.asList("reviewed", "fragment", "structure_3d");
+        String query = accessions.stream().collect(Collectors.joining(" "));
+        query = "accession_id:(" + query + ")";
+        SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
+                SolrStreamingFacetRequest.builder();
+        builder.query(query).facets(facets);
+        TupleStream tupleStream = tupleStreamTemplate.create(builder.build());
+
+        List<Tuple> tuples = new ArrayList<>();
+        try {
+            tupleStream.open();
+            while (true) {
+                Tuple tuple = tupleStream.read();
+                if (tuple.EOF) {
+                    break;
+                }
+                tuples.add(tuple);
+            }
+        } finally {
+            tupleStream.close();
+        }
+        return tuples;
     }
 
     @Override
