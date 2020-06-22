@@ -193,6 +193,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-test-framework</artifactId>
+			<version>${solrj.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Swagger dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -222,6 +229,7 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>${maven-surefire-plugin.version}</version>
 					<configuration>
+						<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
 						<systemProperties>
 							<property>
 								<name>http.proxyHost</name>

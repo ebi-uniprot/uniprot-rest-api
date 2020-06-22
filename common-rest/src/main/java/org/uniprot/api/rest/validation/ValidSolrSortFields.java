@@ -74,12 +74,12 @@ public @interface ValidSolrSortFields {
                             .forEach(
                                     sortClause ->
                                             handleSortClause(sortClause, contextImpl, result));
-                    if (!result.get() && contextImpl != null) {
-                        contextImpl.disableDefaultConstraintViolation();
-                    }
                 } else {
                     addInvalidSortFormatErrorMessage(contextImpl, value);
                     result.getAndSet(false);
+                }
+                if (!result.get() && contextImpl != null) {
+                    contextImpl.disableDefaultConstraintViolation();
                 }
             }
             return result.get();

@@ -14,4 +14,9 @@ public class StreamerConfigProperties {
     private int storeBatchSize;
     private int storeFetchMaxRetries;
     private int storeFetchRetryDelayMillis;
+
+    private String zkHost;
+    private String idFieldName;
+    private String requestHandler;
+    private String collection;
 }

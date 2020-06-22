@@ -38,4 +38,22 @@ class ControllerITUtils {
         assertThat(mappingInfo, notNullValue());
         assertThat(mappingInfo.getProducesCondition().getProducibleMediaTypes(), is(mediaTypes));
     }
+
+    static Set<MediaType> getContentTypes(
+            String requestPath,
+            RequestMappingHandlerMapping requestMappingHandlerMapping) {
+
+
+        RequestMappingInfo mappingInfo =
+                requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
+                        .filter(
+                                requestMappingInfo ->
+                                        requestMappingInfo.getPatternsCondition().getPatterns()
+                                                .stream()
+                                                .anyMatch(path -> path.startsWith(requestPath)))
+                        .findFirst()
+                        .orElse(null);
+        assertThat(mappingInfo, notNullValue());
+        return mappingInfo.getProducesCondition().getProducibleMediaTypes();
+    }
 }

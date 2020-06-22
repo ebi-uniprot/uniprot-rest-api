@@ -4,22 +4,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
-import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -33,39 +28,14 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @author lgonzales
  */
 @Data
-public class UniProtKBRequest implements SearchRequest {
+@EqualsAndHashCode(callSuper = true)
+public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements SearchRequest {
     @Parameter(hidden = true)
     public static final String DEFAULT_FIELDS =
             "accession,id,reviewed,protein_name,gene_names,organism,length";
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
-    @NotNull(message = "{search.required}")
-    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFields(
-            uniProtDataType = UniProtDataType.UNIPROTKB,
-            messagePrefix = "search.uniprot")
-    private String query;
-
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
-    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
-    private String fields;
-
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
-    @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
-    private String sort;
-
     @Parameter(hidden = true)
     private String cursor;
-
-    @Parameter(description = "Flag to include Isoform or not")
-    @Pattern(
-            regexp = "true|false",
-            flags = {Pattern.Flag.CASE_INSENSITIVE},
-            message = "{search.invalid.includeIsoform}")
-    private String includeIsoform;
 
     @Parameter(description = "Name of the facet search")
     @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
@@ -83,10 +53,6 @@ public class UniProtKBRequest implements SearchRequest {
             message = "{search.invalid.matchedFields}")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String showMatchedFields;
-
-    public boolean isIncludeIsoform() {
-        return Boolean.valueOf(includeIsoform);
-    }
 
     public boolean isShowMatchedFields() {
         return Boolean.valueOf(showMatchedFields);

@@ -28,7 +28,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -118,7 +119,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> searchCursor(
-            @Valid @ModelAttribute UniProtKBRequest searchRequest,
+            @Valid @ModelAttribute UniProtKBSearchRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
@@ -191,7 +192,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
      */
     @Tag(name = "uniprotkb")
     @GetMapping(
-            value = "/download",
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,
@@ -232,8 +233,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> download(
-            @Valid @ModelAttribute UniProtKBRequest searchRequest,
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
+            @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
@@ -241,13 +242,14 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         MessageConverterContext<UniProtKBEntry> context =
                 converterContextFactory.get(UNIPROT, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
-        context.setFields(searchRequest.getFields());
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(entryService.streamIds(searchRequest));
+            context.setEntityIds(entryService.streamIds(streamRequest));
         } else if (contentType.equals(RDF_MEDIA_TYPE)) {
-            context.setEntityIds(entryService.streamRDF(searchRequest));
+            context.setEntityIds(entryService.streamRDF(streamRequest));
         } else {
-            context.setEntities(entryService.stream(searchRequest));
+            context.setEntities(entryService.stream(streamRequest));
         }
 
         return super.getDeferredResultResponseEntity(request, context);
@@ -278,7 +280,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 && Utils.notNullNotEmpty(uniProtkbEntry.getInactiveReason().getMergeDemergeTos());
     }
 
-    private void setPreviewInfo(UniProtKBRequest searchRequest, boolean preview) {
+    private void setPreviewInfo(UniProtKBSearchRequest searchRequest, boolean preview) {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }

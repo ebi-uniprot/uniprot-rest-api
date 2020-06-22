@@ -6,7 +6,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +22,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniparc.request.UniParcRequest;
+import org.uniprot.api.uniparc.request.UniParcSearchRequest;
+import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -54,6 +55,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
     private final UniParcQueryService queryService;
     private static final int PREVIEW_SIZE = 10;
+    private final MessageConverterContextFactory<UniParcEntry> converterContextFactory;
 
     @Autowired
     public UniParcController(
@@ -63,15 +65,15 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
         this.queryService = queryService;
+        this.converterContextFactory = converterContextFactory;
     }
 
     @Tag(
             name = "uniparc",
             description =
                     "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).")
-    @RequestMapping(
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -108,7 +110,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> search(
-            @Valid @ModelAttribute UniParcRequest searchRequest,
+            @Valid @ModelAttribute UniParcSearchRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
@@ -120,9 +122,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     }
 
     @Tag(name = "uniparc")
-    @RequestMapping(
+    @GetMapping(
             value = "/{upi}",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -171,9 +172,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     }
 
     @Tag(name = "uniparc")
-    @RequestMapping(
-            value = "/download",
-            method = RequestMethod.GET,
+    @GetMapping(
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -183,7 +183,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download a UniParc sequence entry (or entries) by a SOLR query.",
+            summary = "Stream a UniParc sequence entry (or entries) by a SOLR query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -209,14 +209,25 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> download(
-            @Valid @ModelAttribute UniParcRequest searchRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> stream(
+            @Valid @ModelAttribute UniParcStreamRequest streamRequest,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
-        Stream<UniParcEntry> result = queryService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request, encoding);
+
+        MessageConverterContext<UniParcEntry> context =
+                converterContextFactory.get(UNIPARC, contentType);
+        context.setFileType(FileType.bestFileTypeMatch(encoding));
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
+        if (contentType.equals(LIST_MEDIA_TYPE)) {
+            context.setEntityIds(queryService.streamIds(streamRequest));
+        } else {
+            context.setEntities(queryService.stream(streamRequest));
+        }
+
+        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override
@@ -229,7 +240,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return Optional.empty();
     }
 
-    private void setPreviewInfo(UniParcRequest searchRequest, boolean preview) {
+    private void setPreviewInfo(UniParcSearchRequest searchRequest, boolean preview) {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }

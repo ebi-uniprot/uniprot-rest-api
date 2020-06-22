@@ -5,16 +5,16 @@ import java.time.Duration;
 
 import net.jodah.failsafe.RetryPolicy;
 
+import org.apache.http.client.HttpClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.store.search.document.uniref.UniRefDocument;
 
 /** @author jluo date: 21 Aug 2019 */
 @Configuration
@@ -22,22 +22,31 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 public class UniRefStreamConfig {
 
     @Bean
-    public StoreStreamer<UniRefDocument, UniRefEntry> unirefEntryStoreStreamer(
-            UniRefStoreClient unirefClient, UniRefQueryRepository uniRefQueryRepository) {
+    public TupleStreamTemplate tupleStreamTemplate(
+            StreamerConfigProperties configProperties, HttpClient httpClient) {
+        return TupleStreamTemplate.builder()
+                .streamConfig(configProperties)
+                .httpClient(httpClient)
+                .build();
+    }
+
+    @Bean
+    public StoreStreamer<UniRefEntry> unirefEntryStoreStreamer(
+            UniRefStoreClient unirefClient,
+            TupleStreamTemplate tupleStreamTemplate,
+            StreamerConfigProperties streamConfig) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(
-                                Duration.ofMillis(
-                                        resultsConfigProperties().getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(resultsConfigProperties().getStoreFetchMaxRetries());
+                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        return StoreStreamer.<UniRefDocument, UniRefEntry>builder()
-                .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
+        return StoreStreamer.<UniRefEntry>builder()
+                .streamConfig(streamConfig)
                 .storeClient(unirefClient)
-                .documentToId(UniRefDocument::getId)
-                .repository(uniRefQueryRepository)
+                .streamConfig(streamConfig)
+                .tupleStreamTemplate(tupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
                 .build();
     }

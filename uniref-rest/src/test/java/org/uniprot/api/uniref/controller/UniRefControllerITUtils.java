@@ -1,0 +1,123 @@
+package org.uniprot.api.uniref.controller;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
+import org.uniprot.core.Sequence;
+import org.uniprot.core.cv.go.GoAspect;
+import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
+import org.uniprot.core.impl.SequenceBuilder;
+import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
+import org.uniprot.core.uniref.*;
+import org.uniprot.core.uniref.UniRefType;
+import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
+import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
+import org.uniprot.core.util.Crc64;
+import org.uniprot.core.xml.jaxb.uniref.*;
+import org.uniprot.core.xml.uniprot.XmlConverterHelper;
+
+/**
+ * @author jluo
+ * @date: 23 Aug 2019
+ */
+class UniRefControllerITUtils {
+
+    static final String ID_PREF = "UniRef50_P039";
+    static final String NAME_PREF = "Cluster: MoeK5 ";
+    static final String ACC_PREF = "P123";
+    static final String ACC_2_PREF = "P123";
+    static final String UPI_PREF = "UPI0000083A";
+
+    static UniRefEntry createEntry(int i) {
+
+        org.uniprot.core.uniref.UniRefType type = UniRefType.UniRef100;
+
+        UniRefEntryId entryId = new UniRefEntryIdBuilder(getName(ID_PREF, i)).build();
+
+        return new UniRefEntryBuilder()
+                .id(entryId)
+                .name(getName(NAME_PREF, i))
+                .updated(LocalDate.of(2019, 8, 27))
+                .entryType(type)
+                .commonTaxonId(9606L)
+                .commonTaxon("Homo sapiens")
+                .representativeMember(createReprestativeMember(i))
+                .membersAdd(createMember(i))
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.COMPONENT)
+                                .id("GO:0044444")
+                                .build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.FUNCTION)
+                                .id("GO:0044459")
+                                .build())
+                .goTermsAdd(
+                        new GeneOntologyEntryBuilder()
+                                .aspect(GoAspect.PROCESS)
+                                .id("GO:0032459")
+                                .build())
+                .memberCount(2)
+                .build();
+    }
+
+    static UniRefMember createMember(int i) {
+        String memberId = getName(ACC_2_PREF, i) + "_HUMAN";
+        int length = 312;
+        String pName = "some protein name";
+        String upi = getName(UPI_PREF, i);
+
+        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
+        return new UniRefMemberBuilder()
+                .memberIdType(type)
+                .memberId(memberId)
+                .organismName("Homo sapiens")
+                .organismTaxId(9606)
+                .sequenceLength(length)
+                .proteinName(pName)
+                .uniparcId(new UniParcIdBuilder(upi).build())
+                .accessionsAdd(new UniProtKBAccessionBuilder(getName(ACC_2_PREF, i)).build())
+                .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
+                .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
+                .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
+                .build();
+    }
+
+    static String getName(String prefix, int i) {
+        if (i < 10) {
+            return prefix + "0" + i;
+        } else return prefix + i;
+    }
+
+    static RepresentativeMember createReprestativeMember(int i) {
+        String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVEDDFSAGSADFAFWERDGDSDGFDSHSDJHETRHJREH";
+        Sequence sequence = new SequenceBuilder(seq).build();
+        String memberId = getName(ACC_PREF, i) + "_HUMAN";
+        int length = 312;
+        String pName = "some protein name";
+        String upi = getName(UPI_PREF, i);
+
+        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
+
+        return new RepresentativeMemberBuilder()
+                .memberIdType(type)
+                .memberId(memberId)
+                .organismName("Homo sapiens")
+                .organismTaxId(9606)
+                .sequenceLength(length)
+                .proteinName(pName)
+                .uniparcId(new UniParcIdBuilder(upi).build())
+                .accessionsAdd(new UniProtKBAccessionBuilder(getName(ACC_PREF, i)).build())
+                .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
+                .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
+                .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
+                .isSeed(true)
+                .sequence(sequence)
+                .build();
+    }
+}

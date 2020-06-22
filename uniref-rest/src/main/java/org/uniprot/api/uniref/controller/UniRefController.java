@@ -27,7 +27,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniref.request.UniRefRequest;
+import org.uniprot.api.uniref.request.UniRefSearchRequest;
+import org.uniprot.api.uniref.request.UniRefStreamRequest;
 import org.uniprot.api.uniref.service.UniRefQueryService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
@@ -72,9 +73,8 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
             name = "uniref",
             description =
                     "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
-    @RequestMapping(
+    @GetMapping(
             value = "/{id}",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -123,9 +123,8 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
     }
 
     @Tag(name = "uniref")
-    @RequestMapping(
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -165,7 +164,7 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> search(
-            @Valid @ModelAttribute UniRefRequest searchRequest,
+            @Valid @ModelAttribute UniRefSearchRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
@@ -177,15 +176,14 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
     }
 
     @Tag(name = "uniref")
-    @RequestMapping(
-            value = "/download",
-            method = RequestMethod.GET,
+    @GetMapping(
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download a UniRef clsuter (or clusters) retrieved by a SOLR query.",
+            summary = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -214,8 +212,8 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntry>>> download(
-            @Valid @ModelAttribute UniRefRequest searchRequest,
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntry>>> stream(
+            @Valid @ModelAttribute UniRefStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
@@ -224,11 +222,12 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
         MessageConverterContext<UniRefEntry> context =
                 converterContextFactory.get(UNIREF, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
-        context.setFields(searchRequest.getFields());
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(queryService.streamIds(searchRequest));
+            context.setEntityIds(queryService.streamIds(streamRequest));
         } else {
-            context.setEntities(queryService.stream(searchRequest));
+            context.setEntities(queryService.stream(streamRequest));
         }
 
         return super.getDeferredResultResponseEntity(request, context);
@@ -244,7 +243,7 @@ public class UniRefController extends BasicSearchController<UniRefEntry> {
         return Optional.empty();
     }
 
-    private void setPreviewInfo(UniRefRequest searchRequest, boolean preview) {
+    private void setPreviewInfo(UniRefSearchRequest searchRequest, boolean preview) {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }

@@ -21,7 +21,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Service
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
-    private SearchFieldConfig searchFieldConfig;
+    private final SearchFieldConfig searchFieldConfig;
 
     @Autowired
     public UniParcQueryService(
@@ -29,7 +29,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcFacetConfig facetConfig,
             UniParcSortClause solrSortClause,
             UniParcQueryResultConverter uniParcQueryResultConverter,
-            StoreStreamer<UniParcDocument, UniParcEntry> storeStreamer,
+            StoreStreamer<UniParcEntry> storeStreamer,
             QueryBoosts uniParcQueryBoosts) {
 
         super(
