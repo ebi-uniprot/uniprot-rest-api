@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,17 +34,7 @@ import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.cv.go.GoAspect;
-import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
-import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
@@ -132,7 +121,7 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
         String value = "*";
         switch (searchField) {
             case "id":
-                value = ID_PREF + 11;
+                value = ID_PREF_50 + 11;
                 break;
             case "taxonomy_id":
                 value = "9606";
@@ -174,7 +163,7 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
     }
 
     private void saveEntry(int i) {
-        UniRefEntry unirefEntry = createEntry(i);
+        UniRefEntry unirefEntry = createEntry(i, UniRefType.UniRef50);
 
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);

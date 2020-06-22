@@ -1,8 +1,6 @@
 package org.uniprot.api.uniref.controller;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
 
 import org.uniprot.core.Sequence;
 import org.uniprot.core.cv.go.GoAspect;
@@ -16,9 +14,6 @@ import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
-import org.uniprot.core.util.Crc64;
-import org.uniprot.core.xml.jaxb.uniref.*;
-import org.uniprot.core.xml.uniprot.XmlConverterHelper;
 
 /**
  * @author jluo
@@ -26,17 +21,18 @@ import org.uniprot.core.xml.uniprot.XmlConverterHelper;
  */
 class UniRefControllerITUtils {
 
-    static final String ID_PREF = "UniRef50_P039";
+    static final String ID_PREF_50 = "UniRef50_P039";
+    static final String ID_PREF_90 = "UniRef90_P039";
+    static final String ID_PREF_100 = "UniRef100_P039";
     static final String NAME_PREF = "Cluster: MoeK5 ";
     static final String ACC_PREF = "P123";
     static final String ACC_2_PREF = "P123";
     static final String UPI_PREF = "UPI0000083A";
 
-    static UniRefEntry createEntry(int i) {
+    static UniRefEntry createEntry(int i, UniRefType type) {
+        String idRef = getIdRef(type);
 
-        org.uniprot.core.uniref.UniRefType type = UniRefType.UniRef100;
-
-        UniRefEntryId entryId = new UniRefEntryIdBuilder(getName(ID_PREF, i)).build();
+        UniRefEntryId entryId = new UniRefEntryIdBuilder(getName(idRef, i)).build();
 
         return new UniRefEntryBuilder()
                 .id(entryId)
@@ -64,6 +60,17 @@ class UniRefControllerITUtils {
                                 .build())
                 .memberCount(2)
                 .build();
+    }
+
+    private static String getIdRef(UniRefType type){
+        switch (type){
+            case UniRef50:
+                return ID_PREF_50;
+            case UniRef90:
+                return ID_PREF_90;
+            default:
+                return ID_PREF_100;
+        }
     }
 
     static UniRefMember createMember(int i) {

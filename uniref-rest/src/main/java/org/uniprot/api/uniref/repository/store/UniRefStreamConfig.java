@@ -45,7 +45,6 @@ public class UniRefStreamConfig {
         return StoreStreamer.<UniRefEntry>builder()
                 .streamConfig(streamConfig)
                 .storeClient(unirefClient)
-                .streamConfig(streamConfig)
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
                 .build();

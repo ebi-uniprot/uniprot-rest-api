@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
@@ -89,21 +90,23 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(jsonPath("$.results.size()", is(12)))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniRefId",
+                                "$.results.*.id",
                                 containsInAnyOrder(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UniRef50_P03901",
+                                        "UniRef90_P03901",
+                                        "UniRef100_P03901",
+                                        "UniRef50_P03902",
+                                        "UniRef90_P03902",
+                                        "UniRef100_P03902",
+                                        "UniRef50_P03903",
+                                        "UniRef90_P03903",
+                                        "UniRef100_P03903",
+                                        "UniRef50_P03904",
+                                        "UniRef90_P03904",
+                                        "UniRef100_P03904")));
     }
 
     @Test
@@ -152,7 +155,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                         header().string(
                                         "Content-Disposition",
                                         startsWith("form-data; name=\"attachment\"; filename=\"uniprot-")))
-                .andExpect(jsonPath("$.results.size()", is(10)));
+                .andExpect(jsonPath("$.results.size()", is(12)));
     }
 
     @Test
@@ -161,8 +164,8 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
-                        .param("sort", "upi desc");
+                        .param("query", "identity:0.5")
+                        .param("sort", "id desc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -173,18 +176,12 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcId",
+                                "$.results.*.id",
                                 contains(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UniRef50_P03904",
+                                        "UniRef50_P03903",
+                                        "UniRef50_P03902",
+                                        "UniRef50_P03901")));
     }
 
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")
@@ -204,7 +201,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)));
+                .andExpect(jsonPath("$.results.size()", is(12)));
     }
 
     @Test
@@ -213,8 +210,8 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "accession:P10006 OR accession:P10005")
-                        .param("fields", "gene,organism_id");
+                        .param("query", "identity:1.0 AND (uniprot_id:P12301 OR uniprot_id:P12302)")
+                        .param("fields", "length,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -225,19 +222,22 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcId",
-                                containsInAnyOrder("UPI0000083A06", "UPI0000083A05")))
+                                "$.results.*.id",
+                                containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcCrossReferences.*.properties[?(@.key=='gene_name')].value",
-                                containsInAnyOrder(
-                                        "geneName05", "geneName06", "geneName05", "geneName06")))
+                                "$.results.*.representativeMember.sequence.length",
+                                containsInAnyOrder(66, 66)))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.taxonomies.*.taxonId",
-                                containsInAnyOrder(9606, 10090, 9606, 10090)))
-                .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
-                .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());
+                                "$.results.*.representativeMember.organismTaxId",
+                                containsInAnyOrder(9606, 9606)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.members.*.organismTaxId",
+                                containsInAnyOrder(9606, 9606)))
+                .andExpect(jsonPath("$.results.*.representativeMember.organismName").doesNotExist())
+                .andExpect(jsonPath("$.results.*.members.*.organismName").doesNotExist());
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
@@ -265,14 +265,16 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     private void saveEntries() throws Exception {
-        for (int i = 1; i <= 10; i++) {
-            saveEntry(i);
+        for (int i = 1; i <= 4; i++) {
+            saveEntry(i,UniRefType.UniRef50);
+            saveEntry(i,UniRefType.UniRef90);
+            saveEntry(i,UniRefType.UniRef100);
         }
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }
 
-    private void saveEntry(int i) throws Exception {
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(i);
+    private void saveEntry(int i, UniRefType type) throws Exception {
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(i, type);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefDocument doc = documentConverter.convert(xmlEntry);
