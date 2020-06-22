@@ -77,7 +77,34 @@ class UniProtKBGetByAccessionsIT {
         storeManager.cleanSolr(DataStoreManager.StoreType.LITERATURE);
         storeManager.cleanStore(DataStoreManager.StoreType.UNIPROT);
     }
-
+    @Test
+    void getByAccessions() throws Exception {
+        String dataFile =
+                "/Users/sahmad/Documents/accessions0.txt";
+        log.info("Data file is " + dataFile);
+        long start = System.currentTimeMillis();
+        int count = 1000;
+        List<String> lines = Files.readAllLines(Paths.get(dataFile));
+        Collections.shuffle(lines);
+        String accessions =
+                lines.subList(0, count).stream().collect(Collectors.joining(","));
+        MockMvc mockMvc1 =
+                MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MvcResult result =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .param("accessions", accessions)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE))
+                        .andReturn();
+        long end = System.currentTimeMillis();
+        log.info(
+                "Total time taken: "
+                        + (end - start)
+                        + " milliseconds"
+                        + " for the file: "
+                        + dataFile);
+        log.info(result.getResponse().getContentAsString());
+    }
     @Test
     void getProteinsByAccessions() throws Exception {
         // given
