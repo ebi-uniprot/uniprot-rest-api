@@ -88,14 +88,14 @@ class UniProtKBGetByAccessionsIT {
         Collections.shuffle(lines);
         String accessions =
                 lines.subList(0, count).stream().collect(Collectors.joining(","));
-        MockMvc mockMvc1 =
-                MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         MvcResult result =
                 mockMvc.perform(
                         get("/uniprotkb/accessions")
                                 .param("accessions", accessions)
+                                .param("size", "1")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE))
                         .andReturn();
+        Assertions.assertTrue(result.getResponse().getStatus() == 200);
         long end = System.currentTimeMillis();
         log.info(
                 "Total time taken: "

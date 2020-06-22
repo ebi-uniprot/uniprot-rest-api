@@ -1,13 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -19,20 +11,23 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.SolrStreamingFacetRequest;
 import org.uniprot.api.common.repository.solrstream.TupleStreamTemplate;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
+import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -42,6 +37,14 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service
 @Import(UniProtQueryBoostsConfig.class)
 public class UniProtEntryService
@@ -50,8 +53,8 @@ public class UniProtEntryService
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final QueryBoosts uniProtKBqueryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
-    private final UniprotQueryRepository repository;
-    private final StoreStreamer<UniProtKBEntry> storeStreamer;
+    private UniprotQueryRepository repository;
+    private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
@@ -63,7 +66,7 @@ public class UniProtEntryService
             UniProtSolrSortClause uniProtSolrSortClause,
             QueryBoosts uniProtKBQueryBoosts,
             UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
+            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService) {
         super(
                 repository,
@@ -91,6 +94,14 @@ public class UniProtEntryService
                 repository.searchPage(solrRequest, request.getCursor());
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         return resultsConverter.convertQueryResult(results, fields);
+    }
+    // stub - dummy method
+    public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest request) {
+        UniProtKBEntryBuilder builder = new UniProtKBEntryBuilder("P12345", "P12345", UniProtKBEntryType.SWISSPROT);
+        CursorPage page = CursorPage.of(null, 1);
+        page.setTotalElements(1L);
+        QueryResult<UniProtKBEntry> result = QueryResult.of(Arrays.asList(builder.build()), page);
+        return result;
     }
 
     @Override

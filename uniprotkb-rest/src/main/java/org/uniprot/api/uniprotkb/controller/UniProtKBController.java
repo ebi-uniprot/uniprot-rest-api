@@ -1,20 +1,12 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -41,15 +33,21 @@ import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.Tuple;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
-
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 /**
  * Controller for uniprot advanced search service.
@@ -263,11 +261,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getProteinsByAccessions(
             @Valid GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
-            HttpServletResponse response)
-            throws IOException {
-        return null;
-//        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
-//        return super.getSearchResponse(result, accessionsRequest.getFields(), request, response);
+            HttpServletResponse response) {
+        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
+        return super.getSearchResponse(result, accessionsRequest.getFields(), request, response);
     }
 
     @GetMapping("/proteins")
