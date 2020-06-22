@@ -42,8 +42,7 @@ public class UniParcStreamConfig {
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(
-                                Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
         return StoreStreamer.<UniParcEntry>builder()

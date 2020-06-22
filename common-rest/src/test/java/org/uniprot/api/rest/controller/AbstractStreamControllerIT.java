@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -39,11 +37,9 @@ public abstract class AbstractStreamControllerIT {
 
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
 
-    @Autowired
-    private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     private MiniSolrCloudCluster cluster;
 
@@ -82,9 +78,8 @@ public abstract class AbstractStreamControllerIT {
 
     protected abstract List<SolrCollection> getSolrCollections();
 
-    protected Stream<Arguments> getContentTypes(String requestPath){
-        return ControllerITUtils.getContentTypes(requestPath, requestMappingHandlerMapping)
-                .stream()
+    protected Stream<Arguments> getContentTypes(String requestPath) {
+        return ControllerITUtils.getContentTypes(requestPath, requestMappingHandlerMapping).stream()
                 .map(Arguments::of);
     }
 

@@ -121,7 +121,8 @@ public class UniProtEntryService
 
     public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
         SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts).build();
+                createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts)
+                        .build();
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 

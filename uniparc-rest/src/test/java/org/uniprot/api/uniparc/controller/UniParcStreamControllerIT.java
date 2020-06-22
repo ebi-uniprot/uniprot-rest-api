@@ -153,7 +153,8 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(
                         header().string(
                                         "Content-Disposition",
-                                        startsWith("form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                        startsWith(
+                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
                 .andExpect(jsonPath("$.results.size()", is(10)));
     }
 
@@ -247,9 +248,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, mediaType)
-                        .param("query", "content:*");
+                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "content:*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 

@@ -1,6 +1,19 @@
 package org.uniprot.api.uniref.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,18 +47,6 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 /**
  * @author lgonzales
  * @since 22/06/2020
@@ -62,8 +63,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
     @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    UniProtStoreClient<UniRefEntry> storeClient;
+    @Autowired UniProtStoreClient<UniRefEntry> storeClient;
 
     private static final String streamRequestPath = "/uniref/stream";
 
@@ -154,7 +154,8 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(
                         header().string(
                                         "Content-Disposition",
-                                        startsWith("form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                        startsWith(
+                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
                 .andExpect(jsonPath("$.results.size()", is(12)));
     }
 
@@ -245,9 +246,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, mediaType)
-                        .param("query", "content:*");
+                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "content:*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -266,9 +265,9 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
     private void saveEntries() throws Exception {
         for (int i = 1; i <= 4; i++) {
-            saveEntry(i,UniRefType.UniRef50);
-            saveEntry(i,UniRefType.UniRef90);
-            saveEntry(i,UniRefType.UniRef100);
+            saveEntry(i, UniRefType.UniRef50);
+            saveEntry(i, UniRefType.UniRef90);
+            saveEntry(i, UniRefType.UniRef100);
         }
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }

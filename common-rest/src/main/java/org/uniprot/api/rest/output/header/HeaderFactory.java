@@ -23,9 +23,7 @@ import org.uniprot.core.util.Utils;
  */
 public class HeaderFactory {
 
-    private HeaderFactory(){
-
-    }
+    private HeaderFactory() {}
 
     public static HttpHeaders createHttpSearchHeader(MediaType mediaType) {
         HttpHeaders httpHeaders = new HttpHeaders();

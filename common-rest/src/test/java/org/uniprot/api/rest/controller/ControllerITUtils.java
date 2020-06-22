@@ -40,9 +40,7 @@ class ControllerITUtils {
     }
 
     static Set<MediaType> getContentTypes(
-            String requestPath,
-            RequestMappingHandlerMapping requestMappingHandlerMapping) {
-
+            String requestPath, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 
         RequestMappingInfo mappingInfo =
                 requestMappingHandlerMapping.getHandlerMethods().keySet().stream()

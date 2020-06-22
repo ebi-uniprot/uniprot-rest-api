@@ -62,8 +62,8 @@ class UniRefControllerITUtils {
                 .build();
     }
 
-    private static String getIdRef(UniRefType type){
-        switch (type){
+    private static String getIdRef(UniRefType type) {
+        switch (type) {
             case UniRef50:
                 return ID_PREF_50;
             case UniRef90:
