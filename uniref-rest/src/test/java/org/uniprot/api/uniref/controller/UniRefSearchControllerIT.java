@@ -3,8 +3,8 @@ package org.uniprot.api.uniref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,17 +34,7 @@ import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.cv.go.GoAspect;
-import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
-import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
@@ -73,11 +63,6 @@ import org.uniprot.store.search.SolrCollection;
             UniRefSearchControllerIT.UniRefSearchParameterResolver.class
         })
 public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
-    private static final String ID_PREF = "UniRef50_P039";
-    private static final String NAME_PREF = "Cluster: MoeK5 ";
-    private static final String ACC_PREF = "P123";
-    private static final String ACC_2_PREF = "P123";
-    private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniRefQueryRepository repository;
 
@@ -136,7 +121,7 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
         String value = "*";
         switch (searchField) {
             case "id":
-                value = ID_PREF + 11;
+                value = ID_PREF_50 + 11;
                 break;
             case "taxonomy_id":
                 value = "9606";
@@ -178,101 +163,12 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
     }
 
     private void saveEntry(int i) {
-        UniRefEntry unirefEntry = createEntry(i);
+        UniRefEntry unirefEntry = createEntry(i, UniRefType.UniRef50);
 
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, unirefEntry);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
-    }
-
-    private String getName(String prefix, int i) {
-        if (i < 10) {
-            return prefix + "0" + i;
-        } else return prefix + i;
-    }
-
-    private UniRefEntry createEntry(int i) {
-
-        UniRefType type = UniRefType.UniRef100;
-
-        UniRefEntryId entryId = new UniRefEntryIdBuilder(getName(ID_PREF, i)).build();
-
-        return new UniRefEntryBuilder()
-                .id(entryId)
-                .name(getName(NAME_PREF, i))
-                .updated(LocalDate.of(2019, 8, 27))
-                .entryType(type)
-                .commonTaxonId(9606L)
-                .commonTaxon("Homo sapiens")
-                .representativeMember(createReprestativeMember(i))
-                .membersAdd(createMember(i))
-                .goTermsAdd(
-                        new GeneOntologyEntryBuilder()
-                                .aspect(GoAspect.COMPONENT)
-                                .id("GO:0044444")
-                                .build())
-                .goTermsAdd(
-                        new GeneOntologyEntryBuilder()
-                                .aspect(GoAspect.FUNCTION)
-                                .id("GO:0044459")
-                                .build())
-                .goTermsAdd(
-                        new GeneOntologyEntryBuilder()
-                                .aspect(GoAspect.PROCESS)
-                                .id("GO:0032459")
-                                .build())
-                .memberCount(2)
-                .build();
-    }
-
-    private UniRefMember createMember(int i) {
-        String memberId = getName(ACC_2_PREF, i) + "_HUMAN";
-        int length = 312;
-        String pName = "some protein name";
-        String upi = getName(UPI_PREF, i);
-
-        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
-        return new UniRefMemberBuilder()
-                .memberIdType(type)
-                .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
-                .sequenceLength(length)
-                .proteinName(pName)
-                .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtKBAccessionBuilder(getName(ACC_2_PREF, i)).build())
-                .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
-                .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
-                .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
-                .build();
-    }
-
-    private RepresentativeMember createReprestativeMember(int i) {
-        String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVEDDFSAGSADFAFWERDGDSDGFDSHSDJHETRHJREH";
-        Sequence sequence = new SequenceBuilder(seq).build();
-        String memberId = getName(ACC_PREF, i) + "_HUMAN";
-        int length = 312;
-        String pName = "some protein name";
-        String upi = getName(UPI_PREF, i);
-
-        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
-
-        return new RepresentativeMemberBuilder()
-                .memberIdType(type)
-                .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
-                .sequenceLength(length)
-                .proteinName(pName)
-                .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtKBAccessionBuilder(getName(ACC_PREF, i)).build())
-                .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
-                .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
-                .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
-                .isSeed(true)
-                .sequence(sequence)
-                .build();
     }
 
     static class UniRefSearchParameterResolver extends AbstractSearchParameterResolver {

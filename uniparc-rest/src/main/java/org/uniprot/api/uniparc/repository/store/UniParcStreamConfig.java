@@ -5,16 +5,16 @@ import java.time.Duration;
 
 import net.jodah.failsafe.RetryPolicy;
 
+import org.apache.http.client.HttpClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 /**
  * @author lgonzales
@@ -25,22 +25,30 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 public class UniParcStreamConfig {
 
     @Bean
-    public StoreStreamer<UniParcDocument, UniParcEntry> uniParcEntryStoreStreamer(
-            UniParcStoreClient uniParcClient, UniParcQueryRepository uniParcQueryRepository) {
+    public TupleStreamTemplate tupleStreamTemplate(
+            StreamerConfigProperties configProperties, HttpClient httpClient) {
+        return TupleStreamTemplate.builder()
+                .streamConfig(configProperties)
+                .httpClient(httpClient)
+                .build();
+    }
+
+    @Bean
+    public StoreStreamer<UniParcEntry> uniParcEntryStoreStreamer(
+            UniParcStoreClient uniParcClient,
+            TupleStreamTemplate tupleStreamTemplate,
+            StreamerConfigProperties streamConfig) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(
-                                Duration.ofMillis(
-                                        resultsConfigProperties().getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(resultsConfigProperties().getStoreFetchMaxRetries());
+                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        return StoreStreamer.<UniParcDocument, UniParcEntry>builder()
+        return StoreStreamer.<UniParcEntry>builder()
                 .storeClient(uniParcClient)
-                .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
-                .documentToId(UniParcDocument::getUpi)
-                .repository(uniParcQueryRepository)
+                .streamConfig(streamConfig)
+                .tupleStreamTemplate(tupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
                 .build();
     }

@@ -1,30 +1,27 @@
 package org.uniprot.api.uniref.request;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 import lombok.Data;
 
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
-import org.uniprot.api.rest.validation.*;
-import org.uniprot.api.uniref.repository.UniRefFacetConfig;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
- * @author jluo
- * @date: 20 Aug 2019
+ * @author lgonzales
+ * @since 18/06/2020
  */
 @Data
-public class UniRefRequest implements SearchRequest {
-
-    @Parameter(hidden = true)
-    public static final String DEFAULT_FIELDS = "id,name,common_taxon,count,created";
+public class UniRefBasicRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniref-search-fields.json")
     @Parameter(
@@ -39,19 +36,8 @@ public class UniRefRequest implements SearchRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 
-    @Parameter(hidden = true)
-    private String cursor;
-
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniref-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
-
-    @Parameter(description = "Name of the facet search")
-    @ValidFacets(facetConfig = UniRefFacetConfig.class)
-    private String facets;
-
-    @Parameter(description = "Size of the result. Defaults to 25")
-    @Positive(message = "{search.positive}")
-    private Integer size;
 }

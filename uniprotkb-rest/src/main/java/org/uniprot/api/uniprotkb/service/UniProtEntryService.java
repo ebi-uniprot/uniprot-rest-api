@@ -17,7 +17,8 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
@@ -39,10 +40,10 @@ public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
     private static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
-    private final QueryBoosts queryBoosts;
+    private final QueryBoosts uniProtKBqueryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
-    private UniprotQueryRepository repository;
-    private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
+    private final UniprotQueryRepository repository;
+    private final StoreStreamer<UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
 
@@ -53,7 +54,7 @@ public class UniProtEntryService
             UniProtSolrSortClause uniProtSolrSortClause,
             QueryBoosts uniProtKBQueryBoosts,
             UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
+            StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService) {
         super(
                 repository,
@@ -63,7 +64,7 @@ public class UniProtEntryService
                 uniProtKBQueryBoosts);
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
-        this.queryBoosts = uniProtKBQueryBoosts;
+        this.uniProtKBqueryBoosts = uniProtKBQueryBoosts;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.searchFieldConfig =
@@ -90,7 +91,7 @@ public class UniProtEntryService
 
     @Override
     protected String getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName();
+        return searchFieldConfig.getSearchFieldItemByName(ACCESSION).getFieldName();
     }
 
     @Override
@@ -118,20 +119,22 @@ public class UniProtEntryService
         }
     }
 
-    public Stream<String> streamRDF(SearchRequest searchRequest) {
-        SolrRequest solrRequest = createDownloadSolrRequest(searchRequest);
+    public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts)
+                        .build();
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
 
-        UniProtKBRequest uniProtRequest = (UniProtKBRequest) request;
+        UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
         // fill the common params from the basic service class
         SolrRequest solrRequest = super.createSolrRequest(uniProtRequest, includeFacets);
 
         // uniprotkb related stuff
-        solrRequest.setQueryBoosts(queryBoosts);
+        solrRequest.setQueryBoosts(uniProtKBqueryBoosts);
 
         if (needsToFilterIsoform(uniProtRequest)) {
             List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
@@ -161,11 +164,11 @@ public class UniProtEntryService
      *
      * @return true if we need to add isoform filter query
      */
-    private boolean needsToFilterIsoform(UniProtKBRequest request) {
+    private boolean needsToFilterIsoform(UniProtKBSearchRequest request) {
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
                         request.getQuery(),
-                        searchFieldConfig.getSearchFieldItemByName("accession_id").getFieldName(),
+                        searchFieldConfig.getSearchFieldItemByName(ACCESSION).getFieldName(),
                         searchFieldConfig.getSearchFieldItemByName("id").getFieldName(),
                         searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName());
 
