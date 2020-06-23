@@ -107,26 +107,6 @@ public class StoreStreamer<T> {
         }
     }
 
-    private static class BatchStoreIterable<T> extends BatchIterable<T> {
-        private final UniProtStoreClient<T> storeClient;
-        private final RetryPolicy<Object> retryPolicy;
-
-        BatchStoreIterable(
-                Iterable<String> sourceIterable,
-                UniProtStoreClient<T> storeClient,
-                RetryPolicy<Object> retryPolicy,
-                int batchSize) {
-            super(sourceIterable, batchSize);
-            this.storeClient = storeClient;
-            this.retryPolicy = retryPolicy;
-        }
-
-        @Override
-        List<T> convertBatch(List<String> batch) {
-            return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(batch));
-        }
-    }
-
     // iterable for RDF streaming
     private static class BatchRDFStoreIterable<T> extends BatchIterable<T> {
         private final RDFService<T> storeClient;

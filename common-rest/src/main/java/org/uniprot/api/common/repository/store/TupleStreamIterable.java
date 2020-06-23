@@ -12,7 +12,6 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.slf4j.Logger;
 
 /**
  * This class wraps an existing {@link TupleStream}, originating from a streaming result set from
