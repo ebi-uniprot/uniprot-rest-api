@@ -1,6 +1,5 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
