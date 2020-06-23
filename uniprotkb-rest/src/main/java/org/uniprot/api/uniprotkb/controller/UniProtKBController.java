@@ -257,7 +257,44 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return super.getDeferredResultResponseEntity(request, context);
     }
 
-    @GetMapping("/accessions")
+    @GetMapping(value = "/accessions",
+            produces = {TSV_MEDIA_TYPE_VALUE,
+                    FF_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE,
+                    APPLICATION_XML_VALUE,
+                    APPLICATION_JSON_VALUE,
+                    XLS_MEDIA_TYPE_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    GFF_MEDIA_TYPE_VALUE})
+    @Operation(
+            summary = "Search for a UniProtKB protein entry by a list of accessions.",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            array =
+                                            @ArraySchema(
+                                                    schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UniProtKBEntry.class))),
+                                    @Content(
+                                            mediaType = APPLICATION_XML_VALUE,
+                                            array =
+                                            @ArraySchema(
+                                                    schema =
+                                                    @Schema(
+                                                            implementation = Entry.class,
+                                                            name = "entries"))),
+                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            })
+            })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getProteinsByAccessions(
             @Valid GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
