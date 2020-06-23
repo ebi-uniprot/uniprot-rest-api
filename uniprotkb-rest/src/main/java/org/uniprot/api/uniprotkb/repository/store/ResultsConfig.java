@@ -1,7 +1,12 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,10 +24,6 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.SolrCollection;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Created 21/08/18

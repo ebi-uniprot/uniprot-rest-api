@@ -1,8 +1,13 @@
 package org.uniprot.api.common.repository.store;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -17,10 +22,6 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances, which

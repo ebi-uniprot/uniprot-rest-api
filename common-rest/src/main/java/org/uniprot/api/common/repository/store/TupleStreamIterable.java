@@ -1,6 +1,5 @@
 package org.uniprot.api.common.repository.store;
 
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Iterator;
