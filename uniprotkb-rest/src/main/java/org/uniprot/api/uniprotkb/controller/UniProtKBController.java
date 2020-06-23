@@ -298,7 +298,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getProteinsByAccessions(
-            @Valid GetByAccessionsRequest accessionsRequest,
+            @Valid @ModelAttribute GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 

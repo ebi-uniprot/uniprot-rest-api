@@ -1,14 +1,13 @@
 package org.uniprot.api.rest.validation;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author lgonzales
@@ -18,14 +17,16 @@ public class ValidAccessionListTest {
 
     @Test
     void isValidNullValueReturnTrue() {
-        ValidAccessionListTest.FakeValidAccessionListValidator validator = new ValidAccessionListTest.FakeValidAccessionListValidator();
+        ValidAccessionListTest.FakeValidAccessionListValidator validator =
+                new ValidAccessionListTest.FakeValidAccessionListValidator();
         boolean result = validator.isValid(null, null);
         assertTrue(result);
     }
 
     @Test
     void isValidWithSingleValueReturnTrue() {
-        ValidAccessionListTest.FakeValidAccessionListValidator validator = new ValidAccessionListTest.FakeValidAccessionListValidator();
+        ValidAccessionListTest.FakeValidAccessionListValidator validator =
+                new ValidAccessionListTest.FakeValidAccessionListValidator();
 
         boolean result = validator.isValid("P12345", null);
         assertTrue(result);
@@ -33,7 +34,8 @@ public class ValidAccessionListTest {
 
     @Test
     void isValidWithMultipleValueReturnTrue() {
-        ValidAccessionListTest.FakeValidAccessionListValidator validator = new ValidAccessionListTest.FakeValidAccessionListValidator();
+        ValidAccessionListTest.FakeValidAccessionListValidator validator =
+                new ValidAccessionListTest.FakeValidAccessionListValidator();
 
         boolean result = validator.isValid("P12345, P54321, P32542", null);
         assertTrue(result);
@@ -41,7 +43,8 @@ public class ValidAccessionListTest {
 
     @Test
     void inValidWithMultipleValuesReturnFalse() {
-        ValidAccessionListTest.FakeValidAccessionListValidator validator = new ValidAccessionListTest.FakeValidAccessionListValidator();
+        ValidAccessionListTest.FakeValidAccessionListValidator validator =
+                new ValidAccessionListTest.FakeValidAccessionListValidator();
 
         boolean result = validator.isValid("P12345, INVALID, P54321, INVALID2, P54322", null);
         assertFalse(result);
@@ -53,7 +56,8 @@ public class ValidAccessionListTest {
 
     @Test
     void inValidMaxLengthReturnFalse() {
-        ValidAccessionListTest.FakeValidAccessionListValidator validator = new ValidAccessionListTest.FakeValidAccessionListValidator();
+        ValidAccessionListTest.FakeValidAccessionListValidator validator =
+                new ValidAccessionListTest.FakeValidAccessionListValidator();
 
         boolean result = validator.isValid("P10000,P20000, P30000, P40000, P50000, P60000", null);
         assertFalse(result);
@@ -64,9 +68,11 @@ public class ValidAccessionListTest {
 
     @Test
     void inValidMaxAndValuesLengthReturnFalse() {
-        ValidAccessionListTest.FakeValidAccessionListValidator validator = new ValidAccessionListTest.FakeValidAccessionListValidator();
+        ValidAccessionListTest.FakeValidAccessionListValidator validator =
+                new ValidAccessionListTest.FakeValidAccessionListValidator();
 
-        boolean result = validator.isValid("P10000,P20000, P30000, P4INVALID, P50000, P60000", null);
+        boolean result =
+                validator.isValid("P10000,P20000, P30000, P4INVALID, P50000, P60000", null);
         assertFalse(result);
         assertNotNull(validator.errorList);
         assertEquals(2, validator.errorList.size());
@@ -84,7 +90,8 @@ public class ValidAccessionListTest {
         }
 
         @Override
-        void buildInvalidAccessionMessage(String accession, ConstraintValidatorContextImpl contextImpl) {
+        void buildInvalidAccessionMessage(
+                String accession, ConstraintValidatorContextImpl contextImpl) {
             errorList.add(accession);
         }
 
@@ -93,5 +100,4 @@ public class ValidAccessionListTest {
             return 5;
         }
     }
-
 }
