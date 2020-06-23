@@ -10,14 +10,20 @@ import org.apache.solr.client.solrj.io.stream.TupleStream;
 
 public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<Facet>> {
     private static final String LENGTH_STR = "length";
+    private static final String COUNT_STAR_STR = "count(*)";
+    private static final String RANGE_1_200 = "[1,200]";
+    private static final String RANGE_201_400 = "[201,400]";
+    private static final String RANGE_401_600 = "[401,600]";
+    private static final String RANGE_601_800 = "[601,800]";
+    private static final String RANGE_801_PLUS = "[801,*]";
     private static final Map<String, Integer> RANGE_INDEX = new HashMap<>();
 
     static {
-        RANGE_INDEX.put("[1,200]", 5);
-        RANGE_INDEX.put("[201,400]", 4);
-        RANGE_INDEX.put("[401,600]", 3);
-        RANGE_INDEX.put("[601,800]", 2);
-        RANGE_INDEX.put("[801,*]", 1);
+        RANGE_INDEX.put(RANGE_1_200, 5);
+        RANGE_INDEX.put(RANGE_201_400, 4);
+        RANGE_INDEX.put(RANGE_401_600, 3);
+        RANGE_INDEX.put(RANGE_601_800, 2);
+        RANGE_INDEX.put(RANGE_801_PLUS, 1);
     }
 
     private FacetConfig facetConfig;
@@ -56,7 +62,7 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
                     String facetName = String.valueOf(entry.getKey());
                     if (this.facetConfig.getFacetPropertyMap().containsKey(facetName)) {
                         String facetValue = String.valueOf(entry.getValue());
-                        Long facetCount = (long) map.get("count(*)");
+                        Long facetCount = (long) map.get(COUNT_STAR_STR);
                         List<Pair<String, Long>> valueCount = new ArrayList<>();
                         if (facetNameValue.containsKey(facetName)) {
                             valueCount = facetNameValue.get(facetName);
@@ -83,16 +89,7 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
         if (!LENGTH_STR.equals(facetValues.getKey())) {
             List<FacetItem> values =
                     facetValues.getValue().stream()
-                            .map(
-                                    pair ->
-                                            FacetItem.builder()
-                                                    .value(pair.getLeft())
-                                                    .label(
-                                                            getFacetItemLabel(
-                                                                    facetValues.getKey(),
-                                                                    pair.getLeft()))
-                                                    .count(pair.getRight())
-                                                    .build())
+                            .map(pair -> createFacetItem(pair, facetValues.getKey()))
                             .collect(Collectors.toList());
             // build a facet
             return Facet.builder()
@@ -104,6 +101,14 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
         } else { // handle length buckets differently
             return convertSolrStreamToRangeFacet(facetValues);
         }
+    }
+
+    private FacetItem createFacetItem(Pair<String, Long> pair, String facetName) {
+        return FacetItem.builder()
+                .value(pair.getLeft())
+                .label(getFacetItemLabel(facetName, pair.getLeft()))
+                .count(pair.getRight())
+                .build();
     }
 
     private Facet convertSolrStreamToRangeFacet(
@@ -154,11 +159,11 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
             }
         }
         Map<String, Long> buckets = new HashMap<>();
-        buckets.put("[1,200]", bucket1To200);
-        buckets.put("[201,400]", bucket201To400);
-        buckets.put("[401,600]", bucket401To600);
-        buckets.put("[601,800]", bucket601To800);
-        buckets.put("[801,*]", bucket801Onwards);
+        buckets.put(RANGE_1_200, bucket1To200);
+        buckets.put(RANGE_201_400, bucket201To400);
+        buckets.put(RANGE_401_600, bucket401To600);
+        buckets.put(RANGE_601_800, bucket601To800);
+        buckets.put(RANGE_801_PLUS, bucket801Onwards);
         return buckets;
     }
 
