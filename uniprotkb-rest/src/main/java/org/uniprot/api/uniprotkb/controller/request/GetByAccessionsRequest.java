@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
@@ -23,7 +26,7 @@ public class GetByAccessionsRequest implements SearchRequest {
 
     @NotNull(message = "{search.required}")
     @ValidAccessionList
-    private String accessions;//comma separated list of accessions
+    private String accessions; // comma separated list of accessions
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
@@ -59,5 +62,9 @@ public class GetByAccessionsRequest implements SearchRequest {
     @Override
     public String getSort() {
         return null;
+    }
+
+    public List<String> getAccessionsList() {
+        return Arrays.asList(getAccessions().split(","));
     }
 }

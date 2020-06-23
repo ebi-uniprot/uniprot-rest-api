@@ -17,8 +17,10 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfigProperties;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
-import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
 
 /**
  * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override
@@ -53,12 +55,16 @@ public class DataStoreTestConfig {
         return mock(SolrClient.class);
     }
 
-    @SuppressWarnings("rawtypes")
     @Bean
     @Profile("offline")
-    public UniProtKBStoreClient primaryUniProtStoreClient() {
-        return new UniProtKBStoreClient(
-                VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
+    public UniProtKBStoreClient uniProtStoreClient(
+            UniProtStoreConfigProperties uniProtStoreConfigProperties) {
+        VoldemortClient<UniProtKBEntry> client =
+                new VoldemortRemoteUniProtKBEntryStore(
+                        uniProtStoreConfigProperties.getNumberOfConnections(),
+                        uniProtStoreConfigProperties.getStoreName(),
+                        uniProtStoreConfigProperties.getHost());
+        return new UniProtKBStoreClient(client);
     }
 
     @Bean

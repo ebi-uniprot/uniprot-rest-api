@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances, which
- * enable the exporting of entire result sets from Solr. This template class should be initialised
- * with correct configuration details, e.g., zookeeper address and collection. This template
- * instance can then be used to create specific {@link TupleStream}s for a given query, using the
- * original configuration details specified in the template.
+ * enable us to get facets from Solr. This template class should be initialised with correct
+ * configuration details, e.g., zookeeper address and collection. This template instance can then be
+ * used to create specific {@link TupleStream}s for a given query, using the original configuration
+ * details specified in the template.
  *
  * <p>Created 21/08/18
  *

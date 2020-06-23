@@ -1,15 +1,12 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -19,9 +16,11 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
-import org.uniprot.api.common.repository.solrstream.SolrStreamingFacetRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.solrstream.SolrStreamingFacetRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -35,8 +34,7 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.uniprotkb.UniProtKBEntryType;
-import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -58,6 +56,8 @@ public class UniProtEntryService
     private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
+    private final UniprotKBFacetConfig uniprotKBFacetConfig;
+    // FIXME add as a param
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     public UniProtEntryService(
@@ -84,6 +84,7 @@ public class UniProtEntryService
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+        this.uniprotKBFacetConfig = uniprotKBFacetConfig;
     }
 
     @Override
@@ -96,13 +97,19 @@ public class UniProtEntryService
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         return resultsConverter.convertQueryResult(results, fields);
     }
-    // stub - dummy method
-    public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest request) {
-        UniProtKBEntryBuilder builder =
-                new UniProtKBEntryBuilder("P12345", "P12345", UniProtKBEntryType.SWISSPROT);
-        CursorPage page = CursorPage.of(null, 1);
-        page.setTotalElements(1L);
-        QueryResult<UniProtKBEntry> result = QueryResult.of(Arrays.asList(builder.build()), page);
+
+    public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest accessionsRequest) {
+        SolrStreamingFacetRequest solrStreamingFacetRequest =
+                createSolrStreamingFacetRequest(accessionsRequest);
+        List<String> accessions = accessionsRequest.getAccessionsList();
+        // get facets using solr streaming
+        List<Facet> facets = getFacets(solrStreamingFacetRequest);
+        List<UniProtKBEntry> entries =
+                this.storeStreamer.streamEntries(accessions).collect(Collectors.toList());
+        // TODO Fix cursor
+        CursorPage page = CursorPage.of(null, accessions.size());
+        page.setTotalElements((long) accessionsRequest.getAccessionsList().size());
+        QueryResult<UniProtKBEntry> result = QueryResult.of(entries, page, facets, null);
         return result;
     }
 
@@ -146,35 +153,6 @@ public class UniProtEntryService
                 createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts)
                         .build();
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
-    }
-
-    public List<Tuple> getEntries(List<String> accessions) throws IOException {
-
-        //        List<String> facets = Arrays.asList("reviewed", "fragment", "structure_3d",
-        // "model_organism", "other_organism",
-        //                "existence", "annotation_score", "proteome", "proteins_with", "length");
-        List<String> facets = Arrays.asList("length", "reviewed", "fragment", "structure_3d");
-        String query = accessions.stream().collect(Collectors.joining(" "));
-        query = "accession_id:(" + query + ")";
-        SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
-                SolrStreamingFacetRequest.builder();
-        builder.query(query).facets(facets);
-        TupleStream tupleStream = facetTupleStreamTemplate.create(builder.build());
-
-        List<Tuple> tuples = new ArrayList<>();
-        try {
-            tupleStream.open();
-            while (true) {
-                Tuple tuple = tupleStream.read();
-                if (tuple.EOF) {
-                    break;
-                }
-                tuples.add(tuple);
-            }
-        } finally {
-            tupleStream.close();
-        }
-        return tuples;
     }
 
     @Override
@@ -228,5 +206,30 @@ public class UniProtEntryService
         } else {
             return false;
         }
+    }
+
+    private List<Facet> getFacets(SolrStreamingFacetRequest solrStreamingFacetRequest) {
+        List<Facet> facets = null;
+        if (Utils.notNullNotEmpty(solrStreamingFacetRequest.getFacets())) {
+            // create facet tuple stream and get facets
+            TupleStream tupleStream =
+                    this.facetTupleStreamTemplate.create(solrStreamingFacetRequest);
+            FacetTupleStreamConverter facetTupleStreamConverter =
+                    new FacetTupleStreamConverter(this.uniprotKBFacetConfig);
+            facets = facetTupleStreamConverter.convert(tupleStream);
+        }
+        return facets;
+    }
+
+    private SolrStreamingFacetRequest createSolrStreamingFacetRequest(
+            GetByAccessionsRequest accessionsRequest) {
+        List<String> accessions = accessionsRequest.getAccessionsList();
+        List<String> facets = accessionsRequest.getFacetList();
+        String query = accessions.stream().collect(Collectors.joining(" "));
+        query = "accession_id:(" + query + ")";
+        SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
+                SolrStreamingFacetRequest.builder();
+        builder.query(query).facets(facets);
+        return builder.build();
     }
 }

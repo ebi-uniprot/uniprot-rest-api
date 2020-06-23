@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.store.search.SolrCollection;
 
 /** @author sahmad */
-class TupleStreamTemplateTest {
+class FacetTupleStreamTemplateTest {
     private static FacetTupleStreamTemplate tupleStreamTemplate;
     private static HttpClient httpClient;
     private static String collection = SolrCollection.uniprot.name();
