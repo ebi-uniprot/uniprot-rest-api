@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
  * @author sahmad
  */
 @Builder
-public class TupleStreamTemplate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TupleStreamTemplate.class);
+public class FacetTupleStreamTemplate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FacetTupleStreamTemplate.class);
     private String zookeeperHost;
     private String collection;
     private HttpClient httpClient;

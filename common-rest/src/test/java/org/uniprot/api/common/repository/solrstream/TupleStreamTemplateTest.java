@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 /** @author sahmad */
 class TupleStreamTemplateTest {
-    private static TupleStreamTemplate tupleStreamTemplate;
+    private static FacetTupleStreamTemplate tupleStreamTemplate;
     private static HttpClient httpClient;
     private static String collection = SolrCollection.uniprot.name();
     private static String zkHost = "localhost:2181";
@@ -25,7 +25,7 @@ class TupleStreamTemplateTest {
     static void setUp() {
         httpClient = mock(HttpClient.class);
         tupleStreamTemplate =
-                TupleStreamTemplate.builder()
+                FacetTupleStreamTemplate.builder()
                         .zookeeperHost(zkHost)
                         .collection(collection)
                         .httpClient(httpClient)

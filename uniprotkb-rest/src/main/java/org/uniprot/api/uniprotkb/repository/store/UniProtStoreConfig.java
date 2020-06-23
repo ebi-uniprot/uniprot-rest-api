@@ -11,7 +11,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.solrstream.TupleStreamTemplate;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
@@ -58,9 +58,9 @@ public class UniProtStoreConfig {
     }
 
     @Bean
-    public TupleStreamTemplate tupleStreamTemplate(
+    public FacetTupleStreamTemplate facetTupleStreamTemplate(
             RepositoryConfigProperties configProperties, HttpClient httpClient) {
-        return TupleStreamTemplate.builder()
+        return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())
                 .httpClient(httpClient)

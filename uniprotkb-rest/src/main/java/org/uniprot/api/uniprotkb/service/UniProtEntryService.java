@@ -13,7 +13,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.SolrStreamingFacetRequest;
-import org.uniprot.api.common.repository.solrstream.TupleStreamTemplate;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -58,7 +58,7 @@ public class UniProtEntryService
     private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -158,7 +158,7 @@ public class UniProtEntryService
         SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
                 SolrStreamingFacetRequest.builder();
         builder.query(query).facets(facets);
-        TupleStream tupleStream = tupleStreamTemplate.create(builder.build());
+        TupleStream tupleStream = facetTupleStreamTemplate.create(builder.build());
 
         List<Tuple> tuples = new ArrayList<>();
         try {
