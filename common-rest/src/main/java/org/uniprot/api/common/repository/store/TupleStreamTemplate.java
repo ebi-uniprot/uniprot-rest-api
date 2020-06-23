@@ -68,6 +68,7 @@ public class TupleStreamTemplate {
                         .query(request.getQuery())
                         .filterQueries(request.getFilterQueries())
                         .queryBoosts(request.getQueryBoosts())
+                        .rows(0)
                         .build();
         try {
             QueryResponse response =
