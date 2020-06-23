@@ -1,13 +1,14 @@
 package org.uniprot.api.common.repository.solrstream;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
+
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.uniprot.core.util.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class FacetStreamExpression extends StreamExpression {
@@ -48,9 +49,10 @@ public class FacetStreamExpression extends StreamExpression {
         private String bucketSorts;
         private int bucketSizeLimit;
 
-        public FacetStreamExpressionBuilder(){}
+        public FacetStreamExpressionBuilder() {}
 
-        public FacetStreamExpressionBuilder(String collection, String facet, SolrStreamingFacetRequest request) {
+        public FacetStreamExpressionBuilder(
+                String collection, String facet, SolrStreamingFacetRequest request) {
             this.collection = collection;
             this.query = request.getQuery();
             this.buckets = facet;
@@ -90,12 +92,23 @@ public class FacetStreamExpression extends StreamExpression {
         }
 
         public FacetStreamExpression build() {
-            return new FacetStreamExpression(this.collection, this.query, this.buckets, this.metrics,
-                    this.bucketSorts, this.bucketSizeLimit);
+            return new FacetStreamExpression(
+                    this.collection,
+                    this.query,
+                    this.buckets,
+                    this.metrics,
+                    this.bucketSorts,
+                    this.bucketSizeLimit);
         }
     }
 
-    private void validateParams(String collection, String query, String buckets, String metrics, String bucketSorts, int bucketSizeLimit) {
+    private void validateParams(
+            String collection,
+            String query,
+            String buckets,
+            String metrics,
+            String bucketSorts,
+            int bucketSizeLimit) {
         if (Utils.nullOrEmpty(collection)) {
             throw new IllegalArgumentException("collection is a mandatory param");
         }

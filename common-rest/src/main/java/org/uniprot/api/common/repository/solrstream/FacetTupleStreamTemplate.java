@@ -1,6 +1,11 @@
 package org.uniprot.api.common.repository.solrstream;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.Builder;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
@@ -10,10 +15,6 @@ import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances, which
@@ -40,8 +41,10 @@ public class FacetTupleStreamTemplate {
             List<StreamExpression> facetExpressions =
                     request.getFacets().stream()
                             .map(
-                                    facet -> new FacetStreamExpression.FacetStreamExpressionBuilder(this.collection,
-                                            facet, request).build())
+                                    facet ->
+                                            new FacetStreamExpression.FacetStreamExpressionBuilder(
+                                                            this.collection, facet, request)
+                                                    .build())
                             .collect(Collectors.toList());
 
             // we can replace list with plist function when solr >= 7.5

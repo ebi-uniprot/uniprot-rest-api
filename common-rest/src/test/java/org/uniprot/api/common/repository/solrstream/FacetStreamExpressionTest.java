@@ -1,5 +1,10 @@
 package org.uniprot.api.common.repository.solrstream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
@@ -7,16 +12,12 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-
 public class FacetStreamExpressionTest {
 
     @Test
-    void testCreate(){
-        FacetStreamExpression.FacetStreamExpressionBuilder builder = new FacetStreamExpression.FacetStreamExpressionBuilder();
+    void testCreate() {
+        FacetStreamExpression.FacetStreamExpressionBuilder builder =
+                new FacetStreamExpression.FacetStreamExpressionBuilder();
         String collection = "sample collection";
         String query = "q:*:*";
         String buckets = "facet";
@@ -58,8 +59,9 @@ public class FacetStreamExpressionTest {
     }
 
     @Test
-    void testCreateBucketSizeFailure(){
-        FacetStreamExpression.FacetStreamExpressionBuilder builder = new FacetStreamExpression.FacetStreamExpressionBuilder();
+    void testCreateBucketSizeFailure() {
+        FacetStreamExpression.FacetStreamExpressionBuilder builder =
+                new FacetStreamExpression.FacetStreamExpressionBuilder();
         String collection = "sample collection";
         String query = "q:*:*";
         String buckets = "facet";
@@ -68,29 +70,36 @@ public class FacetStreamExpressionTest {
         int bucketSizeLimit = -1;
         builder.collection(collection).query(query).buckets(buckets);
         builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
-        Assertions.assertEquals("bucketSizeLimit should be a positive integer", exception.getMessage());
+        IllegalArgumentException exception =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
+        Assertions.assertEquals(
+                "bucketSizeLimit should be a positive integer", exception.getMessage());
     }
 
     @Test
-    void testCreateFailureWithoutQuery(){
-        FacetStreamExpression.FacetStreamExpressionBuilder builder = new FacetStreamExpression.FacetStreamExpressionBuilder();
+    void testCreateFailureWithoutQuery() {
+        FacetStreamExpression.FacetStreamExpressionBuilder builder =
+                new FacetStreamExpression.FacetStreamExpressionBuilder();
         String collection = "sample collection";
         builder.collection(collection);
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
+        IllegalArgumentException exception =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
         Assertions.assertEquals("query is a mandatory param", exception.getMessage());
     }
 
     @Test
-    void testCreateFailureWithoutCollection(){
-        FacetStreamExpression.FacetStreamExpressionBuilder builder = new FacetStreamExpression.FacetStreamExpressionBuilder();
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
+    void testCreateFailureWithoutCollection() {
+        FacetStreamExpression.FacetStreamExpressionBuilder builder =
+                new FacetStreamExpression.FacetStreamExpressionBuilder();
+        IllegalArgumentException exception =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
         Assertions.assertEquals("collection is a mandatory param", exception.getMessage());
     }
 
     @Test
-    void testCreateMetricFailure(){
-        FacetStreamExpression.FacetStreamExpressionBuilder builder = new FacetStreamExpression.FacetStreamExpressionBuilder();
+    void testCreateMetricFailure() {
+        FacetStreamExpression.FacetStreamExpressionBuilder builder =
+                new FacetStreamExpression.FacetStreamExpressionBuilder();
         String collection = "sample collection";
         String query = "q:*:*";
         String buckets = "facet";
@@ -99,7 +108,8 @@ public class FacetStreamExpressionTest {
         int bucketSizeLimit = 1;
         builder.collection(collection).query(query).buckets(buckets);
         builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
+        IllegalArgumentException exception =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> builder.build());
         Assertions.assertEquals("Unknown function median(facet)", exception.getMessage());
     }
 }

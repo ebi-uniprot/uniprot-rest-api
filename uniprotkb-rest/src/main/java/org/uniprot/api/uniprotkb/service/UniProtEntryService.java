@@ -1,5 +1,13 @@
 package org.uniprot.api.uniprotkb.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -37,14 +45,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
@@ -98,7 +98,8 @@ public class UniProtEntryService
     }
     // stub - dummy method
     public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest request) {
-        UniProtKBEntryBuilder builder = new UniProtKBEntryBuilder("P12345", "P12345", UniProtKBEntryType.SWISSPROT);
+        UniProtKBEntryBuilder builder =
+                new UniProtKBEntryBuilder("P12345", "P12345", UniProtKBEntryType.SWISSPROT);
         CursorPage page = CursorPage.of(null, 1);
         page.setTotalElements(1L);
         QueryResult<UniProtKBEntry> result = QueryResult.of(Arrays.asList(builder.build()), page);
@@ -152,7 +153,7 @@ public class UniProtEntryService
         //        List<String> facets = Arrays.asList("reviewed", "fragment", "structure_3d",
         // "model_organism", "other_organism",
         //                "existence", "annotation_score", "proteome", "proteins_with", "length");
-        List<String> facets = Arrays.asList("reviewed", "fragment", "structure_3d");
+        List<String> facets = Arrays.asList("length", "reviewed", "fragment", "structure_3d");
         String query = accessions.stream().collect(Collectors.joining(" "));
         query = "accession_id:(" + query + ")";
         SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =

@@ -1,5 +1,11 @@
 package org.uniprot.api.common.repository.solrstream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.stream.FacetStream;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -7,12 +13,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.store.search.SolrCollection;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 
 /** @author sahmad */
 class TupleStreamTemplateTest {
@@ -49,5 +49,4 @@ class TupleStreamTemplateTest {
                 .children()
                 .forEach(child -> assertThat(child, Matchers.instanceOf(FacetStream.class)));
     }
-
 }
