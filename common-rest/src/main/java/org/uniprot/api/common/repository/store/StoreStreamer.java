@@ -36,6 +36,7 @@ public class StoreStreamer<T> {
     private final RetryPolicy<Object> storeFetchRetryPolicy;
     private final RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
 
+    @SuppressWarnings("squid:S2095")
     public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
@@ -80,6 +81,7 @@ public class StoreStreamer<T> {
                 Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
     }
 
+    @SuppressWarnings("squid:S2095")
     private Stream<String> fetchIds(SolrRequest solrRequest) {
         try {
             TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
