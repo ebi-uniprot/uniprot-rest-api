@@ -1,5 +1,8 @@
 package org.uniprot.api.rest.validation;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -23,22 +26,56 @@ public @interface ValidAccessionList {
     Class<? extends Payload>[] payload() default {};
 
     class AccessionListValidator implements ConstraintValidator<ValidAccessionList, String> {
+
+        @Value( "${accessions.max.length}" )
+        private String maxLength;
+
+        @Override
+        public void initialize(ValidAccessionList constraintAnnotation) {
+            SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+        }
+
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
-            int count = 0;
             boolean isValid = true;
             if (Utils.notNullNotEmpty(value)) {
+                ConstraintValidatorContextImpl contextImpl =
+                        (ConstraintValidatorContextImpl) context;
                 // verify if accession is valid.
-                String[] accessions = value.split(",");
-                count = accessions.length;
+                String[] accessions = value.split("\\s*,\\s*");
                 for (String accession : accessions) {
-                    isValid = accession.matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
+                    if(!accession.matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX)){
+                        buildInvalidAccessionMessage(accession, contextImpl);
+                        isValid = false;
+                    }
+                }
+                if(accessions.length > getMaxLength()){
+                    buildInvalidAccessionLengthMessage(contextImpl);
+                    isValid = false;
+                }
+                if (!isValid && contextImpl != null) {
+                    contextImpl.disableDefaultConstraintViolation();
                 }
             }
-            if(count > 1000){
-                isValid = false;
-            }
             return isValid;
+        }
+
+        void buildInvalidAccessionMessage(
+                String accession,
+                ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = "{accessions.invalid.accessions.value}";
+            contextImpl.addMessageParameter("0", accession);
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        void buildInvalidAccessionLengthMessage(ConstraintValidatorContextImpl contextImpl) {
+            String errorMessage = "{accessions.invalid.accessions.size}";
+            contextImpl.addMessageParameter("0", getMaxLength());
+            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        int getMaxLength(){
+            return Integer.parseInt(maxLength);
         }
     }
 }

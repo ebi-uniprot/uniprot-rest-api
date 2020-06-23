@@ -20,7 +20,7 @@ import javax.validation.constraints.Positive;
 public class GetByAccessionsRequest implements SearchRequest {
 
     @NotNull(message = "{search.required}")
-    @ValidAccessionList(message = "invalid comma separated accession")
+    @ValidAccessionList
     private String accessions;//comma separated list of accessions
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")

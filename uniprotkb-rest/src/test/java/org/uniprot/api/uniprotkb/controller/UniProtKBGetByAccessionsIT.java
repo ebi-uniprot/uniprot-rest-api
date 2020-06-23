@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.file.Files;
@@ -23,12 +24,17 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -77,6 +83,33 @@ class UniProtKBGetByAccessionsIT {
         storeManager.cleanSolr(DataStoreManager.StoreType.LITERATURE);
         storeManager.cleanStore(DataStoreManager.StoreType.UNIPROT);
     }
+
+    @Test
+    void getByAccessionsBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "invalid, invalid1")
+                                .param("accessions", "P10000,P20000,P30000,P40000,P50000,P60000,P70000,P80000,P90000,INVALID , INVALID2")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Only '10' accessions are allowed in each request.",
+                                        "Invalid fields parameter value 'invalid'",
+                                        "Invalid fields parameter value 'invalid1'",
+                                        "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
+                                        "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession.")));
+    }
+
     @Test
     void getByAccessions() throws Exception {
         String dataFile =
