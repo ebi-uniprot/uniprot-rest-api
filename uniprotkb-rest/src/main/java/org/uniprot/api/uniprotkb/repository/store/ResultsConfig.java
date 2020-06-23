@@ -1,19 +1,16 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.http.client.HttpClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.store.RDFStreamerConfigProperties;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
@@ -21,6 +18,11 @@ import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.store.search.SolrCollection;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Created 21/08/18
@@ -34,10 +36,16 @@ public class ResultsConfig {
 
     @Bean
     public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties, HttpClient httpClient) {
+            StreamerConfigProperties configProperties,
+            HttpClient httpClient,
+            SolrClient solrClient,
+            SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
                 .httpClient(httpClient)
+                .solrClient(solrClient)
+                .collection(SolrCollection.uniprot)
+                .solrRequestConverter(requestConverter)
                 .build();
     }
 

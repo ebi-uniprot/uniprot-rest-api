@@ -1,21 +1,26 @@
 package org.uniprot.api.common.repository.store;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.http.client.HttpClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.*;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.SolrCollection;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances, which
@@ -34,12 +39,17 @@ import org.uniprot.core.util.Utils;
 public class TupleStreamTemplate {
     private final StreamerConfigProperties streamConfig;
     private final HttpClient httpClient;
+    private final SolrClient solrClient;
+    private final SolrCollection collection;
+    private final SolrRequestConverter solrRequestConverter;
     private StreamFactory streamFactory;
     private StreamContext streamContext;
 
     public TupleStream create(SolrRequest request) {
         initTupleStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
         initStreamContext(streamConfig.getZkHost(), httpClient);
+        validateResponse(request);
+
         TupleStreamBuilder streamBuilder =
                 TupleStreamBuilder.builder()
                         .streamFactory(streamFactory)
@@ -49,6 +59,27 @@ public class TupleStreamTemplate {
                         .build();
 
         return streamBuilder.createFor(request);
+    }
+
+    void validateResponse(SolrRequest request) {
+        SolrRequest slimRequest =
+                SolrRequest.builder()
+                        .query(request.getQuery())
+                        .filterQueries(request.getFilterQueries())
+                        .queryBoosts(request.getQueryBoosts())
+                        .build();
+        try {
+            QueryResponse response =
+                    solrClient.query(
+                            collection.name(), solrRequestConverter.toSolrQuery(slimRequest));
+            if (response.getResults().getNumFound() > streamConfig.getStoreMaxCountToRetrieve()) {
+                throw new ServiceException(
+                        "Too many results to retrieve. Please refine your query or consider fetching batch by batch");
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new ServiceException("Server error when querying Solr", e);
+        }
+        log.debug("Request to stream is valid: " + request);
     }
 
     private void initTupleStreamFactory(String zookeeperHost, String collection) {
