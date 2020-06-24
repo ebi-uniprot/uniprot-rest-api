@@ -1,7 +1,11 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -12,9 +16,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
 public class GetByAccessionsRequest implements SearchRequest {
@@ -32,6 +34,15 @@ public class GetByAccessionsRequest implements SearchRequest {
     @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
+
+    @Parameter(
+            description =
+                    "Add content disposition attachment to response header, this way it can be downloaded as a file in the browser.")
+    @Pattern(
+            regexp = "^true|false$",
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
+            message = "{search.uniprot.invalid.download}")
+    private String download;
 
     @Parameter(hidden = true)
     private String cursor;

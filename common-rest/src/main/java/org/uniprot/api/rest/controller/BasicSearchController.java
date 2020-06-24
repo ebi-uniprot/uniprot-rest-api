@@ -82,6 +82,12 @@ public abstract class BasicSearchController<T> {
             HttpServletRequest request,
             HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
+        MessageConverterContext<T> context = getBasicSearchMessageConverterContext(result, fields, contentType);
+        HttpHeaders headers = createHttpSearchHeader(contentType);
+        return getSearchResult(result, request, response, headers, context);
+    }
+
+    protected MessageConverterContext<T> getBasicSearchMessageConverterContext(QueryResult<T> result, String fields, MediaType contentType) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
         context.setFields(fields);
@@ -96,9 +102,13 @@ public abstract class BasicSearchController<T> {
         } else {
             context.setEntities(result.getContent().stream());
         }
+        return context;
+    }
+
+    protected ResponseEntity<MessageConverterContext<T>> getSearchResult(QueryResult<T> result, HttpServletRequest request, HttpServletResponse response, HttpHeaders headers, MessageConverterContext<T> context) {
         this.eventPublisher.publishEvent(
                 new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-        return ResponseEntity.ok().headers(createHttpSearchHeader(contentType)).body(context);
+        return ResponseEntity.ok().headers(headers).body(context);
     }
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
