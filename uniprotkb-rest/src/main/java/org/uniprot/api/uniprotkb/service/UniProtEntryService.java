@@ -55,8 +55,8 @@ public class UniProtEntryService
     private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    private final UniprotKBFacetConfig uniprotKBFacetConfig;
     private final FacetTupleStreamTemplate facetTupleStreamTemplate;
+    private final FacetTupleStreamConverter facetTupleStreamConverter;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -83,7 +83,7 @@ public class UniProtEntryService
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.uniprotKBFacetConfig = uniprotKBFacetConfig;
+        this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
     }
 
@@ -228,9 +228,7 @@ public class UniProtEntryService
             // create facet tuple stream and get facets
             TupleStream tupleStream =
                     this.facetTupleStreamTemplate.create(solrStreamingFacetRequest);
-            FacetTupleStreamConverter facetTupleStreamConverter =
-                    new FacetTupleStreamConverter(this.uniprotKBFacetConfig);
-            facets = facetTupleStreamConverter.convert(tupleStream);
+            facets = this.facetTupleStreamConverter.convert(tupleStream);
         }
         return facets;
     }
