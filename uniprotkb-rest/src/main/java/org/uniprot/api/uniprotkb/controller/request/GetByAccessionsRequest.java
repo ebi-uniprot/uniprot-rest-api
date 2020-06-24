@@ -67,4 +67,8 @@ public class GetByAccessionsRequest implements SearchRequest {
     public List<String> getAccessionsList() {
         return Arrays.asList(getAccessions().split(","));
     }
+
+    public boolean isDownload() {
+        return Boolean.parseBoolean(download);
+    }
 }

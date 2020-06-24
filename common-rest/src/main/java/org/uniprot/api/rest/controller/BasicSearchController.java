@@ -81,13 +81,16 @@ public abstract class BasicSearchController<T> {
             String fields,
             HttpServletRequest request,
             HttpServletResponse response) {
-        MediaType contentType = getAcceptHeader(request);
-        MessageConverterContext<T> context = getBasicSearchMessageConverterContext(result, fields, contentType);
-        HttpHeaders headers = createHttpSearchHeader(contentType);
-        return getSearchResult(result, request, response, headers, context);
+        return this.getSearchResponse(result, fields, false, request, response);
     }
 
-    protected MessageConverterContext<T> getBasicSearchMessageConverterContext(QueryResult<T> result, String fields, MediaType contentType) {
+    protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
+            QueryResult<T> result,
+            String fields,
+            boolean isDownload,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
         context.setFields(fields);
@@ -102,10 +105,13 @@ public abstract class BasicSearchController<T> {
         } else {
             context.setEntities(result.getContent().stream());
         }
-        return context;
-    }
 
-    protected ResponseEntity<MessageConverterContext<T>> getSearchResult(QueryResult<T> result, HttpServletRequest request, HttpServletResponse response, HttpHeaders headers, MessageConverterContext<T> context) {
+        HttpHeaders headers = createHttpSearchHeader(contentType);
+        if (isDownload) {
+            context.setDownloadContentDispositionHeader(true);
+            headers = createHttpDownloadHeader(context, request);
+        }
+
         this.eventPublisher.publishEvent(
                 new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
         return ResponseEntity.ok().headers(headers).body(context);
