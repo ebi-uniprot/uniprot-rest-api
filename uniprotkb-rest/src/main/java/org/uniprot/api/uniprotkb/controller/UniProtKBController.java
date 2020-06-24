@@ -256,8 +256,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return super.getDeferredResultResponseEntity(request, context);
     }
 
-    @GetMapping(
+    @RequestMapping(
             value = "/accessions",
+            method = {RequestMethod.GET, RequestMethod.POST},
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,

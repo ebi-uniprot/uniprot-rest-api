@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
@@ -500,6 +501,37 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00010", "P00009")));
         ;
+    }
+
+    @Test
+    void getByAccessionsPostSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
+                                        "P00004", "P00008", "P00010", "P00009")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].entryType",
+                                equalTo("UniProtKB reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN")));
     }
 
     @Test
