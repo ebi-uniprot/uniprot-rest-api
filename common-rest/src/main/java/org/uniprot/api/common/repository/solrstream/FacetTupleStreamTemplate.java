@@ -75,4 +75,8 @@ public class FacetTupleStreamTemplate {
         streamContext.setSolrClientCache(solrClientCache);
         return streamContext;
     }
+
+    public void setZookeeperHost(String zkHost){
+        this.zookeeperHost = zkHost;
+    }
 }
