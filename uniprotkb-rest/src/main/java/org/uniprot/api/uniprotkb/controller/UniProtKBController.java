@@ -301,10 +301,13 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             @Valid @ModelAttribute GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
         QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
-
-        return super.getSearchResponse(result, accessionsRequest.getFields(), request, response);
+        return super.getSearchResponse(
+                result,
+                accessionsRequest.getFields(),
+                accessionsRequest.isDownload(),
+                request,
+                response);
     }
 
     @Override
