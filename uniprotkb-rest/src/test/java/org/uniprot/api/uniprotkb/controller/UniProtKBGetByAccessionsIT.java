@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -102,36 +101,6 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
     }
 
     @Test
-    void getByAccessionsBadRequest() throws Exception {
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("download", "INVALID")
-                                .param("fields", "invalid, invalid1")
-                                .param(
-                                        "accessions",
-                                        "P10000,P20000,P30000,P40000,P50000,P60000,P70000,P80000,P90000,INVALID , INVALID2")
-                                .param("size", "10"));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                containsInAnyOrder(
-                                        "Only '10' accessions are allowed in each request.",
-                                        "Invalid fields parameter value 'invalid'",
-                                        "Invalid fields parameter value 'invalid1'",
-                                        "The 'download' parameter has invalid format. It should be a boolean true or false.",
-                                        "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
-                                        "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession.")));
-    }
-
-    @Test
     void getByAccessionsSuccess() throws Exception {
         // when
         ResultActions response =
@@ -154,38 +123,100 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 "$.results.*.primaryAccession",
                                 contains(
                                         "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
-                                        "P00004", "P00008", "P00010", "P00009")));
-        Assertions.fail("TODO: ADD VALIDATIONS");
+                                        "P00004", "P00008", "P00010", "P00009")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].entryType",
+                                equalTo("UniProtKB reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN")));
     }
 
     @Test
-    void getByAccessionsFieldsParameterWorks() throws Exception {
+    void getByAccessionsWithFacetsSuccess() throws Exception {
+        String facetList = "length,model_organism,reviewed";
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(accessionsByIdPath)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("fields", "gene_names,organism_name")
                                 .param(
                                         "accessions",
-                                        "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                        "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("facets", facetList)
                                 .param("size", "10"));
 
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains(
-                                        "P00001", "P00002", "P00003", "P00007", "P00006", "P00005",
+                                        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
                                         "P00004", "P00008", "P00010", "P00009")))
-                .andExpect(jsonPath("$.results.*.organism").exists()) // @Shadab: check value?
-                .andExpect(jsonPath("$.results.*.genes").exists()) // / @Shadab: check value?
-                .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
-                .andExpect(jsonPath("$.results.*.comments").doesNotExist());
-        Assertions.fail("TODO: Check questions above");
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.label",
+                                contains("Sequence length", "Model organisms", "Status")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.name",
+                                contains("length", "model_organism", "reviewed")))
+                .andExpect(jsonPath("$.facets[0].values.*.label", contains(">= 801")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("[801 TO *]")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
+                .andExpect(jsonPath("$.facets[1].values.*.label").doesNotExist())
+                .andExpect(jsonPath("$.facets[1].values.*.value", contains("Human")))
+                .andExpect(jsonPath("$.facets[1].values.*.count", contains(10)))
+                .andExpect(
+                        jsonPath("$.facets[2].values.*.label", contains("Reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.facets[2].values.*.value", contains("true")))
+                .andExpect(jsonPath("$.facets[2].values.*.count", contains(10)));
+    }
+
+    @Test
+    void getByAccessionsWithAllFacetsSuccess() throws Exception {
+        String facetList =
+                "reviewed,fragment,structure_3d,model_organism,other_organism,existence,"
+                        + "annotation_score,proteome,proteins_with,length";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("facets", facetList)
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
+                                        "P00004", "P00008", "P00010", "P00009")))
+                .andExpect(jsonPath("$.facets.size()", is(9)))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.label",
+                                contains(
+                                        "Status",
+                                        "Fragment",
+                                        "3D Structure",
+                                        "Model organisms",
+                                        "Protein Existence",
+                                        "Annotation Score",
+                                        "Proteomes",
+                                        "Proteins with",
+                                        "Sequence length")));
     }
 
     @Test
@@ -211,24 +242,63 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         startsWith(
                                                 "form-data; name=\"attachment\"; filename=\"uniprot-")))
                 .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(jsonPath("$.facets").doesNotExist())
                 .andExpect(
                         jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains(
                                         "P00001", "P00002", "P00003", "P00007", "P00006", "P00005",
                                         "P00004", "P00008", "P00010", "P00009")));
-        Assertions.fail("TODO: ADD VALIDATIONS");
+    }
+
+    @Test
+    void getByAccessionsFieldsParameterWorks() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "gene_names,organism_name")
+                                .param(
+                                        "accessions",
+                                        "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00001", "P00002", "P00003", "P00007", "P00006", "P00005",
+                                        "P00004", "P00008", "P00010", "P00009")))
+                .andExpect(jsonPath("$.results.*.organism").exists())
+                .andExpect(jsonPath("$.results.*.genes").exists())
+                .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
+                .andExpect(jsonPath("$.results.*.comments").doesNotExist())
+                .andExpect(
+                        jsonPath("$.results[0].organism.scientificName", equalTo("Homo sapiens")))
+                .andExpect(jsonPath("$.results[0].organism.commonName", equalTo("Human")))
+                .andExpect(jsonPath("$.results[0].organism.taxonId", equalTo(9606)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].organism.lineage",
+                                equalTo(TEMPLATE_ENTRY.getOrganism().getLineages())));
     }
 
     @Test
     void getByAccessionsWithPagination() throws Exception {
         int pageSize = 4;
+        String facetList = "length,model_organism";
         // when
         ResultActions response =
                 mockMvc.perform(
                         get("/uniprotkb/accessions")
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("fields", "gene_names,organism_name")
+                                .param("facets", facetList)
                                 .param(
                                         "accessions",
                                         "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
@@ -246,11 +316,17 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.primaryAccession",
-                                contains("P00001", "P00002", "P00003", "P00007")));
+                                contains("P00001", "P00002", "P00003", "P00007")))
+                .andExpect(jsonPath("$.facets").exists())
+                .andExpect(jsonPath("$.facets.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.label",
+                                contains("Sequence length", "Model organisms")));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
-        String cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
+        String cursor = linkHeader.split("\\?")[1].split("&")[3].split("=")[1];
         // when 2nd page
         response =
                 mockMvc.perform(
@@ -260,6 +336,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "accessions",
                                         "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
                                 .param("fields", "gene_names,organism_name")
+                                .param("facets", facetList)
                                 .param("cursor", cursor)
                                 .param("size", String.valueOf(pageSize)));
 
@@ -275,11 +352,12 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.primaryAccession",
-                                contains("P00006", "P00005", "P00004", "P00008")));
+                                contains("P00006", "P00005", "P00004", "P00008")))
+                .andExpect(jsonPath("$.facets").doesNotExist());
 
         linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
-        cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
+        cursor = linkHeader.split("\\?")[1].split("&")[3].split("=")[1];
 
         // when last page
         response =
@@ -300,8 +378,8 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(header().string("X-TotalRecords", "10"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00010", "P00009")));
-        ;
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00010", "P00009")))
+                .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
@@ -425,48 +503,33 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
     }
 
     @Test
-    void getByAccessionsWithFacetsSuccess() throws Exception {
-        String facetList = "length,model_organism,reviewed";
+    void getByAccessionsBadRequest() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(accessionsByIdPath)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("download", "INVALID")
+                                .param("fields", "invalid, invalid1")
                                 .param(
                                         "accessions",
-                                        "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
-                                .param("facets", facetList)
+                                        "P10000,P20000,P30000,P40000,P50000,P60000,P70000,P80000,P90000,INVALID , INVALID2")
                                 .param("size", "10"));
 
         // then
         response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.primaryAccession",
-                                contains(
-                                        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
-                                        "P00004", "P00008", "P00010", "P00009")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets.*.label",
-                                contains("Sequence length", "Model organisms", "Status")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets.*.name",
-                                contains("length", "model_organism", "reviewed")))
-                .andExpect(jsonPath("$.facets[0].values.*.label", contains(">= 801")))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("[801 TO *]")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
-                .andExpect(jsonPath("$.facets[1].values.*.label").doesNotExist())
-                .andExpect(jsonPath("$.facets[1].values.*.value", contains("Human")))
-                .andExpect(jsonPath("$.facets[1].values.*.count", contains(10)))
-                .andExpect(
-                        jsonPath("$.facets[2].values.*.label", contains("Reviewed (Swiss-Prot)")))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("true")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(10)));
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Only '10' accessions are allowed in each request.",
+                                        "Invalid fields parameter value 'invalid'",
+                                        "Invalid fields parameter value 'invalid1'",
+                                        "The 'download' parameter has invalid format. It should be a boolean true or false.",
+                                        "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
+                                        "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession.")));
     }
 
     @Test

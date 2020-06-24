@@ -11,12 +11,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
+import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.store.search.SolrCollection;
 
 /** @author jluo date: 21 Aug 2019 */
 @Configuration
@@ -61,5 +63,15 @@ public class UniRefStreamConfig {
     @ConfigurationProperties(prefix = "streamer.uniref")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
+    }
+
+    @Bean
+    public FacetTupleStreamTemplate facetTupleStreamTemplate(
+            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+        return FacetTupleStreamTemplate.builder()
+                .collection(SolrCollection.uniref.name())
+                .zookeeperHost(configProperties.getZkHost())
+                .httpClient(httpClient)
+                .build();
     }
 }

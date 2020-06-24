@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -101,16 +102,16 @@ public class UniProtEntryService
     public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest accessionsRequest) {
         List<String> accessions = accessionsRequest.getAccessionsList();
         // get facets using solr streaming
-        SolrStreamingFacetRequest solrStreamingFacetRequest =
-                createSolrStreamingFacetRequest(accessionsRequest);
-        List<Facet> facets = getFacets(solrStreamingFacetRequest, accessionsRequest.getCursor());
-
+        List<Facet> facets = getFacets(accessionsRequest);
+        // default page size to number of accessions passed
+        int pageSize =
+                Objects.isNull(accessionsRequest.getSize())
+                        ? accessions.size()
+                        : accessionsRequest.getSize();
         // compute the cursor and get subset of accessions as per cursor
         CursorPage cursorPage =
-                CursorPage.of(
-                        accessionsRequest.getCursor(),
-                        accessionsRequest.getSize(),
-                        accessions.size());
+                CursorPage.of(accessionsRequest.getCursor(), pageSize, accessions.size());
+
         List<String> accessionsInPage =
                 accessions.subList(
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
@@ -218,18 +219,18 @@ public class UniProtEntryService
         }
     }
 
-    private List<Facet> getFacets(
-            SolrStreamingFacetRequest solrStreamingFacetRequest, String cursor) {
+    private List<Facet> getFacets(GetByAccessionsRequest accessionsRequest) {
+        SolrStreamingFacetRequest solrStreamingFacetRequest =
+                createSolrStreamingFacetRequest(accessionsRequest);
         List<Facet> facets = null;
-        // compute facets for only first request. Don't compute facets for next pages in paginated
-        // requests
-        if (Utils.nullOrEmpty(cursor)
-                && Utils.notNullNotEmpty(solrStreamingFacetRequest.getFacets())) {
+
+        if (facetsNeeded(accessionsRequest)) {
             // create facet tuple stream and get facets
             TupleStream tupleStream =
                     this.facetTupleStreamTemplate.create(solrStreamingFacetRequest);
             facets = this.facetTupleStreamConverter.convert(tupleStream);
         }
+
         return facets;
     }
 
@@ -243,5 +244,11 @@ public class UniProtEntryService
                 SolrStreamingFacetRequest.builder();
         builder.query(query).facets(facets);
         return builder.build();
+    }
+
+    private boolean facetsNeeded(GetByAccessionsRequest accessionsRequest) {
+        return Utils.nullOrEmpty(accessionsRequest.getCursor())
+                && Utils.notNullNotEmpty(accessionsRequest.getFacetList())
+                && accessionsRequest.isDownload() == false;
     }
 }
