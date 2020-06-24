@@ -111,4 +111,21 @@ public class CursorPage implements Page {
     public boolean hasNextPage() {
         return (offset + pageSize) < totalElements;
     }
+
+    // create page with nextCursor as NEXT
+    public static CursorPage of(String cursor, int pageSize, long totalElements) {
+        CursorPage page = CursorPage.of(cursor, pageSize);
+        page.setTotalElements(totalElements);
+        page.setNextCursor("NEXT");
+        return page;
+    }
+
+    public static int getNextOffset(CursorPage page) {
+        long nextPageOffset = (long) page.getOffset() + page.getPageSize();
+        if (nextPageOffset > page.getTotalElements()) {
+            return page.getTotalElements().intValue();
+        } else {
+            return (int) nextPageOffset;
+        }
+    }
 }

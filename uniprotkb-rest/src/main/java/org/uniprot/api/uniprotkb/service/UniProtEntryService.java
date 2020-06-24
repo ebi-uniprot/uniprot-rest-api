@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -57,8 +56,7 @@ public class UniProtEntryService
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
     private final UniprotKBFacetConfig uniprotKBFacetConfig;
-    // FIXME add as a param
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    private final FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -67,8 +65,9 @@ public class UniProtEntryService
             UniProtSolrSortClause uniProtSolrSortClause,
             QueryBoosts uniProtKBQueryBoosts,
             UniProtKBStoreClient entryStore,
-            StoreStreamer<UniProtDocument, UniProtKBEntry> uniProtEntryStoreStreamer,
-            TaxonomyService taxService) {
+            StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
+            TaxonomyService taxService,
+            FacetTupleStreamTemplate facetTupleStreamTemplate) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -85,6 +84,7 @@ public class UniProtEntryService
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         this.uniprotKBFacetConfig = uniprotKBFacetConfig;
+        this.facetTupleStreamTemplate = facetTupleStreamTemplate;
     }
 
     @Override
@@ -99,17 +99,27 @@ public class UniProtEntryService
     }
 
     public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest accessionsRequest) {
-        SolrStreamingFacetRequest solrStreamingFacetRequest =
-                createSolrStreamingFacetRequest(accessionsRequest);
         List<String> accessions = accessionsRequest.getAccessionsList();
         // get facets using solr streaming
-        List<Facet> facets = getFacets(solrStreamingFacetRequest);
+        SolrStreamingFacetRequest solrStreamingFacetRequest =
+                createSolrStreamingFacetRequest(accessionsRequest);
+        List<Facet> facets = getFacets(solrStreamingFacetRequest, accessionsRequest.getCursor());
+
+        // compute the cursor and get subset of accessions as per cursor
+        CursorPage cursorPage =
+                CursorPage.of(
+                        accessionsRequest.getCursor(),
+                        accessionsRequest.getSize(),
+                        accessions.size());
+        List<String> accessionsInPage =
+                accessions.subList(
+                        cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
+
+        // get n accessions from store
         List<UniProtKBEntry> entries =
-                this.storeStreamer.streamEntries(accessions).collect(Collectors.toList());
-        // TODO Fix cursor
-        CursorPage page = CursorPage.of(null, accessions.size());
-        page.setTotalElements((long) accessionsRequest.getAccessionsList().size());
-        QueryResult<UniProtKBEntry> result = QueryResult.of(entries, page, facets, null);
+                this.storeStreamer.streamEntries(accessionsInPage).collect(Collectors.toList());
+
+        QueryResult<UniProtKBEntry> result = QueryResult.of(entries, cursorPage, facets, null);
         return result;
     }
 
@@ -208,9 +218,13 @@ public class UniProtEntryService
         }
     }
 
-    private List<Facet> getFacets(SolrStreamingFacetRequest solrStreamingFacetRequest) {
+    private List<Facet> getFacets(
+            SolrStreamingFacetRequest solrStreamingFacetRequest, String cursor) {
         List<Facet> facets = null;
-        if (Utils.notNullNotEmpty(solrStreamingFacetRequest.getFacets())) {
+        // compute facets for only first request. Don't compute facets for next pages in paginated
+        // requests
+        if (Utils.nullOrEmpty(cursor)
+                && Utils.notNullNotEmpty(solrStreamingFacetRequest.getFacets())) {
             // create facet tuple stream and get facets
             TupleStream tupleStream =
                     this.facetTupleStreamTemplate.create(solrStreamingFacetRequest);

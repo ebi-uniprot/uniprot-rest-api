@@ -7,20 +7,15 @@ import java.net.URISyntaxException;
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.impl.HttpClientUtil;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfigProperties;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
-import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
 /**
  * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override
@@ -36,17 +31,8 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public HttpClient httpClient(RepositoryConfigProperties config) {
-        // I am creating HttpClient exactly in the same way it is created inside
-        // CloudSolrClient.Builder,
-        // but here I am just adding Credentials
-        ModifiableSolrParams param = null;
-        if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
-            param = new ModifiableSolrParams();
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_USER, config.getUsername());
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, config.getPassword());
-        }
-        return HttpClientUtil.createClient(param);
+    public HttpClient httpClient() {
+        return mock(HttpClient.class);
     }
 
     @Bean
@@ -55,16 +41,12 @@ public class DataStoreTestConfig {
         return mock(SolrClient.class);
     }
 
+    @SuppressWarnings("rawtypes")
     @Bean
     @Profile("offline")
-    public UniProtKBStoreClient uniProtStoreClient(
-            UniProtStoreConfigProperties uniProtStoreConfigProperties) {
-        VoldemortClient<UniProtKBEntry> client =
-                new VoldemortRemoteUniProtKBEntryStore(
-                        uniProtStoreConfigProperties.getNumberOfConnections(),
-                        uniProtStoreConfigProperties.getStoreName(),
-                        uniProtStoreConfigProperties.getHost());
-        return new UniProtKBStoreClient(client);
+    public UniProtKBStoreClient primaryUniProtStoreClient() {
+        return new UniProtKBStoreClient(
+                VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
     }
 
     @Bean

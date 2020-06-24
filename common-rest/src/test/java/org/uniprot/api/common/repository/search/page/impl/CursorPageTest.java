@@ -86,4 +86,21 @@ class CursorPageTest {
 
         assertFalse(page.getNextPageLink(uriBuilder).isPresent());
     }
+
+    @Test
+    void testCursorWithNext() {
+        CursorPage page = CursorPage.of(null, 5, 15);
+        assertNotNull(page);
+        assertNull(page.getCursor());
+        assertEquals(Long.valueOf(0), page.getOffset());
+        assertEquals(Integer.valueOf(5), page.getPageSize());
+        assertEquals(Long.valueOf(15), page.getTotalElements());
+        String nextCursor = page.getEncryptedNextCursor();
+        assertNotNull(nextCursor);
+        String decryptedNextCursor = new String(new BigInteger(nextCursor, 36).toByteArray());
+        assertThat(decryptedNextCursor, CoreMatchers.is("5,NEXT"));
+        // next offset
+        int nextOffset = CursorPage.getNextOffset(page);
+        assertEquals(5, nextOffset);
+    }
 }
