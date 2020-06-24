@@ -11,12 +11,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
+import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.search.SolrCollection;
 
 /**
  * @author lgonzales
@@ -64,5 +66,15 @@ public class UniParcStreamConfig {
     @ConfigurationProperties(prefix = "streamer.uniparc")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
+    }
+
+    @Bean
+    public FacetTupleStreamTemplate facetTupleStreamTemplate(
+            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+        return FacetTupleStreamTemplate.builder()
+                .collection(SolrCollection.uniparc.name())
+                .zookeeperHost(configProperties.getZkHost())
+                .httpClient(httpClient)
+                .build();
     }
 }
