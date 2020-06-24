@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
 
@@ -37,7 +38,11 @@ public abstract class AbstractStreamControllerIT {
 
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
 
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
@@ -62,6 +67,10 @@ public abstract class AbstractStreamControllerIT {
             ReflectionTestUtils.setField(
                     tupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
             cloudSolrClient = cluster.getSolrClient();
+
+            // update facet tuple for fields value for testing
+            ReflectionTestUtils.setField(facetTupleStreamTemplate, "zookeeperHost", cluster.getZkServer().getZkAddress());
+            ReflectionTestUtils.setField(facetTupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
 
             for (SolrCollection solrCollection : getSolrCollections()) {
                 String collection = solrCollection.name();

@@ -210,6 +210,8 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         Assertions.fail("TODO: ADD VALIDATIONS");
     }
 
+
+
     @Test
     void getByAccessionsWithPagination() throws Exception {
         int pageSize = 4;
@@ -292,6 +294,63 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00010", "P00009")));
         ;
+    }
+
+    @Test
+    void getByAccessionsWithFacetsSuccess() throws Exception {
+        String facetList = "length,model_organism,reviewed";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("facets", facetList)
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
+                                        "P00004", "P00008", "P00010", "P00009")))
+                .andExpect(
+                        jsonPath("$.facets.*.label", contains("Sequence length", "Model organisms", "Status")))
+                .andExpect(
+                        jsonPath("$.facets.*.name", contains("length", "model_organism", "reviewed")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.label",
+                                contains(">= 801")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.value",
+                                contains("[801 TO *]")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[1].values.*.label").doesNotExist())
+                .andExpect(
+                        jsonPath(
+                                "$.facets[1].values.*.value",
+                                contains("Human")))
+                .andExpect(jsonPath("$.facets[1].values.*.count", contains(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values.*.label",
+                                contains("Reviewed (Swiss-Prot)")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values.*.value",
+                                contains("true")))
+                .andExpect(jsonPath("$.facets[2].values.*.count", contains(10)));
     }
 
     @Override
