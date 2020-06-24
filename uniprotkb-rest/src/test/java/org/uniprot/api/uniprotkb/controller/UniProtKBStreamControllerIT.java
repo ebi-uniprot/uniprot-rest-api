@@ -249,7 +249,9 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder("P00005", "P00006")))
-                .andExpect(jsonPath("$.results.*.genes.*.geneName.*", contains("FGFR2", "FGFR2")));
+                .andExpect(jsonPath("$.results.*.genes.*.geneName.*", contains("FGFR2", "FGFR2")))
+                .andExpect(jsonPath("$.results.*.keywords").doesNotExist())
+                .andExpect(jsonPath("$.results.*.sequence").doesNotExist());
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")

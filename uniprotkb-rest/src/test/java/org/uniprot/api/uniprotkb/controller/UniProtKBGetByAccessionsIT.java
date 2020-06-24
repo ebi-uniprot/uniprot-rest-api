@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,12 +39,23 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.cv.chebi.ChebiRepo;
+import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
  * @author lgonzales
@@ -55,33 +68,38 @@ import org.uniprot.store.search.SolrCollection;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniProtKBGetByAccessionsIT {
+class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
 
-    @Autowired private LiteratureRepository repository;
-    @Autowired UniProtKBEntryController uniProtKBEntryController;
+    private static final UniProtKBEntry TEMPLATE_ENTRY =
+            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+
+    private final UniProtEntryConverter documentConverter =
+            new UniProtEntryConverter(
+                    TaxonomyRepoMocker.getTaxonomyRepo(),
+                    GoRelationsRepoMocker.getGoRelationRepo(),
+                    PathwayRepoMocker.getPathwayRepo(),
+                    mock(ChebiRepo.class),
+                    mock(ECRepo.class),
+                    new HashMap<>());
 
     @Autowired private UniProtKBStoreClient storeClient;
-    @Autowired private WebApplicationContext webApplicationContext;
 
     @Autowired private MockMvc mockMvc;
 
-    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
-
     @BeforeAll
-    void initSolrAndInjectItInTheRepository() {
-        storeManager.addSolrClient(
-                DataStoreManager.StoreType.LITERATURE, SolrCollection.literature);
-        storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
-        ReflectionTestUtils.setField(
-                repository,
-                "solrClient",
-                storeManager.getSolrClient(DataStoreManager.StoreType.LITERATURE));
-    }
+    void saveEntriesInSolrAndStore() throws Exception {
+        for (int i = 1; i <= 10; i++) {
+            UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
+            String acc = String.format("P%05d", i);
+            entryBuilder.primaryAccession(acc);
 
-    @BeforeEach
-    void cleanData() {
-        storeManager.cleanSolr(DataStoreManager.StoreType.LITERATURE);
-        storeManager.cleanStore(DataStoreManager.StoreType.UNIPROT);
+            UniProtKBEntry uniProtKBEntry = entryBuilder.build();
+            UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
+
+            cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
+            storeClient.saveEntry(uniProtKBEntry);
+        }
+        cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 
     @Test
@@ -91,6 +109,7 @@ class UniProtKBGetByAccessionsIT {
                 mockMvc.perform(
                         get("/uniprotkb/accessions")
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("download", "INVALID")
                                 .param("fields", "invalid, invalid1")
                                 .param("accessions", "P10000,P20000,P30000,P40000,P50000,P60000,P70000,P80000,P90000,INVALID , INVALID2")
                                 .param("size", "10"));
@@ -110,101 +129,68 @@ class UniProtKBGetByAccessionsIT {
                                         "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession.")));
     }
 
+
     @Test
-    void getByAccessions() throws Exception {
-        String dataFile =
-                "/Users/sahmad/Documents/accessions0.txt";
-        log.info("Data file is " + dataFile);
-        long start = System.currentTimeMillis();
-        int count = 1000;
-        List<String> lines = Files.readAllLines(Paths.get(dataFile));
-        Collections.shuffle(lines);
-        String accessions =
-                lines.subList(0, count).stream().collect(Collectors.joining(","));
-        MvcResult result =
+    void getByAccessionsSuccess() throws Exception {
+        // when
+        ResultActions response =
                 mockMvc.perform(
                         get("/uniprotkb/accessions")
-                                .param("accessions", accessions)
-                                .param("size", "1")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE))
-                        .andReturn();
-        Assertions.assertTrue(result.getResponse().getStatus() == 200);
-        long end = System.currentTimeMillis();
-        log.info(
-                "Total time taken: "
-                        + (end - start)
-                        + " milliseconds"
-                        + " for the file: "
-                        + dataFile);
-        log.info(result.getResponse().getContentAsString());
-    }
-    @Test
-    void getProteinsByAccessions() throws Exception {
-        // given
-        long gStart = System.currentTimeMillis();
-        int userCount = 1;
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
-        List<Callable<MvcResult>> tasks = new ArrayList<>();
-        final AtomicInteger atmInt = new AtomicInteger(0);
-        for (int i = 0; i < userCount; i++) {
-            Callable<MvcResult> task =
-                    () -> {
-                        String dataFile =
-                                "/Users/sahmad/Documents/accessions"
-                                        + atmInt.getAndIncrement() % 10
-                                        + ".txt";
-                        log.info("Data file is " + dataFile);
-                        long start = System.currentTimeMillis();
-                        int count = 1000;
-                        List<String> lines = Files.readAllLines(Paths.get(dataFile));
-                        Collections.shuffle(lines);
-                        String accessions =
-                                lines.subList(0, count).stream().collect(Collectors.joining(","));
-                        MockMvc mockMvc1 =
-                                MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-                        MvcResult result =
-                                mockMvc1.perform(
-                                                get("/uniprotkb/proteins")
-                                                        .param("accessions", accessions)
-                                                        .header(ACCEPT, APPLICATION_JSON_VALUE))
-                                        .andReturn();
-                        long end = System.currentTimeMillis();
-                        log.info(
-                                "Total time taken: "
-                                        + (end - start)
-                                        + " milliseconds"
-                                        + " for the file: "
-                                        + dataFile);
-                        return result;
-                    };
-            tasks.add(task);
-        }
-        List<Future<MvcResult>> futures = executorService.invokeAll(tasks);
-        int failedCount = 0;
-        for (Future<MvcResult> future : futures) {
-            MvcResult mvcResult = future.get();
-            log.info(mvcResult.getResponse().getContentAsString());
-            if (mvcResult.getResponse().getStatus() != 200) {
-                failedCount++;
-            }
-        }
-        Assertions.assertEquals(0, failedCount, "No. of failed requests");
-        awaitTerminationAfterShutdown(executorService);
-        log.info(
-                "Grant total time taken: "
-                        + (System.currentTimeMillis() - gStart)
-                        + " milliseconds");
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("accessions", "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results.*.primaryAccession", contains("P00003","P00002","P00001","P00007","P00006","P00005","P00004","P00008","P00010","P00009")));
+        Assertions.fail("TODO: ADD VALIDATIONS");
     }
 
-    public void awaitTerminationAfterShutdown(ExecutorService threadPool) {
-        threadPool.shutdown();
-        try {
-            if (!threadPool.awaitTermination(60, TimeUnit.MINUTES)) {
-                threadPool.shutdownNow();
-            }
-        } catch (InterruptedException ex) {
-            threadPool.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+    @Test
+    void getByAccessionsFieldsParameterWorks() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "gene_names,organism_name")
+                                .param("accessions", "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results.*.primaryAccession", contains("P00001","P00002","P00003","P00007","P00006","P00005","P00004","P00008","P00010","P00009")));
+        Assertions.fail("TODO: ADD VALIDATIONS");
+    }
+
+    @Test
+    void getByAccessionsDownloadWorks() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "gene_names,organism_name")
+                                .param("accessions", "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results.*.primaryAccession", contains("P00001","P00002","P00003","P00007","P00006","P00005","P00004","P00008","P00010","P00009")));
+        Assertions.fail("TODO: ADD VALIDATIONS");
+    }
+
+    @Override
+    protected List<SolrCollection> getSolrCollections() {
+        return Collections.singletonList(SolrCollection.uniprot);
     }
 }

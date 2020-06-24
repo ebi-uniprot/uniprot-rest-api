@@ -6,8 +6,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +15,6 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -40,7 +37,6 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.domain.Tuple;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -305,18 +301,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             @Valid GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
-        return super.getSearchResponse(result, accessionsRequest.getFields(), request, response);
-    }
 
-    @GetMapping("/proteins")
-    public ResponseEntity<List<Tuple>> getProteinsByAccessions(
-            @RequestParam List<String> accessions,
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws IOException {
-        List<org.apache.solr.client.solrj.io.Tuple> result = entryService.getEntries(accessions);
-        return new ResponseEntity(result, HttpStatus.OK);
+        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
+
+        return super.getSearchResponse(result, accessionsRequest.getFields(), request, response);
     }
 
     @Override
