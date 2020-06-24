@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -11,11 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.*;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -205,6 +208,90 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "P00001", "P00002", "P00003", "P00007", "P00006", "P00005",
                                         "P00004", "P00008", "P00010", "P00009")));
         Assertions.fail("TODO: ADD VALIDATIONS");
+    }
+
+    @Test
+    void getByAccessionsWithPagination() throws Exception {
+        int pageSize = 4;
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "gene_names,organism_name")
+                                .param(
+                                        "accessions",
+                                        "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("size", String.valueOf(pageSize)));
+
+        // then first page
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(jsonPath("$.results.size()", is(pageSize)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains("P00001", "P00002", "P00003", "P00007")));
+
+        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        String cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
+        // when 2nd page
+        response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param(
+                                        "accessions",
+                                        "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("fields", "gene_names,organism_name")
+                                .param("cursor", cursor)
+                                .param("size", String.valueOf(pageSize)));
+
+        // then 2nd page
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(jsonPath("$.results.size()", is(pageSize)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains("P00006", "P00005", "P00004", "P00008")));
+
+        linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
+
+        // when last page
+        response =
+                mockMvc.perform(
+                        get("/uniprotkb/accessions")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param(
+                                        "accessions",
+                                        "P00001,P00002,P00003,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("fields", "gene_names,organism_name")
+                                .param("cursor", cursor)
+                                .param("size", String.valueOf(pageSize)));
+
+        // then last page
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00010", "P00009")));
+        ;
     }
 
     @Override
