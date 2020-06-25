@@ -235,14 +235,13 @@ public class UniProtEntryService
 
     private SolrStreamingFacetRequest createSolrStreamingFacetRequest(
             GetByAccessionsRequest accessionsRequest) {
+
         List<String> accessions = accessionsRequest.getAccessionsList();
         List<String> facets = accessionsRequest.getFacetList();
         String query = String.join(" ", accessions);
         query = "accession_id:(" + query + ")";
-        SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
-                SolrStreamingFacetRequest.builder();
-        builder.query(query).facets(facets);
-        return builder.build();
+
+        return SolrStreamingFacetRequest.builder().query(query).facets(facets).build();
     }
 
     private boolean facetsNeeded(GetByAccessionsRequest accessionsRequest) {

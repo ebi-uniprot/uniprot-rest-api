@@ -298,7 +298,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getProteinsByAccessions(
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessions(
             @Valid @ModelAttribute GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {

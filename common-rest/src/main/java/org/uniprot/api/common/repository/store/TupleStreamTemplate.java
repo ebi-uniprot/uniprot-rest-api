@@ -11,15 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.apache.solr.client.solrj.io.stream.expr.*;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.uniprot.api.common.exception.ServiceException;
+import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
+import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
+import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
+import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.solrstream.AbstractTupleStreamTemplate;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -36,19 +35,16 @@ import org.uniprot.core.util.Utils;
 @Getter
 @Builder
 @Slf4j
-public class TupleStreamTemplate {
+public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
     private final StreamerConfigProperties streamConfig;
     private final HttpClient httpClient;
-    private final SolrClient solrClient;
-    private final SolrRequestConverter solrRequestConverter;
-    private StreamFactory streamFactory;
-    private StreamContext streamContext;
 
     public TupleStream create(SolrRequest request) {
-        initTupleStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
-        initStreamContext(streamConfig.getZkHost(), httpClient);
-        validateResponse(request);
-
+        StreamContext streamContext =
+                getStreamContext(
+                        streamConfig.getZkHost(), streamConfig.getCollection(), httpClient);
+        StreamFactory streamFactory =
+                getStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
         TupleStreamBuilder streamBuilder =
                 TupleStreamBuilder.builder()
                         .streamFactory(streamFactory)
@@ -58,42 +54,6 @@ public class TupleStreamTemplate {
                         .build();
 
         return streamBuilder.createFor(request);
-    }
-
-    void validateResponse(SolrRequest request) {
-        if (streamConfig.getStoreMaxCountToRetrieve() > 0) {
-            SolrRequest slimRequest =
-                    SolrRequest.builder()
-                            .query(request.getQuery())
-                            .filterQueries(request.getFilterQueries())
-                            .queryBoosts(request.getQueryBoosts())
-                            .rows(0)
-                            .build();
-            try {
-                QueryResponse response =
-                        solrClient.query(
-                                streamConfig.getCollection(),
-                                solrRequestConverter.toSolrQuery(slimRequest));
-                if (response.getResults().getNumFound()
-                        > streamConfig.getStoreMaxCountToRetrieve()) {
-                    throw new ServiceException(
-                            "Too many results to retrieve. Please refine your query or consider fetching batch by batch");
-                }
-            } catch (SolrServerException | IOException e) {
-                throw new ServiceException("Server error when querying Solr", e);
-            }
-            log.debug("Request to stream is valid: " + request);
-        }
-    }
-
-    private void initTupleStreamFactory(String zookeeperHost, String collection) {
-        if (streamFactory == null) {
-            streamFactory =
-                    new DefaultStreamFactory().withCollectionZkHost(collection, zookeeperHost);
-            log.info("Created new DefaultStreamFactory");
-        } else {
-            log.info("DefaultStreamFactory already created");
-        }
     }
 
     @Builder
@@ -154,23 +114,6 @@ public class TupleStreamTemplate {
                     .filter(o -> !o.getItem().equalsIgnoreCase("score"))
                     .map(o -> o.getItem() + " " + o.getOrder().name())
                     .collect(Collectors.joining(","));
-        }
-    }
-
-    /**
-     * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
-     */
-    private void initStreamContext(String zookeeperHost, HttpClient httpClient) {
-        if (streamContext == null) {
-            StreamContext context = new StreamContext();
-            // this should be the same for each collection, so that
-            // they share client caches
-            context.workerID = streamConfig.getCollection().hashCode();
-            context.numWorkers = 1;
-            SolrClientCache solrClientCache = new SolrClientCache(httpClient);
-            solrClientCache.getCloudSolrClient(zookeeperHost);
-            context.setSolrClientCache(solrClientCache);
-            this.streamContext = context;
         }
     }
 }
