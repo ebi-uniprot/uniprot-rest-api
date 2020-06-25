@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
@@ -50,8 +50,8 @@ public class GetByAccessionsRequest implements SearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
-    @Positive(message = "{search.positive}")
+    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    @PositiveOrZero(message = "{search.positive}")
     private Integer size;
 
     @Override

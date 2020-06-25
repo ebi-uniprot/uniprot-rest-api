@@ -221,6 +221,34 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    void getByAccessionsWithFacetsOnlySuccess() throws Exception {
+        String facetList = "reviewed,fragment,structure_3d,model_organism";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
+                                .param("facets", facetList)
+                                .param("size", "0"));
+
+        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.size()", is(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.label",
+                                contains("Status", "Fragment", "3D Structure", "Model organisms")));
+    }
+
+    @Test
     void getByAccessionsDownloadWorks() throws Exception {
         // when
         ResultActions response =
