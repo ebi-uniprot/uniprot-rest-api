@@ -10,6 +10,10 @@ import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParamete
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.uniprot.core.util.Utils;
 
+/**
+ * This class creates expression to make solr streaming facet function call.
+ * @author sahmad 
+ */
 @Getter
 public class FacetStreamExpression extends StreamExpression {
     public enum MetricFunctionName {
