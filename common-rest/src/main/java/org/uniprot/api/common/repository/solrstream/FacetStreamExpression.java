@@ -12,7 +12,8 @@ import org.uniprot.core.util.Utils;
 
 /**
  * This class creates expression to make solr streaming facet function call.
- * @author sahmad 
+ *
+ * @author sahmad
  */
 @Getter
 public class FacetStreamExpression extends StreamExpression {

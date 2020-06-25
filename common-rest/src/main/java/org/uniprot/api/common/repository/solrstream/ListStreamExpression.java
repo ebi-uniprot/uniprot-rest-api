@@ -5,8 +5,9 @@ import java.util.List;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 
 /**
- * This is a wrapper to prepare a list expression with N stream expressions
- * to call list function(solr streaming decorator function)
+ * This is a wrapper to prepare a list expression with N stream expressions to call list
+ * function(solr streaming decorator function)
+ *
  * @author sahmad
  */
 public class ListStreamExpression extends StreamExpression {
