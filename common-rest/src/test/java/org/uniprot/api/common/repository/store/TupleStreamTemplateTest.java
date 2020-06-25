@@ -1,5 +1,20 @@
 package org.uniprot.api.common.repository.store;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.common.repository.store.TupleStreamTemplate.TupleStreamBuilder.fieldsToReturn;
+import static org.uniprot.api.common.repository.store.TupleStreamTemplate.TupleStreamBuilder.sortToString;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -10,21 +25,6 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.common.repository.store.TupleStreamTemplate.TupleStreamBuilder.fieldsToReturn;
-import static org.uniprot.api.common.repository.store.TupleStreamTemplate.TupleStreamBuilder.sortToString;
 
 /**
  * Created 23/10/18
