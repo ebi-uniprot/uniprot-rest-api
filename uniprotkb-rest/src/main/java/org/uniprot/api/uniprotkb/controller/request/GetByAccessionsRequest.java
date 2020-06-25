@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.controller.request;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -65,7 +66,9 @@ public class GetByAccessionsRequest implements SearchRequest {
     }
 
     public List<String> getAccessionsList() {
-        return Arrays.asList(getAccessions().split(","));
+        return Arrays.asList(getAccessions().split(",")).stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toList());
     }
 
     public boolean isDownload() {
