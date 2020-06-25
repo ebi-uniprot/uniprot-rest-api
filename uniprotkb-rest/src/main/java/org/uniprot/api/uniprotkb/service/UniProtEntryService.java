@@ -120,8 +120,7 @@ public class UniProtEntryService
         List<UniProtKBEntry> entries =
                 this.storeStreamer.streamEntries(accessionsInPage).collect(Collectors.toList());
 
-        QueryResult<UniProtKBEntry> result = QueryResult.of(entries, cursorPage, facets, null);
-        return result;
+        return QueryResult.of(entries, cursorPage, facets, null);
     }
 
     @Override
@@ -238,7 +237,7 @@ public class UniProtEntryService
             GetByAccessionsRequest accessionsRequest) {
         List<String> accessions = accessionsRequest.getAccessionsList();
         List<String> facets = accessionsRequest.getFacetList();
-        String query = accessions.stream().collect(Collectors.joining(" "));
+        String query = String.join(" ", accessions);
         query = "accession_id:(" + query + ")";
         SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
                 SolrStreamingFacetRequest.builder();
@@ -249,6 +248,6 @@ public class UniProtEntryService
     private boolean facetsNeeded(GetByAccessionsRequest accessionsRequest) {
         return Utils.nullOrEmpty(accessionsRequest.getCursor())
                 && Utils.notNullNotEmpty(accessionsRequest.getFacetList())
-                && accessionsRequest.isDownload() == false;
+                && !accessionsRequest.isDownload();
     }
 }

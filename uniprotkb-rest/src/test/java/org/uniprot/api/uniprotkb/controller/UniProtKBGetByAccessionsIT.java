@@ -563,6 +563,73 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    void getByAccessionsWithFewAccessionsMissingFromStoreWithFacetsSuccess() throws Exception {
+        String facetList = "length,model_organism,reviewed";
+        String missingAccessions = "Q54321,Q12345";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00003,P00002,P00001,Q54321,P00007,P00006,P00005,Q12345")
+                                .param("facets", facetList)
+                                .param("size", "8"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(6)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00003", "P00002", "P00001", "P00007", "P00006",
+                                        "P00005")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.label",
+                                contains("Sequence length", "Model organisms", "Status")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.name",
+                                contains("length", "model_organism", "reviewed")))
+                .andExpect(jsonPath("$.facets[0].values.*.label", contains(">= 801")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("[801 TO *]")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(6)))
+                .andExpect(jsonPath("$.facets[1].values.*.label").doesNotExist())
+                .andExpect(jsonPath("$.facets[1].values.*.value", contains("Human")))
+                .andExpect(jsonPath("$.facets[1].values.*.count", contains(6)))
+                .andExpect(
+                        jsonPath("$.facets[2].values.*.label", contains("Reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.facets[2].values.*.value", contains("true")))
+                .andExpect(jsonPath("$.facets[2].values.*.count", contains(6)));
+    }
+
+    @Test
+    void getByAccessionsWithAllAccessionsMissingFromStoreWithFacetsSuccess() throws Exception {
+        String facetList = "length,model_organism,reviewed";
+        String missingAccessions = "Q54321,Q12345";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("accessions", missingAccessions)
+                                .param("facets", facetList)
+                                .param("size", "2"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
     void getByAccessionsBadRequest() throws Exception {
         // when
         ResultActions response =
@@ -643,6 +710,37 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 contains(
                                         "P00001", "P00002", "P00003", "P00007", "P00006", "P00005",
                                         "P00004", "P00008", "P00010", "P00009")));
+    }
+
+    @Test
+    void getByAccessionsWithLowercaseLettersSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "p00003,p00002,P00001,p00007,P00006,P00005,P00004,p00008,P00010,p00009")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005",
+                                        "P00004", "P00008", "P00010", "P00009")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].entryType",
+                                equalTo("UniProtKB reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN")));
     }
 
     @Override

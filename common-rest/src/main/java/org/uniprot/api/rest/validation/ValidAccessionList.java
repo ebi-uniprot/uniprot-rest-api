@@ -45,7 +45,9 @@ public @interface ValidAccessionList {
                 // verify if accession is valid.
                 String[] accessions = value.split("\\s*,\\s*");
                 for (String accession : accessions) {
-                    if (!accession.matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX)) {
+                    if (!accession
+                            .toUpperCase()
+                            .matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX)) {
                         buildInvalidAccessionMessage(accession, contextImpl);
                         isValid = false;
                     }
