@@ -40,9 +40,7 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
     private final HttpClient httpClient;
 
     public TupleStream create(SolrRequest request) {
-        StreamContext streamContext =
-                getStreamContext(
-                        streamConfig.getZkHost(), streamConfig.getCollection(), httpClient);
+        StreamContext streamContext = getStreamContext(streamConfig.getCollection(), httpClient);
         StreamFactory streamFactory =
                 getStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
         TupleStreamBuilder streamBuilder =

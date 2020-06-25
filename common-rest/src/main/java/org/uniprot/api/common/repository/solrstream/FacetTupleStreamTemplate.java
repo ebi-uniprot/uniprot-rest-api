@@ -48,8 +48,7 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
             ListStreamExpression listStreamExpression = new ListStreamExpression(facetExpressions);
             StreamFactory streamFactory = getStreamFactory(this.zookeeperHost, this.collection);
             TupleStream tupleStream = streamFactory.constructStream(listStreamExpression);
-            StreamContext clientContext =
-                    getStreamContext(this.zookeeperHost, this.collection, this.httpClient);
+            StreamContext clientContext = getStreamContext(this.collection, this.httpClient);
             tupleStream.setStreamContext(clientContext);
             return tupleStream;
         } catch (IOException e) {
