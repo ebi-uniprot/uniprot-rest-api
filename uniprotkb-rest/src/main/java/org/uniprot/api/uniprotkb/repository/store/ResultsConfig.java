@@ -23,7 +23,6 @@ import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.store.search.SolrCollection;
 
 /**
  * Created 21/08/18
@@ -45,7 +44,6 @@ public class ResultsConfig {
                 .streamConfig(configProperties)
                 .httpClient(httpClient)
                 .solrClient(solrClient)
-                .collection(SolrCollection.uniprot)
                 .solrRequestConverter(requestConverter)
                 .build();
     }

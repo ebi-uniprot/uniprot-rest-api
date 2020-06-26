@@ -17,7 +17,6 @@ import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.store.search.SolrCollection;
 
 /**
  * @author lgonzales
@@ -37,7 +36,6 @@ public class UniParcStreamConfig {
                 .streamConfig(configProperties)
                 .httpClient(httpClient)
                 .solrClient(solrClient)
-                .collection(SolrCollection.uniparc)
                 .solrRequestConverter(requestConverter)
                 .build();
     }
