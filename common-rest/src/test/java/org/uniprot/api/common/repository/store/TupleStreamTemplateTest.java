@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.store.search.SolrCollection;
 
 /**
  * Created 23/10/18
@@ -92,10 +91,10 @@ class TupleStreamTemplateTest {
         when(solrClient.query(anyString(), any())).thenReturn(response);
 
         StreamerConfigProperties streamConfig = new StreamerConfigProperties();
+        streamConfig.setCollection("uniprot");
         streamConfig.setStoreMaxCountToRetrieve(acceptableHitsToRetrieve);
         TupleStreamTemplate streamTemplate =
                 TupleStreamTemplate.builder()
-                        .collection(SolrCollection.uniprot)
                         .solrClient(solrClient)
                         .streamConfig(streamConfig)
                         .solrRequestConverter(new SolrRequestConverter())
@@ -155,9 +154,9 @@ class TupleStreamTemplateTest {
 
         StreamerConfigProperties streamConfig = new StreamerConfigProperties();
         streamConfig.setStoreMaxCountToRetrieve(acceptableHitsToRetrieve);
+        streamConfig.setCollection("uniprot");
         TupleStreamTemplate streamTemplate =
                 TupleStreamTemplate.builder()
-                        .collection(SolrCollection.uniprot)
                         .solrClient(solrClient)
                         .streamConfig(streamConfig)
                         .solrRequestConverter(new SolrRequestConverter())

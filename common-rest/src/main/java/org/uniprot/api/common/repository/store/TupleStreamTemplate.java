@@ -21,7 +21,6 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.core.util.Utils;
-import org.uniprot.store.search.SolrCollection;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances, which
@@ -41,7 +40,6 @@ public class TupleStreamTemplate {
     private final StreamerConfigProperties streamConfig;
     private final HttpClient httpClient;
     private final SolrClient solrClient;
-    private final SolrCollection collection;
     private final SolrRequestConverter solrRequestConverter;
     private StreamFactory streamFactory;
     private StreamContext streamContext;
@@ -74,7 +72,8 @@ public class TupleStreamTemplate {
             try {
                 QueryResponse response =
                         solrClient.query(
-                                collection.name(), solrRequestConverter.toSolrQuery(slimRequest));
+                                streamConfig.getCollection(),
+                                solrRequestConverter.toSolrQuery(slimRequest));
                 if (response.getResults().getNumFound()
                         > streamConfig.getStoreMaxCountToRetrieve()) {
                     throw new ServiceException(
