@@ -15,7 +15,7 @@
 	<description>UniParc Rest API</description>
 
 	<properties>
-		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
+		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 	</properties>
 
 	<dependencies>
@@ -67,8 +67,8 @@
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
