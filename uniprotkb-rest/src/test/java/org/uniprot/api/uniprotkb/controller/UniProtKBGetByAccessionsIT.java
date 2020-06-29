@@ -18,9 +18,7 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,11 +39,12 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
@@ -81,7 +80,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                     mock(ECRepo.class),
                     new HashMap<>());
 
-    @Autowired private UniProtKBStoreClient storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
     @Autowired private MockMvc mockMvc;
 
@@ -91,8 +90,14 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
             UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
             String acc = String.format("P%05d", i);
             entryBuilder.primaryAccession(acc);
+            if (i % 2 == 0) {
+                entryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
+            } else {
+                entryBuilder.entryType(UniProtKBEntryType.TREMBL);
+            }
 
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
+
             UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
@@ -127,8 +132,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "P00004", "P00008", "P00010", "P00009")))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].entryType",
-                                equalTo("UniProtKB reviewed (Swiss-Prot)")))
+                                "$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN")));
     }
 
@@ -171,10 +175,13 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.facets[1].values.*.label").doesNotExist())
                 .andExpect(jsonPath("$.facets[1].values.*.value", contains("Human")))
                 .andExpect(jsonPath("$.facets[1].values.*.count", contains(10)))
+                .andExpect(jsonPath("$.facets[2].values[0].label", equalTo("Unreviewed (TrEMBL)")))
+                .andExpect(jsonPath("$.facets[2].values[0].value", equalTo("false")))
+                .andExpect(jsonPath("$.facets[2].values[0].count", equalTo(5)))
                 .andExpect(
-                        jsonPath("$.facets[2].values.*.label", contains("Reviewed (Swiss-Prot)")))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("true")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(10)));
+                        jsonPath("$.facets[2].values[1].label", equalTo("Reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.facets[2].values[1].value", equalTo("true")))
+                .andExpect(jsonPath("$.facets[2].values[1].count", equalTo(5)));
     }
 
     @Test
@@ -324,7 +331,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get("/uniprotkb/accessions")
+                        get(accessionsByIdPath)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("fields", "gene_names,organism_name")
                                 .param("facets", facetList)
@@ -359,7 +366,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         // when 2nd page
         response =
                 mockMvc.perform(
-                        get("/uniprotkb/accessions")
+                        get(accessionsByIdPath)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param(
                                         "accessions",
@@ -391,7 +398,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         // when last page
         response =
                 mockMvc.perform(
-                        get("/uniprotkb/accessions")
+                        get(accessionsByIdPath)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param(
                                         "accessions",
@@ -557,8 +564,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "P00004", "P00008", "P00010", "P00009")))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].entryType",
-                                equalTo("UniProtKB reviewed (Swiss-Prot)")))
+                                "$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN")));
     }
 
@@ -602,10 +608,13 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.facets[1].values.*.label").doesNotExist())
                 .andExpect(jsonPath("$.facets[1].values.*.value", contains("Human")))
                 .andExpect(jsonPath("$.facets[1].values.*.count", contains(6)))
+                .andExpect(jsonPath("$.facets[2].values[0].label", equalTo("Unreviewed (TrEMBL)")))
+                .andExpect(jsonPath("$.facets[2].values[0].value", equalTo("false")))
+                .andExpect(jsonPath("$.facets[2].values[0].count", equalTo(4)))
                 .andExpect(
-                        jsonPath("$.facets[2].values.*.label", contains("Reviewed (Swiss-Prot)")))
-                .andExpect(jsonPath("$.facets[2].values.*.value", contains("true")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(6)));
+                        jsonPath("$.facets[2].values[1].label", equalTo("Reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.facets[2].values[1].value", equalTo("true")))
+                .andExpect(jsonPath("$.facets[2].values[1].count", equalTo(2)));
     }
 
     @Test
@@ -738,8 +747,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "P00004", "P00008", "P00010", "P00009")))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].entryType",
-                                equalTo("UniProtKB reviewed (Swiss-Prot)")))
+                                "$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN")));
     }
 

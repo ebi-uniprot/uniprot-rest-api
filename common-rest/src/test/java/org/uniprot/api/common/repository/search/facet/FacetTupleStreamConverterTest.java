@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,12 @@ class FacetTupleStreamConverterTest {
         when(tupleStream.read()).thenReturn(tuple);
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(tupleStream);
-        assertNotNull(facets);
-        assertEquals(0, facets.size());
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        assertNotNull(response);
+        assertNotNull(response.getFacets());
+        assertEquals(0, response.getFacets().size());
+        assertNotNull(response.getAccessions());
+        assertEquals(0, response.getAccessions().size());
     }
 
     @Test
@@ -42,7 +46,11 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(tupleStream);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        assertNotNull(response);
+        List<Facet> facets = response.getFacets();
+        assertNotNull(response.getAccessions());
+        assertEquals(0, response.getAccessions().size());
         assertNotNull(facets);
         assertEquals(2, facets.size());
 
@@ -99,7 +107,11 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(tupleStream);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+
+        List<Facet> facets = response.getFacets();
+        assertNotNull(response.getAccessions());
+        assertEquals(0, response.getAccessions().size());
         assertNotNull(facets);
         assertEquals(1, facets.size());
         Facet lengthFacet = facets.get(0);
@@ -128,11 +140,45 @@ class FacetTupleStreamConverterTest {
         assertEquals(Long.valueOf(2L), itemValue2.getCount());
     }
 
+    @Test
+    void convertFacetWithAccessions() throws IOException {
+        Tuple tuple1 = getTuple("reviewed", true, 234L);
+        Tuple tuple2 = getTuple("reviewed", false, 24L);
+        Tuple tuple3 = getTuple("model_organism", "Human", 123L);
+        Tuple tuple4 = getTuple("model_organism", "Rice", 12L);
+        Tuple tuple5 = getTupleWithoutCount("accession_id", "P12345");
+        Tuple tuple6 = getTupleWithoutCount("accession_id", "Q12345");
+        Tuple eofTuple = new Tuple();
+        eofTuple.EOF = true;
+
+        when(tupleStream.read())
+                .thenReturn(tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, eofTuple);
+
+        FacetTupleStreamConverter facetConverter =
+                new FacetTupleStreamConverter(new FakeFacetConfig());
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        assertNotNull(response);
+        List<Facet> facets = response.getFacets();
+        assertNotNull(response.getAccessions());
+        assertNotNull(facets);
+        assertEquals(2, facets.size());
+        assertEquals(2, response.getAccessions().size());
+        assertEquals(Arrays.asList("P12345", "Q12345"), response.getAccessions());
+    }
+
     private Tuple getTuple(String facet, Object value, Long count) {
         Tuple tuple = new Tuple();
         Map<Object, Object> map = new HashMap<>();
         map.put(facet, value);
         map.put("count(*)", count);
+        tuple.fields = map;
+        return tuple;
+    }
+
+    private Tuple getTupleWithoutCount(String facet, String accession) {
+        Tuple tuple = new Tuple();
+        Map<Object, Object> map = new HashMap<>();
+        map.put(facet, accession);
         tuple.fields = map;
         return tuple;
     }

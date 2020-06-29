@@ -1,6 +1,7 @@
 package org.uniprot.api.common.repository.search.facet;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,7 +9,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 
-public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<Facet>> {
+public class FacetTupleStreamConverter
+        extends FacetConverter<TupleStream, SolrStreamFacetResponse> {
     private static final String LENGTH_STR = "length";
     private static final String COUNT_STAR_STR = "count(*)";
     private static final String RANGE_1_200 = "[1,200]";
@@ -17,6 +19,7 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
     private static final String RANGE_601_800 = "[601,800]";
     private static final String RANGE_801_PLUS = "[801,*]";
     private static final Map<String, Integer> RANGE_INDEX = new HashMap<>();
+    public static final String ACCESSION_ID = "accession_id";
 
     static {
         RANGE_INDEX.put(RANGE_1_200, 5);
@@ -38,14 +41,19 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
     }
 
     @Override
-    public List<Facet> convert(TupleStream tupleStream) {
+    public SolrStreamFacetResponse convert(TupleStream tupleStream) {
         Map<String, List<Pair<String, Long>>> facetNameValuesMap =
                 computeFacetValuesMap(tupleStream);
-        List<Facet> facetResult =
+        List<String> accessions =
+                facetNameValuesMap.getOrDefault(ACCESSION_ID, new ArrayList<>()).stream()
+                        .map(Pair::getLeft)
+                        .collect(Collectors.toList());
+        List<Facet> facets =
                 facetNameValuesMap.entrySet().stream()
+                        .filter(entry -> !ACCESSION_ID.equals(entry.getKey()))
                         .map(this::convertSolrStreamFacet)
                         .collect(Collectors.toList());
-        return facetResult;
+        return new SolrStreamFacetResponse(facets, accessions);
     }
 
     private Map<String, List<Pair<String, Long>>> computeFacetValuesMap(TupleStream tupleStream) {
@@ -60,9 +68,10 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
                 Map<Object, Object> map = tuple.getMap();
                 for (Map.Entry<Object, Object> entry : map.entrySet()) {
                     String facetName = String.valueOf(entry.getKey());
-                    if (this.facetConfig.getFacetPropertyMap().containsKey(facetName)) {
+                    if (ACCESSION_ID.equals(facetName)
+                            || facetConfig.getFacetPropertyMap().containsKey(facetName)) {
                         String facetValue = String.valueOf(entry.getValue());
-                        Long facetCount = (long) map.get(COUNT_STAR_STR);
+                        Long facetCount = (long) map.getOrDefault(COUNT_STAR_STR, 0l);
                         List<Pair<String, Long>> valueCount = new ArrayList<>();
                         if (facetNameValue.containsKey(facetName)) {
                             valueCount = facetNameValue.get(facetName);
@@ -167,7 +176,8 @@ public class FacetTupleStreamConverter extends FacetConverter<TupleStream, List<
         return buckets;
     }
 
-    private class LengthBucketComparator implements Comparator<Map.Entry<String, Long>> {
+    private static class LengthBucketComparator
+            implements Comparator<Map.Entry<String, Long>>, Serializable {
         @Override
         public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
             int valueCompare = Long.compare(o2.getValue(), o1.getValue());
