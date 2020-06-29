@@ -13,10 +13,7 @@ import lombok.Data;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.ValidAccessionList;
-import org.uniprot.api.rest.validation.ValidContentTypes;
-import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -38,6 +35,13 @@ public class GetByAccessionsRequest implements SearchRequest {
     @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
+
+    @Parameter(
+            description =
+                    "Criteria to filter by facet value. It can any supported valid solr query.")
+    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
+    @ValidSolrQueryFacetFields(facetConfig = UniprotKBFacetConfig.class)
+    private String facetFilter;
 
     @Parameter(
             description =

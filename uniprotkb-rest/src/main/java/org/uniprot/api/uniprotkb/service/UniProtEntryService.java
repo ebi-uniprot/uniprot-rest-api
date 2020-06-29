@@ -18,9 +18,10 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
+import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.solrstream.SolrStreamingFacetRequest;
+import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -100,14 +101,19 @@ public class UniProtEntryService
     }
 
     public QueryResult<UniProtKBEntry> getByAccessions(GetByAccessionsRequest accessionsRequest) {
-        List<String> accessions = accessionsRequest.getAccessionsList();
-        // get facets using solr streaming
-        List<Facet> facets = getFacets(accessionsRequest);
+        SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(accessionsRequest);
+        // use the accessions returned by solr stream if facetFilter is passed
+        // otherwise use the passed accessions
+        List<String> accessions =
+                Utils.notNullNotEmpty(accessionsRequest.getFacetFilter())
+                        ? solrStreamResponse.getAccessions()
+                        : accessionsRequest.getAccessionsList();
         // default page size to number of accessions passed
         int pageSize =
                 Objects.isNull(accessionsRequest.getSize())
                         ? accessions.size()
                         : accessionsRequest.getSize();
+
         // compute the cursor and get subset of accessions as per cursor
         CursorPage cursorPage =
                 CursorPage.of(accessionsRequest.getCursor(), pageSize, accessions.size());
@@ -119,6 +125,12 @@ public class UniProtEntryService
         // get n accessions from store
         List<UniProtKBEntry> entries =
                 this.storeStreamer.streamEntries(accessionsInPage).collect(Collectors.toList());
+
+        // facets may be set when facetList is passed but that should not be returned with cursor
+        List<Facet> facets = solrStreamResponse.getFacets();
+        if (Objects.nonNull(accessionsRequest.getCursor())) {
+            facets = null; // do not return facet in case of next page and facetFilter
+        }
 
         return QueryResult.of(entries, cursorPage, facets, null);
     }
@@ -218,35 +230,41 @@ public class UniProtEntryService
         }
     }
 
-    private List<Facet> getFacets(GetByAccessionsRequest accessionsRequest) {
-        SolrStreamingFacetRequest solrStreamingFacetRequest =
-                createSolrStreamingFacetRequest(accessionsRequest);
-        List<Facet> facets = null;
+    private SolrStreamFacetResponse searchBySolrStream(GetByAccessionsRequest accessionsRequest) {
+        SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(accessionsRequest);
+        SolrStreamFacetResponse solrStreamResponse = new SolrStreamFacetResponse();
 
-        if (facetsNeeded(accessionsRequest)) {
-            // create facet tuple stream and get facets
-            TupleStream tupleStream =
-                    this.facetTupleStreamTemplate.create(solrStreamingFacetRequest);
-            facets = this.facetTupleStreamConverter.convert(tupleStream);
+        if (solrStreamNeeded(accessionsRequest)) {
+            TupleStream tupleStream = this.facetTupleStreamTemplate.create(solrStreamRequest);
+            solrStreamResponse = this.facetTupleStreamConverter.convert(tupleStream);
         }
 
-        return facets;
+        return solrStreamResponse;
     }
 
-    private SolrStreamingFacetRequest createSolrStreamingFacetRequest(
+    private SolrStreamFacetRequest createSolrStreamRequest(
             GetByAccessionsRequest accessionsRequest) {
+        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
+                SolrStreamFacetRequest.builder();
 
         List<String> accessions = accessionsRequest.getAccessionsList();
         List<String> facets = accessionsRequest.getFacetList();
-        String query = String.join(" ", accessions);
-        query = "accession_id:(" + query + ")";
+        // construct the query for tuple stream
+        StringBuilder qb = new StringBuilder();
+        qb.append("accession_id:(").append(String.join(" OR ", accessions)).append(")");
+        // append the facet filter query in the accession query
+        if (Utils.notNullNotEmpty(accessionsRequest.getFacetFilter())) {
+            qb.append(" AND (").append(accessionsRequest.getFacetFilter()).append(")");
+            solrRequestBuilder.searchAccession(Boolean.TRUE);
+        }
 
-        return SolrStreamingFacetRequest.builder().query(query).facets(facets).build();
+        return solrRequestBuilder.query(qb.toString()).facets(facets).build();
     }
 
-    private boolean facetsNeeded(GetByAccessionsRequest accessionsRequest) {
-        return Utils.nullOrEmpty(accessionsRequest.getCursor())
-                && Utils.notNullNotEmpty(accessionsRequest.getFacetList())
-                && !accessionsRequest.isDownload();
+    private boolean solrStreamNeeded(GetByAccessionsRequest accessionsRequest) {
+        return (Utils.nullOrEmpty(accessionsRequest.getCursor())
+                        && Utils.notNullNotEmpty(accessionsRequest.getFacetList())
+                        && !accessionsRequest.isDownload())
+                || Utils.notNullNotEmpty(accessionsRequest.getFacetFilter());
     }
 }

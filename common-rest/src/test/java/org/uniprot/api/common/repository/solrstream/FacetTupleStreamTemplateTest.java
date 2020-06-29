@@ -34,14 +34,14 @@ class FacetTupleStreamTemplateTest {
 
     @Test
     void testCreateTupleStream() {
-        SolrStreamingFacetRequest.SolrStreamingFacetRequestBuilder builder =
-                SolrStreamingFacetRequest.builder();
+        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
+                SolrStreamFacetRequest.builder();
         String query = "accession_id:(P12345 OR Q12345)";
         String facet1 = "sample_facet1";
         String facet2 = "sample_facet2";
         String facet3 = "sample_facet3";
         List<String> facets = Arrays.asList(facet1, facet2, facet3);
-        SolrStreamingFacetRequest request = builder.query(query).facets(facets).build();
+        SolrStreamFacetRequest request = builder.query(query).facets(facets).build();
         TupleStream tupleStream = tupleStreamTemplate.create(request);
         assertThat(tupleStream, Matchers.is(Matchers.notNullValue()));
         assertThat(tupleStream.children(), Matchers.is(Matchers.iterableWithSize(3)));

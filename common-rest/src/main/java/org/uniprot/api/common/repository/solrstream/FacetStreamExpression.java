@@ -57,7 +57,7 @@ public class FacetStreamExpression extends StreamExpression {
         public FacetStreamExpressionBuilder() {}
 
         public FacetStreamExpressionBuilder(
-                String collection, String facet, SolrStreamingFacetRequest request) {
+                String collection, String facet, SolrStreamFacetRequest request) {
             this.collection = collection;
             this.query = request.getQuery();
             this.buckets = facet;

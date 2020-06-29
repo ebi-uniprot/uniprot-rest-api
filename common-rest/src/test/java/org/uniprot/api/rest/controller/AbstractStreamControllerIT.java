@@ -41,10 +41,9 @@ public abstract class AbstractStreamControllerIT {
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
 
-    @Autowired
-    private FacetTupleStreamTemplate facetTupleStreamTemplate;
-
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     private MiniSolrCloudCluster cluster;
 
@@ -68,9 +67,7 @@ public abstract class AbstractStreamControllerIT {
                     tupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
             cloudSolrClient = cluster.getSolrClient();
 
-            // update facet tuple for fields value for testing
-            ReflectionTestUtils.setField(facetTupleStreamTemplate, "zookeeperHost", cluster.getZkServer().getZkAddress());
-            ReflectionTestUtils.setField(facetTupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
+            updateFacetTupleStreamTemplate();
 
             for (SolrCollection solrCollection : getSolrCollections()) {
                 String collection = solrCollection.name();
@@ -113,5 +110,15 @@ public abstract class AbstractStreamControllerIT {
                         .getResourceAsStream(SOLR_SYSTEM_PROPERTIES);
         properties.load(propertiesStream);
         return properties;
+    }
+
+    private void updateFacetTupleStreamTemplate() {
+        // update facet tuple for fields value for testing
+        ReflectionTestUtils.setField(
+                facetTupleStreamTemplate, "zookeeperHost", cluster.getZkServer().getZkAddress());
+        ReflectionTestUtils.setField(
+                facetTupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
+        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamFactory", null);
+        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamContext", null);
     }
 }
