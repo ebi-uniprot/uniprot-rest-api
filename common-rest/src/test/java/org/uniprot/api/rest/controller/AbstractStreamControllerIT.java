@@ -53,7 +53,7 @@ public abstract class AbstractStreamControllerIT {
         String solrHome = solrProperties.getProperty("solr.home");
         tempClusterDir = Files.createTempDirectory("MiniSolrCloudCluster");
         System.setProperty(
-                "solr.data.dir", tempClusterDir.toString() + File.separator + "solrTestData");
+                "solr.data.home", tempClusterDir.toString() + File.separator + "solrTestData");
 
         JettyConfig jettyConfig = JettyConfig.builder().setPort(0).build();
         try {
