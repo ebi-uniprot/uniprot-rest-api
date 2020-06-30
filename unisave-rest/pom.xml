@@ -12,7 +12,6 @@
 
 	<artifactId>unisave-rest</artifactId>
 	<description>UniSave Rest API</description>
-	<version>${project.parent.version}</version>
 
 	<dependencies>
 		<dependency>
