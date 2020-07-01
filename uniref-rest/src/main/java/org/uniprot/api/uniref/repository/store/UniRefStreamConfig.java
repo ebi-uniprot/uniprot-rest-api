@@ -6,10 +6,12 @@ import java.time.Duration;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
@@ -23,10 +25,15 @@ public class UniRefStreamConfig {
 
     @Bean
     public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties, HttpClient httpClient) {
+            StreamerConfigProperties configProperties,
+            HttpClient httpClient,
+            SolrClient solrClient,
+            SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
                 .httpClient(httpClient)
+                .solrClient(solrClient)
+                .solrRequestConverter(requestConverter)
                 .build();
     }
 
