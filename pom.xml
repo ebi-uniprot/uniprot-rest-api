@@ -222,55 +222,6 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>${maven-surefire-plugin.version}</version>
-					<configuration>
-						<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
-						<systemProperties>
-							<property>
-								<name>http.proxyHost</name>
-								<value>${http.proxyHost}</value>
-							</property>
-							<property>
-								<name>http.proxyPort</name>
-								<value>${http.proxyPort}</value>
-							</property>
-						</systemProperties>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>${maven-failsafe-plugin.version}</version>
-					<configuration>
-						<systemProperties>
-							<property>
-								<name>http.proxyHost</name>
-								<value>${http.proxyHost}</value>
-							</property>
-							<property>
-								<name>http.proxyPort</name>
-								<value>${http.proxyPort}</value>
-							</property>
-						</systemProperties>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven-compiler-plugin.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco.version}</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -284,6 +235,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<argLine>-Xmx1024m -XX:MaxPermSize=256m ${argLine}</argLine>
 					<includes>
 						<include>*</include>
 					</includes>
