@@ -19,7 +19,6 @@
 		<logback.version>1.2.3</logback.version>
 		<commons-codec.version>1.11</commons-codec.version>
 		<jayway.version>2.4.0</jayway.version>
-
 	</properties>
 
 	<repositories>

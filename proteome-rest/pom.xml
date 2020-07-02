@@ -14,7 +14,6 @@
 
 	<properties>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-
 	</properties>
 
 	<dependencies>

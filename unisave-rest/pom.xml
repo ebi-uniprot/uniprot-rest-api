@@ -14,10 +14,6 @@
 	<description>UniSave Rest API</description>
 	<version>${project.parent.version}</version>
 
-	<properties>
-
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

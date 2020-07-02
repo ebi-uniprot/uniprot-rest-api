@@ -12,11 +12,6 @@
 	<artifactId>support-data-rest</artifactId>
 	<description>UniProt Rest API for support data</description>
 
-	<properties>
-
-	</properties>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
