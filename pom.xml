@@ -28,7 +28,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.version>3.8.0</maven.compiler.version>
 		<java.version>1.8</java.version>
-		<jacoco.version>0.8.4</jacoco.version>
+		<jacoco.version>0.8.5</jacoco.version>
 		<maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
 
 		<spring.boot.version>2.0.3.RELEASE</spring.boot.version>
@@ -60,7 +60,6 @@
 		<spotless.version>1.24.1</spotless.version>
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<modules>
@@ -72,6 +71,7 @@
 		<module>uniref-rest</module>
 		<module>unisave-rest</module>
 		<module>benchmark-rest</module>
+		<module>jacoco-aggregate-report</module>
 	</modules>
 
 	<dependencyManagement>
@@ -225,19 +225,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.4</version>
-				<executions>
-					<execution>
-						<id>prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -293,6 +280,19 @@
 						<phase>compile</phase>
 						<goals>
 							<goal>apply</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -473,14 +473,13 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.4</version>
+						<version>${jacoco.version}</version>
 						<executions>
 							<execution>
-								<id>report</id>
+								<id>prepare-agent</id>
 								<goals>
-									<goal>report-aggregate</goal>
+									<goal>prepare-agent</goal>
 								</goals>
-								<phase>verify</phase>
 							</execution>
 						</executions>
 					</plugin>
