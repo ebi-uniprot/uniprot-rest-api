@@ -13,7 +13,7 @@
 	<description>UniProt Rest API for support data</description>
 
 	<properties>
-		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+
 	</properties>
 
 
