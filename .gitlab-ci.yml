@@ -49,7 +49,7 @@ api:compile:
 api:UT:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -Dtest="! *IT" -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
+    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P jenkins -Dtest="! *IT" -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
     - 'mkdir -p ./uTest_reports'
     - 'find "$(pwd)" -path "*jacoco.xml" | while IFS= read -r item; do NAME="${item##*/}"; cp "$item" "./uTest_reports/${NAME%.*}-$((i++)).${NAME##*.}"; done'
     - 'find "$(pwd)" -path "*jacoco.xml" -delete'
@@ -80,7 +80,7 @@ api:IT:
 
 api:sonar:
   stage: quality
-  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(find "$(pwd)" -path '*jacoco-*.xml' | sed 's/.*/&/' | tr '\n' ',') sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
+  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(find "$(pwd)" -path '*jacoco*.xml' | sed 's/.*/&/' | tr '\n' ',') sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
   dependencies:
     - api:UT
     - api:IT
