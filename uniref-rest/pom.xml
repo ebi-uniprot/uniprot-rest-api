@@ -14,6 +14,9 @@
 	<name>uniref-rest</name>
 	<description>UniRef Rest API</description>
 
+	<properties>
+		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+	</properties>
 
 	<dependencies>
 		<dependency>
