@@ -14,7 +14,7 @@
 
 	<properties>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
-		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+
 	</properties>
 
 	<dependencies>

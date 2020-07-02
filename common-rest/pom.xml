@@ -19,7 +19,7 @@
 		<jaxb.version>2.3.0</jaxb.version>
 		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
-		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+
 	</properties>
 
 	<dependencies>
