@@ -4,7 +4,7 @@ import static org.hamcrest.core.IsAnything.anything;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.AfterEach;
@@ -89,7 +89,7 @@ public abstract class AbstractDownloadControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(httpStatus.value()))
                         .andExpect(
                                 header().string(

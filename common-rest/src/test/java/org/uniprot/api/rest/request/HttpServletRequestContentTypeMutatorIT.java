@@ -4,7 +4,7 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.app.FakeController.EXPECTED_NUMBER;
 import static org.uniprot.api.rest.app.FakeController.FAKE_RESOURCE_BASE;
@@ -48,7 +48,7 @@ public class HttpServletRequestContentTypeMutatorIT {
         ResultActions response =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource").header(ACCEPT, mediaType));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, containsString(mediaType)));
     }
@@ -57,7 +57,7 @@ public class HttpServletRequestContentTypeMutatorIT {
     void canGetResourceWithAcceptableExtension() throws Exception {
         ResultActions response = mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -70,7 +70,7 @@ public class HttpServletRequestContentTypeMutatorIT {
         ResultActions response =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource").param("format", "tsv"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -84,7 +84,7 @@ public class HttpServletRequestContentTypeMutatorIT {
                 mockMvc.perform(
                         get(FAKE_RESOURCE_BASE + "/resource").header(ACCEPT, OBO_MEDIA_TYPE_VALUE));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         content()
@@ -101,7 +101,7 @@ public class HttpServletRequestContentTypeMutatorIT {
     void badRequestWithValidButNotAcceptedExtension() throws Exception {
         ResultActions response = mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.obo"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         content()
@@ -119,7 +119,7 @@ public class HttpServletRequestContentTypeMutatorIT {
         ResultActions response =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID").param(FORMAT, "obo"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         content()
@@ -139,7 +139,7 @@ public class HttpServletRequestContentTypeMutatorIT {
                         get(FAKE_RESOURCE_BASE + "/THIS_DOES_NOT_EXIST")
                                 .header(ACCEPT, DEFAULT_MEDIA_TYPE));
 
-        response.andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        response.andDo(log()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class HttpServletRequestContentTypeMutatorIT {
                 mockMvc.perform(
                         get(FAKE_RESOURCE_BASE + "/resource/number/12").param("format", "txt"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -161,7 +161,7 @@ public class HttpServletRequestContentTypeMutatorIT {
         ResultActions response =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/number/12.txt"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -176,7 +176,7 @@ public class HttpServletRequestContentTypeMutatorIT {
                         get(FAKE_RESOURCE_BASE + "/resource/number/wrong")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().string(containsString(EXPECTED_NUMBER)))
                 .andExpect(
@@ -190,7 +190,7 @@ public class HttpServletRequestContentTypeMutatorIT {
         ResultActions response =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/number/12.xxxx"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().string(containsString(EXPECTED_NUMBER)))
                 .andExpect(
@@ -205,7 +205,7 @@ public class HttpServletRequestContentTypeMutatorIT {
                 mockMvc.perform(
                         get(FAKE_RESOURCE_BASE + "/resource/number/12").param(FORMAT, "xxxx"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         content()
@@ -223,7 +223,7 @@ public class HttpServletRequestContentTypeMutatorIT {
         ResultActions response =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/number/12.obo"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         content()
