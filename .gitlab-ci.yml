@@ -50,7 +50,9 @@ api:compile:
 api:test:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -Dtest="*IT" -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
+    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
+    - 'mkdir -p ./jacoco-report'
+    - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
   artifacts:
     when: always
     expire_in: 2 days
@@ -60,7 +62,7 @@ api:test:
 
 api:sonar:
   stage: quality
-  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=${JACOCO_AGGREGATE_REPORT} sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
+  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(find "$(pwd)" -path 'jacoco.xml') sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
   dependencies:
     - api:test
     - api:compile
@@ -74,3 +76,9 @@ api:deploy:
     - api:compile
   only:
     - master
+after_script:
+  - 'pwd'
+  - 'ls -al'
+  - 'ls -al */'
+  - 'ls -al */*/'
+  - 'ls -al */*/*/'

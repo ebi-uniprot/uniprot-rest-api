@@ -9,7 +9,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Collections;
@@ -123,7 +123,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(jsonPath("$.results.size()", is(10)))
@@ -148,7 +148,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                                 .param("download", "invalid"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -175,7 +175,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -198,7 +198,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -223,7 +223,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)));
@@ -242,7 +242,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -263,7 +263,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
