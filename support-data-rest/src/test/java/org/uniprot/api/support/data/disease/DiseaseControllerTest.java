@@ -2,7 +2,7 @@ package org.uniprot.api.support.data.disease;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Arrays;
@@ -49,7 +49,7 @@ class DiseaseControllerTest {
                         MockMvcRequestBuilders.get("/disease/" + accession)
                                 .param("accessionId", accession));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(jsonPath("$.name", equalTo(disease.getName())))
                 .andExpect(jsonPath("$.id", equalTo(disease.getId())))
                 .andExpect(jsonPath("$.acronym", equalTo(disease.getAcronym())))
@@ -89,7 +89,7 @@ class DiseaseControllerTest {
                                 .param("accessionId", accession));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(
@@ -114,7 +114,7 @@ class DiseaseControllerTest {
                                 .param("accessionId", accession));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(
                         header().string(
