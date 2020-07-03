@@ -8,7 +8,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 
@@ -81,7 +81,7 @@ class UniSaveControllerTest {
                         get(RESOURCE_BASE + ACCESSION).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(ENTRY_VERSION, contains(2, 1)))
@@ -103,7 +103,7 @@ class UniSaveControllerTest {
                                 .param("includeContent", "true"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(RESULTS_CONTENT, hasSize(2)))
@@ -125,7 +125,7 @@ class UniSaveControllerTest {
                                 .param(VERSIONS, "1"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(ENTRY_VERSION, contains(1)))
@@ -146,7 +146,7 @@ class UniSaveControllerTest {
                                 .param(VERSIONS, "1"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath(ENTRY_VERSION, contains(1)))
@@ -168,7 +168,7 @@ class UniSaveControllerTest {
                                 .param("download", "true"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().exists(HttpHeaders.CONTENT_DISPOSITION));
@@ -187,7 +187,7 @@ class UniSaveControllerTest {
                         get(RESOURCE_BASE + ACCESSION).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
     }
@@ -201,7 +201,7 @@ class UniSaveControllerTest {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
@@ -216,7 +216,7 @@ class UniSaveControllerTest {
                                 .param(VERSIONS, "XXXX"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         jsonPath(
@@ -248,7 +248,7 @@ class UniSaveControllerTest {
                                 .param("version2", String.valueOf(version2)));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.diffInfo.entry1.entryVersion", is(1)))
                 .andExpect(jsonPath("$.diffInfo.entry1.content").exists())
@@ -267,7 +267,7 @@ class UniSaveControllerTest {
                                 .param("version2", "2"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
@@ -286,7 +286,7 @@ class UniSaveControllerTest {
                                 .param("version2", "2"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
     }
@@ -301,7 +301,7 @@ class UniSaveControllerTest {
                                 .param("version1", "1"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath(MESSAGES, contains("'version2' is a required parameter")));
     }
@@ -316,7 +316,7 @@ class UniSaveControllerTest {
                                 .param("version2", "1"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath(MESSAGES, contains("'version1' is a required parameter")));
     }
@@ -336,7 +336,7 @@ class UniSaveControllerTest {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.accession", is(ACCESSION)));
     }
@@ -355,7 +355,7 @@ class UniSaveControllerTest {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .andExpect(jsonPath(MESSAGES, contains("Internal server error")));
     }
@@ -375,7 +375,7 @@ class UniSaveControllerTest {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
     }
@@ -389,7 +389,7 @@ class UniSaveControllerTest {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
