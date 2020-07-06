@@ -7,7 +7,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 
@@ -119,7 +119,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -151,7 +151,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)))
@@ -201,7 +201,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)))
@@ -244,7 +244,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
@@ -269,7 +269,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -301,7 +301,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -341,7 +341,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then first page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -377,7 +377,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then 2nd page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -408,7 +408,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then last page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -432,7 +432,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
 
         // then
         ResultActions resultTests =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                         .andExpect(content().contentTypeCompatibleWith(mediaType));
@@ -465,7 +465,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -498,7 +498,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "8"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(6)))
@@ -545,7 +545,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "2"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
@@ -567,7 +567,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -596,7 +596,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("facets", facetList)
                                 .param("size", "10"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -621,7 +621,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then first page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -648,7 +648,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
