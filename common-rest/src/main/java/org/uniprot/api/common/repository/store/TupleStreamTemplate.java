@@ -49,6 +49,9 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
         StreamContext streamContext = getStreamContext(streamConfig.getCollection(), httpClient);
         StreamFactory streamFactory =
                 getStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
+
+        validateResponse(request);
+
         TupleStreamBuilder streamBuilder =
                 TupleStreamBuilder.builder()
                         .streamFactory(streamFactory)

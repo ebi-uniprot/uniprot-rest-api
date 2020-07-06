@@ -29,7 +29,7 @@ public class FacetTupleStreamConverter
         RANGE_INDEX.put(RANGE_801_PLUS, 1);
     }
 
-    private FacetConfig facetConfig;
+    private final FacetConfig facetConfig;
 
     public FacetTupleStreamConverter(FacetConfig facetConfig) {
         this.facetConfig = facetConfig;
@@ -71,7 +71,7 @@ public class FacetTupleStreamConverter
                     if (ACCESSION_ID.equals(facetName)
                             || facetConfig.getFacetPropertyMap().containsKey(facetName)) {
                         String facetValue = String.valueOf(entry.getValue());
-                        Long facetCount = (long) map.getOrDefault(COUNT_STAR_STR, 0l);
+                        Long facetCount = (long) map.getOrDefault(COUNT_STAR_STR, 0L);
                         List<Pair<String, Long>> valueCount = new ArrayList<>();
                         if (facetNameValue.containsKey(facetName)) {
                             valueCount = facetNameValue.get(facetName);
@@ -85,13 +85,17 @@ public class FacetTupleStreamConverter
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         } finally {
-            try {
-                tupleStream.close();
-            } catch (IOException e) {
-                throw new IllegalArgumentException(e);
-            }
+            closeTupleStream(tupleStream);
         }
         return facetNameValue;
+    }
+
+    private void closeTupleStream(TupleStream tupleStream) {
+        try {
+            tupleStream.close();
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private Facet convertSolrStreamFacet(Map.Entry<String, List<Pair<String, Long>>> facetValues) {
