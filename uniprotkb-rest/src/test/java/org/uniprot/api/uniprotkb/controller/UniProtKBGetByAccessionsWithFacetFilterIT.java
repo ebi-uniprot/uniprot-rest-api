@@ -228,14 +228,14 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 contains("P00011", "P00013", "P00015", "P00017", "P00019")))
                 .andExpect(jsonPath("$.facets.*.label", contains("Protein Existence", "Status")))
                 .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.label",
-                                contains("Homology", "Transcript level")))
+                                .andExpect(
+                                        jsonPath(
+                                                "$.facets[0].values.*.label",
+                                                contains("Homology", "Transcript level")))
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.value",
-                                contains("homology", "transcript_level")))
+                                contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(4, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
@@ -272,14 +272,14 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00011", "P00013")))
                 .andExpect(jsonPath("$.facets.*.label", contains("Protein Existence", "Status")))
                 .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.label",
-                                contains("Homology", "Transcript level")))
+                                .andExpect(
+                                        jsonPath(
+                                                "$.facets[0].values.*.label",
+                                                contains("Homology", "Transcript level")))
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.value",
-                                contains("homology", "transcript_level")))
+                                contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(4, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
