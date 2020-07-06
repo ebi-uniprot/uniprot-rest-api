@@ -145,7 +145,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniProtKB protein entry by accession.",
+            summary = "Get UniProtKB entry by an accession.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -256,6 +256,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return super.getDeferredResultResponseEntity(request, context);
     }
 
+    @Tag(name = "uniprotkb")
     @RequestMapping(
             value = "/accessions",
             method = {RequestMethod.GET, RequestMethod.POST},
@@ -270,7 +271,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniProtKB protein entry by a list of accessions.",
+            summary = "Get UniProtKB entries by a list of accessions.",
             responses = {
                 @ApiResponse(
                         content = {

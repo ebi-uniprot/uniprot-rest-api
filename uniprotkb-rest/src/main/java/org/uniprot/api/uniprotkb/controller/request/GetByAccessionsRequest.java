@@ -24,8 +24,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class GetByAccessionsRequest implements SearchRequest {
 
     @NotNull(message = "{search.required}")
+    @Parameter(description = "Comma separated list of accessions")
     @ValidAccessionList
-    private String accessions; // comma separated list of accessions
+    private String accessions;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
