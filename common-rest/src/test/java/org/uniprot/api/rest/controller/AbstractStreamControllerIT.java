@@ -38,8 +38,7 @@ public abstract class AbstractStreamControllerIT {
 
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
 
-    @Autowired
-    private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 

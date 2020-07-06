@@ -11,13 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.solrstream.AbstractTupleStreamTemplate;
 import org.uniprot.core.util.Utils;
 
@@ -38,6 +42,8 @@ import org.uniprot.core.util.Utils;
 public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
     private final StreamerConfigProperties streamConfig;
     private final HttpClient httpClient;
+    private final SolrClient solrClient;
+    private final SolrRequestConverter solrRequestConverter;
 
     public TupleStream create(SolrRequest request) {
         StreamContext streamContext = getStreamContext(streamConfig.getCollection(), httpClient);
@@ -52,6 +58,32 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                         .build();
 
         return streamBuilder.createFor(request);
+    }
+
+    void validateResponse(SolrRequest request) {
+        if (streamConfig.getStoreMaxCountToRetrieve() > 0) {
+            SolrRequest slimRequest =
+                    SolrRequest.builder()
+                            .query(request.getQuery())
+                            .filterQueries(request.getFilterQueries())
+                            .queryBoosts(request.getQueryBoosts())
+                            .rows(0)
+                            .build();
+            try {
+                QueryResponse response =
+                        solrClient.query(
+                                streamConfig.getCollection(),
+                                solrRequestConverter.toSolrQuery(slimRequest));
+                if (response.getResults().getNumFound()
+                        > streamConfig.getStoreMaxCountToRetrieve()) {
+                    throw new ServiceException(
+                            "Too many results to retrieve. Please refine your query or consider fetching batch by batch");
+                }
+            } catch (SolrServerException | IOException e) {
+                throw new ServiceException("Server error when querying Solr", e);
+            }
+            log.debug("Request to stream is valid: " + request);
+        }
     }
 
     @Builder
