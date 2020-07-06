@@ -81,6 +81,18 @@ public class StoreStreamer<T> {
                 Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
     }
 
+    public Stream<T> streamEntries(List<String> accessions) {
+        BatchStoreIterable<T> batchStoreIterable =
+                new BatchStoreIterable<>(
+                        accessions,
+                        storeClient,
+                        storeFetchRetryPolicy,
+                        streamConfig.getStoreBatchSize());
+        return StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .onClose(() -> log.debug("Finished streaming entries."));
+    }
+
     @SuppressWarnings("squid:S2095")
     private Stream<String> fetchIds(SolrRequest solrRequest) {
         try {

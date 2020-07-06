@@ -1,7 +1,5 @@
 package org.uniprot.api.common.repository.store;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Iterator;
@@ -77,7 +75,6 @@ class TupleStreamIterable implements Iterable<String> {
                 try {
                     return Failsafe.with(retryPolicy).get(tupleStream::read);
                 } catch (Exception e) {
-                    LOGGER.error("Error whilst iterating through Solr results stream", e);
                     closeTupleStream();
                     throw new IllegalStateException(
                             "Error whilst iterating through Solr results stream", e);

@@ -54,7 +54,7 @@ public class UniProtEntryService
     private final QueryBoosts uniProtKBqueryBoosts;
     private final UniProtTermsConfig uniProtTermsConfig;
     private UniprotQueryRepository repository;
-    private StoreStreamer<UniProtDocument, UniProtKBEntry> storeStreamer;
+    private StoreStreamer<UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
     private final FacetTupleStreamTemplate facetTupleStreamTemplate;
