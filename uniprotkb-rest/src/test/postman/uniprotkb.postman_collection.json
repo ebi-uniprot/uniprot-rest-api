@@ -1,0 +1,324 @@
+{
+	"info": {
+		"_postman_id": "6d4fa208-60c7-4044-8f62-477bc6348229",
+		"name": "uniprotkb",
+		"description": "Test suite for UniProtKB requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search Proteins",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "275a82d8-f4d4-48f9-a061-743c71e12ebc",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /search API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2b88eedc-7055-4016-a7e7-964d8466af34",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "a8b5b366-0f73-4cf3-b6be-357ed2fc7049",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "accession",
+			"item": [
+				{
+					"name": "Get by accession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "96d9f007-88b5-4d68-993b-11395c0c0905",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"accession",
+								"{{accession}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /accession/{accession} API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7157103c-ca97-4a37-9c7f-c6b38a44d848",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "bcbb8843-8193-4cc6-a58b-191f330878f4",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "accessions",
+			"item": [
+				{
+					"name": "Get Proteins by accession list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d3935d54-936b-40d8-ba13-1d081cc8ff0b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"accessions"
+							],
+							"query": [
+								{
+									"key": "accessions",
+									"value": "{{accession_list}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /accessions API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2ee2a211-de62-4476-a796-f6a61c921d47",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "bf18c997-f496-40b0-b1d0-0f6bfd57fc6c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "stream",
+			"item": [
+				{
+					"name": "Stream Proteins",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "78e7f414-1b29-46ed-89f8-15f4eba014fe",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/stream?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /stream API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "37b0297f-14e9-4a36-911b-3991fde2fee9",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ba58f02a-00f6-4b1e-a7e2-85241d8cfcbc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9fabb014-f3d7-4ce7-bdee-2cd0ad260f64",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "140616c6-995f-458e-8e0e-1d784cb50916",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "debfac42-0bfb-4b89-9371-56f79b9ba8c3",
+			"key": "search_value",
+			"value": "rnf18"
+		},
+		{
+			"id": "9cf3ad79-393a-4cbd-b6cd-470395885e76",
+			"key": "accession_list",
+			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
+		},
+		{
+			"id": "bdf94f52-65e3-49a1-87a9-54635cc79961",
+			"key": "accession",
+			"value": "P12345"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
