@@ -81,6 +81,18 @@ public class StoreStreamer<T> {
                 Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
     }
 
+    public Stream<T> streamEntries(List<String> accessions) {
+        BatchStoreIterable<T> batchStoreIterable =
+                new BatchStoreIterable<>(
+                        accessions,
+                        storeClient,
+                        storeFetchRetryPolicy,
+                        streamConfig.getStoreBatchSize());
+        return StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .onClose(() -> log.debug("Finished streaming entries."));
+    }
+
     @SuppressWarnings("squid:S2095")
     private Stream<String> fetchIds(SolrRequest solrRequest) {
         try {
@@ -104,26 +116,6 @@ public class StoreStreamer<T> {
             String message = "Error when closing TupleStream";
             log.error(message, e);
             throw new IllegalStateException(message, e);
-        }
-    }
-
-    private static class BatchStoreIterable<T> extends BatchIterable<T> {
-        private final UniProtStoreClient<T> storeClient;
-        private final RetryPolicy<Object> retryPolicy;
-
-        BatchStoreIterable(
-                Iterable<String> sourceIterable,
-                UniProtStoreClient<T> storeClient,
-                RetryPolicy<Object> retryPolicy,
-                int batchSize) {
-            super(sourceIterable, batchSize);
-            this.storeClient = storeClient;
-            this.retryPolicy = retryPolicy;
-        }
-
-        @Override
-        List<T> convertBatch(List<String> batch) {
-            return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(batch));
         }
     }
 

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
 
@@ -40,6 +41,8 @@ public abstract class AbstractStreamControllerIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
+
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     private MiniSolrCloudCluster cluster;
 
@@ -62,6 +65,8 @@ public abstract class AbstractStreamControllerIT {
             ReflectionTestUtils.setField(
                     tupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
             cloudSolrClient = cluster.getSolrClient();
+
+            updateFacetTupleStreamTemplate();
 
             for (SolrCollection solrCollection : getSolrCollections()) {
                 String collection = solrCollection.name();
@@ -104,5 +109,15 @@ public abstract class AbstractStreamControllerIT {
                         .getResourceAsStream(SOLR_SYSTEM_PROPERTIES);
         properties.load(propertiesStream);
         return properties;
+    }
+
+    private void updateFacetTupleStreamTemplate() {
+        // update facet tuple for fields value for testing
+        ReflectionTestUtils.setField(
+                facetTupleStreamTemplate, "zookeeperHost", cluster.getZkServer().getZkAddress());
+        ReflectionTestUtils.setField(
+                facetTupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
+        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamFactory", null);
+        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamContext", null);
     }
 }
