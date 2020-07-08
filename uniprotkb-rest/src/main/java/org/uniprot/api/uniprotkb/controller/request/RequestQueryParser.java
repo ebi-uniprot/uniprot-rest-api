@@ -12,7 +12,7 @@ import org.apache.lucene.search.*;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.comment.CommentType;
-import org.uniprot.core.uniprotkb.feature.FeatureType;
+import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.cv.xdb.UniProtCrossReferenceDisplayOrder;
 
 /**
@@ -645,7 +645,7 @@ public class RequestQueryParser {
     }
 
     private static void initFeatureMappingType() {
-        Arrays.stream(FeatureType.values())
+        Arrays.stream(UniprotKBFeatureType.values())
                 .forEach(
                         featureType -> {
                             featureMappingType.put(

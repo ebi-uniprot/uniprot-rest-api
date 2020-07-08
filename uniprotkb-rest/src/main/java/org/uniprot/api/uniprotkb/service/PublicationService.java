@@ -9,9 +9,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Query;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.QueryOperator;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -76,8 +76,10 @@ public class PublicationService {
         }
 
         // PAGINATE THE RESULT
-        CursorPage page = getCursorPage(request, publications.size());
-        publications = publications.subList(page.getOffset().intValue(), getPageTo(page));
+        CursorPage page =
+                CursorPage.of(request.getCursor(), request.getSize(), publications.size());
+        publications =
+                publications.subList(page.getOffset().intValue(), CursorPage.getNextOffset(page));
 
         return QueryResult.of(publications, page, facets);
     }
@@ -235,31 +237,14 @@ public class PublicationService {
     private SolrRequest getSolrRequest(String query) {
         return SolrRequest.builder()
                 .query(query)
-                .addSort(
-                        new Sort(
-                                Sort.Direction.ASC,
+                .sort(
+                        SolrQuery.SortClause.asc(
                                 this.searchFieldConfig
                                         .getSearchFieldItemByName("id")
                                         .getFieldName()))
-                .defaultQueryOperator(Query.Operator.OR)
+                .defaultQueryOperator(QueryOperator.OR)
                 .rows(100)
                 .build();
-    }
-
-    private CursorPage getCursorPage(PublicationRequest request, int publicationSize) {
-        CursorPage page = CursorPage.of(request.getCursor(), request.getSize());
-        page.setTotalElements((long) publicationSize);
-        page.setNextCursor("NEXT");
-        return page;
-    }
-
-    private int getPageTo(CursorPage page) {
-        long nextPageOffset = (long) page.getOffset() + page.getPageSize();
-        if (nextPageOffset > page.getTotalElements()) {
-            return page.getTotalElements().intValue();
-        } else {
-            return (int) nextPageOffset;
-        }
     }
 
     private boolean isFromAccession(String accession, LiteratureMappedReference mappedReference) {

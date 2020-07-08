@@ -5,9 +5,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.data.domain.Sort;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
@@ -22,30 +20,30 @@ public class GeneCentricSortClause extends AbstractSolrSortClause {
 
     @PostConstruct
     public void init() {
-        addDefaultFieldOrderPair(ACCESSION_ID, Sort.Direction.ASC);
+        addDefaultFieldOrderPair(ACCESSION_ID, SolrQuery.ORDER.asc);
     }
 
     @Override
-    protected List<Pair<String, Sort.Direction>> parseSortClause(String sortClause) {
-        List<Pair<String, Sort.Direction>> fieldSortPairs = super.parseSortClause(sortClause);
+    protected List<SolrQuery.SortClause> parseSortClause(String sortClauseRaw) {
+        List<SolrQuery.SortClause> fieldSortPairs = super.parseSortClause(sortClauseRaw);
+
         if (fieldSortPairs.stream()
                 .anyMatch(
-                        val ->
-                                val.getLeft()
+                        clause ->
+                                clause.getItem()
                                         .equals(
                                                 getSearchFieldConfig(getUniProtDataType())
                                                         .getCorrespondingSortField(ACCESSION_ID)
                                                         .getFieldName()))) {
             return fieldSortPairs;
         } else {
-            List<Pair<String, Sort.Direction>> newFieldSortPairs = new ArrayList<>();
-            newFieldSortPairs.addAll(fieldSortPairs);
+            List<SolrQuery.SortClause> newFieldSortPairs = new ArrayList<>(fieldSortPairs);
             newFieldSortPairs.add(
-                    new ImmutablePair<>(
+                    SolrQuery.SortClause.create(
                             getSearchFieldConfig(getUniProtDataType())
                                     .getCorrespondingSortField(ACCESSION_ID)
                                     .getFieldName(),
-                            Sort.Direction.ASC));
+                            SolrQuery.ORDER.asc));
             return newFieldSortPairs;
         }
     }

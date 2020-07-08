@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.suggester.service.SuggesterServiceConfig;
+import org.uniprot.api.support.data.suggester.service.SuggesterServiceConfig;
 
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, SuggesterServiceConfig.class})

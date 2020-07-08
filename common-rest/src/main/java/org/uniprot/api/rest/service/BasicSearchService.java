@@ -16,6 +16,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.document.Document;
@@ -30,9 +31,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     public static final Integer DEFAULT_SOLR_BATCH_SIZE = 100;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
-    private AbstractSolrSortClause solrSortClause;
-    private QueryBoosts queryBoosts;
-    private FacetConfig facetConfig;
+    protected final AbstractSolrSortClause solrSortClause;
+    protected final QueryBoosts queryBoosts;
+    private final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE
@@ -144,24 +145,34 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
-
         SolrRequest.SolrRequestBuilder builder =
-                createSolrRequestBuilder(
-                        request,
-                        this.facetConfig,
-                        this.solrSortClause,
-                        includeFacets,
-                        this.queryBoosts);
+                createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts);
+
+        if (includeFacets && request.hasFacets()) {
+            builder.facets(request.getFacetList());
+            builder.facetConfig(facetConfig);
+        }
+
+        // If the requested size is less than batch size, set the batch size as requested size
+        Integer requestedSize = request.getSize();
+        if (isSizeLessOrEqualToSolrBatchSize(requestedSize)) {
+            builder.rows(requestedSize); // add the batch size for the solr query
+        } else { // Else set the solr batch size if passed else use DEFAULT_SOLR_BATCH_SIZE(25)
+            builder.rows(getDefaultBatchSize());
+        }
+
+        if (requestedSize.equals(
+                NumberUtils.INTEGER_MINUS_ONE)) { // special case for download, -1 to get everything
+            builder.totalRows(Integer.MAX_VALUE);
+        } else { // total number of rows requested by the client
+            builder.totalRows(requestedSize);
+        }
 
         return builder.build();
     }
 
-    private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            SearchRequest request,
-            FacetConfig facetConfig,
-            AbstractSolrSortClause solrSortClause,
-            boolean includeFacets,
-            QueryBoosts queryBoosts) {
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request, AbstractSolrSortClause solrSortClause, QueryBoosts queryBoosts) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
 
@@ -170,27 +181,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         requestBuilder.query(requestedQuery);
 
         if (solrSortClause != null) {
-            requestBuilder.addSort(solrSortClause.getSort(request.getSort()));
-        }
-
-        if (includeFacets && request.hasFacets()) {
-            requestBuilder.facets(request.getFacetList());
-            requestBuilder.facetConfig(facetConfig);
-        }
-
-        // If the requested size is less than batch size, set the batch size as requested size
-        Integer requestedSize = request.getSize();
-        if (isSizeLessOrEqualToSolrBatchSize(requestedSize)) {
-            requestBuilder.rows(requestedSize); // add the batch size for the solr query
-        } else { // Else set the solr batch size if passed else use DEFAULT_SOLR_BATCH_SIZE(25)
-            requestBuilder.rows(getDefaultBatchSize());
-        }
-
-        if (requestedSize.equals(
-                NumberUtils.INTEGER_MINUS_ONE)) { // special case for download, -1 to get everything
-            requestBuilder.totalRows(Integer.MAX_VALUE);
-        } else { // total number of rows requested by the client
-            requestBuilder.totalRows(requestedSize);
+            requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
         requestBuilder.queryBoosts(queryBoosts);

@@ -13,7 +13,6 @@ import org.uniprot.core.xml.uniref.UniRefEntryConverter;
  */
 public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRefEntry, Entry> {
     private final UniRefEntryConverter converter;
-    private final Marshaller marshaller;
     private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniref";
     private static final String HEADER_PREFIX =
             "<UniRef xmlns=\"http://uniprot.org/uniref\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniref http://www.uniprot.org/docs/uniref.xsd\"";
@@ -23,9 +22,8 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
     private String header;
 
     public UniRefXmlMessageConverter(String version, String releaseDate) {
-        super(UniRefEntry.class);
+        super(UniRefEntry.class, XML_CONTEXT);
         converter = new UniRefEntryConverter();
-        marshaller = createMarshaller(XML_CONTEXT);
         header = HEADER_PREFIX;
         if ((version != null) && (!version.isEmpty())) {
             header += " version=\"" + version + "\"";
@@ -50,7 +48,7 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
 
     @Override
     protected Marshaller getMarshaller() {
-        return marshaller;
+        return createMarshaller();
     }
 
     @Override

@@ -30,7 +30,7 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
             UniRefFacetConfig facetConfig,
             UniRefSortClause uniRefSortClause,
             UniRefQueryResultConverter uniRefQueryResultConverter,
-            StoreStreamer<UniRefDocument, UniRefEntry> storeStreamer,
+            StoreStreamer<UniRefEntry> storeStreamer,
             QueryBoosts uniRefQueryBoosts) {
         super(
                 repository,

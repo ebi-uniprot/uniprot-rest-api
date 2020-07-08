@@ -26,9 +26,11 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBRequest;
+import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -76,9 +78,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             name = "uniprotkb",
             description =
                     "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.")
-    @RequestMapping(
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,
@@ -119,7 +120,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> searchCursor(
-            @Valid @ModelAttribute UniProtKBRequest searchRequest,
+            @Valid @ModelAttribute UniProtKBSearchRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
@@ -131,9 +132,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     }
 
     @Tag(name = "uniprotkb")
-    @RequestMapping(
+    @GetMapping(
             value = "/accession/{accession}",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,
@@ -145,7 +145,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniProtKB protein entry by accession.",
+            summary = "Get UniProtKB entry by an accession.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -192,9 +192,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
      *   - omit '-OJ' option to curl, to just see it print to standard output
      */
     @Tag(name = "uniprotkb")
-    @RequestMapping(
-            value = "/download",
-            method = RequestMethod.GET,
+    @GetMapping(
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,
@@ -235,8 +234,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> download(
-            @Valid @ModelAttribute UniProtKBRequest searchRequest,
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
+            @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
@@ -244,16 +243,73 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         MessageConverterContext<UniProtKBEntry> context =
                 converterContextFactory.get(UNIPROTKB, contentType);
         context.setFileType(FileType.bestFileTypeMatch(encoding));
-        context.setFields(searchRequest.getFields());
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(entryService.streamIds(searchRequest));
+            context.setEntityIds(entryService.streamIds(streamRequest));
         } else if (contentType.equals(RDF_MEDIA_TYPE)) {
-            context.setEntityIds(entryService.streamRDF(searchRequest));
+            context.setEntityIds(entryService.streamRDF(streamRequest));
         } else {
-            context.setEntities(entryService.stream(searchRequest));
+            context.setEntities(entryService.stream(streamRequest));
         }
 
         return super.getDeferredResultResponseEntity(request, context);
+    }
+
+    @Tag(name = "uniprotkb")
+    @RequestMapping(
+            value = "/accessions",
+            method = {RequestMethod.GET, RequestMethod.POST},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniProtKB entries by a list of accessions.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniProtKBEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessions(
+            @Valid @ModelAttribute GetByAccessionsRequest accessionsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
+        return super.getSearchResponse(
+                result,
+                accessionsRequest.getFields(),
+                accessionsRequest.isDownload(),
+                request,
+                response);
     }
 
     @Override
@@ -281,7 +337,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 && Utils.notNullNotEmpty(uniProtkbEntry.getInactiveReason().getMergeDemergeTos());
     }
 
-    private void setPreviewInfo(UniProtKBRequest searchRequest, boolean preview) {
+    private void setPreviewInfo(UniProtKBSearchRequest searchRequest, boolean preview) {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }

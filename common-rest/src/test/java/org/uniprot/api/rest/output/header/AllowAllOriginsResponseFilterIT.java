@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.rest.app.FakeController.FAKE_RESOURCE_1_URL;
 import static org.uniprot.api.rest.app.FakeController.FAKE_RESOURCE_BASE;
@@ -59,7 +59,7 @@ class AllowAllOriginsResponseFilterIT {
     void requestWithoutAnOriginHasResponseWithAllOriginsHeader() throws Exception {
         MvcResult result =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL))
-                        .andDo(print())
+                        .andDo(log())
                         .andExpect(status().isOk())
                         .andReturn();
 
@@ -75,7 +75,7 @@ class AllowAllOriginsResponseFilterIT {
                 mockMvc.perform(
                                 get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL)
                                         .headers(originHeader(origin)))
-                        .andDo(print())
+                        .andDo(log())
                         .andExpect(status().isOk())
                         .andReturn();
 
@@ -87,7 +87,7 @@ class AllowAllOriginsResponseFilterIT {
     void requestHasXReleaseHeader() throws Exception {
         MvcResult result =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL))
-                        .andDo(print())
+                        .andDo(log())
                         .andExpect(status().isOk())
                         .andReturn();
 

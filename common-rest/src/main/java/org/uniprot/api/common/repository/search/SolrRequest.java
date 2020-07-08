@@ -7,8 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
-import org.springframework.data.domain.Sort;
-import org.springframework.data.solr.core.query.Query;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 
 /**
@@ -19,10 +18,9 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 @Data
 @Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
 public class SolrRequest {
-    private static final Query.Operator DEFAULT_OPERATOR = Query.Operator.AND;
+    private static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
     private String query;
-    private Query.Operator defaultQueryOperator;
-    private Sort sort;
+    private QueryOperator defaultQueryOperator;
     private FacetConfig facetConfig;
     private String termQuery;
     private QueryBoosts queryBoosts;
@@ -36,20 +34,11 @@ public class SolrRequest {
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();
     @Singular private List<String> facets = new ArrayList<>();
+    @Singular private List<SolrQuery.SortClause> sorts = new ArrayList<>();
 
     // setting default field values in a builder following instructions here:
     // https://www.baeldung.com/lombok-builder-default-value
     public static class SolrRequestBuilder {
-        private Query.Operator defaultQueryOperator = DEFAULT_OPERATOR;
-        private Sort sort;
-
-        public SolrRequestBuilder addSort(Sort sort) {
-            if (this.sort == null) {
-                this.sort = sort;
-            } else {
-                this.sort.and(sort);
-            }
-            return this;
-        }
+        private QueryOperator defaultQueryOperator = DEFAULT_OPERATOR;
     }
 }

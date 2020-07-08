@@ -15,11 +15,20 @@
 	<description>UniRef Rest API</description>
 
 	<properties>
-		<dropwizard.metrics.version>3.2.6</dropwizard.metrics.version>
+
 	</properties>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>uk.ac.ebi.uniprot</groupId>
+			<artifactId>openapi-maven-plugin</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -27,7 +36,6 @@
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
-			<version>${dropwizard.metrics.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -120,4 +128,47 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>openapi</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>uk.ac.ebi.uniprot</groupId>
+						<artifactId>openapi-maven-plugin</artifactId>
+						<version>${openapi-maven-plugin.version}</version>
+						<configuration>
+							<packageLocations>
+								<packageLocation>org.uniprot.api.uniref.controller</packageLocation>
+							</packageLocations>
+							<openApiDirectory>target/generatedsources/swagger/</openApiDirectory>
+							<openApiFileName>uniref-openapi3.yaml</openApiFileName>
+							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.uniprot</groupId>
+								<artifactId>uniprot-config</artifactId>
+								<version>${uniprot-store.version}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>*</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<goals>
+									<goal>oas-generate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

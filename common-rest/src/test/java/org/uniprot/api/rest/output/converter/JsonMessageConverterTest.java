@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -33,6 +35,7 @@ import com.jayway.jsonpath.PathNotFoundException;
  * @author lgonzales
  * @since 2020-04-02
  */
+@Slf4j
 class JsonMessageConverterTest {
 
     private static JsonMessageConverter<UniProtKBEntry> jsonMessageConverter;
@@ -50,7 +53,7 @@ class JsonMessageConverterTest {
     void beforeEntityOnlyReturnEmptyOutput() throws IOException {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder().entityOnly(true).build();
-        System.out.println("------- BEGIN: beforeEntityOnlyReturnEmptyOutput");
+        log.debug("------- BEGIN: beforeEntityOnlyReturnEmptyOutput");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeAfter(messageContext, outputStream);
@@ -66,7 +69,7 @@ class JsonMessageConverterTest {
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .facets(Collections.singleton(getFacet()))
                         .build();
-        System.out.println("------- BEGIN: beforeCanPrintFacet");
+        log.debug("------- BEGIN: beforeCanPrintFacet");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeAfter(messageContext, outputStream);
@@ -78,7 +81,7 @@ class JsonMessageConverterTest {
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.facets")));
         assertEquals(resultJson.read(JsonPath.compile("$.facets.size()")), new Integer(1));
-        assertEquals(resultJson.read(JsonPath.compile("$.facets[0].label")), "My Facet");
+        assertEquals("My Facet", resultJson.read(JsonPath.compile("$.facets[0].label")));
 
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
         assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(0));
@@ -94,7 +97,7 @@ class JsonMessageConverterTest {
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .matchedFields(Collections.singleton(getMatchedField()))
                         .build();
-        System.out.println("------- BEGIN: beforeCanPrintMatchedFields");
+        log.debug("------- BEGIN: beforeCanPrintMatchedFields");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeAfter(messageContext, outputStream);
@@ -106,7 +109,7 @@ class JsonMessageConverterTest {
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.matchedFields")));
         assertEquals(resultJson.read(JsonPath.compile("$.matchedFields.size()")), new Integer(1));
-        assertEquals(resultJson.read(JsonPath.compile("$.matchedFields[0].name")), "fieldName");
+        assertEquals("fieldName", resultJson.read(JsonPath.compile("$.matchedFields[0].name")));
 
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
         assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(0));
@@ -119,27 +122,27 @@ class JsonMessageConverterTest {
     void writeCanWriteEntity() throws IOException {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder().entityOnly(true).build();
-        System.out.println("------- BEGIN: writeCanWriteEntity");
+        log.debug("------- BEGIN: writeCanWriteEntity");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
-        assertEquals(resultJson.read(JsonPath.compile("$.primaryAccession")), "P00001");
+        assertEquals("P00001", resultJson.read(JsonPath.compile("$.primaryAccession")));
     }
 
     @Test
     void writeCanWriteTenEntity() throws IOException {
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder().build();
-        System.out.println("------- BEGIN: 10 writeCanTenWriteEntity");
+        log.debug("------- BEGIN: 10 writeCanTenWriteEntity");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeEntity(outputStream);
@@ -155,7 +158,7 @@ class JsonMessageConverterTest {
         writeAfter(messageContext, outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
@@ -171,25 +174,25 @@ class JsonMessageConverterTest {
                         .entityOnly(true)
                         .fields("accession,organism_name,gene_primary,gene_synonym")
                         .build();
-        System.out.println("------- BEGIN: writeCanWriteEntityWithPathOnlyReturnField");
+        log.debug("------- BEGIN: writeCanWriteEntityWithPathOnlyReturnField");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
 
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
-        assertEquals(resultJson.read(JsonPath.compile("$.primaryAccession")), "P00001");
+        assertEquals("P00001", resultJson.read(JsonPath.compile("$.primaryAccession")));
         assertEquals(
-                resultJson.read(JsonPath.compile("$.organism.scientificName")), "scientific name");
-        assertEquals(resultJson.read(JsonPath.compile("$.genes[0].geneName.value")), "some Gene");
-        assertEquals(resultJson.read(JsonPath.compile("$.genes[0].synonyms[0].value")), "some Syn");
+                "scientific name", resultJson.read(JsonPath.compile("$.organism.scientificName")));
+        assertEquals("some Gene", resultJson.read(JsonPath.compile("$.genes[0].geneName.value")));
+        assertEquals("some Syn", resultJson.read(JsonPath.compile("$.genes[0].synonyms[0].value")));
 
         assertThrows(
                 PathNotFoundException.class,
@@ -203,21 +206,21 @@ class JsonMessageConverterTest {
                         .entityOnly(true)
                         .fields("accession,cc_function")
                         .build();
-        System.out.println("------- BEGIN: writeCanWriteEntityWithFilteredPathReturnField");
+        log.debug("------- BEGIN: writeCanWriteEntityWithFilteredPathReturnField");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
-        assertEquals(resultJson.read(JsonPath.compile("$.primaryAccession")), "P00001");
-        assertEquals(resultJson.read(JsonPath.compile("$.comments[0].commentType")), "FUNCTION");
+        assertEquals("P00001", resultJson.read(JsonPath.compile("$.primaryAccession")));
+        assertEquals("FUNCTION", resultJson.read(JsonPath.compile("$.comments[0].commentType")));
 
         assertThrows(
                 PathNotFoundException.class,
@@ -231,8 +234,7 @@ class JsonMessageConverterTest {
                         .entityOnly(true)
                         .fields("organism_name,cc_rna_editing,cc_polymorphism")
                         .build();
-        System.out.println(
-                "------- BEGIN: writeCanWriteEntityWithFilteredPathWithOrLogicReturnField");
+        log.debug("------- BEGIN: writeCanWriteEntityWithFilteredPathWithOrLogicReturnField");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         writeBefore(messageContext, outputStream);
@@ -240,20 +242,20 @@ class JsonMessageConverterTest {
         writeAfter(messageContext, outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
         assertEquals(
-                resultJson.read(JsonPath.compile("$.primaryAccession")),
-                "P00001"); // required field
+                "P00001",
+                resultJson.read(JsonPath.compile("$.primaryAccession"))); // required field
         assertEquals(
-                resultJson.read(JsonPath.compile("$.organism.scientificName")), "scientific name");
-        assertEquals(resultJson.read(JsonPath.compile("$.comments[0].commentType")), "RNA EDITING");
+                "scientific name", resultJson.read(JsonPath.compile("$.organism.scientificName")));
+        assertEquals("RNA EDITING", resultJson.read(JsonPath.compile("$.comments[0].commentType")));
         assertEquals(
-                resultJson.read(JsonPath.compile("$.comments[1].commentType")), "POLYMORPHISM");
+                "POLYMORPHISM", resultJson.read(JsonPath.compile("$.comments[1].commentType")));
 
         assertThrows(
                 PathNotFoundException.class,
@@ -267,15 +269,14 @@ class JsonMessageConverterTest {
         entities.add(getEntity());
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder().fields("accession").build();
-        System.out.println(
-                "------- BEGIN: writeCanWriteEntitiesWithFilteredPathAndCanPrintEntitySeparator");
+        log.debug("------- BEGIN: writeCanWriteEntitiesWithFilteredPathAndCanPrintEntitySeparator");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
         jsonMessageConverter.writeEntities(
                 entities.stream(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertEquals(
                 "{\"results\":[{\"primaryAccession\":\"P00001\"},{\"primaryAccession\":\"P00001\"}]}",
                 result);
@@ -287,7 +288,7 @@ class JsonMessageConverterTest {
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .fields("organism_name,cc_rna_editing,cc_polymorphism")
                         .build();
-        System.out.println(
+        log.debug(
                 "------- BEGIN: 10 writeCanWriteTenEntitiesWithFilteredPathWithOrLogicReturnField");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -305,7 +306,7 @@ class JsonMessageConverterTest {
         writeAfter(messageContext, outputStream);
 
         String result = outputStream.toString("UTF-8");
-        System.out.println(result);
+        log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
@@ -321,14 +322,14 @@ class JsonMessageConverterTest {
         long start = System.currentTimeMillis();
         jsonMessageConverter.before(messageContext, outputStream);
         long end = System.currentTimeMillis();
-        System.out.println("DEBUG: Before " + (end - start) + " MilliSeconds");
+        log.debug("DEBUG: Before " + (end - start) + " MilliSeconds");
     }
 
     private void writeEntity(OutputStream outputStream) throws IOException {
         long start = System.currentTimeMillis();
         jsonMessageConverter.writeEntity(getEntity(), outputStream);
         long end = System.currentTimeMillis();
-        System.out.println("DEBUG: Write " + (end - start) + " MilliSeconds");
+        log.debug("DEBUG: Write " + (end - start) + " MilliSeconds");
     }
 
     private void writeAfter(
@@ -337,8 +338,9 @@ class JsonMessageConverterTest {
             throws IOException {
         long start = System.currentTimeMillis();
         jsonMessageConverter.after(messageContext, outputStream);
+        jsonMessageConverter.cleanUp();
         long end = System.currentTimeMillis();
-        System.out.println("DEBUG: After " + (end - start) + " MilliSeconds");
+        log.debug("DEBUG: After " + (end - start) + " MilliSeconds");
     }
 
     private UniProtKBEntry getEntity() {
