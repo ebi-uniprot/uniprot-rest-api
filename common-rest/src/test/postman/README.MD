@@ -1,6 +1,11 @@
 
 To run a Postman test
-1. export request_type=\<type\>
+1. export run_environment=\<environment\>
+    - Supported environments:
+        - integration
+        - production
+        - local 
+2. export request_type=\<type\>
    - Supported request types:
      - uniprotkb 
      - proteome
@@ -14,8 +19,8 @@ To run a Postman test
      - taxonomy
      - uniparc
      - uniref
-     - unisave
-         
+     - unisave        
+
 2. ./run_postman_test.sh
 
  
