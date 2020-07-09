@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "afab49ca-fbd2-4506-afbd-12f6a973d37e",
+		"name": "unisave",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "accession",
+			"item": [
+				{
+					"name": "Get by accession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fb4b98e3-595f-49a6-9c30-75433191c96b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/unisave/{{accession}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"unisave",
+								"{{accession}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "diff",
+			"item": [
+				{
+					"name": "Get diff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fdc4128d-b17a-46b4-beec-7822861566c3",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/unisave/{{accession}}/diff",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"unisave",
+								"{{accession}}",
+								"diff"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "status",
+			"item": [
+				{
+					"name": "Get status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "32e1d84e-4e9d-4dd9-ac63-e83b0023746b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/unisave/{{accession}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"unisave",
+								"{{accession}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

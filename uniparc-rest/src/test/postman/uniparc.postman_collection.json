@@ -1,0 +1,195 @@
+{
+	"info": {
+		"_postman_id": "dd9756bf-6f1a-4e0a-9b37-026215938d6a",
+		"name": "uniparc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "upi",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "75b11071-a49d-4af5-b1e5-1aa7329a01e9",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniparc/{{upi}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniparc",
+								"{{upi}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d6863ea8-883b-4398-bb56-7e567db36fa0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b73d0033-299c-4b19-a2d3-dbf066922473",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "20a771dd-2cde-4eab-81fd-8dc71c56ba44",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniparc/search?query?{{uniparc_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniparc",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query?{{uniparc_search_string}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "download",
+			"item": [
+				{
+					"name": "Download",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3b8ae597-a9e5-48aa-8acb-8e3e5e5a44a8",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniparc/download?query?{{uniparc_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniparc",
+								"download"
+							],
+							"query": [
+								{
+									"key": "query?{{uniparc_search_string}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "812e56e7-272c-4165-87d8-4c963c5b9522",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1ae1174f-d853-46e7-8b9f-c8f636cc665c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "179ec26b-f86a-480d-bd07-6672d2d84939",
+			"key": "upi",
+			"value": "UPI0000000001"
+		},
+		{
+			"id": "99dd462b-6309-4b2a-a20c-ae22dcf468e8",
+			"key": "uniparc_search_string",
+			"value": "upi:UPI0000000001"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
