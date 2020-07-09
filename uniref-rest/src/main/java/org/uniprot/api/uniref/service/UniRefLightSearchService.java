@@ -8,7 +8,7 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
-import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -20,17 +20,18 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  */
 @Service
 @Import(UniRefQueryBoostsConfig.class)
-public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocument, UniRefEntry> {
+public class UniRefLightSearchService
+        extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
 
-    private SearchFieldConfig searchFieldConfig;
+    private final SearchFieldConfig searchFieldConfig;
 
     @Autowired
-    public UniRefQueryService(
+    public UniRefLightSearchService(
             UniRefQueryRepository repository,
             UniRefFacetConfig facetConfig,
             UniRefSortClause uniRefSortClause,
             UniRefQueryResultConverter uniRefQueryResultConverter,
-            StoreStreamer<UniRefEntry> storeStreamer,
+            StoreStreamer<UniRefEntryLight> storeStreamer,
             QueryBoosts uniRefQueryBoosts) {
         super(
                 repository,
@@ -44,12 +45,24 @@ public class UniRefQueryService extends StoreStreamerSearchService<UniRefDocumen
     }
 
     @Override
-    public UniRefEntry findByUniqueId(String uniqueId, String fields) {
+    public UniRefEntryLight findByUniqueId(String uniqueId, String fields) {
         return findByUniqueId(uniqueId);
     }
 
     @Override
     protected String getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
+    }
+
+    @Override
+    public UniRefEntryLight findByUniqueId(String uniqueId) {
+        throw new UnsupportedOperationException(
+                "UniRefLightSearchService does not support findByUniqueId, try to use UniRefEntryService");
+    }
+
+    @Override
+    public UniRefEntryLight getEntity(String idField, String value) {
+        throw new UnsupportedOperationException(
+                "UniRefLightSearchService does not support getEntity, try to use UniRefEntryService");
     }
 }

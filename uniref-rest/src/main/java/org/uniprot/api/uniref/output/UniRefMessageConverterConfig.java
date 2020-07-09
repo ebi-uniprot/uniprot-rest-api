@@ -25,6 +25,7 @@ import org.uniprot.api.uniref.output.converter.*;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryValueMapper;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -89,24 +90,49 @@ public class UniRefMessageConverterConfig {
     }
 
     @Bean
-    public MessageConverterContextFactory<UniRefEntry> uniparcMessageConverterContextFactory() {
-        MessageConverterContextFactory<UniRefEntry> contextFactory =
+    public MessageConverterContextFactory<UniRefEntryLight>
+            uniRefLightMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniRefEntryLight> contextFactory =
                 new MessageConverterContextFactory<>();
 
         asList(
-                        uniparcContext(LIST_MEDIA_TYPE),
-                        uniparcContext(APPLICATION_XML),
-                        uniparcContext(APPLICATION_JSON),
-                        uniparcContext(FASTA_MEDIA_TYPE),
-                        uniparcContext(TSV_MEDIA_TYPE),
-                        uniparcContext(XLS_MEDIA_TYPE))
+                        uniRefLightContext(LIST_MEDIA_TYPE),
+                        uniRefLightContext(APPLICATION_XML),
+                        uniRefLightContext(APPLICATION_JSON),
+                        uniRefLightContext(FASTA_MEDIA_TYPE),
+                        uniRefLightContext(TSV_MEDIA_TYPE),
+                        uniRefLightContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
-    private MessageConverterContext<UniRefEntry> uniparcContext(MediaType contentType) {
+    @Bean
+    public MessageConverterContextFactory<UniRefEntry> uniRefMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniRefEntry> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(
+                        uniRefContext(LIST_MEDIA_TYPE),
+                        uniRefContext(APPLICATION_XML),
+                        uniRefContext(APPLICATION_JSON),
+                        uniRefContext(FASTA_MEDIA_TYPE),
+                        uniRefContext(TSV_MEDIA_TYPE),
+                        uniRefContext(XLS_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    private MessageConverterContext<UniRefEntry> uniRefContext(MediaType contentType) {
         return MessageConverterContext.<UniRefEntry>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIREF)
+                .contentType(contentType)
+                .build();
+    }
+
+    private MessageConverterContext<UniRefEntryLight> uniRefLightContext(MediaType contentType) {
+        return MessageConverterContext.<UniRefEntryLight>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIREF)
                 .contentType(contentType)
                 .build();

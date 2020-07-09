@@ -18,7 +18,7 @@ import org.uniprot.api.common.repository.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
-import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
 
 /** @author jluo date: 21 Aug 2019 */
@@ -41,8 +41,8 @@ public class UniRefStreamConfig {
     }
 
     @Bean
-    public StoreStreamer<UniRefEntry> unirefEntryStoreStreamer(
-            UniRefStoreClient unirefClient,
+    public StoreStreamer<UniRefEntryLight> unirefEntryStoreStreamer(
+            UniRefLightStoreClient uniRefLightStoreClient,
             TupleStreamTemplate tupleStreamTemplate,
             StreamerConfigProperties streamConfig) {
 
@@ -52,9 +52,9 @@ public class UniRefStreamConfig {
                         .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        return StoreStreamer.<UniRefEntry>builder()
+        return StoreStreamer.<UniRefEntryLight>builder()
                 .streamConfig(streamConfig)
-                .storeClient(unirefClient)
+                .storeClient(uniRefLightStoreClient)
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
                 .build();

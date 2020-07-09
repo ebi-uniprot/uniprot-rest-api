@@ -55,7 +55,7 @@ import org.uniprot.store.search.SolrCollection;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefController.class)
+@WebMvcTest(UniRefEntryController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,

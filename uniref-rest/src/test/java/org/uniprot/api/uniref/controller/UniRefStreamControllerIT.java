@@ -60,7 +60,7 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  */
 @Slf4j
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefController.class)
+@WebMvcTest(UniRefEntryController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
