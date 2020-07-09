@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "27aeddeb-033c-452d-8058-b7864a329a21",
+		"name": "uniref",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "id",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c73a482a-89b3-4e60-ba95-af00ce5c3ee0",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniref/{{cluster_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniref",
+								"{{cluster_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search cluster",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fe3df2f2-93b9-424a-bfe3-e46c954efc42",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniref/search?query?{{uniref_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniref",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query?{{uniref_search_string}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "stream",
+			"item": [
+				{
+					"name": "Stream cluster",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b1e83469-2beb-43c5-b30c-aeff53f04285",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniref/stream?query?{{uniref_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniref",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "query?{{uniref_search_string}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "19505b90-0a1b-4ec2-9299-71702f130bc0",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "6dd69fc1-901e-4577-81b0-8cef57030e75",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "cca8275c-64b6-4a54-b132-634f05af5721",
+			"key": "cluster_id",
+			"value": "UniRef100_A0A001"
+		},
+		{
+			"id": "7ee4bd0f-1781-45fb-9c7d-bbb48cbf5ded",
+			"key": "uniref_search_string",
+			"value": "id:UniRef100_A0A001"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

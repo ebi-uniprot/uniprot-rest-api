@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "e67e6620-10e9-45b3-9edb-65c5e2f7b6c6",
+		"name": "literature",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "pubmedid",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2b9ed9e-4241-4498-9f8d-0108eddf2156",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/literature/{{literature_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"literature",
+								"{{literature_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b98cbe02-a9c4-466b-87d3-70e9aec2e7c3",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/literature/search?query={{literature_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"literature",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{literature_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "download",
+			"item": [
+				{
+					"name": "Download",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "96877578-ea1d-4d40-8241-c1ccda87a354",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/literature/download?query={{literature_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"literature",
+								"download"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{literature_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "56f023a1-8691-48c0-b28a-1837f83a4318",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "418bacae-f80b-4483-85fa-fb024c81fc01",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "d3f71647-e81e-4bcb-b4df-add3ae8efa4a",
+			"key": "literature_id",
+			"value": "10191091"
+		},
+		{
+			"id": "5ddfa9f2-156c-4a69-b46d-e08f82869954",
+			"key": "literature_search_string",
+			"value": "baggiolini"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
