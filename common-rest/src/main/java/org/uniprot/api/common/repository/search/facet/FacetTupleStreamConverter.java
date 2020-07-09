@@ -119,7 +119,7 @@ public class FacetTupleStreamConverter
     private FacetItem createFacetItem(Pair<String, Long> pair, String facetName) {
         return FacetItem.builder()
                 .value(pair.getLeft())
-                .label(getFacetItemLabel(facetName, pair.getLeft()))
+                .label(getFacetItemLabel(facetName, pair.getLeft().toLowerCase()))
                 .count(pair.getRight())
                 .build();
     }

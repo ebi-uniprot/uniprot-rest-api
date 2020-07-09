@@ -41,8 +41,8 @@ public class MessageConverterContextFactory<T> {
     }
 
     public enum Resource {
-        UNIPROT,
-        UNIPROT_PUBLICATION,
+        UNIPROTKB,
+        UNIPROTKB_PUBLICATION,
         UNIREF,
         UNISAVE,
         UNIPARC,
@@ -53,6 +53,7 @@ public class MessageConverterContextFactory<T> {
         LITERATURE,
         DISEASE,
         CROSSREF,
-        SUBCELLULAR_LOCATION
+        SUBCELLULAR_LOCATION,
+        UNIPROTKB_INTERACTION
     }
 }

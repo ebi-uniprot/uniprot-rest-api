@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.Nullable;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
 
 /** @author lgonzales */
@@ -24,6 +25,11 @@ public class ErrorMessageXMLConverter extends AbstractGenericHttpMessageConverte
     public ErrorMessageXMLConverter() {
         super(MediaType.APPLICATION_XML);
         marshaller = createMarshaller();
+    }
+
+    @Override
+    public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
+        return clazz == ErrorInfo.class && this.canWrite(mediaType);
     }
 
     @Override

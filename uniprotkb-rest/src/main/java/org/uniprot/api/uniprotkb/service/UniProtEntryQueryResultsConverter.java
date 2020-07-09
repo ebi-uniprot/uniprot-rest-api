@@ -2,7 +2,10 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.jodah.failsafe.Failsafe;
@@ -10,6 +13,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -34,6 +38,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  *
  * @author Edd
  */
+@Service
 class UniProtEntryQueryResultsConverter {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(UniProtEntryQueryResultsConverter.class);

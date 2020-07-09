@@ -1,9 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROT_PUBLICATION;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION;
 
 import java.util.Optional;
 
@@ -12,12 +10,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -35,15 +36,15 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
 @RestController
 @RequestMapping(value = "/uniprotkb/accession")
 public class UniProtKBEntryController extends BasicSearchController<PublicationEntry> {
-
     private final PublicationService publicationService;
 
+    @Autowired
     protected UniProtKBEntryController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<PublicationEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             PublicationService publicationService) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROT_PUBLICATION);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB_PUBLICATION);
         this.publicationService = publicationService;
     }
 
@@ -59,7 +60,7 @@ public class UniProtKBEntryController extends BasicSearchController<PublicationE
 
     @GetMapping(
             value = "/{accession}/publications",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedLiteratureByUniprotAccession(
                     @PathVariable("accession")
@@ -69,8 +70,6 @@ public class UniProtKBEntryController extends BasicSearchController<PublicationE
                                     message = "{search.invalid.accession.value}")
                             String accession,
                     @Valid PublicationRequest publicationRequest,
-                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                            MediaType contentType,
                     HttpServletRequest request,
                     HttpServletResponse response) {
         QueryResult<PublicationEntry> literatureEntry =
