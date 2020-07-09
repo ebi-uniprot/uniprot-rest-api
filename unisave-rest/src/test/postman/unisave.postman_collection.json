@@ -125,5 +125,34 @@
 			"protocolProfileBehavior": {}
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "497c9722-820b-4e54-97c3-4d5f0f0c8464",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "abf8da53-1925-434c-b991-371735143d2a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "b988485c-a8a4-44f9-b65d-cdc64e5bd503",
+			"key": "accession",
+			"value": "P12345"
+		}
+	],
 	"protocolProfileBehavior": {}
 }
