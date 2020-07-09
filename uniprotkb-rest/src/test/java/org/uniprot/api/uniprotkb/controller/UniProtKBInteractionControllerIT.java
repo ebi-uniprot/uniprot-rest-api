@@ -105,6 +105,8 @@ class UniProtKBInteractionControllerIT {
                 "solrClient",
                 STORE_MANAGER.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
+        STORE_MANAGER.cleanSolr(DataStoreManager.StoreType.UNIPROT);
+        STORE_MANAGER.cleanStore(DataStoreManager.StoreType.UNIPROT);
         saveScenarios();
     }
 

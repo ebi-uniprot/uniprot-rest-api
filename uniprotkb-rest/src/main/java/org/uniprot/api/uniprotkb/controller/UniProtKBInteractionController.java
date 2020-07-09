@@ -51,7 +51,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
 
     @Override
     protected String getEntityId(InteractionEntry entity) {
-        return null;
+        throw new UnsupportedOperationException("Get by entity ID is not supported");
     }
 
     @Override

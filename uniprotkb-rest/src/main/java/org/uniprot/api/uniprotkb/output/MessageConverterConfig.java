@@ -84,6 +84,9 @@ public class MessageConverterConfig {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 int index = 0;
+                converters.add(index++, uniProtKBJsonMessageConverter);
+                converters.add(index++, new PublicationJsonMessageConverter());
+                converters.add(index++, interactionJsonMessageConverter);
                 converters.add(index++, new UniProtKBFlatFileMessageConverter());
                 converters.add(index++, new UniProtKBFastaMessageConverter());
                 converters.add(index++, new ListMessageConverter());
@@ -105,9 +108,7 @@ public class MessageConverterConfig {
                 converters.add(index++, new UniProtKBXmlMessageConverter());
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
-                converters.add(index++, uniProtKBJsonMessageConverter);
-                converters.add(index++, new PublicationJsonMessageConverter());
-                converters.add(index++, interactionJsonMessageConverter);
+
                 converters.add(index, new InteractionXmlMessageConverter());
             }
         };
