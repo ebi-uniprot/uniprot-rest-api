@@ -66,10 +66,10 @@ import org.uniprot.store.search.SolrCollection;
 class UniProtKBInteractionControllerIT {
 
     private static final String UNIPROTKB_ACCESSION_PATH = "/uniprotkb/accession/";
-    private static final String ENTRY_WITH_INTERACTION_BUT_NO_ASSOCIATED_ENTRIES = "P00002";
-    private static final String ENTRY_WITH_INTERACTION = "P00000";
-    private static final String CROSS_REFERENCED_ASSOCIATION = "P00001";
-    private static final String NON_EXISTENT_ENTRY = "P99999";
+    private static final String ENTRY_WITH_INTERACTION_BUT_NO_ASSOCIATED_ENTRIES = "P99992";
+    private static final String ENTRY_WITH_INTERACTION = "P99990";
+    private static final String CROSS_REFERENCED_ASSOCIATION = "P99991";
+    private static final String NON_EXISTENT_ENTRY = "P99993";
     @RegisterExtension static final DataStoreManager STORE_MANAGER = new DataStoreManager();
     private final UniProtKBEntry entryWithNoInteractions =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);;
@@ -263,12 +263,13 @@ class UniProtKBInteractionControllerIT {
                                 new InteractionBuilder()
                                         .interactantOne(
                                                 new InteractantBuilder()
-                                                        .uniProtKBAccession("P00000")
+                                                        .uniProtKBAccession(ENTRY_WITH_INTERACTION)
                                                         .intActId("EBI-00001")
                                                         .build())
                                         .interactantTwo(
                                                 new InteractantBuilder()
-                                                        .uniProtKBAccession("P00001")
+                                                        .uniProtKBAccession(
+                                                                CROSS_REFERENCED_ASSOCIATION)
                                                         .intActId("EBI-00001")
                                                         .build())
                                         .numberOfExperiments(2)
@@ -301,7 +302,7 @@ class UniProtKBInteractionControllerIT {
                                 new InteractionBuilder()
                                         .interactantOne(
                                                 new InteractantBuilder()
-                                                        .uniProtKBAccession("P00000")
+                                                        .uniProtKBAccession(ENTRY_WITH_INTERACTION)
                                                         .intActId("EBI-00001")
                                                         .build())
                                         .interactantTwo(
