@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.controller;
 
+import java.time.LocalDate;
+
 import org.uniprot.core.Sequence;
 import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
@@ -8,8 +10,6 @@ import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.impl.*;
-
-import java.time.LocalDate;
 
 /**
  * @author jluo
@@ -38,7 +38,8 @@ class UniRefControllerITUtils {
                         .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
                         .membersAdd(entry.getRepresentativeMember().getMemberId())
                         .organismsAdd(entry.getRepresentativeMember().getOrganismName())
-                        .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId());
+                        .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId())
+                        .sequence(entry.getRepresentativeMember().getSequence().getValue());
         entry.getMembers()
                 .forEach(
                         uniRefMember -> {

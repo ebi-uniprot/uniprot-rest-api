@@ -118,8 +118,11 @@ public class UniRefLightSearchController extends BasicSearchController<UniRefEnt
     @GetMapping(
             value = "/stream",
             produces = {
-                TSV_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, FASTA_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.",

@@ -10,7 +10,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Collections;
@@ -243,20 +242,11 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.id",
                                 containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.representativeMember.sequence.length",
-                                containsInAnyOrder(66, 66)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.representativeMember.organismTaxId",
-                                containsInAnyOrder(9606, 9606)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.members.*.organismTaxId",
-                                containsInAnyOrder(9606, 9606)))
-                .andExpect(jsonPath("$.results.*.representativeMember.organismName").doesNotExist())
-                .andExpect(jsonPath("$.results.*.members.*.organismName").doesNotExist());
+                .andExpect(jsonPath("$.results.*.sequenceLength", contains(66, 66)))
+                .andExpect(jsonPath("$.results.*.organismIds", hasItem(hasItem(9606))))
+                .andExpect(jsonPath("$.results.*.organisms").doesNotExist())
+                .andExpect(jsonPath("$.results.*.name").doesNotExist());
+        ;
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")

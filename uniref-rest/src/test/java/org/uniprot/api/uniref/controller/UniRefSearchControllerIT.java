@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -34,13 +36,12 @@ import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
-import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -75,7 +76,8 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
     @BeforeAll
     void initDataStore() {
         storeClient =
-                new UniRefLightStoreClient(VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref-light"));
+                new UniRefLightStoreClient(
+                        VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref-light"));
         getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
         getStoreManager()
                 .addDocConverter(
@@ -160,6 +162,19 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
     }
 
     @Override
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+                .stream()
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
+    }
+
+    @Override
     protected void saveEntries(int numberOfEntries) {
         IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
@@ -169,7 +184,10 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
 
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, createEntryLight(i, UniRefType.UniRef50));
+        getStoreManager()
+                .saveToStore(
+                        DataStoreManager.StoreType.UNIREF,
+                        createEntryLight(i, UniRefType.UniRef50));
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
     }
 
