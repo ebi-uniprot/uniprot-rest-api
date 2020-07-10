@@ -1,11 +1,10 @@
-package org.uniprot.api.uniprotkb.configuration;
+package org.uniprot.api.rest.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 /**
  * This class is responsible for adding descriptive service information to the Spring Actuator
@@ -18,17 +17,19 @@ import org.uniprot.api.rest.service.ServiceInfoConfig;
  */
 @Component
 @Import(ServiceInfoConfig.class)
-public class UniProtKBInfoContributor implements InfoContributor {
+public class UniProtInfoContributor implements InfoContributor {
     static final String SERVICE_INFO_KEY = "service-info";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
 
     @Autowired
-    public UniProtKBInfoContributor(ServiceInfoConfig.ServiceInfo serviceInfo) {
+    public UniProtInfoContributor(ServiceInfoConfig.ServiceInfo serviceInfo) {
         this.serviceInfo = serviceInfo;
     }
 
     @Override
     public void contribute(Info.Builder builder) {
-        builder.withDetail(SERVICE_INFO_KEY, serviceInfo.getMap());
+        if (!serviceInfo.getMap().isEmpty()) {
+            builder.withDetail(SERVICE_INFO_KEY, serviceInfo.getMap());
+        }
     }
 }
