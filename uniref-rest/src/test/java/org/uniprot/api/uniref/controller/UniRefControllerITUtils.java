@@ -1,7 +1,5 @@
 package org.uniprot.api.uniref.controller;
 
-import java.time.LocalDate;
-
 import org.uniprot.core.Sequence;
 import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
@@ -9,8 +7,9 @@ import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.uniref.impl.*;
+
+import java.time.LocalDate;
 
 /**
  * @author jluo
@@ -28,24 +27,27 @@ class UniRefControllerITUtils {
 
     static UniRefEntryLight createEntryLight(int i, UniRefType type) {
         UniRefEntry entry = createEntry(i, type);
-        UniRefEntryLightBuilder builer = new UniRefEntryLightBuilder()
-                .id(entry.getId())
-                .name(entry.getName())
-                .updated(entry.getUpdated())
-                .entryType(entry.getEntryType())
-                .commonTaxonId(entry.getCommonTaxonId())
-                .commonTaxon(entry.getCommonTaxon())
-                .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
-                .membersAdd(entry.getRepresentativeMember().getMemberId())
-                .organismsAdd(entry.getRepresentativeMember().getOrganismName())
-                .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId());
-        entry.getMembers().forEach(uniRefMember -> {
-            builer.memberIdTypesAdd(uniRefMember.getMemberIdType())
-                    .membersAdd(uniRefMember.getMemberId())
-                    .organismsAdd(uniRefMember.getOrganismName())
-                    .organismIdsAdd(uniRefMember.getOrganismTaxId());
-        });
-        return builer.build();
+        UniRefEntryLightBuilder builder =
+                new UniRefEntryLightBuilder()
+                        .id(entry.getId())
+                        .name(entry.getName())
+                        .updated(entry.getUpdated())
+                        .entryType(entry.getEntryType())
+                        .commonTaxonId(entry.getCommonTaxonId())
+                        .commonTaxon(entry.getCommonTaxon())
+                        .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
+                        .membersAdd(entry.getRepresentativeMember().getMemberId())
+                        .organismsAdd(entry.getRepresentativeMember().getOrganismName())
+                        .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId());
+        entry.getMembers()
+                .forEach(
+                        uniRefMember -> {
+                            builder.memberIdTypesAdd(uniRefMember.getMemberIdType())
+                                    .membersAdd(uniRefMember.getMemberId())
+                                    .organismsAdd(uniRefMember.getOrganismName())
+                                    .organismIdsAdd(uniRefMember.getOrganismTaxId());
+                        });
+        return builder.memberCount(entry.getMemberCount()).build();
     }
 
     static UniRefEntry createEntry(int i, UniRefType type) {

@@ -57,7 +57,7 @@ import org.uniprot.store.search.SolrCollection;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefEntryController.class)
+@WebMvcTest(UniRefLightSearchController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
@@ -293,14 +293,6 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content().string(containsString("UniRef50_P03911")))
-                                    .resultMatcher(
-                                            content().string(containsString("UniRef50_P03920")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().string(containsString("UniRef50_P03911")))
@@ -355,15 +347,6 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
                                                     "$.messages.*",
                                                     contains(
                                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

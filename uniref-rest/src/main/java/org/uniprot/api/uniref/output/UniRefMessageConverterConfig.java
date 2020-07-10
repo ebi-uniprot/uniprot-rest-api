@@ -1,15 +1,7 @@
 package org.uniprot.api.uniref.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +13,25 @@ import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
-import org.uniprot.api.uniref.output.converter.*;
+import org.uniprot.api.uniref.output.converter.UniRefFastaMessageConverter;
+import org.uniprot.api.uniref.output.converter.UniRefLightFastaMessageConverter;
+import org.uniprot.api.uniref.output.converter.UniRefXmlMessageConverter;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
+import org.uniprot.core.parser.tsv.uniref.UniRefEntryLightValueMapper;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryValueMapper;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 /**
  * @author jluo
@@ -71,10 +73,21 @@ public class UniRefMessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
+                converters.add(new UniRefLightFastaMessageConverter());
                 converters.add(new UniRefFastaMessageConverter());
                 converters.add(
                         new TsvMessageConverter<>(
+                                UniRefEntryLight.class,
+                                returnConfig,
+                                new UniRefEntryLightValueMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
                                 UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
+                converters.add(
+                        new XlsMessageConverter<>(
+                                UniRefEntryLight.class,
+                                returnConfig,
+                                new UniRefEntryLightValueMapper()));
                 converters.add(
                         new XlsMessageConverter<>(
                                 UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
