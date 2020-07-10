@@ -24,7 +24,11 @@ To run a Postman test
 2. ./run_postman_test.sh
 
  
-To edit a collection.json
-- Load the collection in Postman application
+To edit a collection.json in Postman
+- Load the collection in Postman application by clicking import button on top left
 - Edit accordingly
 - Export the collection and replace this collection at the appropriate place
+
+To import the environment.json in Postman
+- Click on top right cog-wheel icon to `Manage Environment`
+- import the required environment.json file
