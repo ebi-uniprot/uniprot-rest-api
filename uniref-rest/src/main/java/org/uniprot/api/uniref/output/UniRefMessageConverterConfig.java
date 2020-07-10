@@ -23,6 +23,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniref.output.converter.*;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
+import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryValueMapper;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
@@ -78,13 +79,20 @@ public class UniRefMessageConverterConfig {
                         new XlsMessageConverter<>(
                                 UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
 
+                JsonMessageConverter<UniRefEntryLight> unirefLightJsonMessageConverter =
+                        new JsonMessageConverter<>(
+                                UniRefEntryLightJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniRefEntryLight.class,
+                                returnConfig);
+                converters.add(0, unirefLightJsonMessageConverter);
+
                 JsonMessageConverter<UniRefEntry> unirefJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniRefEntryJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniRefEntry.class,
                                 returnConfig);
-                converters.add(0, unirefJsonMessageConverter);
-                converters.add(1, new UniRefXmlMessageConverter("", ""));
+                converters.add(1, unirefJsonMessageConverter);
+                converters.add(2, new UniRefXmlMessageConverter("", ""));
             }
         };
     }

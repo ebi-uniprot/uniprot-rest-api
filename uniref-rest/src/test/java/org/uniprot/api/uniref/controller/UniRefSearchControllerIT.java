@@ -33,11 +33,13 @@ import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
+import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
@@ -68,12 +70,12 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
 
     @Autowired private UniRefFacetConfig facetConfig;
 
-    private UniRefStoreClient storeClient;
+    private UniRefLightStoreClient storeClient;
 
     @BeforeAll
     void initDataStore() {
         storeClient =
-                new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
+                new UniRefLightStoreClient(VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref-light"));
         getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
         getStoreManager()
                 .addDocConverter(
@@ -167,7 +169,7 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
 
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, unirefEntry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, createEntryLight(i, UniRefType.UniRef50));
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
     }
 

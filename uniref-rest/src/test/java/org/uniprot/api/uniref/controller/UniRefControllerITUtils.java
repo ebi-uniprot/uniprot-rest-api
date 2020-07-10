@@ -10,10 +10,7 @@ import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.UniRefType;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
+import org.uniprot.core.uniref.impl.*;
 
 /**
  * @author jluo
@@ -28,6 +25,28 @@ class UniRefControllerITUtils {
     static final String ACC_PREF = "P123";
     static final String ACC_2_PREF = "P123";
     static final String UPI_PREF = "UPI0000083A";
+
+    static UniRefEntryLight createEntryLight(int i, UniRefType type) {
+        UniRefEntry entry = createEntry(i, type);
+        UniRefEntryLightBuilder builer = new UniRefEntryLightBuilder()
+                .id(entry.getId())
+                .name(entry.getName())
+                .updated(entry.getUpdated())
+                .entryType(entry.getEntryType())
+                .commonTaxonId(entry.getCommonTaxonId())
+                .commonTaxon(entry.getCommonTaxon())
+                .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
+                .membersAdd(entry.getRepresentativeMember().getMemberId())
+                .organismsAdd(entry.getRepresentativeMember().getOrganismName())
+                .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId());
+        entry.getMembers().forEach(uniRefMember -> {
+            builer.memberIdTypesAdd(uniRefMember.getMemberIdType())
+                    .membersAdd(uniRefMember.getMemberId())
+                    .organismsAdd(uniRefMember.getOrganismName())
+                    .organismIdsAdd(uniRefMember.getOrganismTaxId());
+        });
+        return builer.build();
+    }
 
     static UniRefEntry createEntry(int i, UniRefType type) {
         String idRef = getIdRef(type);

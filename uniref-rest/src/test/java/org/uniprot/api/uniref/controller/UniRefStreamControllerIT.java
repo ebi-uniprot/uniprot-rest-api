@@ -10,6 +10,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Collections;
@@ -41,6 +42,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
@@ -71,7 +73,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
     private static final String streamRequestPath = "/uniref/stream";
     private final UniRefDocumentConverter documentConverter =
             new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
-    @Autowired UniProtStoreClient<UniRefEntry> storeClient;
+    @Autowired UniProtStoreClient<UniRefEntryLight> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
 
@@ -294,7 +296,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
         Entry xmlEntry = converter.toXml(entry);
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
-        storeClient.saveEntry(entry);
+        storeClient.saveEntry(UniRefControllerITUtils.createEntryLight(i, type));
     }
 
     private Stream<Arguments> getAllSortFields() {
