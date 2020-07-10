@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "08ad0770-1895-4c03-8dc3-bd667e82cac7",
+		"_postman_id": "97d558b3-8023-4909-9626-5c64791e0741",
 		"name": "uniprotkb",
 		"description": "Test suite for UniProtKB requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -15,7 +15,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ad30795c-4bd9-457b-95d1-74712d1528ef",
+								"id": "c2059a4d-89a0-47b4-8250-91e3a61d4f4f",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -54,7 +54,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d811ed71-26bd-4537-acaa-cf4d3b18661e",
+								"id": "a46419bb-0f0e-40bb-8233-3deb3440c9b5",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -93,7 +93,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "21d7e1c3-c5a3-42fa-b182-a2e6ee3b786d",
+								"id": "03753955-d188-42a8-bc42-ce47030c418f",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -132,7 +132,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7ce4abd1-f45b-41d8-9d35-be5ebe2a1aa3",
+								"id": "dd09ae3b-db25-4d17-97e2-964fc1d53145",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -171,7 +171,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6bab1923-238a-4593-b60a-417711051815",
+								"id": "95e87392-632b-47fc-ba3a-849c41926bed",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -210,7 +210,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "6f3b8c42-c41c-47db-a38b-3bb940c74ffb",
+						"id": "387e6e8e-07d7-406b-ad49-b6b98327c92d",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -220,7 +220,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "66d10712-5b65-4cf7-8808-a14a37f55a96",
+						"id": "4b062163-b632-41fd-af75-3cb3767d56ce",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -239,11 +239,59 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0238271a-6c17-4b8c-aae8-4246dab7181f",
+								"id": "37002996-8138-4aac-9fc2-1fd3e7ee464a",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
+									"",
+									"pm.test(\"Status code\", function () {",
 									"    pm.response.to.have.status(200);",
-									"});"
+									"});",
+									"",
+									"pm.test(\"Content-Type\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"entryType\", function () {",
+									"    pm.expect(jsonData.entryType).to.eql(\"UniProtKB reviewed (Swiss-Prot)\");",
+									"});",
+									"",
+									"pm.test(\"primaryAccession\", function () {",
+									"    pm.expect(jsonData.primaryAccession).to.eql(\"P12345\");",
+									"});",
+									"",
+									"utils.verifySecondaryAccessions(jsonData.secondaryAccessions, [\"G1SKL2\"]);",
+									"",
+									"",
+									"pm.test(\"uniProtkbId\", function () {",
+									"    pm.expect(jsonData.uniProtkbId).to.eql(\"AATM_RABIT\");",
+									"});",
+									"",
+									"utils.verifyEntryAudit(jsonData.entryAudit, jsonData.entryAudit.firstPublicDate, jsonData.entryAudit.lastAnnotationUpdateDate, jsonData.entryAudit.lastSequenceUpdateDate, jsonData.entryAudit.entryVersion,jsonData.entryAudit.sequenceVersion);",
+									"",
+									"pm.test(\"annotationScore\", function () {",
+									"    pm.expect(jsonData.annotationScore).to.eql(93.30000000000001);",
+									"});",
+									"",
+									"utils.verifyOrganism(jsonData.organism, \"Oryctolagus cuniculus\", \"Rabbit\", 9986, ",
+									"[\"Eukaryota\", \"Metazoa\", \"Chordata\", \"Craniata\", \"Vertebrata\", \"Euteleostomi\", \"Mammalia\",",
+									"\"Eutheria\", \"Euarchontoglires\", \"Glires\", \"Lagomorpha\", \"Leporidae\", \"Oryctolagus\"]);",
+									"",
+									"pm.test(\"proteinExistence\", function () {",
+									"    pm.expect(jsonData.proteinExistence).to.eql(\"1: Evidence at protein level\");",
+									"});",
+									"",
+									"pm.test(\"proteinDescription\", function () {",
+									"    utils.verifyNotNull(\"proteinDescription\", jsonData.proteinDescription);",
+									"});",
+									"",
+									"var expectedFullName = {\"value\": \"Aspartate aminotransferase, mitochondrial\"};",
+									"var expectedShortNames = [{\"value\": \"mAspAT\"}];",
+									"var expectedEcNumbers = [{\"value\": \"2.6.1.1\"},{\"value\": \"2.6.1.7\"}];",
+									"utils.verifyProteinName(\"recommendedName\", jsonData.proteinDescription.recommendedName,  ",
+									"    expectedFullName, expectedShortNames, expectedEcNumbers);",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -280,7 +328,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "5d5da4be-753e-4b4b-a198-3246964cada8",
+						"id": "a3506926-0442-4ed9-b407-f771e2a375ed",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -290,7 +338,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "64f6934e-f35b-4551-a23c-7038a0d832ea",
+						"id": "3ef571f2-7636-42ad-b022-ee16f045cf41",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -309,7 +357,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e5541247-3383-47b6-9aa2-f68f52eb5959",
+								"id": "16ef86ec-0ef9-4014-a819-b0befabcbec8",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -348,7 +396,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4a2b1923-2714-4c35-b860-20c9233fb280",
+						"id": "a450eda9-5b34-4f39-8998-7d3011929d35",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -358,7 +406,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2b9aa208-4d40-44fa-b467-5b9b44d3af15",
+						"id": "918705d0-a38d-4b99-b4c6-f9c10ee8bea2",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -377,7 +425,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1e531664-35b6-4e4e-8930-8f882866e11d",
+								"id": "d185f25b-94ad-432d-87e5-94c3e791707e",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -416,7 +464,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4b6b47f3-01ad-4eaa-9807-31e85ff89649",
+						"id": "6d9d0b21-f0f0-4dc7-a9c0-2c34c202dc66",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -426,7 +474,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "78e39611-67c9-4e41-85c1-ea290425963c",
+						"id": "b16478e2-3d52-424e-bf58-84a5d91ff65d",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -441,17 +489,67 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "0f27e970-d581-4ef3-a741-76ded3e95a1e",
+				"id": "20616312-d383-4e75-a05f-203edb0e8c39",
 				"type": "text/javascript",
 				"exec": [
-					""
+					"utils = {",
+					"  verifyEntryAudit: function(entryAudit, firstPublicDate, lastAnnotationUpdateDate, lastSequenceUpdateDate, entryVersion, sequenceVersion) {",
+					"    pm.test(\"entryAudit\", function () {",
+					"      utils.verifyNotNull(\"entryAudit\", entryAudit);",
+					"      pm.expect(entryAudit, 'is not an object').to.be.an(\"object\");",
+					"      pm.expect(entryAudit.firstPublicDate, \"firstPublicDate\").to.eql(firstPublicDate);",
+					"      pm.expect(entryAudit.lastAnnotationUpdateDate, \"lastAnnotationUpdateDate\").to.eql(lastAnnotationUpdateDate);",
+					"      pm.expect(entryAudit.lastSequenceUpdateDate, \"lastSequenceUpdateDate\").to.eql(lastSequenceUpdateDate);",
+					"      pm.expect(entryAudit.entryVersion, \"entryVersion\").to.eql(entryVersion);",
+					"      pm.expect(entryAudit.sequenceVersion, \"sequenceVersion\").to.eql(sequenceVersion);",
+					"  })},",
+					"",
+					"  verifySecondaryAccessions: function(secondaryAccessions, accessions) {",
+					"    pm.test(\"secondaryAccessions\", function () {",
+					"    utils.verifyArrayValues(\"secondaryAccessions\", secondaryAccessions, accessions);",
+					"})},",
+					"",
+					"verifyOrganism: function(organism, scientificName, commonName, taxonId, lineage, evidences) {",
+					"    pm.test(\"organism\", function () {",
+					"      utils.verifyNotNull(\"organism\", organism);",
+					"      pm.expect(organism, 'is not an object').to.be.an(\"object\");",
+					"      pm.expect(organism.scientificName, \"scientificName\").to.eql(scientificName);",
+					"      pm.expect(organism.commonName, \"commonName\").to.eql(commonName);",
+					"      pm.expect(organism.taxonId, \"taxonId\").to.eql(taxonId);  ",
+					"      utils.verifyArrayValues(\"lineage\", organism.lineage, lineage);",
+					"      pm.expect(organism.evidences, 'is not undefined').to.be.a('undefined');",
+					"})},",
+					"",
+					"verifyProteinName: function(fieldName, proteinName, fullName, shortNames, ecNumbers){",
+					"pm.test(fieldName, function () {",
+					"      utils.verifyNotNull(fieldName, proteinName);",
+					"      pm.expect(proteinName, 'is not an object').to.be.an(\"object\");",
+					"      utils.verifyNotNull(\"fieldName\", proteinName.fullName);",
+					"      pm.expect(proteinName.fullName, \"fullName\").to.eql(fullName);",
+					"      utils.verifyArrayValues(\"shortNames\", proteinName.shortNames, shortNames);",
+					"      utils.verifyArrayValues(\"ecNumbers\", proteinName.ecNumbers, ecNumbers);",
+					"})",
+					"},",
+					"",
+					"verifyArrayValues: function(name, actualValues, expectedValues){",
+					"  utils.verifyNotNull(name, actualValues);",
+					"  pm.expect(actualValues, name + ' is not array').to.be.an('array');",
+					"  pm.expect(actualValues, name + ' length mismatch').to.have.lengthOf(expectedValues.length);",
+					"  pm.expect(actualValues, name + ' values mismatch').to.have.deep.members(expectedValues);",
+					"},",
+					"",
+					"verifyNotNull: function(name, value){",
+					"  pm.expect(value, name + ' is undefined').not.to.be.a('undefined');",
+					"  pm.expect(value, name + ' is null').not.to.be.a('null');",
+					"}",
+					"};"
 				]
 			}
 		},
 		{
 			"listen": "test",
 			"script": {
-				"id": "38bb5bb6-16a8-46c4-908a-db648437cd8a",
+				"id": "e69f0221-4b9a-4bc6-a953-e088db1e716f",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -461,22 +559,22 @@
 	],
 	"variable": [
 		{
-			"id": "d4474dd8-11be-4d85-a960-b6bd8f59a0e0",
+			"id": "35727096-8cfb-4545-b17e-1213f069caa4",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "19fa8f07-85b3-4cd2-b418-86183fb9346d",
+			"id": "aec09e57-71b2-4cfd-8499-bedce548bca3",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "72ff1671-061a-45a0-985a-0e64336207ba",
+			"id": "bbf9cd9b-b175-4e62-bc73-7524262f6a85",
 			"key": "accession",
 			"value": "P12345"
 		},
 		{
-			"id": "f537c1c7-474d-4fb9-a983-ecb49fbba851",
+			"id": "0cdd7208-3267-448b-8395-a8e0ae657766",
 			"key": "search_by_gene",
 			"value": "gene:p53"
 		}
