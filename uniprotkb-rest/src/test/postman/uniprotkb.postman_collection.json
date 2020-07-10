@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6d4fa208-60c7-4044-8f62-477bc6348229",
+		"_postman_id": "08ad0770-1895-4c03-8dc3-bd667e82cac7",
 		"name": "uniprotkb",
 		"description": "Test suite for UniProtKB requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -15,7 +15,163 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "275a82d8-f4d4-48f9-a061-743c71e12ebc",
+								"id": "ad30795c-4bd9-457b-95d1-74712d1528ef",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d811ed71-26bd-4537-acaa-cf4d3b18661e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_by_gene}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_by_gene}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene xml",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "21d7e1c3-c5a3-42fa-b182-a2e6ee3b786d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene tsv",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7ce4abd1-f45b-41d8-9d35-be5ebe2a1aa3",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6bab1923-238a-4593-b60a-417711051815",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -54,7 +210,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "2b88eedc-7055-4016-a7e7-964d8466af34",
+						"id": "6f3b8c42-c41c-47db-a38b-3bb940c74ffb",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -64,7 +220,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a8b5b366-0f73-4cf3-b6be-357ed2fc7049",
+						"id": "66d10712-5b65-4cf7-8808-a14a37f55a96",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -83,7 +239,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "96d9f007-88b5-4d68-993b-11395c0c0905",
+								"id": "0238271a-6c17-4b8c-aae8-4246dab7181f",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -124,7 +280,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "7157103c-ca97-4a37-9c7f-c6b38a44d848",
+						"id": "5d5da4be-753e-4b4b-a198-3246964cada8",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -134,7 +290,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "bcbb8843-8193-4cc6-a58b-191f330878f4",
+						"id": "64f6934e-f35b-4551-a23c-7038a0d832ea",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -153,7 +309,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d3935d54-936b-40d8-ba13-1d081cc8ff0b",
+								"id": "e5541247-3383-47b6-9aa2-f68f52eb5959",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -192,7 +348,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "2ee2a211-de62-4476-a796-f6a61c921d47",
+						"id": "4a2b1923-2714-4c35-b860-20c9233fb280",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -202,7 +358,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "bf18c997-f496-40b0-b1d0-0f6bfd57fc6c",
+						"id": "2b9aa208-4d40-44fa-b467-5b9b44d3af15",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -221,7 +377,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "78e7f414-1b29-46ed-89f8-15f4eba014fe",
+								"id": "1e531664-35b6-4e4e-8930-8f882866e11d",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -260,7 +416,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "37b0297f-14e9-4a36-911b-3991fde2fee9",
+						"id": "4b6b47f3-01ad-4eaa-9807-31e85ff89649",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -270,7 +426,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ba58f02a-00f6-4b1e-a7e2-85241d8cfcbc",
+						"id": "78e39611-67c9-4e41-85c1-ea290425963c",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -285,7 +441,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "9fabb014-f3d7-4ce7-bdee-2cd0ad260f64",
+				"id": "0f27e970-d581-4ef3-a741-76ded3e95a1e",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -295,7 +451,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "140616c6-995f-458e-8e0e-1d784cb50916",
+				"id": "38bb5bb6-16a8-46c4-908a-db648437cd8a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -305,19 +461,24 @@
 	],
 	"variable": [
 		{
-			"id": "debfac42-0bfb-4b89-9371-56f79b9ba8c3",
+			"id": "d4474dd8-11be-4d85-a960-b6bd8f59a0e0",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "9cf3ad79-393a-4cbd-b6cd-470395885e76",
+			"id": "19fa8f07-85b3-4cd2-b418-86183fb9346d",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "bdf94f52-65e3-49a1-87a9-54635cc79961",
+			"id": "72ff1671-061a-45a0-985a-0e64336207ba",
 			"key": "accession",
 			"value": "P12345"
+		},
+		{
+			"id": "f537c1c7-474d-4fb9-a983-ecb49fbba851",
+			"key": "search_by_gene",
+			"value": "gene:p53"
 		}
 	],
 	"protocolProfileBehavior": {}
