@@ -50,7 +50,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         return this.storeStreamer.idsStream(solrRequest);
     }
 
-    private SolrRequest createDownloadSolrRequest(StreamRequest request) {
+    protected SolrRequest createDownloadSolrRequest(StreamRequest request) {
         return createSolrRequestBuilder(request, solrSortClause, queryBoosts).build();
     }
 }
