@@ -246,6 +246,10 @@
 							"script": {
 								"id": "37002996-8138-4aac-9fc2-1fd3e7ee464a",
 								"exec": [
+									"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
+									"// to log various types of message on Postman Console",
+									"//e.g. console.warn(\"This is a sample warning message to print on Postman console\");",
+									"//e.g.console.error(\"This is a sample error message to print on Postman console\");",
 									"",
 									"// verify headers",
 									"",
@@ -264,11 +268,14 @@
 									"// 4. X-Release",
 									"let verifyXReleaseHeader = eval(pm.globals.get(\"verifyXReleaseHeader\"));",
 									"verifyXReleaseHeader(pm.globals.get('x_release'));",
-									"",
+									"// log the value of x_release at debug",
+									"console.log(\"The value of variable x_release is \" + pm.globals.get('x_release'));",
 									"",
 									"// 5. Access-Control-Allow-Origin",
 									"let verifyControlAllowHeader = eval(pm.globals.get(\"verifyControlAllowHeader\"));",
 									"verifyControlAllowHeader(pm.globals.get('control_origin'));",
+									"// log the value of x_release at info level",
+									"console.info(\"The value of variable control_origin is \" + pm.globals.get('control_origin'));",
 									"",
 									"// 6. Expose Headers",
 									"let verifyExposeHeaders = eval(pm.globals.get(\"verifyExposeHeaders\"));",
@@ -314,6 +321,7 @@
 									"",
 									"utils.verifyEntryAudit(jsonData.entryAudit, expectedFirstPublicDate, expectedLastAnnotationUpdateDate, expectedLastSequenceUpdateDate, expectedEntryVersion, expectedSequenceVersion);",
 									"",
+									"console.log(jsonData.annotationScore);",
 									"pm.test(\"annotationScore\", function () {",
 									"    pm.expect(jsonData.annotationScore).to.eql(93.30000000000001);",
 									"});",
@@ -335,6 +343,7 @@
 									"var expectedEcNumbers = [{\"value\": \"2.6.1.1\"},{\"value\": \"2.6.1.7\"}];",
 									"utils.verifyProteinName(\"recommendedName\", jsonData.proteinDescription.recommendedName,  ",
 									"    expectedFullName, expectedShortNames, expectedEcNumbers);",
+									"",
 									""
 								],
 								"type": "text/javascript"
@@ -603,22 +612,22 @@
 	],
 	"variable": [
 		{
-			"id": "25a9188f-50d3-452b-856e-5a80e15af599",
+			"id": "9abd4ef4-f46d-4e2b-ac7e-f988605d09ce",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "907f390b-8e22-43cd-a491-6bc504800d0a",
+			"id": "a8ae2191-0590-4415-85e1-6897de25eff1",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "6caf91de-7be6-412e-bd16-0b63bcf688bb",
+			"id": "ad99f117-7e1a-4558-8801-1c27c1f04c97",
 			"key": "accession",
 			"value": "P12345"
 		},
 		{
-			"id": "331ca5ee-2291-469a-8b9b-10c72139173a",
+			"id": "eb73d2b4-8f09-4510-b98b-f432087299d4",
 			"key": "search_by_gene",
 			"value": "gene:p53"
 		}
