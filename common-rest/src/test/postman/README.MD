@@ -32,8 +32,8 @@
 
 2. Import the environment.json in Postman
     - Click on top right cog-wheel icon to `Manage Environment`
-    - import the required environment.json file
+    - Import the required *environment.json file
 
-3. To import the global variables stored in uniprot_workspace.postman_globals.json in Postman
+3. Import the global variables stored in uniprot_workspace.postman_globals.json in Postman
     - Click on top right cog-wheel icon to `Manage Environment`
-    - import the *globals.json file
+    - Import the *globals.json file
