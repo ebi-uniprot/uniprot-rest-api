@@ -19,6 +19,11 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -243,19 +248,22 @@
 								"exec": [
 									"",
 									"// verify headers",
-									"pm.test(\"Status code\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
 									"",
-									"pm.test(\"Content-Type\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\");",
-									"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
-									"});",
+									"//1. Vary",
+									"let verifyVaryHeader = eval(pm.globals.get(\"verifyVaryHeader\"));",
+									"verifyVaryHeader();",
 									"",
-									"pm.test(\"X-Release\", function () {",
-									"    pm.response.to.have.header(\"X-Release\");",
-									"    pm.response.to.be.header(\"X-Release\", pm.collectionVariables.get('x_release'));",
-									"});",
+									"// 2. Status",
+									"let verifyStatusHeader = eval(pm.globals.get(\"verifyStatusHeader\"));",
+									"verifyStatusHeader();",
+									"",
+									"// 3. Content-Type",
+									"let verifyContentTypeHeader = eval(pm.globals.get(\"verifyContentTypeHeader\"));",
+									"verifyContentTypeHeader();",
+									"",
+									"// 4. X-Release",
+									"let verifyXReleaseHeader = eval(pm.globals.get(\"verifyXReleaseHeader\"));",
+									"verifyXReleaseHeader(pm.globals.get('x_release'));",
 									"",
 									"pm.test(\"Access-Control-Allow-Origin\", function () {",
 									"    pm.response.to.have.header(\"Access-Control-Allow-Origin\");",
@@ -263,7 +271,7 @@
 									"});",
 									"",
 									"// verify data",
-									"var jsonData = pm.response.json();",
+									"let jsonData = pm.response.json();",
 									"",
 									"pm.test(\"entryType\", function () {",
 									"    pm.expect(jsonData.entryType).to.eql(\"UniProtKB reviewed (Swiss-Prot)\");",
@@ -578,34 +586,24 @@
 	],
 	"variable": [
 		{
-			"id": "f07994e7-259f-4203-873d-8951d6020749",
+			"id": "a221a4b1-90db-4ada-9433-60d512388e2e",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "19f60e7d-fa4d-4bde-aa7e-0c00b54bfc18",
+			"id": "4bf3d22f-727f-4295-aa74-3706ee0d323b",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "9c30438c-9990-43b2-97fd-ec425eb0d1eb",
+			"id": "f67c35ed-1fe1-4d38-9ce0-b52a93d76ce3",
 			"key": "accession",
 			"value": "P12345"
 		},
 		{
-			"id": "c2f152cc-ea89-43c5-a9b8-b881994ece55",
+			"id": "58b21a74-da85-499e-8d61-4f1f15ac1893",
 			"key": "search_by_gene",
 			"value": "gene:p53"
-		},
-		{
-			"id": "b5a30b23-6f95-4af4-b894-7bbf9e932a57",
-			"key": "x_release",
-			"value": "20-May-2020"
-		},
-		{
-			"id": "bcf1985a-add9-45cc-93ce-4a9d1e69aeea",
-			"key": "control_origin",
-			"value": "*"
 		}
 	],
 	"protocolProfileBehavior": {}
