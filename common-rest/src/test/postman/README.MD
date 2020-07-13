@@ -1,11 +1,13 @@
 
 ####Run Postman tests from command line:
 1. export run_environment=\<environment\>
+    - e.g. `$export run_environment=integration`
     - Supported environments:
         - integration
         - production
         - local 
 2. export request_type=\<type\>
+    - e.g. `$export request_type=uniprotkb`
    - Supported request types:
      - uniprotkb 
      - proteome

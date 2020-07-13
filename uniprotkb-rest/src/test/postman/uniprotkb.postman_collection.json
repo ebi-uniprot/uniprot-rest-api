@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "97d558b3-8023-4909-9626-5c64791e0741",
+		"_postman_id": "443ecf1e-183c-415e-9126-9e1584df7e87",
 		"name": "uniprotkb",
 		"description": "Test suite for UniProtKB requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -265,10 +265,27 @@
 									"let verifyXReleaseHeader = eval(pm.globals.get(\"verifyXReleaseHeader\"));",
 									"verifyXReleaseHeader(pm.globals.get('x_release'));",
 									"",
-									"pm.test(\"Access-Control-Allow-Origin\", function () {",
-									"    pm.response.to.have.header(\"Access-Control-Allow-Origin\");",
-									"    pm.response.to.be.header(\"Access-Control-Allow-Origin\", pm.collectionVariables.get('control_origin'));",
-									"});",
+									"",
+									"// 5. Access-Control-Allow-Origin",
+									"let verifyControlAllowHeader = eval(pm.globals.get(\"verifyControlAllowHeader\"));",
+									"verifyControlAllowHeader(pm.globals.get('control_origin'));",
+									"",
+									"// 6. Expose Headers",
+									"let verifyExposeHeaders = eval(pm.globals.get(\"verifyExposeHeaders\"));",
+									"verifyExposeHeaders();",
+									"",
+									"// 7. Date Headers",
+									"let verifyDateHeader = eval(pm.globals.get(\"verifyDateHeader\"));",
+									"verifyDateHeader();",
+									"",
+									"// 8. Transfer-Encoding",
+									"let verifyTransferEncodingHeader = eval(pm.globals.get(\"verifyTransferEncodingHeader\"));",
+									"verifyTransferEncodingHeader();",
+									"",
+									"",
+									"// 9. X-Cache-Info",
+									"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
+									"verifyXCacheInfoHeader();",
 									"",
 									"// verify data",
 									"let jsonData = pm.response.json();",
@@ -586,22 +603,22 @@
 	],
 	"variable": [
 		{
-			"id": "a221a4b1-90db-4ada-9433-60d512388e2e",
+			"id": "25a9188f-50d3-452b-856e-5a80e15af599",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "4bf3d22f-727f-4295-aa74-3706ee0d323b",
+			"id": "907f390b-8e22-43cd-a491-6bc504800d0a",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "f67c35ed-1fe1-4d38-9ce0-b52a93d76ce3",
+			"id": "6caf91de-7be6-412e-bd16-0b63bcf688bb",
 			"key": "accession",
 			"value": "P12345"
 		},
 		{
-			"id": "58b21a74-da85-499e-8d61-4f1f15ac1893",
+			"id": "331ca5ee-2291-469a-8b9b-10c72139173a",
 			"key": "search_by_gene",
 			"value": "gene:p53"
 		}
