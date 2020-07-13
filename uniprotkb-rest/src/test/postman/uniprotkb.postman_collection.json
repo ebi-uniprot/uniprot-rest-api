@@ -242,6 +242,7 @@
 								"id": "37002996-8138-4aac-9fc2-1fd3e7ee464a",
 								"exec": [
 									"",
+									"// verify headers",
 									"pm.test(\"Status code\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
@@ -251,6 +252,17 @@
 									"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
 									"});",
 									"",
+									"pm.test(\"X-Release\", function () {",
+									"    pm.response.to.have.header(\"X-Release\");",
+									"    pm.response.to.be.header(\"X-Release\", pm.collectionVariables.get('x_release'));",
+									"});",
+									"",
+									"pm.test(\"Access-Control-Allow-Origin\", function () {",
+									"    pm.response.to.have.header(\"Access-Control-Allow-Origin\");",
+									"    pm.response.to.be.header(\"Access-Control-Allow-Origin\", pm.collectionVariables.get('control_origin'));",
+									"});",
+									"",
+									"// verify data",
 									"var jsonData = pm.response.json();",
 									"",
 									"pm.test(\"entryType\", function () {",
@@ -268,7 +280,14 @@
 									"    pm.expect(jsonData.uniProtkbId).to.eql(\"AATM_RABIT\");",
 									"});",
 									"",
-									"utils.verifyEntryAudit(jsonData.entryAudit, jsonData.entryAudit.firstPublicDate, jsonData.entryAudit.lastAnnotationUpdateDate, jsonData.entryAudit.lastSequenceUpdateDate, jsonData.entryAudit.entryVersion,jsonData.entryAudit.sequenceVersion);",
+									"// verify entryAudit",
+									"var expectedFirstPublicDate = '1989-10-01';",
+									"var expectedLastAnnotationUpdateDate ='2020-02-26';",
+									"var expectedLastSequenceUpdateDate = '2013-09-18';",
+									"var expectedEntryVersion = 125;",
+									"var expectedSequenceVersion = 2;",
+									"",
+									"utils.verifyEntryAudit(jsonData.entryAudit, expectedFirstPublicDate, expectedLastAnnotationUpdateDate, expectedLastSequenceUpdateDate, expectedEntryVersion, expectedSequenceVersion);",
 									"",
 									"pm.test(\"annotationScore\", function () {",
 									"    pm.expect(jsonData.annotationScore).to.eql(93.30000000000001);",
@@ -559,24 +578,34 @@
 	],
 	"variable": [
 		{
-			"id": "35727096-8cfb-4545-b17e-1213f069caa4",
+			"id": "f07994e7-259f-4203-873d-8951d6020749",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "aec09e57-71b2-4cfd-8499-bedce548bca3",
+			"id": "19f60e7d-fa4d-4bde-aa7e-0c00b54bfc18",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "bbf9cd9b-b175-4e62-bc73-7524262f6a85",
+			"id": "9c30438c-9990-43b2-97fd-ec425eb0d1eb",
 			"key": "accession",
 			"value": "P12345"
 		},
 		{
-			"id": "0cdd7208-3267-448b-8395-a8e0ae657766",
+			"id": "c2f152cc-ea89-43c5-a9b8-b881994ece55",
 			"key": "search_by_gene",
 			"value": "gene:p53"
+		},
+		{
+			"id": "b5a30b23-6f95-4af4-b894-7bbf9e932a57",
+			"key": "x_release",
+			"value": "20-May-2020"
+		},
+		{
+			"id": "bcf1985a-add9-45cc-93ce-4a9d1e69aeea",
+			"key": "control_origin",
+			"value": "*"
 		}
 	],
 	"protocolProfileBehavior": {}
