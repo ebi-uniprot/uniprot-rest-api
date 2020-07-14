@@ -17,9 +17,12 @@ execute_newman_run_for_supporting_data() {
 
 if [ "$request_type" = "all" ]; then
   echo "Running all collections one after another ...."
-  declare -a all_collections=('proteome' 'uniparc' 'uniprot' 'uniref' 'unisave' 'configure' 'crossref' 'disease' 'keyword'
-  'literature' 'subcell' 'suggester' 'taxonomy')
-  for collection in "${all_collections[@]}"; do execute_newman_run "$collection"; done
+  # call main collections
+  declare -a main_collections=('proteome' 'uniparc' 'uniprot' 'uniref' 'unisave')
+  for collection in "${main_collections[@]}"; do execute_newman_run "$collection"; done
+  # call supporting data collections
+  declare -a supporting_data_collections=('configure' 'crossref' 'disease' 'keyword' 'literature' 'subcell' 'suggester' 'taxonomy')
+  for collection in "${supporting_data_collections[@]}"; do execute_newman_run_for_supporting_data "$collection"; done
 else
   case $request_type in
   uniprotkb)
