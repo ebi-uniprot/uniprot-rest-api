@@ -1,5 +1,10 @@
 
 ####Run Postman tests from command line:
+   - Prerequisite
+     - `newman` installed
+     - To install `newman`, run
+        - `npm install -g newman`    
+     
 1. export run_environment=\<environment\>
     - e.g. `$export run_environment=integration`
     - Supported environments:
