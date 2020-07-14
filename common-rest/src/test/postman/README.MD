@@ -13,7 +13,9 @@
         - local 
 2. export request_type=\<type\>
     - e.g. `$export request_type=uniprotkb`
+    - e.g. To run all types `$export request_type=all`
    - Supported request types:
+     - all
      - uniprotkb 
      - proteome
      - configure
