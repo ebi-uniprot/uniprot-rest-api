@@ -14,9 +14,9 @@ proteome)
   echo "Running proteome tests.."
   newman run ../../../../proteome-rest/src/test/postman/proteome.postman_collection.json -e "$run_environment".postman_environment.json -g uniprot_workspace.postman_globals.json
   ;;
-congure)
-  echo "Running conguration tests.."
-  newman run ../../../../support-data-rest/src/test/postman/congure/conguration.postman_collection.json -e "$run_environment".postman_environment.json -g uniprot_workspace.postman_globals.json
+configure)
+  echo "Running configuration tests.."
+  newman run ../../../../support-data-rest/src/test/postman/configure/configuration.postman_collection.json -e "$run_environment".postman_environment.json -g uniprot_workspace.postman_globals.json
   ;;
 crossref)
   echo "Running crossref tests.."
