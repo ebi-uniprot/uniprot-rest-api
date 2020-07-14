@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dd9756bf-6f1a-4e0a-9b37-026215938d6a",
+		"_postman_id": "38302d4c-c0c6-4d77-8491-ddf7d927826c",
 		"name": "uniparc",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "75b11071-a49d-4af5-b1e5-1aa7329a01e9",
+								"id": "174edd9c-6597-4416-820f-be643169aa48",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -46,7 +46,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d6863ea8-883b-4398-bb56-7e567db36fa0",
+						"id": "4b4520b9-5819-48cf-91f4-3c7e53b415e4",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -56,7 +56,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b73d0033-299c-4b19-a2d3-dbf066922473",
+						"id": "e6a5dd52-439e-41e5-8724-31aca80bc0bc",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -75,7 +75,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "20a771dd-2cde-4eab-81fd-8dc71c56ba44",
+								"id": "200f2d55-bf5b-40ce-bc42-ddb1da9ea7f6",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -112,15 +112,15 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "download",
+			"name": "stream",
 			"item": [
 				{
-					"name": "Download",
+					"name": "Stream",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "3b8ae597-a9e5-48aa-8acb-8e3e5e5a44a8",
+								"id": "8128a1b3-2cd9-429a-8b8c-588b28c39c1b",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -134,14 +134,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniparc/download?query?{{uniparc_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniparc/stream?query?{{uniparc_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
 								"uniparc",
-								"download"
+								"stream"
 							],
 							"query": [
 								{
@@ -161,7 +161,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "812e56e7-272c-4165-87d8-4c963c5b9522",
+				"id": "18ee8f88-9fd8-4e55-a2fa-e13abc11f9de",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -171,7 +171,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "1ae1174f-d853-46e7-8b9f-c8f636cc665c",
+				"id": "90499672-e420-463c-a1d7-5fb5c6fae472",
 				"type": "text/javascript",
 				"exec": [
 					""
