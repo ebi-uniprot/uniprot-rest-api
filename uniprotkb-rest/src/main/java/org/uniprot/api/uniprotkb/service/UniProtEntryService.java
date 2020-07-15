@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -123,8 +122,7 @@ public class UniProtEntryService
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
 
         // get n accessions from store
-        List<UniProtKBEntry> entries =
-                this.storeStreamer.streamEntries(accessionsInPage).collect(Collectors.toList());
+        Stream<UniProtKBEntry> entries = this.storeStreamer.streamEntries(accessionsInPage);
 
         // facets may be set when facetList is passed but that should not be returned with cursor
         List<Facet> facets = solrStreamResponse.getFacets();

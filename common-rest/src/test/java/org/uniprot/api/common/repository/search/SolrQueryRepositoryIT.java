@@ -89,10 +89,11 @@ class SolrQueryRepositoryIT {
 
     @Test
     void invalidQueryExceptionReturned() {
+        SolrRequest request = queryWithoutFacets("invalid:invalid");
         QueryRetrievalException thrown =
                 assertThrows(
                         QueryRetrievalException.class,
-                        () -> queryRepo.getEntry(queryWithoutFacets("invalid:invalid")));
+                        () -> queryRepo.getEntry(request));
 
         assertEquals("Error executing solr query", thrown.getMessage());
     }
@@ -114,9 +115,7 @@ class SolrQueryRepositoryIT {
         QueryResult<UniProtDocument> queryResult =
                 queryRepo.searchPage(queryWithoutFacets(accQuery, 2), page.getCursor());
         List<String> page1Accs =
-                queryResult.getContent().stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
+                queryResult.getContent().map(doc -> doc.accession).collect(Collectors.toList());
 
         // then
         assertNotNull(queryResult.getPage());
@@ -151,7 +150,7 @@ class SolrQueryRepositoryIT {
                         .isPresent());
 
         assertNotNull(queryResult.getContent());
-        assertEquals(1, queryResult.getContent().size());
+        assertEquals(1L, queryResult.getContent().count());
 
         assertNotNull(queryResult.getFacets());
         assertTrue(queryResult.getFacets().isEmpty());
@@ -209,9 +208,10 @@ class SolrQueryRepositoryIT {
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
 
         // when attempt to fetch then error occurs
+        SolrRequest request = queryWithMatchedFields("accession:" + findMe);
         assertThrows(
                 InvalidRequestException.class,
-                () -> queryRepo.searchPage(queryWithMatchedFields("accession:" + findMe), null));
+                () -> queryRepo.searchPage(request, null));
     }
 
     @Test
@@ -234,9 +234,7 @@ class SolrQueryRepositoryIT {
         QueryResult<UniProtDocument> queryResult =
                 queryRepo.searchPage(queryWithoutFacets(accQuery, size), page.getCursor());
         List<String> page1Accs =
-                queryResult.getContent().stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
+                queryResult.getContent().map(doc -> doc.accession).collect(Collectors.toList());
 
         assertNotNull(queryResult.getPage());
         page = (CursorPage) queryResult.getPage();
@@ -248,9 +246,7 @@ class SolrQueryRepositoryIT {
         // ... and attempt to fetch page 2
         queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery, size), nextCursor);
         List<String> page2Accs =
-                queryResult.getContent().stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
+                queryResult.getContent().map(doc -> doc.accession).collect(Collectors.toList());
 
         assertNotNull(queryResult.getPage());
         page = (CursorPage) queryResult.getPage();
@@ -262,9 +258,7 @@ class SolrQueryRepositoryIT {
         // ... and attempt to fetch last page 3
         queryResult = queryRepo.searchPage(queryWithoutFacets(accQuery, size), nextCursor);
         List<String> page3Accs =
-                queryResult.getContent().stream()
-                        .map(doc -> doc.accession)
-                        .collect(Collectors.toList());
+                queryResult.getContent().map(doc -> doc.accession).collect(Collectors.toList());
 
         page = (CursorPage) queryResult.getPage();
         assertFalse(

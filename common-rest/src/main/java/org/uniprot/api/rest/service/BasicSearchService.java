@@ -1,9 +1,7 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -93,11 +91,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         SolrRequest solrRequest = createSearchSolrRequest(request);
 
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
-        List<R> converted =
-                results.getContent().stream()
-                        .map(entryConverter)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
+        Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 

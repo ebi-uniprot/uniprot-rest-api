@@ -42,7 +42,9 @@ public class UniRefBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
 
-    @Parameter(description = "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms")
+    @Parameter(
+            description =
+                    "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms")
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
