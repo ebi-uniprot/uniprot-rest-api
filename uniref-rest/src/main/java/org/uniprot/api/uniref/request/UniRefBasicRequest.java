@@ -1,6 +1,7 @@
 package org.uniprot.api.uniref.request;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
@@ -40,4 +41,11 @@ public class UniRefBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
+
+    @Parameter(description = "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms")
+    @Pattern(
+            regexp = "true|false",
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
+            message = "{search.uniref.invalid.complete.value}")
+    private String complete;
 }
