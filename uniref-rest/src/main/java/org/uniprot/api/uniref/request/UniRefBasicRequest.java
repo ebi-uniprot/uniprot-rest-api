@@ -12,6 +12,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -50,4 +51,12 @@ public class UniRefBasicRequest {
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.uniref.invalid.complete.value}")
     private String complete;
+
+    public boolean isComplete() {
+        boolean result = false;
+        if (Utils.notNullNotEmpty(complete)) {
+            result = Boolean.parseBoolean(complete);
+        }
+        return result;
+    }
 }

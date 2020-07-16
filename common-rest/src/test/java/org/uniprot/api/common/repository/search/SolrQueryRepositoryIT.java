@@ -91,9 +91,7 @@ class SolrQueryRepositoryIT {
     void invalidQueryExceptionReturned() {
         SolrRequest request = queryWithoutFacets("invalid:invalid");
         QueryRetrievalException thrown =
-                assertThrows(
-                        QueryRetrievalException.class,
-                        () -> queryRepo.getEntry(request));
+                assertThrows(QueryRetrievalException.class, () -> queryRepo.getEntry(request));
 
         assertEquals("Error executing solr query", thrown.getMessage());
     }
@@ -209,9 +207,7 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch then error occurs
         SolrRequest request = queryWithMatchedFields("accession:" + findMe);
-        assertThrows(
-                InvalidRequestException.class,
-                () -> queryRepo.searchPage(request, null));
+        assertThrows(InvalidRequestException.class, () -> queryRepo.searchPage(request, null));
     }
 
     @Test

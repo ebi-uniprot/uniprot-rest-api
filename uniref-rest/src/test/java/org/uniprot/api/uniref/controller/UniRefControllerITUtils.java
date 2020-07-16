@@ -22,11 +22,28 @@ class UniRefControllerITUtils {
     static final String ID_PREF_100 = "UniRef100_P039";
     static final String NAME_PREF = "Cluster: MoeK5 ";
     static final String ACC_PREF = "P123";
-    static final String ACC_2_PREF = "P123";
+    static final String ACC_2_PREF = "P321";
     static final String UPI_PREF = "UPI0000083A";
+
+    static UniRefEntry createEntryWithTwelveMembers(int i, UniRefType type) {
+        UniRefEntryBuilder builder = UniRefEntryBuilder.from(createEntry(i, type));
+        for (int j = 2; j <= 12; j++) {
+            builder.membersAdd(createMember(j));
+        }
+        return builder.build();
+    }
+
+    static UniRefEntryLight createEntryLightWithTwelveMembers(int i, UniRefType type) {
+        UniRefEntry entry = createEntryWithTwelveMembers(i, type);
+        return createEntryLight(entry);
+    }
 
     static UniRefEntryLight createEntryLight(int i, UniRefType type) {
         UniRefEntry entry = createEntry(i, type);
+        return createEntryLight(entry);
+    }
+
+    static UniRefEntryLight createEntryLight(UniRefEntry entry) {
         UniRefEntryLightBuilder builder =
                 new UniRefEntryLightBuilder()
                         .id(entry.getId())
@@ -36,7 +53,11 @@ class UniRefControllerITUtils {
                         .commonTaxonId(entry.getCommonTaxonId())
                         .commonTaxon(entry.getCommonTaxon())
                         .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
-                        .membersAdd(entry.getRepresentativeMember().getMemberId())
+                        .membersAdd(
+                                entry.getRepresentativeMember()
+                                        .getUniProtAccessions()
+                                        .get(0)
+                                        .getValue())
                         .organismsAdd(entry.getRepresentativeMember().getOrganismName())
                         .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId())
                         .sequence(entry.getRepresentativeMember().getSequence().getValue());
@@ -44,7 +65,8 @@ class UniRefControllerITUtils {
                 .forEach(
                         uniRefMember -> {
                             builder.memberIdTypesAdd(uniRefMember.getMemberIdType())
-                                    .membersAdd(uniRefMember.getMemberId())
+                                    .membersAdd(
+                                            uniRefMember.getUniProtAccessions().get(0).getValue())
                                     .organismsAdd(uniRefMember.getOrganismName())
                                     .organismIdsAdd(uniRefMember.getOrganismTaxId());
                         });
@@ -105,8 +127,8 @@ class UniRefControllerITUtils {
         return new UniRefMemberBuilder()
                 .memberIdType(type)
                 .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
+                .organismName("Homo sapiens " + i)
+                .organismTaxId(9606 + i)
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
@@ -136,8 +158,8 @@ class UniRefControllerITUtils {
         return new RepresentativeMemberBuilder()
                 .memberIdType(type)
                 .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
+                .organismName("Homo sapiens (Representative)")
+                .organismTaxId(9600)
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
