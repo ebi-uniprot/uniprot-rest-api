@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -13,6 +14,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author lgonzales
  * @since 10/06/2020
  */
+@Disabled
 class DefaultSearchQueryOptimiserTest {
 
     @Test
@@ -45,6 +47,22 @@ class DefaultSearchQueryOptimiserTest {
         // then
         assertNotNull(optimisedQuery);
         assertEquals("idField:VALIDIDVALUE", optimisedQuery);
+    }
+
+    @Test
+    void testQueryOptimisationDefaultFieldSearchValidQueryOptimisation2() {
+        // given
+        List<SearchFieldItem> fields = new ArrayList<>();
+        fields.add(getSearchFieldItem("idField", "validIdValue"));
+        DefaultSearchQueryOptimiser searchQueryOptimiser = new DefaultSearchQueryOptimiser(fields);
+        String query = "idField:validIdValue OR validIdValue";
+
+        // when
+        String optimisedQuery = searchQueryOptimiser.optimiseSearchQuery(query);
+
+        // then
+        assertNotNull(optimisedQuery);
+        assertEquals("idField:validIdValue OR idField:VALIDIDVALUE", optimisedQuery);
     }
 
     @Test
@@ -105,6 +123,23 @@ class DefaultSearchQueryOptimiserTest {
         fields.add(getSearchFieldItem("idField", "validValue"));
         DefaultSearchQueryOptimiser searchQueryOptimiser = new DefaultSearchQueryOptimiser(fields);
         String query = "\"validValue\"";
+
+        // when
+        String optimisedQuery = searchQueryOptimiser.optimiseSearchQuery(query);
+
+        // then
+        assertNotNull(optimisedQuery);
+        assertEquals("idField:VALIDVALUE", optimisedQuery);
+    }
+
+    @Test
+    void testQueryOptimisationDefaultFieldSearchWithDoubleQuotes2() {
+        // given
+        List<SearchFieldItem> fields = new ArrayList<>();
+        fields.add(getSearchFieldItem("idField", "validValue"));
+        DefaultSearchQueryOptimiser searchQueryOptimiser = new DefaultSearchQueryOptimiser(fields);
+//        String query = "\"validValue\"";
+        String query = "(\"validValue\") (validValue thing (validValue~ OR X))";
 
         // when
         String optimisedQuery = searchQueryOptimiser.optimiseSearchQuery(query);
