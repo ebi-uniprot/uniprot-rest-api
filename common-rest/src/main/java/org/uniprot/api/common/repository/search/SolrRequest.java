@@ -1,14 +1,13 @@
 package org.uniprot.api.common.repository.search;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.
@@ -18,6 +17,12 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 @Data
 @Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
 public class SolrRequest {
+    // TODO: 17/07/2020 should this be and or or and, after using {@link DefaultSearchOptimiser}?
+    // use case: X OR Y => X Y. With default operator AND => X AND Y => wrong result.
+    // If change default operator to OR
+    // use case: X Y => X Y. With default operator OR => X OR Y => wrong result.
+    // conclusion -- 2 query parsers with their own default operator causes problem when
+    // manipulating query. How to fix this?
     private static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
     private String query;
     private QueryOperator defaultQueryOperator;

@@ -1,6 +1,13 @@
 package org.uniprot.api.rest.service;
 
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -12,12 +19,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.BytesRef;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
-
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 /**
  * @author lgonzales
@@ -62,6 +63,7 @@ public class DefaultSearchQueryOptimiser {
         String result = requestedQuery;
         try {
             QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
+            qp.setDefaultOperator(QueryParser.Operator.AND);
             qp.setAllowLeadingWildcard(true);
             Query parsedQuery = qp.parse(requestedQuery);
             if (optimisePossible) {

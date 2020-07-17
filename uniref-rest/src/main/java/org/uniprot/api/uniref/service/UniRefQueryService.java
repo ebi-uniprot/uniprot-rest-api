@@ -1,6 +1,5 @@
 package org.uniprot.api.uniref.service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
