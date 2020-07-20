@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author lgonzales
  * @since 10/06/2020
  */
-@Disabled
 class DefaultSearchQueryOptimiserTest {
 
     @Test
@@ -262,6 +261,38 @@ class DefaultSearchQueryOptimiserTest {
     }
 
     @Test
+    void testQueryOptimisationWhenNextToLeftBracket() {
+        // given
+        List<SearchFieldItem> fields = new ArrayList<>();
+        fields.add(getSearchFieldItem("idField", "validValue"));
+        DefaultSearchQueryOptimiser searchQueryOptimiser = new DefaultSearchQueryOptimiser(fields);
+        String query = "(validValue AND other)";
+
+        // when
+        String optimisedQuery = searchQueryOptimiser.optimiseSearchQuery(query);
+
+        // then
+        assertNotNull(optimisedQuery);
+        assertEquals("(idField:VALIDVALUE AND other)", optimisedQuery);
+    }
+
+    @Test
+    void testQueryOptimisationWhenNextToRightBracket() {
+        // given
+        List<SearchFieldItem> fields = new ArrayList<>();
+        fields.add(getSearchFieldItem("idField", "validValue"));
+        DefaultSearchQueryOptimiser searchQueryOptimiser = new DefaultSearchQueryOptimiser(fields);
+        String query = "(other AND validValue)";
+
+        // when
+        String optimisedQuery = searchQueryOptimiser.optimiseSearchQuery(query);
+
+        // then
+        assertNotNull(optimisedQuery);
+        assertEquals("(other AND idField:VALIDVALUE)", optimisedQuery);
+    }
+
+    @Test
     void testQueryOptimisationWithRange() {
         // given
         List<SearchFieldItem> fields = new ArrayList<>();
@@ -340,7 +371,9 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("(something AND other) AND idField1:VALIDVALUE1 +(idField2:VALIDVALUE2) AND ((idField3:VALIDVALUE3))", optimisedQuery);
+        assertEquals(
+                "(something AND other) AND idField1:VALIDVALUE1 +(idField2:VALIDVALUE2) AND ((idField3:VALIDVALUE3))",
+                optimisedQuery);
     }
 
     @Test

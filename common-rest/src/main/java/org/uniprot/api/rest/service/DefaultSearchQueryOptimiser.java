@@ -19,10 +19,12 @@ public class DefaultSearchQueryOptimiser {
     private final List<SearchFieldItem> optimisedFields;
     // The optimiser first breaks the query into white space separated tokens. These tokens are then
     // matched against TOKEN_PATTERN. If there is no match, then no optimisation occurs. Otherwise,
-    // the token is split into three parts: (before)(token)(after). E.g., value, +(value).
+    // the token is split into three groups: (before)(token)(after).
     // Groups 1 and 2 allows characters not related to the actual token, e.g., +,-,[,],(,), etc.
-    // Group 3 records the precise value, and is matched against all known ID fields for an optimised
-    // version, see {@link org.uniprot.api.rest.service.DefaultSearchQueryOptimiser.getOptimisedDefaultTermForValue}
+    // Group 3 records the precise value, which is not permitted to contain a ':' (i.e., no field specified),
+    // and is then matched against all known ID fields for an optimised version, see {@link
+    // org.uniprot.api.rest.service.DefaultSearchQueryOptimiser.getOptimisedDefaultTermForValue}
+    // For example: query = "nofield field1:hello (+x AND y) => tokens ["nofield", "(+x", "AND", "y)"].
     private static final Pattern TOKEN_PATTERN =
             Pattern.compile("([\"+\\-\\(\\)\\]]+)?([\\w]+)([\"\\(\\)\\[]+)?");
 
