@@ -67,7 +67,7 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
             SpringExtension.class,
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniRefStreamControllerIT extends AbstractStreamControllerIT {
+class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
 
     private static final String streamRequestPath = "/uniref/stream";
     private final UniRefDocumentConverter documentConverter =

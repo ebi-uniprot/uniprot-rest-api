@@ -71,10 +71,10 @@ import org.uniprot.store.search.SolrCollection;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniRefSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
-            UniRefSearchControllerIT.UniRefSearchParameterResolver.class
+            UniRefLightSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
+            UniRefLightSearchControllerIT.UniRefSearchParameterResolver.class
         })
-class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private UniRefQueryRepository repository;
 
