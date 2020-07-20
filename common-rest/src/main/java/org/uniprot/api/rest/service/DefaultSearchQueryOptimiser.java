@@ -1,36 +1,30 @@
 package org.uniprot.api.rest.service;
 
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.util.BytesRef;
-import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 /**
  * @author lgonzales
  * @since 10/06/2020
  */
-@Slf4j
 public class DefaultSearchQueryOptimiser {
 
     private final List<SearchFieldItem> optimisedFields;
-    private Field reflectedTermText;
-    private Field reflectedTermField;
-    private boolean optimisePossible;
+    // The optimiser first breaks the query into white space separated tokens. These tokens are then
+    // matched against TOKEN_PATTERN. If there is no match, then no optimisation occurs. Otherwise,
+    // the token is split into three parts: (before)(token)(after). E.g., value, +(value).
+    // Groups 1 and 2 allows characters not related to the actual token, e.g., +,-,[,],(,), etc.
+    // Group 3 records the precise value, and is matched against all known ID fields for an optimised
+    // version, see {@link org.uniprot.api.rest.service.DefaultSearchQueryOptimiser.getOptimisedDefaultTermForValue}
+    private static final Pattern TOKEN_PATTERN =
+            Pattern.compile("([\"+\\-\\(\\)\\]]+)?([\\w]+)([\"\\(\\)\\[]+)?");
 
     public DefaultSearchQueryOptimiser(SearchFieldItem idField) {
         this(Collections.singletonList(idField));
@@ -38,19 +32,6 @@ public class DefaultSearchQueryOptimiser {
 
     public DefaultSearchQueryOptimiser(List<SearchFieldItem> optimisedFields) {
         this.optimisedFields = optimisedFields;
-        reflectedTermField = null;
-        try {
-            reflectedTermField = Term.class.getDeclaredField("field");
-            reflectedTermField.setAccessible(true);
-            reflectedTermText = Term.class.getDeclaredField("bytes");
-            reflectedTermText.setAccessible(true);
-            optimisePossible = true;
-        } catch (NoSuchFieldException e) {
-            log.error(
-                    "Could not get Term.field for use when adding concrete fields to default fields, e.g., P12345 -> accession_id:P12345",
-                    e);
-            optimisePossible = false;
-        }
     }
 
     /**
@@ -60,90 +41,35 @@ public class DefaultSearchQueryOptimiser {
      * @return Optimised search query string
      */
     public String optimiseSearchQuery(String requestedQuery) {
-        String result = requestedQuery;
-        try {
-            QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
-            qp.setDefaultOperator(QueryParser.Operator.AND);
-            qp.setAllowLeadingWildcard(true);
-            Query parsedQuery = qp.parse(requestedQuery);
-            if (optimisePossible) {
-                addFieldToDefaultQueries(parsedQuery);
-                result = parsedQuery.toString();
+        StringBuilder sb = new StringBuilder();
+        String[] tokens = requestedQuery.split("[ \t]");
+        String sep = "";
+        for (String rawToken : tokens) {
+            Matcher matcher = TOKEN_PATTERN.matcher(rawToken);
+            if (matcher.matches()
+                    && !matcher.group(2).equalsIgnoreCase("AND")
+                    && !matcher.group(2).equalsIgnoreCase("OR")) {
+
+                String optimisedToken = getOptimisedDefaultTermForValue(matcher.group(2));
+
+                String group1 = Utils.emptyOrString(matcher.group(1));
+                String group3 = Utils.emptyOrString(matcher.group(3));
+
+                // quotes
+                if (group1.endsWith("\"") && group3.startsWith("\"")) {
+                    group1 = group1.substring(0, group1.length() - 1);
+                    group3 = group3.substring(1);
+                }
+
+                sb.append(sep).append(group1).append(optimisedToken).append(group3);
+            } else {
+                sb.append(sep).append(rawToken);
             }
-
-            // +- way, deploy, do searches (simple searches + ones that get optimised), check
-            // results
-            // wwwdev, do searches (simple searches + manually typed optimised queries), check
-            // results
-
-            String thing = "XXXXXXXXX ";
-            //            List<String> defaultTerms = getDefaultSearchFieldTerms(parsedQuery);
-            //            for (String defaultTerm : defaultTerms) {
-            //                Optional<TermQuery> optimizedQuery =
-            // getOptimisedDefaultTermForValue(defaultTerm);
-            //                if (optimizedQuery.isPresent()) {
-            //                    if (result.contains("\"" + defaultTerm + "\"")) {
-            //                        defaultTerm = "\"" + defaultTerm + "\"";
-            //                    }
-            //
-            //                    result = result.replace(defaultTerm,
-            // optimizedQuery.get().toString());
-            //                }
-            //            }
-        } catch (ParseException e) {
-            throw new ServiceException(
-                    "Unable to parse query in the optimisation" + requestedQuery, e);
+            sep = " ";
         }
-        return result;
-    }
 
-    private void addFieldToDefaultQueries(Query query) {
-        if (query instanceof TermQuery) {
-            TermQuery termQuery = (TermQuery) query;
-            optimiseIfNecessary(termQuery.getTerm());
-        } else if (query instanceof BooleanQuery) {
-            BooleanQuery booleanQuery = (BooleanQuery) query;
-            for (BooleanClause clause : booleanQuery.clauses()) {
-                addFieldToDefaultQueries(clause.getQuery());
-            }
-        }
+        return sb.toString();
     }
-
-    //    private List<String> getDefaultSearchFieldTerms(Query query) {
-    //        Field field = null;
-    //        try {
-    //            field = Term.class.getDeclaredField("field");
-    //        } catch (NoSuchFieldException e) {
-    //            e.printStackTrace();
-    //        }
-    //        if (field != null) {
-    //
-    //            List<String> defaultTerms = new ArrayList<>();
-    //            if (query instanceof TermQuery) {
-    //                TermQuery termQuery = (TermQuery) query;
-    //                if (termQuery.getTerm().field().equals("")) {
-    //                    defaultTerms.add(termQuery.getTerm().text());
-    //
-    //                    Term term = termQuery.getTerm();
-    //                    if (term.field().equals("")) {
-    //                        try {
-    //                            field.setAccessible(true);
-    //                            field.set(term, "something");
-    //                        } catch (IllegalAccessException e) {
-    //                            e.printStackTrace();
-    //                        }
-    //                    }
-    //                }
-    //            } else if (query instanceof BooleanQuery) {
-    //                BooleanQuery booleanQuery = (BooleanQuery) query;
-    //                for (BooleanClause clause : booleanQuery.clauses()) {
-    //                    defaultTerms.addAll(getDefaultSearchFieldTerms(clause.getQuery()));
-    //                }
-    //            }
-    //            return defaultTerms;
-    //        }
-    //        return emptyList();
-    //    }
 
     /**
      * Method to verify if the default term query value can be optimised to use an specific search
@@ -156,34 +82,15 @@ public class DefaultSearchQueryOptimiser {
      * @param termQueryValue requested default term query value
      * @return the optimised term query if can be optimised
      */
-    //    private Optional<TermQuery> getOptimisedDefaultTermForValue(String termQueryValue) {
-    //        Optional<TermQuery> result = Optional.empty();
-    //        for (SearchFieldItem field : optimisedFields) {
-    //            if (notNullNotEmpty(field.getValidRegex())
-    //                    && termQueryValue.matches(field.getValidRegex())) {
-    //                Term optimisedTerm = new Term(field.getFieldName(),
-    // termQueryValue.toUpperCase());
-    //                result = Optional.of(new TermQuery(optimisedTerm));
-    //                break;
-    //            }
-    //        }
-    //        return result;
-    //    }
-
-    private void optimiseIfNecessary(Term term) {
-        if (term.field().equals("")) {
-            for (SearchFieldItem field : optimisedFields) {
-                if (notNullNotEmpty(field.getValidRegex())
-                        && term.text().matches(field.getValidRegex())) {
-                    try {
-                        reflectedTermField.set(term, field.getFieldName());
-                        reflectedTermText.set(term, new BytesRef(term.text().toUpperCase()));
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
+    private String getOptimisedDefaultTermForValue(String termQueryValue) {
+        String toReturn = termQueryValue;
+        for (SearchFieldItem field : optimisedFields) {
+            if (notNullNotEmpty(field.getValidRegex())
+                    && termQueryValue.matches(field.getValidRegex())) {
+                toReturn = field.getFieldName() + ":" + termQueryValue.toUpperCase();
+                break;
             }
         }
+        return toReturn;
     }
 }
