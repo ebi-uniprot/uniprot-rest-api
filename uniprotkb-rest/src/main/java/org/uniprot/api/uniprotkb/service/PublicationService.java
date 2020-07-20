@@ -81,7 +81,7 @@ public class PublicationService {
         publications =
                 publications.subList(page.getOffset().intValue(), CursorPage.getNextOffset(page));
 
-        return QueryResult.of(publications, page, facets);
+        return QueryResult.of(publications.stream(), page, facets);
     }
 
     private List<PublicationEntry> getUniprotEntryPublicationEntries(String accession) {

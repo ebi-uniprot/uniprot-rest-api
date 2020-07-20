@@ -760,7 +760,7 @@ public abstract class AbstractSearchControllerIT {
                 .map(Arguments::of);
     }
 
-    private Stream<Arguments> getAllReturnedFields() {
+    protected Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));

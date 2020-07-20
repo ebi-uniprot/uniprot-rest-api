@@ -4,9 +4,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -97,13 +95,10 @@ public abstract class BasicSearchController<T> {
         context.setFacets(result.getFacets());
         context.setMatchedFields(result.getMatchedFields());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            List<String> accList =
-                    result.getContent().stream()
-                            .map(this::getEntityId)
-                            .collect(Collectors.toList());
-            context.setEntityIds(accList.stream());
+            Stream<String> accList = result.getContent().map(this::getEntityId);
+            context.setEntityIds(accList);
         } else {
-            context.setEntities(result.getContent().stream());
+            context.setEntities(result.getContent());
         }
 
         HttpHeaders headers = createHttpSearchHeader(contentType);

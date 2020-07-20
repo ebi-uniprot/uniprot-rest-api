@@ -41,6 +41,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
@@ -60,18 +61,18 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  */
 @Slf4j
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefController.class)
+@WebMvcTest(UniRefEntryController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniRefStreamControllerIT extends AbstractStreamControllerIT {
+class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
 
     private static final String streamRequestPath = "/uniref/stream";
     private final UniRefDocumentConverter documentConverter =
             new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
-    @Autowired UniProtStoreClient<UniRefEntry> storeClient;
+    @Autowired UniProtStoreClient<UniRefEntryLight> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
 
@@ -241,20 +242,11 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.id",
                                 containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.representativeMember.sequence.length",
-                                containsInAnyOrder(66, 66)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.representativeMember.organismTaxId",
-                                containsInAnyOrder(9606, 9606)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.members.*.organismTaxId",
-                                containsInAnyOrder(9606, 9606)))
-                .andExpect(jsonPath("$.results.*.representativeMember.organismName").doesNotExist())
-                .andExpect(jsonPath("$.results.*.members.*.organismName").doesNotExist());
+                .andExpect(jsonPath("$.results.*.sequenceLength", contains(66, 66)))
+                .andExpect(jsonPath("$.results.*.organismIds", hasItem(hasItem(9600))))
+                .andExpect(jsonPath("$.results.*.organisms").doesNotExist())
+                .andExpect(jsonPath("$.results.*.name").doesNotExist());
+        ;
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
@@ -294,7 +286,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
         Entry xmlEntry = converter.toXml(entry);
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
-        storeClient.saveEntry(entry);
+        storeClient.saveEntry(UniRefControllerITUtils.createEntryLight(i, type));
     }
 
     private Stream<Arguments> getAllSortFields() {

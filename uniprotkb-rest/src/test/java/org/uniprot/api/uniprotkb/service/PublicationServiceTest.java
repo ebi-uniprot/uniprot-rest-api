@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ class PublicationServiceTest {
         assertNotNull(result.getFacets());
         assertTrue(result.getFacets().isEmpty());
 
-        List<PublicationEntry> entries = new ArrayList<>(result.getContent());
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
         assertNotNull(entries);
         assertEquals(2, entries.size());
 
@@ -103,7 +104,7 @@ class PublicationServiceTest {
         assertNotNull(result.getFacets());
         assertTrue(result.getFacets().isEmpty());
 
-        List<PublicationEntry> entries = new ArrayList<>(result.getContent());
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
         assertNotNull(entries);
         assertEquals(1, entries.size());
 
@@ -146,7 +147,7 @@ class PublicationServiceTest {
 
         assertNotNull(result);
         assertNotNull(result.getContent());
-        assertEquals(2, result.getContent().size());
+        assertEquals(2, result.getContent().count());
         assertNotNull(result.getFacets());
 
         List<Facet> facets = new ArrayList<>(result.getFacets());
@@ -181,7 +182,7 @@ class PublicationServiceTest {
         assertEquals(new Integer(3), cursorPage.getPageSize());
         assertEquals(new Long(0), cursorPage.getOffset());
 
-        List<PublicationEntry> entries = new ArrayList<>(result.getContent());
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
         assertNotNull(entries);
         assertEquals(3, entries.size());
         Literature literature = (Literature) entries.get(0).getReference().getCitation();
@@ -218,7 +219,7 @@ class PublicationServiceTest {
         assertEquals(new Integer(3), cursorPage.getPageSize());
         assertEquals(new Long(3), cursorPage.getOffset());
 
-        List<PublicationEntry> entries = new ArrayList<>(result.getContent());
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
         assertNotNull(entries);
         assertEquals(3, entries.size());
         Literature literature = (Literature) entries.get(0).getReference().getCitation();
@@ -255,7 +256,7 @@ class PublicationServiceTest {
         assertEquals(new Integer(3), cursorPage.getPageSize());
         assertEquals(new Long(6), cursorPage.getOffset());
 
-        List<PublicationEntry> entries = new ArrayList<>(result.getContent());
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
         assertNotNull(entries);
         assertEquals(1, entries.size());
         Literature literature = (Literature) entries.get(0).getReference().getCitation();
