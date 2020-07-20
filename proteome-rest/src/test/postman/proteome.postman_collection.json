@@ -1,0 +1,372 @@
+{
+	"info": {
+		"_postman_id": "0441c876-18d3-4e18-b6e7-b715ce5fae30",
+		"name": "proteome",
+		"description": "Test suite of proteome",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "genecentric",
+			"item": [
+				{
+					"name": "download",
+					"item": [
+						{
+							"name": "Download gene centric data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "47728edf-af36-4704-aa80-ca5af4793d8f",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{genecentric_path}}/download?query={{genecentric_search_value}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{genecentric_path}}",
+										"download"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{genecentric_search_value}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "search",
+					"item": [
+						{
+							"name": "Search by query",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c7f6f16a-fd46-4737-aa03-bc18f49b449b",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{genecentric_path}}/search?query={{genecentric_search_value}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{genecentric_path}}",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{genecentric_search_value}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "accession",
+					"item": [
+						{
+							"name": "Get by accesssion",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "82c421ac-9925-44cd-b17c-424844ffb1d3",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{genecentric_path}}/{{accession}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{genecentric_path}}",
+										"{{accession}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "upid",
+					"item": [
+						{
+							"name": "Get by upid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "af855daa-e194-48e2-85cf-3d4350f12a81",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{genecentric_path}}/upid/{{upid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{genecentric_path}}",
+										"upid",
+										"{{upid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "proteome",
+			"item": [
+				{
+					"name": "search",
+					"item": [
+						{
+							"name": "Search proteome",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7794163f-6213-4e1e-93f8-43c881534b0c",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/proteome/search?query={{proteome_search_value}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"proteome",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{proteome_search_value}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "download",
+					"item": [
+						{
+							"name": "Download proteome",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2107767a-ebed-4bc4-bf9b-6043252d2aa8",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/proteome/search?query={{proteome_search_value}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"proteome",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{proteome_search_value}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "upid",
+					"item": [
+						{
+							"name": "Get by upid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3e528ab0-e1ac-4562-9be6-84dec42aa8c9",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/proteome/{{upid}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"proteome",
+										"{{upid}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "01de868e-a2f5-4cf2-bee7-f65152a978c9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ab4c2865-472d-43f2-b7fe-a4e42b1ff571",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "64555ab8-77d8-4bc9-9ccf-2e4d41e26f53",
+			"key": "genecentric_search_value",
+			"value": "UP000001816"
+		},
+		{
+			"id": "aef743b1-f57b-49a4-8be1-9d467e39cae8",
+			"key": "accession",
+			"value": "P12345"
+		},
+		{
+			"id": "2b293c8d-6565-4b90-8308-6ee1e77898c8",
+			"key": "upid",
+			"value": "UP000001816"
+		},
+		{
+			"id": "0fdb6cef-3dd7-4f57-a789-501752e94db4",
+			"key": "proteome_search_value",
+			"value": "UP000001816"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

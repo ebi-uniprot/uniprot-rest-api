@@ -136,6 +136,63 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    void streamCanReturnIncludeIsoforms() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "content:*")
+                        .param("includeIsoform", "true");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(12)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                containsInAnyOrder(
+                                        "P00001",
+                                        "P00002",
+                                        "P00003",
+                                        "P00004",
+                                        "P00005",
+                                        "P00006",
+                                        "P00007",
+                                        "P00008",
+                                        "P00009",
+                                        "P00010",
+                                        "P00011-2",
+                                        "P00012-2")));
+    }
+
+    @Test
+    void streamCanReturnIsoformsOnly() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "(content:BEK) AND (is_isoform:true)");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                containsInAnyOrder("P00011-2", "P00012-2")));
+    }
+
+    @Test
     void streamBadRequest() throws Exception {
         // when
         ResultActions response =
@@ -278,14 +335,16 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
     private void saveEntries() throws Exception {
         for (int i = 1; i <= 10; i++) {
-            saveEntry(i);
+            saveEntry(i, "");
         }
+        saveEntry(11, "-2");
+        saveEntry(12, "-2");
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 
-    private void saveEntry(int i) throws Exception {
+    private void saveEntry(int i, String isoFormString) throws Exception {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
-        String acc = String.format("P%05d", i);
+        String acc = String.format("P%05d", i) + isoFormString;
         entryBuilder.primaryAccession(acc);
 
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();

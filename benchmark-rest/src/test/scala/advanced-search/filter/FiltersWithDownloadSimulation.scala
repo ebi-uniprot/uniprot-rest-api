@@ -112,6 +112,7 @@ class FiltersWithDownloadSimulation extends Simulation {
     downloadInstance.inject(atOnceUsers(conf.getInt("a.s.multi.filters.download.users")))
   )
     .protocols(httpConf)
-    //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+    .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.multi.filters.percentile3.responseTime")),//percentile3 == 95th Percentile
+      global.successfulRequests.percent.gt(conf.getInt("a.s.multi.filters.successPercentGreaterThan")))
     .maxDuration(conf.getInt("a.s.multi.filters.maxDuration") minutes)
 }

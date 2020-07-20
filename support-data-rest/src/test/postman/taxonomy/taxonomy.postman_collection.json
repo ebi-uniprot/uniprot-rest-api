@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "609a0366-b908-4192-a3c3-2804c3709949",
+		"name": "taxonomy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "taxonid",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bce38f30-1d89-4627-93d2-876d3cffc699",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/taxonomy/{{taxonomy_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"taxonomy",
+								"{{taxonomy_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search taxonomy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f8f7f221-0f4a-44d5-9162-867d93059f98",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/taxonomy/search?query={{taxonomy_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"taxonomy",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{taxonomy_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "download",
+			"item": [
+				{
+					"name": "Download taxonomy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93011b6e-cb6a-435f-945f-82fab3f13196",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/taxonomy/download?query={{taxonomy_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"taxonomy",
+								"download"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{taxonomy_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d497fa8c-1d32-4bd0-a2d2-9008d284d86d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b207a579-ab2a-4b8f-9c6d-cfeae2aca21d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "1224ea18-67f0-4e0b-8767-237685de9a50",
+			"key": "taxonomy_id",
+			"value": "85621"
+		},
+		{
+			"id": "5a5c16b3-9c28-433d-80fd-b4ed0c7e6c69",
+			"key": "taxonomy_search_string",
+			"value": "9606"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
