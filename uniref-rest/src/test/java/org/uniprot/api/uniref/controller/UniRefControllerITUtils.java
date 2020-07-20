@@ -9,11 +9,7 @@ import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.UniRefType;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
+import org.uniprot.core.uniref.impl.*;
 
 /**
  * @author jluo
@@ -26,8 +22,56 @@ class UniRefControllerITUtils {
     static final String ID_PREF_100 = "UniRef100_P039";
     static final String NAME_PREF = "Cluster: MoeK5 ";
     static final String ACC_PREF = "P123";
-    static final String ACC_2_PREF = "P123";
+    static final String ACC_2_PREF = "P321";
     static final String UPI_PREF = "UPI0000083A";
+
+    static UniRefEntry createEntryWithTwelveMembers(int i, UniRefType type) {
+        UniRefEntryBuilder builder = UniRefEntryBuilder.from(createEntry(i, type));
+        for (int j = 2; j <= 12; j++) {
+            builder.membersAdd(createMember(j));
+        }
+        return builder.build();
+    }
+
+    static UniRefEntryLight createEntryLightWithTwelveMembers(int i, UniRefType type) {
+        UniRefEntry entry = createEntryWithTwelveMembers(i, type);
+        return createEntryLight(entry);
+    }
+
+    static UniRefEntryLight createEntryLight(int i, UniRefType type) {
+        UniRefEntry entry = createEntry(i, type);
+        return createEntryLight(entry);
+    }
+
+    static UniRefEntryLight createEntryLight(UniRefEntry entry) {
+        UniRefEntryLightBuilder builder =
+                new UniRefEntryLightBuilder()
+                        .id(entry.getId())
+                        .name(entry.getName())
+                        .updated(entry.getUpdated())
+                        .entryType(entry.getEntryType())
+                        .commonTaxonId(entry.getCommonTaxonId())
+                        .commonTaxon(entry.getCommonTaxon())
+                        .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
+                        .membersAdd(
+                                entry.getRepresentativeMember()
+                                        .getUniProtAccessions()
+                                        .get(0)
+                                        .getValue())
+                        .organismsAdd(entry.getRepresentativeMember().getOrganismName())
+                        .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId())
+                        .sequence(entry.getRepresentativeMember().getSequence().getValue());
+        entry.getMembers()
+                .forEach(
+                        uniRefMember -> {
+                            builder.memberIdTypesAdd(uniRefMember.getMemberIdType())
+                                    .membersAdd(
+                                            uniRefMember.getUniProtAccessions().get(0).getValue())
+                                    .organismsAdd(uniRefMember.getOrganismName())
+                                    .organismIdsAdd(uniRefMember.getOrganismTaxId());
+                        });
+        return builder.memberCount(entry.getMemberCount()).build();
+    }
 
     static UniRefEntry createEntry(int i, UniRefType type) {
         String idRef = getIdRef(type);
@@ -83,8 +127,8 @@ class UniRefControllerITUtils {
         return new UniRefMemberBuilder()
                 .memberIdType(type)
                 .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
+                .organismName("Homo sapiens " + i)
+                .organismTaxId(9606 + i)
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
@@ -114,8 +158,8 @@ class UniRefControllerITUtils {
         return new RepresentativeMemberBuilder()
                 .memberIdType(type)
                 .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
+                .organismName("Homo sapiens (Representative)")
+                .organismTaxId(9600)
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())

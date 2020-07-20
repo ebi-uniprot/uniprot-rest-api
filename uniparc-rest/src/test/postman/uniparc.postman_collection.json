@@ -1,0 +1,195 @@
+{
+	"info": {
+		"_postman_id": "38302d4c-c0c6-4d77-8491-ddf7d927826c",
+		"name": "uniparc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "upi",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "174edd9c-6597-4416-820f-be643169aa48",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniparc/{{upi}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniparc",
+								"{{upi}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "4b4520b9-5819-48cf-91f4-3c7e53b415e4",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e6a5dd52-439e-41e5-8724-31aca80bc0bc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "200f2d55-bf5b-40ce-bc42-ddb1da9ea7f6",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniparc/search?query?{{uniparc_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniparc",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query?{{uniparc_search_string}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "stream",
+			"item": [
+				{
+					"name": "Stream",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8128a1b3-2cd9-429a-8b8c-588b28c39c1b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/uniparc/stream?query?{{uniparc_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"uniparc",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "query?{{uniparc_search_string}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "18ee8f88-9fd8-4e55-a2fa-e13abc11f9de",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "90499672-e420-463c-a1d7-5fb5c6fae472",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "179ec26b-f86a-480d-bd07-6672d2d84939",
+			"key": "upi",
+			"value": "UPI0000000001"
+		},
+		{
+			"id": "99dd462b-6309-4b2a-a20c-ae22dcf468e8",
+			"key": "uniparc_search_string",
+			"value": "upi:UPI0000000001"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

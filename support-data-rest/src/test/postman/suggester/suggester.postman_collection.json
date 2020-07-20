@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "24b521df-f058-4d63-a4bd-9bdd2cfa4495",
+		"name": "suggester",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get suggestion",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6224b1c5-a762-4f72-a236-ff32b8391609",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{path_context}}/suggester?dict={{suggestor_dict}}&query={{suggestor_search_string}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{path_context}}",
+						"suggester"
+					],
+					"query": [
+						{
+							"key": "dict",
+							"value": "{{suggestor_dict}}"
+						},
+						{
+							"key": "query",
+							"value": "{{suggestor_search_string}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "379e5201-3bd1-4f94-8f8d-5aa388413d39",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5773e4bd-3520-4e18-a132-70d73a9dc308",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "b81152c2-cf42-4b13-99ec-4de6784fc2a9",
+			"key": "suggestor_dict",
+			"value": "KEYWORD"
+		},
+		{
+			"id": "3d2edfa9-1836-4425-bb81-f10b537176f7",
+			"key": "suggestor_search_string",
+			"value": "Biological"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

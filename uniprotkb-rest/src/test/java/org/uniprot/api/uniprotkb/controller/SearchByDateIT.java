@@ -4,7 +4,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
@@ -207,12 +207,12 @@ class SearchByDateIT {
 
         if (accessions == null) {
             // then
-            response.andDo(print())
+            response.andDo(log())
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                     .andExpect(jsonPath("$.results.*.primaryAccession").doesNotExist());
         } else {
-            response.andDo(print())
+            response.andDo(log())
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                     .andExpect(jsonPath("$.results.*.primaryAccession", contains(accessions)));

@@ -1,11 +1,15 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Collections;
@@ -14,6 +18,9 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -53,6 +60,12 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Slf4j
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcController.class)
+// @ContextConfiguration(
+//        classes = {
+//            UniParcDataStoreTestConfig.class,
+//            UniParcRestApplication.class,
+//            ErrorHandlerConfig.class
+//        })
 @ExtendWith(
         value = {
             SpringExtension.class,
@@ -61,19 +74,27 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
     private static final String UPI_PREF = "UPI0000083A";
-
-    @Autowired private MockMvc mockMvc;
-
-    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
-
     private static final String streamRequestPath = "/uniparc/stream";
-
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private SolrClient solrClient;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
+
+        // for the following tests, ensure the number of hits
+        // for each query is less than the maximum number allowed
+        // to be streamed (configured in {@link
+        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
+        long queryHits = 100L;
+        QueryResponse response = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(queryHits);
+        when(response.getResults()).thenReturn(results);
+        when(solrClient.query(anyString(), any())).thenReturn(response);
     }
 
     @Test
@@ -88,7 +109,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(jsonPath("$.results.size()", is(10)))
@@ -121,7 +142,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                 .param("download", "invalid"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -148,7 +169,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -171,7 +192,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -204,7 +225,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)));
@@ -223,7 +244,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -254,7 +275,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));

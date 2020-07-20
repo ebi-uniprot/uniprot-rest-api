@@ -1,24 +1,35 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
@@ -33,12 +44,13 @@ import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
-import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
+import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -55,30 +67,134 @@ import org.uniprot.store.search.SolrCollection;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefController.class)
+@WebMvcTest(UniRefLightSearchController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniRefSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
-            UniRefSearchControllerIT.UniRefSearchParameterResolver.class
+            UniRefLightSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
+            UniRefLightSearchControllerIT.UniRefSearchParameterResolver.class
         })
-public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private UniRefQueryRepository repository;
 
     @Autowired private UniRefFacetConfig facetConfig;
 
-    private UniRefStoreClient storeClient;
+    private UniRefLightStoreClient storeClient;
 
     @BeforeAll
     void initDataStore() {
         storeClient =
-                new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
+                new UniRefLightStoreClient(
+                        VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref-light"));
         getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
         getStoreManager()
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIREF,
                         new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+    }
+
+    @Test
+    void searchInvalidCompleteValueReturnBadRequest() throws Exception {
+        // given
+        UniRefEntry entry =
+                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=content:*&complete=invalid")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "'complete' parameter value has invalid format. It should be true or false.")));
+    }
+
+    @Test
+    void searchByDefaultReturnTopTenMembersAndOrganisms() throws Exception {
+        // given
+        UniRefEntry entry =
+                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=content:*")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
+                .andExpect(jsonPath("$.results[*].members.size()", contains(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].members[*]",
+                                contains(
+                                        "P12301", "P32101", "P32102", "P32103", "P32104", "P32105",
+                                        "P32106", "P32107", "P32108", "P32109")))
+                .andExpect(jsonPath("$.results[*].organisms.size()", contains(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].organisms[*]",
+                                contains(
+                                        "Homo sapiens (Representative)",
+                                        "Homo sapiens 1",
+                                        "Homo sapiens 2",
+                                        "Homo sapiens 3",
+                                        "Homo sapiens 4",
+                                        "Homo sapiens 5",
+                                        "Homo sapiens 6",
+                                        "Homo sapiens 7",
+                                        "Homo sapiens 8",
+                                        "Homo sapiens 9")))
+                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].organismIds[*]",
+                                contains(
+                                        9600, 9607, 9608, 9609, 9610, 9611, 9612, 9613, 9614,
+                                        9615)))
+                .andExpect(jsonPath("$.results[*].memberCount", contains(13)))
+                .andExpect(jsonPath("$.results[*].organismCount", contains(13)));
+    }
+
+    @Test
+    void searchByDefaultReturnCompleteMembersAndOrganisms() throws Exception {
+        // given
+        UniRefEntry entry =
+                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=content:*&complete=true")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
+                .andExpect(jsonPath("$.results[*].members.size()", contains(13)))
+                .andExpect(jsonPath("$.results[*].organisms.size()", contains(13)))
+                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(13)))
+                .andExpect(jsonPath("$.results[*].memberCount", contains(13)))
+                .andExpect(jsonPath("$.results[*].organismCount", contains(13)));
     }
 
     @AfterEach
@@ -124,7 +240,7 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
                 value = ID_PREF_50 + 11;
                 break;
             case "taxonomy_id":
-                value = "9606";
+                value = "9600";
                 break;
             case "length":
                 value = "[10 TO 500]";
@@ -158,16 +274,33 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
     }
 
     @Override
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+                .stream()
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
+    }
+
+    @Override
     protected void saveEntries(int numberOfEntries) {
         IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
     private void saveEntry(int i) {
         UniRefEntry unirefEntry = createEntry(i, UniRefType.UniRef50);
+        saveEntry(unirefEntry);
+    }
 
+    private void saveEntry(UniRefEntry unirefEntry) {
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, unirefEntry);
+        getStoreManager()
+                .saveToStore(DataStoreManager.StoreType.UNIREF, createEntryLight(unirefEntry));
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
     }
 
@@ -280,7 +413,7 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("taxonomy_id:9606")
+                    .query("taxonomy_id:9600")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -288,14 +421,6 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
                                             jsonPath(
                                                     "$.results.*.id",
                                                     contains("UniRef50_P03911", "UniRef50_P03920")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content().string(containsString("UniRef50_P03911")))
-                                    .resultMatcher(
-                                            content().string(containsString("UniRef50_P03920")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -353,15 +478,6 @@ public class UniRefSearchControllerIT extends AbstractSearchWithFacetControllerI
                                                     "$.messages.*",
                                                     contains(
                                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

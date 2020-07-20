@@ -10,6 +10,7 @@
 		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>common-rest</artifactId>
+	<name>common-rest</name>
 
 	<properties>
 		<hamcrest-all.version>1.3</hamcrest-all.version>
@@ -18,6 +19,7 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
+
 	</properties>
 
 	<dependencies>

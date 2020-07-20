@@ -1,11 +1,15 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Collections;
@@ -14,6 +18,9 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,6 +41,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
@@ -53,26 +61,35 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  */
 @Slf4j
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefController.class)
+@WebMvcTest(UniRefEntryController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniRefStreamControllerIT extends AbstractStreamControllerIT {
-
-    @Autowired private MockMvc mockMvc;
-
-    @Autowired UniProtStoreClient<UniRefEntry> storeClient;
+class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
 
     private static final String streamRequestPath = "/uniref/stream";
-
     private final UniRefDocumentConverter documentConverter =
             new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+    @Autowired UniProtStoreClient<UniRefEntryLight> storeClient;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private SolrClient solrClient;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
+
+        // for the following tests, ensure the number of hits
+        // for each query is less than the maximum number allowed
+        // to be streamed (configured in {@link
+        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
+        long queryHits = 100L;
+        QueryResponse response = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(queryHits);
+        when(response.getResults()).thenReturn(results);
+        when(solrClient.query(anyString(), any())).thenReturn(response);
     }
 
     @Test
@@ -87,7 +104,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(jsonPath("$.results.size()", is(12)))
@@ -122,7 +139,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
                                 .param("download", "invalid"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -149,7 +166,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -172,7 +189,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -199,7 +216,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(12)));
@@ -218,27 +235,18 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.id",
                                 containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.representativeMember.sequence.length",
-                                containsInAnyOrder(66, 66)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.representativeMember.organismTaxId",
-                                containsInAnyOrder(9606, 9606)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.members.*.organismTaxId",
-                                containsInAnyOrder(9606, 9606)))
-                .andExpect(jsonPath("$.results.*.representativeMember.organismName").doesNotExist())
-                .andExpect(jsonPath("$.results.*.members.*.organismName").doesNotExist());
+                .andExpect(jsonPath("$.results.*.sequenceLength", contains(66, 66)))
+                .andExpect(jsonPath("$.results.*.organismIds", hasItem(hasItem(9600))))
+                .andExpect(jsonPath("$.results.*.organisms").doesNotExist())
+                .andExpect(jsonPath("$.results.*.name").doesNotExist());
+        ;
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
@@ -252,7 +260,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
@@ -278,7 +286,7 @@ class UniRefStreamControllerIT extends AbstractStreamControllerIT {
         Entry xmlEntry = converter.toXml(entry);
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
-        storeClient.saveEntry(entry);
+        storeClient.saveEntry(UniRefControllerITUtils.createEntryLight(i, type));
     }
 
     private Stream<Arguments> getAllSortFields() {

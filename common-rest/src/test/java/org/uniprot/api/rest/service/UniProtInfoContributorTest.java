@@ -1,31 +1,28 @@
-package org.uniprot.api.uniprotkb.configuration;
+package org.uniprot.api.rest.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.uniprot.api.uniprotkb.configuration.UniProtKBInfoContributor.SERVICE_INFO_KEY;
+import static org.uniprot.api.rest.service.UniProtInfoContributor.SERVICE_INFO_KEY;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.actuate.info.Info;
-import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 /**
- * Created 01/04/20
+ * Created 10/07/2020
  *
  * @author Edd
  */
-class UniProtKBInfoContributorTest {
-
+class UniProtInfoContributorTest {
     @Test
     void infoBuilderIsUpdated() {
         Map<String, Object> serviceInfoMap = new HashMap<>();
         serviceInfoMap.put("release", "releaseValue");
         ServiceInfoConfig.ServiceInfo serviceInfo =
                 ServiceInfoConfig.ServiceInfo.builder().map(serviceInfoMap).build();
-        UniProtKBInfoContributor uniProtKBInfoContributor =
-                new UniProtKBInfoContributor(serviceInfo);
+        UniProtInfoContributor uniProtKBInfoContributor = new UniProtInfoContributor(serviceInfo);
         Info.Builder infoBuilder = new Info.Builder();
 
         uniProtKBInfoContributor.contribute(infoBuilder);

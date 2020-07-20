@@ -1,0 +1,128 @@
+{
+	"info": {
+		"_postman_id": "9f75b316-8057-4109-ae9b-95d9c572c182",
+		"name": "crossref",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "id",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5ffba7a4-0588-46fb-bc3a-e796031cdd79",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/xref/{{xref_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"xref",
+								"{{xref_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search xref",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "463cc9fb-6498-4d32-8149-2fd71afa45af",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/xref/search?query={{xref_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"xref",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{xref_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8b6c9552-af1c-4649-a444-48b373a625ed",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "9cb2b4a0-f81f-4ff3-bdf4-be6965a5f22b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "7ea25b3b-7bf7-4b4e-ac23-d7790c97900c",
+			"key": "xref_id",
+			"value": "DB-0236"
+		},
+		{
+			"id": "10e7cdaf-9eee-4639-afc1-7b41cfa12ff0",
+			"key": "xref_search_string",
+			"value": "curated"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

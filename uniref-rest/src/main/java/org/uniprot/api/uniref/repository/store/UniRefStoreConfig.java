@@ -4,7 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
+import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortRemoteUniRefEntryLightStore;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortRemoteUniRefEntryStore;
 
 /**
@@ -19,6 +21,11 @@ public class UniRefStoreConfig {
     }
 
     @Bean
+    public UniRefLightStoreConfigProperties lightStoreConfigProperties() {
+        return new UniRefLightStoreConfigProperties();
+    }
+
+    @Bean
     @Profile("live")
     public UniRefStoreClient uniRefStoreClient(
             UniRefStoreConfigProperties unirefStoreConfigProperties) {
@@ -28,5 +35,17 @@ public class UniRefStoreConfig {
                         unirefStoreConfigProperties.getStoreName(),
                         unirefStoreConfigProperties.getHost());
         return new UniRefStoreClient(client);
+    }
+
+    @Bean
+    @Profile("live")
+    public UniRefLightStoreClient uniRefLightStoreClient(
+            UniRefLightStoreConfigProperties lightStoreConfigProperties) {
+        VoldemortClient<UniRefEntryLight> client =
+                new VoldemortRemoteUniRefEntryLightStore(
+                        lightStoreConfigProperties.getNumberOfConnections(),
+                        lightStoreConfigProperties.getStoreName(),
+                        lightStoreConfigProperties.getHost());
+        return new UniRefLightStoreClient(client);
     }
 }

@@ -3,7 +3,7 @@ package org.uniprot.api.support.data.taxonomy;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.ByteBuffer;
@@ -119,7 +119,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response = getMockMvc().perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))

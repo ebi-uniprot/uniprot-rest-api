@@ -4,9 +4,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,6 +79,15 @@ public abstract class BasicSearchController<T> {
             String fields,
             HttpServletRequest request,
             HttpServletResponse response) {
+        return this.getSearchResponse(result, fields, false, request, response);
+    }
+
+    protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
+            QueryResult<T> result,
+            String fields,
+            boolean isDownload,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
@@ -88,17 +95,21 @@ public abstract class BasicSearchController<T> {
         context.setFacets(result.getFacets());
         context.setMatchedFields(result.getMatchedFields());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
-            List<String> accList =
-                    result.getContent().stream()
-                            .map(this::getEntityId)
-                            .collect(Collectors.toList());
-            context.setEntityIds(accList.stream());
+            Stream<String> accList = result.getContent().map(this::getEntityId);
+            context.setEntityIds(accList);
         } else {
-            context.setEntities(result.getContent().stream());
+            context.setEntities(result.getContent());
         }
+
+        HttpHeaders headers = createHttpSearchHeader(contentType);
+        if (isDownload) {
+            context.setDownloadContentDispositionHeader(true);
+            headers = createHttpDownloadHeader(context, request);
+        }
+
         this.eventPublisher.publishEvent(
                 new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
-        return ResponseEntity.ok().headers(createHttpSearchHeader(contentType)).body(context);
+        return ResponseEntity.ok().headers(headers).body(context);
     }
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
