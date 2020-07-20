@@ -1,6 +1,7 @@
 package org.uniprot.api.common.repository.search;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 
@@ -17,11 +18,11 @@ import org.uniprot.api.common.repository.search.term.TermInfo;
 public class QueryResult<T> {
     private final Collection<TermInfo> matchedFields;
     private Page page;
-    private final Collection<T> content;
+    private final Stream<T> content;
     private final Collection<Facet> facets;
 
     private QueryResult(
-            Collection<T> content,
+            Stream<T> content,
             Page page,
             Collection<Facet> facets,
             Collection<TermInfo> matchedFields) {
@@ -31,17 +32,16 @@ public class QueryResult<T> {
         this.matchedFields = matchedFields;
     }
 
-    public static <T> QueryResult<T> of(Collection<T> content, Page page) {
+    public static <T> QueryResult<T> of(Stream<T> content, Page page) {
         return new QueryResult<>(content, page, null, null);
     }
 
-    public static <T> QueryResult<T> of(
-            Collection<T> content, Page page, Collection<Facet> facets) {
+    public static <T> QueryResult<T> of(Stream<T> content, Page page, Collection<Facet> facets) {
         return new QueryResult<>(content, page, facets, null);
     }
 
     public static <T> QueryResult<T> of(
-            Collection<T> content,
+            Stream<T> content,
             Page page,
             Collection<Facet> facets,
             Collection<TermInfo> termInfos) {

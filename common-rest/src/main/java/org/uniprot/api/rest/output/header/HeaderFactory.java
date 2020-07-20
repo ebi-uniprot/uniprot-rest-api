@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.util.Utils;
 
 /**
  * Used by standard search/download controllers for creating headers used when searching and
@@ -21,6 +22,9 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
  * @author Edd
  */
 public class HeaderFactory {
+
+    private HeaderFactory() {}
+
     public static HttpHeaders createHttpSearchHeader(MediaType mediaType) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(mediaType);
@@ -31,39 +35,37 @@ public class HeaderFactory {
 
     public static HttpHeaders createHttpDownloadHeader(
             MessageConverterContext context, HttpServletRequest request) {
+        HttpHeaders httpHeaders = new HttpHeaders();
         MediaType mediaType = context.getContentType();
+        httpHeaders.setContentType(mediaType);
+        handleGatewayCaching(httpHeaders);
+        if (context.isDownloadContentDispositionHeader()) {
+            String actualFileName = getContentDispositionFileName(context, request, mediaType);
+            httpHeaders.setContentDispositionFormData("attachment", actualFileName);
+        }
+        return httpHeaders;
+    }
+
+    private static String getContentDispositionFileName(
+            MessageConverterContext context, HttpServletRequest request, MediaType mediaType) {
         String suffix =
                 "."
                         + UniProtMediaType.getFileExtension(mediaType)
                         + context.getFileType().getExtension();
-        String queryString = request.getQueryString();
-        String desiredFileName = "uniprot-" + queryString + suffix;
-        String actualFileName;
 
-        // truncate the file name if the query makes it too long -- instead use date + truncated
-        // query
-        if (desiredFileName.length() > 200) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter dateTimeFormatter =
-                    DateTimeFormatter.ofPattern("yyyy.MM.dd@HH:mm:ss.SS");
-            String timestamp = now.format(dateTimeFormatter);
-            int queryStrLength = queryString.length();
-            int queryStringTruncatePoint = queryStrLength > 50 ? 50 : queryStrLength;
-            actualFileName =
-                    "uniprot-"
-                            + timestamp
-                            + "-"
-                            + queryString.substring(0, queryStringTruncatePoint)
-                            + suffix;
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH.mm.ss.SS");
+        String queryString;
+        if (Utils.notNullNotEmpty(request.getQueryString())) {
+            queryString = request.getQueryString().replaceAll("[^A-Za-z0-9]", "_");
+            if (queryString.length() > 60) {
+                queryString = queryString.substring(0, 60);
+            }
+            queryString += "-" + now.format(dateTimeFormatter);
         } else {
-            actualFileName = desiredFileName;
+            queryString = now.format(dateTimeFormatter);
         }
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentDispositionFormData("attachment", actualFileName);
-        httpHeaders.setContentType(mediaType);
-        handleGatewayCaching(httpHeaders);
-
-        return httpHeaders;
+        return "uniprot-" + queryString + suffix;
     }
 
     /**

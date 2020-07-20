@@ -1,0 +1,636 @@
+{
+	"info": {
+		"_postman_id": "443ecf1e-183c-415e-9126-9e1584df7e87",
+		"name": "uniprotkb",
+		"description": "Test suite for UniProtKB requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search Proteins",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c2059a4d-89a0-47b4-8250-91e3a61d4f4f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a46419bb-0f0e-40bb-8233-3deb3440c9b5",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_by_gene}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_by_gene}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene xml",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "03753955-d188-42a8-bc42-ce47030c418f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene tsv",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd09ae3b-db25-4d17-97e2-964fc1d53145",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by gene list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "95e87392-632b-47fc-ba3a-849c41926bed",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /search API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "387e6e8e-07d7-406b-ad49-b6b98327c92d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b062163-b632-41fd-af75-3cb3767d56ce",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "accession",
+			"item": [
+				{
+					"name": "Get by accession",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "37002996-8138-4aac-9fc2-1fd3e7ee464a",
+								"exec": [
+									"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
+									"// to log various types of message on Postman Console",
+									"//e.g. console.warn(\"This is a sample warning message to print on Postman console\");",
+									"//e.g.console.error(\"This is a sample error message to print on Postman console\");",
+									"",
+									"// verify headers",
+									"",
+									"//1. Vary",
+									"let verifyVaryHeader = eval(pm.globals.get(\"verifyVaryHeader\"));",
+									"verifyVaryHeader();",
+									"",
+									"// 2. Status",
+									"let verifyStatusHeader = eval(pm.globals.get(\"verifyStatusHeader\"));",
+									"verifyStatusHeader();",
+									"",
+									"// 3. Content-Type",
+									"let verifyContentTypeHeader = eval(pm.globals.get(\"verifyContentTypeHeader\"));",
+									"verifyContentTypeHeader();",
+									"",
+									"// 4. X-Release",
+									"let verifyXReleaseHeader = eval(pm.globals.get(\"verifyXReleaseHeader\"));",
+									"verifyXReleaseHeader(pm.globals.get('x_release'));",
+									"// log the value of x_release at debug",
+									"console.log(\"The value of variable x_release is \" + pm.globals.get('x_release'));",
+									"",
+									"// 5. Access-Control-Allow-Origin",
+									"let verifyControlAllowHeader = eval(pm.globals.get(\"verifyControlAllowHeader\"));",
+									"verifyControlAllowHeader(pm.globals.get('control_origin'));",
+									"// log the value of x_release at info level",
+									"console.info(\"The value of variable control_origin is \" + pm.globals.get('control_origin'));",
+									"",
+									"// 6. Expose Headers",
+									"let verifyExposeHeaders = eval(pm.globals.get(\"verifyExposeHeaders\"));",
+									"verifyExposeHeaders();",
+									"",
+									"// 7. Date Headers",
+									"let verifyDateHeader = eval(pm.globals.get(\"verifyDateHeader\"));",
+									"verifyDateHeader();",
+									"",
+									"// 8. Transfer-Encoding",
+									"let verifyTransferEncodingHeader = eval(pm.globals.get(\"verifyTransferEncodingHeader\"));",
+									"verifyTransferEncodingHeader();",
+									"",
+									"",
+									"// 9. X-Cache-Info",
+									"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
+									"verifyXCacheInfoHeader();",
+									"",
+									"// verify data",
+									"let jsonData = pm.response.json();",
+									"",
+									"pm.test(\"entryType\", function () {",
+									"    pm.expect(jsonData.entryType).to.eql(\"UniProtKB reviewed (Swiss-Prot)\");",
+									"});",
+									"",
+									"pm.test(\"primaryAccession\", function () {",
+									"    pm.expect(jsonData.primaryAccession).to.eql(\"P12345\");",
+									"});",
+									"",
+									"utils.verifySecondaryAccessions(jsonData.secondaryAccessions, [\"G1SKL2\"]);",
+									"",
+									"",
+									"pm.test(\"uniProtkbId\", function () {",
+									"    pm.expect(jsonData.uniProtkbId).to.eql(\"AATM_RABIT\");",
+									"});",
+									"",
+									"// verify entryAudit",
+									"var expectedFirstPublicDate = '1989-10-01';",
+									"var expectedLastAnnotationUpdateDate ='2020-02-26';",
+									"var expectedLastSequenceUpdateDate = '2013-09-18';",
+									"var expectedEntryVersion = 125;",
+									"var expectedSequenceVersion = 2;",
+									"",
+									"utils.verifyEntryAudit(jsonData.entryAudit, expectedFirstPublicDate, expectedLastAnnotationUpdateDate, expectedLastSequenceUpdateDate, expectedEntryVersion, expectedSequenceVersion);",
+									"",
+									"console.log(jsonData.annotationScore);",
+									"pm.test(\"annotationScore\", function () {",
+									"    pm.expect(jsonData.annotationScore).to.eql(93.30000000000001);",
+									"});",
+									"",
+									"utils.verifyOrganism(jsonData.organism, \"Oryctolagus cuniculus\", \"Rabbit\", 9986, ",
+									"[\"Eukaryota\", \"Metazoa\", \"Chordata\", \"Craniata\", \"Vertebrata\", \"Euteleostomi\", \"Mammalia\",",
+									"\"Eutheria\", \"Euarchontoglires\", \"Glires\", \"Lagomorpha\", \"Leporidae\", \"Oryctolagus\"]);",
+									"",
+									"pm.test(\"proteinExistence\", function () {",
+									"    pm.expect(jsonData.proteinExistence).to.eql(\"1: Evidence at protein level\");",
+									"});",
+									"",
+									"pm.test(\"proteinDescription\", function () {",
+									"    utils.verifyNotNull(\"proteinDescription\", jsonData.proteinDescription);",
+									"});",
+									"",
+									"var expectedFullName = {\"value\": \"Aspartate aminotransferase, mitochondrial\"};",
+									"var expectedShortNames = [{\"value\": \"mAspAT\"}];",
+									"var expectedEcNumbers = [{\"value\": \"2.6.1.1\"},{\"value\": \"2.6.1.7\"}];",
+									"utils.verifyProteinName(\"recommendedName\", jsonData.proteinDescription.recommendedName,  ",
+									"    expectedFullName, expectedShortNames, expectedEcNumbers);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"accession",
+								"{{accession}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /accession/{accession} API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a3506926-0442-4ed9-b407-f771e2a375ed",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ef571f2-7636-42ad-b022-ee16f045cf41",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "accessions",
+			"item": [
+				{
+					"name": "Get Proteins by accession list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "16ef86ec-0ef9-4014-a819-b0befabcbec8",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"accessions"
+							],
+							"query": [
+								{
+									"key": "accessions",
+									"value": "{{accession_list}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /accessions API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a450eda9-5b34-4f39-8998-7d3011929d35",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "918705d0-a38d-4b99-b4c6-f9c10ee8bea2",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "stream",
+			"item": [
+				{
+					"name": "Stream Proteins",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d185f25b-94ad-432d-87e5-94c3e791707e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/stream?query={{search_value}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{search_value}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test suite for /stream API.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6d9d0b21-f0f0-4dc7-a9c0-2c34c202dc66",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b16478e2-3d52-424e-bf58-84a5d91ff65d",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "20616312-d383-4e75-a05f-203edb0e8c39",
+				"type": "text/javascript",
+				"exec": [
+					"utils = {",
+					"  verifyEntryAudit: function(entryAudit, firstPublicDate, lastAnnotationUpdateDate, lastSequenceUpdateDate, entryVersion, sequenceVersion) {",
+					"    pm.test(\"entryAudit\", function () {",
+					"      utils.verifyNotNull(\"entryAudit\", entryAudit);",
+					"      pm.expect(entryAudit, 'is not an object').to.be.an(\"object\");",
+					"      pm.expect(entryAudit.firstPublicDate, \"firstPublicDate\").to.eql(firstPublicDate);",
+					"      pm.expect(entryAudit.lastAnnotationUpdateDate, \"lastAnnotationUpdateDate\").to.eql(lastAnnotationUpdateDate);",
+					"      pm.expect(entryAudit.lastSequenceUpdateDate, \"lastSequenceUpdateDate\").to.eql(lastSequenceUpdateDate);",
+					"      pm.expect(entryAudit.entryVersion, \"entryVersion\").to.eql(entryVersion);",
+					"      pm.expect(entryAudit.sequenceVersion, \"sequenceVersion\").to.eql(sequenceVersion);",
+					"  })},",
+					"",
+					"  verifySecondaryAccessions: function(secondaryAccessions, accessions) {",
+					"    pm.test(\"secondaryAccessions\", function () {",
+					"    utils.verifyArrayValues(\"secondaryAccessions\", secondaryAccessions, accessions);",
+					"})},",
+					"",
+					"verifyOrganism: function(organism, scientificName, commonName, taxonId, lineage, evidences) {",
+					"    pm.test(\"organism\", function () {",
+					"      utils.verifyNotNull(\"organism\", organism);",
+					"      pm.expect(organism, 'is not an object').to.be.an(\"object\");",
+					"      pm.expect(organism.scientificName, \"scientificName\").to.eql(scientificName);",
+					"      pm.expect(organism.commonName, \"commonName\").to.eql(commonName);",
+					"      pm.expect(organism.taxonId, \"taxonId\").to.eql(taxonId);  ",
+					"      utils.verifyArrayValues(\"lineage\", organism.lineage, lineage);",
+					"      pm.expect(organism.evidences, 'is not undefined').to.be.a('undefined');",
+					"})},",
+					"",
+					"verifyProteinName: function(fieldName, proteinName, fullName, shortNames, ecNumbers){",
+					"pm.test(fieldName, function () {",
+					"      utils.verifyNotNull(fieldName, proteinName);",
+					"      pm.expect(proteinName, 'is not an object').to.be.an(\"object\");",
+					"      utils.verifyNotNull(\"fieldName\", proteinName.fullName);",
+					"      pm.expect(proteinName.fullName, \"fullName\").to.eql(fullName);",
+					"      utils.verifyArrayValues(\"shortNames\", proteinName.shortNames, shortNames);",
+					"      utils.verifyArrayValues(\"ecNumbers\", proteinName.ecNumbers, ecNumbers);",
+					"})",
+					"},",
+					"",
+					"verifyArrayValues: function(name, actualValues, expectedValues){",
+					"  utils.verifyNotNull(name, actualValues);",
+					"  pm.expect(actualValues, name + ' is not array').to.be.an('array');",
+					"  pm.expect(actualValues, name + ' length mismatch').to.have.lengthOf(expectedValues.length);",
+					"  pm.expect(actualValues, name + ' values mismatch').to.have.deep.members(expectedValues);",
+					"},",
+					"",
+					"verifyNotNull: function(name, value){",
+					"  pm.expect(value, name + ' is undefined').not.to.be.a('undefined');",
+					"  pm.expect(value, name + ' is null').not.to.be.a('null');",
+					"}",
+					"};"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e69f0221-4b9a-4bc6-a953-e088db1e716f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "9abd4ef4-f46d-4e2b-ac7e-f988605d09ce",
+			"key": "search_value",
+			"value": "rnf18"
+		},
+		{
+			"id": "a8ae2191-0590-4415-85e1-6897de25eff1",
+			"key": "accession_list",
+			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
+		},
+		{
+			"id": "ad99f117-7e1a-4558-8801-1c27c1f04c97",
+			"key": "accession",
+			"value": "P12345"
+		},
+		{
+			"id": "eb73d2b4-8f09-4510-b98b-f432087299d4",
+			"key": "search_by_gene",
+			"value": "gene:p53"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

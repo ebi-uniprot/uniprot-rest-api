@@ -67,10 +67,10 @@ public abstract class SolrQueryRepository<T extends Document> {
             List<Facet> facets = facetConverter.convert(solrResponse);
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
 
-            return QueryResult.of(resultList, page, facets, termInfos);
+            return QueryResult.of(resultList.stream(), page, facets, termInfos);
         } catch (InvalidRequestException ire) {
             throw ire;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (e.getCause() instanceof InvalidRequestException) {
                 throw (InvalidRequestException) e.getCause();
             }
@@ -94,7 +94,7 @@ public abstract class SolrQueryRepository<T extends Document> {
             } else {
                 return Optional.empty();
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
             logSolrQuery(request);

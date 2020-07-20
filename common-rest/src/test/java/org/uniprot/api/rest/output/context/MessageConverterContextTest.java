@@ -28,7 +28,7 @@ class MessageConverterContextTest {
         List<Facet> facets = emptyList();
         List<TermInfo> matchedFields = emptyList();
         MessageConverterContextFactory.Resource resource =
-                MessageConverterContextFactory.Resource.UNIPROT;
+                MessageConverterContextFactory.Resource.UNIPROTKB;
         String fields = "field1,field2";
 
         MessageConverterContext<String> context =
@@ -62,7 +62,7 @@ class MessageConverterContextTest {
         List<Facet> facets = emptyList();
         List<TermInfo> matchedFIelds = emptyList();
         MessageConverterContextFactory.Resource resource =
-                MessageConverterContextFactory.Resource.UNIPROT;
+                MessageConverterContextFactory.Resource.UNIPROTKB;
         String fields = "field1,field2";
 
         MessageConverterContext<String> context =

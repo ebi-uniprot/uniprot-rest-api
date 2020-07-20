@@ -46,7 +46,8 @@ class DownloadSimulation extends Simulation {
     instance.inject(atOnceUsers(conf.getInt("a.s.download.users")))
   )
     .protocols(httpConf)
-    //      .assertions(global.responseTime.percentile3.lte(500), global.successfulRequests.percent.gte(99))
+    .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.download.percentile3.responseTime")),//percentile3 == 95th Percentile
+      global.successfulRequests.percent.gt(conf.getInt("a.s.download.successfulRequests.percent")))
     .maxDuration(conf.getInt("a.s.download.maxDuration") minutes)
 
 }

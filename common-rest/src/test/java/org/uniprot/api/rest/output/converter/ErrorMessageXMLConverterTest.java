@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
 
 /**
@@ -66,6 +67,27 @@ class ErrorMessageXMLConverterTest {
         assertTrue(result.contains("<messages>errorMessage1</messages>"));
         assertTrue(result.contains("<messages>errorMessage2</messages>"));
         assertTrue(result.contains("<url>url</url>"));
+    }
+
+    @Test
+    void canWriteIfErrorInfoEntityAndXml() {
+        assertTrue(
+                new ErrorMessageXMLConverter()
+                        .canWrite(null, ErrorInfo.class, MediaType.APPLICATION_XML));
+    }
+
+    @Test
+    void cannotWriteIfErrorInfoEntityButNotXml() {
+        assertFalse(
+                new ErrorMessageXMLConverter()
+                        .canWrite(null, ErrorInfo.class, MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void cannotWriteIfNotErrorInfoEntityAndIsXml() {
+        assertFalse(
+                new ErrorMessageXMLConverter()
+                        .canWrite(null, String.class, MediaType.APPLICATION_XML));
     }
 
     private HttpOutputMessage getHttpOutputMessage(ByteArrayOutputStream outputStream) {

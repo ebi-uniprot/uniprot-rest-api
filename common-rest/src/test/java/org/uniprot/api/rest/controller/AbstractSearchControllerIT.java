@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
@@ -85,7 +85,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -115,7 +115,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -134,7 +134,7 @@ public abstract class AbstractSearchControllerIT {
                 mockMvc.perform(get(getSearchRequestPath()).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*", contains("'query' is a required parameter")));
@@ -153,7 +153,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)));
@@ -169,7 +169,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
     }
@@ -185,7 +185,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -205,7 +205,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -233,7 +233,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)));
@@ -259,7 +259,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -288,7 +288,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -317,7 +317,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -351,7 +351,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -372,7 +372,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -401,7 +401,7 @@ public abstract class AbstractSearchControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)));
@@ -432,7 +432,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
@@ -452,7 +452,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("fields", "invalidField, otherInvalid")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -483,7 +483,7 @@ public abstract class AbstractSearchControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -520,7 +520,7 @@ public abstract class AbstractSearchControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(print())
+                    response.andDo(log())
                             .andExpect(status().is(HttpStatus.OK.value()))
                             .andExpect(
                                     header().string(
@@ -549,7 +549,7 @@ public abstract class AbstractSearchControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(print())
+                    response.andDo(log())
                             .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                             .andExpect(
                                     header().string(
@@ -586,7 +586,7 @@ public abstract class AbstractSearchControllerIT {
         // when
         ResultActions response = mockMvc.perform(get(getSearchRequestPath()).param("query", "*:*"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE));
     }
@@ -605,7 +605,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("query", "*:*")
                                 .param("format", extension));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -628,7 +628,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("size", "0"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*", contains("'size' must be greater than 0")));
@@ -648,7 +648,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("query", "*:*"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", String.valueOf(savedEntries)))
@@ -675,7 +675,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("size", "5"));
 
         // then page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "5"))
@@ -697,7 +697,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("size", "5"));
 
         // then first page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "6"))
@@ -720,7 +720,7 @@ public abstract class AbstractSearchControllerIT {
                                 .param("size", "5"));
 
         // then last page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "6"))
@@ -760,7 +760,7 @@ public abstract class AbstractSearchControllerIT {
                 .map(Arguments::of);
     }
 
-    private Stream<Arguments> getAllReturnedFields() {
+    protected Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));

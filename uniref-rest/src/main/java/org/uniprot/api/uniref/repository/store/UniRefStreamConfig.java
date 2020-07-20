@@ -5,16 +5,21 @@ import java.time.Duration;
 
 import net.jodah.failsafe.RetryPolicy;
 
+import org.apache.http.client.HttpClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.common.repository.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.uniref.repository.UniRefQueryRepository;
-import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.store.search.document.uniref.UniRefDocument;
+import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.store.search.SolrCollection;
 
 /** @author jluo date: 21 Aug 2019 */
 @Configuration
@@ -22,22 +27,35 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 public class UniRefStreamConfig {
 
     @Bean
-    public StoreStreamer<UniRefDocument, UniRefEntry> unirefEntryStoreStreamer(
-            UniRefStoreClient unirefClient, UniRefQueryRepository uniRefQueryRepository) {
+    public TupleStreamTemplate tupleStreamTemplate(
+            StreamerConfigProperties configProperties,
+            HttpClient httpClient,
+            SolrClient solrClient,
+            SolrRequestConverter requestConverter) {
+        return TupleStreamTemplate.builder()
+                .streamConfig(configProperties)
+                .httpClient(httpClient)
+                .solrClient(solrClient)
+                .solrRequestConverter(requestConverter)
+                .build();
+    }
+
+    @Bean
+    public StoreStreamer<UniRefEntryLight> unirefEntryStoreStreamer(
+            UniRefLightStoreClient uniRefLightStoreClient,
+            TupleStreamTemplate tupleStreamTemplate,
+            StreamerConfigProperties streamConfig) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(
-                                Duration.ofMillis(
-                                        resultsConfigProperties().getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(resultsConfigProperties().getStoreFetchMaxRetries());
+                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        return StoreStreamer.<UniRefDocument, UniRefEntry>builder()
-                .storeBatchSize(resultsConfigProperties().getStoreBatchSize())
-                .storeClient(unirefClient)
-                .documentToId(UniRefDocument::getId)
-                .repository(uniRefQueryRepository)
+        return StoreStreamer.<UniRefEntryLight>builder()
+                .streamConfig(streamConfig)
+                .storeClient(uniRefLightStoreClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
                 .build();
     }
@@ -46,5 +64,15 @@ public class UniRefStreamConfig {
     @ConfigurationProperties(prefix = "streamer.uniref")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
+    }
+
+    @Bean
+    public FacetTupleStreamTemplate facetTupleStreamTemplate(
+            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+        return FacetTupleStreamTemplate.builder()
+                .collection(SolrCollection.uniref.name())
+                .zookeeperHost(configProperties.getZkHost())
+                .httpClient(httpClient)
+                .build();
     }
 }

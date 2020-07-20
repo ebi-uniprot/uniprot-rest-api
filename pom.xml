@@ -28,7 +28,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.version>3.8.0</maven.compiler.version>
 		<java.version>1.8</java.version>
-		<jacoco.version>0.8.4</jacoco.version>
+		<jacoco.version>0.8.5</jacoco.version>
 		<maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
 
 		<spring.boot.version>2.0.3.RELEASE</spring.boot.version>
@@ -71,6 +71,7 @@
 		<module>uniref-rest</module>
 		<module>unisave-rest</module>
 		<module>benchmark-rest</module>
+		<module>jacoco-aggregate-report</module>
 	</modules>
 
 	<dependencyManagement>
@@ -193,6 +194,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-test-framework</artifactId>
+			<version>${solrj.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Swagger dependencies -->
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -215,54 +223,6 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>${maven-surefire-plugin.version}</version>
-					<configuration>
-						<systemProperties>
-							<property>
-								<name>http.proxyHost</name>
-								<value>${http.proxyHost}</value>
-							</property>
-							<property>
-								<name>http.proxyPort</name>
-								<value>${http.proxyPort}</value>
-							</property>
-						</systemProperties>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>${maven-failsafe-plugin.version}</version>
-					<configuration>
-						<systemProperties>
-							<property>
-								<name>http.proxyHost</name>
-								<value>${http.proxyHost}</value>
-							</property>
-							<property>
-								<name>http.proxyPort</name>
-								<value>${http.proxyPort}</value>
-							</property>
-						</systemProperties>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven-compiler-plugin.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco.version}</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -276,6 +236,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<argLine>-Xmx1024m -XX:MaxPermSize=256m ${argLine}</argLine>
 					<includes>
 						<include>*</include>
 					</includes>
@@ -319,6 +280,19 @@
 						<phase>compile</phase>
 						<goals>
 							<goal>apply</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -499,18 +473,12 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.4</version>
+						<version>${jacoco.version}</version>
 						<executions>
 							<execution>
 								<id>prepare-agent</id>
 								<goals>
 									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>report</id>
-								<goals>
-									<goal>report</goal>
 								</goals>
 							</execution>
 						</executions>

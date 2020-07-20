@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,7 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.*;
+import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -27,8 +31,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     public static final Integer DEFAULT_SOLR_BATCH_SIZE = 100;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
-    private final AbstractSolrSortClause solrSortClause;
-    private final QueryBoosts queryBoosts;
+    protected final AbstractSolrSortClause solrSortClause;
+    protected final QueryBoosts queryBoosts;
     private final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
@@ -54,7 +58,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public R findByUniqueId(final String uniqueId) {
-        return getEntity(getIdField().getFieldName(), uniqueId);
+        return getEntity(getIdField(), uniqueId);
     }
 
     public R getEntity(String idField, String value) {
@@ -87,11 +91,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         SolrRequest solrRequest = createSearchSolrRequest(request);
 
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
-        List<R> converted =
-                results.getContent().stream()
-                        .map(entryConverter)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
+        Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
@@ -143,24 +143,34 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
-
         SolrRequest.SolrRequestBuilder builder =
-                createSolrRequestBuilder(
-                        request,
-                        this.facetConfig,
-                        this.solrSortClause,
-                        includeFacets,
-                        this.queryBoosts);
+                createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts);
+
+        if (includeFacets && request.hasFacets()) {
+            builder.facets(request.getFacetList());
+            builder.facetConfig(facetConfig);
+        }
+
+        // If the requested size is less than batch size, set the batch size as requested size
+        Integer requestedSize = request.getSize();
+        if (isSizeLessOrEqualToSolrBatchSize(requestedSize)) {
+            builder.rows(requestedSize); // add the batch size for the solr query
+        } else { // Else set the solr batch size if passed else use DEFAULT_SOLR_BATCH_SIZE(25)
+            builder.rows(getDefaultBatchSize());
+        }
+
+        if (requestedSize.equals(
+                NumberUtils.INTEGER_MINUS_ONE)) { // special case for download, -1 to get everything
+            builder.totalRows(Integer.MAX_VALUE);
+        } else { // total number of rows requested by the client
+            builder.totalRows(requestedSize);
+        }
 
         return builder.build();
     }
 
-    private SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            SearchRequest request,
-            FacetConfig facetConfig,
-            AbstractSolrSortClause solrSortClause,
-            boolean includeFacets,
-            QueryBoosts queryBoosts) {
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request, AbstractSolrSortClause solrSortClause, QueryBoosts queryBoosts) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
 
@@ -170,26 +180,6 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
-        }
-
-        if (includeFacets && request.hasFacets()) {
-            requestBuilder.facets(request.getFacetList());
-            requestBuilder.facetConfig(facetConfig);
-        }
-
-        // If the requested size is less than batch size, set the batch size as requested size
-        Integer requestedSize = request.getSize();
-        if (isSizeLessOrEqualToSolrBatchSize(requestedSize)) {
-            requestBuilder.rows(requestedSize); // add the batch size for the solr query
-        } else { // Else set the solr batch size if passed else use DEFAULT_SOLR_BATCH_SIZE(25)
-            requestBuilder.rows(getDefaultBatchSize());
-        }
-
-        if (requestedSize.equals(
-                NumberUtils.INTEGER_MINUS_ONE)) { // special case for download, -1 to get everything
-            requestBuilder.totalRows(Integer.MAX_VALUE);
-        } else { // total number of rows requested by the client
-            requestBuilder.totalRows(requestedSize);
         }
 
         requestBuilder.queryBoosts(queryBoosts);

@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONOMY;
@@ -81,7 +81,7 @@ class SuggesterControllerWithServerErrorsIT {
                                 .param("dict", TAXONOMY.name()));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
     }

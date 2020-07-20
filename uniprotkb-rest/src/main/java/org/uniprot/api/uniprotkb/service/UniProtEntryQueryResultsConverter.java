@@ -2,14 +2,16 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -34,9 +36,8 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  *
  * @author Edd
  */
+@Service
 class UniProtEntryQueryResultsConverter {
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(UniProtEntryQueryResultsConverter.class);
 
     private final UniProtKBStoreClient entryStore;
     private final RetryPolicy<Object> retryPolicy =
@@ -55,12 +56,11 @@ class UniProtEntryQueryResultsConverter {
 
     QueryResult<UniProtKBEntry> convertQueryResult(
             QueryResult<UniProtDocument> results, List<ReturnField> filters) {
-        List<UniProtKBEntry> upEntries =
-                results.getContent().stream()
+        Stream<UniProtKBEntry> upEntries =
+                results.getContent()
                         .map(doc -> convertDoc(doc, filters))
                         .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
+                        .map(Optional::get);
         return QueryResult.of(
                 upEntries, results.getPage(), results.getFacets(), results.getMatchedFields());
     }

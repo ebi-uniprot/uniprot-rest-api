@@ -75,7 +75,7 @@ public class UniProtKBConfigureController {
                                                                                     .class)))
                         })
             })
-    @GetMapping("/search-terms")
+    @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getUniProtSearchTerms() {
         return service.getUniProtSearchItems();
     }
