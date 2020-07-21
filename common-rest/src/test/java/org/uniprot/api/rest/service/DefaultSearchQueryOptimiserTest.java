@@ -1,14 +1,13 @@
 package org.uniprot.api.rest.service;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * @author lgonzales

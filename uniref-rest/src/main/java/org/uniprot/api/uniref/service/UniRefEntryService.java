@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +10,12 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
 /**
@@ -32,8 +36,13 @@ public class UniRefEntryService extends BasicSearchService<UniRefDocument, UniRe
     }
 
     @Override
-    protected String getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return this.searchFieldConfig.getSearchFieldItemByName("id");
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
@@ -46,5 +55,12 @@ public class UniRefEntryService extends BasicSearchService<UniRefDocument, UniRe
     public Stream<UniRefEntry> download(SearchRequest request) {
         throw new UnsupportedOperationException(
                 "UniRefEntryService does not support download, try to use UniRefLightSearchService");
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        List<SearchFieldItem> optimisedFields = new ArrayList<>();
+        optimisedFields.add(this.getIdField());
+        optimisedFields.add(this.searchFieldConfig.getSearchFieldItemByName("upi"));
+        return optimisedFields;
     }
 }

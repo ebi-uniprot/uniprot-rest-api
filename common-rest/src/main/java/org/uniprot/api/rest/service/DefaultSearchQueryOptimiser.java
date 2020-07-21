@@ -1,14 +1,14 @@
 package org.uniprot.api.rest.service;
 
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * @author lgonzales
@@ -21,10 +21,12 @@ public class DefaultSearchQueryOptimiser {
     // matched against TOKEN_PATTERN. If there is no match, then no optimisation occurs. Otherwise,
     // the token is split into three groups: (before)(token)(after).
     // Groups 1 and 2 allows characters not related to the actual token, e.g., +,-,[,],(,), etc.
-    // Group 3 records the precise value, which is not permitted to contain a ':' (i.e., no field specified),
+    // Group 3 records the precise value, which is not permitted to contain a ':' (i.e., no field
+    // specified),
     // and is then matched against all known ID fields for an optimised version, see {@link
     // org.uniprot.api.rest.service.DefaultSearchQueryOptimiser.getOptimisedDefaultTermForValue}
-    // For example: query = "nofield field1:hello (+x AND y) => tokens ["nofield", "(+x", "AND", "y)"].
+    // For example: query = "nofield field1:hello (+x AND y) => tokens ["nofield", "(+x", "AND",
+    // "y)"].
     private static final Pattern TOKEN_PATTERN =
             Pattern.compile("([\"+\\-\\(\\)\\]]+)?([\\w]+)([\"\\(\\)\\[]+)?");
 
