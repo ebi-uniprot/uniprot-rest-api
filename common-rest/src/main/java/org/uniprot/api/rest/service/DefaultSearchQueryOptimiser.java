@@ -16,7 +16,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  */
 public class DefaultSearchQueryOptimiser {
 
-    private final List<SearchFieldItem> optimisedFields;
+    private final List<SearchFieldItem> optimisableFields;
     // The optimiser first breaks the query into white space separated tokens. These tokens are then
     // matched against TOKEN_PATTERN. If there is no match, then no optimisation occurs. Otherwise,
     // the token is split into three groups: (before)(token)(after).
@@ -34,8 +34,8 @@ public class DefaultSearchQueryOptimiser {
         this(Collections.singletonList(idField));
     }
 
-    public DefaultSearchQueryOptimiser(List<SearchFieldItem> optimisedFields) {
-        this.optimisedFields = optimisedFields;
+    public DefaultSearchQueryOptimiser(List<SearchFieldItem> optimisableFields) {
+        this.optimisableFields = optimisableFields;
     }
 
     /**
@@ -88,7 +88,7 @@ public class DefaultSearchQueryOptimiser {
      */
     private String getOptimisedDefaultTermForValue(String termQueryValue) {
         String toReturn = termQueryValue;
-        for (SearchFieldItem field : optimisedFields) {
+        for (SearchFieldItem field : optimisableFields) {
             if (notNullNotEmpty(field.getValidRegex())
                     && termQueryValue.matches(field.getValidRegex())) {
                 toReturn = field.getFieldName() + ":" + termQueryValue.toUpperCase();
