@@ -15,7 +15,7 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
+import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortInMemoryUniRefMemberStore;
 
 /**
  * @author jluo
@@ -38,8 +38,9 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public UniRefMemberStoreClient unirefStoreClient() {
-        return new UniRefMemberStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("uniref"));
+    public UniRefMemberStoreClient unirefMemberStoreClient() {
+        return new UniRefMemberStoreClient(
+                VoldemortInMemoryUniRefMemberStore.getInstance("uniref"));
     }
 
     @Bean

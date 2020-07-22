@@ -1,15 +1,17 @@
 package org.uniprot.api.uniref.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author lgonzales

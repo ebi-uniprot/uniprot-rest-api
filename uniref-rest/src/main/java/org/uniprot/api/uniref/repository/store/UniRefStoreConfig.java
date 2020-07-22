@@ -7,7 +7,7 @@ import org.uniprot.core.uniref.RepresentativeMember;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortRemoteUniRefEntryLightStore;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortRemoteUniRefMemberStore;
+import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortRemoteUniRefMemberStore;
 
 /**
  * @author jluo

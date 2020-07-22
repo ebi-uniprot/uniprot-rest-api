@@ -42,7 +42,7 @@ import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefMemberStore;
+import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortInMemoryUniRefMemberStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -70,7 +70,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private UniRefMemberStoreClient memberStoreClient;
 
-    private UniRefLightStoreClient lightStoreClient; //TODO:
+    private UniRefLightStoreClient lightStoreClient; // TODO:
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -95,7 +95,8 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @BeforeAll
     void initDataStore() {
         memberStoreClient =
-                new UniRefMemberStoreClient(VoldemortInMemoryUniRefMemberStore.getInstance("avro-uniref"));
+                new UniRefMemberStoreClient(
+                        VoldemortInMemoryUniRefMemberStore.getInstance("avro-uniref"));
         getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, memberStoreClient);
         getStoreManager()
                 .addDocConverter(
