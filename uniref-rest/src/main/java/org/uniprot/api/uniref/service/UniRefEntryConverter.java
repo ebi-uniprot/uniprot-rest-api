@@ -38,7 +38,8 @@ public class UniRefEntryConverter {
     private final UniRefMemberStoreClient entryStore;
     private final UniRefLightStoreClient uniRefLightStore;
 
-    public UniRefEntryConverter(UniRefMemberStoreClient entryStore, UniRefLightStoreClient uniRefLightStore) {
+    public UniRefEntryConverter(
+            UniRefMemberStoreClient entryStore, UniRefLightStoreClient uniRefLightStore) {
         this.entryStore = entryStore;
         this.uniRefLightStore = uniRefLightStore;
     }
@@ -48,8 +49,12 @@ public class UniRefEntryConverter {
         UniRefEntryLight entryLight = getUniRefEntryLightFromStore(doc.getId());
         List<String> pageMemberIds = entryLight.getMembers();
         boolean convertCommon = true;
-        if(!uniRefIdRequest.isComplete()) {
-            CursorPage page = CursorPage.of(uniRefIdRequest.getCursor(), uniRefIdRequest.getSize(), entryLight.getMemberCount());
+        if (!uniRefIdRequest.isComplete()) {
+            CursorPage page =
+                    CursorPage.of(
+                            uniRefIdRequest.getCursor(),
+                            uniRefIdRequest.getSize(),
+                            entryLight.getMemberCount());
             convertCommon = (page.getOffset() == 0); // convert common only in the first page
             pageMemberIds = getMembersPage(page, entryLight);
             builder.page(page);
@@ -58,10 +63,11 @@ public class UniRefEntryConverter {
         return builder.build();
     }
 
-    private UniRefEntry buildUniRefEntry(UniRefEntryLight entryLight, List<String> pageMemberIds, boolean convertCommon) {
+    private UniRefEntry buildUniRefEntry(
+            UniRefEntryLight entryLight, List<String> pageMemberIds, boolean convertCommon) {
         UniRefEntryBuilder builder = new UniRefEntryBuilder();
 
-        if(convertCommon) {
+        if (convertCommon) {
             builder.id(entryLight.getId());
             builder.name(entryLight.getName());
             builder.entryType(entryLight.getEntryType());
@@ -71,43 +77,52 @@ public class UniRefEntryConverter {
             builder.commonTaxon(entryLight.getCommonTaxon());
             builder.goTermsSet(entryLight.getGoTerms());
         }
-        //build members
+        // build members
         pageMemberIds.forEach(memberId -> convertMember(memberId, builder, entryLight));
         return builder.build();
     }
 
-    private void convertMember(String memberId, UniRefEntryBuilder builder, UniRefEntryLight entryLight) {
+    private void convertMember(
+            String memberId, UniRefEntryBuilder builder, UniRefEntryLight entryLight) {
         RepresentativeMember storedMember = getMemberFromStore(memberId);
-        if(storedMember.getMemberId().equalsIgnoreCase(entryLight.getRepresentativeId())){
-            if(storedMember.getMemberId().equalsIgnoreCase(entryLight.getSeedId())){
-                storedMember = RepresentativeMemberBuilder.from(storedMember)
-                        .isSeed(true)
-                        .build();
+        if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getRepresentativeId())) {
+            if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getSeedId())) {
+                storedMember = RepresentativeMemberBuilder.from(storedMember).isSeed(true).build();
             }
             builder.representativeMember(storedMember);
         } else {
             UniRefMemberBuilder memberBuilder = UniRefMemberBuilder.from(storedMember);
-            if(storedMember.getMemberId().equalsIgnoreCase(entryLight.getSeedId())){
+            if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getSeedId())) {
                 memberBuilder.isSeed(true);
             }
             builder.membersAdd(memberBuilder.build());
         }
     }
 
-    private UniRefEntryLight getUniRefEntryLightFromStore(String clusterId){
-        return Failsafe.with(retryPolicy).get(() -> uniRefLightStore.getEntry(clusterId))
-                .orElseThrow(() -> new ServiceException("Unable to get UniRefEntryLight from store. ClusterId:"+clusterId));
+    private UniRefEntryLight getUniRefEntryLightFromStore(String clusterId) {
+        return Failsafe.with(retryPolicy)
+                .get(() -> uniRefLightStore.getEntry(clusterId))
+                .orElseThrow(
+                        () ->
+                                new ServiceException(
+                                        "Unable to get UniRefEntryLight from store. ClusterId:"
+                                                + clusterId));
     }
 
-    private RepresentativeMember getMemberFromStore(String memberId){
-        return Failsafe.with(retryPolicy).get(() -> entryStore.getEntry(memberId))
-                .orElseThrow(() -> new ServiceException("Unable to get RepresentativeMember from store. MemberId:"+memberId));
+    private RepresentativeMember getMemberFromStore(String memberId) {
+        return Failsafe.with(retryPolicy)
+                .get(() -> entryStore.getEntry(memberId))
+                .orElseThrow(
+                        () ->
+                                new ServiceException(
+                                        "Unable to get RepresentativeMember from store. MemberId:"
+                                                + memberId));
     }
 
     private List<String> getMembersPage(CursorPage page, UniRefEntryLight entryLight) {
         int offset = page.getOffset().intValue();
         int nextOffset = CursorPage.getNextOffset(page);
-        if(nextOffset > entryLight.getMemberCount()){
+        if (nextOffset > entryLight.getMemberCount()) {
             nextOffset = entryLight.getMemberCount();
         }
         return entryLight.getMembers().subList(offset, nextOffset);

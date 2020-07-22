@@ -100,7 +100,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         UniRefEntryResult entryResult = entryService.getEntity(id, idRequest);
-        if(entryResult.getPage() != null) {
+        if (entryResult.getPage() != null) {
             this.eventPublisher.publishEvent(
                     new PaginatedResultsEvent(this, request, response, entryResult.getPage()));
         }

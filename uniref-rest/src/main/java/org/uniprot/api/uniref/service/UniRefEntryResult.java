@@ -2,6 +2,7 @@ package org.uniprot.api.uniref.service;
 
 import lombok.Builder;
 import lombok.Getter;
+
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.core.uniref.UniRefEntry;
 
@@ -16,5 +17,4 @@ public class UniRefEntryResult {
     private UniRefEntry entry;
 
     private CursorPage page;
-
 }

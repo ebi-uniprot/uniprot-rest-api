@@ -18,11 +18,12 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  * @since 09/07/2020
  */
 @Service
-public class UniRefEntryService{
+public class UniRefEntryService {
 
     private final SearchFieldConfig searchFieldConfig;
     private final SolrQueryRepository<UniRefDocument> repository;
     private final UniRefEntryConverter entryConverter;
+
     @Autowired
     public UniRefEntryService(
             SolrQueryRepository<UniRefDocument> repository, UniRefEntryConverter entryConverter) {
@@ -52,10 +53,11 @@ public class UniRefEntryService{
     }
 
     private UniRefDocument getEntryFromSolr(String value) {
-        SolrRequest solrRequest = SolrRequest.builder()
-                .query(getIdField() + ":" + value)
-                .rows(NumberUtils.INTEGER_ONE)
-                .build();
+        SolrRequest solrRequest =
+                SolrRequest.builder()
+                        .query(getIdField() + ":" + value)
+                        .rows(NumberUtils.INTEGER_ONE)
+                        .build();
         return repository
                 .getEntry(solrRequest)
                 .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
