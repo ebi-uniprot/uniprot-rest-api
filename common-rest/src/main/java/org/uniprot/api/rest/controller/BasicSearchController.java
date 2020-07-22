@@ -33,7 +33,7 @@ import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
  */
 @Slf4j
 public abstract class BasicSearchController<T> {
-    private final ApplicationEventPublisher eventPublisher;
+    protected final ApplicationEventPublisher eventPublisher;
     private final MessageConverterContextFactory<T> converterContextFactory;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;

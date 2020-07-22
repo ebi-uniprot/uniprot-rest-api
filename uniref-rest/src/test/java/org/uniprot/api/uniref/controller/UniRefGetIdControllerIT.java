@@ -27,7 +27,8 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
-import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
+import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
+import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
@@ -41,7 +42,7 @@ import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
+import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefMemberStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -67,7 +68,9 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Autowired private UniRefQueryRepository repository;
 
-    private UniRefStoreClient storeClient;
+    private UniRefMemberStoreClient memberStoreClient;
+
+    private UniRefLightStoreClient lightStoreClient; //TODO:
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -91,9 +94,9 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @BeforeAll
     void initDataStore() {
-        storeClient =
-                new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("avro-uniref"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
+        memberStoreClient =
+                new UniRefMemberStoreClient(VoldemortInMemoryUniRefMemberStore.getInstance("avro-uniref"));
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, memberStoreClient);
         getStoreManager()
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIREF,
@@ -102,7 +105,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @AfterEach
     void cleanStoreClient() {
-        storeClient.truncate();
+        memberStoreClient.truncate();
     }
 
     @Override

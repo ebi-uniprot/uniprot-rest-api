@@ -8,9 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author jluo
  * @date: 20 Aug 2019
  */
-@ConfigurationProperties(prefix = "voldemort.uniref")
+@ConfigurationProperties(prefix = "voldemort.uniref.member")
 @Data
-public class UniRefStoreConfigProperties {
+public class UniRefMemberStoreConfigProperties {
     private String host;
     private int numberOfConnections;
     private String storeName;

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
-import org.uniprot.api.uniref.repository.store.UniRefStoreClient;
+import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.datastore.voldemort.uniref.VoldemortInMemoryUniRefEntryStore;
 
@@ -38,8 +38,8 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public UniRefStoreClient unirefStoreClient() {
-        return new UniRefStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("uniref"));
+    public UniRefMemberStoreClient unirefStoreClient() {
+        return new UniRefMemberStoreClient(VoldemortInMemoryUniRefEntryStore.getInstance("uniref"));
     }
 
     @Bean
