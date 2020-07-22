@@ -8,6 +8,8 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +21,14 @@ import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
+import org.uniprot.api.uniref.request.UniRefIdRequest;
+import org.uniprot.api.uniref.service.UniRefEntryResult;
 import org.uniprot.api.uniref.service.UniRefEntryService;
-import org.uniprot.api.uniref.service.UniRefLightSearchService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,7 +50,6 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
     @Autowired
     public UniRefEntryController(
             ApplicationEventPublisher eventPublisher,
-            UniRefLightSearchService queryService,
             UniRefEntryService entryService,
             MessageConverterContextFactory<UniRefEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
@@ -97,18 +96,15 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.id.value}")
                     String id,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "uniref-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
-                    @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
-                    @RequestParam(value = "fields", required = false)
-                    String fields,
-            HttpServletRequest request) {
-        UniRefEntry entry = entryService.findByUniqueId(id);
-        return super.getEntityResponse(entry, fields, request);
+            @Valid @ModelAttribute UniRefIdRequest idRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        UniRefEntryResult entryResult = entryService.getEntity(id, idRequest);
+        if(entryResult.getPage() != null) {
+            this.eventPublisher.publishEvent(
+                    new PaginatedResultsEvent(this, request, response, entryResult.getPage()));
+        }
+        return super.getEntityResponse(entryResult.getEntry(), idRequest.getFields(), request);
     }
 
     @Override
