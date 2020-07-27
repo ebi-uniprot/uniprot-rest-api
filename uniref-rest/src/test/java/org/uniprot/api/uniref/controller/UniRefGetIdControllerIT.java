@@ -3,8 +3,9 @@ package org.uniprot.api.uniref.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
 
-import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,20 +30,7 @@ import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.cv.go.GoAspect;
-import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
-import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
-import org.uniprot.core.xml.jaxb.uniref.Entry;
-import org.uniprot.core.xml.uniref.UniRefEntryConverter;
-import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortInMemoryUniRefMemberStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -63,18 +51,18 @@ import org.uniprot.store.search.SolrCollection;
             UniRefGetIdControllerIT.UniRefGetIdContentTypeParamResolver.class
         })
 public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
-    private static final String ID = "UniRef50_P03923";
-    private static final String NAME = "Cluster: MoeK5";
+    private static final String ID = "UniRef50_P03901";
+    private static final String NAME = "Cluster: MoeK5 01";
 
     @Autowired private UniRefQueryRepository repository;
 
-    private UniRefMemberStoreClient memberStoreClient;
+    @Autowired private UniRefMemberStoreClient memberStoreClient;
 
-    private UniRefLightStoreClient lightStoreClient; // TODO:
+    @Autowired private UniRefLightStoreClient lightStoreClient;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
-        return DataStoreManager.StoreType.UNIREF;
+        return DataStoreManager.StoreType.UNIREF_LIGHT;
     }
 
     @Override
@@ -94,13 +82,11 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @BeforeAll
     void initDataStore() {
-        memberStoreClient =
-                new UniRefMemberStoreClient(
-                        VoldemortInMemoryUniRefMemberStore.getInstance("avro-uniref"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, memberStoreClient);
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF_LIGHT, lightStoreClient);
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF_MEMBER, memberStoreClient);
         getStoreManager()
                 .addDocConverter(
-                        DataStoreManager.StoreType.UNIREF,
+                        DataStoreManager.StoreType.UNIREF_LIGHT,
                         new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
@@ -111,94 +97,15 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        UniRefEntry unirefEntry = createEntry();
-        UniRefEntryConverter converter = new UniRefEntryConverter();
-        Entry entry = converter.toXml(unirefEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF, unirefEntry);
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
-    }
-
-    private UniRefEntry createEntry() {
-
-        UniRefType type = UniRefType.UniRef100;
-
-        UniRefEntryId entryId = new UniRefEntryIdBuilder(ID).build();
-
-        return new UniRefEntryBuilder()
-                .id(entryId)
-                .name(NAME)
-                .updated(LocalDate.of(2019, 8, 27))
-                .entryType(type)
-                .commonTaxonId(9606L)
-                .commonTaxon("Homo sapiens")
-                .representativeMember(createReprestativeMember())
-                .membersAdd(createMember())
-                .goTermsAdd(
-                        new GeneOntologyEntryBuilder()
-                                .aspect(GoAspect.COMPONENT)
-                                .id("GO:0044444")
-                                .build())
-                .goTermsAdd(
-                        new GeneOntologyEntryBuilder()
-                                .aspect(GoAspect.FUNCTION)
-                                .id("GO:0044459")
-                                .build())
-                .goTermsAdd(
-                        new GeneOntologyEntryBuilder()
-                                .aspect(GoAspect.PROCESS)
-                                .id("GO:0032459")
-                                .build())
-                .memberCount(2)
-                .build();
-    }
-
-    private UniRefMember createMember() {
-        String memberId = "P12345_HUMAN";
-        int length = 312;
-        String pName = "some protein name";
-        String upi = "UPI0000083A08";
-
-        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
-        return new UniRefMemberBuilder()
-                .memberIdType(type)
-                .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
-                .sequenceLength(length)
-                .proteinName(pName)
-                .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtKBAccessionBuilder("P12345").build())
-                .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
-                .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
-                .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
-                .build();
-    }
-
-    private RepresentativeMember createReprestativeMember() {
-        String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVEDDFSAGSADFAFWERDGDSDGFDSHSDJHETRHJREH";
-        Sequence sequence = new SequenceBuilder(seq).build();
-        String memberId = "P12345_HUMAN";
-        int length = 312;
-        String pName = "some protein name";
-        String upi = "UPI0000083A08";
-
-        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
-
-        return new RepresentativeMemberBuilder()
-                .memberIdType(type)
-                .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
-                .sequenceLength(length)
-                .proteinName(pName)
-                .uniparcId(new UniParcIdBuilder(upi).build())
-                .accessionsAdd(new UniProtKBAccessionBuilder("P12345").build())
-                .uniref100Id(new UniRefEntryIdBuilder("UniRef100_P03923").build())
-                .uniref90Id(new UniRefEntryIdBuilder("UniRef90_P03943").build())
-                .uniref50Id(new UniRefEntryIdBuilder("UniRef50_P03973").build())
-                .isSeed(true)
-                .sequence(sequence)
-                .build();
+        UniRefEntry unirefEntry = createEntry(1, UniRefType.UniRef50);
+        getStoreManager()
+                .saveToStore(
+                        DataStoreManager.StoreType.UNIREF_LIGHT, createEntryLight(unirefEntry));
+        List<RepresentativeMember> members = createEntryMembers(unirefEntry);
+        members.forEach(
+                member -> {
+                    getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF_MEMBER, member);
+                });
     }
 
     static class UniRefGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -291,7 +198,7 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UniRef50_P03923	Cluster: MoeK5	Homo sapiens	2	2019-08-27")))
+                                                                    "UniRef50_P03901\tCluster: MoeK5 01\tHomo sapiens\t2\t2019-08-27")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

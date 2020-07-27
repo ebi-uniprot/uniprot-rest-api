@@ -1,6 +1,7 @@
 package org.uniprot.api.uniref.repository.store;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.stream.IntStream;
@@ -10,6 +11,8 @@ import junit.framework.AssertionFailedError;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.uniref.request.UniRefIdRequest;
 import org.uniprot.api.uniref.service.UniRefEntryResult;
 import org.uniprot.core.cv.go.GoAspect;
@@ -30,6 +33,8 @@ import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortInMemoryUniR
 class UniRefEntryStoreRepositoryTest {
 
     private static final String UNIREF_ID_OK = "UniRef50_P21802";
+    public static final String UNIREF_INVALID_ID = "INVALID_ID";
+    public static final String UNIREF_REPRESENTATIVE_AS_SEED_ID = "UniRef50_P11111";
     public static final String REPRESENTATIVE_ID = "P21802";
     public static final String SEED_ID = "P12342";
     private UniRefEntryStoreRepository repository;
@@ -67,12 +72,13 @@ class UniRefEntryStoreRepositoryTest {
         assertEquals(10L, entry.getCommonTaxonId().longValue());
         assertEquals(1, entry.getGoTerms().size());
 
-        assertEquals(28, entry.getMemberCount().intValue());
+        assertEquals(28, entry.getMemberCount().intValue()); // 27+representative
         assertEquals(27, entry.getMembers().size());
 
         assertEquals(REPRESENTATIVE_ID, entry.getRepresentativeMember().getMemberId());
         UniRefMember seedMember =
                 entry.getMembers().stream()
+                        .filter(uniRefMember -> uniRefMember.isSeed() != null)
                         .filter(UniRefMember::isSeed)
                         .findFirst()
                         .orElseThrow(AssertionFailedError::new);
@@ -80,24 +86,184 @@ class UniRefEntryStoreRepositoryTest {
     }
 
     @Test
-    void getFirstPageEntryByIdDefault25() {
+    void getFirstPageEntryByIdDefault25WithCommonDataAndRepresentative() {
         UniRefIdRequest request = new UniRefIdRequest();
         UniRefEntryResult result = repository.getEntryById(UNIREF_ID_OK, request);
         assertNotNull(result);
+        assertNotNull(result.getPage());
+        CursorPage page = result.getPage();
+        assertEquals(0L, page.getOffset().longValue());
+        assertEquals(25, page.getPageSize().intValue());
+        assertEquals(28L, page.getTotalElements().longValue());
+        assertEquals("3v5g94y9lqs", page.getEncryptedNextCursor());
+        assertTrue(page.hasNextPage());
+
+        assertNotNull(result.getEntry());
+
+        UniRefEntry entry = result.getEntry();
+        assertEquals(UNIREF_ID_OK, entry.getId().getValue());
+        assertEquals("name value", entry.getName());
+        assertEquals(UniRefType.UniRef50, entry.getEntryType());
+        assertNotNull(entry.getUpdated());
+        assertEquals("common taxon value", entry.getCommonTaxon());
+        assertEquals(10L, entry.getCommonTaxonId().longValue());
+        assertEquals(1, entry.getGoTerms().size());
+
+        assertEquals(28, entry.getMemberCount().intValue());
+        assertEquals(24, entry.getMembers().size());
+
+        assertEquals(REPRESENTATIVE_ID, entry.getRepresentativeMember().getMemberId());
+        UniRefMember seedMember =
+                entry.getMembers().stream()
+                        .filter(uniRefMember -> uniRefMember.isSeed() != null)
+                        .filter(UniRefMember::isSeed)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+        assertEquals(SEED_ID, seedMember.getMemberId());
     }
 
     @Test
-    void getSecondPageEntryById() {
+    void getFirstPageEntryByIdWithSize10() {
         UniRefIdRequest request = new UniRefIdRequest();
+        request.setSize(10);
         UniRefEntryResult result = repository.getEntryById(UNIREF_ID_OK, request);
         assertNotNull(result);
+        assertNotNull(result.getPage());
+        CursorPage page = result.getPage();
+        assertEquals(0L, page.getOffset().longValue());
+        assertEquals(10, page.getPageSize().intValue());
+        assertEquals(28L, page.getTotalElements().longValue());
+        assertEquals("3sbq7rwffis", page.getEncryptedNextCursor());
+        assertTrue(page.hasNextPage());
+
+        assertNotNull(result.getEntry());
+
+        UniRefEntry entry = result.getEntry();
+        assertEquals(UNIREF_ID_OK, entry.getId().getValue());
+        assertEquals("name value", entry.getName());
+        assertEquals(UniRefType.UniRef50, entry.getEntryType());
+        assertNotNull(entry.getUpdated());
+        assertEquals("common taxon value", entry.getCommonTaxon());
+        assertEquals(10L, entry.getCommonTaxonId().longValue());
+        assertEquals(1, entry.getGoTerms().size());
+
+        assertEquals(28, entry.getMemberCount().intValue());
+        assertEquals(9, entry.getMembers().size());
+
+        assertEquals(REPRESENTATIVE_ID, entry.getRepresentativeMember().getMemberId());
+        UniRefMember seedMember =
+                entry.getMembers().stream()
+                        .filter(uniRefMember -> uniRefMember.isSeed() != null)
+                        .filter(UniRefMember::isSeed)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+        assertEquals(SEED_ID, seedMember.getMemberId());
+    }
+
+    @Test
+    void getSecondPageEntryByIdWithSize10OnlyMembers() {
+        UniRefIdRequest request = new UniRefIdRequest();
+        request.setSize(10);
+        request.setCursor("3sbq7rwffis");
+        UniRefEntryResult result = repository.getEntryById(UNIREF_ID_OK, request);
+        assertNotNull(result);
+
+        assertNotNull(result);
+        assertNotNull(result.getPage());
+        CursorPage page = result.getPage();
+        assertEquals(10L, page.getOffset().longValue());
+        assertEquals(10, page.getPageSize().intValue());
+        assertEquals(28L, page.getTotalElements().longValue());
+        assertEquals("3v3i3le3dck", page.getEncryptedNextCursor());
+        assertTrue(page.hasNextPage());
+
+        assertNotNull(result.getEntry());
+
+        UniRefEntry entry = result.getEntry();
+        assertNotNull(entry);
+        assertNull(entry.getId());
+        assertNull(entry.getName());
+        assertNull(entry.getEntryType());
+        assertNull(entry.getUpdated());
+        assertNull(entry.getCommonTaxon());
+        assertNull(entry.getCommonTaxonId());
+        assertTrue(entry.getGoTerms().isEmpty());
+        assertNull(entry.getRepresentativeMember());
+        assertNull(entry.getMemberCount());
+        assertEquals(10, entry.getMembers().size());
     }
 
     @Test
     void getLastPageEntryById() {
         UniRefIdRequest request = new UniRefIdRequest();
+        request.setSize(10);
+        request.setCursor("3v3i3le3dck");
         UniRefEntryResult result = repository.getEntryById(UNIREF_ID_OK, request);
         assertNotNull(result);
+
+        assertNotNull(result);
+        assertNotNull(result.getPage());
+        CursorPage page = result.getPage();
+        assertEquals(20L, page.getOffset().longValue());
+        assertEquals(10, page.getPageSize().intValue());
+        assertEquals(28L, page.getTotalElements().longValue());
+        assertFalse(page.hasNextPage());
+
+        assertNotNull(result.getEntry());
+
+        UniRefEntry entry = result.getEntry();
+        assertNotNull(entry);
+        assertNull(entry.getId());
+        assertNull(entry.getName());
+        assertNull(entry.getEntryType());
+        assertNull(entry.getUpdated());
+        assertNull(entry.getCommonTaxon());
+        assertNull(entry.getCommonTaxonId());
+        assertTrue(entry.getGoTerms().isEmpty());
+        assertNull(entry.getRepresentativeMember());
+        assertNull(entry.getMemberCount());
+        assertEquals(8, entry.getMembers().size());
+    }
+
+    @Test
+    void getNotFoundEntryLight() {
+        UniRefIdRequest request = new UniRefIdRequest();
+        ResourceNotFoundException error =
+                assertThrows(
+                        ResourceNotFoundException.class,
+                        () -> repository.getEntryById("NOT_FOUND_ID", request));
+        assertEquals(
+                "Unable to get UniRefEntry from store. ClusterId: NOT_FOUND_ID",
+                error.getMessage());
+    }
+
+    @Test
+    void getNotFoundEntryMember() {
+        UniRefIdRequest request = new UniRefIdRequest();
+        ResourceNotFoundException error =
+                assertThrows(
+                        ResourceNotFoundException.class,
+                        () -> repository.getEntryById(UNIREF_INVALID_ID, request));
+        assertEquals(
+                "Unable to get Member from store. ClusterId: INVALID_ID, memberId:INVALID",
+                error.getMessage());
+    }
+
+    @Test
+    void getRepresentativeSeedEntryById() {
+        UniRefIdRequest request = new UniRefIdRequest();
+        UniRefEntryResult result =
+                repository.getEntryById(UNIREF_REPRESENTATIVE_AS_SEED_ID, request);
+        assertNotNull(result);
+
+        UniRefEntry entry = result.getEntry();
+        assertEquals(UNIREF_REPRESENTATIVE_AS_SEED_ID, entry.getId().getValue());
+
+        assertEquals(1, entry.getMemberCount().intValue());
+        assertEquals(0, entry.getMembers().size());
+
+        assertEquals(SEED_ID, entry.getRepresentativeMember().getMemberId());
+        assertEquals(true, entry.getRepresentativeMember().isSeed());
     }
 
     private void createLightEntries(UniRefLightStoreClient lightStoreClient) {
@@ -129,8 +295,16 @@ class UniRefEntryStoreRepositoryTest {
 
         UniRefEntryLight wrongEntry =
                 new UniRefEntryLightBuilder().id("INVALID_ID").membersAdd("INVALID").build();
-
         lightStoreClient.saveEntry(wrongEntry);
+
+        UniRefEntryLight repreSeed =
+                new UniRefEntryLightBuilder()
+                        .id(UNIREF_REPRESENTATIVE_AS_SEED_ID)
+                        .seedId(SEED_ID)
+                        .representativeId(SEED_ID)
+                        .membersAdd(SEED_ID)
+                        .build();
+        lightStoreClient.saveEntry(repreSeed);
     }
 
     private void createMembers(UniRefMemberStoreClient memberStoreClient) {

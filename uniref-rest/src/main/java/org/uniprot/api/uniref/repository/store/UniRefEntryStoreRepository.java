@@ -126,9 +126,6 @@ public class UniRefEntryStoreRepository {
     private List<String> getMembersPage(CursorPage page, UniRefEntryLight entryLight) {
         int offset = page.getOffset().intValue();
         int nextOffset = CursorPage.getNextOffset(page);
-        if (nextOffset > entryLight.getMemberCount()) {
-            nextOffset = entryLight.getMemberCount();
-        }
         return entryLight.getMembers().subList(offset, nextOffset);
     }
 }
