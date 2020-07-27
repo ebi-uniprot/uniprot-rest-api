@@ -87,10 +87,10 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         storeClient =
                 new UniRefLightStoreClient(
                         VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref-light"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF_LIGHT, storeClient);
         getStoreManager()
                 .addDocConverter(
-                        DataStoreManager.StoreType.UNIREF,
+                        DataStoreManager.StoreType.UNIREF_LIGHT,
                         new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
@@ -204,7 +204,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
-        return DataStoreManager.StoreType.UNIREF;
+        return DataStoreManager.StoreType.UNIREF_LIGHT;
     }
 
     @Override
@@ -300,8 +300,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
         getStoreManager()
-                .saveToStore(DataStoreManager.StoreType.UNIREF, createEntryLight(unirefEntry));
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
+                .saveToStore(
+                        DataStoreManager.StoreType.UNIREF_LIGHT, createEntryLight(unirefEntry));
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF_LIGHT, entry);
     }
 
     static class UniRefSearchParameterResolver extends AbstractSearchParameterResolver {
