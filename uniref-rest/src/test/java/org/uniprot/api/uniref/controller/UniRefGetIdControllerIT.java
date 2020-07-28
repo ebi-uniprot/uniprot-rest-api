@@ -1,21 +1,29 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
 
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -50,7 +58,7 @@ import org.uniprot.store.search.SolrCollection;
             UniRefGetIdControllerIT.UniRefGetIdParameterResolver.class,
             UniRefGetIdControllerIT.UniRefGetIdContentTypeParamResolver.class
         })
-public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
+class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ID = "UniRef50_P03901";
     private static final String NAME = "Cluster: MoeK5 01";
 
@@ -92,12 +100,17 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @AfterEach
     void cleanStoreClient() {
+        lightStoreClient.truncate();
         memberStoreClient.truncate();
     }
 
     @Override
     protected void saveEntry() {
         UniRefEntry unirefEntry = createEntry(1, UniRefType.UniRef50);
+        saveEntry(unirefEntry);
+    }
+
+    private void saveEntry(UniRefEntry unirefEntry) {
         getStoreManager()
                 .saveToStore(
                         DataStoreManager.StoreType.UNIREF_LIGHT, createEntryLight(unirefEntry));
@@ -106,6 +119,136 @@ public class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 member -> {
                     getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF_MEMBER, member);
                 });
+    }
+
+    @Test
+    void getIdCompleteTrueReturnAllMembersWithoutPagination() throws Exception {
+        // given
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 28, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("complete", "true")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", nullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.id", is(ID)))
+                .andExpect(jsonPath("$.representativeMember.memberId", is("P12301_HUMAN")))
+                .andExpect(jsonPath("$.members.size()", is(27)))
+                .andExpect(jsonPath("$.memberCount", is(28)));
+    }
+
+    @Test
+    void getIdByDefaultReturnTwentyFiveMembersWithPagination() throws Exception {
+        // given
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 28, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "28"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=25")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=3v5g94y9lqs")))
+                .andExpect(jsonPath("$.id", is(ID)))
+                .andExpect(jsonPath("$.representativeMember.memberId", is("P12301_HUMAN")))
+                .andExpect(jsonPath("$.members.size()", is(24)))
+                .andExpect(jsonPath("$.memberCount", is(28)));
+    }
+
+    @Test
+    void getFirstPageMembers() throws Exception {
+        // given
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 15, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("size", "10")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "15"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=10")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=3sbq7rwffis")))
+                .andExpect(jsonPath("$.id", is(ID)))
+                .andExpect(jsonPath("$.representativeMember.memberId", is("P12301_HUMAN")))
+                .andExpect(jsonPath("$.members.size()", is(9)))
+                .andExpect(
+                        jsonPath(
+                                "$.members[*].memberId",
+                                contains(
+                                        "P32101_HUMAN",
+                                        "P32102_HUMAN",
+                                        "P32103_HUMAN",
+                                        "P32104_HUMAN",
+                                        "P32105_HUMAN",
+                                        "P32106_HUMAN",
+                                        "P32107_HUMAN",
+                                        "P32108_HUMAN",
+                                        "P32109_HUMAN")))
+                .andExpect(jsonPath("$.memberCount", is(15)));
+    }
+
+    @Test
+    void getLastPageMembers() throws Exception {
+        // given
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 15, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("size", "10")
+                                        .param("cursor", "3sbq7rwffis")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "15"))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.id").doesNotExist())
+                .andExpect(jsonPath("$.representativeMember").doesNotExist())
+                .andExpect(jsonPath("$.memberCount").doesNotExist())
+                .andExpect(jsonPath("$.members.size()", is(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.members[*].memberId",
+                                contains(
+                                        "P32110_HUMAN",
+                                        "P32111_HUMAN",
+                                        "P32112_HUMAN",
+                                        "P32113_HUMAN",
+                                        "P32114_HUMAN")));
     }
 
     static class UniRefGetIdParameterResolver extends AbstractGetIdParameterResolver {

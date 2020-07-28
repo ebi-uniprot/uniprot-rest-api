@@ -97,8 +97,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchInvalidCompleteValueReturnBadRequest() throws Exception {
         // given
-        UniRefEntry entry =
-                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -122,8 +121,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchByDefaultReturnTopTenMembersAndOrganisms() throws Exception {
         // given
-        UniRefEntry entry =
-                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -174,8 +172,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchByDefaultReturnCompleteMembersAndOrganisms() throws Exception {
         // given
-        UniRefEntry entry =
-                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
