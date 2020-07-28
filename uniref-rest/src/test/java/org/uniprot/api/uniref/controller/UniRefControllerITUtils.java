@@ -27,17 +27,17 @@ class UniRefControllerITUtils {
     static final String ACC_2_PREF = "P321";
     static final String UPI_PREF = "UPI0000083A";
 
-    static UniRefEntry createEntryWithTwelveMembers(int i, UniRefType type) {
+    static UniRefEntry createEntry(int i, int numberOfMembers, UniRefType type) {
         UniRefEntryBuilder builder = UniRefEntryBuilder.from(createEntry(i, type));
-        for (int j = 2; j <= 12; j++) {
+        for (int j = 2; j < numberOfMembers; j++) {
             builder.membersAdd(createMember(j));
         }
-        builder.memberCount(13);
+        builder.memberCount(numberOfMembers); // member plus representative
         return builder.build();
     }
 
-    static UniRefEntryLight createEntryLightWithTwelveMembers(int i, UniRefType type) {
-        UniRefEntry entry = createEntryWithTwelveMembers(i, type);
+    static UniRefEntryLight createEntryLight(int i, int numberOfMembers, UniRefType type) {
+        UniRefEntry entry = createEntry(i, numberOfMembers, type);
         return createEntryLight(entry);
     }
 
