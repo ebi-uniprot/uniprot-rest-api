@@ -151,7 +151,10 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.goTerms.size()", is(3)))
                 .andExpect(jsonPath("$.representativeMember.memberIdType", is("UniProtKB ID")))
                 .andExpect(jsonPath("$.representativeMember.memberId", is("P12301_HUMAN")))
-                .andExpect(jsonPath("$.representativeMember.organismName", is("Homo sapiens (Representative)")))
+                .andExpect(
+                        jsonPath(
+                                "$.representativeMember.organismName",
+                                is("Homo sapiens (Representative)")))
                 .andExpect(jsonPath("$.representativeMember.organismTaxId", is(9600)))
                 .andExpect(jsonPath("$.representativeMember.sequenceLength", is(312)))
                 .andExpect(jsonPath("$.representativeMember.proteinName", is("some protein name")))
@@ -162,7 +165,6 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.representativeMember.uniparcId", is("UPI0000083A01")))
                 .andExpect(jsonPath("$.representativeMember.seed", is(true)))
                 .andExpect(jsonPath("$.representativeMember.sequence").exists())
-
                 .andExpect(jsonPath("$.members[0].memberIdType", is("UniProtKB ID")))
                 .andExpect(jsonPath("$.members[0].memberId", is("P32101_HUMAN")))
                 .andExpect(jsonPath("$.members[0].organismName", is("Homo sapiens 1")))
@@ -176,7 +178,6 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.members[0].uniparcId", is("UPI0000083A01")))
                 .andExpect(jsonPath("$.members[0].seed").doesNotExist())
                 .andExpect(jsonPath("$.members[0].sequence").doesNotExist())
-
                 .andExpect(jsonPath("$.members.size()", is(27)));
     }
 
