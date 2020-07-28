@@ -165,8 +165,8 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                                 contains(
                                         9600, 9607, 9608, 9609, 9610, 9611, 9612, 9613, 9614,
                                         9615)))
-                .andExpect(jsonPath("$.results[*].memberCount", contains(13)))
-                .andExpect(jsonPath("$.results[*].organismCount", contains(13)));
+                .andExpect(jsonPath("$.results[*].memberCount", contains(12)))
+                .andExpect(jsonPath("$.results[*].organismCount", contains(12)));
     }
 
     @Test
@@ -187,11 +187,11 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
-                .andExpect(jsonPath("$.results[*].members.size()", contains(13)))
-                .andExpect(jsonPath("$.results[*].organisms.size()", contains(13)))
-                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(13)))
-                .andExpect(jsonPath("$.results[*].memberCount", contains(13)))
-                .andExpect(jsonPath("$.results[*].organismCount", contains(13)));
+                .andExpect(jsonPath("$.results[*].members.size()", contains(12)))
+                .andExpect(jsonPath("$.results[*].organisms.size()", contains(12)))
+                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(12)))
+                .andExpect(jsonPath("$.results[*].memberCount", contains(12)))
+                .andExpect(jsonPath("$.results[*].organismCount", contains(12)));
     }
 
     @AfterEach
