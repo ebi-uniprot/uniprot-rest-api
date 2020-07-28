@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -35,6 +36,7 @@ public class HttpServletRequestContentTypeMutator {
     public static final String ERROR_MESSAGE_ATTRIBUTE =
             "org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.errorMessageAttribute";
     static final String FORMAT = "format";
+    static final String COMPRESSED = "compressed";
     private static final Set<String> VALID_EXTENSIONS =
             UniProtMediaType.ALL_TYPES.stream()
                     .map(UniProtMediaType::getFileExtension)
@@ -60,6 +62,13 @@ public class HttpServletRequestContentTypeMutator {
     }
 
     public void mutate(
+            MutableHttpServletRequest request,
+            RequestMappingHandlerMapping requestMappingHandlerMapping) {
+        mutateAcceptHeader(request, requestMappingHandlerMapping);
+        mutateAcceptEncodingHeader(request);
+    }
+
+    private void mutateAcceptHeader(
             MutableHttpServletRequest request,
             RequestMappingHandlerMapping requestMappingHandlerMapping) {
         initResourcePath2MediaTypesMap(requestMappingHandlerMapping);
@@ -93,6 +102,13 @@ public class HttpServletRequestContentTypeMutator {
                     }
                 }
             }
+        }
+    }
+
+    private void mutateAcceptEncodingHeader(MutableHttpServletRequest request) {
+        String compressed = request.getParameter(COMPRESSED);
+        if (Utils.notNullNotEmpty(compressed) && compressed.equalsIgnoreCase("true")) {
+            request.addHeader(HttpHeaders.ACCEPT_ENCODING, FileType.GZIP.getFileType());
         }
     }
 
