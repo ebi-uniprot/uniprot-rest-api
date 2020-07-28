@@ -66,6 +66,8 @@ class UniRefControllerITUtils {
                         .entryType(entry.getEntryType())
                         .commonTaxonId(entry.getCommonTaxonId())
                         .commonTaxon(entry.getCommonTaxon())
+                        .memberCount(entry.getMemberCount())
+                        .goTermsSet(entry.getGoTerms())
                         .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
                         .membersAdd(getMemberId(entry.getRepresentativeMember()))
                         .representativeId(entry.getRepresentativeMember().getMemberId())
