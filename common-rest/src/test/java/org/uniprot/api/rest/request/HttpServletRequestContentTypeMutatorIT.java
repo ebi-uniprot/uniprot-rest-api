@@ -5,12 +5,20 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.app.FakeController.EXPECTED_NUMBER;
 import static org.uniprot.api.rest.app.FakeController.FAKE_RESOURCE_BASE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.FORMAT;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipException;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.rest.app.FakeBasicSearchController;
 import org.uniprot.api.rest.app.FakeController;
 import org.uniprot.api.rest.app.FakeRESTApp;
 
@@ -37,9 +46,9 @@ import org.uniprot.api.rest.app.FakeRESTApp;
 @ActiveProfiles("use-fake-app")
 @ContextConfiguration(classes = {FakeRESTApp.class})
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(FakeController.class)
+@WebMvcTest({FakeController.class, FakeBasicSearchController.class})
 @AutoConfigureWebClient
-public class HttpServletRequestContentTypeMutatorIT {
+class HttpServletRequestContentTypeMutatorIT {
     @Autowired private MockMvc mockMvc;
 
     @Test
@@ -167,6 +176,73 @@ public class HttpServletRequestContentTypeMutatorIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         containsString(FF_MEDIA_TYPE_VALUE)));
+    }
+
+    @Test
+    void validWithValidFormatAndCompressedRequestSucceeds() throws Exception {
+        ResultActions response =
+                mockMvc.perform(
+                        get("/fakeBasicSearch/fakeId")
+                                .param("compressed", "true")
+                                .param("format", "list"));
+
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(
+                                                HttpHeaders.CONTENT_TYPE,
+                                                containsString(LIST_MEDIA_TYPE_VALUE)));
+        byte[] content = resultActions.andReturn().getResponse().getContentAsByteArray();
+        GZIPInputStream gzipStream = new GZIPInputStream(new ByteArrayInputStream(content));
+        InputStreamReader reader = new InputStreamReader(gzipStream);
+        BufferedReader in = new BufferedReader(reader);
+        Assertions.assertEquals("Response value", in.readLine());
+    }
+
+    @Test
+    void validWithValidFormatAndAcceptEncodingRequestSucceeds() throws Exception {
+        ResultActions response =
+                mockMvc.perform(
+                        get("/fakeBasicSearch/fakeId")
+                                .header(HttpHeaders.ACCEPT_ENCODING, "gzip")
+                                .param("format", "list"));
+
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(
+                                                HttpHeaders.CONTENT_TYPE,
+                                                containsString(LIST_MEDIA_TYPE_VALUE)));
+        byte[] content = resultActions.andReturn().getResponse().getContentAsByteArray();
+        GZIPInputStream gzipStream = new GZIPInputStream(new ByteArrayInputStream(content));
+        InputStreamReader reader = new InputStreamReader(gzipStream);
+        BufferedReader in = new BufferedReader(reader);
+        Assertions.assertEquals("Response value", in.readLine());
+    }
+
+    @Test
+    void validWithValidFormatAndNotCompressedRequestSucceeds() throws Exception {
+        ResultActions response =
+                mockMvc.perform(
+                        get("/fakeBasicSearch/fakeId")
+                                .param("compressed", "false")
+                                .param("format", "list"));
+
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(
+                                                HttpHeaders.CONTENT_TYPE,
+                                                containsString(LIST_MEDIA_TYPE_VALUE)));
+        byte[] content = resultActions.andReturn().getResponse().getContentAsByteArray();
+        ZipException error =
+                Assertions.assertThrows(
+                        ZipException.class,
+                        () -> new GZIPInputStream(new ByteArrayInputStream(content)));
+        Assertions.assertEquals("Not in GZIP format", error.getMessage());
     }
 
     @Test

@@ -20,13 +20,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.GeneCentricRequest;
@@ -101,9 +95,8 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
-    @RequestMapping(
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> searchCursor(
             @Valid @ModelAttribute GeneCentricRequest searchRequest,
@@ -114,9 +107,8 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
     }
 
     @Tag(name = "genecentric")
-    @RequestMapping(
+    @GetMapping(
             value = "/upid/{upid}",
-            method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     @Operation(
             summary = "Fetch all proteins of Proteome id.",
@@ -198,17 +190,13 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
-    @RequestMapping(
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public DeferredResult<ResponseEntity<MessageConverterContext<CanonicalProtein>>> download(
-            @Valid @ModelAttribute GeneCentricRequest searchRequest,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-            HttpServletRequest request) {
+            @Valid @ModelAttribute GeneCentricRequest searchRequest, HttpServletRequest request) {
         Stream<CanonicalProtein> result = service.download(searchRequest);
-        return super.download(
-                result, searchRequest.getFields(), getAcceptHeader(request), request, encoding);
+        return super.download(result, searchRequest.getFields(), getAcceptHeader(request), request);
     }
 
     @Tag(name = "genecentric")
@@ -226,9 +214,8 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
-    @RequestMapping(
+    @GetMapping(
             value = "/{accession}",
-            method = RequestMethod.GET,
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByAccession(
             @Parameter(description = "UnirotKB accession")

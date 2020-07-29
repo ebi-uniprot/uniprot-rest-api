@@ -1,8 +1,8 @@
 package org.uniprot.api.rest.output.context;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author lgonzales
