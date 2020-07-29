@@ -107,7 +107,7 @@ public class HttpServletRequestContentTypeMutator {
 
     private void mutateAcceptEncodingHeader(MutableHttpServletRequest request) {
         String compressed = request.getParameter(COMPRESSED);
-        if (Utils.notNullNotEmpty(compressed) && compressed.equalsIgnoreCase("true")) {
+        if ("true".equalsIgnoreCase(compressed)) {
             request.addHeader(HttpHeaders.ACCEPT_ENCODING, FileType.GZIP.getFileType());
         }
     }
