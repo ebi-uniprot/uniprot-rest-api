@@ -14,10 +14,8 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniref.request.UniRefIdRequest;
 import org.uniprot.api.uniref.service.UniRefEntryResult;
-import org.uniprot.core.uniref.RepresentativeMember;
-import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.core.uniref.UniRefEntryId;
-import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.core.uniref.*;
+import org.uniprot.core.uniref.impl.AbstractUniRefMemberBuilder;
 import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
@@ -85,16 +83,36 @@ public class UniRefEntryStoreRepository {
             String memberId, UniRefEntryBuilder builder, UniRefEntryLight entryLight) {
         RepresentativeMember storedMember = getMemberFromStore(memberId, entryLight.getId());
         if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getRepresentativeId())) {
-            if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getSeedId())) {
-                storedMember = RepresentativeMemberBuilder.from(storedMember).isSeed(true).build();
-            }
-            builder.representativeMember(storedMember);
+            RepresentativeMemberBuilder repBuilder =
+                    RepresentativeMemberBuilder.from(storedMember).isSeed(true);
+            cleanMemberFields(repBuilder, entryLight, memberId);
+            builder.representativeMember(repBuilder.build());
         } else {
             UniRefMemberBuilder memberBuilder = UniRefMemberBuilder.from(storedMember);
-            if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getSeedId())) {
-                memberBuilder.isSeed(true);
-            }
+            cleanMemberFields(memberBuilder, entryLight, memberId);
             builder.membersAdd(memberBuilder.build());
+        }
+    }
+
+    private void cleanMemberFields(
+            AbstractUniRefMemberBuilder<?, ?> builder,
+            UniRefEntryLight entryLight,
+            String memberId) {
+        switch (entryLight.getEntryType()) {
+            case UniRef100:
+                builder.uniref100Id(null);
+                break;
+            case UniRef90:
+                builder.uniref90Id(null);
+                break;
+            case UniRef50:
+                builder.uniref50Id(null);
+                break;
+            default:
+                break;
+        }
+        if (memberId.equalsIgnoreCase(entryLight.getSeedId())) {
+            builder.isSeed(true);
         }
     }
 

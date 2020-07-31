@@ -299,6 +299,7 @@ class UniRefEntryStoreRepositoryTest {
 
         UniRefEntryLight repreSeed =
                 new UniRefEntryLightBuilder()
+                        .entryType(UniRefType.UniRef100)
                         .id(UNIREF_REPRESENTATIVE_AS_SEED_ID)
                         .seedId(SEED_ID)
                         .representativeId(SEED_ID)
