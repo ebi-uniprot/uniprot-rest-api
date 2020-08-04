@@ -82,8 +82,7 @@ public class UniRefEntryStoreRepository {
                         unirefMemberStore,
                         retryPolicy,
                         unirefMemberStore.getMemberBatchSize());
-        batchIterable.forEach(
-                storedMembers -> convertMembers(storedMembers, builder, entryLight));
+        batchIterable.forEach(storedMembers -> convertMembers(storedMembers, builder, entryLight));
         return builder.build();
     }
 
