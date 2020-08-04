@@ -76,6 +76,7 @@ class UniRefEntryStoreRepositoryTest {
         assertEquals(27, entry.getMembers().size());
 
         assertEquals(REPRESENTATIVE_ID, entry.getRepresentativeMember().getMemberId());
+        assertNotNull(entry.getRepresentativeMember().getSequence());
         UniRefMember seedMember =
                 entry.getMembers().stream()
                         .filter(uniRefMember -> uniRefMember.isSeed() != null)
@@ -242,6 +243,7 @@ class UniRefEntryStoreRepositoryTest {
         UniRefIdRequest request = new UniRefIdRequest();
         UniRefEntryResult result = repository.getEntryById(UNIREF_90_ID, request);
         assertNotNull(result);
+        assertNull(result.getPage());
 
         UniRefEntry entry = result.getEntry();
         assertEquals(UNIREF_90_ID, entry.getId().getValue());

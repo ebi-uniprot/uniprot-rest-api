@@ -21,13 +21,13 @@ public class UniRefEntryService {
         this.entryStoreRepository = entryStoreRepository;
     }
 
-    public UniRefEntryResult getEntity(String idValue, UniRefIdRequest idRequesst) {
+    public UniRefEntryResult getEntity(String clusterId, UniRefIdRequest idRequesst) {
         try {
-            return entryStoreRepository.getEntryById(idValue, idRequesst);
+            return entryStoreRepository.getEntryById(clusterId, idRequesst);
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            String message = "Could not get entity for id: [" + idValue + "]";
+            String message = "Could not get entity for id: [" + clusterId + "]";
             throw new ServiceException(message, e);
         }
     }
