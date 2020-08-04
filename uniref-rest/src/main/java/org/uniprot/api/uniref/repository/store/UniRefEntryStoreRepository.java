@@ -49,11 +49,13 @@ public class UniRefEntryStoreRepository {
     public UniRefEntryResult getEntryById(String idValue, UniRefIdRequest uniRefIdRequest) {
         UniRefEntryResult.UniRefEntryResultBuilder builder = UniRefEntryResult.builder();
         UniRefEntryLight entryLight = getUniRefEntryLightFromStore(idValue);
+
         List<String> pageMemberIds = entryLight.getMembers();
         boolean convertCommon = true;
         if (!uniRefIdRequest.isComplete()) {
             CursorPage page = getPage(uniRefIdRequest, entryLight.getMemberCount());
             builder.page(page);
+
             pageMemberIds = getMembersPage(page, entryLight);
             convertCommon = (page.getOffset() == 0);
         }

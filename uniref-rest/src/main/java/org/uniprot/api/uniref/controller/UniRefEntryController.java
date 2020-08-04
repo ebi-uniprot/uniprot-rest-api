@@ -26,6 +26,7 @@ import org.uniprot.api.uniref.request.UniRefIdRequest;
 import org.uniprot.api.uniref.service.UniRefEntryResult;
 import org.uniprot.api.uniref.service.UniRefEntryService;
 import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -99,8 +100,9 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             @Valid @ModelAttribute UniRefIdRequest idRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
+
         UniRefEntryResult entryResult = entryService.getEntity(id, idRequest);
-        if (entryResult.getPage() != null) {
+        if (Utils.notNull(entryResult.getPage())) {
             this.eventPublisher.publishEvent(
                     new PaginatedResultsEvent(this, request, response, entryResult.getPage()));
         }

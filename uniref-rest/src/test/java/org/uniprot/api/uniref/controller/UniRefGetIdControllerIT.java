@@ -142,7 +142,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(header().string("X-TotalRecords", nullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.id", is(ID)))
-                .andExpect(jsonPath("$.name", is("Cluster: MoeK5 01")))
+                .andExpect(jsonPath("$.name", is(NAME)))
                 .andExpect(jsonPath("$.memberCount", is(28)))
                 .andExpect(jsonPath("$.updated", is("2019-08-27")))
                 .andExpect(jsonPath("$.entryType", is("UniRef50")))
