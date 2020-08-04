@@ -40,7 +40,7 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public UniRefMemberStoreClient unirefMemberStoreClient() {
         return new UniRefMemberStoreClient(
-                VoldemortInMemoryUniRefMemberStore.getInstance("uniref-member"));
+                VoldemortInMemoryUniRefMemberStore.getInstance("uniref-member"), 5);
     }
 
     @Bean

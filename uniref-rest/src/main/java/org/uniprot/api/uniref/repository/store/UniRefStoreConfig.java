@@ -34,7 +34,8 @@ public class UniRefStoreConfig {
                         unirefStoreConfigProperties.getNumberOfConnections(),
                         unirefStoreConfigProperties.getStoreName(),
                         unirefStoreConfigProperties.getHost());
-        return new UniRefMemberStoreClient(client);
+        return new UniRefMemberStoreClient(
+                client, unirefStoreConfigProperties.getMemberBatchSize());
     }
 
     @Bean

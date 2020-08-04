@@ -2,6 +2,7 @@ package org.uniprot.api.uniref.repository.store;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import net.jodah.failsafe.RetryPolicy;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.common.repository.store.BatchStoreIterable;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniref.request.UniRefIdRequest;
 import org.uniprot.api.uniref.service.UniRefEntryResult;
@@ -30,18 +32,17 @@ public class UniRefEntryStoreRepository {
 
     private static final String CLUSTER_ID_NOT_FOUND =
             "Unable to get UniRefEntry from store. ClusterId: ";
-    private static final String MEMBER_NOT_FOUND = "Unable to get Member from store. ClusterId: ";
     private final RetryPolicy<Object> retryPolicy =
             new RetryPolicy<>()
                     .handle(IOException.class)
                     .withDelay(Duration.ofMillis(100))
                     .withMaxRetries(5);
-    private final UniRefMemberStoreClient entryStore;
+    private final UniRefMemberStoreClient unirefMemberStore;
     private final UniRefLightStoreClient uniRefLightStore;
 
     public UniRefEntryStoreRepository(
-            UniRefMemberStoreClient entryStore, UniRefLightStoreClient uniRefLightStore) {
-        this.entryStore = entryStore;
+            UniRefMemberStoreClient unirefMemberStore, UniRefLightStoreClient uniRefLightStore) {
+        this.unirefMemberStore = unirefMemberStore;
         this.uniRefLightStore = uniRefLightStore;
     }
 
@@ -75,21 +76,35 @@ public class UniRefEntryStoreRepository {
             builder.goTermsSet(entryLight.getGoTerms());
         }
         // build members
-        pageMemberIds.forEach(memberId -> convertMember(memberId, builder, entryLight));
+        BatchStoreIterable<RepresentativeMember> batchIterable =
+                new BatchStoreIterable<>(
+                        pageMemberIds,
+                        unirefMemberStore,
+                        retryPolicy,
+                        unirefMemberStore.getMemberBatchSize());
+        batchIterable.forEach(
+                storedMembers -> convertMembers(storedMembers, builder, entryLight));
         return builder.build();
     }
 
+    private void convertMembers(
+            Collection<RepresentativeMember> storedMembers,
+            UniRefEntryBuilder builder,
+            UniRefEntryLight entryLight) {
+        storedMembers.forEach(storedMember -> convertMember(storedMember, builder, entryLight));
+    }
+
     private void convertMember(
-            String memberId, UniRefEntryBuilder builder, UniRefEntryLight entryLight) {
-        RepresentativeMember storedMember = getMemberFromStore(memberId, entryLight.getId());
+            RepresentativeMember storedMember,
+            UniRefEntryBuilder builder,
+            UniRefEntryLight entryLight) {
         if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getRepresentativeId())) {
-            RepresentativeMemberBuilder repBuilder =
-                    RepresentativeMemberBuilder.from(storedMember).isSeed(true);
-            cleanMemberFields(repBuilder, entryLight, memberId);
+            RepresentativeMemberBuilder repBuilder = RepresentativeMemberBuilder.from(storedMember);
+            cleanMemberFields(repBuilder, entryLight, storedMember.getMemberId());
             builder.representativeMember(repBuilder.build());
         } else {
             UniRefMemberBuilder memberBuilder = UniRefMemberBuilder.from(storedMember);
-            cleanMemberFields(memberBuilder, entryLight, memberId);
+            cleanMemberFields(memberBuilder, entryLight, storedMember.getMemberId());
             builder.membersAdd(memberBuilder.build());
         }
     }
@@ -120,18 +135,6 @@ public class UniRefEntryStoreRepository {
         return Failsafe.with(retryPolicy)
                 .get(() -> uniRefLightStore.getEntry(clusterId))
                 .orElseThrow(() -> new ResourceNotFoundException(CLUSTER_ID_NOT_FOUND + clusterId));
-    }
-
-    private RepresentativeMember getMemberFromStore(String memberId, UniRefEntryId clusterId) {
-        return Failsafe.with(retryPolicy)
-                .get(() -> entryStore.getEntry(memberId))
-                .orElseThrow(
-                        () ->
-                                new ResourceNotFoundException(
-                                        MEMBER_NOT_FOUND
-                                                + clusterId.getValue()
-                                                + ", memberId:"
-                                                + memberId));
     }
 
     private CursorPage getPage(UniRefIdRequest uniRefIdRequest, int memberCount) {

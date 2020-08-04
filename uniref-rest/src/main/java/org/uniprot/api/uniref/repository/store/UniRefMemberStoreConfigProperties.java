@@ -14,4 +14,5 @@ public class UniRefMemberStoreConfigProperties {
     private String host;
     private int numberOfConnections;
     private String storeName;
+    private int memberBatchSize;
 }

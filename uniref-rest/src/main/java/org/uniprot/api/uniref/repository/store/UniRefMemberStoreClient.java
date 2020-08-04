@@ -9,7 +9,16 @@ import org.uniprot.store.datastore.voldemort.VoldemortClient;
  * @date: 20 Aug 2019
  */
 public class UniRefMemberStoreClient extends UniProtStoreClient<RepresentativeMember> {
-    public UniRefMemberStoreClient(VoldemortClient<RepresentativeMember> client) {
+
+    private final int memberBatchSize;
+
+    public UniRefMemberStoreClient(
+            VoldemortClient<RepresentativeMember> client, int memberBatchSize) {
         super(client);
+        this.memberBatchSize = memberBatchSize;
+    }
+
+    public int getMemberBatchSize() {
+        return memberBatchSize;
     }
 }
