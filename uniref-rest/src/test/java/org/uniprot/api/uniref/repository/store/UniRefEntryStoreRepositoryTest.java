@@ -33,17 +33,17 @@ import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortInMemoryUniR
 class UniRefEntryStoreRepositoryTest {
 
     private static final String UNIREF_ID_OK = "UniRef50_P21802";
-    public static final String UNIREF_INVALID_ID = "INVALID_ID";
     public static final String UNIREF_REPRESENTATIVE_AS_SEED_ID = "UniRef50_P11111";
     public static final String REPRESENTATIVE_ID = "P21802";
     public static final String SEED_ID = "P12342";
+    private static final String UNIREF_90_ID = "UniRef90_P21802";
     private UniRefEntryStoreRepository repository;
 
     @BeforeAll
     void setup() {
         VoldemortInMemoryUniRefMemberStore memberStore =
                 VoldemortInMemoryUniRefMemberStore.getInstance("uniref-member");
-        UniRefMemberStoreClient memberStoreClient = new UniRefMemberStoreClient(memberStore);
+        UniRefMemberStoreClient memberStoreClient = new UniRefMemberStoreClient(memberStore, 5);
         createMembers(memberStoreClient);
 
         VoldemortInMemoryUniRefEntryLightStore lightStore =
@@ -238,15 +238,27 @@ class UniRefEntryStoreRepositoryTest {
     }
 
     @Test
-    void getNotFoundEntryMember() {
+    void getUniRef90ById() {
         UniRefIdRequest request = new UniRefIdRequest();
-        ResourceNotFoundException error =
-                assertThrows(
-                        ResourceNotFoundException.class,
-                        () -> repository.getEntryById(UNIREF_INVALID_ID, request));
-        assertEquals(
-                "Unable to get Member from store. ClusterId: INVALID_ID, memberId:INVALID",
-                error.getMessage());
+        UniRefEntryResult result = repository.getEntryById(UNIREF_90_ID, request);
+        assertNotNull(result);
+
+        UniRefEntry entry = result.getEntry();
+        assertEquals(UNIREF_90_ID, entry.getId().getValue());
+
+        assertEquals(2, entry.getMemberCount().intValue());
+        assertEquals(1, entry.getMembers().size());
+
+        assertEquals(REPRESENTATIVE_ID, entry.getRepresentativeMember().getMemberId());
+        assertNull(entry.getRepresentativeMember().isSeed());
+        assertNull(entry.getRepresentativeMember().getUniRef90Id());
+
+        UniRefMember seedMember = entry.getMembers().get(0);
+        assertNotNull(seedMember);
+
+        assertEquals(SEED_ID, seedMember.getMemberId());
+        assertTrue(seedMember.isSeed());
+        assertNull(seedMember.getUniRef90Id());
     }
 
     @Test
@@ -293,9 +305,16 @@ class UniRefEntryStoreRepositoryTest {
                         });
         lightStoreClient.saveEntry(builderOk.build());
 
-        UniRefEntryLight wrongEntry =
-                new UniRefEntryLightBuilder().id("INVALID_ID").membersAdd("INVALID").build();
-        lightStoreClient.saveEntry(wrongEntry);
+        UniRefEntryLight uniref90 =
+                new UniRefEntryLightBuilder()
+                        .entryType(UniRefType.UniRef90)
+                        .id(UNIREF_90_ID)
+                        .membersAdd(REPRESENTATIVE_ID)
+                        .membersAdd(SEED_ID)
+                        .representativeId(REPRESENTATIVE_ID)
+                        .seedId(SEED_ID)
+                        .build();
+        lightStoreClient.saveEntry(uniref90);
 
         UniRefEntryLight repreSeed =
                 new UniRefEntryLightBuilder()
