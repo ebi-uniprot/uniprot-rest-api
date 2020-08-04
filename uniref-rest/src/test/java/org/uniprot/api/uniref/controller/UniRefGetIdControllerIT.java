@@ -4,7 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -136,7 +137,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", nullValue()))
@@ -195,7 +196,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "28"))
@@ -223,7 +224,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "15"))
@@ -265,7 +266,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "15"))
