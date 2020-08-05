@@ -32,18 +32,28 @@ public class UniRefEntryStoreRepository {
 
     private static final String CLUSTER_ID_NOT_FOUND =
             "Unable to get UniRefEntry from store. ClusterId: ";
-    private final RetryPolicy<Object> retryPolicy =
-            new RetryPolicy<>()
-                    .handle(IOException.class)
-                    .withDelay(Duration.ofMillis(100))
-                    .withMaxRetries(5);
+    private final RetryPolicy<Object> uniRefMemberRetryPolicy;
+    private final RetryPolicy<Object> uniRefLightRetryPolicy;
     private final UniRefMemberStoreClient unirefMemberStore;
     private final UniRefLightStoreClient uniRefLightStore;
 
     public UniRefEntryStoreRepository(
-            UniRefMemberStoreClient unirefMemberStore, UniRefLightStoreClient uniRefLightStore) {
+            UniRefMemberStoreClient unirefMemberStore,
+            UniRefMemberStoreConfigProperties uniRefMemberConfig,
+            UniRefLightStoreClient uniRefLightStore,
+            UniRefLightStoreConfigProperties uniRefLightConfig) {
         this.unirefMemberStore = unirefMemberStore;
         this.uniRefLightStore = uniRefLightStore;
+        this.uniRefLightRetryPolicy =
+                new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(Duration.ofMillis(uniRefLightConfig.getFetchRetryDelayMillis()))
+                        .withMaxRetries(uniRefLightConfig.getFetchMaxRetries());
+        this.uniRefMemberRetryPolicy =
+                new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(Duration.ofMillis(uniRefMemberConfig.getFetchRetryDelayMillis()))
+                        .withMaxRetries(uniRefMemberConfig.getFetchMaxRetries());
     }
 
     public UniRefEntryResult getEntryById(String idValue, UniRefIdRequest uniRefIdRequest) {
@@ -82,7 +92,7 @@ public class UniRefEntryStoreRepository {
                 new BatchStoreIterable<>(
                         pageMemberIds,
                         unirefMemberStore,
-                        retryPolicy,
+                        uniRefMemberRetryPolicy,
                         unirefMemberStore.getMemberBatchSize());
         batchIterable.forEach(storedMembers -> convertMembers(storedMembers, builder, entryLight));
         return builder.build();
@@ -133,7 +143,7 @@ public class UniRefEntryStoreRepository {
     }
 
     private UniRefEntryLight getUniRefEntryLightFromStore(String clusterId) {
-        return Failsafe.with(retryPolicy)
+        return Failsafe.with(uniRefLightRetryPolicy)
                 .get(() -> uniRefLightStore.getEntry(clusterId))
                 .orElseThrow(() -> new ResourceNotFoundException(CLUSTER_ID_NOT_FOUND + clusterId));
     }

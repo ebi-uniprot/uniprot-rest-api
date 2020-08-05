@@ -16,7 +16,7 @@ import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortRemoteUniRef
 @Configuration
 public class UniRefStoreConfig {
     @Bean
-    public UniRefMemberStoreConfigProperties storeConfigProperties() {
+    public UniRefMemberStoreConfigProperties memberStoreConfigProperties() {
         return new UniRefMemberStoreConfigProperties();
     }
 
