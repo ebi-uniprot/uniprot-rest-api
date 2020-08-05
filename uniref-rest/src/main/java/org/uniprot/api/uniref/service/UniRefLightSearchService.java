@@ -41,7 +41,7 @@ public class UniRefLightSearchService
             UniRefQueryRepository repository,
             UniRefFacetConfig facetConfig,
             UniRefSortClause uniRefSortClause,
-            UniRefQueryResultConverter uniRefQueryResultConverter,
+            UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
             QueryBoosts uniRefQueryBoosts) {
         super(

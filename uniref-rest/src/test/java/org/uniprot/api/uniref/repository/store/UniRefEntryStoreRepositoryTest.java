@@ -17,6 +17,7 @@ import org.uniprot.api.uniref.request.UniRefIdRequest;
 import org.uniprot.api.uniref.service.UniRefEntryResult;
 import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
+import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
@@ -51,7 +52,17 @@ class UniRefEntryStoreRepositoryTest {
         UniRefLightStoreClient lightStoreClient = new UniRefLightStoreClient(lightStore);
         createLightEntries(lightStoreClient);
 
-        repository = new UniRefEntryStoreRepository(memberStoreClient, lightStoreClient);
+        UniRefLightStoreConfigProperties lightStoreConfig = new UniRefLightStoreConfigProperties();
+        lightStoreConfig.setFetchMaxRetries(1);
+        lightStoreConfig.setFetchRetryDelayMillis(100);
+
+        UniRefMemberStoreConfigProperties memberStoreConfig =
+                new UniRefMemberStoreConfigProperties();
+        memberStoreConfig.setFetchMaxRetries(1);
+        memberStoreConfig.setFetchRetryDelayMillis(100);
+        repository =
+                new UniRefEntryStoreRepository(
+                        memberStoreClient, memberStoreConfig, lightStoreClient, lightStoreConfig);
     }
 
     @Test
@@ -243,7 +254,8 @@ class UniRefEntryStoreRepositoryTest {
         UniRefIdRequest request = new UniRefIdRequest();
         UniRefEntryResult result = repository.getEntryById(UNIREF_90_ID, request);
         assertNotNull(result);
-        assertNull(result.getPage());
+        assertNotNull(result.getPage());
+        assertFalse(result.getPage().hasNextPage());
 
         UniRefEntry entry = result.getEntry();
         assertEquals(UNIREF_90_ID, entry.getId().getValue());
@@ -337,6 +349,7 @@ class UniRefEntryStoreRepositoryTest {
                                     new RepresentativeMemberBuilder()
                                             .memberId("P1234" + i)
                                             .memberIdType(UniRefMemberIdType.UNIPROTKB)
+                                            .sequence(new SequenceBuilder("AAAAA").build())
                                             .accessionsAdd(
                                                     new UniProtKBAccessionBuilder("P1234" + i)
                                                             .build())
@@ -346,6 +359,7 @@ class UniRefEntryStoreRepositoryTest {
                                     new RepresentativeMemberBuilder()
                                             .memberId("P4321" + i)
                                             .memberIdType(UniRefMemberIdType.UNIPROTKB)
+                                            .sequence(new SequenceBuilder("AAAAA").build())
                                             .accessionsAdd(
                                                     new UniProtKBAccessionBuilder("P4321" + i)
                                                             .build())
@@ -355,6 +369,7 @@ class UniRefEntryStoreRepositoryTest {
                                     new RepresentativeMemberBuilder()
                                             .memberId("UniParc" + i)
                                             .memberIdType(UniRefMemberIdType.UNIPARC)
+                                            .sequence(new SequenceBuilder("AAAAA").build())
                                             .uniparcId(new UniParcIdBuilder("UniParc" + i).build())
                                             .build());
                         });
@@ -363,6 +378,7 @@ class UniRefEntryStoreRepositoryTest {
                 new RepresentativeMemberBuilder()
                         .memberId(REPRESENTATIVE_ID)
                         .memberIdType(UniRefMemberIdType.UNIPROTKB)
+                        .sequence(new SequenceBuilder("AAAAA").build())
                         .accessionsAdd(new UniProtKBAccessionBuilder(REPRESENTATIVE_ID).build())
                         .build());
     }

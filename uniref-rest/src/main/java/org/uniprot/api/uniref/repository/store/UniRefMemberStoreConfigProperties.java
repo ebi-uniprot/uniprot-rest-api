@@ -15,4 +15,6 @@ public class UniRefMemberStoreConfigProperties {
     private int numberOfConnections;
     private String storeName;
     private int memberBatchSize;
+    private int fetchMaxRetries;
+    private int fetchRetryDelayMillis;
 }
