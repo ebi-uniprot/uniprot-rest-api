@@ -9,6 +9,7 @@ import static org.springframework.http.HttpHeaders.USER_AGENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.COMPRESSED;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.FORMAT;
 
 import java.util.*;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.FileType;
 
 /**
  * Created 10/12/19
@@ -264,5 +267,49 @@ class HttpServletRequestContentTypeMutatorTest {
         assertThat(
                 paths,
                 containsInAnyOrder("/w/x/y", "/w/x/{y}", "/w/y/d", "/w/{x}/y", "/w/{x}/{y}"));
+    }
+
+    @Test
+    void requestWithCompressedRequestTrue() {
+        // given
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getHeader(ACCEPT)).thenReturn(APPLICATION_JSON_VALUE);
+        when(httpRequest.getParameter(COMPRESSED)).thenReturn("true");
+        String uri = "/a/b/ENTITY";
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
+        when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
+
+        // when
+        MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+
+        // then
+        assertThat(mutableRequest.getHeader(HttpHeaders.ACCEPT_ENCODING), is("gzip"));
+    }
+
+    @Test
+    void requestWithCompressedRequestTrueOverrideCurrentAcceptEncoding() {
+        // given
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getHeader(ACCEPT)).thenReturn(APPLICATION_JSON_VALUE);
+        when(httpRequest.getHeader(HttpHeaders.ACCEPT_ENCODING))
+                .thenReturn(FileType.FILE.getFileType());
+        when(httpRequest.getParameter(COMPRESSED)).thenReturn("true");
+        String uri = "/a/b/ENTITY";
+        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost" + uri));
+        when(httpRequest.getRequestURI()).thenReturn(uri);
+        when(httpRequest.getServletPath()).thenReturn(uri);
+        when(httpRequest.getContextPath()).thenReturn("");
+
+        // when
+        MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
+        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+
+        // then
+        assertThat(
+                mutableRequest.getHeader(HttpHeaders.ACCEPT_ENCODING),
+                is(FileType.GZIP.getFileType()));
     }
 }

@@ -174,10 +174,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             @Valid @ModelAttribute LiteratureRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         Stream<LiteratureEntry> result = literatureService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request, encoding);
+        return super.download(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override

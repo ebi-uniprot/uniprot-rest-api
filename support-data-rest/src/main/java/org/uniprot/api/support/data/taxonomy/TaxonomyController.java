@@ -168,10 +168,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             @Valid @ModelAttribute TaxonomyRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         Stream<TaxonomyEntry> result = taxonomyService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request, encoding);
+        return super.download(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override
