@@ -53,7 +53,7 @@
 		},
 		{
 			"key": "verifyXCacheInfoHeader",
-			"value": "(function verifyCacheInfo(info='caching'){\npm.test(\"X-Cache-Info Header\", function () {\n    pm.response.to.have.header(\"X-Cache-Info\");\n    pm.response.to.be.header(\"X-Cache-Info\", info);\n});\n})",
+			"value": "(function verifyCacheInfo(info='caching'){\npm.test(\"X-Cache-Info Header\", function () {\n    pm.response.to.have.header(\"X-Cache-Info\");\n    pm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);\n});\n})",
 			"enabled": true
 		},
 		{
@@ -64,6 +64,6 @@
 	],
 	"name": "My Workspace Globals",
 	"_postman_variable_scope": "globals",
-	"_postman_exported_at": "2020-07-20T14:34:45.397Z",
-	"_postman_exported_using": "Postman/7.28.0"
+	"_postman_exported_at": "2020-08-06T12:15:34.637Z",
+	"_postman_exported_using": "Postman/7.29.1"
 }

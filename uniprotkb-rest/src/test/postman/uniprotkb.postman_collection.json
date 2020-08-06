@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e8184259-5c5d-4293-911c-52fbc4199d67",
+		"_postman_id": "35201244-5bef-418c-866e-51ffbaa5ca4a",
 		"name": "uniprotkb",
 		"description": "Test suite for UniProtKB requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -10,12 +10,272 @@
 			"name": "search",
 			"item": [
 				{
+					"name": "Scenario-1",
+					"item": [
+						{
+							"name": "Search Proteins",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "771979a8-a68d-4cb5-b749-c3fc7e1e0a83",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Content-Type\", function () {",
+											"    pm.response.to.have.header(\"Content-Type\");",
+											"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
+											"});",
+											"",
+											"// get the response data",
+											"let jsonData = pm.response.json();",
+											"// verify array",
+											"utils.verifyArray(\"results\", jsonData.results);",
+											"// verify length",
+											"pm.test(\"Results size\", function () {",
+											"    pm.expect(jsonData.results,  'results length mismatch').to.have.lengthOf(25);",
+											"});",
+											"",
+											"// get first accession and set it for next step",
+											"let accession = jsonData.results[0].primaryAccession;",
+											"pm.environment.set(\"scenario-1-accession\", accession);",
+											"",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{scenario-1-search-term}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{scenario-1-search-term}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get by accession",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5e0fdf21-51c9-4f79-aadb-c27992980a1a",
+										"exec": [
+											"",
+											"// verify common headers",
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, undefined, undefined, undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"// X-Cache-Info - Sample code to verify a single header",
+											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
+											"verifyXCacheInfoHeader();",
+											"",
+											"// verify data",
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"entryType\", function () {",
+											"    pm.expect(jsonData.entryType).to.eql(\"UniProtKB reviewed (Swiss-Prot)\");",
+											"});",
+											"",
+											"pm.test(\"primaryAccession\", function () {",
+											"    pm.expect(jsonData.primaryAccession).to.eql(pm.environment.get(\"scenario-1-accession\"));",
+											"});",
+											"",
+											"",
+											"pm.test(\"uniProtkbId\", function () {",
+											"    pm.expect(jsonData.uniProtkbId).to.eql(\"CDC7_HUMAN\");",
+											"});",
+											"",
+											"pm.test(\"annotationScore\", function () {",
+											"    pm.expect(jsonData.annotationScore).to.eql(0.0);",
+											"});",
+											"",
+											"utils.verifyOrganism(jsonData.organism, \"Homo sapiens\", \"Human\", 9606, ",
+											"[\"Eukaryota\",",
+											"            \"Metazoa\",",
+											"            \"Chordata\",",
+											"            \"Craniata\",",
+											"            \"Vertebrata\",",
+											"            \"Euteleostomi\",",
+											"            \"Mammalia\",",
+											"            \"Eutheria\",",
+											"            \"Euarchontoglires\",",
+											"            \"Primates\",",
+											"            \"Haplorrhini\",",
+											"            \"Catarrhini\",",
+											"            \"Hominidae\",",
+											"            \"Homo\"]);",
+											"",
+											"pm.test(\"proteinExistence\", function () {",
+											"    pm.expect(jsonData.proteinExistence).to.eql(\"1: Evidence at protein level\");",
+											"});",
+											"",
+											"pm.test(\"proteinDescription\", function () {",
+											"    utils.verifyNotNull(\"proteinDescription\", jsonData.proteinDescription);",
+											"});",
+											"",
+											"pm.test(\"genes array\", function () {",
+											"    utils.verifyArray(\"genes\", jsonData.genes);",
+											"    pm.expect(jsonData.genes, 'genes length mismatch').to.have.lengthOf(1);",
+											"});",
+											"",
+											"pm.test(\"genes value\", function () {",
+											"    pm.expect(jsonData.genes[0].geneName.value).to.eql(\"CDC7\");",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{scenario-1-accession}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{scenario-1-accession}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Download in text format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "53301027-da07-4566-9bf5-257eb8d03b80",
+										"exec": [
+											"let verifyStatusHeader = eval(pm.globals.get(\"verifyStatusHeader\"));",
+											"verifyStatusHeader();",
+											"",
+											"let verifyContentType = eval(pm.globals.get(\"verifyContentTypeHeader\"));",
+											"verifyContentType('text/flatfile');",
+											"",
+											"let accession = pm.environment.get(\"scenario-1-accession\");",
+											"pm.test(\"Accession match\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"AC   \" + accession);",
+											"});",
+											"",
+											"pm.test(\"ID match\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"ID   CDC7_HUMAN\");",
+											"});",
+											"",
+											"pm.test(\"Gene name match\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"GN   Name=CDC7;\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "text/flatfile",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/stream?query={{scenario-1-accession}}&download=true",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"stream"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "{{scenario-1-accession}}"
+										},
+										{
+											"key": "download",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "1. Search using gene and organism\n2. Get the first entry\n3. Download the first entry as text file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b96e8ed-0210-459f-9dbd-92bcf65a049f",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.set(\"scenario-1-search-term\", \"cdc7 human\");"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "260ce722-37ab-436d-8a32-ec9b9e6ab0fb",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Search Proteins",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "15400b0f-b113-4237-9c92-58b4c3bfc93e",
+								"id": "65248611-871a-4d56-a1bb-24ef8bbfe168",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -63,7 +323,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "37217aac-bb36-4776-96a2-cb466814d71e",
+								"id": "5ac0b90d-4cad-4feb-93bd-d83b5fdc6515",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -102,7 +362,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8e100690-9868-4369-8c3f-95a7974f156d",
+								"id": "1fa55663-21c6-4a20-a762-48d75c5248d1",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -141,7 +401,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7fda72aa-9390-4255-9d66-b5aa36f0852e",
+								"id": "4d107631-1913-4820-8c30-73f5900af84d",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -180,7 +440,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "97a5061a-b89d-4097-835c-ac83ef7aee30",
+								"id": "8a8f70df-43bc-459b-92ad-af63e7db0ffc",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -219,7 +479,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a1567669-3f62-4e1e-bb91-b6b8faa8b879",
+						"id": "286e9089-e349-4165-80c3-2884defaaf2b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -229,7 +489,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "21126b0f-5710-4839-a609-190cfa829266",
+						"id": "df91cd15-6860-4594-9b9f-39e27db04a4b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -248,7 +508,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "65497a2b-aeec-4f95-bc1c-12309f51303f",
+								"id": "e4f455a6-2e6e-47d5-bfa6-2e696f0ec1c8",
 								"exec": [
 									"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
 									"// to log various types of message on Postman Console",
@@ -353,7 +613,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "823fedaa-ee6e-406e-9b24-37d2b3398fdc",
+						"id": "2509ba77-e1eb-4bce-8406-ab4c4e3cffdf",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -363,7 +623,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c19e960b-9d8f-4124-8de1-709326268a88",
+						"id": "599aaacb-d2ef-4e52-b43c-ff25cf3279f7",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -382,7 +642,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6b0d5dc9-283c-4dec-b30f-f823477cc0a9",
+								"id": "cf8396e2-32bb-48d5-a4bb-d3ebc4511f1d",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -421,7 +681,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "9d00a728-6cb9-40f8-b062-551939b2b4cf",
+						"id": "4bc42c9e-38da-4559-a8df-11609afc68b2",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -431,7 +691,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e7c9437c-ad4a-4804-ac86-612bac1ee247",
+						"id": "af86fbdf-58cf-43a0-b73f-6e4f9992fc93",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -450,7 +710,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "13c26bb8-9968-46fd-b9be-24d2a062c04b",
+								"id": "2ad4bb06-955c-4231-ac39-1cf05a1bf335",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -489,7 +749,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4b08acb1-23f2-495a-8859-8268f3bb6f39",
+						"id": "6ab7c94f-c034-42c7-9bea-9032cceea6c0",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -499,7 +759,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a0124087-851e-419e-ade8-1d20fd1cf36f",
+						"id": "aca39634-773c-4cef-bb7b-c00637293c97",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -514,7 +774,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "9ee790c2-62ed-4222-b810-6e9937d3cb4a",
+				"id": "0dc62f1a-742b-4866-bccc-85955e980226",
 				"type": "text/javascript",
 				"exec": [
 					"utils = {",
@@ -590,7 +850,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "dfd5669e-7f69-4fc7-ae36-fe8cb49d44ce",
+				"id": "edd32891-71f9-4b99-8899-1135877c9631",
 				"type": "text/javascript",
 				"exec": [
 					""
