@@ -1,18 +1,26 @@
 package org.uniprot.api.uniparc.service;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
+import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -29,6 +37,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private static final String UNIPARC_ID_FIELD = "upi";
     private final SearchFieldConfig searchFieldConfig;
     private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final UniParcQueryRepository repository;
+    private final UniParcQueryResultConverter entryConverter;
 
     @Autowired
     public UniParcQueryService(
@@ -50,6 +60,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         this.defaultSearchQueryOptimiser =
                 new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
+        this.repository = repository;
+        this.entryConverter = uniParcQueryResultConverter;
     }
 
     @Override
@@ -69,5 +81,47 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
         return Collections.singletonList(getIdField());
+    }
+
+    public QueryResult<UniParcEntry> findByAccession(
+            String accession, String dbTypes, String dbIds, String taxonIds, Boolean isActive) {
+
+        UniParcSearchRequest searchRequest = createSearchRequest(accession);
+        SolrRequest solrRequest = createSearchSolrRequest(searchRequest);
+        QueryResult<UniParcDocument> results =
+                repository.searchPage(solrRequest, searchRequest.getCursor());
+
+        List<String> databases = csvToList(dbTypes);
+        List<String> databaseIds = csvToList(dbIds);
+        List<String> toxonomyIds = csvToList(taxonIds);
+        UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
+        UniParcDatabaseIdFilter dbIdFilter = new UniParcDatabaseIdFilter();
+        UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
+        UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
+
+        Stream<UniParcEntry> converted =
+                results.getContent()
+                        .map(entryConverter)
+                        .filter(Objects::nonNull)
+                        .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
+                        .map(uniParcEntry -> dbIdFilter.apply(uniParcEntry, databaseIds))
+                        .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, toxonomyIds))
+                        .map(uniParcEntry -> statusFilter.apply(uniParcEntry, isActive));
+
+        return QueryResult.of(converted, results.getPage(), null);
+    }
+
+    private UniParcSearchRequest createSearchRequest(String accession) {
+        UniParcSearchRequest searchRequest = new UniParcSearchRequest();
+        searchRequest.setQuery("accession:" + accession);
+        return searchRequest;
+    }
+
+    private List<String> csvToList(String csv) {
+        List<String> list = new ArrayList<>();
+        if (Utils.notNullNotEmpty(csv)) {
+            list = Arrays.stream(csv.split(",")).map(String::trim).collect(Collectors.toList());
+        }
+        return list;
     }
 }

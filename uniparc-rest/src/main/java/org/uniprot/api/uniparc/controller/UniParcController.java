@@ -230,6 +230,24 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getDeferredResultResponseEntity(request, context);
     }
 
+    @GetMapping(
+            value = "/accession/{accession}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> findByAccession(
+            @PathVariable String accession,
+            String dbTypes,
+            String dbIds,
+            String taxonIds,
+            Boolean active,
+            String fields,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        QueryResult<UniParcEntry> results =
+                queryService.findByAccession(accession, dbTypes, dbIds, taxonIds, active);
+        return super.getSearchResponse(results, fields, request, response);
+    }
+
     @Override
     protected String getEntityId(UniParcEntry entity) {
         return entity.getUniParcId().getValue();

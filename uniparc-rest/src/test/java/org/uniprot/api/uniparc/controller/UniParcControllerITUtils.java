@@ -18,9 +18,9 @@ import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
  * @author lgonzales
  * @since 18/06/2020
  */
-class UniParcControllerITUtils {
+public class UniParcControllerITUtils {
 
-    static UniParcEntry createEntry(int i, String upiRef) {
+    public static UniParcEntry createEntry(int i, String upiRef) {
         String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
         Sequence sequence = new SequenceBuilder(seq).build();
         List<UniParcCrossReference> xrefs = getXrefs(i);
