@@ -114,7 +114,6 @@ public class UniRefLightSearchService
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
         return asList(
                 searchFieldConfig.getSearchFieldItemByName("id"),
-                searchFieldConfig.getSearchFieldItemByName("uniprot_id"),
                 searchFieldConfig.getSearchFieldItemByName("upi"));
     }
 
