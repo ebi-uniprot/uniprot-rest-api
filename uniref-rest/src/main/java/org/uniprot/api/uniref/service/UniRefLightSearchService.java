@@ -1,6 +1,9 @@
 package org.uniprot.api.uniref.service;
 
+import static java.util.Arrays.asList;
+
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,6 +15,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
@@ -22,6 +26,7 @@ import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
 /**
@@ -33,15 +38,16 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 public class UniRefLightSearchService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
 
-    private final SearchFieldConfig searchFieldConfig;
     private static final int ID_LIMIT = 10;
+    private final SearchFieldConfig searchFieldConfig;
+    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
 
     @Autowired
     public UniRefLightSearchService(
             UniRefQueryRepository repository,
             UniRefFacetConfig facetConfig,
             UniRefSortClause uniRefSortClause,
-            UniRefQueryResultConverter uniRefQueryResultConverter,
+            UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
             QueryBoosts uniRefQueryBoosts) {
         super(
@@ -53,16 +59,13 @@ public class UniRefLightSearchService
                 uniRefQueryBoosts);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
+        this.defaultSearchQueryOptimiser =
+                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
     public UniRefEntryLight findByUniqueId(String uniqueId, String fields) {
         return findByUniqueId(uniqueId);
-    }
-
-    @Override
-    protected String getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
     }
 
     @Override
@@ -86,6 +89,34 @@ public class UniRefLightSearchService
         return result;
     }
 
+    @Override
+    public UniRefEntryLight findByUniqueId(String uniqueId) {
+        throw new UnsupportedOperationException(
+                "UniRefLightSearchService does not support findByUniqueId, try to use UniRefEntryService");
+    }
+
+    @Override
+    public UniRefEntryLight getEntity(String idField, String value) {
+        throw new UnsupportedOperationException(
+                "UniRefLightSearchService does not support getEntity, try to use UniRefEntryService");
+    }
+
+    @Override
+    protected SearchFieldItem getIdField() {
+        return this.searchFieldConfig.getSearchFieldItemByName("id");
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return asList(
+                searchFieldConfig.getSearchFieldItemByName("id"),
+                searchFieldConfig.getSearchFieldItemByName("upi"));
+    }
+
     private UniRefEntryLight removeOverLimitIds(UniRefEntryLight entry) {
         UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entry);
         if (entry.getMembers().size() > ID_LIMIT) {
@@ -106,17 +137,5 @@ public class UniRefLightSearchService
             builder.organismsSet(organisms);
         }
         return builder.build();
-    }
-
-    @Override
-    public UniRefEntryLight findByUniqueId(String uniqueId) {
-        throw new UnsupportedOperationException(
-                "UniRefLightSearchService does not support findByUniqueId, try to use UniRefEntryService");
-    }
-
-    @Override
-    public UniRefEntryLight getEntity(String idField, String value) {
-        throw new UnsupportedOperationException(
-                "UniRefLightSearchService does not support getEntity, try to use UniRefEntryService");
     }
 }

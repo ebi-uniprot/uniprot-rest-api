@@ -16,7 +16,12 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
  */
 @Profile("use-fake-app")
 @SpringBootApplication
-@Import({FakeController.class, HttpCommonHeaderConfig.class})
+@Import({
+    FakeController.class,
+    HttpCommonHeaderConfig.class,
+    FakeAppConfig.class,
+    FakeBasicSearchController.class
+})
 @ComponentScan(basePackages = "org.uniprot.api.rest.validation.error")
 public class FakeRESTApp {
     public static void main(String[] args) {

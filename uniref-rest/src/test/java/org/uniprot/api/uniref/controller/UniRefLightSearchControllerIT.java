@@ -5,7 +5,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
@@ -87,18 +86,17 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         storeClient =
                 new UniRefLightStoreClient(
                         VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref-light"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF, storeClient);
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIREF_LIGHT, storeClient);
         getStoreManager()
                 .addDocConverter(
-                        DataStoreManager.StoreType.UNIREF,
+                        DataStoreManager.StoreType.UNIREF_LIGHT,
                         new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
     @Test
     void searchInvalidCompleteValueReturnBadRequest() throws Exception {
         // given
-        UniRefEntry entry =
-                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -109,7 +107,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -122,8 +120,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchByDefaultReturnTopTenMembersAndOrganisms() throws Exception {
         // given
-        UniRefEntry entry =
-                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -167,15 +164,14 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                                 contains(
                                         9600, 9607, 9608, 9609, 9610, 9611, 9612, 9613, 9614,
                                         9615)))
-                .andExpect(jsonPath("$.results[*].memberCount", contains(13)))
-                .andExpect(jsonPath("$.results[*].organismCount", contains(13)));
+                .andExpect(jsonPath("$.results[*].memberCount", contains(12)))
+                .andExpect(jsonPath("$.results[*].organismCount", contains(12)));
     }
 
     @Test
     void searchByDefaultReturnCompleteMembersAndOrganisms() throws Exception {
         // given
-        UniRefEntry entry =
-                UniRefControllerITUtils.createEntryWithTwelveMembers(1, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -190,11 +186,11 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
-                .andExpect(jsonPath("$.results[*].members.size()", contains(13)))
-                .andExpect(jsonPath("$.results[*].organisms.size()", contains(13)))
-                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(13)))
-                .andExpect(jsonPath("$.results[*].memberCount", contains(13)))
-                .andExpect(jsonPath("$.results[*].organismCount", contains(13)));
+                .andExpect(jsonPath("$.results[*].members.size()", contains(12)))
+                .andExpect(jsonPath("$.results[*].organisms.size()", contains(12)))
+                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(12)))
+                .andExpect(jsonPath("$.results[*].memberCount", contains(12)))
+                .andExpect(jsonPath("$.results[*].organismCount", contains(12)));
     }
 
     @AfterEach
@@ -204,7 +200,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
-        return DataStoreManager.StoreType.UNIREF;
+        return DataStoreManager.StoreType.UNIREF_LIGHT;
     }
 
     @Override
@@ -300,8 +296,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
         getStoreManager()
-                .saveToStore(DataStoreManager.StoreType.UNIREF, createEntryLight(unirefEntry));
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF, entry);
+                .saveToStore(
+                        DataStoreManager.StoreType.UNIREF_LIGHT, createEntryLight(unirefEntry));
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF_LIGHT, entry);
     }
 
     static class UniRefSearchParameterResolver extends AbstractSearchParameterResolver {

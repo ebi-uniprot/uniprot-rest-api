@@ -17,6 +17,7 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
 
 /**
@@ -56,10 +57,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public R findByUniqueId(final String uniqueId) {
-        return getEntity(getIdField(), uniqueId);
+        return getEntity(getIdField().getFieldName(), uniqueId);
     }
-
-    protected abstract String getIdField();
 
     public R getEntity(String idField, String value) {
         try {
@@ -112,6 +111,10 @@ public abstract class BasicSearchService<D extends Document, R> {
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
         return createSearchSolrRequest(request, true);
     }
+
+    protected abstract SearchFieldItem getIdField();
+
+    protected abstract DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser();
 
     /*
        case 1. size is not passed, use  DEFAULT_RESULTS_SIZE(25) then set rows and totalRows as DEFAULT_RESULTS_SIZE
@@ -172,7 +175,7 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         String requestedQuery = request.getQuery();
 
-        requestBuilder.query(requestedQuery);
+        requestBuilder.query(getDefaultSearchQueryOptimiser().optimiseSearchQuery(requestedQuery));
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));

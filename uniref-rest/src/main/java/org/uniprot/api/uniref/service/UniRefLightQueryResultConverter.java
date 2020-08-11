@@ -17,7 +17,7 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  * @date: 20 Aug 2019
  */
 @Component
-public class UniRefQueryResultConverter implements Function<UniRefDocument, UniRefEntryLight> {
+public class UniRefLightQueryResultConverter implements Function<UniRefDocument, UniRefEntryLight> {
 
     private final UniRefLightStoreClient entryStore;
     private final RetryPolicy<Object> retryPolicy =
@@ -26,7 +26,7 @@ public class UniRefQueryResultConverter implements Function<UniRefDocument, UniR
                     .withDelay(Duration.ofMillis(100))
                     .withMaxRetries(5);
 
-    public UniRefQueryResultConverter(UniRefLightStoreClient entryStore) {
+    public UniRefLightQueryResultConverter(UniRefLightStoreClient entryStore) {
         this.entryStore = entryStore;
     }
 

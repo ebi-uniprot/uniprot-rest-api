@@ -228,7 +228,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "identity:1.0 AND (uniprot_id:P12301 OR uniprot_id:P12302)")
+                        .param("query", "identity:1.0 AND (P12301 OR P12302)")
                         .param("fields", "length,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();

@@ -83,6 +83,13 @@
 			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>uniprot-indexer-integration-test</artifactId>
+			<version>${uniprot-store.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

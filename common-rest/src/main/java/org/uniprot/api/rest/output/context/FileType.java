@@ -21,6 +21,10 @@ public enum FileType {
         return extension;
     }
 
+    public String getFileType() {
+        return fileType;
+    }
+
     /**
      * @param value the requested file type
      * @return the most appropriate file type for the given input
