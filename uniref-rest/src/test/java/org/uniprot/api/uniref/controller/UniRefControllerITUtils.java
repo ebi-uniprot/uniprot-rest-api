@@ -1,6 +1,8 @@
 package org.uniprot.api.uniref.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.uniprot.core.Sequence;
 import org.uniprot.core.cv.go.GoAspect;
@@ -25,22 +27,34 @@ class UniRefControllerITUtils {
     static final String ACC_2_PREF = "P321";
     static final String UPI_PREF = "UPI0000083A";
 
-    static UniRefEntry createEntryWithTwelveMembers(int i, UniRefType type) {
+    static UniRefEntry createEntry(int i, int numberOfMembers, UniRefType type) {
         UniRefEntryBuilder builder = UniRefEntryBuilder.from(createEntry(i, type));
-        for (int j = 2; j <= 12; j++) {
+        for (int j = 2; j < numberOfMembers; j++) {
             builder.membersAdd(createMember(j));
         }
+        builder.memberCount(numberOfMembers); // member plus representative
         return builder.build();
     }
 
-    static UniRefEntryLight createEntryLightWithTwelveMembers(int i, UniRefType type) {
-        UniRefEntry entry = createEntryWithTwelveMembers(i, type);
+    static UniRefEntryLight createEntryLight(int i, int numberOfMembers, UniRefType type) {
+        UniRefEntry entry = createEntry(i, numberOfMembers, type);
         return createEntryLight(entry);
     }
 
     static UniRefEntryLight createEntryLight(int i, UniRefType type) {
         UniRefEntry entry = createEntry(i, type);
         return createEntryLight(entry);
+    }
+
+    static List<RepresentativeMember> createEntryMembers(UniRefEntry entry) {
+        List<RepresentativeMember> members = new ArrayList<>();
+        members.add(entry.getRepresentativeMember());
+        entry.getMembers()
+                .forEach(
+                        member -> {
+                            members.add(RepresentativeMemberBuilder.from(member).build());
+                        });
+        return members;
     }
 
     static UniRefEntryLight createEntryLight(UniRefEntry entry) {
@@ -52,12 +66,12 @@ class UniRefControllerITUtils {
                         .entryType(entry.getEntryType())
                         .commonTaxonId(entry.getCommonTaxonId())
                         .commonTaxon(entry.getCommonTaxon())
+                        .memberCount(entry.getMemberCount())
+                        .goTermsSet(entry.getGoTerms())
                         .memberIdTypesAdd(entry.getRepresentativeMember().getMemberIdType())
-                        .membersAdd(
-                                entry.getRepresentativeMember()
-                                        .getUniProtAccessions()
-                                        .get(0)
-                                        .getValue())
+                        .membersAdd(getMemberId(entry.getRepresentativeMember()))
+                        .representativeId(entry.getRepresentativeMember().getMemberId())
+                        .seedId(getSeedId(entry))
                         .organismsAdd(entry.getRepresentativeMember().getOrganismName())
                         .organismIdsAdd(entry.getRepresentativeMember().getOrganismTaxId())
                         .sequence(entry.getRepresentativeMember().getSequence().getValue());
@@ -65,8 +79,7 @@ class UniRefControllerITUtils {
                 .forEach(
                         uniRefMember -> {
                             builder.memberIdTypesAdd(uniRefMember.getMemberIdType())
-                                    .membersAdd(
-                                            uniRefMember.getUniProtAccessions().get(0).getValue())
+                                    .membersAdd(getMemberId(uniRefMember))
                                     .organismsAdd(uniRefMember.getOrganismName())
                                     .organismIdsAdd(uniRefMember.getOrganismTaxId());
                         });
@@ -114,6 +127,28 @@ class UniRefControllerITUtils {
                 return ID_PREF_90;
             default:
                 return ID_PREF_100;
+        }
+    }
+
+    private static String getMemberId(UniRefMember member) {
+        if (member.getMemberIdType().equals(UniRefMemberIdType.UNIPARC)) {
+            return member.getMemberId();
+        } else {
+            return member.getUniProtAccessions().get(0).getValue();
+        }
+    }
+
+    private static String getSeedId(UniRefEntry entry) {
+        Boolean isSeed = entry.getRepresentativeMember().isSeed();
+        if (isSeed != null && isSeed) {
+            return entry.getRepresentativeMember().getMemberId();
+        } else {
+            return entry.getMembers().stream()
+                    .filter(member -> member.isSeed() != null)
+                    .filter(UniRefMember::isSeed)
+                    .map(UniRefMember::getMemberId)
+                    .findFirst()
+                    .orElse("");
         }
     }
 

@@ -33,7 +33,7 @@ import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
  */
 @Slf4j
 public abstract class BasicSearchController<T> {
-    private final ApplicationEventPublisher eventPublisher;
+    protected final ApplicationEventPublisher eventPublisher;
     private final MessageConverterContextFactory<T> converterContextFactory;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
@@ -54,6 +54,7 @@ public abstract class BasicSearchController<T> {
         MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
+        context.setFileType(getBestFileTypeFromRequest(request));
         context.setEntityOnly(true);
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(Stream.of(getEntityId(entity)));
@@ -93,6 +94,7 @@ public abstract class BasicSearchController<T> {
 
         context.setFields(fields);
         context.setFacets(result.getFacets());
+        context.setFileType(getBestFileTypeFromRequest(request));
         context.setMatchedFields(result.getMatchedFields());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             Stream<String> accList = result.getContent().map(this::getEntityId);
@@ -113,14 +115,10 @@ public abstract class BasicSearchController<T> {
     }
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
-            Stream<T> result,
-            String fields,
-            MediaType contentType,
-            HttpServletRequest request,
-            String encoding) {
+            Stream<T> result, String fields, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
-        context.setFileType(FileType.bestFileTypeMatch(encoding));
+        context.setFileType(getBestFileTypeFromRequest(request));
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(result.map(this::getEntityId));
         } else {
@@ -163,6 +161,11 @@ public abstract class BasicSearchController<T> {
 
     protected MediaType getAcceptHeader(HttpServletRequest request) {
         return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));
+    }
+
+    protected FileType getBestFileTypeFromRequest(HttpServletRequest request) {
+        String encoding = request.getHeader(HttpHeaders.ACCEPT_ENCODING);
+        return FileType.bestFileTypeMatch(encoding);
     }
 
     private String getLocationURLForId(String redirectId) {

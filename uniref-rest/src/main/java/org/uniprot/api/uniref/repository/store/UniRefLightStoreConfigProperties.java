@@ -14,4 +14,6 @@ public class UniRefLightStoreConfigProperties {
     private String host;
     private String storeName;
     private int numberOfConnections;
+    private int fetchMaxRetries;
+    private int fetchRetryDelayMillis;
 }

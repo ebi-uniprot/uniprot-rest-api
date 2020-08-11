@@ -3,11 +3,11 @@ package org.uniprot.api.uniref.repository.store;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.RepresentativeMember;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortRemoteUniRefEntryLightStore;
-import org.uniprot.store.datastore.voldemort.uniref.VoldemortRemoteUniRefEntryStore;
+import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortRemoteUniRefMemberStore;
 
 /**
  * @author jluo
@@ -16,8 +16,8 @@ import org.uniprot.store.datastore.voldemort.uniref.VoldemortRemoteUniRefEntrySt
 @Configuration
 public class UniRefStoreConfig {
     @Bean
-    public UniRefStoreConfigProperties storeConfigProperties() {
-        return new UniRefStoreConfigProperties();
+    public UniRefMemberStoreConfigProperties memberStoreConfigProperties() {
+        return new UniRefMemberStoreConfigProperties();
     }
 
     @Bean
@@ -27,14 +27,15 @@ public class UniRefStoreConfig {
 
     @Bean
     @Profile("live")
-    public UniRefStoreClient uniRefStoreClient(
-            UniRefStoreConfigProperties unirefStoreConfigProperties) {
-        VoldemortClient<UniRefEntry> client =
-                new VoldemortRemoteUniRefEntryStore(
+    public UniRefMemberStoreClient uniRefStoreClient(
+            UniRefMemberStoreConfigProperties unirefStoreConfigProperties) {
+        VoldemortClient<RepresentativeMember> client =
+                new VoldemortRemoteUniRefMemberStore(
                         unirefStoreConfigProperties.getNumberOfConnections(),
                         unirefStoreConfigProperties.getStoreName(),
                         unirefStoreConfigProperties.getHost());
-        return new UniRefStoreClient(client);
+        return new UniRefMemberStoreClient(
+                client, unirefStoreConfigProperties.getMemberBatchSize());
     }
 
     @Bean

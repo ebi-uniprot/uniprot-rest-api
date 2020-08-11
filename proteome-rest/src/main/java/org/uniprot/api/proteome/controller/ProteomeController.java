@@ -22,13 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.ProteomeRequest;
@@ -80,9 +74,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     "The Proteomes service provides access to UniProtKB proteomes with"
                             + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
                             + " proteome identifiers, species names or taxonomy identifiers")
-    @RequestMapping(
+    @GetMapping(
             value = "/search",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -128,9 +121,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
     }
 
     @Tag(name = "proteome")
-    @RequestMapping(
+    @GetMapping(
             value = "/{upid}",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -177,9 +169,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
     }
 
     @Tag(name = "proteome")
-    @RequestMapping(
+    @GetMapping(
             value = "/download",
-            method = RequestMethod.GET,
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -217,10 +208,9 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             @Valid @ModelAttribute ProteomeRequest searchRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         Stream<ProteomeEntry> result = queryService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request, encoding);
+        return super.download(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override
