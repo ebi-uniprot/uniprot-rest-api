@@ -1,14 +1,19 @@
 package org.uniprot.api.support.data.subcell.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.support.data.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 
 /**
@@ -19,7 +24,9 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 @Import(SubcellularLocationQueryBoostsConfig.class)
 public class SubcellularLocationService
         extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
-    private SearchFieldConfig searchFieldConfig;
+    private static final String SUBCELL_ID_FIELD = "id";
+    private final SearchFieldConfig searchFieldConfig;
+    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
 
     public SubcellularLocationService(
             SubcellularLocationRepository repository,
@@ -34,10 +41,21 @@ public class SubcellularLocationService
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
+        this.defaultSearchQueryOptimiser =
+                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
-    protected String getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return this.searchFieldConfig.getSearchFieldItemByName(SUBCELL_ID_FIELD);
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return Collections.singletonList(getIdField());
     }
 }

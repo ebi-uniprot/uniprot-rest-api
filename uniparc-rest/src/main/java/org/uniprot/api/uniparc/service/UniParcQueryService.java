@@ -1,10 +1,14 @@
 package org.uniprot.api.uniparc.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
@@ -12,6 +16,7 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 /**
@@ -21,7 +26,9 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Service
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
+    private static final String UNIPARC_ID_FIELD = "upi";
     private final SearchFieldConfig searchFieldConfig;
+    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
 
     @Autowired
     public UniParcQueryService(
@@ -41,15 +48,26 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 uniParcQueryBoosts);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        this.defaultSearchQueryOptimiser =
+                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
-    protected String getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName("upi").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
     }
 
     @Override
     public UniParcEntry findByUniqueId(String uniqueId, String filters) {
         return findByUniqueId(uniqueId);
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return Collections.singletonList(getIdField());
     }
 }

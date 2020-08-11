@@ -1,9 +1,13 @@
 package org.uniprot.api.support.data.crossref.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.support.data.crossref.config.CrossRefFacetConfig;
 import org.uniprot.api.support.data.crossref.config.CrossRefQueryBoostsConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -12,13 +16,15 @@ import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
 @Service
 @Import(CrossRefQueryBoostsConfig.class)
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
-    private SearchFieldConfig fieldConfig =
-            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
+    private static final String CROSS_REF_ID_FIELD = "id";
+    private final SearchFieldConfig searchFieldConfig;
+    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
 
     public CrossRefService(
             CrossRefRepository crossRefRepository,
@@ -32,10 +38,23 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefSolrSortClause,
                 crossRefQueryBoosts,
                 crossRefFacetConfig);
+        this.searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
+        this.defaultSearchQueryOptimiser =
+                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
     }
 
     @Override
-    protected String getIdField() {
-        return fieldConfig.getSearchFieldItemByName("id").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return searchFieldConfig.getSearchFieldItemByName(CROSS_REF_ID_FIELD);
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return Collections.singletonList(getIdField());
     }
 }
