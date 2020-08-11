@@ -1,9 +1,6 @@
 package org.uniprot.api.uniparc.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,25 +61,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.entryConverter = uniParcQueryResultConverter;
     }
 
-    @Override
-    protected SearchFieldItem getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
-    }
-
-    @Override
-    public UniParcEntry findByUniqueId(String uniqueId, String filters) {
-        return findByUniqueId(uniqueId);
-    }
-
-    @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
-    }
-
     public QueryResult<UniParcEntry> findByAccession(
             String accession, String dbTypes, String dbIds, String taxonIds, Boolean isActive) {
 
@@ -109,6 +87,25 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                         .map(uniParcEntry -> statusFilter.apply(uniParcEntry, isActive));
 
         return QueryResult.of(converted, results.getPage(), null);
+    }
+
+    @Override
+    protected SearchFieldItem getIdField() {
+        return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
+    }
+
+    @Override
+    public UniParcEntry findByUniqueId(String uniqueId, String filters) {
+        return findByUniqueId(uniqueId);
+    }
+
+    @Override
+    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+        return defaultSearchQueryOptimiser;
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        return Collections.singletonList(getIdField());
     }
 
     private UniParcSearchRequest createSearchRequest(String accession) {
