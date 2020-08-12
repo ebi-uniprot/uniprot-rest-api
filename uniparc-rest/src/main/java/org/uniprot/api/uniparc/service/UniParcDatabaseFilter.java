@@ -24,7 +24,12 @@ public class UniParcDatabaseFilter implements BiFunction<UniParcEntry, List<Stri
             List<UniParcCrossReference> filteredRefs =
                     xrefs.stream()
                             .filter(xref -> Objects.nonNull(xref.getDatabase()))
-                            .filter(xref -> databases.contains(xref.getDatabase().getDisplayName()))
+                            .filter(
+                                    xref ->
+                                            databases.contains(
+                                                    xref.getDatabase()
+                                                            .getDisplayName()
+                                                            .toLowerCase()))
                             .collect(Collectors.toList());
             builder.uniParcCrossReferencesSet(filteredRefs);
         }

@@ -27,6 +27,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
@@ -234,18 +235,13 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/accession/{accession}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> findByAccession(
-            @PathVariable String accession,
-            String dbTypes,
-            String dbIds,
-            String taxonIds,
-            Boolean active,
-            String fields,
+            @Valid @ModelAttribute UniParcGetByAccessionRequest getByAccessionRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        QueryResult<UniParcEntry> results =
-                queryService.findByAccession(accession, dbTypes, dbIds, taxonIds, active);
-        return super.getSearchResponse(results, fields, request, response);
+        QueryResult<UniParcEntry> results = queryService.findByAccession(getByAccessionRequest);
+        return super.getSearchResponse(
+                results, getByAccessionRequest.getFields(), request, response);
     }
 
     @Override

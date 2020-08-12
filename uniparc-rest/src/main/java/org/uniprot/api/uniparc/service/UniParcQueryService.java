@@ -15,6 +15,8 @@ import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
+import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;
@@ -32,6 +34,8 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private static final String UNIPARC_ID_FIELD = "upi";
+    private static final String ACCESSION_STR = "accession";
+    private static final String COMMA_STR = ",";
     private final SearchFieldConfig searchFieldConfig;
     private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
     private final UniParcQueryRepository repository;
@@ -62,31 +66,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     public QueryResult<UniParcEntry> findByAccession(
-            String accession, String dbTypes, String dbIds, String taxonIds, Boolean isActive) {
-
-        UniParcSearchRequest searchRequest = createSearchRequest(accession);
-        SolrRequest solrRequest = createSearchSolrRequest(searchRequest);
-        QueryResult<UniParcDocument> results =
-                repository.searchPage(solrRequest, searchRequest.getCursor());
-
-        List<String> databases = csvToList(dbTypes);
-        List<String> databaseIds = csvToList(dbIds);
-        List<String> toxonomyIds = csvToList(taxonIds);
-        UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
-        UniParcDatabaseIdFilter dbIdFilter = new UniParcDatabaseIdFilter();
-        UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
-        UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
-
-        Stream<UniParcEntry> converted =
-                results.getContent()
-                        .map(entryConverter)
-                        .filter(Objects::nonNull)
-                        .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
-                        .map(uniParcEntry -> dbIdFilter.apply(uniParcEntry, databaseIds))
-                        .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, toxonomyIds))
-                        .map(uniParcEntry -> statusFilter.apply(uniParcEntry, isActive));
-
-        return QueryResult.of(converted, results.getPage(), null);
+            UniParcGetByAccessionRequest getByAccessionRequest) {
+        return findByFieldId(
+                ACCESSION_STR, getByAccessionRequest.getAccession(), getByAccessionRequest);
     }
 
     @Override
@@ -108,16 +90,56 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return Collections.singletonList(getIdField());
     }
 
-    private UniParcSearchRequest createSearchRequest(String accession) {
+    private QueryResult<UniParcEntry> findByFieldId(
+            String fieldName, String fieldValue, UniParcGetByIdRequest request) {
+        // input
+        String dbTypes = request.getDbTypes();
+        String dbIds = request.getDbIds();
+        String taxonIds = request.getTaxonIds();
+        Boolean isActive = request.getActive();
+
+        // search uniparc ids from solr
+        UniParcSearchRequest searchRequest = createSolrSearchByIdRequest(fieldName, fieldValue);
+        SolrRequest solrRequest = createSearchSolrRequest(searchRequest);
+        QueryResult<UniParcDocument> results =
+                repository.searchPage(solrRequest, searchRequest.getCursor());
+
+        // convert comma separated values to list
+        List<String> databases = csvToList(dbTypes);
+        List<String> databaseIds = csvToList(dbIds);
+        List<String> toxonomyIds = csvToList(taxonIds);
+        UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
+        UniParcDatabaseIdFilter dbIdFilter = new UniParcDatabaseIdFilter();
+        UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
+        UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
+
+        // get and filter the results
+        Stream<UniParcEntry> converted =
+                results.getContent()
+                        .map(entryConverter)
+                        .filter(Objects::nonNull)
+                        .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
+                        .map(uniParcEntry -> dbIdFilter.apply(uniParcEntry, databaseIds))
+                        .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, toxonomyIds))
+                        .map(uniParcEntry -> statusFilter.apply(uniParcEntry, isActive));
+
+        return QueryResult.of(converted, results.getPage());
+    }
+
+    private UniParcSearchRequest createSolrSearchByIdRequest(String fieldName, String fieldValue) {
         UniParcSearchRequest searchRequest = new UniParcSearchRequest();
-        searchRequest.setQuery("accession:" + accession);
+        searchRequest.setQuery(fieldName + ":" + fieldValue);
         return searchRequest;
     }
 
     private List<String> csvToList(String csv) {
         List<String> list = new ArrayList<>();
         if (Utils.notNullNotEmpty(csv)) {
-            list = Arrays.stream(csv.split(",")).map(String::trim).collect(Collectors.toList());
+            list =
+                    Arrays.stream(csv.split(COMMA_STR))
+                            .map(String::trim)
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
         }
         return list;
     }

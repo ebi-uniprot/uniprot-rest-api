@@ -25,7 +25,7 @@ public class UniParcDatabaseIdFilter
             List<UniParcCrossReference> filteredRefs =
                     xrefs.stream()
                             .filter(xref -> Objects.nonNull(xref.getDatabase()))
-                            .filter(xref -> databaseIds.contains(xref.getId()))
+                            .filter(xref -> databaseIds.contains(xref.getId().toLowerCase()))
                             .collect(Collectors.toList());
             builder.uniParcCrossReferencesSet(filteredRefs);
         }
