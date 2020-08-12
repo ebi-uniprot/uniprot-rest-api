@@ -1,19 +1,18 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.*;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
+import static org.uniprot.core.util.Utils.*;
 
 /**
  * Created 14/06/19
@@ -78,6 +77,7 @@ public class SolrRequestConverter {
         private static final String DEFAULT_FIELD = "df";
         private static final String BOOST_FIELD_TYPE_NUMBER = "=number:";
         private static final String QUERY_PLACEHOLDER = "{query}";
+        private static final String QUERY_FIELDS = "qf";
 
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
@@ -157,6 +157,10 @@ public class SolrRequestConverter {
                 if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
                     solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
+            }
+
+            if (notNullNotEmpty(boosts.getQueryFields())) {
+                solrQuery.add(QUERY_FIELDS, boosts.getQueryFields());
             }
         }
 

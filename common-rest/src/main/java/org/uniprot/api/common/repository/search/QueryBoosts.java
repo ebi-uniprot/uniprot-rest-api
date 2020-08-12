@@ -1,11 +1,10 @@
 package org.uniprot.api.common.repository.search;
 
-import java.util.List;
+import lombok.*;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
-import lombok.ToString;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created 04/09/19
@@ -20,4 +19,17 @@ public class QueryBoosts {
     private String defaultSearchBoostFunctions;
     @Singular private List<String> advancedSearchBoosts;
     private String advancedSearchBoostFunctions;
+
+    @Setter(AccessLevel.NONE)
+    private String queryFields;
+
+    public static class QueryBoostsBuilder {
+        public QueryBoostsBuilder queryFields(String queryFields) {
+            this.queryFields =
+                    Arrays.stream(queryFields.split(","))
+                            .map(String::trim)
+                            .collect(Collectors.joining(" "));
+            return this;
+        }
+    }
 }

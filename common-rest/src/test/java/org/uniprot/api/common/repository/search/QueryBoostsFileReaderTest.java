@@ -56,4 +56,11 @@ class QueryBoostsFileReaderTest {
                 reader.getQueryBoosts().getAdvancedSearchBoostFunctions(),
                 is("advanced1,advanced2"));
     }
+
+    @Test
+    void queryFieldsLoadedCorrectly() {
+        assertThat(
+                reader.getQueryBoosts().getQueryFields(),
+                is("field1 field2"));
+    }
 }

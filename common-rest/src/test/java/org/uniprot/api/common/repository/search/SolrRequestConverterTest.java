@@ -214,6 +214,27 @@ class SolrRequestConverterTest {
         }
 
         @Test
+        void queryFieldsQFCreatedCorrectly() {
+            // given
+            SolrRequest request =
+                    SolrRequest.builder()
+                            .query("value1")
+                            .queryBoosts(
+                                    QueryBoosts.builder()
+                                            .queryFields("field1,field2")
+                                            .build())
+                            .build();
+
+            // when
+            SolrQuery solrQuery = converter.toSolrQuery(request);
+
+            // then
+            assertThat(
+                    solrQuery.get("qf"),
+                    is("field1 field2"));
+        }
+
+        @Test
         void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly() {
             // given
             SolrRequest request =

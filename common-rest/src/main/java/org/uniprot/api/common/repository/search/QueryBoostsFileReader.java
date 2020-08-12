@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QueryBoostsFileReader {
     private static final String COMMENT_PREFIX = "#";
     private final QueryBoosts.QueryBoostsBuilder builder;
-    private String boostsResourceLocation;
+    private final String boostsResourceLocation;
 
     public QueryBoostsFileReader(String boostsResourceLocation) {
         this.boostsResourceLocation = boostsResourceLocation;
@@ -47,6 +47,8 @@ public class QueryBoostsFileReader {
                     boostType = BoostType.ADVANCED_SEARCH;
                 } else if (line.startsWith(BoostType.ADVANCED_SEARCH_FUNCTIONS.prefix)) {
                     boostType = BoostType.ADVANCED_SEARCH_FUNCTIONS;
+                } else if (line.startsWith(BoostType.QUERY_FIELDS.prefix)) {
+                    boostType = BoostType.QUERY_FIELDS;
                 } else if (line.startsWith(COMMENT_PREFIX) || line.trim().isEmpty()) {
                     // => commented out or empty line, skip it
                     log.debug("ignoring boost line: <{}>", line);
@@ -75,16 +77,20 @@ public class QueryBoostsFileReader {
             case ADVANCED_SEARCH_FUNCTIONS:
                 builder.advancedSearchBoostFunctions(line);
                 break;
+            case QUERY_FIELDS:
+                builder.queryFields(line);
+                break;
         }
     }
 
     private enum BoostType {
         DEFAULT_SEARCH("# DEFAULT-SEARCH-BOOSTS"),
         DEFAULT_SEARCH_FUNCTIONS("# DEFAULT-SEARCH-BOOST-FUNCTIONS"),
+        QUERY_FIELDS("# QUERY-FIELDS"),
         ADVANCED_SEARCH("# ADVANCED-SEARCH-BOOSTS"),
         ADVANCED_SEARCH_FUNCTIONS("# ADVANCED-SEARCH-BOOST-FUNCTIONS");
 
-        private String prefix;
+        private final String prefix;
 
         BoostType(String prefix) {
             this.prefix = prefix;
