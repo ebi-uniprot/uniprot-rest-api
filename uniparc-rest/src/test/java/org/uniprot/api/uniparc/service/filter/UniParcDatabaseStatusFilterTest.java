@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.service;
+package org.uniprot.api.uniparc.service.filter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

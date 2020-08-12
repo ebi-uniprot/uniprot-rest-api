@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.service;
+package org.uniprot.api.uniparc.service.filter;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,18 +14,18 @@ import org.uniprot.core.util.Utils;
  * @author sahmad
  * @created 11/08/2020
  */
-public class UniParcDatabaseIdFilter
-        implements BiFunction<UniParcEntry, List<String>, UniParcEntry> {
+public class UniParcDatabaseStatusFilter
+        implements BiFunction<UniParcEntry, Boolean, UniParcEntry> {
 
     @Override
-    public UniParcEntry apply(UniParcEntry uniParcEntry, List<String> databaseIds) {
+    public UniParcEntry apply(UniParcEntry uniParcEntry, Boolean isActive) {
         UniParcEntryBuilder builder = UniParcEntryBuilder.from(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
-        if (Utils.notNullNotEmpty(xrefs) && Utils.notNullNotEmpty(databaseIds)) {
+        if (Utils.notNullNotEmpty(xrefs) && Objects.nonNull(isActive)) {
             List<UniParcCrossReference> filteredRefs =
                     xrefs.stream()
                             .filter(xref -> Objects.nonNull(xref.getDatabase()))
-                            .filter(xref -> databaseIds.contains(xref.getId().toLowerCase()))
+                            .filter(xref -> Objects.equals(isActive, xref.isActive()))
                             .collect(Collectors.toList());
             builder.uniParcCrossReferencesSet(filteredRefs);
         }

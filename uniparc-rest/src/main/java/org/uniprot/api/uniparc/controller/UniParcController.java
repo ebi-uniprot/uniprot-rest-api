@@ -233,13 +233,14 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
     @GetMapping(
             value = "/accession/{accession}",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> findByAccession(
             @Valid @ModelAttribute UniParcGetByAccessionRequest getByAccessionRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
         QueryResult<UniParcEntry> results = queryService.findByAccession(getByAccessionRequest);
+
         return super.getSearchResponse(
                 results, getByAccessionRequest.getFields(), request, response);
     }

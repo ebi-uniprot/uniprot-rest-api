@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.service;
+package org.uniprot.api.uniparc.service.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +41,7 @@ class UniParcDatabaseFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> dbFilter = Arrays.asList("UniProtKB/TrEMBL");
+        List<String> dbFilter = Arrays.asList("UniProtKB/TrEMBL".toLowerCase());
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(this.uniParcEntry, dbFilter);
         // everything should be same except xrefs
@@ -69,7 +69,7 @@ class UniParcDatabaseFilterTest {
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
         List<String> dbFilter =
-                Arrays.asList("RandomDB", UniParcDatabase.SWISSPROT.getDisplayName());
+                Arrays.asList("RandomDB", UniParcDatabase.SWISSPROT.getDisplayName().toLowerCase());
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(this.uniParcEntry, dbFilter);
         // everything should be same except xrefs

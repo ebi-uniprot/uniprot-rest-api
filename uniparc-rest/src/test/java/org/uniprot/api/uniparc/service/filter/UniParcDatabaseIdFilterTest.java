@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.service;
+package org.uniprot.api.uniparc.service.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ class UniParcDatabaseIdFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> dbIdFilter = Arrays.asList("P12301");
+        List<String> dbIdFilter = Arrays.asList("P12301".toLowerCase());
         // filter by dbid
         UniParcEntry filteredEntry = idFilter.apply(this.uniParcEntry, dbIdFilter);
         // everything should be same except xrefs
@@ -65,7 +65,7 @@ class UniParcDatabaseIdFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> dbIdFilter = Arrays.asList("RandomDB", "P10001");
+        List<String> dbIdFilter = Arrays.asList("RandomDB".toLowerCase(), "P10001".toLowerCase());
         // filter by dbid
         UniParcEntry filteredEntry = idFilter.apply(this.uniParcEntry, dbIdFilter);
         // everything should be same except xrefs
@@ -81,7 +81,7 @@ class UniParcDatabaseIdFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> dbIdFilter = Arrays.asList("RandomDB");
+        List<String> dbIdFilter = Arrays.asList("RandomDB".toLowerCase());
         // filter by dbid
         UniParcEntry filteredEntry = idFilter.apply(this.uniParcEntry, dbIdFilter);
         // everything should be same but no xrefs
@@ -96,7 +96,7 @@ class UniParcDatabaseIdFilterTest {
         UniParcEntryBuilder entryBuilder = UniParcEntryBuilder.from(uniParcEntry);
         entryBuilder.uniParcCrossReferencesSet(null);
         UniParcEntry entryWithoutXref = entryBuilder.build();
-        List<String> dbIdFilter = Arrays.asList("P1001");
+        List<String> dbIdFilter = Arrays.asList("P1001".toLowerCase());
         // filter by dbid
         UniParcEntry filteredEntry = idFilter.apply(entryWithoutXref, dbIdFilter);
         Assertions.assertEquals(entryWithoutXref, filteredEntry);

@@ -4,6 +4,9 @@ import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -13,10 +16,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UniParcGetByAccessionRequest extends UniParcGetByIdRequest {
-    private static final String ACCESSION_PATTERN =
-            "([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])(-[0-9]+)?";
 
-    @Pattern(regexp = ACCESSION_PATTERN, message = "{search.invalid.accession.value}")
+    @Pattern(
+            regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
+            message = "{search.invalid.accession.value}")
     @Parameter(description = "Unique identifier for the UniProt entry")
     private String accession;
 }
