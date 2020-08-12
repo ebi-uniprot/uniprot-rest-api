@@ -70,17 +70,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcGetByAccessionIT {
-    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension
+    static DataStoreManager storeManager = new DataStoreManager();
 
     private static final String getByAccessionPath = "/uniparc/accession/{accession}";
 
-    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired
+    private UniProtStoreClient<UniParcEntry> storeClient;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
     private static final String UPI_PREF = "UPI0000083A";
 
-    @Autowired private UniParcQueryRepository repository;
+    @Autowired
+    private UniParcQueryRepository repository;
 
     @BeforeAll
     void initDataStore() {
@@ -113,7 +117,7 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void getByAccessionSuccess() throws Exception {
+    void testGetByAccessionSuccess() throws Exception {
         // when
         String accession = "P12301";
         ResultActions response =
@@ -197,7 +201,39 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void getByAccessionWithDBFilterSuccess() throws Exception {
+    void testGetByNonExistingAccessionSuccess() throws Exception {
+        // when
+        String accession = "P54321";
+        ResultActions response =
+                mockMvc.perform(MockMvcRequestBuilders.get(getByAccessionPath, accession));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", empty()));
+    }
+
+    @Test
+    void testGetByAccessionWithInvalidAccession() throws Exception {
+        String accession = "ABCDEFG";
+        // when
+        ResultActions response =
+                mockMvc.perform(MockMvcRequestBuilders.get(getByAccessionPath, accession));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
+                .andExpect(jsonPath("$.messages[0]", equalTo("The 'accession' value has invalid format. It should be a valid UniProtKB accession")));
+    }
+
+    @Test
+    void testGetByAccessionWithDBFilterSuccess() throws Exception {
         // when
         String accession = "P12301";
         String dbTypes = "UniProtKB/TrEMBL,embl";
@@ -228,7 +264,27 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void getByAccessionWithDBIdsFilterSuccess() throws Exception {
+    void testGetByAccessionWithInvalidDBFilterSuccess() throws Exception {
+        // when
+        String accession = "P12301";
+        String dbTypes = "randomDB";
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                                .param("dbTypes", dbTypes));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
+                .andExpect(jsonPath("$.messages[0]", containsString("is invalid UniParc Cross Ref DB Name")));
+    }
+
+    @Test
+    void testGetByAccessionWithDBIdsFilterSuccess() throws Exception {
         // when
         String accession = "P12301";
         String dbIds = "unimes1,P10001,randomId";
@@ -259,7 +315,27 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void getByAccessionWithTaxonomyIdsFilterSuccess() throws Exception {
+    void testGetByAccessionWithMoreDBIdsThanSupportedFilterSuccess() throws Exception {
+        // when
+        String accession = "P12301";
+        String dbIds = "dbId1,dbId2,dbId3,dbId4,dbId5,dbId6,dbId7";
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                                .param("dbIds", dbIds));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
+                .andExpect(jsonPath("$.messages[0]", containsString("is the maximum count limit of comma separated items. You have passed")));
+    }
+
+    @Test
+    void testGetByAccessionWithTaxonomyIdsFilterSuccess() throws Exception {
         // when
         String accession = "P12301";
         String taxonIds = "9606,radomTaxonId";
@@ -288,7 +364,7 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void getByAccessionWithActiveCrossRefFilterSuccess() throws Exception {
+    void testGetByAccessionWithActiveCrossRefFilterSuccess() throws Exception {
         // when
         String accession = "P12301";
         String active = "true";
@@ -320,7 +396,7 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void getByAccessionWithInActiveCrossRefFilterSuccess() throws Exception {
+    void testGetByAccessionWithInActiveCrossRefFilterSuccess() throws Exception {
         // when
         String accession = "P12301";
         String active = "false";
@@ -350,7 +426,7 @@ class UniParcGetByAccessionIT {
 
     @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
     @MethodSource("getAllReturnedFields")
-    void searchCanSearchWithAllAvailableReturnedFields(String name, List<String> paths)
+    void testGetAccessionWithAllAvailableReturnedFields(String name, List<String> paths)
             throws Exception {
         String accession = "P12301";
         // when
@@ -375,13 +451,33 @@ class UniParcGetByAccessionIT {
         }
     }
 
+    @Test
+    void testGetAccessionWithInvalidReturnedFields()
+            throws Exception {
+        String accession = "P12301";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getByAccessionPath, accession)
+                                .param("fields", "randomField")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
+                .andExpect(jsonPath("$.messages[0]", containsString("Invalid fields parameter value ")));
+
+    }
+
     @ParameterizedTest(name = "[{index}] get by accession with content-type {0}")
     @ValueSource(
             strings = {
-                "",
-                MediaType.APPLICATION_XML_VALUE,
-                MediaType.APPLICATION_JSON_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE
+                    "",
+                    MediaType.APPLICATION_XML_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE,
+                    UniProtMediaType.FASTA_MEDIA_TYPE_VALUE
             })
     void testGetBySupportedContentTypes(String contentType) throws Exception {
         // when
