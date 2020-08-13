@@ -1,25 +1,8 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.stream.IntStream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -28,22 +11,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.uniparc.UniParcRestApplication;
-import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
-import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.search.SolrCollection;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -56,57 +37,20 @@ import org.uniprot.store.search.SolrCollection;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcGetByUpIdIT {
-    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
+class UniParcGetByUpIdIT extends AbstractGetByIdTest{
+
 
     private static final String getByUpIdPath = "/uniparc/proteome/{upid}";
-
-    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
-
-    @Autowired private MockMvc mockMvc;
-
-    private static final String UPI_PREF = "UPI0000083A";
-
-    @Autowired private UniParcQueryRepository repository;
-
-    @BeforeAll
-    void initDataStore() {
-        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPARC, SolrCollection.uniparc);
-        ReflectionTestUtils.setField(
-                repository,
-                "solrClient",
-                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC));
-        storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
-
-        storeManager.addDocConverter(
-                DataStoreManager.StoreType.UNIPARC,
-                new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
-
-        // create 5 entries
-        IntStream.rangeClosed(1, 5).forEach(this::saveEntry);
-    }
-
-    @AfterAll
-    static void cleanUp() {
-        storeManager.close();
-    }
-
-    private void saveEntry(int i) {
-        UniParcEntry entry = UniParcControllerITUtils.createEntry(i, UPI_PREF);
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
+    @Override
+    protected String getGetByIdEndpoint() {
+        return getByUpIdPath;
     }
 
     @Test
     void testGetByUpIdSuccess() throws Exception {
         // when
         String upid = "UP123456701";
-        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get(getByUpIdPath, upid));
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid));
 
         // then
         response.andDo(print())
@@ -116,7 +60,7 @@ class UniParcGetByUpIdIT {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(2)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(
                         jsonPath("$.results[0].uniParcCrossReferences[*].version", notNullValue()))

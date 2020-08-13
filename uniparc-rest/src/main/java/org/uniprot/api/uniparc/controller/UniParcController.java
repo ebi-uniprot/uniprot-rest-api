@@ -235,7 +235,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
     @GetMapping(
             value = "/accession/{accession}",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE,
+                    XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> findByAccession(
             @Valid @ModelAttribute UniParcGetByAccessionRequest getByAccessionRequest,
             HttpServletRequest request,
@@ -248,7 +249,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
     @GetMapping(
             value = "/dbreference/{dbId}",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE,
+                    XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> findByDbId(
             @Valid @ModelAttribute UniParcGetByDbIdRequest getByDbIdRequest,
             HttpServletRequest request,
@@ -261,7 +263,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
     @GetMapping(
             value = "/proteome/{upId}",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE,
+                    TSV_MEDIA_TYPE_VALUE,
+                    XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> findByUpId(
             @Valid @ModelAttribute UniParcGetByUpIdRequest getByUpIdRequest,
             HttpServletRequest request,

@@ -1,5 +1,29 @@
 package org.uniprot.api.uniparc.controller;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.uniparc.UniParcRestApplication;
+import org.uniprot.core.util.Utils;
+
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -16,58 +40,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.uniparc.UniParcRestApplication;
-import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
-import org.uniprot.core.Property;
-import org.uniprot.core.uniparc.UniParcCrossReference;
-import org.uniprot.core.uniparc.UniParcDatabase;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.util.Utils;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.search.SolrCollection;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
 /**
  * @author sahmad
@@ -80,52 +55,13 @@ import org.uniprot.store.search.SolrCollection;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcGetByAccessionIT {
-    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
+class UniParcGetByAccessionIT extends AbstractGetByIdTest{
 
-    private static final String getByAccessionPath = "/uniparc/accession/{accession}";
+    private static final String getGetByIdEndpoint = "/uniparc/accession/{accession}";
 
-    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
-
-    @Autowired private MockMvc mockMvc;
-
-    private static final String UPI_PREF = "UPI0000083A";
-
-    @Autowired private UniParcQueryRepository repository;
-
-    @BeforeAll
-    void initDataStore() {
-        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPARC, SolrCollection.uniparc);
-        ReflectionTestUtils.setField(
-                repository,
-                "solrClient",
-                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC));
-        storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
-
-        storeManager.addDocConverter(
-                DataStoreManager.StoreType.UNIPARC,
-                new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
-
-        // create 5 entries
-        IntStream.rangeClosed(1, 5).forEach(this::saveEntry);
-    }
-
-    @AfterAll
-    static void cleanUp() {
-        storeManager.close();
-    }
-
-    private void saveEntry(int i) {
-        UniParcEntry entry = UniParcControllerITUtils.createEntry(i, UPI_PREF);
-        // append two more cross ref
-        UniParcEntry updatedEntry = appendTwoMoreXRefs(entry, i);
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(updatedEntry);
-        storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC, updatedEntry);
+    @Override
+    protected String getGetByIdEndpoint() {
+        return getGetByIdEndpoint;
     }
 
     @Test
@@ -133,7 +69,7 @@ class UniParcGetByAccessionIT {
         // when
         String accession = "P12301";
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getByAccessionPath, accession));
+                mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession));
 
         // then
         response.andDo(print())
@@ -182,7 +118,7 @@ class UniParcGetByAccessionIT {
         // when
         String accession = "P54321";
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getByAccessionPath, accession));
+                mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession));
 
         // then
         response.andDo(print())
@@ -197,7 +133,7 @@ class UniParcGetByAccessionIT {
         String accession = "ABCDEFG";
         // when
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getByAccessionPath, accession));
+                mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession));
 
         // then
         response.andDo(print())
@@ -220,7 +156,7 @@ class UniParcGetByAccessionIT {
         String dbTypes = "UniProtKB/TrEMBL,embl";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("dbTypes", dbTypes));
 
         // then
@@ -248,7 +184,7 @@ class UniParcGetByAccessionIT {
         String dbTypes = "randomDB";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("dbTypes", dbTypes));
 
         // then
@@ -271,7 +207,7 @@ class UniParcGetByAccessionIT {
         String dbIds = "unimes1,P10001,randomId";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("dbIds", dbIds));
 
         // then
@@ -299,7 +235,7 @@ class UniParcGetByAccessionIT {
         String dbIds = "dbId1,dbId2,dbId3,dbId4,dbId5,dbId6,dbId7";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("dbIds", dbIds));
 
         // then
@@ -323,7 +259,7 @@ class UniParcGetByAccessionIT {
         String taxonIds = "9606,radomTaxonId";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("taxonIds", taxonIds));
 
         // then
@@ -349,7 +285,7 @@ class UniParcGetByAccessionIT {
         String active = "true";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("active", active));
 
         // then
@@ -376,7 +312,7 @@ class UniParcGetByAccessionIT {
         String active = "false";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, accession)
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), accession)
                                 .param("active", active));
 
         // then
@@ -402,7 +338,7 @@ class UniParcGetByAccessionIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(getByAccessionPath, accession)
+                        get(getGetByIdEndpoint(), accession)
                                 .param("fields", name)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -426,7 +362,7 @@ class UniParcGetByAccessionIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(getByAccessionPath, accession)
+                        get(getGetByIdEndpoint(), accession)
                                 .param("fields", "randomField")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -447,13 +383,16 @@ class UniParcGetByAccessionIT {
                 "",
                 MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE
+                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                    TSV_MEDIA_TYPE_VALUE,
+                    XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE
             })
     void testGetBySupportedContentTypes(String contentType) throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, "P12301")
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), "P12301")
                                 .header(ACCEPT, contentType));
 
         if (Utils.nullOrEmpty(contentType)) {
@@ -467,12 +406,12 @@ class UniParcGetByAccessionIT {
 
     @ParameterizedTest(name = "[{index}] try to get by accession with content-type {0}")
     @ValueSource(
-            strings = {MediaType.APPLICATION_PDF_VALUE, UniProtMediaType.LIST_MEDIA_TYPE_VALUE})
+            strings = {MediaType.APPLICATION_PDF_VALUE, UniProtMediaType.GFF_MEDIA_TYPE_VALUE})
     void testGetByAccessionWithUnsupportedContentTypes(String contentType) throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getByAccessionPath, "P12301")
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), "P12301")
                                 .header(ACCEPT, contentType));
 
         // then
@@ -485,45 +424,4 @@ class UniParcGetByAccessionIT {
                                         "Invalid request received. Requested media type/format not accepted:")));
     }
 
-    private UniParcEntry appendTwoMoreXRefs(UniParcEntry entry, int i) {
-        UniParcCrossReference xref1 =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(1)
-                        .database(UniParcDatabase.EMBL)
-                        .id("embl" + i)
-                        .version(7)
-                        .active(true)
-                        .created(LocalDate.of(2017, 2, 12))
-                        .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "proteinName" + i))
-                        .build();
-
-        UniParcCrossReference xref2 =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(1)
-                        .database(UniParcDatabase.UNIMES)
-                        .id("unimes" + i)
-                        .version(7)
-                        .active(false)
-                        .created(LocalDate.of(2017, 2, 12))
-                        .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "proteinName" + i))
-                        .build();
-        UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
-        builder.uniParcCrossReferencesAdd(xref1);
-        builder.uniParcCrossReferencesAdd(xref2);
-        return builder.build();
-    }
-
-    protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC)
-                .getReturnFields().stream()
-                .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
-    }
 }
