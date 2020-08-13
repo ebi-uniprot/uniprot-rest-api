@@ -77,10 +77,13 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.entryConverter = uniParcQueryResultConverter;
     }
 
-    public QueryResult<UniParcEntry> findByAccession(
-            UniParcGetByAccessionRequest getByAccessionRequest) {
-        return findByFieldId(
-                ACCESSION_STR, getByAccessionRequest.getAccession(), getByAccessionRequest);
+    public UniParcEntry findByAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
+
+        UniParcEntry uniParcEntry = getEntity(ACCESSION_STR, getByAccessionRequest.getAccession());
+
+        return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
+                .findFirst()
+                .orElse(null);
     }
 
     public QueryResult<UniParcEntry> findByDbId(UniParcGetByDbIdRequest getByDbIdRequest) {
@@ -112,11 +115,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     private QueryResult<UniParcEntry> findByFieldId(
             String fieldName, String fieldValue, UniParcGetByIdRequest request) {
-        // input
-        String dbTypes = request.getDbTypes();
-        String dbIds = request.getDbIds();
-        String taxonIds = request.getTaxonIds();
-        Boolean isActive = request.getActive();
 
         // search uniparc ids from solr
         UniParcSearchRequest searchRequest = createSolrSearchByIdRequest(fieldName, fieldValue);
@@ -124,26 +122,32 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         QueryResult<UniParcDocument> results =
                 repository.searchPage(solrRequest, searchRequest.getCursor());
 
+        // convert doc to entries
+        Stream<UniParcEntry> converted =
+                results.getContent().map(entryConverter).filter(Objects::nonNull);
+        // filter the entries
+        Stream<UniParcEntry> filtered = filterUniParcStream(converted, request);
+        return QueryResult.of(filtered, results.getPage());
+    }
+
+    private Stream<UniParcEntry> filterUniParcStream(
+            Stream<UniParcEntry> uniParcEntryStream, UniParcGetByIdRequest request) {
         // convert comma separated values to list
-        List<String> databases = csvToList(dbTypes);
-        List<String> databaseIds = csvToList(dbIds);
-        List<String> toxonomyIds = csvToList(taxonIds);
+        List<String> databases = csvToList(request.getDbTypes());
+        List<String> databaseIds = csvToList(request.getDbIds());
+        List<String> toxonomyIds = csvToList(request.getTaxonIds());
+        // converters
         UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
         UniParcDatabaseIdFilter dbIdFilter = new UniParcDatabaseIdFilter();
         UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
         UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
 
-        // get and filter the results
-        Stream<UniParcEntry> converted =
-                results.getContent()
-                        .map(entryConverter)
-                        .filter(Objects::nonNull)
-                        .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
-                        .map(uniParcEntry -> dbIdFilter.apply(uniParcEntry, databaseIds))
-                        .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, toxonomyIds))
-                        .map(uniParcEntry -> statusFilter.apply(uniParcEntry, isActive));
-
-        return QueryResult.of(converted, results.getPage());
+        // filter the results
+        return uniParcEntryStream
+                .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
+                .map(uniParcEntry -> dbIdFilter.apply(uniParcEntry, databaseIds))
+                .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, toxonomyIds))
+                .map(uniParcEntry -> statusFilter.apply(uniParcEntry, request.getActive()));
     }
 
     private UniParcSearchRequest createSolrSearchByIdRequest(String fieldName, String fieldValue) {

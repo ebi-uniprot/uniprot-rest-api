@@ -1,12 +1,21 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -131,80 +140,45 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(accession)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].version", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].versionI", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].active", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].created", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].lastUpdated", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[0].properties", iterableWithSize(4)))
                 .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(accession)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", notNullValue()))
                 .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].version", notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].versionI", notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].active", notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].created", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].lastUpdated",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].properties",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[0].properties",
-                                iterableWithSize(4)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].properties[*].key",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].properties[*].value",
-                                notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.value", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.length", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.molWeight", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.crc64", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.md5", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures[*].databaseId", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures[*].locations", notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].sequenceFeatures[0].locations", iterableWithSize(2)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].locations[*].start",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].locations[*].end",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].sequenceFeatures[*].interproGroup", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].interproGroup.id",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].interproGroup.name",
-                                notNullValue()))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)))
-                .andExpect(jsonPath("$.results[0].taxonomies[*].scientificName", notNullValue()))
-                .andExpect(jsonPath("$.results[0].taxonomies[*].taxonId", notNullValue()));
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].value", notNullValue()))
+                .andExpect(jsonPath("$.sequence", notNullValue()))
+                .andExpect(jsonPath("$.sequence.value", notNullValue()))
+                .andExpect(jsonPath("$.sequence.length", notNullValue()))
+                .andExpect(jsonPath("$.sequence.molWeight", notNullValue()))
+                .andExpect(jsonPath("$.sequence.crc64", notNullValue()))
+                .andExpect(jsonPath("$.sequence.md5", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
+                .andExpect(jsonPath("$.sequenceFeatures[*].database", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[*].databaseId", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[*].locations", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[0].locations", iterableWithSize(2)))
+                .andExpect(jsonPath("$.sequenceFeatures[*].locations[*].start", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[*].locations[*].end", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[*].interproGroup", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[*].interproGroup.id", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures[*].interproGroup.name", notNullValue()))
+                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)))
+                .andExpect(jsonPath("$.taxonomies[*].scientificName", notNullValue()))
+                .andExpect(jsonPath("$.taxonomies[*].taxonId", notNullValue()));
     }
 
     @Test
-    void testGetByNonExistingAccessionSuccess() throws Exception {
+    void testGetByNonExistingAccession() throws Exception {
         // when
         String accession = "P54321";
         ResultActions response =
@@ -212,10 +186,10 @@ class UniParcGetByAccessionIT {
 
         // then
         response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", empty()));
+                .andExpect(jsonPath("$.messages", hasItem("Resource not found")));
     }
 
     @Test
@@ -254,20 +228,17 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(2)))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(accession)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(accession)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].database",
+                                "$.uniParcCrossReferences[*].database",
                                 containsInAnyOrder("UniProtKB/TrEMBL", "EMBL")))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequence", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
+                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
     }
 
     @Test
@@ -308,20 +279,17 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(2)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].id",
+                                "$.uniParcCrossReferences[*].id",
                                 containsInAnyOrder("unimes1", "P10001")))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.sequence", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
+                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
     }
 
     @Test
@@ -363,18 +331,15 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem("P12301")))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].taxonomies[0].taxonId", is(9606)));
+                .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem("P12301")))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.sequence", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
+                .andExpect(jsonPath("$.taxonomies", iterableWithSize(1)))
+                .andExpect(jsonPath("$.taxonomies[0].taxonId", is(9606)));
     }
 
     @Test
@@ -392,21 +357,16 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(3)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem("P12301")))
+                .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(3)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem("P12301")))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].active",
-                                contains(true, true, true)))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
+                        jsonPath("$.uniParcCrossReferences[*].active", contains(true, true, true)))
+                .andExpect(jsonPath("$.sequence", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
+                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
     }
 
     @Test
@@ -424,18 +384,14 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].active", contains(false)))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(1)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].active", contains(false)))
+                .andExpect(jsonPath("$.sequence", notNullValue()))
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
+                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
     }
 
     @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
@@ -455,11 +411,10 @@ class UniParcGetByAccessionIT {
                 response.andDo(print())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
-                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                        .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (String path : paths) {
-            String returnFieldValidatePath = "$.results[*]." + path;
+            String returnFieldValidatePath = "$." + path;
             log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }

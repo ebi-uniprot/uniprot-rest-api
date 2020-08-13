@@ -1,7 +1,5 @@
 package org.uniprot.api.uniparc.request;
 
-import javax.validation.constraints.Positive;
-
 import lombok.Data;
 
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
@@ -39,11 +37,4 @@ public class UniParcGetByIdRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
-
-    @Parameter(description = "Size of the result. Defaults to 25")
-    @Positive(message = "{search.positive}")
-    private Integer size;
-
-    @Parameter(hidden = true)
-    private String cursor;
 }

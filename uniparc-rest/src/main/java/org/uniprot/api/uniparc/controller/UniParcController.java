@@ -241,10 +241,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        QueryResult<UniParcEntry> results = queryService.findByAccession(getByAccessionRequest);
+        UniParcEntry entry = queryService.findByAccession(getByAccessionRequest);
 
-        return super.getSearchResponse(
-                results, getByAccessionRequest.getFields(), request, response);
+        return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
 
     @GetMapping(

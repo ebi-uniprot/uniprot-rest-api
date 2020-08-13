@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniParcGetByUpIdRequest extends UniParcGetByIdRequest {
+public class UniParcGetByUpIdRequest extends UniParcGetByIdPageRequest {
     @Parameter(description = "UniProt Proteome UPID")
     @NotNull(message = "{search.required}")
     private String upId;

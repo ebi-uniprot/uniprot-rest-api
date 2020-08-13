@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniParcGetByDbIdRequest extends UniParcGetByIdRequest {
+public class UniParcGetByDbIdRequest extends UniParcGetByIdPageRequest {
     @Parameter(
             description =
                     "All UniParc cross reference accessions, eg. AAC02967 (EMBL) or XP_006524055 (RefSeq)")
