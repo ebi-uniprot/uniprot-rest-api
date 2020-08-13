@@ -1,6 +1,21 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -45,19 +60,6 @@ import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 /**
  * @author sahmad
  * @since 2020-08-11
@@ -70,21 +72,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcGetByAccessionIT {
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     private static final String getByAccessionPath = "/uniparc/accession/{accession}";
 
-    @Autowired
-    private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     private static final String UPI_PREF = "UPI0000083A";
 
-    @Autowired
-    private UniParcQueryRepository repository;
+    @Autowired private UniParcQueryRepository repository;
 
     @BeforeAll
     void initDataStore() {
@@ -104,6 +102,11 @@ class UniParcGetByAccessionIT {
 
         // create 5 entries
         IntStream.rangeClosed(1, 5).forEach(this::saveEntry);
+    }
+
+    @AfterAll
+    static void cleanUp() {
+        storeManager.close();
     }
 
     private void saveEntry(int i) {
@@ -229,7 +232,11 @@ class UniParcGetByAccessionIT {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(jsonPath("$.messages[0]", equalTo("The 'accession' value has invalid format. It should be a valid UniProtKB accession")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                equalTo(
+                                        "The 'accession' value has invalid format. It should be a valid UniProtKB accession")));
     }
 
     @Test
@@ -280,7 +287,10 @@ class UniParcGetByAccessionIT {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(jsonPath("$.messages[0]", containsString("is invalid UniParc Cross Ref DB Name")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                containsString("is invalid UniParc Cross Ref DB Name")));
     }
 
     @Test
@@ -331,7 +341,11 @@ class UniParcGetByAccessionIT {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(jsonPath("$.messages[0]", containsString("is the maximum count limit of comma separated items. You have passed")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                containsString(
+                                        "is the maximum count limit of comma separated items. You have passed")));
     }
 
     @Test
@@ -452,8 +466,7 @@ class UniParcGetByAccessionIT {
     }
 
     @Test
-    void testGetAccessionWithInvalidReturnedFields()
-            throws Exception {
+    void testGetAccessionWithInvalidReturnedFields() throws Exception {
         String accession = "P12301";
         // when
         ResultActions response =
@@ -467,17 +480,19 @@ class UniParcGetByAccessionIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(jsonPath("$.messages[0]", containsString("Invalid fields parameter value ")));
-
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                containsString("Invalid fields parameter value ")));
     }
 
     @ParameterizedTest(name = "[{index}] get by accession with content-type {0}")
     @ValueSource(
             strings = {
-                    "",
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_JSON_VALUE,
-                    UniProtMediaType.FASTA_MEDIA_TYPE_VALUE
+                "",
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE
             })
     void testGetBySupportedContentTypes(String contentType) throws Exception {
         // when
@@ -552,8 +567,8 @@ class UniParcGetByAccessionIT {
     }
 
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC).getReturnFields()
-                .stream()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC)
+                .getReturnFields().stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 }

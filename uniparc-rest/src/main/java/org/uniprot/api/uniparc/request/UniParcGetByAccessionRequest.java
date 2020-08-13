@@ -1,5 +1,6 @@
 package org.uniprot.api.uniparc.request;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
@@ -21,6 +22,7 @@ public class UniParcGetByAccessionRequest extends UniParcGetByIdRequest {
             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.invalid.accession.value}")
+    @NotNull(message = "{search.required}")
     @Parameter(description = "Unique identifier for the UniProt entry")
     private String accession;
 }

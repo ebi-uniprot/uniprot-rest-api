@@ -28,6 +28,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByDbIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUpIdRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
@@ -243,6 +245,32 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
         return super.getSearchResponse(
                 results, getByAccessionRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/dbreference/{dbId}",
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> findByDbId(
+            @Valid @ModelAttribute UniParcGetByDbIdRequest getByDbIdRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        QueryResult<UniParcEntry> results = queryService.findByDbId(getByDbIdRequest);
+
+        return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/proteome/{upId}",
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> findByUpId(
+            @Valid @ModelAttribute UniParcGetByUpIdRequest getByUpIdRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        QueryResult<UniParcEntry> results = queryService.findByUpId(getByUpIdRequest);
+
+        return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
     }
 
     @Override
