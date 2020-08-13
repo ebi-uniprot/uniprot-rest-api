@@ -219,19 +219,14 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1")
-                            .queryBoosts(
-                                    QueryBoosts.builder()
-                                            .queryFields("field1,field2")
-                                            .build())
+                            .queryBoosts(QueryBoosts.builder().queryFields("field1,field2").build())
                             .build();
 
             // when
             SolrQuery solrQuery = converter.toSolrQuery(request);
 
             // then
-            assertThat(
-                    solrQuery.get("qf"),
-                    is("field1 field2"));
+            assertThat(solrQuery.get("qf"), is("field1 field2"));
         }
 
         @Test

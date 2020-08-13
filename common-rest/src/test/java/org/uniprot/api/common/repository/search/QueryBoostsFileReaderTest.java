@@ -59,8 +59,6 @@ class QueryBoostsFileReaderTest {
 
     @Test
     void queryFieldsLoadedCorrectly() {
-        assertThat(
-                reader.getQueryBoosts().getQueryFields(),
-                is("field1 field2"));
+        assertThat(reader.getQueryBoosts().getQueryFields(), is("field1 field2"));
     }
 }
