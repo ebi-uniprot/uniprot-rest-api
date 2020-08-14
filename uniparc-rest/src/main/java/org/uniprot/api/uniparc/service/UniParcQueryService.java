@@ -22,6 +22,7 @@ import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseIdFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
@@ -73,7 +74,16 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.entryConverter = uniParcQueryResultConverter;
     }
 
-    public UniParcEntry getByAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
+    public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
+
+        UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, getByUniParcIdRequest.getUpi());
+
+        return filterUniParcStream(Stream.of(uniParcEntry), getByUniParcIdRequest)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
 
         UniParcEntry uniParcEntry = getEntity(ACCESSION_STR, getByAccessionRequest.getAccession());
 

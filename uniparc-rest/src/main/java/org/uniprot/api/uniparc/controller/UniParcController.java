@@ -14,7 +14,6 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,7 +23,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,20 +33,16 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -162,25 +156,10 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpId(
-            @Parameter(description = "Unique identifier for the UniParc entry")
-                    @PathVariable("upi")
-                    @Pattern(
-                            regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
-                            flags = {Pattern.Flag.CASE_INSENSITIVE},
-                            message = "{search.invalid.upi.value}")
-                    String upi,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "uniparc-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
-                    @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
-                    @RequestParam(value = "fields", required = false)
-                    String fields,
+            @Valid @ModelAttribute UniParcGetByUniParcIdRequest getByUniParcIdRequest,
             HttpServletRequest request) {
-        UniParcEntry entry = queryService.findByUniqueId(upi.toUpperCase());
-        return super.getEntityResponse(entry, fields, request);
+        UniParcEntry entry = queryService.getByUniParcId(getByUniParcIdRequest);
+        return super.getEntityResponse(entry, getByUniParcIdRequest.getFields(), request);
     }
 
     @GetMapping(
@@ -273,7 +252,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        UniParcEntry entry = queryService.getByAccession(getByAccessionRequest);
+        UniParcEntry entry = queryService.getByUniProtAccession(getByAccessionRequest);
 
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
