@@ -12,16 +12,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad
- * @created 12/08/2020
+ * @created 14/08/2020
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniParcGetByAccessionRequest extends UniParcGetByIdRequest {
+public class UniParcGetByUniParcIdRequest extends UniParcGetByIdRequest {
     @Pattern(
-            regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
+            regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},
-            message = "{search.invalid.accession.value}")
+            message = "{search.invalid.upi.value}")
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Unique identifier for the UniProt entry")
-    private String accession;
+    @Parameter(description = "UniParc ID (UPI)")
+    private String upi;
 }

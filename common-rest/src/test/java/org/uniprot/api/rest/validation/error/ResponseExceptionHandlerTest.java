@@ -213,7 +213,6 @@ class ResponseExceptionHandlerTest {
                         null,
                         null,
                         null,
-                        null,
                         null));
         ConstraintViolationException error = new ConstraintViolationException(constraintViolations);
 
