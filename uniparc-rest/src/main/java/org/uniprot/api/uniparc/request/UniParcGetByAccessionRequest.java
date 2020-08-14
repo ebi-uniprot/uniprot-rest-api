@@ -1,13 +1,14 @@
 package org.uniprot.api.uniparc.request;
 
-import org.uniprot.store.search.field.validator.FieldRegexConstants;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad

@@ -1,5 +1,28 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,48 +60,21 @@ import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-
 /**
  * @author sahmad
  * @created 13/08/2020
  */
 @Slf4j
 public abstract class AbstractGetByIdTest {
-    @RegisterExtension
-    static DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    @Autowired
-    private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
 
-    @Autowired
-    protected MockMvc mockMvc;
+    @Autowired protected MockMvc mockMvc;
 
     private static final String UPI_PREF = "UPI0000083A";
 
-    @Autowired
-    private UniParcQueryRepository repository;
+    @Autowired private UniParcQueryRepository repository;
 
     protected abstract String getGetByIdEndpoint();
 
@@ -111,8 +107,7 @@ public abstract class AbstractGetByIdTest {
     }
 
     @ParameterizedTest(name = "[{index}] try to get by id with content-type {0}")
-    @ValueSource(
-            strings = {MediaType.APPLICATION_PDF_VALUE, UniProtMediaType.OBO_MEDIA_TYPE_VALUE})
+    @ValueSource(strings = {MediaType.APPLICATION_PDF_VALUE, UniProtMediaType.OBO_MEDIA_TYPE_VALUE})
     void testGetByIdWithUnsupportedContentTypes(String contentType) throws Exception {
         // when
         ResultActions response =
@@ -133,13 +128,14 @@ public abstract class AbstractGetByIdTest {
     @ParameterizedTest(name = "[{index}] get by id with content-type {0}")
     @ValueSource(
             strings = {
-                    "",
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_JSON_VALUE,
-                    UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
-                    TSV_MEDIA_TYPE_VALUE,
-                    XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE
+                "",
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
             })
     void testGetByIdSupportedContentTypes(String contentType) throws Exception {
         // when
@@ -198,7 +194,10 @@ public abstract class AbstractGetByIdTest {
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
         for (String path : paths) {
-            String returnFieldValidatePath = getGetByIdEndpoint().contains("accession") ? "$." + path : "$.results[*]." + path;
+            String returnFieldValidatePath =
+                    getGetByIdEndpoint().contains("accession")
+                            ? "$." + path
+                            : "$.results[*]." + path;
             log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }

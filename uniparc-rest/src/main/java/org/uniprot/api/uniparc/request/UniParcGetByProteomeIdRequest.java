@@ -1,12 +1,13 @@
 package org.uniprot.api.uniparc.request;
 
-import org.uniprot.api.rest.request.SearchRequest;
-
 import javax.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.uniprot.api.rest.request.SearchRequest;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad
@@ -14,7 +15,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchRequest implements SearchRequest {
+public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchRequest
+        implements SearchRequest {
+    @Parameter(hidden = true)
     private static final String PROTEOME_ID_STR = "upid";
 
     @Parameter(description = "UniProt Proteome UPID")
