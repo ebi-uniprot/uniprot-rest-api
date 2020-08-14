@@ -3,9 +3,6 @@ package org.uniprot.api.uniparc.controller;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -16,11 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniparc.UniParcRestApplication;
-import org.uniprot.core.util.Utils;
-
-import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,17 +25,10 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
 /**
  * @author sahmad
@@ -64,6 +50,11 @@ class UniParcGetByAccessionIT extends AbstractGetByIdTest{
         return getGetByIdEndpoint;
     }
 
+    @Override
+    protected String getSearchValue() {
+        return "P12301";
+    }
+
     @Test
     void testGetByAccessionSuccess() throws Exception {
         // when
@@ -77,7 +68,7 @@ class UniParcGetByAccessionIT extends AbstractGetByIdTest{
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(accession)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].version", notNullValue()))
@@ -268,7 +259,7 @@ class UniParcGetByAccessionIT extends AbstractGetByIdTest{
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem("P12301")))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
@@ -294,12 +285,12 @@ class UniParcGetByAccessionIT extends AbstractGetByIdTest{
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(3)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem("P12301")))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(
-                        jsonPath("$.uniParcCrossReferences[*].active", contains(true, true, true)))
+                        jsonPath("$.uniParcCrossReferences[*].active", contains(true, true, true, true)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
                 .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
@@ -329,99 +320,4 @@ class UniParcGetByAccessionIT extends AbstractGetByIdTest{
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
                 .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
     }
-
-    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
-    @MethodSource("getAllReturnedFields")
-    void testGetAccessionWithAllAvailableReturnedFields(String name, List<String> paths)
-            throws Exception {
-        String accession = "P12301";
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getGetByIdEndpoint(), accession)
-                                .param("fields", name)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        ResultActions resultActions =
-                response.andDo(print())
-                        .andExpect(status().is(HttpStatus.OK.value()))
-                        .andExpect(
-                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
-
-        for (String path : paths) {
-            String returnFieldValidatePath = "$." + path;
-            log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
-            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
-        }
-    }
-
-    @Test
-    void testGetAccessionWithInvalidReturnedFields() throws Exception {
-        String accession = "P12301";
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getGetByIdEndpoint(), accession)
-                                .param("fields", "randomField")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[0]",
-                                containsString("Invalid fields parameter value ")));
-    }
-
-    @ParameterizedTest(name = "[{index}] get by accession with content-type {0}")
-    @ValueSource(
-            strings = {
-                "",
-                MediaType.APPLICATION_XML_VALUE,
-                MediaType.APPLICATION_JSON_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
-                    TSV_MEDIA_TYPE_VALUE,
-                    XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE
-            })
-    void testGetBySupportedContentTypes(String contentType) throws Exception {
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), "P12301")
-                                .header(ACCEPT, contentType));
-
-        if (Utils.nullOrEmpty(contentType)) {
-            contentType = MediaType.APPLICATION_JSON_VALUE;
-        }
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType));
-    }
-
-    @ParameterizedTest(name = "[{index}] try to get by accession with content-type {0}")
-    @ValueSource(
-            strings = {MediaType.APPLICATION_PDF_VALUE, UniProtMediaType.GFF_MEDIA_TYPE_VALUE})
-    void testGetByAccessionWithUnsupportedContentTypes(String contentType) throws Exception {
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), "P12301")
-                                .header(ACCEPT, contentType));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[0]",
-                                containsString(
-                                        "Invalid request received. Requested media type/format not accepted:")));
-    }
-
 }

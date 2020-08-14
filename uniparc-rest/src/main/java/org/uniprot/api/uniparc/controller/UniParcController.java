@@ -28,8 +28,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByDbIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByUpIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
@@ -237,12 +237,12 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/accession/{accession}",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE,
                     XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<UniParcEntry>> findByAccession(
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getByAccession(
             @Valid @ModelAttribute UniParcGetByAccessionRequest getByAccessionRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        UniParcEntry entry = queryService.findByAccession(getByAccessionRequest);
+        UniParcEntry entry = queryService.getByAccession(getByAccessionRequest);
 
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
@@ -251,12 +251,12 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/dbreference/{dbId}",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE,
                     XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<UniParcEntry>> findByDbId(
-            @Valid @ModelAttribute UniParcGetByDbIdRequest getByDbIdRequest,
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> searchByDBRefId(
+            @Valid @ModelAttribute UniParcGetByDBRefIdRequest getByDbIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        QueryResult<UniParcEntry> results = queryService.findByDbId(getByDbIdRequest);
+        QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByDbIdRequest);
 
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
@@ -266,12 +266,12 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE,
                     TSV_MEDIA_TYPE_VALUE,
                     XLS_MEDIA_TYPE_VALUE, LIST_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<UniParcEntry>> findByUpId(
-            @Valid @ModelAttribute UniParcGetByUpIdRequest getByUpIdRequest,
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> searchByProteomeId(
+            @Valid @ModelAttribute UniParcGetByProteomeIdRequest getByUpIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        QueryResult<UniParcEntry> results = queryService.findByUpId(getByUpIdRequest);
+        QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByUpIdRequest);
 
         return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
     }

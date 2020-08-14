@@ -1,15 +1,14 @@
 package org.uniprot.api.uniparc.request;
 
-import lombok.Data;
-
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidUniParcDatabaseList;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
 /**
  * @author sahmad

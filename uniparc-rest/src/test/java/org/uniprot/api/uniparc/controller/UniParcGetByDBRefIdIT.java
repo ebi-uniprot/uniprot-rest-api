@@ -3,9 +3,6 @@ package org.uniprot.api.uniparc.controller;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -16,11 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniparc.UniParcRestApplication;
-import org.uniprot.core.util.Utils;
-
-import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,22 +22,15 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
 /**
  * @author sahmad
@@ -57,11 +43,16 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcGetByDbIdIT extends AbstractGetByIdTest{
+class UniParcGetByDBRefIdIT extends AbstractGetByIdTest{
     private static final String getByDBIdPath = "/uniparc/dbreference/{dbid}";
     @Override
     protected String getGetByIdEndpoint() {
         return getByDBIdPath;
+    }
+
+    @Override
+    protected String getSearchValue() {
+        return "embl1";
     }
 
     @Test
@@ -79,7 +70,7 @@ class UniParcGetByDbIdIT extends AbstractGetByIdTest{
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(
                         jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(dbid)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
@@ -163,7 +154,7 @@ class UniParcGetByDbIdIT extends AbstractGetByIdTest{
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(
                         jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(dbid)));
     }
@@ -310,7 +301,7 @@ class UniParcGetByDbIdIT extends AbstractGetByIdTest{
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(dbid)))
                 .andExpect(
@@ -339,7 +330,7 @@ class UniParcGetByDbIdIT extends AbstractGetByIdTest{
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(3)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(4)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem("P12301")))
                 .andExpect(
@@ -347,7 +338,7 @@ class UniParcGetByDbIdIT extends AbstractGetByIdTest{
                 .andExpect(
                         jsonPath(
                                 "$.results[0].uniParcCrossReferences[*].active",
-                                contains(true, true, true)))
+                                contains(true, true, true, true)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
                 .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
@@ -382,98 +373,78 @@ class UniParcGetByDbIdIT extends AbstractGetByIdTest{
                 .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
     }
 
-    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
-    @MethodSource("getAllReturnedFields")
-    void testGetDbIdWithAllAvailableReturnedFields(String name, List<String> paths)
-            throws Exception {
-        String dbid = "embl1";
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getGetByIdEndpoint(), dbid)
-                                .param("fields", name)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        ResultActions resultActions =
-                response.andDo(print())
-                        .andExpect(status().is(HttpStatus.OK.value()))
-                        .andExpect(
-                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                        .andExpect(jsonPath("$.results.size()", greaterThan(0)));
-
-        for (String path : paths) {
-            String returnFieldValidatePath = "$.results[*]." + path;
-            log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
-            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
-        }
-    }
-
     @Test
-    void testGetDbIdWithInvalidReturnedFields() throws Exception {
-        String dbid = "P12301";
+    void testGetByDbIdWithPagination() throws Exception {
         // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getGetByIdEndpoint(), dbid)
-                                .param("fields", "randomField")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        String dbid = "common-vector";
+        int size = 2;
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid)
+        .param("size", String.valueOf(size)));
 
         // then
         response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[0]",
-                                containsString("Invalid fields parameter value ")));
-    }
-
-    @ParameterizedTest(name = "[{index}] get by dbId with content-type {0}")
-    @ValueSource(
-            strings = {
-                    "",
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_JSON_VALUE,
-                    UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
-                    TSV_MEDIA_TYPE_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE
-            })
-    void testGetByDbIdSupportedContentTypes(String contentType) throws Exception {
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), "embl1")
-                                .header(ACCEPT, contentType));
-
-        if (Utils.nullOrEmpty(contentType)) {
-            contentType = MediaType.APPLICATION_JSON_VALUE;
-        }
-        // then
-        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType));
-    }
-
-    @ParameterizedTest(name = "[{index}] try to get by dbid with content-type {0}")
-    @ValueSource(
-            strings = {MediaType.APPLICATION_PDF_VALUE, UniProtMediaType.OBO_MEDIA_TYPE_VALUE})
-    void testGetByDbIdWithUnsupportedContentTypes(String contentType) throws Exception {
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), "P12301")
-                                .header(ACCEPT, contentType));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(jsonPath("$.results.size()", is(size)))
                 .andExpect(
                         jsonPath(
-                                "$.messages[0]",
-                                containsString(
-                                        "Invalid request received. Requested media type/format not accepted:")));
+                                "$.results.*.uniParcId",
+                                contains("UPI0000083A01", "UPI0000083A02")))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(
+                        jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(dbid)));
+
+        String cursor1 = extractCursor(response);
+        // when get second page
+        ResultActions responsePage2 = mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid)
+                .param("size", String.valueOf(size))
+                .param("cursor", cursor1));
+
+        // then verify second page
+        responsePage2.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(jsonPath("$.results.size()", is(size)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.uniParcId",
+                                contains("UPI0000083A03", "UPI0000083A04")))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(
+                        jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(dbid)));
+
+        String cursor2 = extractCursor(responsePage2);
+
+        // when get third page
+        ResultActions responsePage3 = mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid)
+                .param("size", String.valueOf(size))
+                .param("cursor", cursor2));
+
+        // then verify third page
+        responsePage3.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.uniParcId",
+                                contains("UPI0000083A05")))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(
+                        jsonPath("$.results[0].uniParcCrossReferences[*].id", hasItem(dbid)));
+
     }
 }
