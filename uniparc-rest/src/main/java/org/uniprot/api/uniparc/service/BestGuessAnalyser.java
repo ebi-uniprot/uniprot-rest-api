@@ -2,12 +2,14 @@ package org.uniprot.api.uniparc.service;
 
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.service.exception.BestGuessAnalyserException;
+import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
-import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.search.SolrQueryUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,14 +33,16 @@ import java.util.stream.Stream;
 class BestGuessAnalyser {
 
     private static final String MORE_THAN_ONE_BEST_GUESS_FOUND = "More than one Best Guess found {list}. Review your query and/or contact us.";
-    private final UniParcTaxonomyFilter taxonomyFilter;
+    private final UniParcCrossReferenceTaxonomyFilter taxonomyFilter;
     private final UniParcDatabaseFilter databaseFilter;
     private final UniParcDatabaseStatusFilter statusFilter;
+    private final SearchFieldConfig searchFieldConfig;
 
-    public BestGuessAnalyser(){
-        taxonomyFilter = new UniParcTaxonomyFilter();
-        databaseFilter = new UniParcDatabaseFilter();
-        statusFilter = new UniParcDatabaseStatusFilter();
+    public BestGuessAnalyser(SearchFieldConfig searchFieldConfig){
+        this.taxonomyFilter = new UniParcCrossReferenceTaxonomyFilter();
+        this.databaseFilter = new UniParcDatabaseFilter();
+        this.statusFilter = new UniParcDatabaseStatusFilter();
+        this.searchFieldConfig = searchFieldConfig;
     }
     /**
      *
@@ -76,22 +80,22 @@ class BestGuessAnalyser {
      */
     private List<UniParcEntry> getFilteredUniParcEntries(Stream<UniParcEntry> entries, UniParcBestGuessRequest request) {
         List<String> databases = new ArrayList<>();
-        databases.add(UniParcDatabase.SWISSPROT.getDisplayName());
-        databases.add(UniParcDatabase.SWISSPROT_VARSPLIC.getDisplayName());
-        databases.add(UniParcDatabase.TREMBL.getDisplayName());
+        databases.add(UniParcDatabase.SWISSPROT.getDisplayName().toLowerCase());
+        databases.add(UniParcDatabase.SWISSPROT_VARSPLIC.getDisplayName().toLowerCase());
+        databases.add(UniParcDatabase.TREMBL.getDisplayName().toLowerCase());
 
         List<String> toxonomyIds = getBestGuessTaxonomyFilters(request);
 
         return entries.filter(Objects::nonNull)
-                .map(uniParcEntry -> databaseFilter.apply(uniParcEntry, databases))
-                .map(uniParcEntry -> taxonomyFilter.apply(uniParcEntry, toxonomyIds))
-                .map(uniParcEntry -> statusFilter.apply(uniParcEntry, true))
+                .map(uniParcEntry -> this.databaseFilter.apply(uniParcEntry, databases))
+                .map(uniParcEntry -> this.taxonomyFilter.apply(uniParcEntry, toxonomyIds))
+                .map(uniParcEntry -> this.statusFilter.apply(uniParcEntry, true))
                 .collect(Collectors.toList());
     }
 
     private List<String> getBestGuessTaxonomyFilters(UniParcBestGuessRequest request) {
-        //TODO: add taxonomy Filter
-        return new ArrayList<>();
+        String taxFieldName = searchFieldConfig.getSearchFieldItemByName("taxonomy_id").getFieldName();
+        return SolrQueryUtil.getTermValues(request.getQuery(), taxFieldName);
     }
 
     /**
@@ -108,6 +112,7 @@ class BestGuessAnalyser {
         if(!filteredEntries.isEmpty()) {
             List<String> databases = Arrays.stream(databaseType)
                     .map(UniParcDatabase::getDisplayName)
+                    .map(String::toLowerCase)
                     .collect(Collectors.toList());
 
             // Get longest sequence among filtered entries.
@@ -116,7 +121,7 @@ class BestGuessAnalyser {
             //Get list of UniParcEntry with the longest sequence, we might have more than one entry.
             List<UniParcEntry> maxLengthEntries = filteredEntries.stream()
                     .filter(entry -> entry.getSequence().getLength() == maxLength)
-                    .map(uniParcEntry -> databaseFilter.apply(uniParcEntry, databases))
+                    .map(uniParcEntry -> this.databaseFilter.apply(uniParcEntry, databases))
                     .collect(Collectors.toList());
 
             //Now we need to iterate over databaseType (parameter order define database priority).
@@ -167,7 +172,7 @@ class BestGuessAnalyser {
         return maxLengthEntries.stream().filter(
                   uniParcEntry -> uniParcEntry.getUniParcCrossReferences().stream()
                           .anyMatch(crossReference -> crossReference != null &&
-                                  crossReference.getDatabase().getName().equals(databaseType.toString()))
+                                  crossReference.getDatabase().equals(databaseType))
           ).collect(Collectors.toList());
     }
 
