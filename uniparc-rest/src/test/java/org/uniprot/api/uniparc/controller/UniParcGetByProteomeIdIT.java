@@ -42,7 +42,7 @@ import org.uniprot.api.uniparc.UniParcRestApplication;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcGetByProteomeIdIT extends AbstractGetByIdTest {
+class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
 
     private static final String getByUpIdPath = "/uniparc/proteome/{upid}";
 
@@ -70,7 +70,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetByIdTest {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083A01")))
+                .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(
@@ -165,7 +165,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetByIdTest {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcId",
-                                contains("UPI0000083A01", "UPI0000083A02")))
+                                contains("UPI0000083C01", "UPI0000083C02")))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(
                         jsonPath(
@@ -198,7 +198,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetByIdTest {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcId",
-                                contains("UPI0000083A03", "UPI0000083A04")))
+                                contains("UPI0000083C03", "UPI0000083C04")))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(
                         jsonPath(
@@ -227,7 +227,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetByIdTest {
                 .andExpect(header().string("X-TotalRecords", "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083A05")))
+                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(
                         jsonPath(

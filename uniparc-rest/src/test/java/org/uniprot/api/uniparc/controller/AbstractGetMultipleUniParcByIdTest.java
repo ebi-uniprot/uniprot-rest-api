@@ -16,7 +16,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -42,12 +41,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
-import org.uniprot.core.Property;
-import org.uniprot.core.uniparc.UniParcCrossReference;
-import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -65,14 +59,16 @@ import org.uniprot.store.search.SolrCollection;
  * @created 13/08/2020
  */
 @Slf4j
-public abstract class AbstractGetByIdTest {
+public abstract class AbstractGetMultipleUniParcByIdTest {
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
 
     @Autowired protected MockMvc mockMvc;
 
-    private static final String UPI_PREF = "UPI0000083A";
+    private static final String UPI_PREF = "UPI0000083C";
+    protected static String ACCESSION = "P12301";
+    protected static String UNIPARC_ID = "UPI0000083C01";
 
     @Autowired private UniParcQueryRepository repository;
 
@@ -101,7 +97,7 @@ public abstract class AbstractGetByIdTest {
     }
 
     @AfterAll
-    static void cleanUp() {
+    void cleanUp() {
         storeManager.cleanSolr(DataStoreManager.StoreType.UNIPARC);
         storeManager.close();
     }
@@ -206,67 +202,14 @@ public abstract class AbstractGetByIdTest {
     private void saveEntry(int i) {
         UniParcEntry entry = UniParcControllerITUtils.createEntry(i, UPI_PREF);
         // append two more cross ref
-        UniParcEntry updatedEntry = appendMoreXRefs(entry, i);
+        UniParcEntry updatedEntry = UniParcControllerITUtils.appendMoreXRefs(entry, i);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(updatedEntry);
         storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC, updatedEntry);
     }
 
-    private UniParcEntry appendMoreXRefs(UniParcEntry entry, int i) {
-        UniParcCrossReference xref1 =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(1)
-                        .database(UniParcDatabase.EMBL)
-                        .id("embl" + i)
-                        .version(7)
-                        .active(true)
-                        .created(LocalDate.of(2017, 2, 12))
-                        .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "proteinName" + i))
-                        .build();
-
-        UniParcCrossReference xref2 =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(1)
-                        .database(UniParcDatabase.UNIMES)
-                        .id("unimes" + i)
-                        .version(7)
-                        .active(false)
-                        .created(LocalDate.of(2017, 2, 12))
-                        .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "proteinName" + i))
-                        .build();
-
-        // common db xref
-        UniParcCrossReference xref3 =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(1)
-                        .database(UniParcDatabase.VECTORBASE)
-                        .id("common-vector")
-                        .version(7)
-                        .active(true)
-                        .created(LocalDate.of(2017, 2, 12))
-                        .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "common-vector-proteinName" + i))
-                        .build();
-        UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
-        builder.uniParcCrossReferencesAdd(xref1);
-        builder.uniParcCrossReferencesAdd(xref2);
-        builder.uniParcCrossReferencesAdd(xref3);
-        return builder.build();
-    }
-
-    protected Stream<Arguments> getAllReturnedFields() {
+    protected static Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC)
                 .getReturnFields().stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));

@@ -115,4 +115,57 @@ public class UniParcControllerITUtils {
             return prefix + "0" + i;
         } else return prefix + i;
     }
+
+    static UniParcEntry appendMoreXRefs(UniParcEntry entry, int i) {
+        UniParcCrossReference xref1 =
+                new UniParcCrossReferenceBuilder()
+                        .versionI(1)
+                        .database(UniParcDatabase.EMBL)
+                        .id("embl" + i)
+                        .version(7)
+                        .active(true)
+                        .created(LocalDate.of(2017, 2, 12))
+                        .lastUpdated(LocalDate.of(2017, 4, 23))
+                        .propertiesAdd(
+                                new Property(
+                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
+                                        "proteinName" + i))
+                        .build();
+
+        UniParcCrossReference xref2 =
+                new UniParcCrossReferenceBuilder()
+                        .versionI(1)
+                        .database(UniParcDatabase.UNIMES)
+                        .id("unimes" + i)
+                        .version(7)
+                        .active(false)
+                        .created(LocalDate.of(2017, 2, 12))
+                        .lastUpdated(LocalDate.of(2017, 4, 23))
+                        .propertiesAdd(
+                                new Property(
+                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
+                                        "proteinName" + i))
+                        .build();
+
+        // common db xref
+        UniParcCrossReference xref3 =
+                new UniParcCrossReferenceBuilder()
+                        .versionI(1)
+                        .database(UniParcDatabase.VECTORBASE)
+                        .id("common-vector")
+                        .version(7)
+                        .active(true)
+                        .created(LocalDate.of(2017, 2, 12))
+                        .lastUpdated(LocalDate.of(2017, 4, 23))
+                        .propertiesAdd(
+                                new Property(
+                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
+                                        "common-vector-proteinName" + i))
+                        .build();
+        UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
+        builder.uniParcCrossReferencesAdd(xref1);
+        builder.uniParcCrossReferencesAdd(xref2);
+        builder.uniParcCrossReferencesAdd(xref3);
+        return builder.build();
+    }
 }
