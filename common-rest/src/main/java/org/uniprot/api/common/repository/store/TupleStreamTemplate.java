@@ -40,6 +40,7 @@ import org.uniprot.core.util.Utils;
 @Builder
 @Slf4j
 public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
+    private static final String DEF_TYPE_VALUE = "edismax";
     private final StreamerConfigProperties streamConfig;
     private final HttpClient httpClient;
     private final SolrClient solrClient;
@@ -96,6 +97,22 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
         private final String idField;
         private final StreamContext streamContext;
 
+        static String fieldsToReturn(String idField, List<SolrQuery.SortClause> order) {
+            String sortFields =
+                    order.stream()
+                            .map(SolrQuery.SortClause::getItem)
+                            .filter(o -> !o.equalsIgnoreCase("score"))
+                            .collect(Collectors.joining(","));
+            return idField + (Utils.nullOrEmpty(sortFields) ? "" : "," + sortFields);
+        }
+
+        static String sortToString(List<SolrQuery.SortClause> order) {
+            return order.stream()
+                    .filter(o -> !o.getItem().equalsIgnoreCase("score"))
+                    .map(o -> o.getItem() + " " + o.getOrder().name())
+                    .collect(Collectors.joining(","));
+        }
+
         private TupleStream createFor(SolrRequest request) {
             try {
                 StreamExpression requestExpression = new StreamExpression("search");
@@ -122,7 +139,16 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                 requestExpression.addParameter(
                         new StreamExpressionNamedParameter("qt", requestHandler));
 
-                requestExpression.addParameter(new StreamExpressionNamedParameter("df", "content"));
+                requestExpression.addParameter(
+                        new StreamExpressionNamedParameter("defType", DEF_TYPE_VALUE));
+                if (Utils.notNullNotEmpty(request.getQueryBoosts().getQueryFields())) {
+                    requestExpression.addParameter(
+                            new StreamExpressionNamedParameter(
+                                    "qf", request.getQueryBoosts().getQueryFields()));
+                } else {
+                    requestExpression.addParameter(
+                            new StreamExpressionNamedParameter("df", "content"));
+                }
 
                 TupleStream tupleStream = streamFactory.constructStream(requestExpression);
                 tupleStream.setStreamContext(streamContext);
@@ -131,22 +157,6 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                 log.error("Could not create TupleStream", e);
                 throw new IllegalStateException();
             }
-        }
-
-        static String fieldsToReturn(String idField, List<SolrQuery.SortClause> order) {
-            String sortFields =
-                    order.stream()
-                            .map(SolrQuery.SortClause::getItem)
-                            .filter(o -> !o.equalsIgnoreCase("score"))
-                            .collect(Collectors.joining(","));
-            return idField + (Utils.nullOrEmpty(sortFields) ? "" : "," + sortFields);
-        }
-
-        static String sortToString(List<SolrQuery.SortClause> order) {
-            return order.stream()
-                    .filter(o -> !o.getItem().equalsIgnoreCase("score"))
-                    .map(o -> o.getItem() + " " + o.getOrder().name())
-                    .collect(Collectors.joining(","));
         }
     }
 }

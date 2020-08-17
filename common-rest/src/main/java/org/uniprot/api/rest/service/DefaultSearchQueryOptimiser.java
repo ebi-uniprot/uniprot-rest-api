@@ -91,7 +91,7 @@ public class DefaultSearchQueryOptimiser {
         for (SearchFieldItem field : optimisableFields) {
             if (notNullNotEmpty(field.getValidRegex())
                     && termQueryValue.matches(field.getValidRegex())) {
-                toReturn = field.getFieldName() + ":" + termQueryValue.toUpperCase();
+                toReturn = field.getFieldName() + ":" + termQueryValue;
                 break;
             }
         }

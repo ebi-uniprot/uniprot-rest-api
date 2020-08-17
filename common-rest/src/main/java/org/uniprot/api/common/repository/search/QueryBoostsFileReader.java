@@ -31,7 +31,7 @@ public class QueryBoostsFileReader {
     }
 
     private void initialiseBoosts() {
-        log.info("Loading boosts ...");
+        log.info("Loading boosts [" + this.boostsResourceLocation + "]...");
         InputStream resourceAsStream = getClass().getResourceAsStream(boostsResourceLocation);
         if (notNull(resourceAsStream)) {
 
