@@ -98,7 +98,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*");
+                        .param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -159,7 +159,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("download", "true");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -209,7 +209,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("sort", sortField + " asc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -254,7 +254,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "content:*");
+                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 

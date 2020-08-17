@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
@@ -44,7 +45,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("idField:VALIDIDVALUE", optimisedQuery);
+        assertEquals("idField:validIdValue", optimisedQuery);
     }
 
     @Test
@@ -60,7 +61,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("idField:validIdValue AND idField:VALIDIDVALUE", optimisedQuery);
+        assertEquals("idField:validIdValue AND idField:validIdValue", optimisedQuery);
     }
 
     @Test
@@ -76,7 +77,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("idField:validIdValue OR idField:VALIDIDVALUE", optimisedQuery);
+        assertEquals("idField:validIdValue OR idField:validIdValue", optimisedQuery);
     }
 
     @Test
@@ -92,7 +93,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("+idField:VALIDIDVALUE", optimisedQuery);
+        assertEquals("+idField:validIdValue", optimisedQuery);
     }
 
     @Test
@@ -108,7 +109,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("+idField:validIdValue +(idField:VALIDIDVALUE)", optimisedQuery);
+        assertEquals("+idField:validIdValue +(idField:validIdValue)", optimisedQuery);
     }
 
     @Test
@@ -124,7 +125,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("-idField:VALIDIDVALUE", optimisedQuery);
+        assertEquals("-idField:validIdValue", optimisedQuery);
     }
 
     @Test
@@ -140,7 +141,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("+idField:validIdValue -(idField:VALIDIDVALUE)", optimisedQuery);
+        assertEquals("+idField:validIdValue -(idField:validIdValue)", optimisedQuery);
     }
 
     @Test
@@ -156,7 +157,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("other (field:value +((idField:VALIDIDVALUE)))", optimisedQuery);
+        assertEquals("other (field:value +((idField:validIdValue)))", optimisedQuery);
     }
 
     @Test
@@ -172,7 +173,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("other (field:value ((+idField:VALIDIDVALUE)))", optimisedQuery);
+        assertEquals("other (field:value ((+idField:validIdValue)))", optimisedQuery);
     }
 
     @Test
@@ -204,7 +205,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("gene:queryValue AND (idField:VALIDVALUE OR otherValue)", optimisedQuery);
+        assertEquals("gene:queryValue AND (idField:validValue OR otherValue)", optimisedQuery);
     }
 
     @Test
@@ -222,7 +223,7 @@ class DefaultSearchQueryOptimiserTest {
         // then
         assertNotNull(optimisedQuery);
         assertEquals(
-                "gene:queryValue AND (idField:VALIDVALUE OR otherField:OTHERVALUE OR ignoreValue)",
+                "gene:queryValue AND (idField:validValue OR otherField:otherValue OR ignoreValue)",
                 optimisedQuery);
     }
 
@@ -239,7 +240,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("idField:VALIDVALUE", optimisedQuery);
+        assertEquals("idField:validValue", optimisedQuery);
     }
 
     @Test
@@ -256,7 +257,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("other (other2 idField:VALIDVALUE)", optimisedQuery);
+        assertEquals("other (other2 idField:validValue)", optimisedQuery);
     }
 
     @Test
@@ -272,7 +273,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("(idField:VALIDVALUE AND other)", optimisedQuery);
+        assertEquals("(idField:validValue AND other)", optimisedQuery);
     }
 
     @Test
@@ -288,7 +289,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("(other AND idField:VALIDVALUE)", optimisedQuery);
+        assertEquals("(other AND idField:validValue)", optimisedQuery);
     }
 
     @Test
@@ -304,7 +305,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("other OR value:[1 TO 10] OR idField:VALIDVALUE", optimisedQuery);
+        assertEquals("other OR value:[1 TO 10] OR idField:validValue", optimisedQuery);
     }
 
     @Test
@@ -320,7 +321,7 @@ class DefaultSearchQueryOptimiserTest {
 
         // then
         assertNotNull(optimisedQuery);
-        assertEquals("other* OR idField:VALIDVALUE", optimisedQuery);
+        assertEquals("other* OR idField:validValue", optimisedQuery);
     }
 
     @Test
@@ -371,7 +372,7 @@ class DefaultSearchQueryOptimiserTest {
         // then
         assertNotNull(optimisedQuery);
         assertEquals(
-                "(something AND other) AND idField1:VALIDVALUE1 +(idField2:VALIDVALUE2) AND ((idField3:VALIDVALUE3))",
+                "(something AND other) AND idField1:validValue1 +(idField2:validValue2) AND ((idField3:validValue3))",
                 optimisedQuery);
     }
 

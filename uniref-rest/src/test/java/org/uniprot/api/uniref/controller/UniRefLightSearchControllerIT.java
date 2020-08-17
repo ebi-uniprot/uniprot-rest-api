@@ -103,7 +103,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getSearchRequestPath() + "?query=content:*&complete=invalid")
+                                get(getSearchRequestPath() + "?query=*&complete=invalid")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
