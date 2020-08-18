@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -67,8 +66,7 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
-    @Autowired
-    private UniParcFacetConfig facetConfig;
+    @Autowired private UniParcFacetConfig facetConfig;
 
     private UniParcStoreClient storeClient;
 
@@ -266,13 +264,14 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("database,taxonomy_name"))
+                    .queryParam("facets", Collections.singletonList("database"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
-                    .resultMatcher(
-                            jsonPath("$.facets.*.label", contains("Database", "Organisms")))
+                    .resultMatcher(jsonPath("$.facets.*.label", contains("Database")))
+                    .resultMatcher(jsonPath("$.facets.*.values.*.value", contains("uniprotkb/swiss-prot", "uniprotkb/trembl")))
+                    .resultMatcher(jsonPath("$.facets.*.values.*.count", contains(2, 2)))
                     .build();
         }
     }
