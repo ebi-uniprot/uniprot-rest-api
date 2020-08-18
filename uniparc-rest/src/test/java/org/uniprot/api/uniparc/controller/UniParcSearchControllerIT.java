@@ -4,7 +4,9 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -18,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -27,6 +30,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
+import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
@@ -59,10 +63,12 @@ import org.uniprot.store.search.SolrCollection;
             UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
             UniParcSearchControllerIT.UniParcSearchParameterResolver.class
         })
-public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
+public class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
+    @Autowired
+    private UniParcFacetConfig facetConfig;
 
     private UniParcStoreClient storeClient;
 
@@ -156,6 +162,11 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
 
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
+    }
+
+    @Override
+    protected List<String> getAllFacetFields() {
+        return new ArrayList<>(facetConfig.getFacetNames());
     }
 
     static class UniParcSearchParameterResolver extends AbstractSearchParameterResolver {
@@ -255,11 +266,13 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    //    .queryParam("facets", Collections.singletonList("reference"))
+                    .queryParam("facets", Collections.singletonList("database,taxonomy_name"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.uniParcId.value",
+                                    "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
+                    .resultMatcher(
+                            jsonPath("$.facets.*.label", contains("Database", "Organisms")))
                     .build();
         }
     }
