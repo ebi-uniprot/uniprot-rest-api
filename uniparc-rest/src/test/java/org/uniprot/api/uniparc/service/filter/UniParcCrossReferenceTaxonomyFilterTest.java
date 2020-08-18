@@ -1,6 +1,12 @@
 package org.uniprot.api.uniparc.service.filter;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,14 +14,6 @@ import org.uniprot.api.uniparc.controller.UniParcControllerITUtils;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -36,8 +34,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     void createTestData() {
         this.uniParcEntry = UniParcControllerITUtils.createEntry(1, UNIPARC_ID_PREFIX);
         assertNotNull(this.uniParcEntry);
-        assertTrue(
-                this.uniParcEntry.getUniParcId().getValue().startsWith(UNIPARC_ID_PREFIX));
+        assertTrue(this.uniParcEntry.getUniParcId().getValue().startsWith(UNIPARC_ID_PREFIX));
     }
 
     @Test
@@ -49,7 +46,9 @@ class UniParcCrossReferenceTaxonomyFilterTest {
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except xrefs
         assertEquals(1, filteredEntry.getUniParcCrossReferences().size());
-        assertEquals("9606", filteredEntry.getUniParcCrossReferences().get(0).getProperties().get(1).getValue());
+        assertEquals(
+                "9606",
+                filteredEntry.getUniParcCrossReferences().get(0).getProperties().get(1).getValue());
         verifyUniParcEntry(filteredEntry);
         verifyOriginalAndFilteredEntry(this.uniParcEntry, filteredEntry);
     }
@@ -67,14 +66,18 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     void testFilterByMatchingNonMatchingTaxons() {
         verifyUniParcEntry(uniParcEntry);
         assertEquals(2, this.uniParcEntry.getTaxonomies().size());
-        List<String> taxonFilter = Arrays.asList("10090","9606");
+        List<String> taxonFilter = Arrays.asList("10090", "9606");
         // filter by taxon
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except UniParcCrossReferences
         assertEquals(1, filteredEntry.getUniParcCrossReferences().size());
-        assertEquals("9606", filteredEntry.getUniParcCrossReferences().get(0).getProperties().get(1).getValue());
+        assertEquals(
+                "9606",
+                filteredEntry.getUniParcCrossReferences().get(0).getProperties().get(1).getValue());
         verifyUniParcEntry(filteredEntry);
-        assertNotEquals(uniParcEntry.getUniParcCrossReferences(), filteredEntry.getUniParcCrossReferences());
+        assertNotEquals(
+                uniParcEntry.getUniParcCrossReferences(),
+                filteredEntry.getUniParcCrossReferences());
         verifyOriginalAndFilteredEntry(this.uniParcEntry, filteredEntry);
     }
 
@@ -118,9 +121,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
             UniParcEntry uniParcEntry, UniParcEntry filteredEntry) {
         assertEquals(uniParcEntry.getUniParcId(), filteredEntry.getUniParcId());
         assertEquals(uniParcEntry.getSequence(), filteredEntry.getSequence());
-        assertEquals(
-                uniParcEntry.getSequenceFeatures(), filteredEntry.getSequenceFeatures());
+        assertEquals(uniParcEntry.getSequenceFeatures(), filteredEntry.getSequenceFeatures());
         assertEquals(uniParcEntry.getTaxonomies(), filteredEntry.getTaxonomies());
     }
-
 }

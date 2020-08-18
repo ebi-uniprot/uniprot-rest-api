@@ -33,12 +33,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.request.UniParcSearchRequest;
-import org.uniprot.api.uniparc.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.request.*;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -349,6 +344,43 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByUpIdRequest);
 
         return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/bestguess",
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
+    @Operation(
+            summary =
+                    "For a given user input (request parameters), Best Guess returns the UniParcEntry with a cross-reference to the longest active UniProtKB sequence (preferably from Swiss-Prot and if not then TrEMBL). It also returns the sequence and related information. If it finds more than one longest active UniProtKB sequence it returns 400 (Bad Request) error response with the list of cross references found.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> uniParcBestGuess(
+            @Valid @ModelAttribute UniParcBestGuessRequest bestGuessRequest,
+            HttpServletRequest request) {
+
+        UniParcEntry bestGuess = queryService.getUniParcBestGuess(bestGuessRequest);
+
+        return super.getEntityResponse(bestGuess, bestGuessRequest.getFields(), request);
     }
 
     @Override

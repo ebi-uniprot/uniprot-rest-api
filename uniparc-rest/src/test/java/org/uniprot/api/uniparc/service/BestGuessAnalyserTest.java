@@ -1,30 +1,25 @@
 package org.uniprot.api.uniparc.service;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
-import org.uniprot.api.uniparc.service.exception.BestGuessAnalyserException;
-import org.uniprot.core.Location;
-import org.uniprot.core.Property;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.*;
-import org.uniprot.core.uniparc.impl.InterProGroupBuilder;
-import org.uniprot.core.uniparc.impl.SequenceFeatureBuilder;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.service.exception.BestGuessAnalyserException;
+import org.uniprot.core.Property;
+import org.uniprot.core.Sequence;
+import org.uniprot.core.impl.SequenceBuilder;
+import org.uniprot.core.uniparc.*;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
+import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
 /**
  * @author lgonzales
@@ -34,9 +29,11 @@ class BestGuessAnalyserTest {
 
     @Test
     void analyseBestGuessEmptyList() throws BestGuessAnalyserException {
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
-        UniParcEntry result = bestGuessAnalyser.analyseBestGuess(Stream.empty(), new UniParcBestGuessRequest());
+        UniParcEntry result =
+                bestGuessAnalyser.analyseBestGuess(Stream.empty(), new UniParcBestGuessRequest());
         assertNull(result);
     }
 
@@ -45,22 +42,27 @@ class BestGuessAnalyserTest {
         List<UniParcEntry> entries = new ArrayList<>();
 
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "swissProt", 9606, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "swissProt", 9606, true));
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "trembl", 9607, true));
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "inactive", 9608, false));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT_VARSPLIC, "isoform", 9609, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT_VARSPLIC, "isoform", 9609, true));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBL", 9610, true));
 
         entries.add(createUniParcEntry("UP1", 20, crossReferences));
 
         crossReferences = new ArrayList<>();
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "swissProtShortSeq", 9606, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "swissProtShortSeq", 9606, true));
 
         entries.add(createUniParcEntry("UP2", 18, crossReferences));
 
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
-        UniParcEntry result = bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
+        UniParcEntry result =
+                bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
         assertNotNull(result.getUniParcCrossReferences());
         assertEquals("UP1", result.getUniParcId().getValue());
@@ -79,24 +81,30 @@ class BestGuessAnalyserTest {
         List<UniParcEntry> entries = new ArrayList<>();
 
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "swissProt", 9606, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "swissProt", 9606, true));
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "trembl", 9607, true));
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "inactive", 9608, false));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT_VARSPLIC, "isoformInactive", 9609, false));
+        crossReferences.add(
+                createCrossReference(
+                        UniParcDatabase.SWISSPROT_VARSPLIC, "isoformInactive", 9609, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBL", 9610, true));
 
         entries.add(createUniParcEntry("UP1", 20, crossReferences));
 
         crossReferences = new ArrayList<>();
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "tremblUP2", 9607, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "inactiveUP2", 9608, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.TREMBL, "inactiveUP2", 9608, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBLShort", 9610, true));
 
         entries.add(createUniParcEntry("UP2", 20, crossReferences));
 
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
-        UniParcEntry result = bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
+        UniParcEntry result =
+                bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
         assertNotNull(result.getUniParcCrossReferences());
         assertEquals("UP1", result.getUniParcId().getValue());
@@ -113,22 +121,27 @@ class BestGuessAnalyserTest {
 
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "trembl", 9607, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "inactive", 9608, false));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT_VARSPLIC, "isoform", 9609, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "inactive", 9608, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT_VARSPLIC, "isoform", 9609, true));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBL", 9610, true));
 
         entries.add(createUniParcEntry("UP1", 20, crossReferences));
 
         crossReferences = new ArrayList<>();
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "tremblUP2", 9607, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "inactiveUP2", 9608, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.TREMBL, "inactiveUP2", 9608, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBLUP2", 9610, true));
 
         entries.add(createUniParcEntry("UP2", 20, crossReferences));
 
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
-        UniParcEntry result = bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
+        UniParcEntry result =
+                bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
         assertNotNull(result.getUniParcCrossReferences());
         assertEquals("UP1", result.getUniParcId().getValue());
@@ -145,19 +158,23 @@ class BestGuessAnalyserTest {
 
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "trembl", 9607, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "inactive", 9608, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "inactive", 9608, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBL", 9610, true));
 
         entries.add(createUniParcEntry("UP1", 20, crossReferences));
 
         crossReferences = new ArrayList<>();
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "swissProtShortSeq", 9606, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "swissProtShortSeq", 9606, true));
 
         entries.add(createUniParcEntry("UP2", 18, crossReferences));
 
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
-        UniParcEntry result = bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
+        UniParcEntry result =
+                bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
         assertNotNull(result.getUniParcCrossReferences());
         assertEquals("UP1", result.getUniParcId().getValue());
@@ -173,25 +190,37 @@ class BestGuessAnalyserTest {
         List<UniParcEntry> entries = new ArrayList<>();
 
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "swissProtUP1", 9606, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "swissProtUP1", 9606, true));
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "tremblUP1", 9607, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "inactiveUP1", 9608, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "inactiveUP1", 9608, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBLUP1", 9610, true));
 
         entries.add(createUniParcEntry("UP1", 20, crossReferences));
 
         crossReferences = new ArrayList<>();
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "swissProtUP2", 9606, true));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "swissProtUP2", 9606, true));
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "tremblUP2", 9607, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "inactiveUP2", 9608, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.TREMBL, "inactiveUP2", 9608, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBLUP2", 9610, true));
 
         entries.add(createUniParcEntry("UP2", 20, crossReferences));
 
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
-        BestGuessAnalyserException result = assertThrows(BestGuessAnalyserException.class, () -> bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest()));
-        assertEquals("More than one Best Guess found {UP1:swissProtUP1;UP2:swissProtUP2}. Review your query and/or contact us.", result.getMessage());
+        BestGuessAnalyserException result =
+                assertThrows(
+                        BestGuessAnalyserException.class,
+                        () ->
+                                bestGuessAnalyser.analyseBestGuess(
+                                        entries.stream(), new UniParcBestGuessRequest()));
+        assertEquals(
+                "More than one Best Guess found {UP1:swissProtUP1;UP2:swissProtUP2}. Review your query and/or contact us.",
+                result.getMessage());
     }
 
     @Test
@@ -200,22 +229,25 @@ class BestGuessAnalyserTest {
 
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "tremblUP1", 9606, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "inactiveUP1", 9607, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "inactiveUP1", 9607, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBLUP1", 9608, true));
 
         entries.add(createUniParcEntry("UP1", 20, crossReferences));
 
         crossReferences = new ArrayList<>();
         crossReferences.add(createCrossReference(UniParcDatabase.TREMBL, "tremblUP2", 9610, true));
-        crossReferences.add(createCrossReference(UniParcDatabase.SWISSPROT, "inactiveUP2", 9611, false));
+        crossReferences.add(
+                createCrossReference(UniParcDatabase.SWISSPROT, "inactiveUP2", 9611, false));
         crossReferences.add(createCrossReference(UniParcDatabase.EMBL, "EMBLUP2", 9612, true));
 
         entries.add(createUniParcEntry("UP2", 20, crossReferences));
 
-        SearchFieldConfig searchConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        SearchFieldConfig searchConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         UniParcBestGuessRequest request = new UniParcBestGuessRequest();
-        request.setQuery(searchConfig.getSearchFieldItemByName("taxonomy_id").getFieldName()+":9606");
-
+        request.setQuery(
+                searchConfig.getSearchFieldItemByName("taxonomy_id").getFieldName() + ":9606");
 
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
         UniParcEntry result = bestGuessAnalyser.analyseBestGuess(entries.stream(), request);
@@ -229,8 +261,8 @@ class BestGuessAnalyserTest {
         assertEquals("tremblUP1", crossref.getId());
     }
 
-
-    private static UniParcCrossReference createCrossReference(UniParcDatabase database, String id, Integer taxId, boolean active){
+    private static UniParcCrossReference createCrossReference(
+            UniParcDatabase database, String id, Integer taxId, boolean active) {
         UniParcCrossReferenceBuilder xrefBuilder = new UniParcCrossReferenceBuilder();
         xrefBuilder
                 .database(database)
@@ -241,7 +273,8 @@ class BestGuessAnalyserTest {
                 .created(LocalDate.of(2015, 4, 1))
                 .lastUpdated(LocalDate.of(2019, 5, 8));
         List<Property> properties = new ArrayList<>();
-        properties.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, taxId.toString()));
+        properties.add(
+                new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, taxId.toString()));
         properties.add(
                 new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "Gelsolin, isoform J"));
         properties.add(new Property(UniParcCrossReference.PROPERTY_GENE_NAME, "Gel"));
@@ -251,15 +284,13 @@ class BestGuessAnalyserTest {
         return xrefBuilder.build();
     }
 
-    public static UniParcEntry createUniParcEntry(String id, int sequenceLength, List<UniParcCrossReference> crossReferences) {
+    public static UniParcEntry createUniParcEntry(
+            String id, int sequenceLength, List<UniParcCrossReference> crossReferences) {
         UniParcEntryBuilder builder = new UniParcEntryBuilder();
         StringBuilder sequence = new StringBuilder();
         IntStream.range(0, sequenceLength).forEach(i -> sequence.append("A"));
         Sequence uniSeq = new SequenceBuilder(sequence.toString()).build();
-        builder.uniParcId(id)
-                .sequence(uniSeq)
-                .uniParcCrossReferencesSet(crossReferences);
+        builder.uniParcId(id).sequence(uniSeq).uniParcCrossReferencesSet(crossReferences);
         return builder.build();
     }
-
 }

@@ -1,23 +1,24 @@
 package org.uniprot.api.uniparc.service.filter;
 
-import org.uniprot.core.Property;
-import org.uniprot.core.uniparc.UniParcCrossReference;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.util.Utils;
+import static org.uniprot.core.uniparc.UniParcCrossReference.*;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static org.uniprot.core.uniparc.UniParcCrossReference.*;
+import org.uniprot.core.Property;
+import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author lgonzales
  * @since 14/08/2020
  */
-public class UniParcCrossReferenceTaxonomyFilter implements BiFunction<UniParcEntry, List<String>, UniParcEntry> {
+public class UniParcCrossReferenceTaxonomyFilter
+        implements BiFunction<UniParcEntry, List<String>, UniParcEntry> {
 
     @Override
     public UniParcEntry apply(UniParcEntry uniParcEntry, List<String> taxonomyIds) {
@@ -38,6 +39,7 @@ public class UniParcCrossReferenceTaxonomyFilter implements BiFunction<UniParcEn
         return xref.getProperties().stream()
                 .filter(property -> property.getKey().equalsIgnoreCase(PROPERTY_NCBI_TAXONOMY_ID))
                 .map(Property::getValue)
-                .findFirst().orElse("");
+                .findFirst()
+                .orElse("");
     }
 }

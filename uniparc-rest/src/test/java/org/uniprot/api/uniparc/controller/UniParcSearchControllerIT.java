@@ -27,7 +27,6 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
-import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
@@ -64,8 +63,6 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
-
-    @Autowired private UniParcFacetConfig facetConfig;
 
     private UniParcStoreClient storeClient;
 
@@ -194,7 +191,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("taxonomy_name:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -211,7 +208,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                             Collections.singletonList(
                                     "upi:INVALID OR taxonomy_id:INVALID "
                                             + "OR length:INVALID OR upid:INVALID"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -340,7 +337,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -359,17 +356,17 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
