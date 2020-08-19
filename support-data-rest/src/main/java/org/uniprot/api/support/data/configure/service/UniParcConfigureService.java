@@ -9,6 +9,7 @@ import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.uniparc.UniParcConfigUtil;
 
 /**
  * @author jluo
@@ -17,22 +18,27 @@ import org.uniprot.store.config.UniProtDataType;
 @Service
 public class UniParcConfigureService {
 
-    public List<UniProtReturnField> getResultFields() {
+    private static final String DATABASE = "database";
+	private static final String ACTIVE = "active";
+	public List<UniProtReturnField> getResultFields() {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPARC);
     }
 
     public List<AdvancedSearchTerm> getSearchItems() {
-        List<AdvancedSearchTerm.Value> values = getUniParcDatabaseValues();
-
+        List<AdvancedSearchTerm.Value> databases = getUniParcAllDatabaseValues();
+        List<AdvancedSearchTerm.Value> aliveDabases = getUniParcAliveDatabaseValues();
         List<AdvancedSearchTerm> result =
                 AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPARC);
 
         for (int i = 0; i < result.size(); i++) {
             AdvancedSearchTerm searchTerm = result.get(i);
-            if (searchTerm.getTerm().equalsIgnoreCase("database")
-                    || searchTerm.getTerm().equalsIgnoreCase("active")) {
+            if (searchTerm.getTerm().equalsIgnoreCase(DATABASE)) {
                 AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
-                builder.values(values);
+                builder.values(databases);
+                result.set(i, builder.build());
+            }else if (searchTerm.getTerm().equalsIgnoreCase(ACTIVE)) {
+                AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
+                builder.values(aliveDabases);
                 result.set(i, builder.build());
             }
         }
@@ -40,9 +46,19 @@ public class UniParcConfigureService {
         return result;
     }
 
-    private List<AdvancedSearchTerm.Value> getUniParcDatabaseValues() {
+    private List<AdvancedSearchTerm.Value> getUniParcAllDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
-                .map(db -> new AdvancedSearchTerm.Value(db.getDisplayName(), db.getDisplayName()))
+        		.map(UniParcConfigUtil::uniparcDatabaseToSearchField)
+        		.distinct()
+                .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
+                .collect(Collectors.toList());
+    }
+    private List<AdvancedSearchTerm.Value> getUniParcAliveDatabaseValues() {
+        return Arrays.stream(UniParcDatabase.values())
+        		.filter(db->db.isAlive())
+        		.map(UniParcConfigUtil::uniparcDatabaseToSearchField)
+        		.distinct()
+                .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
                 .collect(Collectors.toList());
     }
 }
