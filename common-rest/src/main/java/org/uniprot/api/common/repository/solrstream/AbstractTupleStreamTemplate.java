@@ -28,7 +28,7 @@ public abstract class AbstractTupleStreamTemplate {
         if (Objects.isNull(this.streamFactory)) {
             initTupleStreamFactory(zkHost, collection);
         } else {
-            log.info("DefaultStreamFactory already created");
+            log.info("DefaultStreamFactory already created for collection {}", collection);
         }
         return this.streamFactory;
     }
@@ -37,7 +37,7 @@ public abstract class AbstractTupleStreamTemplate {
         if (Objects.isNull(this.streamContext)) {
             initStreamContext(collection, httpClient);
         } else {
-            log.info("StreamContext already created");
+            log.info("StreamContext already created for collection {}", collection);
         }
         return this.streamContext;
     }
@@ -45,7 +45,7 @@ public abstract class AbstractTupleStreamTemplate {
     private void initTupleStreamFactory(String zookeeperHost, String collection) {
         this.streamFactory =
                 new DefaultStreamFactory().withCollectionZkHost(collection, zookeeperHost);
-        log.info("Created new DefaultStreamFactory");
+        log.info("Created new DefaultStreamFactory for {} and {}", zookeeperHost, collection);
     }
 
     /**
@@ -60,6 +60,6 @@ public abstract class AbstractTupleStreamTemplate {
         SolrClientCache solrClientCache = new SolrClientCache(httpClient);
         context.setSolrClientCache(solrClientCache);
         this.streamContext = context;
-        log.info("Created new StreamContext");
+        log.info("Created new StreamContext for {} ", collection);
     }
 }

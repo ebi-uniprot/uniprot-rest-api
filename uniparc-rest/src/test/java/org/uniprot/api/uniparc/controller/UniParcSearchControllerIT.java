@@ -4,7 +4,9 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -17,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -60,11 +62,10 @@ import org.uniprot.store.search.SolrCollection;
             UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
             UniParcSearchControllerIT.UniParcSearchParameterResolver.class
         })
-public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
+public class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
-
     @Autowired private UniParcFacetConfig facetConfig;
 
     private UniParcStoreClient storeClient;
@@ -161,6 +162,11 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
     }
 
+    @Override
+    protected List<String> getAllFacetFields() {
+        return new ArrayList<>(facetConfig.getFacetNames());
+    }
+
     static class UniParcSearchParameterResolver extends AbstractSearchParameterResolver {
 
         @Override
@@ -194,7 +200,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("taxonomy_name:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -211,7 +217,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                             Collections.singletonList(
                                     "upi:INVALID OR taxonomy_id:INVALID "
                                             + "OR length:INVALID OR upid:INVALID"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -258,11 +264,14 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    //    .queryParam("facets", Collections.singletonList("reference"))
+                    .queryParam("facets", Collections.singletonList("database"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.uniParcId.value",
+                                    "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
+                    .resultMatcher(jsonPath("$.facets.*.label", contains("Database")))
+                    .resultMatcher(jsonPath("$.facets.*.values.*.value", contains("uniprotkb/swiss-prot", "uniprotkb/trembl")))
+                    .resultMatcher(jsonPath("$.facets.*.values.*.count", contains(2, 2)))
                     .build();
         }
     }
@@ -340,7 +349,7 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -359,17 +368,17 @@ public class UniParcSearchControllerIT extends AbstractSearchControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

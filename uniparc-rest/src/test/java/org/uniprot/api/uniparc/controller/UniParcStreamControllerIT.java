@@ -73,7 +73,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
-    private static final String UPI_PREF = "UPI0000083A";
+    private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
@@ -117,16 +117,16 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 containsInAnyOrder(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UPI0000283A10",
+                                        "UPI0000283A09",
+                                        "UPI0000283A08",
+                                        "UPI0000283A07",
+                                        "UPI0000283A06",
+                                        "UPI0000283A05",
+                                        "UPI0000283A04",
+                                        "UPI0000283A03",
+                                        "UPI0000283A02",
+                                        "UPI0000283A01")));
     }
 
     @Test
@@ -199,16 +199,16 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UPI0000283A10",
+                                        "UPI0000283A09",
+                                        "UPI0000283A08",
+                                        "UPI0000283A07",
+                                        "UPI0000283A06",
+                                        "UPI0000283A05",
+                                        "UPI0000283A04",
+                                        "UPI0000283A03",
+                                        "UPI0000283A02",
+                                        "UPI0000283A01")));
     }
 
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")
@@ -250,7 +250,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcId",
-                                containsInAnyOrder("UPI0000083A06", "UPI0000083A05")))
+                                containsInAnyOrder("UPI0000283A06", "UPI0000283A05")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcCrossReferences.*.properties[?(@.key=='gene_name')].value",

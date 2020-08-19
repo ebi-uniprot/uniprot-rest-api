@@ -19,10 +19,7 @@ import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.*;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseIdFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
@@ -120,6 +117,17 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     @Override
     protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
         return defaultSearchQueryOptimiser;
+    }
+
+    public UniParcEntry getUniParcBestGuess(UniParcBestGuessRequest request) {
+        UniParcStreamRequest streamRequest = new UniParcStreamRequest();
+        streamRequest.setQuery(request.getQuery());
+        streamRequest.setFields(request.getFields());
+
+        Stream<UniParcEntry> streamResult = stream(streamRequest);
+
+        BestGuessAnalyser analyser = new BestGuessAnalyser(searchFieldConfig);
+        return analyser.analyseBestGuess(streamResult, request);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {

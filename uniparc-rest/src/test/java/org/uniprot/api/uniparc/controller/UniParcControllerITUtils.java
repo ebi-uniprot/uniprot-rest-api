@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.uniprot.core.Location;
 import org.uniprot.core.Property;
@@ -108,6 +109,38 @@ public class UniParcControllerITUtils {
                         .build();
 
         return Arrays.asList(xref, xref2);
+    }
+
+    static UniParcEntry createEntry(
+            String id, int sequenceLength, List<UniParcCrossReference> crossReferences) {
+        UniParcEntryBuilder builder = new UniParcEntryBuilder();
+        StringBuilder sequence = new StringBuilder();
+        IntStream.range(0, sequenceLength).forEach(i -> sequence.append("A"));
+        Sequence uniSeq = new SequenceBuilder(sequence.toString()).build();
+        builder.uniParcId(id).sequence(uniSeq).uniParcCrossReferencesSet(crossReferences);
+        return builder.build();
+    }
+
+    static UniParcCrossReference getXref(
+            UniParcDatabase database, String id, Integer taxId, boolean active) {
+        UniParcCrossReferenceBuilder xrefBuilder = new UniParcCrossReferenceBuilder();
+        xrefBuilder
+                .database(database)
+                .id(id)
+                .versionI(1)
+                .version(7)
+                .active(active)
+                .created(LocalDate.of(2017, 2, 12))
+                .lastUpdated(LocalDate.of(2017, 4, 23));
+        List<Property> properties = new ArrayList<>();
+        properties.add(
+                new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, taxId.toString()));
+        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "protein Name"));
+        properties.add(new Property(UniParcCrossReference.PROPERTY_GENE_NAME, "Gel"));
+        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, "UPI"));
+        xrefBuilder.propertiesSet(properties);
+
+        return xrefBuilder.build();
     }
 
     static String getName(String prefix, int i) {

@@ -6,12 +6,14 @@ import java.util.stream.Stream;
 
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.service.exception.BestGuessAnalyserException;
+import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
-import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.search.SolrQueryUtil;
 
 /**
  * This class is responsible to analyse a list of UniParcEntry and return the BestGuess among then.
@@ -32,14 +34,16 @@ class BestGuessAnalyser {
 
     private static final String MORE_THAN_ONE_BEST_GUESS_FOUND =
             "More than one Best Guess found {list}. Review your query and/or contact us.";
-    private final UniParcTaxonomyFilter taxonomyFilter;
+    private final UniParcCrossReferenceTaxonomyFilter taxonomyFilter;
     private final UniParcDatabaseFilter databaseFilter;
     private final UniParcDatabaseStatusFilter statusFilter;
+    private final SearchFieldConfig searchFieldConfig;
 
-    public BestGuessAnalyser() {
-        taxonomyFilter = new UniParcTaxonomyFilter();
-        databaseFilter = new UniParcDatabaseFilter();
-        statusFilter = new UniParcDatabaseStatusFilter();
+    public BestGuessAnalyser(SearchFieldConfig searchFieldConfig) {
+        this.taxonomyFilter = new UniParcCrossReferenceTaxonomyFilter();
+        this.databaseFilter = new UniParcDatabaseFilter();
+        this.statusFilter = new UniParcDatabaseStatusFilter();
+        this.searchFieldConfig = searchFieldConfig;
     }
     /**
      * This method return UniParcEntry BestGuess from a list of UniParcEntry and based on request
@@ -51,8 +55,8 @@ class BestGuessAnalyser {
      * @throws BestGuessAnalyserException if find more than one UniParcEntry with list the longest
      *     sequence.
      */
-    UniParcEntry analyseBestGuess(Stream<UniParcEntry> queryResult, UniParcBestGuessRequest request)
-            throws BestGuessAnalyserException {
+    UniParcEntry analyseBestGuess(
+            Stream<UniParcEntry> queryResult, UniParcBestGuessRequest request) {
         // First Search for DatabaseType.SWISSPROT or DatabaseType.SWISSPROT_VARSPLIC (isoforms)
         List<UniParcEntry> resultList = getFilteredUniParcEntries(queryResult, request);
 
@@ -83,22 +87,23 @@ class BestGuessAnalyser {
     private List<UniParcEntry> getFilteredUniParcEntries(
             Stream<UniParcEntry> entries, UniParcBestGuessRequest request) {
         List<String> databases = new ArrayList<>();
-        databases.add(UniParcDatabase.SWISSPROT.getDisplayName());
-        databases.add(UniParcDatabase.SWISSPROT_VARSPLIC.getDisplayName());
-        databases.add(UniParcDatabase.TREMBL.getDisplayName());
+        databases.add(UniParcDatabase.SWISSPROT.getDisplayName().toLowerCase());
+        databases.add(UniParcDatabase.SWISSPROT_VARSPLIC.getDisplayName().toLowerCase());
+        databases.add(UniParcDatabase.TREMBL.getDisplayName().toLowerCase());
 
         List<String> toxonomyIds = getBestGuessTaxonomyFilters(request);
 
         return entries.filter(Objects::nonNull)
-                .map(uniParcEntry -> databaseFilter.apply(uniParcEntry, databases))
-                .map(uniParcEntry -> taxonomyFilter.apply(uniParcEntry, toxonomyIds))
-                .map(uniParcEntry -> statusFilter.apply(uniParcEntry, true))
+                .map(uniParcEntry -> this.databaseFilter.apply(uniParcEntry, databases))
+                .map(uniParcEntry -> this.taxonomyFilter.apply(uniParcEntry, toxonomyIds))
+                .map(uniParcEntry -> this.statusFilter.apply(uniParcEntry, true))
                 .collect(Collectors.toList());
     }
 
     private List<String> getBestGuessTaxonomyFilters(UniParcBestGuessRequest request) {
-        // TODO: add taxonomy Filter
-        return new ArrayList<>();
+        String taxFieldName =
+                searchFieldConfig.getSearchFieldItemByName("taxonomy_id").getFieldName();
+        return SolrQueryUtil.getTermValues(request.getQuery(), taxFieldName);
     }
 
     /**
@@ -112,14 +117,14 @@ class BestGuessAnalyser {
      *     sequence.
      */
     private UniParcEntry getBestGuessUniParcEntry(
-            List<UniParcEntry> filteredEntries, UniParcDatabase... databaseType)
-            throws BestGuessAnalyserException {
+            List<UniParcEntry> filteredEntries, UniParcDatabase... databaseType) {
         UniParcEntry bestGuess = null;
 
         if (!filteredEntries.isEmpty()) {
             List<String> databases =
                     Arrays.stream(databaseType)
                             .map(UniParcDatabase::getDisplayName)
+                            .map(String::toLowerCase)
                             .collect(Collectors.toList());
 
             // Get longest sequence among filtered entries.
@@ -134,7 +139,7 @@ class BestGuessAnalyser {
             List<UniParcEntry> maxLengthEntries =
                     filteredEntries.stream()
                             .filter(entry -> entry.getSequence().getLength() == maxLength)
-                            .map(uniParcEntry -> databaseFilter.apply(uniParcEntry, databases))
+                            .map(uniParcEntry -> this.databaseFilter.apply(uniParcEntry, databases))
                             .collect(Collectors.toList());
 
             // Now we need to iterate over databaseType (parameter order define database priority).
@@ -198,10 +203,7 @@ class BestGuessAnalyser {
                                                         crossReference != null
                                                                 && crossReference
                                                                         .getDatabase()
-                                                                        .getName()
-                                                                        .equals(
-                                                                                databaseType
-                                                                                        .toString())))
+                                                                        .equals(databaseType)))
                 .collect(Collectors.toList());
     }
 }
