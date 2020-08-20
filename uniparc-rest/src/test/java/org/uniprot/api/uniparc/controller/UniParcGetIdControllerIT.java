@@ -1,14 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -24,6 +15,15 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author jluo
@@ -153,7 +153,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083D01\tHomo sapiens; MOUSE\tP10001; P12301\t2017-02-12\t2017-04-23\t30")))
+                                                                    "UPI0000083D01\tHomo sapiens; Torpedo californica\tP10001; P12301\t2017-02-12\t2017-04-23\t30")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

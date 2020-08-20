@@ -1,19 +1,28 @@
 package org.uniprot.api.uniparc.controller;
 
+import org.uniprot.core.Location;
+import org.uniprot.core.Property;
+import org.uniprot.core.Sequence;
+import org.uniprot.core.impl.SequenceBuilder;
+import org.uniprot.core.uniparc.InterProGroup;
+import org.uniprot.core.uniparc.SequenceFeature;
+import org.uniprot.core.uniparc.SignatureDbType;
+import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.uniparc.UniParcDatabase;
+import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.impl.InterProGroupBuilder;
+import org.uniprot.core.uniparc.impl.SequenceFeatureBuilder;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
+import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
+import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
+import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
-
-import org.uniprot.core.Location;
-import org.uniprot.core.Property;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.*;
-import org.uniprot.core.uniparc.impl.*;
-import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
-import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 
 /**
  * @author lgonzales
@@ -45,7 +54,7 @@ public class UniParcControllerITUtils {
     static List<Taxonomy> getTaxonomies() {
         Taxonomy taxonomy =
                 new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
-        Taxonomy taxonomy2 = new TaxonomyBuilder().taxonId(10090).scientificName("MOUSE").build();
+        Taxonomy taxonomy2 = new TaxonomyBuilder().taxonId(7787).scientificName("Torpedo californica").build();
         return Arrays.asList(taxonomy, taxonomy2);
     }
 
@@ -94,6 +103,7 @@ public class UniParcControllerITUtils {
                         UniParcCrossReference.PROPERTY_PROTEIN_NAME,
                         getName("anotherProteinName", i)));
         properties2.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "9606"));
+        properties2.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "7787"));
         properties2.add(new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, "UP000005640"));
 
         UniParcCrossReference xref2 =

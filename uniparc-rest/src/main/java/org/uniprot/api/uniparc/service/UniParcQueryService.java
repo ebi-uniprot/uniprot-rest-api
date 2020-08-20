@@ -102,7 +102,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 results.getContent().map(entryConverter).filter(Objects::nonNull);
         // filter the entries
         Stream<UniParcEntry> filtered = filterUniParcStream(converted, searchRequest);
-        return QueryResult.of(filtered, results.getPage());
+        return QueryResult.of(filtered, results.getPage(), results.getFacets());
     }
 
     @Override
