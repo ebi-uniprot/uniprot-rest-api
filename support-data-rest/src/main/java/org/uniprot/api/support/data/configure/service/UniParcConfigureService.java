@@ -19,8 +19,9 @@ import org.uniprot.store.config.uniparc.UniParcConfigUtil;
 public class UniParcConfigureService {
 
     private static final String DATABASE = "database";
-	private static final String ACTIVE = "active";
-	public List<UniProtReturnField> getResultFields() {
+    private static final String ACTIVE = "active";
+
+    public List<UniProtReturnField> getResultFields() {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPARC);
     }
 
@@ -36,7 +37,7 @@ public class UniParcConfigureService {
                 AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
                 builder.values(databases);
                 result.set(i, builder.build());
-            }else if (searchTerm.getTerm().equalsIgnoreCase(ACTIVE)) {
+            } else if (searchTerm.getTerm().equalsIgnoreCase(ACTIVE)) {
                 AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
                 builder.values(aliveDabases);
                 result.set(i, builder.build());
@@ -48,16 +49,17 @@ public class UniParcConfigureService {
 
     private List<AdvancedSearchTerm.Value> getUniParcAllDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
-        		.map(UniParcConfigUtil::uniparcDatabaseToSearchField)
-        		.distinct()
+                .map(UniParcConfigUtil::uniparcDatabaseToSearchField)
+                .distinct()
                 .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
                 .collect(Collectors.toList());
     }
+
     private List<AdvancedSearchTerm.Value> getUniParcAliveDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
-        		.filter(db->db.isAlive())
-        		.map(UniParcConfigUtil::uniparcDatabaseToSearchField)
-        		.distinct()
+                .filter(db -> db.isAlive())
+                .map(UniParcConfigUtil::uniparcDatabaseToSearchField)
+                .distinct()
                 .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
                 .collect(Collectors.toList());
     }

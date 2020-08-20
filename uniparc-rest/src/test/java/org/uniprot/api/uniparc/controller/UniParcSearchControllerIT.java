@@ -113,7 +113,7 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
             case "length":
                 value = "[* TO *]";
                 break;
-            case "accession":
+            case "uniprotkb":
             case "isoform":
                 value = "P10011";
                 break;
@@ -270,8 +270,11 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Database")))
-                    .resultMatcher(jsonPath("$.facets.*.values.*.value", contains("uniprotkb/swiss-prot", "uniprotkb/trembl")))
-                    .resultMatcher(jsonPath("$.facets.*.values.*.count", contains(2, 2)))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets.*.values.*.value",
+                                    contains("uniprot")))
+                    .resultMatcher(jsonPath("$.facets.*.values.*.count", contains(2)))
                     .build();
         }
     }

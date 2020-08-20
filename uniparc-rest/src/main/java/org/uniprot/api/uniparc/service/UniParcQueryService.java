@@ -40,7 +40,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private static final String UNIPARC_ID_FIELD = "upi";
-    private static final String ACCESSION_STR = "accession";
+    private static final String ACCESSION_FIELD = "uniprotkb";
     private static final String COMMA_STR = ",";
     private final SearchFieldConfig searchFieldConfig;
     private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
@@ -82,7 +82,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
 
-        UniParcEntry uniParcEntry = getEntity(ACCESSION_STR, getByAccessionRequest.getAccession());
+        UniParcEntry uniParcEntry =
+                getEntity(ACCESSION_FIELD, getByAccessionRequest.getAccession());
 
         return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
                 .findFirst()

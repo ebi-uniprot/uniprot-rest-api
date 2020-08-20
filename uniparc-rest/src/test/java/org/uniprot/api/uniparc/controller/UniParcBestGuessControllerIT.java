@@ -168,7 +168,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "database:EMBL")
+                        .param("query", "database:embl-cds")
                         .param("fields", "upi,sequence");
 
         mockMvc.perform(requestBuilder)
