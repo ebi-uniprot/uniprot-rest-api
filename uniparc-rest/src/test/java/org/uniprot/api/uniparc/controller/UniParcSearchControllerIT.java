@@ -270,10 +270,7 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Database")))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.facets.*.values.*.value",
-                                    contains("uniprot")))
+                    .resultMatcher(jsonPath("$.facets.*.values.*.value", contains("uniprot")))
                     .resultMatcher(jsonPath("$.facets.*.values.*.count", contains(2)))
                     .build();
         }
