@@ -59,7 +59,7 @@ import org.uniprot.store.search.SolrCollection;
  * @created 13/08/2020
  */
 @Slf4j
-public abstract class AbstractGetMultipleUniParcByIdTest {
+abstract class AbstractGetMultipleUniParcByIdTest {
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     @Autowired private UniProtStoreClient<UniParcEntry> storeClient;

@@ -25,6 +25,7 @@ import org.uniprot.api.uniparc.service.filter.UniParcDatabaseIdFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -41,6 +42,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private static final String UNIPARC_ID_FIELD = "upi";
     private static final String ACCESSION_STR = "accession";
+    public static final String MD5_STR = "md5";
     private static final String COMMA_STR = ",";
     private final SearchFieldConfig searchFieldConfig;
     private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
@@ -85,6 +87,16 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         UniParcEntry uniParcEntry = getEntity(ACCESSION_STR, getByAccessionRequest.getAccession());
 
         return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public UniParcEntry getBySequence(UniParcSequenceRequest sequenceRequest) {
+
+        String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
+        UniParcEntry uniParcEntry = getEntity(MD5_STR, md5Value);
+
+        return filterUniParcStream(Stream.of(uniParcEntry), sequenceRequest)
                 .findFirst()
                 .orElse(null);
     }

@@ -22,8 +22,9 @@ import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 public class UniParcControllerITUtils {
 
     public static UniParcEntry createEntry(int i, String upiRef) {
-        String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
-        Sequence sequence = new SequenceBuilder(seq).build();
+        StringBuilder seq = new StringBuilder("MLMPKRTKYR");
+        IntStream.range(0, i).forEach(j -> seq.append("A"));
+        Sequence sequence = new SequenceBuilder(seq.toString()).build();
         List<UniParcCrossReference> xrefs = getXrefs(i);
 
         List<SequenceFeature> seqFeatures = new ArrayList<>();

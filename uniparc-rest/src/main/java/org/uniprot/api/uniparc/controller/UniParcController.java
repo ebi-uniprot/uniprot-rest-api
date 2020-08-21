@@ -1,7 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.http.MediaType.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
@@ -21,12 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -357,12 +351,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntry.class))),
+                                    schema = @Schema(implementation = UniParcEntry.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -381,6 +370,42 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         UniParcEntry bestGuess = queryService.getUniParcBestGuess(bestGuessRequest);
 
         return super.getEntityResponse(bestGuess, bestGuessRequest.getFields(), request);
+    }
+
+    @GetMapping(
+            value = "/sequence",
+            produces = {
+                    APPLICATION_JSON_VALUE,
+                    APPLICATION_XML_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    TSV_MEDIA_TYPE_VALUE,
+                    XLS_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniParc entry by protein sequence",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            schema = @Schema(implementation = UniParcEntry.class)),
+                                    @Content(
+                                            mediaType = APPLICATION_XML_VALUE,
+                                            schema = @Schema(implementation = Entry.class)),
+                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                            })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> uniParcSequenceFilter(
+            @Valid @ModelAttribute UniParcSequenceRequest sequenceRequest,
+            HttpServletRequest request) {
+
+        UniParcEntry entry = queryService.getBySequence(sequenceRequest);
+
+        return super.getEntityResponse(entry, sequenceRequest.getFields(), request);
     }
 
     @Override
