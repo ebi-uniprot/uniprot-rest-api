@@ -63,12 +63,12 @@ class UniParcTaxonomyFilterTest {
     void testFilterByMatchingNonMatchingTaxons() {
         verifyUniParcEntry(uniParcEntry);
         Assertions.assertEquals(2, this.uniParcEntry.getTaxonomies().size());
-        List<String> taxonFilter = Arrays.asList("0", "10090");
+        List<String> taxonFilter = Arrays.asList("0", "9606");
         // filter by taxon
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except taxon
         Assertions.assertEquals(1, filteredEntry.getTaxonomies().size());
-        Assertions.assertEquals(10090L, filteredEntry.getTaxonomies().get(0).getTaxonId());
+        Assertions.assertEquals(9606L, filteredEntry.getTaxonomies().get(0).getTaxonId());
         verifyUniParcEntry(filteredEntry);
         Assertions.assertNotEquals(uniParcEntry.getTaxonomies(), filteredEntry.getTaxonomies());
         verifyOriginalAndFilteredEntry(this.uniParcEntry, filteredEntry);

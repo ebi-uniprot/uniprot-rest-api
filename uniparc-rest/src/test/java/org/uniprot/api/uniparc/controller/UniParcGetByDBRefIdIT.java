@@ -1,22 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +14,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.uniparc.UniParcRestApplication;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -224,61 +224,6 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                         jsonPath(
                                 "$.messages[0]",
                                 containsString("is invalid UniParc Cross Ref DB Name")));
-    }
-
-    @Test
-    void testGetByDbIdWithDBIdsFilterSuccess() throws Exception {
-        // when
-        String dbid = "unimes1";
-        String dbIds = "P12301,P10001,randomId";
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid)
-                                .param("dbIds", dbIds));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(2)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].id",
-                                containsInAnyOrder("P10001", "P12301")))
-                .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.results[0].taxonomies", iterableWithSize(2)));
-    }
-
-    @Test
-    void testGetByDbIdWithMoreDBIdsThanSupportedFilterSuccess() throws Exception {
-        // when
-        String dbid = "unimes1";
-        String dbIds = "dbId1,dbId2,dbId3,dbId4,dbId5,dbId6,dbId7";
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid)
-                                .param("dbIds", dbIds));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[0]",
-                                containsString(
-                                        "is the maximum count limit of comma separated items. You have passed")));
     }
 
     @Test

@@ -1,13 +1,5 @@
 package org.uniprot.api.uniparc.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -19,9 +11,13 @@ import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.request.*;
+import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
-import org.uniprot.api.uniparc.service.filter.UniParcDatabaseIdFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -33,6 +29,14 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * @author jluo
  * @date: 21 Jun 2019
@@ -41,7 +45,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Import(UniParcQueryBoostsConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private static final String UNIPARC_ID_FIELD = "upi";
-    private static final String ACCESSION_STR = "accession";
+    private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String MD5_STR = "md5";
     private static final String COMMA_STR = ",";
     private final SearchFieldConfig searchFieldConfig;
@@ -84,7 +88,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
 
-        UniParcEntry uniParcEntry = getEntity(ACCESSION_STR, getByAccessionRequest.getAccession());
+        UniParcEntry uniParcEntry =
+                getEntity(ACCESSION_FIELD, getByAccessionRequest.getAccession());
 
         return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
                 .findFirst()
@@ -113,7 +118,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 results.getContent().map(entryConverter).filter(Objects::nonNull);
         // filter the entries
         Stream<UniParcEntry> filtered = filterUniParcStream(converted, searchRequest);
-        return QueryResult.of(filtered, results.getPage());
+        return QueryResult.of(filtered, results.getPage(), results.getFacets());
     }
 
     @Override
@@ -150,18 +155,15 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             Stream<UniParcEntry> uniParcEntryStream, UniParcGetByIdRequest request) {
         // convert comma separated values to list
         List<String> databases = csvToList(request.getDbTypes());
-        List<String> databaseIds = csvToList(request.getDbIds());
         List<String> toxonomyIds = csvToList(request.getTaxonIds());
         // converters
         UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
-        UniParcDatabaseIdFilter dbIdFilter = new UniParcDatabaseIdFilter();
         UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
         UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
 
         // filter the results
         return uniParcEntryStream
                 .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
-                .map(uniParcEntry -> dbIdFilter.apply(uniParcEntry, databaseIds))
                 .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, toxonomyIds))
                 .map(uniParcEntry -> statusFilter.apply(uniParcEntry, request.getActive()));
     }

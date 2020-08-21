@@ -1,17 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,6 +22,18 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -144,58 +144,6 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                         jsonPath(
                                 "$.messages[0]",
                                 containsString("is invalid UniParc Cross Ref DB Name")));
-    }
-
-    @Test
-    void testGetByAccessionWithDBIdsFilterSuccess() throws Exception {
-        // when
-        String dbIds = "unimes1,P10001,randomId";
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
-                                        .param("dbIds", dbIds));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.uniParcCrossReferences[*].id",
-                                containsInAnyOrder("unimes1", "P10001")))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
-    }
-
-    @Test
-    void testGetByAccessionWithMoreDBIdsThanSupportedFilterSuccess() throws Exception {
-        // when
-        String dbIds = "dbId1,dbId2,dbId3,dbId4,dbId5,dbId6,dbId7";
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
-                                        .param("dbIds", dbIds));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[0]",
-                                containsString(
-                                        "is the maximum count limit of comma separated items. You have passed")));
     }
 
     @Test

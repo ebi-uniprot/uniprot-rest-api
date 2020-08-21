@@ -1,15 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +23,7 @@ import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
-import org.uniprot.core.uniparc.*;
+import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
@@ -42,6 +32,21 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author jluo
@@ -113,7 +118,7 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
             case "length":
                 value = "[* TO *]";
                 break;
-            case "accession":
+            case "uniprotkb":
             case "isoform":
                 value = "P10011";
                 break;
@@ -135,11 +140,6 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIPARC,
                         new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
-    }
-
-    @AfterEach
-    void cleanStoreClient() {
-        storeClient.truncate();
     }
 
     @Override
@@ -264,17 +264,16 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("database"))
+                    .queryParam("facets", Collections.singletonList("database,organism_name"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
-                    .resultMatcher(jsonPath("$.facets.*.label", contains("Database")))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.facets.*.values.*.value",
-                                    contains("uniprotkb/swiss-prot", "uniprotkb/trembl")))
-                    .resultMatcher(jsonPath("$.facets.*.values.*.count", contains(2, 2)))
+                    .resultMatcher(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.value", contains("uniprot")))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.count", contains(2)))
+                    .resultMatcher(jsonPath("$.facets[1].values.*.value", contains("Homo sapiens", "Torpedo californica")))
+                    .resultMatcher(jsonPath("$.facets[1].values.*.count", contains(2, 2)))
                     .build();
         }
     }
@@ -322,12 +321,12 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083A11	Homo sapiens; MOUSE	P10011; P12311	2017-02-12	2017-04-23	30")))
+                                                                    "UPI0000083A11	Homo sapiens; Torpedo californica	P10011; P12311	2017-02-12	2017-04-23	30")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083A20	Homo sapiens; MOUSE	P10020; P12320	2017-02-12	2017-04-23	30")))
+                                                                    "UPI0000083A20	Homo sapiens; Torpedo californica	P10020; P12320	2017-02-12	2017-04-23	30")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
