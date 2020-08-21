@@ -147,58 +147,6 @@ public abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdCo
     }
 
     @Test
-    void testGetByAccessionWithDBIdsFilterSuccess() throws Exception {
-        // when
-        String dbIds = "unimes1,P10001,randomId";
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
-                                        .param("dbIds", dbIds));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.uniParcCrossReferences[*].id",
-                                containsInAnyOrder("unimes1", "P10001")))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
-    }
-
-    @Test
-    void testGetByAccessionWithMoreDBIdsThanSupportedFilterSuccess() throws Exception {
-        // when
-        String dbIds = "dbId1,dbId2,dbId3,dbId4,dbId5,dbId6,dbId7";
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
-                                        .param("dbIds", dbIds));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[0]",
-                                containsString(
-                                        "is the maximum count limit of comma separated items. You have passed")));
-    }
-
-    @Test
     void testGetByAccessionWithTaxonomyIdsFilterSuccess() throws Exception {
         // when
         String taxonIds = "9606,radomTaxonId";

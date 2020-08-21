@@ -22,10 +22,6 @@ public class UniParcGetByIdRequest {
     @ValidUniParcDatabaseList
     private String dbTypes;
 
-    @Parameter(description = "Comma separated list of UniParc Cross Ref DB Ids")
-    @ValidCommaSeparatedItemsLength
-    private String dbIds;
-
     @Parameter(description = "Flag to filter by active(true) or inactive(false) Cross Ref")
     private Boolean active;
 
