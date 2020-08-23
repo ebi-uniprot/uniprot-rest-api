@@ -375,29 +375,29 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @GetMapping(
             value = "/sequence",
             produces = {
-                    APPLICATION_JSON_VALUE,
-                    APPLICATION_XML_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    TSV_MEDIA_TYPE_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE
+                APPLICATION_JSON_VALUE,
+                APPLICATION_XML_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniParc entry by protein sequence",
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UniParcEntry.class)),
-                                    @Content(
-                                            mediaType = APPLICATION_XML_VALUE,
-                                            schema = @Schema(implementation = Entry.class)),
-                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
-                            })
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniParcEntry.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> uniParcSequenceFilter(
             @Valid @ModelAttribute UniParcSequenceRequest sequenceRequest,

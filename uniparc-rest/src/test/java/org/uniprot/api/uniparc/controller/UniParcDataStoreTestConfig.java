@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.mockito.Mockito.mock;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -10,8 +12,6 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * @author jluo

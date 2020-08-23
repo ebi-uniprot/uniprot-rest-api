@@ -1,5 +1,13 @@
 package org.uniprot.api.uniparc.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -11,12 +19,7 @@ import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.request.*;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
@@ -28,14 +31,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author jluo

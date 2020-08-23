@@ -65,7 +65,8 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     }
 
     @Override
-    public boolean canRead(Type type, @Nullable Class<?> contextClass, @Nullable MediaType mediaType) {
+    public boolean canRead(
+            Type type, @Nullable Class<?> contextClass, @Nullable MediaType mediaType) {
         return false;
     }
 

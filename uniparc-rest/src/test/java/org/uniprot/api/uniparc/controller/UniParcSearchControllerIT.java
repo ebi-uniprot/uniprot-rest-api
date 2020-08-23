@@ -1,5 +1,20 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,21 +47,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author jluo
@@ -272,7 +272,10 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
                     .resultMatcher(jsonPath("$.facets[0].values.*.value", contains("uniprot")))
                     .resultMatcher(jsonPath("$.facets[0].values.*.count", contains(2)))
-                    .resultMatcher(jsonPath("$.facets[1].values.*.value", contains("Homo sapiens", "Torpedo californica")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[1].values.*.value",
+                                    contains("Homo sapiens", "Torpedo californica")))
                     .resultMatcher(jsonPath("$.facets[1].values.*.count", contains(2, 2)))
                     .build();
         }

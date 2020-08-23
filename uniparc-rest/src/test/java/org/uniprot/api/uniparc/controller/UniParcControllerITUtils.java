@@ -1,5 +1,11 @@
 package org.uniprot.api.uniparc.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.uniprot.core.Location;
 import org.uniprot.core.Property;
 import org.uniprot.core.Sequence;
@@ -17,12 +23,6 @@ import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * @author lgonzales
@@ -55,7 +55,8 @@ public class UniParcControllerITUtils {
     static List<Taxonomy> getTaxonomies() {
         Taxonomy taxonomy =
                 new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
-        Taxonomy taxonomy2 = new TaxonomyBuilder().taxonId(7787).scientificName("Torpedo californica").build();
+        Taxonomy taxonomy2 =
+                new TaxonomyBuilder().taxonId(7787).scientificName("Torpedo californica").build();
         return Arrays.asList(taxonomy, taxonomy2);
     }
 
