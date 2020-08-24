@@ -1,13 +1,13 @@
 package org.uniprot.api.uniparc.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author lgonzales
@@ -21,5 +21,4 @@ public class UniParcSequenceRequest extends UniParcGetByIdRequest {
     @NotNull(message = "{uniparc.sequence.required}")
     @Pattern(regexp = SEQUENCE_REGEX, message = "{uniparc.sequence.invalid}")
     private String sequence;
-
 }

@@ -6,6 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.hamcrest.Matchers;
@@ -41,9 +44,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * @author lgonzales
@@ -122,13 +122,12 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.messages.*", Matchers.contains("Resource not found")));
     }
 
-
     @Test
     void testGetBySequenceWithoutSequenceBadRequest() throws Exception {
         // when
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getBySequencePath)
-                        .param("dbTypes", "invalid"));
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getBySequencePath).param("dbTypes", "invalid"));
 
         // then
         response.andDo(print())
@@ -149,15 +148,17 @@ class UniParcControllerGetBySequenceIT {
     void testGetBySequenceBadRequest() throws Exception {
         // when
         String taxIds = "9606,9607,9608,9609,9610,9611,9612";
-        String dbTypes = Arrays.stream(UniParcDatabase.values())
-                .map(EnumDisplay::getDisplayName)
-                .collect(Collectors.joining(","));
+        String dbTypes =
+                Arrays.stream(UniParcDatabase.values())
+                        .map(EnumDisplay::getDisplayName)
+                        .collect(Collectors.joining(","));
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getBySequencePath)
-                        .param("sequence", "AA1BBCC")
-                        .param("taxonIds", taxIds)
-                        .param("fields", "invalid")
-                        .param("dbTypes", dbTypes));
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getBySequencePath)
+                                .param("sequence", "AA1BBCC")
+                                .param("taxonIds", taxIds)
+                                .param("fields", "invalid")
+                                .param("dbTypes", dbTypes));
 
         // then
         response.andDo(print())
@@ -377,6 +378,4 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
                 .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
     }
-
-
 }

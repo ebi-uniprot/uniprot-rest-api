@@ -6,17 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author sahmad
  * @created 12/08/2020
  */
-public class ValidUniParcDatabaseListTest {
+class ValidEnumDisplayValueTest {
+
+    private FakeUniParcDBListValidator validator;
+
+    @BeforeEach
+    void setupValidator(){
+        validator = new FakeUniParcDBListValidator();
+        validator.addValidValue("ensemblbacteria");
+        validator.addValidValue("embl");
+        validator.addValidValue("tremblnew");
+    }
 
     @Test
     void testNullValue() {
-        FakeUniParcDBListValidator validator = new FakeUniParcDBListValidator();
         String input = null;
         boolean isValid = validator.isValid(input, null);
         assertTrue(isValid);
@@ -24,7 +34,6 @@ public class ValidUniParcDatabaseListTest {
 
     @Test
     void testEmptyValue() {
-        FakeUniParcDBListValidator validator = new FakeUniParcDBListValidator();
         String input = "";
         boolean isValid = validator.isValid(input, null);
         assertTrue(isValid);
@@ -33,7 +42,6 @@ public class ValidUniParcDatabaseListTest {
 
     @Test
     void testValidValue() {
-        FakeUniParcDBListValidator validator = new FakeUniParcDBListValidator();
         String input = "EnsemblBacteria";
         boolean isValid = validator.isValid(input, null);
         assertTrue(isValid);
@@ -42,7 +50,6 @@ public class ValidUniParcDatabaseListTest {
 
     @Test
     void testValidInvalidValues() {
-        FakeUniParcDBListValidator validator = new FakeUniParcDBListValidator();
         String input = "EnsemblBacteria,embl,invalid";
         boolean isValid = validator.isValid(input, null);
         assertFalse(isValid);
@@ -53,7 +60,6 @@ public class ValidUniParcDatabaseListTest {
 
     @Test
     void testValidValues() {
-        FakeUniParcDBListValidator validator = new FakeUniParcDBListValidator();
         String input = "EnsemblBacteria, EMBl, tremblnew";
         boolean isValid = validator.isValid(input, null);
         assertTrue(isValid);
@@ -62,7 +68,6 @@ public class ValidUniParcDatabaseListTest {
 
     @Test
     void testInvalidValue() {
-        FakeUniParcDBListValidator validator = new FakeUniParcDBListValidator();
         String input = "invalid";
         boolean isValid = validator.isValid(input, null);
         assertFalse(isValid);
@@ -71,14 +76,17 @@ public class ValidUniParcDatabaseListTest {
         assertTrue(validator.errorList.get(0).contains("invalid"));
     }
 
-    static class FakeUniParcDBListValidator
-            extends ValidUniParcDatabaseList.UniParcDatabaseListValidator {
+    static class FakeUniParcDBListValidator extends ValidEnumDisplayValue.EnumDisplayValidator {
         private final List<String> errorList = new ArrayList<>();
 
         @Override
         void buildInvalidUniParcDBMessage(
                 String dbName, ConstraintValidatorContextImpl contextImpl) {
             errorList.add("Invalid UniParc DB Name " + dbName);
+        }
+
+        void addValidValue(String value){
+            super.acceptedValues.add(value);
         }
     }
 }

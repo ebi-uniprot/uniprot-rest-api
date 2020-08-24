@@ -4,8 +4,9 @@ import lombok.Data;
 
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
+import org.uniprot.api.rest.validation.ValidEnumDisplayValue;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.rest.validation.ValidUniParcDatabaseList;
+import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -19,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniParcGetByIdRequest {
     @Parameter(description = "Comma separated list of UniParc Cross Ref DB Names")
     @ValidCommaSeparatedItemsLength
-    @ValidUniParcDatabaseList
+    @ValidEnumDisplayValue(enumDisplay = UniParcDatabase.class, message = "")
     private String dbTypes;
 
     @Parameter(description = "Flag to filter by active(true) or inactive(false) Cross Ref")
