@@ -22,7 +22,7 @@ import org.uniprot.core.util.Utils;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidEnumDisplayValue {
-    String message() default "invalid Enum display values";
+    String message() default "{uniparc.dbnames.invalid.dbname.message}";
 
     Class<? extends EnumDisplay> enumDisplay();
 
@@ -32,7 +32,7 @@ public @interface ValidEnumDisplayValue {
 
     class EnumDisplayValidator implements ConstraintValidator<ValidEnumDisplayValue, String> {
 
-        protected final List<String> acceptedValues = new ArrayList<>();
+        private final List<String> acceptedValues = new ArrayList<>();
 
         @Override
         public void initialize(ValidEnumDisplayValue constraintAnnotation) {
@@ -67,7 +67,7 @@ public @interface ValidEnumDisplayValue {
         }
 
         private boolean isValidUniParcDatabase(String dbName) {
-            return acceptedValues.contains(dbName.toLowerCase());
+            return getAcceptedValues().contains(dbName.toLowerCase());
         }
 
         void buildInvalidUniParcDBMessage(
@@ -75,6 +75,10 @@ public @interface ValidEnumDisplayValue {
             String errorMessage = "{uniparc.dbnames.invalid.dbname.message}";
             contextImpl.addMessageParameter("0", dbName);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        public List<String> getAcceptedValues() {
+            return acceptedValues;
         }
     }
 }

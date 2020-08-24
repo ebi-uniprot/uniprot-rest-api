@@ -18,7 +18,7 @@ class ValidEnumDisplayValueTest {
     private FakeUniParcDBListValidator validator;
 
     @BeforeEach
-    void setupValidator(){
+    void setupValidator() {
         validator = new FakeUniParcDBListValidator();
         validator.addValidValue("ensemblbacteria");
         validator.addValidValue("embl");
@@ -85,8 +85,8 @@ class ValidEnumDisplayValueTest {
             errorList.add("Invalid UniParc DB Name " + dbName);
         }
 
-        void addValidValue(String value){
-            super.acceptedValues.add(value);
+        void addValidValue(String value) {
+            super.getAcceptedValues().add(value);
         }
     }
 }

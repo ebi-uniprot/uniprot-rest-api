@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -140,14 +141,15 @@ class UniParcControllerGetBySequenceIT {
                         jsonPath(
                                 "$.messages[*]",
                                 containsInAnyOrder(
-                                        "Protein sequence is a required parameter.",
+                                        "'sequence' is a required parameter",
                                         "'invalid' is invalid UniParc Cross Ref DB Name")));
     }
 
     @Test
     void testGetBySequenceBadRequest() throws Exception {
         // when
-        String taxIds = "9606,9607,9608,9609,9610,9611,9612";
+        String taxIds =
+                IntStream.range(0, 102).mapToObj(String::valueOf).collect(Collectors.joining(","));
         String dbTypes =
                 Arrays.stream(UniParcDatabase.values())
                         .map(EnumDisplay::getDisplayName)
@@ -166,15 +168,14 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", iterableWithSize(4)))
+                .andExpect(jsonPath("$.messages", iterableWithSize(3)))
                 .andExpect(
                         jsonPath(
                                 "$.messages[*]",
                                 containsInAnyOrder(
-                                        "'5' is the maximum count limit of comma separated items. You have passed '7' items.",
+                                        "'100' is the maximum count limit of comma separated items for 'taxonIds' param. You have passed '102' items.",
                                         "Protein sequence has invalid format. It should match the following regex '[A-Z]+'.",
-                                        "Invalid fields parameter value 'invalid'",
-                                        "'5' is the maximum count limit of comma separated items. You have passed '39' items.")));
+                                        "Invalid fields parameter value 'invalid'")));
     }
 
     @Test

@@ -153,7 +153,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083D01\tHomo sapiens; Torpedo californica\tP10001; P12301\t2017-02-12\t2017-04-23\t30")))
+                                                                    "UPI0000083D01\tHomo sapiens; Torpedo californica\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

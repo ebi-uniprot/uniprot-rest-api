@@ -11,15 +11,17 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Constraint(validatedBy = ValidCommaSeparatedItemsLength.ListLengthValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCommaSeparatedItemsLength {
     String message() default "invalid comma separated list items count";
+
+    int maxLength() default 10;
 
     Class<?>[] groups() default {};
 
@@ -28,11 +30,11 @@ public @interface ValidCommaSeparatedItemsLength {
     class ListLengthValidator
             implements ConstraintValidator<ValidCommaSeparatedItemsLength, String> {
 
-        @Value("${list.max.items.count}")
-        private String maxLength;
+        private int maxLength;
 
         @Override
         public void initialize(ValidCommaSeparatedItemsLength constraintAnnotation) {
+            this.maxLength = constraintAnnotation.maxLength();
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         }
 
@@ -43,7 +45,7 @@ public @interface ValidCommaSeparatedItemsLength {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
 
-                String[] values = value.split("\\s*,\\s*");
+                String[] values = value.split(FieldRegexConstants.COMMA_SEPARATED_REGEX);
                 int itemsCount = values.length;
                 if (values.length > getMaxLength()) {
                     buildInvalidListLengthMessage(itemsCount, contextImpl);
@@ -65,7 +67,7 @@ public @interface ValidCommaSeparatedItemsLength {
         }
 
         int getMaxLength() {
-            return Integer.parseInt(maxLength);
+            return maxLength;
         }
     }
 }

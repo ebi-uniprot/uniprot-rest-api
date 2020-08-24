@@ -324,7 +324,7 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083A11	Homo sapiens; Torpedo californica	P10011; P12311	2017-02-12	2017-04-23	30")))
+                                                                    "UPI0000083A11	Homo sapiens; Torpedo californica	P10011; P12311	2017-02-12	2017-04-23	21")))
                                     .resultMatcher(
                                             content()
                                                     .string(

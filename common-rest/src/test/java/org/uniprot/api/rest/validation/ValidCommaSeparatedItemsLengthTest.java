@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  * @author sahmad
  * @created 12/08/2020
  */
-public class ValidCommaSeparatedItemsLengthTest {
+class ValidCommaSeparatedItemsLengthTest {
 
     @Test
     void testEmptyValue() {

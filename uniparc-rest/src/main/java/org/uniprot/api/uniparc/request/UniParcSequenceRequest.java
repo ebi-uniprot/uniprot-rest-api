@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniParcSequenceRequest extends UniParcGetByIdRequest {
 
     @Parameter(description = "Protein Sequence")
-    @NotNull(message = "{uniparc.sequence.required}")
+    @NotNull(message = "{search.required}")
     @Pattern(regexp = SEQUENCE_REGEX, message = "{uniparc.sequence.invalid}")
     private String sequence;
 }
