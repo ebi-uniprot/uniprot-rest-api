@@ -20,10 +20,10 @@ import static org.mockito.Mockito.mock;
 
 /**
  * This class tests the full flow of functionality offered by {@link UniProtQueryProcessor},
- * including query String parsing by the lucene {@link StandardSyntaxParser}, different types
- * of queries and optimising fields.
+ * including query String parsing by the lucene {@link StandardSyntaxParser}, different types of
+ * queries and optimising fields.
  *
- * Created 24/08/2020
+ * <p>Created 24/08/2020
  *
  * @author Edd
  */
@@ -67,6 +67,43 @@ class UniProtQueryProcessorTest {
                         + " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void invalidQueryReturnsInSameQuery() throws QueryNodeException {
+        UniProtQueryNodeProcessorPipeline mockPipeline =
+                mock(UniProtQueryNodeProcessorPipeline.class);
+        doThrow(new QueryNodeParseException(new RuntimeException()))
+                .when(mockPipeline)
+                .process(any(QueryNode.class));
+
+        UniProtQueryProcessor processor =
+                UniProtQueryProcessor.builder().queryProcessorPipeline(mockPipeline).build();
+        String query = "anything";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void queryProcessingErrorReturnsInSameQuery() throws QueryNodeException {
+        UniProtQueryNodeProcessorPipeline mockPipeline =
+                mock(UniProtQueryNodeProcessorPipeline.class);
+        doThrow(new QueryNodeException(new RuntimeException()))
+                .when(mockPipeline)
+                .process(any(QueryNode.class));
+
+        UniProtQueryProcessor processor =
+                UniProtQueryProcessor.builder().queryProcessorPipeline(mockPipeline).build();
+        String query = "anything";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    protected SearchFieldItem searchFieldWithValidRegex(String fieldName, String regex) {
+        SearchFieldItem fieldItem = new SearchFieldItem();
+        fieldItem.setFieldName(fieldName);
+        fieldItem.setValidRegex(regex);
+        return fieldItem;
     }
 
     @Nested
@@ -133,42 +170,5 @@ class UniProtQueryProcessorTest {
             String processedQuery = processor.processQuery(query);
             assertThat(processedQuery, is(query));
         }
-    }
-
-    @Test
-    void invalidQueryReturnsInSameQuery() throws QueryNodeException {
-        UniProtQueryNodeProcessorPipeline mockPipeline =
-                mock(UniProtQueryNodeProcessorPipeline.class);
-        doThrow(new QueryNodeParseException(new RuntimeException()))
-                .when(mockPipeline)
-                .process(any(QueryNode.class));
-
-        UniProtQueryProcessor processor =
-                UniProtQueryProcessor.builder().queryProcessorPipeline(mockPipeline).build();
-        String query = "anything";
-        String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is(query));
-    }
-
-    @Test
-    void queryProcessingErrorReturnsInSameQuery() throws QueryNodeException {
-        UniProtQueryNodeProcessorPipeline mockPipeline =
-                mock(UniProtQueryNodeProcessorPipeline.class);
-        doThrow(new QueryNodeException(new RuntimeException()))
-                .when(mockPipeline)
-                .process(any(QueryNode.class));
-
-        UniProtQueryProcessor processor =
-                UniProtQueryProcessor.builder().queryProcessorPipeline(mockPipeline).build();
-        String query = "anything";
-        String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is(query));
-    }
-
-    protected SearchFieldItem searchFieldWithValidRegex(String fieldName, String regex) {
-        SearchFieldItem fieldItem = new SearchFieldItem();
-        fieldItem.setFieldName(fieldName);
-        fieldItem.setValidRegex(regex);
-        return fieldItem;
     }
 }

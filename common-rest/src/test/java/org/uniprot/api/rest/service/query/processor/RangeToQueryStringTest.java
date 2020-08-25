@@ -45,7 +45,9 @@ class RangeToQueryStringTest {
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
         System.out.println(processedQuery);
-        assertThat(processedQuery, is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "]"));
+        assertThat(
+                processedQuery,
+                is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "]"));
     }
 
     @Test
@@ -67,7 +69,9 @@ class RangeToQueryStringTest {
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
         System.out.println(processedQuery);
-        assertThat(processedQuery, is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "}"));
+        assertThat(
+                processedQuery,
+                is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "}"));
     }
 
     @Test
@@ -89,7 +93,9 @@ class RangeToQueryStringTest {
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
         System.out.println(processedQuery);
-        assertThat(processedQuery, is(field + ":{" + escape(textLower) + " TO " + escape(textUpper) + "}"));
+        assertThat(
+                processedQuery,
+                is(field + ":{" + escape(textLower) + " TO " + escape(textUpper) + "}"));
     }
 
     @Test
@@ -111,7 +117,9 @@ class RangeToQueryStringTest {
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
         System.out.println(processedQuery);
-        assertThat(processedQuery, is(field + ":{" + escape(textLower) + " TO " + escape(textUpper) + "]"));
+        assertThat(
+                processedQuery,
+                is(field + ":{" + escape(textLower) + " TO " + escape(textUpper) + "]"));
     }
 
     @Test
@@ -155,7 +163,9 @@ class RangeToQueryStringTest {
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
         System.out.println(processedQuery);
-        assertThat(processedQuery, is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "]"));
+        assertThat(
+                processedQuery,
+                is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "]"));
     }
 
     private String escape(String toEscape) {
