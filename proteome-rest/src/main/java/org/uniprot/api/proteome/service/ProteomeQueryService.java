@@ -1,8 +1,5 @@
 package org.uniprot.api.proteome.service;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
@@ -10,12 +7,18 @@ import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author jluo
@@ -26,7 +29,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     private static final String PROTEOME_ID_FIELD = "upid";
     private final SearchFieldConfig fieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public ProteomeQueryService(
             ProteomeQueryRepository repository,
@@ -40,8 +43,12 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
                 proteomeQueryBoosts,
                 facetConfig);
         fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor =
+                UniProtQueryProcessor.builder()
+                        .queryProcessorPipeline(
+                                new UniProtQueryNodeProcessorPipeline(
+                                        getDefaultSearchOptimisedFieldItems()))
+                        .build();
     }
 
     @Override
@@ -50,8 +57,8 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {

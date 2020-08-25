@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -20,7 +23,7 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseEntry> {
     private static final String DISEASE_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -36,8 +39,12 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor =
+                UniProtQueryProcessor.builder()
+                        .queryProcessorPipeline(
+                                new UniProtQueryNodeProcessorPipeline(
+                                        getDefaultSearchOptimisedFieldItems()))
+                        .build();
     }
 
     @Override
@@ -46,8 +53,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {

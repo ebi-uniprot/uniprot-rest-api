@@ -24,6 +24,9 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
@@ -56,9 +59,9 @@ public class UniProtEntryService
     private final StoreStreamer<UniProtKBEntry> storeStreamer;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
     private final FacetTupleStreamTemplate facetTupleStreamTemplate;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
+    private final QueryProcessor queryProcessor;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -85,9 +88,12 @@ public class UniProtEntryService
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
-        this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
+        this.queryProcessor =
+                UniProtQueryProcessor.builder()
+                        .queryProcessorPipeline(
+                                new UniProtQueryNodeProcessorPipeline(
+                                        getDefaultSearchOptimisedFieldItems()))
+                        .build();        this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
     }
 
@@ -179,8 +185,8 @@ public class UniProtEntryService
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     @Override

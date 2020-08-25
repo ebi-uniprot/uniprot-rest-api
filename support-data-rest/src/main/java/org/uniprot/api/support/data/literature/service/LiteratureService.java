@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -26,7 +29,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
     private static final String LITERATURE_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public LiteratureService(
             LiteratureRepository repository,
@@ -37,9 +40,12 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
         super(repository, entryConverter, literatureSortClause, literatureQueryBoosts, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
-    }
+        this.queryProcessor =
+                UniProtQueryProcessor.builder()
+                        .queryProcessorPipeline(
+                                new UniProtQueryNodeProcessorPipeline(
+                                        getDefaultSearchOptimisedFieldItems()))
+                        .build();    }
 
     @Override
     protected SearchFieldItem getIdField() {
@@ -47,8 +53,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {

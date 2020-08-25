@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.keyword.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -21,7 +24,7 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 public class KeywordService extends BasicSearchService<KeywordDocument, KeywordEntry> {
     private static final String KEYWORD_ID_FIELD = "keyword_id";
     private final SearchFieldConfig fieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public KeywordService(
             KeywordRepository repository,
@@ -30,8 +33,12 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             QueryBoosts keywordQueryBoosts) {
         super(repository, keywordEntryConverter, keywordSortClause, keywordQueryBoosts, null);
         this.fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor =
+                UniProtQueryProcessor.builder()
+                        .queryProcessorPipeline(
+                                new UniProtQueryNodeProcessorPipeline(
+                                        getDefaultSearchOptimisedFieldItems()))
+                        .build();
     }
 
     @Override
@@ -40,8 +47,8 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
