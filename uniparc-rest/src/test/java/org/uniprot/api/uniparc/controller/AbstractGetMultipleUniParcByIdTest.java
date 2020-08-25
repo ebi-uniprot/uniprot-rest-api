@@ -1,12 +1,9 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -200,56 +197,6 @@ abstract class AbstractGetMultipleUniParcByIdTest {
             log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
-    }
-
-    @Test
-    void searchWithFacetsSuccess() throws Exception {
-        String searchVal = getSearchValue();
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getGetByIdEndpoint(), searchVal)
-                                .param("facets", "database,organism_name")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets", notNullValue()))
-                .andExpect(jsonPath("$.facets", iterableWithSize(2)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
-                .andExpect(jsonPath("$.facets.*.name", contains("database", "organism_name")))
-                .andExpect(jsonPath("$.facets.*.allowMultipleSelection", contains(true, true)))
-                .andExpect(jsonPath("$.facets[0].values", iterableWithSize(4)))
-                .andExpect(jsonPath("$.facets[0].values.*.value", notNullValue()))
-                .andExpect(jsonPath("$.facets[0].values.*.count", notNullValue()))
-                .andExpect(jsonPath("$.facets[1].values", iterableWithSize(2)))
-                .andExpect(jsonPath("$.facets[1].values.*.value", notNullValue()))
-                .andExpect(jsonPath("$.facets[1].values.*.count", notNullValue()));
-    }
-
-    @Test
-    void searchWithIncorrectFacets() throws Exception {
-        String searchVal = getSearchValue();
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getGetByIdEndpoint(), searchVal)
-                                .param("facets", "invalid, invalid2")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                containsInAnyOrder(
-                                        startsWith(
-                                                "Invalid facet name 'invalid'. Expected value can be "),
-                                        startsWith(
-                                                "Invalid facet name 'invalid2'. Expected value can be "))));
     }
 
     private void saveEntry(int i) {

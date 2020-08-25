@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -23,15 +21,16 @@ public abstract class UniParcGetByIdPageSearchRequest extends UniParcGetByIdRequ
     @Positive(message = "{search.positive}")
     private Integer size;
 
-    @Parameter(description = "Name of the facet search")
-    @ValidFacets(facetConfig = UniParcFacetConfig.class)
-    protected String facets;
-
     @Parameter(hidden = true)
     private String cursor;
 
     @Override
     public String getSort() {
+        return null;
+    }
+
+    @Override
+    public String getFacets() {
         return null;
     }
 }
