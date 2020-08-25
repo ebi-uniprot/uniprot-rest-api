@@ -46,8 +46,8 @@ public class RangeToQueryString {
         return sb.toString();
     }
 
-    static String[] getFieldParts(CharSequence charSequenceLower) {
-        String charSequenceLowerStr = charSequenceLower.toString();
+    static String[] getFieldParts(CharSequence fieldAsString) {
+        String charSequenceLowerStr = fieldAsString.toString();
         String[] parts = new String[2];
         String field = charSequenceLowerStr.substring(0, charSequenceLowerStr.indexOf(':'));
         parts[0] = field;
