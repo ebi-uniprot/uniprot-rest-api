@@ -15,7 +15,6 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
@@ -67,7 +66,8 @@ public class UniRefLightSearchService
                         .queryProcessorPipeline(
                                 new UniProtQueryNodeProcessorPipeline(
                                         getDefaultSearchOptimisedFieldItems()))
-                        .build();    }
+                        .build();
+    }
 
     @Override
     public UniRefEntryLight findByUniqueId(String uniqueId, String fields) {

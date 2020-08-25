@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
@@ -42,7 +41,8 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
                         .queryProcessorPipeline(
                                 new UniProtQueryNodeProcessorPipeline(
                                         getDefaultSearchOptimisedFieldItems()))
-                        .build();    }
+                        .build();
+    }
 
     public TaxonomyEntry findById(final long taxId) {
         return findByUniqueId(String.valueOf(taxId));

@@ -1,10 +1,10 @@
 package org.uniprot.api.rest.service.query.processor;
 
+import java.util.List;
+
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorPipeline;
 import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.List;
 
 /**
  * Created 22/08/2020

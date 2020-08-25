@@ -1,5 +1,10 @@
 package org.uniprot.api.rest.service.query.processor;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.text.DecimalFormat;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
@@ -8,11 +13,6 @@ import org.apache.lucene.queryparser.flexible.standard.nodes.PointRangeQueryNode
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.text.DecimalFormat;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * This specific test class is required, because {@link UniProtPointRangeQueryNodeProcessorTest}

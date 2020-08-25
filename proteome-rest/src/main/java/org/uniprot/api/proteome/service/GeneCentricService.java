@@ -1,5 +1,8 @@
 package org.uniprot.api.proteome.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -16,9 +19,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author jluo

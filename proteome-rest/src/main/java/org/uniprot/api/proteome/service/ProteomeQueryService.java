@@ -1,12 +1,14 @@
 package org.uniprot.api.proteome.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
@@ -16,9 +18,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author jluo

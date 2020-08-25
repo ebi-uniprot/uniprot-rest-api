@@ -2,6 +2,7 @@ package org.uniprot.api.rest.service.query;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;

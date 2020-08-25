@@ -22,7 +22,6 @@ import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
@@ -93,7 +92,8 @@ public class UniProtEntryService
                         .queryProcessorPipeline(
                                 new UniProtQueryNodeProcessorPipeline(
                                         getDefaultSearchOptimisedFieldItems()))
-                        .build();        this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
+                        .build();
+        this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
     }
 
