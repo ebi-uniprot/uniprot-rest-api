@@ -21,19 +21,4 @@ class UniProtOpenRangeQueryNodeProcessor extends OpenRangeQueryNodeProcessor {
             return queryNode;
         }
     }
-
-    //    private static class UniProtTermRangeQueryNode extends TermRangeQueryNode {
-    //        public UniProtTermRangeQueryNode(TermRangeQueryNode queryNode) {
-    //            super(
-    //                    queryNode.getLowerBound(),
-    //                    queryNode.getUpperBound(),
-    //                    queryNode.isLowerInclusive(),
-    //                    queryNode.isUpperInclusive());
-    //        }
-    //
-    //        @Override
-    //        public CharSequence toQueryString(EscapeQuerySyntax escapeSyntaxParser) {
-    //            return RangeToQueryString.toQueryString(this, escapeSyntaxParser);
-    //        }
-    //    }
 }
