@@ -42,13 +42,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefFacetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     @Override
     protected SearchFieldItem getIdField() {

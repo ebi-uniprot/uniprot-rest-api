@@ -1,16 +1,18 @@
 package org.uniprot.api.rest.service.query.processor;
 
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.FuzzyQueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.QuotedFieldQueryNode;
+import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
-import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 /**
  * Created 23/08/2020
@@ -31,8 +33,22 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
 
     @Override
     protected QueryNode postProcessNode(QueryNode node) {
+        // do not delegate to UniProtFieldQueryNode unless we want
         if (node instanceof FieldQueryNode) {
-            return new UniProtFieldQueryNode((FieldQueryNode) node, optimisableFields);
+            // handle all subtypes of FieldQueryNode
+            if (node instanceof QuotedFieldQueryNode) {
+                CharSequence field = ((QuotedFieldQueryNode) node).getField();
+                if (field.equals(IMPOSSIBLE_FIELD)) {
+                    ((QuotedFieldQueryNode) node).setField(null);
+                }
+            } else if (node instanceof FuzzyQueryNode) {
+                CharSequence field = ((FuzzyQueryNode) node).getField();
+                if (field.equals(IMPOSSIBLE_FIELD)) {
+                    ((FuzzyQueryNode) node).setField(null);
+                }
+            } else {
+                return new UniProtFieldQueryNode((FieldQueryNode) node, optimisableFields);
+            }
         }
         return node;
     }

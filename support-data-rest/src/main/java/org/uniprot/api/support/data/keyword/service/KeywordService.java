@@ -32,13 +32,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             QueryBoosts keywordQueryBoosts) {
         super(repository, keywordEntryConverter, keywordSortClause, keywordQueryBoosts, null);
         this.fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     @Override
     protected SearchFieldItem getIdField() {

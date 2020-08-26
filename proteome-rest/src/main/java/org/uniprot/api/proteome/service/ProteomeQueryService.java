@@ -42,13 +42,7 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
                 proteomeQueryBoosts,
                 facetConfig);
         fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     @Override
     protected SearchFieldItem getIdField() {

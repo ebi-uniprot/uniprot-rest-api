@@ -43,13 +43,7 @@ public class SubcellularLocationService
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
-        ;
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());        ;
     }
 
     @Override

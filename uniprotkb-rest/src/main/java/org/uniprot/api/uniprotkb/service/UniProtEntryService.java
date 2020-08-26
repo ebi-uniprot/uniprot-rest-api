@@ -1,8 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.*;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.context.annotation.Import;
@@ -25,7 +22,6 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
@@ -45,6 +41,9 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)
@@ -87,12 +86,7 @@ public class UniProtEntryService
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
     }

@@ -1,13 +1,5 @@
 package org.uniprot.api.rest.service.query;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-
-import java.util.Collections;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -17,6 +9,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 /**
  * This class tests the full flow of functionality offered by {@link UniProtQueryProcessor},
@@ -34,13 +33,8 @@ class UniProtQueryProcessorTest {
     @BeforeEach
     void setUp() {
         processor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        Collections.singletonList(
-                                                searchFieldWithValidRegex(
-                                                        FIELD_NAME, "^P[0-9]+$"))))
-                        .build();
+                new UniProtQueryProcessor(
+                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")));
     }
 
     @Test
@@ -77,8 +71,7 @@ class UniProtQueryProcessorTest {
                 .when(mockPipeline)
                 .process(any(QueryNode.class));
 
-        UniProtQueryProcessor processor =
-                UniProtQueryProcessor.builder().queryProcessorPipeline(mockPipeline).build();
+        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline);
         String query = "anything";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
@@ -92,14 +85,83 @@ class UniProtQueryProcessorTest {
                 .when(mockPipeline)
                 .process(any(QueryNode.class));
 
-        UniProtQueryProcessor processor =
-                UniProtQueryProcessor.builder().queryProcessorPipeline(mockPipeline).build();
+        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline);
         String query = "anything";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
     }
 
-    protected SearchFieldItem searchFieldWithValidRegex(String fieldName, String regex) {
+    @Test
+    void handlesFuzzySearch() {
+        String query = "roam~3.0";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesFuzzyFieldSearch() {
+        String query = "field:roam~3.0";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesProximitySearch() {
+        String query = "\"hello world\"~3";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesFieldProximitySearch() {
+        String query = "field:\"hello world\"~3";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesWildcardExpression() {
+        String query = "*";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesFieldWildcardExpression() {
+        String query = "a:*";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesLeadingWildcardExpression() {
+        String query = "a:*thing";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesTrailingWildcardExpression() {
+        String query = "a:thing*";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesDefaultPhraseQuery() {
+        String query = "\"this is an accession that is not optimised P12345\"";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handlesFieldPhraseQuery() {
+        String query = "field:\"this is an accession that is not optimised P12345\"";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(query));
+    }
+
+    private SearchFieldItem searchFieldWithValidRegex(String fieldName, String regex) {
         SearchFieldItem fieldItem = new SearchFieldItem();
         fieldItem.setFieldName(fieldName);
         fieldItem.setValidRegex(regex);

@@ -36,13 +36,7 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
         super(repository, converter, taxonomySortClause, taxonomyQueryBoosts, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     public TaxonomyEntry findById(final long taxId) {
         return findByUniqueId(String.valueOf(taxId));

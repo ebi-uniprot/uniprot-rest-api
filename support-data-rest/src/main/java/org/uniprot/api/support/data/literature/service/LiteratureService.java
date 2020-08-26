@@ -39,13 +39,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
         super(repository, entryConverter, literatureSortClause, literatureQueryBoosts, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
-        this.queryProcessor =
-                UniProtQueryProcessor.builder()
-                        .queryProcessorPipeline(
-                                new UniProtQueryNodeProcessorPipeline(
-                                        getDefaultSearchOptimisedFieldItems()))
-                        .build();
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     @Override
     protected SearchFieldItem getIdField() {
