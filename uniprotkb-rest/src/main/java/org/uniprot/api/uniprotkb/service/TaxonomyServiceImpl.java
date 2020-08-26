@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -49,7 +49,7 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
+    protected QueryProcessor getQueryProcessor() {
         return null;
     }
 
