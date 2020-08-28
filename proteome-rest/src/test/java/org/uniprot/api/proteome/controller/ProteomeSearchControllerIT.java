@@ -211,18 +211,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         xrefs.add(xref1);
         List<Component> components = new ArrayList<>();
         Component component1 =
-                new ComponentBuilder()
-                        .name("someName1")
-                        .description("some description")
-                        .type(org.uniprot.core.proteome.ComponentType.UNPLACED)
-                        .build();
+                new ComponentBuilder().name("someName1").description("some description").build();
 
         Component component2 =
-                new ComponentBuilder()
-                        .name("someName2")
-                        .description("some description 2")
-                        .type(org.uniprot.core.proteome.ComponentType.SEGMENTED_GENOME)
-                        .build();
+                new ComponentBuilder().name("someName2").description("some description 2").build();
 
         components.add(component1);
         components.add(component2);
