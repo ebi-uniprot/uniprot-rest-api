@@ -15,8 +15,10 @@ import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.*;
@@ -44,9 +46,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     public static final String MD5_STR = "md5";
     private static final String COMMA_STR = ",";
     private final SearchFieldConfig searchFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
+    private final QueryProcessor queryProcessor;
 
     @Autowired
     public UniParcQueryService(
@@ -66,8 +68,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 uniParcQueryBoosts);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
     }
@@ -127,8 +128,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     public UniParcEntry getUniParcBestGuess(UniParcBestGuessRequest request) {

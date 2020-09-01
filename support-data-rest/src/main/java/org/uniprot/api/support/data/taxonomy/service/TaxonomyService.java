@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -22,7 +24,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     private static final String TAXONOMY_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public TaxonomyService(
             TaxonomyRepository repository,
@@ -34,9 +36,7 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
         super(repository, converter, taxonomySortClause, taxonomyQueryBoosts, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     public TaxonomyEntry findById(final long taxId) {
         return findByUniqueId(String.valueOf(taxId));
@@ -48,8 +48,8 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {

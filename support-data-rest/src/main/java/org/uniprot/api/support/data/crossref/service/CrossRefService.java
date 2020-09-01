@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.crossref.config.CrossRefFacetConfig;
 import org.uniprot.api.support.data.crossref.config.CrossRefQueryBoostsConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -24,7 +26,7 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
     private static final String CROSS_REF_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public CrossRefService(
             CrossRefRepository crossRefRepository,
@@ -40,9 +42,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefFacetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
-    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
 
     @Override
     protected SearchFieldItem getIdField() {
@@ -50,8 +50,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {

@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.DefaultSearchQueryOptimiser;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -26,7 +28,7 @@ public class SubcellularLocationService
         extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
     private static final String SUBCELL_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
-    private final DefaultSearchQueryOptimiser defaultSearchQueryOptimiser;
+    private final QueryProcessor queryProcessor;
 
     public SubcellularLocationService(
             SubcellularLocationRepository repository,
@@ -41,8 +43,7 @@ public class SubcellularLocationService
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
-        this.defaultSearchQueryOptimiser =
-                new DefaultSearchQueryOptimiser(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());        ;
     }
 
     @Override
@@ -51,8 +52,8 @@ public class SubcellularLocationService
     }
 
     @Override
-    protected DefaultSearchQueryOptimiser getDefaultSearchQueryOptimiser() {
-        return defaultSearchQueryOptimiser;
+    protected QueryProcessor getQueryProcessor() {
+        return queryProcessor;
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
