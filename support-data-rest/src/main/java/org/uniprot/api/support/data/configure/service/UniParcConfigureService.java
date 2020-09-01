@@ -49,7 +49,7 @@ public class UniParcConfigureService {
 
     private List<AdvancedSearchTerm.Value> getUniParcAllDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
-                .map(UniParcConfigUtil::uniparcDatabaseToSearchField)
+                .map(UniParcConfigUtil::getDBNameValue)
                 .distinct()
                 .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
                 .collect(Collectors.toList());
@@ -58,7 +58,7 @@ public class UniParcConfigureService {
     private List<AdvancedSearchTerm.Value> getUniParcAliveDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
                 .filter(db -> db.isAlive())
-                .map(UniParcConfigUtil::uniparcDatabaseToSearchField)
+                .map(UniParcConfigUtil::getDBNameValue)
                 .distinct()
                 .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
                 .collect(Collectors.toList());
