@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -96,7 +97,8 @@ class UniParcControllerGetBySequenceIT {
 
         storeManager.addDocConverter(
                 DataStoreManager.StoreType.UNIPARC,
-                new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+                new UniParcDocumentConverter(
+                        TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
 
         saveEntry();
     }
@@ -142,7 +144,7 @@ class UniParcControllerGetBySequenceIT {
                                 "$.messages[*]",
                                 containsInAnyOrder(
                                         "'sequence' is a required parameter",
-                                        "'invalid' is invalid UniParc Cross Ref DB Name")));
+                                        "'invalid' is an invalid UniParc cross reference database name")));
     }
 
     @Test
@@ -297,7 +299,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         jsonPath(
                                 "$.messages[0]",
-                                containsString("is invalid UniParc Cross Ref DB Name")));
+                                containsString(
+                                        "is an invalid UniParc cross reference database name")));
     }
 
     @Test

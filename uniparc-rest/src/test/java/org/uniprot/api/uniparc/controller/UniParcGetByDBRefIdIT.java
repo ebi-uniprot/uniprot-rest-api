@@ -223,7 +223,8 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(
                         jsonPath(
                                 "$.messages[0]",
-                                containsString("is invalid UniParc Cross Ref DB Name")));
+                                containsString(
+                                        "is an invalid UniParc cross reference database name")));
     }
 
     @Test

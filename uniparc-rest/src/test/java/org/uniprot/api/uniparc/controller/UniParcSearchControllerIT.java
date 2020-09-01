@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -139,7 +140,8 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
         getStoreManager()
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIPARC,
-                        new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+                        new UniParcDocumentConverter(
+                                TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
     }
 
     @Override

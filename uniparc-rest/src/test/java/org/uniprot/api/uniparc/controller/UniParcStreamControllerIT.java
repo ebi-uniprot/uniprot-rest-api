@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -82,7 +83,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
     private final UniParcDocumentConverter documentConverter =
-            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
     @Autowired UniProtStoreClient<UniParcEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;

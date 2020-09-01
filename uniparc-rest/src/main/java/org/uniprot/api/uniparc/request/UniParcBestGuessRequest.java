@@ -22,7 +22,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniParcBestGuessRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniparc-search-fields.json")
-    @Parameter(description = "Criteria to search the uniparc. It can take any valid solr query.")
+    @Parameter(
+            description =
+                    "The query is used to search UniParc. This accepts any valid standard Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -31,7 +33,7 @@ public class UniParcBestGuessRequest {
     protected String query;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = "Comma separated list of fields to be returned in the response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String fields;
 }

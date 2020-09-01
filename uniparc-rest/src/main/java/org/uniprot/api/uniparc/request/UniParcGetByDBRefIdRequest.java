@@ -18,7 +18,7 @@ public class UniParcGetByDBRefIdRequest extends UniParcGetByIdPageSearchRequest 
 
     @Parameter(
             description =
-                    "All UniParc cross reference accessions, eg. AAC02967 (EMBL) or XP_006524055 (RefSeq)")
+                    "UniParc cross reference id, eg. AAC02967 (EMBL) or XP_006524055 (RefSeq)")
     @NotNull(message = "{search.required}")
     private String dbId;
 

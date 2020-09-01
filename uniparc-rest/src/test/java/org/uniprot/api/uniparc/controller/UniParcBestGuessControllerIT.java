@@ -20,6 +20,7 @@ import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.getXre
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     private static final String BEST_GUESS_PATH = "/uniparc/bestguess";
 
     private final UniParcDocumentConverter documentConverter =
-            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
     @Autowired UniProtStoreClient<UniParcEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;

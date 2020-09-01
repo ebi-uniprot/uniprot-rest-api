@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -86,7 +88,8 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         getStoreManager()
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIPARC,
-                        new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+                        new UniParcDocumentConverter(
+                                TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
     }
 
     @AfterAll
@@ -143,7 +146,8 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(
                         jsonPath(
                                 "$.messages[0]",
-                                containsString("is invalid UniParc Cross Ref DB Name")));
+                                containsString(
+                                        "is an invalid UniParc cross reference database name")));
     }
 
     @Test

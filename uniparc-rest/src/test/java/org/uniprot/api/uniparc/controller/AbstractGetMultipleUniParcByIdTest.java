@@ -16,6 +16,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -90,7 +91,8 @@ abstract class AbstractGetMultipleUniParcByIdTest {
 
         storeManager.addDocConverter(
                 DataStoreManager.StoreType.UNIPARC,
-                new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+                new UniParcDocumentConverter(
+                        TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
 
         // create 5 entries
         IntStream.rangeClosed(1, 5).forEach(this::saveEntry);
