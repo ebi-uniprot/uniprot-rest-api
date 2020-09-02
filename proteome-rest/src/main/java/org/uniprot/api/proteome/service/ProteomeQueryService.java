@@ -11,7 +11,6 @@ import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -42,7 +41,8 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
                 proteomeQueryBoosts,
                 facetConfig);
         fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+    }
 
     @Override
     protected SearchFieldItem getIdField() {

@@ -9,7 +9,6 @@ import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.crossref.config.CrossRefFacetConfig;
 import org.uniprot.api.support.data.crossref.config.CrossRefQueryBoostsConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -42,7 +41,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefFacetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+    }
 
     @Override
     protected SearchFieldItem getIdField() {

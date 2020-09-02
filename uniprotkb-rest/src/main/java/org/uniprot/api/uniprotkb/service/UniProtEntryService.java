@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.service;
 
+import java.util.*;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.context.annotation.Import;
@@ -41,9 +44,6 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 @Service
 @Import(UniProtQueryBoostsConfig.class)

@@ -1,5 +1,11 @@
 package org.uniprot.api.rest.service.query.processor;
 
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FuzzyQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -7,12 +13,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QuotedFieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 /**
  * Created 23/08/2020

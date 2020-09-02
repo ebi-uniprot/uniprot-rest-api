@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class RDFService<T> implements StoreService<T> {
         LOGGER.debug("RDF call for accessions : {}", allAccessions);
         T rdfXML = getEntriesByAccessions(allAccessions);
         T rdfResponse = convertRDFForStreaming(rdfXML);
-        return Arrays.asList(rdfResponse);
+        return Objects.nonNull(rdfResponse) ? Arrays.asList(rdfResponse) : new ArrayList<>();
     }
 
     @Override

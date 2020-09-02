@@ -9,7 +9,6 @@ import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -36,7 +35,8 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
         super(repository, converter, taxonomySortClause, taxonomyQueryBoosts, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+    }
 
     public TaxonomyEntry findById(final long taxId) {
         return findByUniqueId(String.valueOf(taxId));

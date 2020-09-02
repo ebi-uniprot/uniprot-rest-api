@@ -1,12 +1,12 @@
 package org.uniprot.api.rest.service.query.processor;
 
+import java.util.List;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorPipeline;
 import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.List;
 
 /**
  * This class contains query node processors, that act to manipulate the query. If we need to do any
