@@ -11,6 +11,7 @@ import static org.uniprot.core.util.Utils.nullOrEmpty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -135,8 +136,9 @@ public class ResponseExceptionHandler {
         List<String> messages = new ArrayList<>();
 
         for (FieldError error : ex.getFieldErrors()) {
-            if (error.getDefaultMessage() != null) {
-                messages.add(error.getDefaultMessage().replaceAll("\\{field\\}", error.getField()));
+            String errorMessage = error.getDefaultMessage();
+            if (Objects.nonNull(errorMessage)) {
+                messages.add(errorMessage.replaceAll("\\{field\\}", error.getField()));
             }
         }
 
