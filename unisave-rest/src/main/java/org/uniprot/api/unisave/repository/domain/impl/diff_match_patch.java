@@ -1264,7 +1264,7 @@ public class diff_match_patch {
                     thisDiff = pointer.next(); // Walk past nextDiff.
                     nextDiff = pointer.hasNext() ? pointer.next() : null;
                     changes = true;
-                } else if (thisDiff.text.startsWith(nextDiff.text)) {
+                } else if (Objects.nonNull(thisDiff) && thisDiff.text.startsWith(nextDiff.text)) {
                     // Shift the edit over the next equality.
                     prevDiff.text += nextDiff.text;
                     thisDiff.text = thisDiff.text.substring(nextDiff.text.length()) + nextDiff.text;

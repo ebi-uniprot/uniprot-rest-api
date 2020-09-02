@@ -54,7 +54,8 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     @Override
     public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
         boolean result = false;
-        if (this.canWrite(mediaType)
+        if (Objects.nonNull(type)
+                && this.canWrite(mediaType)
                 && MessageConverterContext.class.isAssignableFrom(clazz)
                 && Utils.notNull(type)) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
