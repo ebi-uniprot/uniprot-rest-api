@@ -7,6 +7,9 @@ import lombok.Data;
 
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.uniref.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -24,6 +27,11 @@ public class UniRefIdRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     @Parameter(description = "Comma separated list of fields to be returned in response")
     private String fields;
+
+    @Parameter(description = "Facet filter query for UniRef Cluster Members")
+    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
+    @ValidSolrQueryFacetFields(facetConfig = UniRefEntryFacetConfig.class)
+    private String filter;
 
     @Parameter(
             description =

@@ -45,6 +45,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -284,9 +285,11 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         UniRefEntry entry = UniRefControllerITUtils.createEntry(i, type);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
+        UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
+        UniRefEntryLight entryLight = unirefLightConverter.fromXml(xmlEntry);
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
-        storeClient.saveEntry(UniRefControllerITUtils.createEntryLight(i, type));
+        storeClient.saveEntry(entryLight);
     }
 
     private Stream<Arguments> getAllSortFields() {

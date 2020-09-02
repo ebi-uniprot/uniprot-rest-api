@@ -9,8 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,13 @@ import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
 import org.uniprot.core.uniref.*;
+import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
+import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
+import org.uniprot.core.xml.jaxb.uniref.Entry;
+import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -111,9 +120,11 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     private void saveEntry(UniRefEntry unirefEntry) {
-        getStoreManager()
-                .saveToStore(
-                        DataStoreManager.StoreType.UNIREF_LIGHT, createEntryLight(unirefEntry));
+        UniRefEntryConverter converter = new UniRefEntryConverter();
+        UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
+        Entry entry = converter.toXml(unirefEntry);
+        UniRefEntryLight entryLight = unirefLightConverter.fromXml(entry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF_LIGHT, entryLight);
         List<RepresentativeMember> members = createEntryMembers(unirefEntry);
         members.forEach(
                 member -> {
@@ -124,7 +135,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void getIdCompleteTrueReturnAllMembersWithoutPagination() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 28, UniRefType.UniRef50);
+        UniRefEntry entry = createEntry(1, 28, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -184,7 +195,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void getIdByDefaultReturnTwentyFiveMembersWithPagination() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 28, UniRefType.UniRef50);
+        UniRefEntry entry = createEntry(1, 28, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -211,7 +222,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void getFirstPageMembers() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 15, UniRefType.UniRef50);
+        UniRefEntry entry = createEntry(1, 15, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -223,7 +234,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "15"))
@@ -252,7 +263,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Test
     void getLastPageMembers() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 15, UniRefType.UniRef50);
+        UniRefEntry entry = createEntry(1, 15, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -283,6 +294,268 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         "P32112_HUMAN",
                                         "P32113_HUMAN",
                                         "P32114_HUMAN")));
+    }
+
+    @Test
+    void filterMemberTypes() throws Exception {
+        // given
+        UniRefEntry builder = getUniRefEntryForFilter();
+        saveEntry(builder);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("size", "10")
+                                        .param("filter", "member_id_type:uniparc")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "2"))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.id", is("UniRef50_P03901")))
+                .andExpect(jsonPath("$.memberCount", is(6)))
+                .andExpect(jsonPath("$.members.size()", is(2)))
+                .andExpect(
+                        jsonPath("$.members[*].memberId", contains("UP123456788", "UP123456789")))
+                .andExpect(jsonPath("$.members[*].memberIdType", contains("UniParc", "UniParc")));
+    }
+
+    @Test
+    void filterUniProtMemberTypes() throws Exception {
+        // given
+        UniRefEntry builder = getUniRefEntryForFilter();
+        saveEntry(builder);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("size", "10")
+                                        .param(
+                                                "filter",
+                                                "uniprot_member_id_type:unreviewed_uniprotkbtrembl")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "1"))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.id", is("UniRef50_P03901")))
+                .andExpect(jsonPath("$.memberCount", is(6)))
+                .andExpect(jsonPath("$.members.size()", is(1)))
+                .andExpect(jsonPath("$.members[*].memberId", contains("P32106_HUMAN")))
+                .andExpect(
+                        jsonPath(
+                                "$.members[*].memberIdType",
+                                contains("Unreviewed (UniProtKB/TrEMBL)")));
+    }
+
+    @Test
+    void filterInvalidQueryField() throws Exception {
+        // given
+        UniRefEntry builder = getUniRefEntryForFilter();
+        saveEntry(builder);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("size", "10")
+                                        .param("filter", "invalid:invalid")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid facet name 'invalid'. Expected value can be [member_id_type, uniprot_member_id_type].")));
+    }
+
+    @Test
+    void filterInvalidQuerySyntax() throws Exception {
+        // given
+        UniRefEntry builder = getUniRefEntryForFilter();
+        saveEntry(builder);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath() + ID)
+                                        .param("size", "10")
+                                        .param("filter", "invalid:}invalid{")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*", contains("query parameter has an invalid syntax")));
+    }
+
+    @Test
+    void getFacetsSuccess() throws Exception {
+        // given
+        UniRefEntryLight entryLight =
+                new UniRefEntryLightBuilder()
+                        .id(ID)
+                        .membersAdd("UP1234566787," + UniRefMemberIdType.UNIPARC.getDisplayOrder())
+                        .membersAdd("UP1234566788," + UniRefMemberIdType.UNIPARC.getDisplayOrder())
+                        .membersAdd("UP1234566789," + UniRefMemberIdType.UNIPARC.getDisplayOrder())
+                        .membersAdd(
+                                "P12344,"
+                                        + UniRefMemberIdType.UNIPROTKB_SWISSPROT.getDisplayOrder())
+                        .membersAdd(
+                                "P12345,"
+                                        + UniRefMemberIdType.UNIPROTKB_SWISSPROT.getDisplayOrder())
+                        .membersAdd(
+                                "P12346," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                        .membersAdd(
+                                "P12347," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                        .membersAdd(
+                                "P12348," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                        .membersAdd(
+                                "P12349," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                        .build();
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF_LIGHT, entryLight);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get("/uniref/" + ID + "/facets")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.size()", is(2)))
+                .andExpect(jsonPath("$.[0].label", is("Member Types")))
+                .andExpect(jsonPath("$.[0].name", is("member_id_type")))
+                .andExpect(jsonPath("$.[0].values.size()", is(2)))
+                .andExpect(jsonPath("$.[0].values[*].value", hasItems("uniprotkb_id", "uniparc")))
+                .andExpect(jsonPath("$.[0].values[*].count", hasItems(6, 3)))
+                .andExpect(jsonPath("$.[1].label", is("UniProtKB Member Types")))
+                .andExpect(jsonPath("$.[1].name", is("uniprot_member_id_type")))
+                .andExpect(jsonPath("$.[1].values.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.[1].values[*].value",
+                                hasItems(
+                                        "unreviewed_uniprotkbtrembl",
+                                        "reviewed_uniprotkbswissprot")))
+                .andExpect(jsonPath("$.[1].values[*].count", hasItems(4, 2)));
+    }
+
+    @Test
+    void getFacetsBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get("/uniref/INVALID/facets")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "The 'id' value has invalid format. It should be a valid UniRef Cluster id")));
+    }
+
+    @Test
+    void getFacetsNotFound() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get("/uniref/UniRef50_P12345/facets")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
+    }
+
+    @NotNull
+    private UniRefEntry getUniRefEntryForFilter() {
+        UniRefEntryBuilder builder = new UniRefEntryBuilder();
+        builder.id(ID);
+        builder.name("Cluster Name");
+        builder.commonTaxonId(9606L);
+        builder.entryType(UniRefType.UniRef50);
+
+        RepresentativeMemberBuilder repBuilder =
+                RepresentativeMemberBuilder.from(createReprestativeMember(1));
+        repBuilder.uniparcId(null);
+        repBuilder.memberId("CDC7_HUMAN");
+        builder.representativeMember(repBuilder.build());
+
+        builder.membersAdd(
+                UniRefMemberBuilder.from(createMember(2))
+                        .memberIdType(UniRefMemberIdType.UNIPROTKB)
+                        .memberId("CDC7_HUMAN")
+                        .uniparcId(null)
+                        .build());
+        builder.membersAdd(
+                UniRefMemberBuilder.from(createMember(3))
+                        .memberIdType(UniRefMemberIdType.UNIPROTKB)
+                        .memberId("CDC8_HUMAN")
+                        .uniparcId(null)
+                        .build());
+
+        builder.membersAdd(
+                UniRefMemberBuilder.from(createMember(4))
+                        .memberIdType(UniRefMemberIdType.UNIPARC)
+                        .memberId("UP123456788")
+                        .accessionsSet(new ArrayList<>())
+                        .build());
+        builder.membersAdd(
+                UniRefMemberBuilder.from(createMember(5))
+                        .memberIdType(UniRefMemberIdType.UNIPARC)
+                        .memberId("UP123456789")
+                        .accessionsSet(new ArrayList<>())
+                        .build());
+
+        builder.membersAdd(
+                UniRefMemberBuilder.from(createMember(6))
+                        .memberIdType(UniRefMemberIdType.UNIPROTKB_TREMBL)
+                        .uniparcId(null)
+                        .build());
+        builder.memberCount(6);
+        return builder.build();
     }
 
     static class UniRefGetIdParameterResolver extends AbstractGetIdParameterResolver {

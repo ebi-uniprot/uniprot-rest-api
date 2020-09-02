@@ -73,8 +73,14 @@ public class UniRefLightSearchService
         UniRefSearchRequest unirefRequest = (UniRefSearchRequest) request;
         QueryResult<UniRefEntryLight> result = super.search(request);
         if (!unirefRequest.isComplete()) {
-            Stream<UniRefEntryLight> content = result.getContent().map(this::removeOverLimitIds);
-            return QueryResult.of(content, result.getPage(), result.getFacets());
+            Stream<UniRefEntryLight> content =
+                    result.getContent().map(this::removeOverLimitAndCleanMemberId);
+
+            result = QueryResult.of(content, result.getPage(), result.getFacets());
+        } else {
+            Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
+
+            result = QueryResult.of(content, result.getPage(), result.getFacets());
         }
         return result;
     }
@@ -84,7 +90,9 @@ public class UniRefLightSearchService
         UniRefStreamRequest unirefRequest = (UniRefStreamRequest) request;
         Stream<UniRefEntryLight> result = super.stream(request);
         if (!unirefRequest.isComplete()) {
-            result = result.map(this::removeOverLimitIds);
+            result = result.map(this::removeOverLimitAndCleanMemberId);
+        } else {
+            result = result.map(this::cleanMemberId);
         }
         return result;
     }
@@ -117,11 +125,26 @@ public class UniRefLightSearchService
                 searchFieldConfig.getSearchFieldItemByName("upi"));
     }
 
-    private UniRefEntryLight removeOverLimitIds(UniRefEntryLight entry) {
+    private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {
         UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entry);
+
+        List<String> members = removeMemberTypeFromMemberId(entry.getMembers());
+        builder.membersSet(members);
+
+        return builder.build();
+    }
+
+    private UniRefEntryLight removeOverLimitAndCleanMemberId(UniRefEntryLight entry) {
+        UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entry);
+
+        List<String> members = entry.getMembers();
         if (entry.getMembers().size() > ID_LIMIT) {
-            builder.membersSet(entry.getMembers().subList(0, ID_LIMIT));
+            members = entry.getMembers().subList(0, ID_LIMIT);
         }
+
+        members = removeMemberTypeFromMemberId(members);
+        builder.membersSet(members);
+
         if (entry.getOrganismIds().size() > ID_LIMIT) {
             LinkedHashSet<Long> organismIds =
                     entry.getOrganismIds().stream()
@@ -137,5 +160,18 @@ public class UniRefLightSearchService
             builder.organismsSet(organisms);
         }
         return builder.build();
+    }
+
+    /**
+     * This method remove MemberIdType from member list and return just memberId
+     *
+     * @param members List of members that are stored in Voldemort with format:
+     *     "memberId,MemberIdType"
+     * @return List of return clean member with the format "memberId"
+     */
+    private List<String> removeMemberTypeFromMemberId(List<String> members) {
+        return members.stream()
+                .map(memberId -> memberId.split(",")[0])
+                .collect(Collectors.toList());
     }
 }
