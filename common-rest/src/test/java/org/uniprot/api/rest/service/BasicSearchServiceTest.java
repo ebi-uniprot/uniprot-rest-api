@@ -1,5 +1,9 @@
 package org.uniprot.api.rest.service;
 
+import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,10 +12,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-
-import static java.util.Collections.emptyList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BasicSearchServiceTest {
     private static BasicSearchService mockService;

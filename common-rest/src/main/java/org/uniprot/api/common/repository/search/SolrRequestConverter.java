@@ -53,8 +53,8 @@ public class SolrRequestConverter {
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
-        if (notNull(request.getQueryBoosts())) {
-            setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
+        if (notNull(request.getQueryConfig())) {
+            setQueryBoosts(solrQuery, request.getQuery(), request.getQueryConfig());
         }
 
         log.debug("Solr Query: " + solrQuery);
@@ -137,7 +137,7 @@ public class SolrRequestConverter {
             sorts.forEach(solrQuery::addSort);
         }
 
-        static void setQueryBoosts(SolrQuery solrQuery, String query, QueryBoosts boosts) {
+        static void setQueryBoosts(SolrQuery solrQuery, String query, SolrQueryConfig boosts) {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries

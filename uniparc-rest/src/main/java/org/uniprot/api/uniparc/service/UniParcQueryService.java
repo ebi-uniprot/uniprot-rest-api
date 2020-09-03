@@ -6,12 +6,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -26,7 +25,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  * @date: 21 Jun 2019
  */
 @Service
-@Import(UniParcQueryBoostsConfig.class)
+@Import(UniParcSolrQueryConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private static final String UNIPARC_ID_FIELD = "upi";
     private final SearchFieldConfig searchFieldConfig;
@@ -39,7 +38,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcSortClause solrSortClause,
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
-            QueryBoosts uniParcQueryBoosts) {
+            SolrQueryConfig uniParcSolrQueryConf) {
 
         super(
                 repository,
@@ -47,7 +46,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 solrSortClause,
                 facetConfig,
                 storeStreamer,
-                uniParcQueryBoosts);
+                uniParcSolrQueryConf);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }

@@ -1,6 +1,9 @@
 package org.uniprot.api.rest.service.query;
 
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
@@ -8,8 +11,6 @@ import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxI
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.List;
 
 /**
  * This class does the following:

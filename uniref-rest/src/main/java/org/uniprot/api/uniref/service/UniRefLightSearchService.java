@@ -3,7 +3,7 @@ package org.uniprot.api.uniref.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -35,7 +35,7 @@ import static java.util.Arrays.asList;
  * @date: 20 Aug 2019
  */
 @Service
-@Import(UniRefQueryBoostsConfig.class)
+@Import(UniRefSolrQueryConfig.class)
 public class UniRefLightSearchService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
 
@@ -50,14 +50,14 @@ public class UniRefLightSearchService
             UniRefSortClause uniRefSortClause,
             UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
-            QueryBoosts uniRefQueryBoosts) {
+            SolrQueryConfig uniRefSolrQueryConf) {
         super(
                 repository,
                 uniRefQueryResultConverter,
                 uniRefSortClause,
                 facetConfig,
                 storeStreamer,
-                uniRefQueryBoosts);
+                uniRefSolrQueryConf);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
         this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());

@@ -3,7 +3,7 @@ package org.uniprot.api.rest.service;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
@@ -21,9 +21,9 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
             StoreStreamer<R> storeStreamer,
-            QueryBoosts queryBoosts) {
+            SolrQueryConfig solrQueryConfig) {
 
-        this(repository, null, solrSortClause, facetConfig, storeStreamer, queryBoosts);
+        this(repository, null, solrSortClause, facetConfig, storeStreamer, solrQueryConfig);
     }
 
     public StoreStreamerSearchService(
@@ -32,9 +32,9 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             AbstractSolrSortClause solrSortClause,
             FacetConfig facetConfig,
             StoreStreamer<R> storeStreamer,
-            QueryBoosts queryBoosts) {
+            SolrQueryConfig solrQueryConfig) {
 
-        super(repository, entryConverter, solrSortClause, queryBoosts, facetConfig);
+        super(repository, entryConverter, solrSortClause, solrQueryConfig, facetConfig);
         this.storeStreamer = storeStreamer;
     }
 

@@ -14,7 +14,7 @@ import lombok.*;
 @Builder
 @Getter
 @ToString
-public class QueryBoosts {
+public class SolrQueryConfig {
     @Singular private List<String> defaultSearchBoosts;
     private String defaultSearchBoostFunctions;
     @Singular private List<String> advancedSearchBoosts;
@@ -23,8 +23,8 @@ public class QueryBoosts {
     @Setter(AccessLevel.NONE)
     private String queryFields;
 
-    public static class QueryBoostsBuilder {
-        public QueryBoostsBuilder queryFields(String queryFields) {
+    public static class SolrQueryConfigBuilder {
+        public SolrQueryConfigBuilder queryFields(String queryFields) {
             this.queryFields =
                     Arrays.stream(queryFields.split(","))
                             .map(String::trim)
