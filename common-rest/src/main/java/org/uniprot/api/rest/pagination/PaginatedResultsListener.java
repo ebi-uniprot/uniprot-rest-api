@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.repository.search.page.Page;
+import org.uniprot.core.util.Utils;
 
 /**
  * Event Listener Class responsible to build Link pagination header and also X-TotalRecords
@@ -27,18 +28,20 @@ public class PaginatedResultsListener implements ApplicationListener<PaginatedRe
         HttpServletRequest request = paginatedResultsEvent.getRequest();
         UriComponentsBuilder uriBuilder = getUriComponentsBuilder(request);
 
-        StringBuilder linkHeader = new StringBuilder();
+        if (Utils.notNull(page)) {
+            StringBuilder linkHeader = new StringBuilder();
 
-        Optional<String> nextPageLink = page.getNextPageLink(uriBuilder);
-        nextPageLink.ifPresent(s -> linkHeader.append(createLinkHeader(s, "next")));
+            Optional<String> nextPageLink = page.getNextPageLink(uriBuilder);
+            nextPageLink.ifPresent(s -> linkHeader.append(createLinkHeader(s, "next")));
 
-        if (!linkHeader.toString().isEmpty()) {
-            response.addHeader("Link", linkHeader.toString());
-        }
+            if (!linkHeader.toString().isEmpty()) {
+                response.addHeader("Link", linkHeader.toString());
+            }
 
-        Long totalRecords = page.getTotalElements();
-        if (totalRecords > 0) {
-            response.addHeader("X-TotalRecords", totalRecords.toString());
+            Long totalRecords = page.getTotalElements();
+            if (totalRecords > 0) {
+                response.addHeader("X-TotalRecords", totalRecords.toString());
+            }
         }
     }
 

@@ -39,6 +39,35 @@ class ControllerITUtils {
         assertThat(mappingInfo.getProducesCondition().getProducibleMediaTypes(), is(mediaTypes));
     }
 
+    static void verifyIdContentTypes(
+            String requestPath,
+            RequestMappingHandlerMapping requestMappingHandlerMapping,
+            List<ContentTypeParam> contentTypes) {
+        assertThat(contentTypes, notNullValue());
+        assertThat(contentTypes, not(empty()));
+        Set<MediaType> mediaTypes =
+                contentTypes.stream()
+                        .map(ContentTypeParam::getContentType)
+                        .collect(Collectors.toSet());
+
+        RequestMappingInfo mappingInfo =
+                requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
+                        .filter(
+                                requestMappingInfo ->
+                                        requestMappingInfo.getPatternsCondition().getPatterns()
+                                                .stream()
+                                                .anyMatch(path -> path.startsWith(requestPath)))
+                        .filter(
+                                requestMappingInfo ->
+                                        requestMappingInfo.getPatternsCondition().getPatterns()
+                                                .stream()
+                                                .anyMatch(path -> path.endsWith("}")))
+                        .findFirst()
+                        .orElse(null);
+        assertThat(mappingInfo, notNullValue());
+        assertThat(mappingInfo.getProducesCondition().getProducibleMediaTypes(), is(mediaTypes));
+    }
+
     static Set<MediaType> getContentTypes(
             String requestPath, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 

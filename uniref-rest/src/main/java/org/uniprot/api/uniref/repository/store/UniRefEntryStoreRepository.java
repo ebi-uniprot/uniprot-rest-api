@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.repository.store;
 
+import static org.uniprot.api.uniref.repository.store.UniRefEntryFacetConfig.*;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
@@ -11,6 +13,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.store.BatchStoreIterable;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -60,17 +63,23 @@ public class UniRefEntryStoreRepository {
         UniRefEntryResult.UniRefEntryResultBuilder builder = UniRefEntryResult.builder();
         UniRefEntryLight entryLight = getUniRefEntryLightFromStore(idValue);
 
-        List<String> pageMemberIds = entryLight.getMembers();
+        List<String> pageMemberIds =
+                applyFacetFilters(entryLight.getMembers(), uniRefIdRequest.getFilter());
         boolean convertCommon = true;
         if (!uniRefIdRequest.isComplete()) {
-            CursorPage page = getPage(uniRefIdRequest, entryLight.getMemberCount());
+            CursorPage page = getPage(uniRefIdRequest, pageMemberIds.size());
             builder.page(page);
 
-            pageMemberIds = getMembersPage(page, entryLight);
+            pageMemberIds = getMembersPage(page, pageMemberIds);
             convertCommon = (page.getOffset() == 0);
         }
         builder.entry(buildUniRefEntry(entryLight, pageMemberIds, convertCommon));
         return builder.build();
+    }
+
+    public List<Facet> getFacets(String idValue) {
+        UniRefEntryLight entryLight = getUniRefEntryLightFromStore(idValue);
+        return UniRefEntryFacetConfig.getFacets(entryLight);
     }
 
     private UniRefEntry buildUniRefEntry(
@@ -155,9 +164,9 @@ public class UniRefEntryStoreRepository {
         return CursorPage.of(uniRefIdRequest.getCursor(), uniRefIdRequest.getSize(), memberCount);
     }
 
-    private List<String> getMembersPage(CursorPage page, UniRefEntryLight entryLight) {
+    private List<String> getMembersPage(CursorPage page, List<String> members) {
         int offset = page.getOffset().intValue();
         int nextOffset = CursorPage.getNextOffset(page);
-        return entryLight.getMembers().subList(offset, nextOffset);
+        return members.subList(offset, nextOffset);
     }
 }
