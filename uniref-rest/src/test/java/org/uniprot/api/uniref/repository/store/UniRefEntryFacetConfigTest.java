@@ -50,8 +50,8 @@ class UniRefEntryFacetConfigTest {
         assertNotNull(memberType.getValues());
         assertEquals(2, memberType.getValues().size());
         item = memberType.getValues().get(1);
-        assertEquals("Reviewed (UniProtKB/Swiss-Prot)", item.getLabel());
-        assertEquals("reviewed_uniprotkbswissprot", item.getValue());
+        assertEquals("UniProtKB Reviewed (Swiss-Prot)", item.getLabel());
+        assertEquals("uniprotkb_reviewed_swissprot", item.getValue());
         assertEquals(2, item.getCount());
     }
 
@@ -100,7 +100,7 @@ class UniRefEntryFacetConfigTest {
         UniRefEntryLight entryLight = getUniRefEntryLight();
         String query =
                 UniRefEntryFacetConfig.UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName()
-                        + ":reviewed_uniprotkbswissprot";
+                        + ":uniprotkb_reviewed_swissprot";
         List<String> result =
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);
@@ -115,7 +115,7 @@ class UniRefEntryFacetConfigTest {
         UniRefEntryLight entryLight = getUniRefEntryLight();
         String query =
                 UniRefEntryFacetConfig.UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName()
-                        + ":unreviewed_uniprotkbtrembl";
+                        + ":uniprotkb_unreviewed_trembl";
         List<String> result =
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);
@@ -132,7 +132,7 @@ class UniRefEntryFacetConfigTest {
                         + ":uniprotkb_id AND "
                         + UniRefEntryFacetConfig.UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE
                                 .getFacetName()
-                        + ":reviewed_uniprotkbswissprot";
+                        + ":uniprotkb_reviewed_swissprot";
         List<String> result =
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);

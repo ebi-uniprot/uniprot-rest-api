@@ -234,7 +234,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "15"))
@@ -312,7 +312,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "2"))
@@ -339,11 +339,11 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .param("size", "10")
                                         .param(
                                                 "filter",
-                                                "uniprot_member_id_type:unreviewed_uniprotkbtrembl")
+                                                "uniprot_member_id_type:uniprotkb_unreviewed_trembl")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "1"))
@@ -355,7 +355,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.members[*].memberIdType",
-                                contains("Unreviewed (UniProtKB/TrEMBL)")));
+                                contains("UniProtKB Unreviewed (TrEMBL)")));
     }
 
     @Test
@@ -374,7 +374,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
@@ -403,7 +403,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
@@ -420,23 +420,28 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
         UniRefEntryLight entryLight =
                 new UniRefEntryLightBuilder()
                         .id(ID)
-                        .membersAdd("UP1234566787," + UniRefMemberIdType.UNIPARC.getDisplayOrder())
-                        .membersAdd("UP1234566788," + UniRefMemberIdType.UNIPARC.getDisplayOrder())
-                        .membersAdd("UP1234566789," + UniRefMemberIdType.UNIPARC.getDisplayOrder())
+                        .membersAdd(
+                                "UP1234566787," + UniRefMemberIdType.UNIPARC.getMemberIdTypeId())
+                        .membersAdd(
+                                "UP1234566788," + UniRefMemberIdType.UNIPARC.getMemberIdTypeId())
+                        .membersAdd(
+                                "UP1234566789," + UniRefMemberIdType.UNIPARC.getMemberIdTypeId())
                         .membersAdd(
                                 "P12344,"
-                                        + UniRefMemberIdType.UNIPROTKB_SWISSPROT.getDisplayOrder())
+                                        + UniRefMemberIdType.UNIPROTKB_SWISSPROT
+                                                .getMemberIdTypeId())
                         .membersAdd(
                                 "P12345,"
-                                        + UniRefMemberIdType.UNIPROTKB_SWISSPROT.getDisplayOrder())
+                                        + UniRefMemberIdType.UNIPROTKB_SWISSPROT
+                                                .getMemberIdTypeId())
                         .membersAdd(
-                                "P12346," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                                "P12346," + UniRefMemberIdType.UNIPROTKB_TREMBL.getMemberIdTypeId())
                         .membersAdd(
-                                "P12347," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                                "P12347," + UniRefMemberIdType.UNIPROTKB_TREMBL.getMemberIdTypeId())
                         .membersAdd(
-                                "P12348," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                                "P12348," + UniRefMemberIdType.UNIPROTKB_TREMBL.getMemberIdTypeId())
                         .membersAdd(
-                                "P12349," + UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder())
+                                "P12349," + UniRefMemberIdType.UNIPROTKB_TREMBL.getMemberIdTypeId())
                         .build();
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF_LIGHT, entryLight);
 
@@ -448,7 +453,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.size()", is(2)))
@@ -464,8 +469,8 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                         jsonPath(
                                 "$.[1].values[*].value",
                                 hasItems(
-                                        "unreviewed_uniprotkbtrembl",
-                                        "reviewed_uniprotkbswissprot")))
+                                        "uniprotkb_unreviewed_trembl",
+                                        "uniprotkb_reviewed_swissprot")))
                 .andExpect(jsonPath("$.[1].values[*].count", hasItems(4, 2)));
     }
 
@@ -479,7 +484,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))
@@ -501,7 +506,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))

@@ -20,6 +20,11 @@ import org.uniprot.core.util.Utils;
 @Component
 public class UniRefEntryFacetConfig extends FacetConfig {
 
+    private static final String UNIPROTKB_FILTER_VALUE =
+            getCleanFacetValue(UniRefMemberIdType.UNIPROTKB.getDisplayName());
+    private static final String UNIPARC_FILTER_VALUE =
+            getCleanFacetValue(UniRefMemberIdType.UNIPARC.getDisplayName());
+
     enum UniRefEntryFacet {
         MEMBER_ID_TYPE("member_id_type", "Member Types"),
         UNIPROT_MEMBER_ID_TYPE("uniprot_member_id_type", "UniProtKB Member Types");
@@ -99,25 +104,35 @@ public class UniRefEntryFacetConfig extends FacetConfig {
         return results;
     }
 
+    /**
+     * This method return true if member should be removed from list and false otherwise For
+     * UniprotKb filter we must not remove Trembl or SwissProt
+     *
+     * @param filterValue requested filter value
+     * @param memberValue member value with the format "databaseId,memberTypeId"
+     * @return true if member should be removed from list
+     */
     private static boolean filterMemberTypeValue(String filterValue, String memberValue) {
-        String typeOrder = memberValue.split(",")[1];
-        UniRefMemberIdType memberType = UniRefMemberIdType.fromDisplayOrder(typeOrder);
+        String memberTypeId = memberValue.split(",")[1];
+        UniRefMemberIdType memberType = UniRefMemberIdType.fromMemberTypeId(memberTypeId);
 
-        String cleanUniProt = getCleanFacetValue(UniRefMemberIdType.UNIPROTKB.getDisplayName());
-        String cleanUniParc = getCleanFacetValue(UniRefMemberIdType.UNIPARC.getDisplayName());
-        if (cleanUniProt.equals(filterValue.trim())) {
-            return !(memberType.equals(UniRefMemberIdType.UNIPROTKB_SWISSPROT)
-                    || memberType.equals(UniRefMemberIdType.UNIPROTKB_TREMBL));
-        } else if (cleanUniParc.equals(filterValue.trim())) {
-            return !memberType.equals(UniRefMemberIdType.UNIPARC);
-        } else {
-            return true;
+        boolean shouldRemove = true;
+        if (UNIPROTKB_FILTER_VALUE.equals(filterValue)) {
+            shouldRemove = !isMemberTypeTremblOrSwissProt(memberType);
+        } else if (UNIPARC_FILTER_VALUE.equals(filterValue)) {
+            shouldRemove = !memberType.equals(UniRefMemberIdType.UNIPARC);
         }
+        return shouldRemove;
+    }
+
+    private static boolean isMemberTypeTremblOrSwissProt(UniRefMemberIdType memberType) {
+        return memberType.equals(UniRefMemberIdType.UNIPROTKB_SWISSPROT)
+                || memberType.equals(UniRefMemberIdType.UNIPROTKB_TREMBL);
     }
 
     private static boolean filterUniProtMemberTypeValue(String filterValue, String memberValue) {
-        String typeOrder = memberValue.split(",")[1];
-        UniRefMemberIdType memberType = UniRefMemberIdType.fromDisplayOrder(typeOrder);
+        String memberTypeId = memberValue.split(",")[1];
+        UniRefMemberIdType memberType = UniRefMemberIdType.fromMemberTypeId(memberTypeId);
 
         String cleanFilterValue = getCleanFacetValue(memberType.getDisplayName());
         return !cleanFilterValue.equalsIgnoreCase(filterValue.trim());
@@ -127,7 +142,7 @@ public class UniRefEntryFacetConfig extends FacetConfig {
         Map<String, Long> mappedItems =
                 members.stream()
                         .map(member -> member.split(",")[1])
-                        .map(UniRefMemberIdType::fromDisplayOrder)
+                        .map(UniRefMemberIdType::fromMemberTypeId)
                         .filter(memberType -> memberType != UniRefMemberIdType.UNIPARC)
                         .map(UniRefMemberIdType::getDisplayName)
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -140,7 +155,7 @@ public class UniRefEntryFacetConfig extends FacetConfig {
                 members.stream()
                         .map(member -> member.split(",")[1])
                         .map(UniRefEntryFacetConfig::mapTremblAndSwissProtToUniProt)
-                        .map(UniRefMemberIdType::fromDisplayOrder)
+                        .map(UniRefMemberIdType::fromMemberTypeId)
                         .map(UniRefMemberIdType::getDisplayName)
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -148,11 +163,11 @@ public class UniRefEntryFacetConfig extends FacetConfig {
     }
 
     private static String mapTremblAndSwissProtToUniProt(String id) {
-        int order = Integer.parseInt(id);
-        if (order == UniRefMemberIdType.UNIPROTKB_SWISSPROT.getDisplayOrder()
-                || order == UniRefMemberIdType.UNIPROTKB_TREMBL.getDisplayOrder()) {
-            order = UniRefMemberIdType.UNIPROTKB.getDisplayOrder();
+        int memberIdTypeId = Integer.parseInt(id);
+        if (memberIdTypeId == UniRefMemberIdType.UNIPROTKB_SWISSPROT.getMemberIdTypeId()
+                || memberIdTypeId == UniRefMemberIdType.UNIPROTKB_TREMBL.getMemberIdTypeId()) {
+            memberIdTypeId = UniRefMemberIdType.UNIPROTKB.getMemberIdTypeId();
         }
-        return String.valueOf(order);
+        return String.valueOf(memberIdTypeId);
     }
 }
