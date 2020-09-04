@@ -10,7 +10,6 @@ import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 public class GeneCentricSolrQueryConfig {
     private static final String RESOURCE_LOCATION = "/genecentric-query.config";
 
-//    @Qualifier("geneCentricSolrQueryConf")
     @Bean
     public SolrQueryConfig geneCentricSolrQueryConf() {
         return new SolrQueryConfigFileReader(RESOURCE_LOCATION).getConfig();

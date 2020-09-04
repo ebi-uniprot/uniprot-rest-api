@@ -10,7 +10,6 @@ import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 public class ProteomeSolrQueryConfig {
     private static final String RESOURCE_LOCATION = "/proteome-query.config";
 
-    @Qualifier("proteomeSolrQueryConf")
     @Bean
     public SolrQueryConfig proteomeSolrQueryConf() {
         return new SolrQueryConfigFileReader(RESOURCE_LOCATION).getConfig();
