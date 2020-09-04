@@ -24,14 +24,14 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 @ConfigurationProperties(prefix = "facet")
 public class UniParcFacetConfig extends FacetConfig {
 
-    private Map<String, FacetProperty> uniparcFacets = new HashMap<>();
+    private Map<String, FacetProperty> uniparc = new HashMap<>();
 
     @Override
     public Map<String, FacetProperty> getFacetPropertyMap() {
-        return uniparcFacets;
+        return uniparc;
     }
 
     public Collection<String> getFacetNames() {
-        return uniparcFacets.keySet();
+        return uniparc.keySet();
     }
 }

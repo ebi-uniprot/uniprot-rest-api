@@ -58,12 +58,14 @@ public abstract class AbstractStreamControllerIT {
         System.setProperty(
                 "solr.data.home", tempClusterDir.toString() + File.separator + "solrTestData");
 
-        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).build();
+        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).stopAtShutdown(true).build();
         try {
             cluster = new MiniSolrCloudCluster(1, tempClusterDir, jettyConfig);
             tupleStreamTemplate.getStreamConfig().setZkHost(cluster.getZkServer().getZkAddress());
             ReflectionTestUtils.setField(
                     tupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
+            ReflectionTestUtils.setField(tupleStreamTemplate, "streamFactory", null);
+            ReflectionTestUtils.setField(tupleStreamTemplate, "streamContext", null);
             cloudSolrClient = cluster.getSolrClient();
 
             updateFacetTupleStreamTemplate();
@@ -92,9 +94,11 @@ public abstract class AbstractStreamControllerIT {
     public void stopCluster() throws Exception {
         if (cloudSolrClient != null) {
             cloudSolrClient.close();
+            cloudSolrClient = null;
         }
         if (cluster != null) {
             cluster.shutdown();
+            cluster = null;
         }
 
         // Delete tempDir content

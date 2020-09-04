@@ -33,4 +33,16 @@ class ReturnFieldMetaReaderImplTest {
         assertTrue(validateFieldMap(result, "name", "abbrev"));
         assertTrue(validateFieldMap(result, "label", "Database Abbreviation"));
     }
+
+    @Test
+    void readUniParcReturnFields() {
+        ReturnFieldMetaReaderImpl returnFieldMetaReaderImpl = new ReturnFieldMetaReaderImpl();
+        List<Map<String, Object>> result =
+                returnFieldMetaReaderImpl.read("uniparc-return-fields.json");
+        assertNotNull(result);
+
+        assertEquals(25, result.size());
+        assertTrue(validateFieldMap(result, "name", "sequence"));
+        assertTrue(validateFieldMap(result, "label", "Sequence"));
+    }
 }

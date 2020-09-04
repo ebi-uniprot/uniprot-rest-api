@@ -68,6 +68,13 @@ class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
+    void canReadMessageConvertersAlwaysReturnFalse() throws Exception {
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
+
+        assertThat(converter.canRead(null, null, ANY_MEDIA_TYPE), is(false));
+    }
+
+    @Test
     void separatorUsedToSeparateEntities() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         converter.setEntitySeparator(ENTITY_SEPARATOR);
