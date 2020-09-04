@@ -80,8 +80,7 @@ public class SolrRequestConverter {
         private static final String QUERY_PLACEHOLDER = "{query}";
         private static final String QUERY_FIELDS = "qf";
 
-        private SolrQueryConverter(){
-        }
+        private SolrQueryConverter() {}
 
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
