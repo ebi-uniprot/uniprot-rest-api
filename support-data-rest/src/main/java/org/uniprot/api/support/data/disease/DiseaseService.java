@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
@@ -17,7 +17,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 @Service
-@Import(DiseaseQueryBoostsConfig.class)
+@Import(DiseaseSolrQueryConfig.class)
 public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseEntry> {
     private static final String DISEASE_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
@@ -27,13 +27,13 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             DiseaseRepository diseaseRepository,
             DiseaseDocumentToDiseaseConverter toDiseaseConverter,
             DiseaseSolrSortClause diseaseSolrSortClause,
-            QueryBoosts diseaseQueryBoosts) {
+            SolrQueryConfig diseaseSolrQueryConf) {
 
         super(
                 diseaseRepository,
                 toDiseaseConverter,
                 diseaseSolrSortClause,
-                diseaseQueryBoosts,
+                diseaseSolrQueryConf,
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);

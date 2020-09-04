@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
@@ -19,7 +19,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 @Service
-@Import(TaxonomyQueryBoostsConfig.class)
+@Import(TaxonomySolrQueryConfig.class)
 public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     private static final String TAXONOMY_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
@@ -30,9 +30,9 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
             TaxonomyFacetConfig facetConfig,
             TaxonomyEntryConverter converter,
             TaxonomySortClause taxonomySortClause,
-            QueryBoosts taxonomyQueryBoosts) {
+            SolrQueryConfig taxonomySolrQueryConf) {
 
-        super(repository, converter, taxonomySortClause, taxonomyQueryBoosts, facetConfig);
+        super(repository, converter, taxonomySortClause, taxonomySolrQueryConf, facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
         this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());

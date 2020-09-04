@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
@@ -23,7 +23,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
  * @date: 26 Apr 2019
  */
 @Service
-@Import(ProteomeQueryBoostsConfig.class)
+@Import(ProteomeSolrQueryConfig.class)
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     private static final String PROTEOME_ID_FIELD = "upid";
     private final SearchFieldConfig fieldConfig;
@@ -33,12 +33,12 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
             ProteomeQueryRepository repository,
             ProteomeFacetConfig facetConfig,
             ProteomeSortClause solrSortClause,
-            QueryBoosts proteomeQueryBoosts) {
+            SolrQueryConfig proteomeSolrQueryConf) {
         super(
                 repository,
                 new ProteomeEntryConverter(),
                 solrSortClause,
-                proteomeQueryBoosts,
+                proteomeSolrQueryConf,
                 facetConfig);
         fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
         this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());

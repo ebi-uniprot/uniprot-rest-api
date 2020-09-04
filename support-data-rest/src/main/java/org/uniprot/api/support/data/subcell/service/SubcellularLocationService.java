@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
@@ -22,7 +22,7 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
  * @since 2019-07-19
  */
 @Service
-@Import(SubcellularLocationQueryBoostsConfig.class)
+@Import(SubcellularLocationSolrQueryConfig.class)
 public class SubcellularLocationService
         extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
     private static final String SUBCELL_ID_FIELD = "id";
@@ -33,12 +33,12 @@ public class SubcellularLocationService
             SubcellularLocationRepository repository,
             SubcellularLocationEntryConverter subcellularLocationEntryConverter,
             SubcellularLocationSortClause subcellularLocationSortClause,
-            QueryBoosts subcellQueryBoosts) {
+            SolrQueryConfig subcellSolrQueryConf) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
                 subcellularLocationSortClause,
-                subcellQueryBoosts,
+                subcellSolrQueryConf,
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);

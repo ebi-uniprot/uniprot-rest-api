@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
  * @author Edd
  */
 class QueryBoostsFileReaderTest {
-    private QueryBoostsFileReader reader;
+    private SolrQueryConfigFileReader reader;
 
     @BeforeEach
     void setUp() {
-        this.reader = new QueryBoostsFileReader("/test-boosts.config");
+        this.reader = new SolrQueryConfigFileReader("/test-boosts.config");
     }
 
     @Test
@@ -29,31 +29,34 @@ class QueryBoostsFileReaderTest {
     @Test
     void missingFileCausesException() {
         assertThrows(
-                QueryBoostCreationException.class,
-                () -> new QueryBoostsFileReader("this-file-does-not-exist"));
+                SolrQueryConfigCreationException.class,
+                () -> new SolrQueryConfigFileReader("this-file-does-not-exist"));
     }
 
     @Test
     void defaultBoostsLoadedCorrectly() {
         assertThat(
-                reader.getQueryBoosts().getDefaultSearchBoosts(),
+                reader.getConfig().getDefaultSearchBoosts(),
                 containsInAnyOrder("default1:{query}^1.0", "default2:9606^2.0"));
     }
 
     @Test
     void defaultBoostFunctionsLoadedCorrectly() {
-        assertThat(reader.getQueryBoosts().getDefaultSearchBoostFunctions(), is("default3"));
+        assertThat(reader.getConfig().getDefaultSearchBoostFunctions(), is("default3"));
     }
 
     @Test
     void advancedBoostsLoadedCorrectly() {
-        assertThat(reader.getQueryBoosts().getAdvancedSearchBoosts(), is(empty()));
+        assertThat(reader.getConfig().getAdvancedSearchBoosts(), is(empty()));
     }
 
     @Test
     void advancedBoostFunctionsLoadedCorrectly() {
-        assertThat(
-                reader.getQueryBoosts().getAdvancedSearchBoostFunctions(),
-                is("advanced1,advanced2"));
+        assertThat(reader.getConfig().getAdvancedSearchBoostFunctions(), is("advanced1,advanced2"));
+    }
+
+    @Test
+    void queryFieldsLoadedCorrectly() {
+        assertThat(reader.getConfig().getQueryFields(), is("field1 field2"));
     }
 }

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
@@ -28,7 +28,7 @@ import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniProtSolrQueryConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -46,12 +46,12 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @Service
-@Import(UniProtQueryBoostsConfig.class)
+@Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
     private static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
-    private final QueryBoosts uniProtKBqueryBoosts;
+    private final SolrQueryConfig solrQueryConfig;
     private final UniProtTermsConfig uniProtTermsConfig;
     private final UniprotQueryRepository repository;
     private final StoreStreamer<UniProtKBEntry> storeStreamer;
@@ -66,7 +66,7 @@ public class UniProtEntryService
             UniprotKBFacetConfig uniprotKBFacetConfig,
             UniProtTermsConfig uniProtTermsConfig,
             UniProtSolrSortClause uniProtSolrSortClause,
-            QueryBoosts uniProtKBQueryBoosts,
+            SolrQueryConfig uniProtKBSolrQueryConf,
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService,
@@ -76,10 +76,10 @@ public class UniProtEntryService
                 uniprotKBFacetConfig,
                 uniProtSolrSortClause,
                 uniProtEntryStoreStreamer,
-                uniProtKBQueryBoosts);
+                uniProtKBSolrQueryConf);
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
-        this.uniProtKBqueryBoosts = uniProtKBQueryBoosts;
+        this.solrQueryConfig = uniProtKBSolrQueryConf;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.storeStreamer = uniProtEntryStoreStreamer;
         this.searchFieldConfig =
@@ -173,8 +173,7 @@ public class UniProtEntryService
 
     public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
         SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts)
-                        .build();
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
         return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
@@ -201,7 +200,7 @@ public class UniProtEntryService
         SolrRequest solrRequest = super.createSolrRequest(uniProtRequest, includeFacets);
 
         // uniprotkb related stuff
-        solrRequest.setQueryBoosts(uniProtKBqueryBoosts);
+        solrRequest.setQueryConfig(solrQueryConfig);
 
         if (needsToFilterIsoform(uniProtRequest.getQuery(), uniProtRequest.isIncludeIsoform())) {
             addIsoformFilter(solrRequest);

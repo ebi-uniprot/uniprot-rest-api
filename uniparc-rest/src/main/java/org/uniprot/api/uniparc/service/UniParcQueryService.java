@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
@@ -38,7 +38,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  * @date: 21 Jun 2019
  */
 @Service
-@Import(UniParcQueryBoostsConfig.class)
+@Import(UniParcSolrQueryConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     private static final String UNIPARC_ID_FIELD = "upi";
     private static final String ACCESSION_FIELD = "uniprotkb";
@@ -56,7 +56,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcSortClause solrSortClause,
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
-            QueryBoosts uniParcQueryBoosts) {
+            SolrQueryConfig uniParcSolrQueryConf) {
 
         super(
                 repository,
@@ -64,7 +64,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 solrSortClause,
                 facetConfig,
                 storeStreamer,
-                uniParcQueryBoosts);
+                uniParcSolrQueryConf);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());

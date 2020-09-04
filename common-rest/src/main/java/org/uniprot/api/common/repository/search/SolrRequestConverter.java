@@ -53,8 +53,8 @@ public class SolrRequestConverter {
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
-        if (notNull(request.getQueryBoosts())) {
-            setQueryBoosts(solrQuery, request.getQuery(), request.getQueryBoosts());
+        if (notNull(request.getQueryConfig())) {
+            setQueryConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
         }
 
         log.debug("Solr Query: " + solrQuery);
@@ -78,6 +78,9 @@ public class SolrRequestConverter {
         private static final String DEFAULT_FIELD = "df";
         private static final String BOOST_FIELD_TYPE_NUMBER = "=number:";
         private static final String QUERY_PLACEHOLDER = "{query}";
+        private static final String QUERY_FIELDS = "qf";
+
+        private SolrQueryConverter() {}
 
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
@@ -136,7 +139,7 @@ public class SolrRequestConverter {
             sorts.forEach(solrQuery::addSort);
         }
 
-        static void setQueryBoosts(SolrQuery solrQuery, String query, QueryBoosts boosts) {
+        static void setQueryConfigs(SolrQuery solrQuery, String query, SolrQueryConfig boosts) {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries
@@ -157,6 +160,10 @@ public class SolrRequestConverter {
                 if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
                     solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
+            }
+
+            if (notNullNotEmpty(boosts.getQueryFields())) {
+                solrQuery.add(QUERY_FIELDS, boosts.getQueryFields());
             }
         }
 
