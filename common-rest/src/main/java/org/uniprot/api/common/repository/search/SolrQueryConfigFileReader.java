@@ -5,6 +5,7 @@ import static org.uniprot.core.util.Utils.notNull;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,21 +40,16 @@ public class SolrQueryConfigFileReader {
                     new BufferedReader(new InputStreamReader(resourceAsStream)).lines();
             QueryConfigType queryConfigType = QueryConfigType.DEFAULT_SEARCH;
             for (String line : lines.toArray(String[]::new)) {
-                if (line.startsWith(QueryConfigType.DEFAULT_SEARCH.prefix)) {
-                    queryConfigType = QueryConfigType.DEFAULT_SEARCH;
-                } else if (line.startsWith(QueryConfigType.DEFAULT_SEARCH_FUNCTIONS.prefix)) {
-                    queryConfigType = QueryConfigType.DEFAULT_SEARCH_FUNCTIONS;
-                } else if (line.startsWith(QueryConfigType.ADVANCED_SEARCH.prefix)) {
-                    queryConfigType = QueryConfigType.ADVANCED_SEARCH;
-                } else if (line.startsWith(QueryConfigType.ADVANCED_SEARCH_FUNCTIONS.prefix)) {
-                    queryConfigType = QueryConfigType.ADVANCED_SEARCH_FUNCTIONS;
-                } else if (line.startsWith(QueryConfigType.QUERY_FIELDS.prefix)) {
-                    queryConfigType = QueryConfigType.QUERY_FIELDS;
-                } else if (line.startsWith(COMMENT_PREFIX) || line.trim().isEmpty()) {
-                    // => commented out or empty line, skip it
-                    log.debug("ignoring boost line: <{}>", line);
+                QueryConfigType parsedType = QueryConfigType.typeOf(line);
+                if (parsedType == null) {
+                    if ((line.startsWith(COMMENT_PREFIX) || line.trim().isEmpty())) {
+                        // => commented out or empty line, skip it
+                        log.debug("ignoring boost line: <{}>", line);
+                    } else {
+                        addQueryConfig(queryConfigType, line);
+                    }
                 } else {
-                    addQueryConfig(queryConfigType, line);
+                    queryConfigType = parsedType;
                 }
             }
             log.info("Loaded Solr query config.");
@@ -94,6 +90,13 @@ public class SolrQueryConfigFileReader {
 
         QueryConfigType(String prefix) {
             this.prefix = prefix;
+        }
+
+        private static QueryConfigType typeOf(String value) {
+            return Arrays.stream(QueryConfigType.values())
+                    .filter(val -> val.prefix.equals(value))
+                    .findFirst()
+                    .orElse(null);
         }
     }
 }

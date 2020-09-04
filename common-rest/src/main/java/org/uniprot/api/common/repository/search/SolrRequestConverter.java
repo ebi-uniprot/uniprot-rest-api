@@ -54,7 +54,7 @@ public class SolrRequestConverter {
         }
 
         if (notNull(request.getQueryConfig())) {
-            setQueryBoosts(solrQuery, request.getQuery(), request.getQueryConfig());
+            setQueryConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
         }
 
         log.debug("Solr Query: " + solrQuery);
@@ -79,6 +79,9 @@ public class SolrRequestConverter {
         private static final String BOOST_FIELD_TYPE_NUMBER = "=number:";
         private static final String QUERY_PLACEHOLDER = "{query}";
         private static final String QUERY_FIELDS = "qf";
+
+        private SolrQueryConverter(){
+        }
 
         static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
@@ -137,7 +140,7 @@ public class SolrRequestConverter {
             sorts.forEach(solrQuery::addSort);
         }
 
-        static void setQueryBoosts(SolrQuery solrQuery, String query, SolrQueryConfig boosts) {
+        static void setQueryConfigs(SolrQuery solrQuery, String query, SolrQueryConfig boosts) {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries

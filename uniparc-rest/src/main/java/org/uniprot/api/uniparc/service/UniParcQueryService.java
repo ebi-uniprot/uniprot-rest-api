@@ -49,7 +49,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 uniParcSolrQueryConf);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());    }
+        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+    }
 
     @Override
     protected SearchFieldItem getIdField() {
