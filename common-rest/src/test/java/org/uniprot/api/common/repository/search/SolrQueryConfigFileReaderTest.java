@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Edd
  */
-class QueryBoostsFileReaderTest {
+class SolrQueryConfigFileReaderTest {
     private SolrQueryConfigFileReader reader;
 
     @BeforeEach
