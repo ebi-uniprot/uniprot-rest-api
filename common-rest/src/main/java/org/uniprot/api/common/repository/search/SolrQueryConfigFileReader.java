@@ -40,13 +40,14 @@ public class SolrQueryConfigFileReader {
                     new BufferedReader(new InputStreamReader(resourceAsStream)).lines();
             QueryConfigType queryConfigType = QueryConfigType.DEFAULT_SEARCH;
             for (String line : lines.toArray(String[]::new)) {
-                QueryConfigType parsedType = QueryConfigType.typeOf(line);
+                String trimmedLine = line.trim();
+                QueryConfigType parsedType = QueryConfigType.typeOf(trimmedLine);
                 if (parsedType == null) {
-                    if ((line.startsWith(COMMENT_PREFIX) || line.trim().isEmpty())) {
+                    if ((line.startsWith(COMMENT_PREFIX) || trimmedLine.isEmpty())) {
                         // => commented out or empty line, skip it
                         log.debug("ignoring boost line: <{}>", line);
                     } else {
-                        addQueryConfig(queryConfigType, line);
+                        addQueryConfig(queryConfigType, trimmedLine);
                     }
                 } else {
                     queryConfigType = parsedType;
