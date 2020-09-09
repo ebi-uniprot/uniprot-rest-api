@@ -1,2 +1,2 @@
 protein_url#protein_format
-/uniprot/api/uniprotkb/search?query=name:Vitamin B6 transporter TPN1#application/json
+/uniprot/api/uniprotkb/search?query=protein_name:Vitamin B6 transporter TPN1#application/json
