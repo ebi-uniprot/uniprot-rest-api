@@ -68,6 +68,9 @@
 						<includes>
 							<include>application.properties</include>
 						</includes>
+						<excludes>
+							<exclude>test/resources/**</exclude>
+						</excludes>
 					</testResource>
 				</testResources>
 			</build>
