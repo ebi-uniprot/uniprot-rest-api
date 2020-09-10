@@ -34,16 +34,6 @@
 				<version>${gatling-plugin.version}</version>
 			</plugin>
 		</plugins>
-		<!-- allow us to specify an external properties files used to configure 
-			the tests -->
-		<testResources>
-			<testResource>
-				<directory>${properties.dir}</directory>
-				<includes>
-					<include>application.properties</include>
-				</includes>
-			</testResource>
-		</testResources>
 	</build>
 
 	<profiles>
@@ -70,6 +60,16 @@
 						</executions>
 					</plugin>
 				</plugins>
+				<!-- allow us to specify an external properties files used to configure
+                the tests -->
+				<testResources>
+					<testResource>
+						<directory>${properties.dir}</directory>
+						<includes>
+							<include>application.properties</include>
+						</includes>
+					</testResource>
+				</testResources>
 			</build>
 		</profile>
 	</profiles>
