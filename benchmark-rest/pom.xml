@@ -60,17 +60,14 @@
 						</executions>
 					</plugin>
 				</plugins>
-				<!-- allow us to specify an external properties files used to configure
-                the tests -->
+				<!-- allow us to specify an external properties files used to configure 
+					the tests -->
 				<testResources>
 					<testResource>
 						<directory>${properties.dir}</directory>
 						<includes>
 							<include>application.properties</include>
 						</includes>
-						<excludes>
-							<exclude>test/resources/**</exclude>
-						</excludes>
 					</testResource>
 				</testResources>
 			</build>
