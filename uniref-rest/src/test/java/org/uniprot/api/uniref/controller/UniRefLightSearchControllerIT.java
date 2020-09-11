@@ -47,6 +47,7 @@ import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
@@ -295,9 +296,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     private void saveEntry(UniRefEntry unirefEntry) {
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry entry = converter.toXml(unirefEntry);
-        getStoreManager()
-                .saveToStore(
-                        DataStoreManager.StoreType.UNIREF_LIGHT, createEntryLight(unirefEntry));
+        UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
+        UniRefEntryLight entryLight = unirefLightConverter.fromXml(entry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIREF_LIGHT, entryLight);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIREF_LIGHT, entry);
     }
 

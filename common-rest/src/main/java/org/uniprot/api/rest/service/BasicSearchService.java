@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
@@ -32,7 +32,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     protected final AbstractSolrSortClause solrSortClause;
-    protected final QueryBoosts queryBoosts;
+    protected final SolrQueryConfig queryBoosts;
     private final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
@@ -48,7 +48,7 @@ public abstract class BasicSearchService<D extends Document, R> {
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
-            QueryBoosts queryBoosts,
+            SolrQueryConfig queryBoosts,
             FacetConfig facetConfig) {
         this.repository = repository;
         this.entryConverter = entryConverter;
@@ -170,7 +170,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            BasicRequest request, AbstractSolrSortClause solrSortClause, QueryBoosts queryBoosts) {
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
 
@@ -182,7 +184,7 @@ public abstract class BasicSearchService<D extends Document, R> {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
-        requestBuilder.queryBoosts(queryBoosts);
+        requestBuilder.queryConfig(queryBoosts);
 
         return requestBuilder;
     }

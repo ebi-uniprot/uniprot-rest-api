@@ -70,7 +70,7 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                     SolrRequest.builder()
                             .query(request.getQuery())
                             .filterQueries(request.getFilterQueries())
-                            .queryBoosts(request.getQueryBoosts())
+                            .queryConfig(request.getQueryConfig())
                             .rows(0)
                             .build();
             try {
@@ -141,10 +141,10 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
 
                 requestExpression.addParameter(
                         new StreamExpressionNamedParameter("defType", DEF_TYPE_VALUE));
-                if (Utils.notNullNotEmpty(request.getQueryBoosts().getQueryFields())) {
+                if (Utils.notNullNotEmpty(request.getQueryConfig().getQueryFields())) {
                     requestExpression.addParameter(
                             new StreamExpressionNamedParameter(
-                                    "qf", request.getQueryBoosts().getQueryFields()));
+                                    "qf", request.getQueryConfig().getQueryFields()));
                 } else {
                     requestExpression.addParameter(
                             new StreamExpressionNamedParameter("df", "content"));

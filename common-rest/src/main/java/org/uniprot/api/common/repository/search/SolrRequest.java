@@ -23,7 +23,7 @@ public class SolrRequest {
     private QueryOperator defaultQueryOperator;
     private FacetConfig facetConfig;
     private String termQuery;
-    private QueryBoosts queryBoosts;
+    private SolrQueryConfig queryConfig;
     private String defaultField;
     // Batch size of rows in solr request. In case of search api request rows and totalRows will be
     // same.

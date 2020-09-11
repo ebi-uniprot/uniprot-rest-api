@@ -132,8 +132,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1 value2")
-                            .queryBoosts(
-                                    QueryBoosts.builder()
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1:{query}^3")
                                             .defaultSearchBoost("field2:value3^2")
                                             .build())
@@ -155,8 +155,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("9606")
-                            .queryBoosts(
-                                    QueryBoosts.builder()
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1=number:{query}^3")
                                             .build())
                             .build();
@@ -175,8 +175,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("hello")
-                            .queryBoosts(
-                                    QueryBoosts.builder()
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1=number:{query}^3")
                                             .build())
                             .build();
@@ -195,8 +195,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1 value2")
-                            .queryBoosts(
-                                    QueryBoosts.builder()
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1:value3^3")
                                             .defaultSearchBoost("field2:value4^2")
                                             .defaultSearchBoostFunctions("f1,f2")
@@ -219,7 +219,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1")
-                            .queryBoosts(QueryBoosts.builder().queryFields("field1,field2").build())
+                            .queryConfig(
+                                    SolrQueryConfig.builder().queryFields("field1,field2").build())
                             .build();
 
             // when
@@ -235,8 +236,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("field1:value1 value2")
-                            .queryBoosts(
-                                    QueryBoosts.builder()
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
                                             .advancedSearchBoost("field1:value3^3")
                                             .advancedSearchBoost("field2:value4^2")
                                             .advancedSearchBoostFunctions("f1,f2")

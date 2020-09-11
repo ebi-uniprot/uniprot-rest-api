@@ -1,23 +1,20 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.time.LocalDate;
-import java.util.*;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
@@ -26,24 +23,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
-import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
-import org.uniprot.core.Location;
-import org.uniprot.core.Property;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.*;
-import org.uniprot.core.uniparc.impl.*;
-import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
-import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.search.SolrCollection;
 
 /**
  * @author jluo
@@ -64,53 +44,10 @@ import org.uniprot.store.search.SolrCollection;
             UniParcGetIdControllerIT.UniParcGetIdParameterResolver.class,
             UniParcGetIdControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
-public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
-    private static final String UPI = "UPI0000083A08";
-    @Autowired private UniParcQueryRepository repository;
-
-    private UniParcStoreClient storeClient;
-
+public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
     @Override
-    protected DataStoreManager.StoreType getStoreType() {
-        return DataStoreManager.StoreType.UNIPARC;
-    }
-
-    @Override
-    protected SolrCollection getSolrCollection() {
-        return SolrCollection.uniparc;
-    }
-
-    @Override
-    protected SolrQueryRepository getRepository() {
-        return repository;
-    }
-
-    @BeforeAll
-    void initDataStore() {
-        storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
-
-        getStoreManager()
-                .addDocConverter(
-                        DataStoreManager.StoreType.UNIPARC,
-                        new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
-    }
-
-    @AfterEach
-    void cleanStoreClient() {
-        storeClient.truncate();
-    }
-
-    @Override
-    protected void saveEntry() {
-        UniParcEntry entry = create();
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
-
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
+    protected String getIdPathValue() {
+        return UNIPARC_ID;
     }
 
     @Override
@@ -118,90 +55,13 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/uniparc/";
     }
 
-    private UniParcEntry create() {
-        String seq = "MVSWGRFICLVVVTMATLSLARPSFSLVED";
-        Sequence sequence = new SequenceBuilder(seq).build();
-        List<UniParcCrossReference> xrefs = getXrefs();
-        List<SequenceFeature> seqFeatures = getSeqFeatures();
-        List<Taxonomy> taxonomies = getTaxonomies();
-        return new UniParcEntryBuilder()
-                .uniParcId(new UniParcIdBuilder(UPI).build())
-                .uniParcCrossReferencesSet(xrefs)
-                .sequence(sequence)
-                .sequenceFeaturesSet(seqFeatures)
-                .taxonomiesSet(taxonomies)
-                .build();
-    }
-
-    private List<Taxonomy> getTaxonomies() {
-        Taxonomy taxonomy =
-                new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
-        Taxonomy taxonomy2 = new TaxonomyBuilder().taxonId(10090).scientificName("MOUSE").build();
-        return Arrays.asList(taxonomy, taxonomy2);
-    }
-
-    private List<SequenceFeature> getSeqFeatures() {
-        List<Location> locations = Arrays.asList(new Location(12, 23), new Location(45, 89));
-        InterProGroup domain = new InterProGroupBuilder().name("name1").id("id1").build();
-        SequenceFeature sf =
-                new SequenceFeatureBuilder()
-                        .interproGroup(domain)
-                        .signatureDbType(SignatureDbType.PFAM)
-                        .signatureDbId("sigId2")
-                        .locationsSet(locations)
-                        .build();
-        SequenceFeature sf3 =
-                SequenceFeatureBuilder.from(sf).signatureDbType(SignatureDbType.PROSITE).build();
-        return Arrays.asList(sf, sf3);
-    }
-
-    private List<UniParcCrossReference> getXrefs() {
-        List<Property> properties = new ArrayList<>();
-        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "some pname"));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_GENE_NAME, "some gname"));
-        UniParcCrossReference xref =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(3)
-                        .database(UniParcDatabase.SWISSPROT)
-                        .id("P12345")
-                        .version(7)
-                        .active(true)
-                        .created(LocalDate.of(2017, 5, 17))
-                        .lastUpdated(LocalDate.of(2017, 2, 27))
-                        .propertiesSet(properties)
-                        .build();
-
-        List<Property> properties2 = new ArrayList<>();
-        properties2.add(new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "some pname"));
-        properties2.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "9606"));
-
-        UniParcCrossReference xref2 =
-                new UniParcCrossReferenceBuilder()
-                        .versionI(1)
-                        .database(UniParcDatabase.TREMBL)
-                        .id("P52346")
-                        .version(7)
-                        .active(true)
-                        .created(LocalDate.of(2017, 2, 12))
-                        .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesSet(properties2)
-                        .build();
-
-        return Arrays.asList(xref, xref2);
-    }
-
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
-                    .id(UPI)
-                    .resultMatcher(jsonPath("$.uniParcId", is(UPI)))
-                    //
-                    // .resultMatcher(jsonPath("$.scientificName",is("scientific")))
-                    //		                    .resultMatcher(jsonPath("$.commonName",is("common")))
-                    //		                    .resultMatcher(jsonPath("$.mnemonic",is("mnemonic")))
-                    //		                    .resultMatcher(jsonPath("$.links",contains("link")))
+                    .id(UNIPARC_ID)
+                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
                     .build();
         }
 
@@ -209,7 +69,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -222,7 +82,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("UPI0000083A09")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -230,9 +90,9 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
-                    .id(UPI)
+                    .id(UNIPARC_ID)
                     .fields("upi,organism")
-                    .resultMatcher(jsonPath("$.uniParcId", is(UPI)))
+                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
                     .resultMatcher(jsonPath("$.taxonomies").exists())
                     .resultMatcher(jsonPath("$.uniParcCrossReferences").doesNotExist())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
@@ -243,9 +103,9 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdParameter withInvalidFilterParameter() {
             return GetIdParameter.builder()
-                    .id(UPI)
+                    .id(UNIPARC_ID)
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -260,26 +120,26 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {
             return GetIdContentTypeParam.builder()
-                    .id(UPI)
+                    .id(UNIPARC_ID)
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.uniParcId", is(UPI)))
+                                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(content().string(containsString(UPI)))
+                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(UPI)))
+                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(UPI)))
+                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -293,7 +153,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083A08	Homo sapiens; MOUSE	P12345; P52346	2017-02-12	2017-04-23	30")))
+                                                                    "UPI0000083D01\tHomo sapiens; Torpedo californica\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -311,7 +171,7 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -330,22 +190,22 @@ public class UniParcGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
         }

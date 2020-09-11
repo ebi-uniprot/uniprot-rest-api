@@ -1,6 +1,9 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -10,9 +13,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -73,10 +80,10 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
-    private static final String UPI_PREF = "UPI0000083A";
+    private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
     private final UniParcDocumentConverter documentConverter =
-            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
     @Autowired UniProtStoreClient<UniParcEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
@@ -117,16 +124,16 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 containsInAnyOrder(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UPI0000283A10",
+                                        "UPI0000283A09",
+                                        "UPI0000283A08",
+                                        "UPI0000283A07",
+                                        "UPI0000283A06",
+                                        "UPI0000283A05",
+                                        "UPI0000283A04",
+                                        "UPI0000283A03",
+                                        "UPI0000283A02",
+                                        "UPI0000283A01")));
     }
 
     @Test
@@ -199,16 +206,16 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UPI0000283A10",
+                                        "UPI0000283A09",
+                                        "UPI0000283A08",
+                                        "UPI0000283A07",
+                                        "UPI0000283A06",
+                                        "UPI0000283A05",
+                                        "UPI0000283A04",
+                                        "UPI0000283A03",
+                                        "UPI0000283A02",
+                                        "UPI0000283A01")));
     }
 
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")
@@ -237,7 +244,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "accession:P10006 OR accession:P10005")
+                        .param("query", "uniprotkb:P10006 OR uniprotkb:P10005")
                         .param("fields", "gene,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -250,7 +257,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcId",
-                                containsInAnyOrder("UPI0000083A06", "UPI0000083A05")))
+                                containsInAnyOrder("UPI0000283A06", "UPI0000283A05")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcCrossReferences.*.properties[?(@.key=='gene_name')].value",
@@ -259,7 +266,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.taxonomies.*.taxonId",
-                                containsInAnyOrder(9606, 10090, 9606, 10090)))
+                                containsInAnyOrder(9606, 7787, 9606, 7787)))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());
     }
