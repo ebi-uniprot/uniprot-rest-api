@@ -48,8 +48,8 @@ public class UniProtQueryProcessor implements QueryProcessor {
     public String processQuery(String query) {
         try {
             QueryNode queryTree = syntaxParser.parse(query, IMPOSSIBLE_FIELD);
-            QueryNode process = queryProcessorPipeline.process(queryTree);
-            return process.toQueryString(ESCAPER).toString();
+            QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
+            return processedQueryTree.toQueryString(ESCAPER).toString();
         } catch (QueryNodeException e) {
             log.warn("Problem processing user query: " + query, e);
             return query;
