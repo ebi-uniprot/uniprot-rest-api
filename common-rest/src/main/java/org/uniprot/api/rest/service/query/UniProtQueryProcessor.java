@@ -33,20 +33,20 @@ public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final UniProtQueryNodeProcessorPipeline queryProcessorPipeline;
-    private final StandardSyntaxParser syntaxParser;
 
     public UniProtQueryProcessor(List<SearchFieldItem> optimisableFields) {
         this(new UniProtQueryNodeProcessorPipeline(optimisableFields));
     }
 
     public UniProtQueryProcessor(UniProtQueryNodeProcessorPipeline pipeline) {
-        syntaxParser = new StandardSyntaxParser();
         queryProcessorPipeline = pipeline;
     }
 
     @Override
     public String processQuery(String query) {
         try {
+            StandardSyntaxParser syntaxParser = new StandardSyntaxParser();
+
             QueryNode queryTree = syntaxParser.parse(query, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
             return processedQueryTree.toQueryString(ESCAPER).toString();
