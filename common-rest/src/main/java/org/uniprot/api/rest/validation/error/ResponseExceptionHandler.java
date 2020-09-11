@@ -108,12 +108,16 @@ public class ResponseExceptionHandler {
      * @param request http request
      * @return 500 Internal server error response
      */
+    @SuppressWarnings("squid:S5145")
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
         StringBuffer url = request.getRequestURL();
         String queryString = request.getQueryString();
-        String urlAndParams = queryString == null? url.toString() : url.append('?').append(queryString).toString();
+        String urlAndParams =
+                queryString == null
+                        ? url.toString()
+                        : url.append('?').append(queryString).toString();
         logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
