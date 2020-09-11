@@ -1,5 +1,22 @@
 package org.uniprot.api.rest.validation.error;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -22,22 +39,6 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
-import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
-import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -111,7 +112,8 @@ public class ResponseExceptionHandler {
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
         StringBuffer url = request.getRequestURL();
-        String urlAndParams = url.append('?').append(request.getQueryString()).toString();
+        String queryString = request.getQueryString();
+        String urlAndParams = queryString == null? url.toString() : url.append('?').append(queryString).toString();
         logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
