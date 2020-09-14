@@ -89,7 +89,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniparc/search?query?{{uniparc_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniparc/search?query={{uniparc_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -134,7 +134,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniparc/stream?query?{{uniparc_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniparc/stream?query={{uniparc_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
