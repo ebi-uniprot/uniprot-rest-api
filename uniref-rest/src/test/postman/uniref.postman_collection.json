@@ -67,7 +67,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniref/search?query?{{uniref_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniref/search?query={{uniref_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -112,7 +112,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniref/stream?query?{{uniref_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniref/stream?query={{uniref_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
