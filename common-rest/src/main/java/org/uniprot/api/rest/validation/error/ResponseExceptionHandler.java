@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.validation.error;
 
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -107,22 +108,19 @@ public class ResponseExceptionHandler {
      * @param request http request
      * @return 500 Internal server error response
      */
-    @SuppressWarnings("all")
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
-        StringBuffer url = request.getRequestURL();
-        String queryString = request.getQueryString();
-        String urlAndParams =
-                queryString == null
-                        ? url.toString()
-                        : url.append('?').append(queryString).toString();
+        String url = Encode.forHtml(request.getRequestURL().toString());
+        String queryString = Encode.forHtml(request.getQueryString());
+        String urlAndParams = queryString == null ? url : url + '?' + queryString;
+        //NOSONAR
         logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
         addDebugError(request, ex, messages);
 
-        ErrorInfo error = new ErrorInfo(url.toString(), messages);
+        ErrorInfo error = new ErrorInfo(url, messages);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(getContentTypeFromRequest(request))
