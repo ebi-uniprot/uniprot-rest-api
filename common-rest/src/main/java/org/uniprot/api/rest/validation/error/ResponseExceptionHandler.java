@@ -107,6 +107,7 @@ public class ResponseExceptionHandler {
      * @param request http request
      * @return 500 Internal server error response
      */
+    @SuppressWarnings("javasecurity:S5145")
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
@@ -115,9 +116,7 @@ public class ResponseExceptionHandler {
         String urlAndParams =
                 queryString == null
                         ? url.toString()
-                        : url.append('?')
-                                .append(queryString.replaceAll("[\n\r\t]", "_"))
-                                .toString();
+                        : url.append('?').append(queryString).toString();
         logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
