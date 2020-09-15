@@ -107,7 +107,7 @@ public class ResponseExceptionHandler {
      * @param request http request
      * @return 500 Internal server error response
      */
-    @SuppressWarnings("javasecurity:S5145")
+    @SuppressWarnings("all")
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
