@@ -22,14 +22,13 @@ class URLRetrievalSimulation extends Simulation {
       case urlRegex(baseUrl) => "url=" + baseUrl
       case _ => url2
     }
-    val format: String = "format=${format}";
-    val httpReqInfo: String = basicRequest + ", " + format;
+    val httpReqInfo: String = basicRequest + ", format=${format}";
     val requestStr: String = host + "${url}";
 
     val request =
       feed(feeder)
         .pause(5 seconds, 15 seconds)
-        .exec(http(format)
+        .exec(http(httpReqInfo)
           .get(requestStr)
           .header("Accept", "${format}")
         )
