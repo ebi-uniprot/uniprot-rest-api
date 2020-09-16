@@ -1,4 +1,9 @@
-
+import io.gatling.core.Predef._
+import io.gatling.core.scenario.Simulation
+import io.gatling.core.structure.ChainBuilder
+import io.gatling.http.Predef._
+import scala.concurrent.duration._
+import com.typesafe.config._
 
 /**
  * Simulates simple retrieval of URLs from the REST service. Since these URLs can be anywhere, this simulation
@@ -22,13 +27,14 @@ class URLRetrievalSimulation extends Simulation {
       case urlRegex(baseUrl) => "url=" + baseUrl
       case _ => url2
     }
-    val httpReqInfo: String = basicRequest + ", format=${format}";
+    val format = "format=${format}"
+    val httpReqInfo: String = basicRequest + ", " + format;
     val requestStr: String = host + "${url}";
 
     val request =
       feed(feeder)
         .pause(5 seconds, 15 seconds)
-        .exec(http(httpReqInfo)
+        .exec(http(format)
           .get(requestStr)
           .header("Accept", "${format}")
         )
