@@ -1,5 +1,22 @@
 package org.uniprot.api.rest.validation.error;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,22 +40,6 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
-import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
-import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -114,8 +115,8 @@ public class ResponseExceptionHandler {
         String url = Encode.forHtml(request.getRequestURL().toString());
         String queryString = Encode.forHtml(request.getQueryString());
         String urlAndParams = queryString == null ? url : url + '?' + queryString;
-        //NOSONAR
-        logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
+        // NOSONAR
+        logger.error("handleInternalServerError -- {}", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
         addDebugError(request, ex, messages);
