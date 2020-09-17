@@ -94,9 +94,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     void bestGuessCanReturnSuccessSwissProt() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(BEST_GUESS_PATH)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*");
+                get(BEST_GUESS_PATH).header(ACCEPT, MediaType.APPLICATION_JSON).param("query", "*");
 
         mockMvc.perform(requestBuilder)
                 .andDo(print())
