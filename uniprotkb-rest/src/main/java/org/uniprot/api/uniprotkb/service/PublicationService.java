@@ -76,10 +76,12 @@ public class PublicationService {
         }
 
         // PAGINATE THE RESULT
-        CursorPage page = getCursorPage(request, publications.size());
-        publications = publications.subList(page.getOffset().intValue(), getPageTo(page));
+        CursorPage page =
+                CursorPage.of(request.getCursor(), request.getSize(), publications.size());
+        publications =
+                publications.subList(page.getOffset().intValue(), CursorPage.getNextOffset(page));
 
-        return QueryResult.of(publications, page, facets);
+        return QueryResult.of(publications.stream(), page, facets);
     }
 
     private List<PublicationEntry> getUniprotEntryPublicationEntries(String accession) {
@@ -243,22 +245,6 @@ public class PublicationService {
                 .defaultQueryOperator(QueryOperator.OR)
                 .rows(100)
                 .build();
-    }
-
-    private CursorPage getCursorPage(PublicationRequest request, int publicationSize) {
-        CursorPage page = CursorPage.of(request.getCursor(), request.getSize());
-        page.setTotalElements((long) publicationSize);
-        page.setNextCursor("NEXT");
-        return page;
-    }
-
-    private int getPageTo(CursorPage page) {
-        long nextPageOffset = (long) page.getOffset() + page.getPageSize();
-        if (nextPageOffset > page.getTotalElements()) {
-            return page.getTotalElements().intValue();
-        } else {
-            return (int) nextPageOffset;
-        }
     }
 
     private boolean isFromAccession(String accession, LiteratureMappedReference mappedReference) {

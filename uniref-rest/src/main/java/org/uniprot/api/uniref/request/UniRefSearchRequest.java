@@ -20,9 +20,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniRefSearchRequest extends UniRefBasicRequest implements SearchRequest {
 
     @Parameter(hidden = true)
-    public static final String DEFAULT_FIELDS = "id,name,common_taxon,count,created";
-
-    @Parameter(hidden = true)
     private String cursor;
 
     @Parameter(description = "Name of the facet search")

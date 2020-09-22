@@ -20,9 +20,8 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.lang.Nullable;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
 
@@ -55,7 +54,8 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     @Override
     public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
         boolean result = false;
-        if (this.canWrite(mediaType)
+        if (Objects.nonNull(type)
+                && this.canWrite(mediaType)
                 && MessageConverterContext.class.isAssignableFrom(clazz)
                 && Utils.notNull(type)) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -66,35 +66,37 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     }
 
     @Override
+    public boolean canRead(
+            Type type, @Nullable Class<?> contextClass, @Nullable MediaType mediaType) {
+        return false;
+    }
+
+    @Override
     protected MessageConverterContext<C> readInternal(
-            Class<? extends MessageConverterContext<C>> aClass, HttpInputMessage httpInputMessage)
-            throws HttpMessageNotReadableException {
+            Class<? extends MessageConverterContext<C>> aClass, HttpInputMessage httpInputMessage) {
         return null;
     }
 
     @Override
     public MessageConverterContext<C> read(
-            Type type, Class<?> aClass, HttpInputMessage httpInputMessage)
-            throws HttpMessageNotReadableException {
+            Type type, Class<?> aClass, HttpInputMessage httpInputMessage) {
         return null;
     }
 
     @Override
     protected void writeInternal(
             MessageConverterContext<C> context, Type type, HttpOutputMessage httpOutputMessage)
-            throws IOException, HttpMessageNotWritableException {
+            throws IOException {
         AtomicInteger counter = new AtomicInteger();
         OutputStream outputStream = httpOutputMessage.getBody();
         Instant start = Instant.now();
 
-        switch (context.getFileType()) {
-            case GZIP:
-                try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
-                    writeContents(context, gzipOutputStream, start, counter);
-                }
-                break;
-            default:
-                writeContents(context, outputStream, start, counter);
+        if (context.getFileType() == FileType.GZIP) {
+            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
+                writeContents(context, gzipOutputStream, start, counter);
+            }
+        } else {
+            writeContents(context, outputStream, start, counter);
         }
     }
 

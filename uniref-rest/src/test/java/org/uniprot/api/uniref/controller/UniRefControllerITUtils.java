@@ -1,6 +1,8 @@
 package org.uniprot.api.uniref.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.uniprot.core.Sequence;
 import org.uniprot.core.cv.go.GoAspect;
@@ -9,11 +11,7 @@ import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.core.uniref.*;
-import org.uniprot.core.uniref.UniRefType;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
+import org.uniprot.core.uniref.impl.*;
 
 /**
  * @author jluo
@@ -26,8 +24,28 @@ class UniRefControllerITUtils {
     static final String ID_PREF_100 = "UniRef100_P039";
     static final String NAME_PREF = "Cluster: MoeK5 ";
     static final String ACC_PREF = "P123";
-    static final String ACC_2_PREF = "P123";
+    static final String ACC_2_PREF = "P321";
     static final String UPI_PREF = "UPI0000083A";
+
+    static UniRefEntry createEntry(int i, int numberOfMembers, UniRefType type) {
+        UniRefEntryBuilder builder = UniRefEntryBuilder.from(createEntry(i, type));
+        for (int j = 2; j < numberOfMembers; j++) {
+            builder.membersAdd(createMember(j));
+        }
+        builder.memberCount(numberOfMembers); // member plus representative
+        return builder.build();
+    }
+
+    static List<RepresentativeMember> createEntryMembers(UniRefEntry entry) {
+        List<RepresentativeMember> members = new ArrayList<>();
+        members.add(entry.getRepresentativeMember());
+        entry.getMembers()
+                .forEach(
+                        member -> {
+                            members.add(RepresentativeMemberBuilder.from(member).build());
+                        });
+        return members;
+    }
 
     static UniRefEntry createEntry(int i, UniRefType type) {
         String idRef = getIdRef(type);
@@ -83,8 +101,8 @@ class UniRefControllerITUtils {
         return new UniRefMemberBuilder()
                 .memberIdType(type)
                 .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
+                .organismName("Homo sapiens " + i)
+                .organismTaxId(9606 + i)
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())
@@ -114,8 +132,8 @@ class UniRefControllerITUtils {
         return new RepresentativeMemberBuilder()
                 .memberIdType(type)
                 .memberId(memberId)
-                .organismName("Homo sapiens")
-                .organismTaxId(9606)
+                .organismName("Homo sapiens (Representative)")
+                .organismTaxId(9600)
                 .sequenceLength(length)
                 .proteinName(pName)
                 .uniparcId(new UniParcIdBuilder(upi).build())

@@ -4,7 +4,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ class UniProtViewByControllerIT {
         String parent = "1.1.-.-";
 
         mockMvc.perform(get("/uniprotkb/view/ec").param("query", query).param("parent", parent))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$[0].id", is("1.1.1.-")))
                 .andExpect(jsonPath("$[0].label", is("With NAD(+) or NADP(+) as acceptor")))
                 .andExpect(jsonPath("$[1].id", is("1.1.3.-")))
@@ -82,7 +82,7 @@ class UniProtViewByControllerIT {
                         get("/uniprotkb/view/keyword")
                                 .param("query", query)
                                 .param("parent", parent))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$[0].id", is("KW-0128")))
                 .andExpect(jsonPath("$[0].label", is("Catecholamine metabolism")))
                 .andExpect(jsonPath("$[1].id", is("KW-0131")))
@@ -119,7 +119,7 @@ class UniProtViewByControllerIT {
                         get("/uniprotkb/view/pathway")
                                 .param("query", query)
                                 .param("parent", parent))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$[0].id", is("289")))
                 .andExpect(jsonPath("$[0].label", is("Amine and polyamine biosynthesis")))
                 .andExpect(jsonPath("$[1].id", is("456")))
@@ -145,7 +145,7 @@ class UniProtViewByControllerIT {
         String parent = "GO:0002150";
 
         mockMvc.perform(get("/uniprotkb/view/go").param("query", query).param("parent", parent))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$[0].id", is("GO:0008150")))
                 .andExpect(jsonPath("$[0].label", is("biological_process")))
                 .andExpect(jsonPath("$[1].id", is("GO:0005575")))
@@ -182,7 +182,7 @@ class UniProtViewByControllerIT {
                         get("/uniprotkb/view/taxonomy")
                                 .param("query", query)
                                 .param("parent", parent))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$[0].id", is("1425170")))
                 .andExpect(jsonPath("$[0].label", is("Homo heidelbergensis")))
                 .andExpect(jsonPath("$[1].id", is("9606")))

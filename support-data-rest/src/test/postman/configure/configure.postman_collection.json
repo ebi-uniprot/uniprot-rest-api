@@ -1,0 +1,551 @@
+{
+	"info": {
+		"_postman_id": "c3317fa5-533a-4229-bdf7-5c72cb01020f",
+		"name": "configuration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "proteome",
+			"item": [
+				{
+					"name": "Get result fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8e453f16-2540-477c-a607-7c80625e635b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/proteome/result-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"proteome",
+								"result-fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get search fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b737f9f9-228f-41f9-8ebb-bfda4cd380df",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/proteome/search-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"proteome",
+								"search-fields"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "uniparc",
+			"item": [
+				{
+					"name": "Get result fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ca502ee0-cf5f-4582-86cd-ea5e05375980",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniparc/result-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniparc",
+								"result-fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get search fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2bd8a211-818a-4006-a8c7-aadd6362b810",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniparc/search-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniparc",
+								"search-fields"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "uniprotkb",
+			"item": [
+				{
+					"name": "Get all databases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5c693cf1-a898-4b3f-ba68-f4d7f9477d73",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/allDatabases",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"allDatabases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get databases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1c9a1afb-ca4f-4b49-b276-834f3cffe5bd",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/databases",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"databases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get annotation evidences",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5fb7d9bd-b88c-493c-876f-0573d4460898",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/annotation_evidences",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"annotation_evidences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get list of evidence databases",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "071bf87e-c5e6-4dff-97c9-fdb7fdc3d7bf",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/evidenceDatabases",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"evidenceDatabases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get result fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e1549b0d-b9a5-457f-9978-6ea87c74b53f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/result-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"result-fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get search terms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "66a49093-3115-4aee-9e84-8db26fbe02f4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/search_terms",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"search_terms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get go evidences",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ab1c1350-3a3b-4fd0-9c0b-9b8f6e5aaaef",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/go_evidences",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniprotkb",
+								"go_evidences"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "uniref",
+			"item": [
+				{
+					"name": "Get result fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d43dba95-3e77-488a-a9bc-4740b3ea0cd6",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniref/result-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniref",
+								"result-fields"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get search fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9f12fb4f-1c9a-4b8d-abf0-dec193172c7f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/uniref/search-fields",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"uniref",
+								"search-fields"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "util",
+			"item": [
+				{
+					"name": "Parse query",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9e3e81ca-551e-4db8-95fb-150f688547d6",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/configure/util/queryParser?query={{parser_query_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"configure",
+								"util",
+								"queryParser"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{parser_query_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f2dcfc51-2252-4230-9b01-db080e557062",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "c66d66b9-305d-444e-b7ad-b6c31cb96a04",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "599f7b7a-b55c-47ba-a272-bc903a2eb699",
+			"key": "parser_query_string",
+			"value": " (gene:cdc7) AND (organism_id:9606)"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

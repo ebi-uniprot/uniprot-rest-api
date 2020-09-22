@@ -27,13 +27,14 @@ class URLRetrievalSimulation extends Simulation {
       case urlRegex(baseUrl) => "url=" + baseUrl
       case _ => url2
     }
-    val httpReqInfo: String = basicRequest + ", format=${format}";
+    val format = "format=${format}"
+    val httpReqInfo: String = basicRequest + ", " + format;
     val requestStr: String = host + "${url}";
 
     val request =
       feed(feeder)
         .pause(5 seconds, 15 seconds)
-        .exec(http(httpReqInfo)
+        .exec(http(format)
           .get(requestStr)
           .header("Accept", "${format}")
         )
@@ -55,5 +56,6 @@ class URLRetrievalSimulation extends Simulation {
   )
     .protocols(httpConf)
     .maxDuration(conf.getInt("a.s.url.retrieval.maxDuration") minutes)
-    .assertions(global.successfulRequests.percent.gt(conf.getInt("a.s.url.retrieval.successPercentGreaterThan")))
+    .assertions(global.successfulRequests.percent.gt(conf.getInt("a.s.url.retrieval.successPercentGreaterThan")),
+      global.responseTime.percentile3.lt(conf.getInt("a.s.url.retrieval.percentile3.responseTime")))
 }

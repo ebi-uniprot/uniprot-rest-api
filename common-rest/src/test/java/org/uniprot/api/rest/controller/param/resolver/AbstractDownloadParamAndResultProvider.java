@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.jupiter.api.extension.Extension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -16,7 +17,7 @@ import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
 /** class to provide common query param and result matcher */
-public abstract class AbstractDownloadParamAndResultProvider {
+public abstract class AbstractDownloadParamAndResultProvider implements Extension {
     public DownloadParamAndResult getDownloadParamAndResult(
             MediaType contentType, Integer entryCount) {
         DownloadParamAndResult.DownloadParamAndResultBuilder builder =

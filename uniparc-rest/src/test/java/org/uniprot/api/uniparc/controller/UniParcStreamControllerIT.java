@@ -1,19 +1,33 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -53,6 +67,12 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Slf4j
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcController.class)
+// @ContextConfiguration(
+//        classes = {
+//            UniParcDataStoreTestConfig.class,
+//            UniParcRestApplication.class,
+//            ErrorHandlerConfig.class
+//        })
 @ExtendWith(
         value = {
             SpringExtension.class,
@@ -60,20 +80,28 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
-    private static final String UPI_PREF = "UPI0000083A";
-
-    @Autowired private MockMvc mockMvc;
-
-    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
-
+    private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
-
     private final UniParcDocumentConverter documentConverter =
-            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
+    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private SolrClient solrClient;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
+
+        // for the following tests, ensure the number of hits
+        // for each query is less than the maximum number allowed
+        // to be streamed (configured in {@link
+        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
+        long queryHits = 100L;
+        QueryResponse response = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(queryHits);
+        when(response.getResults()).thenReturn(results);
+        when(solrClient.query(anyString(), any())).thenReturn(response);
     }
 
     @Test
@@ -82,13 +110,13 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*");
+                        .param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(jsonPath("$.results.size()", is(10)))
@@ -96,16 +124,16 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 containsInAnyOrder(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UPI0000283A10",
+                                        "UPI0000283A09",
+                                        "UPI0000283A08",
+                                        "UPI0000283A07",
+                                        "UPI0000283A06",
+                                        "UPI0000283A05",
+                                        "UPI0000283A04",
+                                        "UPI0000283A03",
+                                        "UPI0000283A02",
+                                        "UPI0000283A01")));
     }
 
     @Test
@@ -121,7 +149,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                 .param("download", "invalid"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -141,14 +169,14 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("download", "true");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -164,30 +192,30 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("sort", "upi desc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains(
-                                        "UPI0000083A10",
-                                        "UPI0000083A09",
-                                        "UPI0000083A08",
-                                        "UPI0000083A07",
-                                        "UPI0000083A06",
-                                        "UPI0000083A05",
-                                        "UPI0000083A04",
-                                        "UPI0000083A03",
-                                        "UPI0000083A02",
-                                        "UPI0000083A01")));
+                                        "UPI0000283A10",
+                                        "UPI0000283A09",
+                                        "UPI0000283A08",
+                                        "UPI0000283A07",
+                                        "UPI0000283A06",
+                                        "UPI0000283A05",
+                                        "UPI0000283A04",
+                                        "UPI0000283A03",
+                                        "UPI0000283A02",
+                                        "UPI0000283A01")));
     }
 
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")
@@ -197,14 +225,14 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("sort", sortField + " asc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)));
@@ -216,20 +244,20 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "accession:P10006 OR accession:P10005")
+                        .param("query", "uniprotkb:P10006 OR uniprotkb:P10005")
                         .param("fields", "gene,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcId",
-                                containsInAnyOrder("UPI0000083A06", "UPI0000083A05")))
+                                containsInAnyOrder("UPI0000283A06", "UPI0000283A05")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcCrossReferences.*.properties[?(@.key=='gene_name')].value",
@@ -238,7 +266,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.taxonomies.*.taxonId",
-                                containsInAnyOrder(9606, 10090, 9606, 10090)))
+                                containsInAnyOrder(9606, 7787, 9606, 7787)))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());
     }
@@ -248,13 +276,13 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "content:*");
+                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));

@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "337e2824-84a3-42af-bd44-1800a9ff8eda",
+		"name": "keyword",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "id",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "00ffbafb-05c8-4c2b-95e6-5ac281aaa430",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/keyword/{{keyword_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"keyword",
+								"{{keyword_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search keyword",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "094db600-de7e-4da0-8a39-a6485890891c",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/keyword/search?query={{keyword_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"keyword",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{keyword_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "download",
+			"item": [
+				{
+					"name": "Download keyword",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "abb0f0d1-2ff0-4c48-a35a-4f18521436a8",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/keyword/download?query={{keyword_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"keyword",
+								"download"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{keyword_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "76507b39-fb3d-4206-8817-6f26d5f43cfb",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b15dc5ba-7a3d-4ab0-9d28-9ae0a8d6b710",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "f1f85ca5-16e7-489b-81dc-9962647f584b",
+			"key": "keyword_id",
+			"value": "KW-0001"
+		},
+		{
+			"id": "b35ea821-089c-4413-991d-f5d8ce4bd27f",
+			"key": "keyword_search_string",
+			"value": "ligand"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

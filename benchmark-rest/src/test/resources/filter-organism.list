@@ -1,2 +1,2 @@
-organism_url,organism_format
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/search?query=organism_name:Salmonella dublin,application/json
+organism_url#organism_format
+/uniprot/api/uniprotkb/search?query=organism_name:Salmonella dublin#application/json

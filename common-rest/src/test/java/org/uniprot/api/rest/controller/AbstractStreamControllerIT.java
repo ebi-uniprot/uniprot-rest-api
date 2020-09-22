@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.store.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
 
@@ -41,6 +42,8 @@ public abstract class AbstractStreamControllerIT {
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
     private MiniSolrCloudCluster cluster;
 
     private Path tempClusterDir;
@@ -53,15 +56,19 @@ public abstract class AbstractStreamControllerIT {
         String solrHome = solrProperties.getProperty("solr.home");
         tempClusterDir = Files.createTempDirectory("MiniSolrCloudCluster");
         System.setProperty(
-                "solr.data.dir", tempClusterDir.toString() + File.separator + "solrTestData");
+                "solr.data.home", tempClusterDir.toString() + File.separator + "solrTestData");
 
-        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).build();
+        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).stopAtShutdown(true).build();
         try {
             cluster = new MiniSolrCloudCluster(1, tempClusterDir, jettyConfig);
             tupleStreamTemplate.getStreamConfig().setZkHost(cluster.getZkServer().getZkAddress());
             ReflectionTestUtils.setField(
                     tupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
+            ReflectionTestUtils.setField(tupleStreamTemplate, "streamFactory", null);
+            ReflectionTestUtils.setField(tupleStreamTemplate, "streamContext", null);
             cloudSolrClient = cluster.getSolrClient();
+
+            updateFacetTupleStreamTemplate();
 
             for (SolrCollection solrCollection : getSolrCollections()) {
                 String collection = solrCollection.name();
@@ -87,9 +94,11 @@ public abstract class AbstractStreamControllerIT {
     public void stopCluster() throws Exception {
         if (cloudSolrClient != null) {
             cloudSolrClient.close();
+            cloudSolrClient = null;
         }
         if (cluster != null) {
             cluster.shutdown();
+            cluster = null;
         }
 
         // Delete tempDir content
@@ -104,5 +113,15 @@ public abstract class AbstractStreamControllerIT {
                         .getResourceAsStream(SOLR_SYSTEM_PROPERTIES);
         properties.load(propertiesStream);
         return properties;
+    }
+
+    private void updateFacetTupleStreamTemplate() {
+        // update facet tuple for fields value for testing
+        ReflectionTestUtils.setField(
+                facetTupleStreamTemplate, "zookeeperHost", cluster.getZkServer().getZkAddress());
+        ReflectionTestUtils.setField(
+                facetTupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
+        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamFactory", null);
+        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamContext", null);
     }
 }

@@ -1,9 +1,7 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -11,14 +9,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
 
 /**
@@ -32,7 +32,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     protected final AbstractSolrSortClause solrSortClause;
-    protected final QueryBoosts queryBoosts;
+    protected final SolrQueryConfig queryBoosts;
     private final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
@@ -48,7 +48,7 @@ public abstract class BasicSearchService<D extends Document, R> {
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
-            QueryBoosts queryBoosts,
+            SolrQueryConfig queryBoosts,
             FacetConfig facetConfig) {
         this.repository = repository;
         this.entryConverter = entryConverter;
@@ -58,10 +58,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public R findByUniqueId(final String uniqueId) {
-        return getEntity(getIdField(), uniqueId);
+        return getEntity(getIdField().getFieldName(), uniqueId);
     }
-
-    protected abstract String getIdField();
 
     public R getEntity(String idField, String value) {
         try {
@@ -93,11 +91,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         SolrRequest solrRequest = createSearchSolrRequest(request);
 
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
-        List<R> converted =
-                results.getContent().stream()
-                        .map(entryConverter)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
+        Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
@@ -118,6 +112,10 @@ public abstract class BasicSearchService<D extends Document, R> {
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
         return createSearchSolrRequest(request, true);
     }
+
+    protected abstract SearchFieldItem getIdField();
+
+    protected abstract QueryProcessor getQueryProcessor();
 
     /*
        case 1. size is not passed, use  DEFAULT_RESULTS_SIZE(25) then set rows and totalRows as DEFAULT_RESULTS_SIZE
@@ -172,19 +170,21 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            BasicRequest request, AbstractSolrSortClause solrSortClause, QueryBoosts queryBoosts) {
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
 
         String requestedQuery = request.getQuery();
 
-        requestBuilder.query(requestedQuery);
+        requestBuilder.query(getQueryProcessor().processQuery(requestedQuery));
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
-        requestBuilder.queryBoosts(queryBoosts);
+        requestBuilder.queryConfig(queryBoosts);
 
         return requestBuilder;
     }

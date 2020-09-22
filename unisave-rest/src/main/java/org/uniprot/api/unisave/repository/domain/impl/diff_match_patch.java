@@ -832,7 +832,9 @@ public class diff_match_patch {
             }
         }
         while (thisDiff != null) {
-            if (prevDiff.operation == Operation.DELETE && thisDiff.operation == Operation.INSERT) {
+            if (Objects.nonNull(prevDiff)
+                    && prevDiff.operation == Operation.DELETE
+                    && thisDiff.operation == Operation.INSERT) {
                 String deletion = prevDiff.text;
                 String insertion = thisDiff.text;
                 int overlap_length1 = this.diff_commonOverlap(deletion, insertion);
@@ -1243,9 +1245,11 @@ public class diff_match_patch {
         Diff nextDiff = pointer.hasNext() ? pointer.next() : null;
         // Intentionally ignore the first and last element (don't need checking).
         while (nextDiff != null) {
-            if (prevDiff.operation == Operation.EQUAL && nextDiff.operation == Operation.EQUAL) {
+            if (Objects.nonNull(prevDiff)
+                    && prevDiff.operation == Operation.EQUAL
+                    && nextDiff.operation == Operation.EQUAL) {
                 // This is a single edit surrounded by equalities.
-                if (thisDiff.text.endsWith(prevDiff.text)) {
+                if (Objects.nonNull(thisDiff) && thisDiff.text.endsWith(prevDiff.text)) {
                     // Shift the edit over the previous equality.
                     thisDiff.text =
                             prevDiff.text
@@ -1260,7 +1264,7 @@ public class diff_match_patch {
                     thisDiff = pointer.next(); // Walk past nextDiff.
                     nextDiff = pointer.hasNext() ? pointer.next() : null;
                     changes = true;
-                } else if (thisDiff.text.startsWith(nextDiff.text)) {
+                } else if (Objects.nonNull(thisDiff) && thisDiff.text.startsWith(nextDiff.text)) {
                     // Shift the edit over the next equality.
                     prevDiff.text += nextDiff.text;
                     thisDiff.text = thisDiff.text.substring(nextDiff.text.length()) + nextDiff.text;

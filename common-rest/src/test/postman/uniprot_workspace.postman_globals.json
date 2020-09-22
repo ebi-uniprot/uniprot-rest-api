@@ -1,0 +1,69 @@
+{
+	"id": "8d8902c2-d671-4c64-8931-ffd8a400f037",
+	"values": [
+		{
+			"key": "x_release",
+			"value": "15-July-2020",
+			"enabled": true
+		},
+		{
+			"key": "control_origin",
+			"value": "*",
+			"enabled": true
+		},
+		{
+			"key": "verifyVaryHeader",
+			"value": "(function verifyVaryHeader(varyValue = 'Accept, Accept-Encoding'){\n  pm.test(\"Vary Header\", function () {\n    pm.response.to.have.header(\"Vary\");\n    pm.response.to.be.header(\"Vary\", varyValue);\n});\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyStatusHeader",
+			"value": "(function verifyStatus(status=200){\npm.test(\"Status code Header\", function () {\n    pm.response.to.have.status(status);\n});\n}\n)",
+			"enabled": true
+		},
+		{
+			"key": "verifyContentTypeHeader",
+			"value": "(function verifyContentType(contentType='application/json'){\npm.test(\"Content-Type Header\", function () {\n    pm.response.to.have.header(\"Content-Type\");\n    pm.response.to.be.header(\"Content-Type\", contentType);\n});\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyXReleaseHeader",
+			"value": "(function verifyXRelease(xRelease){pm.test(\"X-Release Header\", function () {\n    pm.response.to.have.header(\"X-Release\");\n    pm.response.to.be.header(\"X-Release\", xRelease);\n});\n\n\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyControlAllowHeader",
+			"value": "(function verifyControl(controlAllow){pm.test(\"Access-Control-Allow-Origin Header\", function () {\n    pm.response.to.have.header(\"Access-Control-Allow-Origin\");\n    pm.response.to.be.header(\"Access-Control-Allow-Origin\", controlAllow);\n});})",
+			"enabled": true
+		},
+		{
+			"key": "verifyExposeHeaders",
+			"value": "(function verifyExposeHeaders(headers='Link, X-TotalRecords, X-Release'){pm.test(\"Access-Control-Expose-Headers Header\", function () {\n    pm.response.to.have.header(\"Access-Control-Expose-Headers\");\n    pm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n});\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyDateHeader",
+			"value": "(function verifyDate(){\npm.test(\"Date Header\", function () {\n    pm.response.to.have.header(\"Date\");\n    \n});\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyTransferEncodingHeader",
+			"value": "(function verifyEncoding(encode='chunked'){\npm.test(\"Transfer-Encoding Header\", function () {\n    pm.response.to.have.header(\"Transfer-Encoding\");\n    pm.response.to.be.header(\"Transfer-Encoding\", encode);\n});\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyXCacheInfoHeader",
+			"value": "(function verifyCacheInfo(info='caching'){\npm.test(\"X-Cache-Info Header\", function () {\n    pm.response.to.have.header(\"X-Cache-Info\");\n    pm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);\n});\n})",
+			"enabled": true
+		},
+		{
+			"key": "verifyHeaders",
+			"value": "(function verifyHeaders(varyValue = 'Accept, Accept-Encoding', status=200, \ncontentType='application/json', headers='Link, X-TotalRecords, X-Release', \nencode='chunked', info='caching', xRelease, controlAllow){\npm.test(\"Vary Header\", function () {\npm.response.to.have.header(\"Vary\");\npm.response.to.be.header(\"Vary\", varyValue);\n});\npm.test(\"Status code Header\", function () {\npm.response.to.have.status(status);\n});\npm.test(\"Content-Type Header\", function () {\npm.response.to.have.header(\"Content-Type\");\npm.response.to.be.header(\"Content-Type\", contentType);\n});\npm.test(\"X-Release Header\", function () {\npm.response.to.have.header(\"X-Release\");\npm.response.to.be.header(\"X-Release\", xRelease);\n});\npm.test(\"Access-Control-Allow-Origin Header\", function () {\npm.response.to.have.header(\"Access-Control-Allow-Origin\");\npm.response.to.be.header(\"Access-Control-Allow-Origin\", controlAllow);\n});\npm.test(\"Access-Control-Expose-Headers Header\", function () {\npm.response.to.have.header(\"Access-Control-Expose-Headers\");\npm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n});\npm.test(\"Date Header\", function () {\npm.response.to.have.header(\"Date\");\n});\npm.test(\"Transfer-Encoding Header\", function () {\npm.response.to.have.header(\"Transfer-Encoding\");\npm.response.to.be.header(\"Transfer-Encoding\", encode);\n});\npm.test(\"X-Cache-Info Header\", function () {\npm.response.to.have.header(\"X-Cache-Info\");\npm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);\n});\n})\n",
+			"enabled": true
+		}
+	],
+	"name": "My Workspace Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2020-08-06T12:39:43.915Z",
+	"_postman_exported_using": "Postman/7.29.1"
+}

@@ -2,8 +2,7 @@ package org.uniprot.api.rest.validation.error;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +24,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.exception.NoContentException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 
 /** @author lgonzales */
@@ -173,6 +173,26 @@ class ResponseExceptionHandlerTest {
     }
 
     @Test
+    void handleNoContentException() {
+        // when
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+
+        String message = "message describing error";
+        NoContentException error = new NoContentException(message, null);
+
+        ResponseEntity<Void> responseEntity =
+                errorHandler.handleNoContentExceptionNoContent(error, request);
+
+        // then
+        assertNotNull(responseEntity);
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+
+        assertNull(responseEntity.getBody());
+    }
+
+    @Test
     void constraintViolationException() {
         // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
@@ -187,7 +207,6 @@ class ResponseExceptionHandlerTest {
                         null,
                         null,
                         "Field Error Message",
-                        null,
                         null,
                         null,
                         null,

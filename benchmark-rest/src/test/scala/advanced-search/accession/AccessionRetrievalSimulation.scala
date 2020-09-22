@@ -48,5 +48,7 @@ class AccessionRetrievalSimulation extends Simulation {
     instance.inject(atOnceUsers(conf.getInt("a.s.accession.retrieval.users")))
   )
     .protocols(httpConf)
+    .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.accession.retrieval.percentile3.responseTime")),//percentile3 == 95th Percentile
+      global.successfulRequests.percent.gt(conf.getInt("a.s.accession.retrieval.successfulRequests.percent")))
     .maxDuration(conf.getInt("a.s.accession.retrieval.maxDuration") minutes)
 }

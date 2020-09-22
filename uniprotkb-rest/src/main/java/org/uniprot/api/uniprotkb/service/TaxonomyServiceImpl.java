@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.service.BasicSearchService;
+import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, TaxonomyEntry>
         implements TaxonomyService {
-    private SearchFieldConfig searchFieldConfig;
+    private final SearchFieldConfig searchFieldConfig;
 
     @Autowired
     public TaxonomyServiceImpl(TaxonomyRepository taxRepo) {
@@ -42,8 +44,13 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
     }
 
     @Override
-    protected String getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName("id").getFieldName();
+    protected SearchFieldItem getIdField() {
+        return searchFieldConfig.getSearchFieldItemByName("id");
+    }
+
+    @Override
+    protected QueryProcessor getQueryProcessor() {
+        return null;
     }
 
     @Override

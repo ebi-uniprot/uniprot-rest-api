@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "c8ccf17d-079b-4286-a305-e398f9f5c513",
+		"name": "disease",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "id",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "72c30d01-8a5f-4f84-b4a6-0c3cbe5e54ca",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/disease/{{disease_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"disease",
+								"{{disease_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search disease",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d92f1831-4168-411d-ae27-8ec30a68f21b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/disease/search?query={{disease_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"disease",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{disease_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "download",
+			"item": [
+				{
+					"name": "Download disease",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6743612e-d000-426e-b574-c9264f89f4a2",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/disease/download?query={{disease_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"disease",
+								"download"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{disease_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "dc105f7e-8d9e-4759-b5ae-13fc10f40e58",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b5414625-c6bb-4776-8f7d-ef10841aa7f4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "ae3183bf-111f-41c7-ac79-80bd91dbf6d0",
+			"key": "disease_id",
+			"value": "DI-00009"
+		},
+		{
+			"id": "0fe1a9dd-1de6-4e21-8189-8f0e186143c1",
+			"key": "disease_search_string",
+			"value": "DI-00009"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

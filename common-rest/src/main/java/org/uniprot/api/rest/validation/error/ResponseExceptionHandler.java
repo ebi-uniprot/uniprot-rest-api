@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.validation.error;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
@@ -10,11 +11,13 @@ import static org.uniprot.core.util.Utils.nullOrEmpty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.exception.NoContentException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
@@ -108,12 +112,16 @@ public class ResponseExceptionHandler {
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
-        logger.error("handleThrowableBadRequest: ", ex);
+        String url = Encode.forHtml(request.getRequestURL().toString());
+        String queryString = Encode.forHtml(request.getQueryString());
+        String urlAndParams = queryString == null ? url : url + '?' + queryString;
+        // NOSONAR
+        logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
         addDebugError(request, ex, messages);
 
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
+        ErrorInfo error = new ErrorInfo(url, messages);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(getContentTypeFromRequest(request))
@@ -133,8 +141,9 @@ public class ResponseExceptionHandler {
         List<String> messages = new ArrayList<>();
 
         for (FieldError error : ex.getFieldErrors()) {
-            if (error.getDefaultMessage() != null) {
-                messages.add(error.getDefaultMessage().replaceAll("\\{field\\}", error.getField()));
+            String errorMessage = error.getDefaultMessage();
+            if (Objects.nonNull(errorMessage)) {
+                messages.add(errorMessage.replaceAll("\\{field\\}", error.getField()));
             }
         }
 
@@ -192,6 +201,22 @@ public class ResponseExceptionHandler {
         addDebugError(request, ex, messages);
 
         return getBadRequestResponseEntity(request, messages);
+    }
+
+    /**
+     * No content exception handler that was caught during processing of request. Note that a 204 no
+     * content response must contain <i>no</i> body.
+     *
+     * @param ex thrown exception
+     * @param request http request
+     * @return 204 No content error response
+     */
+    @ExceptionHandler({NoContentException.class})
+    public ResponseEntity<Void> handleNoContentExceptionNoContent(
+            NoContentException ex, HttpServletRequest request) {
+        addDebugError(request, ex, emptyList());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})

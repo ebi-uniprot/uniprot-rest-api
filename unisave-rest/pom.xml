@@ -12,7 +12,10 @@
 
 	<artifactId>unisave-rest</artifactId>
 	<description>UniSave Rest API</description>
-	<version>${project.parent.version}</version>
+
+	<properties>
+
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -37,8 +40,8 @@
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
 

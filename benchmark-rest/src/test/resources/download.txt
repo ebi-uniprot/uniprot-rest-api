@@ -1,6 +1,6 @@
-download_url,download_format,download_encoding
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/download?query=taxonomy_name:Human,text/flatfile,gzip
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/download?query=taxonomy_name:Oryza,text/flatfile,file
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/download?query=taxonomy_name:Arabidopsis,text/flatfile,gzip
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/download?query=taxonomy_id:35325,text/flatfile,file
-http://wwwdev.ebi.ac.uk/uniprot/api/uniprotkb/download?query=gene:Aba,text/flatfile,gzip
+download_url#download_format#download_encoding
+/uniprot/api/uniprotkb/stream?query=taxonomy_name:Human#text/flatfile#gzip
+/uniprot/api/uniprotkb/stream?query=taxonomy_name:Oryza#text/flatfile#file
+/uniprot/api/uniprotkb/stream?query=taxonomy_name:Arabidopsis#text/flatfile#gzip
+/uniprot/api/uniprotkb/stream?query=taxonomy_id:35325#text/flatfile#file
+/uniprot/api/uniprotkb/stream?query=gene:Aba#text/flatfile#gzip

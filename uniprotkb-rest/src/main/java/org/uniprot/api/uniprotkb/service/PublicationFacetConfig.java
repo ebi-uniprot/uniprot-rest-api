@@ -1,16 +1,13 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static org.uniprot.api.common.repository.search.facet.FacetUtils.*;
+
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.common.repository.search.facet.Facet;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetItem;
-import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.common.repository.search.facet.*;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.util.Utils;
@@ -25,7 +22,6 @@ public class PublicationFacetConfig extends FacetConfig {
 
     private static final String SMALL_SCALE = "Small scale";
     private static final String LARGE_SCALE = "Large scale";
-    private static final Pattern CLEAN_VALUE_REGEX = Pattern.compile("[a-zA-Z_]");
 
     private enum PublicationFacet {
         SOURCE("source", "Source"),
@@ -118,7 +114,7 @@ public class PublicationFacetConfig extends FacetConfig {
     private static boolean filterCategoryValues(String value, PublicationEntry entry) {
         if (Utils.notNullNotEmpty(entry.getCategories())) {
             return entry.getCategories().stream()
-                    .map(PublicationFacetConfig::getCleanFacetValue)
+                    .map(FacetUtils::getCleanFacetValue)
                     .noneMatch(category -> category.equalsIgnoreCase(value.trim()));
         } else {
             return true;
@@ -151,7 +147,7 @@ public class PublicationFacetConfig extends FacetConfig {
         Map<String, Long> categoryCountMap =
                 publications.stream()
                         .filter(PublicationEntry::hasCategories)
-                        .flatMap((publicationEntry) -> publicationEntry.getCategories().stream())
+                        .flatMap(publicationEntry -> publicationEntry.getCategories().stream())
                         .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
 
         return buildFacetItems(categoryCountMap);
@@ -165,36 +161,6 @@ public class PublicationFacetConfig extends FacetConfig {
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
         return buildFacetItems(sourceCountMap);
-    }
-
-    private static List<FacetItem> buildFacetItems(Map<String, Long> countMap) {
-        List<FacetItem> result = new ArrayList<>();
-
-        countMap.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .forEachOrdered(
-                        (entry) -> {
-                            String value = getCleanFacetValue(entry.getKey());
-                            FacetItem item =
-                                    FacetItem.builder()
-                                            .label(entry.getKey())
-                                            .value(value)
-                                            .count(entry.getValue())
-                                            .build();
-                            result.add(item);
-                        });
-
-        return result;
-    }
-
-    private static String getCleanFacetValue(String value) {
-        StringBuilder result = new StringBuilder();
-        value = value.replaceAll(" ", "_");
-        Matcher m = CLEAN_VALUE_REGEX.matcher(value);
-        while (m.find()) {
-            result.append(m.group());
-        }
-        return result.toString().toLowerCase();
     }
 
     @Override

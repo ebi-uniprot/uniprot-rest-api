@@ -159,12 +159,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> download(
-            @Valid @ModelAttribute KeywordRequest searchRequest,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-            HttpServletRequest request) {
+            @Valid @ModelAttribute KeywordRequest searchRequest, HttpServletRequest request) {
         Stream<KeywordEntry> result = keywordService.download(searchRequest);
-        return super.download(
-                result, searchRequest.getFields(), getAcceptHeader(request), request, encoding);
+        return super.download(result, searchRequest.getFields(), getAcceptHeader(request), request);
     }
 
     @Override
