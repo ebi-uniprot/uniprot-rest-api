@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -194,6 +195,47 @@ class TaxonomyGetIdsControllerIT {
     }
 
     @Test
+    void validDownloadParameterReturnSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(TAX_IDS_RESOURCE + "9606,9607,9608")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("download", "true"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        header().string(
+                                "Content-Disposition",
+                                startsWith(
+                                        "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)));
+    }
+
+    @Test
+    void validFieldsParameterReturnSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(TAX_IDS_RESOURCE + "9606,9607,9608")
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "common_name"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)))
+                .andExpect(jsonPath("$.results.*.commonName", contains("common", "common", "common")))
+                     .andExpect(jsonPath("$.results.*.scientificName").doesNotExist());
+    }
+
+    @Test
     void validIdsCanPaginateFirstPageReturnSuccess() throws Exception {
         // when
         ResultActions response =
@@ -312,7 +354,7 @@ class TaxonomyGetIdsControllerIT {
     }
 
     private void saveEntries() {
-        for (int taxId = 9600; taxId < 9700; taxId++) {
+        for (int taxId = 9600; taxId < 9610; taxId++) {
             TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
             TaxonomyEntry taxonomyEntry =
                     entryBuilder
@@ -329,6 +371,7 @@ class TaxonomyGetIdsControllerIT {
                             .id(String.valueOf(taxId))
                             .taxId((long) taxId)
                             .synonym("synonym")
+                            .common("common")
                             .scientific("scientific")
                             .reference(taxId % 2 == 0)
                             .reviewed(taxId % 2 == 0)
