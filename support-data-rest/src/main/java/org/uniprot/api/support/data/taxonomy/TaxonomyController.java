@@ -108,20 +108,20 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     @Operation(
             summary = "Get taxonomy by comma separated taxon ids.",
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            array =
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
                                             @ArraySchema(
                                                     schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    TaxonomyEntry.class))),
-                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
-                            })
+                                                            @Schema(
+                                                                    implementation =
+                                                                            TaxonomyEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
             })
     @GetMapping(
             value = "/taxonIds/{taxonIds}",

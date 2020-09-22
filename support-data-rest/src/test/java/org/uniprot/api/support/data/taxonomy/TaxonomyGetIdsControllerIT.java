@@ -1,12 +1,10 @@
 package org.uniprot.api.support.data.taxonomy;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
@@ -34,7 +32,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataApplication;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
@@ -77,7 +74,7 @@ class TaxonomyGetIdsControllerIT {
     }
 
     @AfterAll
-    void cleanSolrData(){
+    void cleanSolrData() {
         storeManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
     }
 
@@ -86,15 +83,17 @@ class TaxonomyGetIdsControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(TAX_IDS_RESOURCE + "9606,9607")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        get(TAX_IDS_RESOURCE + "9606,9607").header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.taxonId", contains(9606,9607)))
-                .andExpect(jsonPath("$.results.*.scientificName", contains("scientific", "scientific")));
+                .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.scientificName",
+                                contains("scientific", "scientific")));
     }
 
     @Test
@@ -102,14 +101,17 @@ class TaxonomyGetIdsControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(TAX_IDS_RESOURCE + "9606,9607")
-                                .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
+                        get(TAX_IDS_RESOURCE + "9606,9607").header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(containsString("Taxon Id\tMnemonic\tScientific name\tCommon name\tOther Names\tReviewed")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Taxon Id\tMnemonic\tScientific name\tCommon name\tOther Names\tReviewed")))
                 .andExpect(content().string(containsString("9606\tmnemonic\tscientific\tcommon")));
     }
 
@@ -118,8 +120,7 @@ class TaxonomyGetIdsControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(TAX_IDS_RESOURCE + "9606,9607")
-                                .header(ACCEPT, LIST_MEDIA_TYPE_VALUE));
+                        get(TAX_IDS_RESOURCE + "9606,9607").header(ACCEPT, LIST_MEDIA_TYPE_VALUE));
 
         // then
         response.andDo(log())
@@ -134,8 +135,7 @@ class TaxonomyGetIdsControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(TAX_IDS_RESOURCE + "9606,9607")
-                                .header(ACCEPT, XLS_MEDIA_TYPE_VALUE));
+                        get(TAX_IDS_RESOURCE + "9606,9607").header(ACCEPT, XLS_MEDIA_TYPE_VALUE));
 
         // then
         response.andDo(log())
@@ -157,12 +157,16 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("reference","reviewed")))
+                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("reference", "reviewed")))
                 .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(2, 2)))
-                .andExpect(jsonPath("$.facets.*.values[0].value", containsInAnyOrder("true", "true")))
+                .andExpect(
+                        jsonPath("$.facets.*.values[0].value", containsInAnyOrder("true", "true")))
                 .andExpect(jsonPath("$.facets.*.values[0].count", containsInAnyOrder(2, 2)))
-                .andExpect(jsonPath("$.results.*.taxonId", contains(9606,9607, 9608)))
-                .andExpect(jsonPath("$.results.*.scientificName", contains("scientific", "scientific","scientific")));
+                .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.scientificName",
+                                contains("scientific", "scientific", "scientific")));
     }
 
     @Test
@@ -179,9 +183,11 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("reference","reviewed")))
+                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("reference", "reviewed")))
                 .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 1)))
-                .andExpect(jsonPath("$.facets.*.values[0].value", containsInAnyOrder("false", "false")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets.*.values[0].value", containsInAnyOrder("false", "false")))
                 .andExpect(jsonPath("$.facets.*.values[0].count", containsInAnyOrder(1, 1)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9607)))
                 .andExpect(jsonPath("$.results.*.scientificName", contains("scientific")));
@@ -231,8 +237,7 @@ class TaxonomyGetIdsControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(TAX_IDS_RESOURCE + "96,97")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        get(TAX_IDS_RESOURCE + "96,97").header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
@@ -258,19 +263,22 @@ class TaxonomyGetIdsControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))
-                .andExpect(jsonPath("$.messages.*", containsInAnyOrder("taxonIds value has invalid format. It should be a list of comma separated taxonIds (without spaces).",
-                        "Invalid fields parameter value 'INVALID1'",
-                        "Invalid facet name 'INVALID'. Expected value can be [reference, reviewed, proteome, annotated].",
-                        "The 'download' parameter has invalid format. It should be a boolean true or false.",
-                        "'facetFilter' parameter has an invalid syntax")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "taxonIds value has invalid format. It should be a list of comma separated taxonIds (without spaces).",
+                                        "Invalid fields parameter value 'INVALID1'",
+                                        "Invalid facet name 'INVALID'. Expected value can be [reference, reviewed, proteome, annotated].",
+                                        "The 'download' parameter has invalid format. It should be a boolean true or false.",
+                                        "'facetFilter' parameter has an invalid syntax")));
     }
 
     @Test
     void invalidInputSizeReturnBadRequest() throws Exception {
         // when
-        String taxIds = IntStream.range(1,1003)
-                .mapToObj(String::valueOf)
-                .collect(Collectors.joining(","));
+        String taxIds =
+                IntStream.range(1, 1003).mapToObj(String::valueOf).collect(Collectors.joining(","));
         ResultActions response =
                 mockMvc.perform(
                         get(TAX_IDS_RESOURCE + taxIds)
@@ -283,8 +291,13 @@ class TaxonomyGetIdsControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))
-                .andExpect(jsonPath("$.messages.*", containsInAnyOrder("Only '1000' ids are allowed in each request. Your request has '1002' ids.",
-                        "Invalid fields parameter value 'INVALID1'","Invalid facet name 'INVALID'. Expected value can be [reference, reviewed, proteome, annotated].")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Only '1000' ids are allowed in each request. Your request has '1002' ids.",
+                                        "Invalid fields parameter value 'INVALID1'",
+                                        "Invalid facet name 'INVALID'. Expected value can be [reference, reviewed, proteome, annotated].")));
     }
 
     private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {

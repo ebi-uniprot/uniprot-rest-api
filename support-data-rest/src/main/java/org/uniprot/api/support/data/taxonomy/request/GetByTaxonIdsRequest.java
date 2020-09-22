@@ -57,17 +57,17 @@ public class GetByTaxonIdsRequest implements SearchRequest {
             description =
                     "Add content disposition attachment to response header, this way it can be downloaded as a file in the browser.")
     @Pattern(
-            regexp = "^true|false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
+            regexp = "^true|false$",
             message = "{search.taxonomy.invalid.download}")
     private String download;
 
+    @PositiveOrZero(message = "{search.positive}")
+    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    private Integer size;
+
     @Parameter(hidden = true)
     private String cursor;
-
-    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
-    @PositiveOrZero(message = "{search.positive}")
-    private Integer size;
 
     @Override
     public String getQuery() {
