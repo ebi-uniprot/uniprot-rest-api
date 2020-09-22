@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class GetByTaxonIdsRequest implements SearchRequest {
 
+    @Parameter(hidden = true)
     private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
 
     @NotNull(message = "{search.required}")
