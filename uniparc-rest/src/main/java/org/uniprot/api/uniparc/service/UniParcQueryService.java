@@ -2,7 +2,6 @@ package org.uniprot.api.uniparc.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,7 +16,6 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.*;
@@ -40,7 +38,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Service
 @Import(UniParcSolrQueryConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
-    private static final String UNIPARC_ID_FIELD = "upi";
+    public static final String UNIPARC_ID_FIELD = "upi";
     private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String MD5_STR = "md5";
     private static final String COMMA_STR = ",";
@@ -56,7 +54,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcSortClause solrSortClause,
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
-            SolrQueryConfig uniParcSolrQueryConf) {
+            SolrQueryConfig uniParcSolrQueryConf,
+            QueryProcessor uniParcQueryProcessor) {
 
         super(
                 repository,
@@ -67,7 +66,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 uniParcSolrQueryConf);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
     }
@@ -140,10 +139,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
         BestGuessAnalyser analyser = new BestGuessAnalyser(searchFieldConfig);
         return analyser.analyseBestGuess(streamResult, request);
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

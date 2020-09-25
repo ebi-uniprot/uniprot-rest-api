@@ -209,9 +209,9 @@ class TaxonomyGetIdsControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                "Content-Disposition",
-                                startsWith(
-                                        "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                        "Content-Disposition",
+                                        startsWith(
+                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
                 .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)));
     }
@@ -231,8 +231,9 @@ class TaxonomyGetIdsControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)))
-                .andExpect(jsonPath("$.results.*.commonName", contains("common", "common", "common")))
-                     .andExpect(jsonPath("$.results.*.scientificName").doesNotExist());
+                .andExpect(
+                        jsonPath("$.results.*.commonName", contains("common", "common", "common")))
+                .andExpect(jsonPath("$.results.*.scientificName").doesNotExist());
     }
 
     @Test

@@ -24,7 +24,6 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
@@ -49,7 +48,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
-    private static final String ACCESSION = "accession_id";
+    public static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final SolrQueryConfig solrQueryConfig;
     private final UniProtTermsConfig uniProtTermsConfig;
@@ -70,7 +69,8 @@ public class UniProtEntryService
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService,
-            FacetTupleStreamTemplate facetTupleStreamTemplate) {
+            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            QueryProcessor uniProtKBQueryProcessor) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -86,7 +86,7 @@ public class UniProtEntryService
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = uniProtKBQueryProcessor;
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
     }
@@ -285,9 +285,5 @@ public class UniProtEntryService
                         && Utils.notNullNotEmpty(accessionsRequest.getFacetList())
                         && !accessionsRequest.isDownload())
                 || Utils.notNullNotEmpty(accessionsRequest.getFacetFilter());
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }

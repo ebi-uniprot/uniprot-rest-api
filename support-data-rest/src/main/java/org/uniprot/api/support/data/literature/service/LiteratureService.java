@@ -1,14 +1,10 @@
 package org.uniprot.api.support.data.literature.service;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -25,7 +21,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Service
 @Import(LiteratureSolrQueryConfig.class)
 public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
-    private static final String LITERATURE_ID_FIELD = "id";
+    public static final String LITERATURE_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
 
@@ -34,7 +30,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             LiteratureEntryConverter entryConverter,
             LiteratureFacetConfig facetConfig,
             LiteratureSortClause literatureSortClause,
-            SolrQueryConfig literatureSolrQueryConf) {
+            SolrQueryConfig literatureSolrQueryConf,
+            QueryProcessor literatureQueryProcessor) {
         super(
                 repository,
                 entryConverter,
@@ -43,7 +40,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                 facetConfig);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = literatureQueryProcessor;
     }
 
     @Override
@@ -54,9 +51,5 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }

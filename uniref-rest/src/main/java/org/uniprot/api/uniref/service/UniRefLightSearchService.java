@@ -1,7 +1,5 @@
 package org.uniprot.api.uniref.service;
 
-import static java.util.Arrays.asList;
-
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +15,6 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
@@ -40,6 +37,8 @@ public class UniRefLightSearchService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
 
     private static final int ID_LIMIT = 10;
+    public static final String UNIREF_ID = "id";
+    public static final String UNIREF_UPI = "upi";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
 
@@ -50,7 +49,8 @@ public class UniRefLightSearchService
             UniRefSortClause uniRefSortClause,
             UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
-            SolrQueryConfig uniRefSolrQueryConf) {
+            SolrQueryConfig uniRefSolrQueryConf,
+            QueryProcessor uniRefQueryProcessor) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -60,7 +60,7 @@ public class UniRefLightSearchService
                 uniRefSolrQueryConf);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = uniRefQueryProcessor;
     }
 
     @Override
@@ -111,18 +111,12 @@ public class UniRefLightSearchService
 
     @Override
     protected SearchFieldItem getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName("id");
+        return this.searchFieldConfig.getSearchFieldItemByName(UNIREF_ID);
     }
 
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return asList(
-                searchFieldConfig.getSearchFieldItemByName("id"),
-                searchFieldConfig.getSearchFieldItemByName("upi"));
     }
 
     private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {

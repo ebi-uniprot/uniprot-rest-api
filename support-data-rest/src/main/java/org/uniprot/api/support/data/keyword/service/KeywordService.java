@@ -1,14 +1,10 @@
 package org.uniprot.api.support.data.keyword.service;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.support.data.keyword.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -20,7 +16,7 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 @Service
 @Import(KeywordSolrQueryConfig.class)
 public class KeywordService extends BasicSearchService<KeywordDocument, KeywordEntry> {
-    private static final String KEYWORD_ID_FIELD = "keyword_id";
+    public static final String KEYWORD_ID_FIELD = "keyword_id";
     private final SearchFieldConfig fieldConfig;
     private final QueryProcessor queryProcessor;
 
@@ -28,10 +24,11 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordRepository repository,
             KeywordEntryConverter keywordEntryConverter,
             KeywordSortClause keywordSortClause,
-            SolrQueryConfig keywordSolrQueryConf) {
+            SolrQueryConfig keywordSolrQueryConf,
+            QueryProcessor keywordQueryProcessor) {
         super(repository, keywordEntryConverter, keywordSortClause, keywordSolrQueryConf, null);
         this.fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = keywordQueryProcessor;
     }
 
     @Override
@@ -42,9 +39,5 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }

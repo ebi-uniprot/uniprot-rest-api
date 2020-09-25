@@ -1,9 +1,21 @@
 package org.uniprot.api.proteome.service;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 @Configuration
 public class GeneCentricSolrQueryConfig {
@@ -12,5 +24,25 @@ public class GeneCentricSolrQueryConfig {
     @Bean
     public SolrQueryConfig geneCentricSolrQueryConf() {
         return new SolrQueryConfigFileReader(RESOURCE_LOCATION).getConfig();
+    }
+
+    @Bean
+    public QueryProcessor geneCentricQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+        Map<String, String> geneCentricWhitelistFields =
+                whiteListFieldConfig
+                        .getField()
+                        .getOrDefault(
+                                UniProtDataType.GENECENTRIC.toString().toLowerCase(),
+                                new HashMap<>());
+        return new UniProtQueryProcessor(
+                getDefaultSearchOptimisedFieldItems(), geneCentricWhitelistFields);
+    }
+
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
+        SearchFieldConfig searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
+        return Collections.singletonList(
+                searchFieldConfig.getSearchFieldItemByName(
+                        GeneCentricService.GENECENTRIC_ID_FIELD));
     }
 }

@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.service.query;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,8 +35,9 @@ public class UniProtQueryProcessor implements QueryProcessor {
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final UniProtQueryNodeProcessorPipeline queryProcessorPipeline;
 
-    public UniProtQueryProcessor(List<SearchFieldItem> optimisableFields) {
-        this(new UniProtQueryNodeProcessorPipeline(optimisableFields));
+    public UniProtQueryProcessor(
+            List<SearchFieldItem> optimisableFields, Map<String, String> whiteListFields) {
+        this(new UniProtQueryNodeProcessorPipeline(optimisableFields, whiteListFields));
     }
 
     public UniProtQueryProcessor(UniProtQueryNodeProcessorPipeline pipeline) {

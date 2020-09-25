@@ -1,14 +1,10 @@
 package org.uniprot.api.support.data.subcell.service;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.support.data.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -25,7 +21,7 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 @Import(SubcellularLocationSolrQueryConfig.class)
 public class SubcellularLocationService
         extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
-    private static final String SUBCELL_ID_FIELD = "id";
+    public static final String SUBCELL_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
 
@@ -33,7 +29,8 @@ public class SubcellularLocationService
             SubcellularLocationRepository repository,
             SubcellularLocationEntryConverter subcellularLocationEntryConverter,
             SubcellularLocationSortClause subcellularLocationSortClause,
-            SolrQueryConfig subcellSolrQueryConf) {
+            SolrQueryConfig subcellSolrQueryConf,
+            QueryProcessor subcellQueryProcessor) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
@@ -42,8 +39,7 @@ public class SubcellularLocationService
                 null);
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
-        ;
+        this.queryProcessor = subcellQueryProcessor;
     }
 
     @Override
@@ -54,9 +50,5 @@ public class SubcellularLocationService
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }

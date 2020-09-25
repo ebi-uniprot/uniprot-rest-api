@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.service;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -13,7 +14,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 
-public class BasicSearchServiceTest {
+class BasicSearchServiceTest {
     private static BasicSearchService mockService;
     private SearchRequest request;
 
@@ -21,7 +22,7 @@ public class BasicSearchServiceTest {
     static void setUpBeforeAll() {
         mockService = Mockito.mock(BasicSearchService.class, Mockito.CALLS_REAL_METHODS);
         Mockito.when(mockService.getQueryProcessor())
-                .thenReturn(new UniProtQueryProcessor(emptyList()));
+                .thenReturn(new UniProtQueryProcessor(emptyList(), emptyMap()));
         ReflectionTestUtils.setField(
                 mockService,
                 "solrBatchSize",
