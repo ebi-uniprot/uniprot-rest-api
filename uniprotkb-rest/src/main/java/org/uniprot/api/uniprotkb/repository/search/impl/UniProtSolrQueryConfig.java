@@ -33,7 +33,14 @@ public class UniProtSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor uniProtKBQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig uniProtKBSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+    }
+
+    @Bean
+    public QueryProcessor uniProtKBQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig uniProtKBSearchFieldConfig) {
         Map<String, String> uniprotWhiteListFields =
                 whiteListFieldConfig
                         .getField()
@@ -41,13 +48,13 @@ public class UniProtSolrQueryConfig {
                                 UniProtDataType.UNIPROTKB.toString().toLowerCase(),
                                 new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), uniprotWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(uniProtKBSearchFieldConfig),
+                uniprotWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig uniProtKBSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(UniProtEntryService.ACCESSION));
+                uniProtKBSearchFieldConfig.getSearchFieldItemByName(UniProtEntryService.ACCESSION));
     }
 }

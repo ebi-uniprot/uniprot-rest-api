@@ -27,7 +27,14 @@ public class GeneCentricSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor geneCentricQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig geneCentricSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
+    }
+
+    @Bean
+    public QueryProcessor geneCentricQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig geneCentricSearchFieldConfig) {
         Map<String, String> geneCentricWhitelistFields =
                 whiteListFieldConfig
                         .getField()
@@ -35,14 +42,14 @@ public class GeneCentricSolrQueryConfig {
                                 UniProtDataType.GENECENTRIC.toString().toLowerCase(),
                                 new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), geneCentricWhitelistFields);
+                getDefaultSearchOptimisedFieldItems(geneCentricSearchFieldConfig),
+                geneCentricWhitelistFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig geneCentricSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(
+                geneCentricSearchFieldConfig.getSearchFieldItemByName(
                         GeneCentricService.GENECENTRIC_ID_FIELD));
     }
 }

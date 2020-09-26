@@ -21,9 +21,7 @@ import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
@@ -50,7 +48,8 @@ public class UniRefLightSearchService
             UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
             SolrQueryConfig uniRefSolrQueryConf,
-            QueryProcessor uniRefQueryProcessor) {
+            QueryProcessor uniRefQueryProcessor,
+            SearchFieldConfig uniRefSearchFieldConfig) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -58,8 +57,7 @@ public class UniRefLightSearchService
                 facetConfig,
                 storeStreamer,
                 uniRefSolrQueryConf);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
+        this.searchFieldConfig = uniRefSearchFieldConfig;
         this.queryProcessor = uniRefQueryProcessor;
     }
 

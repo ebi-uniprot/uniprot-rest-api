@@ -27,20 +27,28 @@ public class TaxonomySolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor taxonomyQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig taxonomySearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
+    }
+
+    @Bean
+    public QueryProcessor taxonomyQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig taxonomySearchFieldConfig) {
         Map<String, String> taxonomyWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.TAXONOMY.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), taxonomyWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(taxonomySearchFieldConfig),
+                taxonomyWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig taxonomySearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(TaxonomyService.TAXONOMY_ID_FIELD));
+                taxonomySearchFieldConfig.getSearchFieldItemByName(
+                        TaxonomyService.TAXONOMY_ID_FIELD));
     }
 }

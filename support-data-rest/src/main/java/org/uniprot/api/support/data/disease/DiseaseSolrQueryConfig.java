@@ -27,20 +27,26 @@ public class DiseaseSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor diseaseQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig diseaseSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
+    }
+
+    @Bean
+    public QueryProcessor diseaseQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig diseaseSearchFieldConfig) {
         Map<String, String> diseaseWhitelistFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.DISEASE.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), diseaseWhitelistFields);
+                getDefaultSearchOptimisedFieldItems(diseaseSearchFieldConfig),
+                diseaseWhitelistFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig diseaseSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(DiseaseService.DISEASE_ID_FIELD));
+                diseaseSearchFieldConfig.getSearchFieldItemByName(DiseaseService.DISEASE_ID_FIELD));
     }
 }

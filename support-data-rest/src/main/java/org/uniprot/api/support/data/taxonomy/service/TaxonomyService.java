@@ -8,9 +8,7 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
@@ -27,11 +25,11 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
             TaxonomyEntryConverter converter,
             TaxonomySortClause taxonomySortClause,
             SolrQueryConfig taxonomySolrQueryConf,
-            QueryProcessor taxonomyQueryProcessor) {
+            QueryProcessor taxonomyQueryProcessor,
+            SearchFieldConfig taxonomySearchFieldConfig) {
 
         super(repository, converter, taxonomySortClause, taxonomySolrQueryConf, facetConfig);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
+        this.searchFieldConfig = taxonomySearchFieldConfig;
         this.queryProcessor = taxonomyQueryProcessor;
     }
 

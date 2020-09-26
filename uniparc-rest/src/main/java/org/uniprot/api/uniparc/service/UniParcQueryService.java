@@ -25,9 +25,7 @@ import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
@@ -55,7 +53,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
             SolrQueryConfig uniParcSolrQueryConf,
-            QueryProcessor uniParcQueryProcessor) {
+            QueryProcessor uniParcQueryProcessor,
+            SearchFieldConfig uniParcSearchFieldConfig) {
 
         super(
                 repository,
@@ -64,8 +63,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 facetConfig,
                 storeStreamer,
                 uniParcSolrQueryConf);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+        this.searchFieldConfig = uniParcSearchFieldConfig;
         this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;

@@ -8,9 +8,7 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
@@ -31,15 +29,15 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             LiteratureFacetConfig facetConfig,
             LiteratureSortClause literatureSortClause,
             SolrQueryConfig literatureSolrQueryConf,
-            QueryProcessor literatureQueryProcessor) {
+            QueryProcessor literatureQueryProcessor,
+            SearchFieldConfig literatureSearchFieldConfig) {
         super(
                 repository,
                 entryConverter,
                 literatureSortClause,
                 literatureSolrQueryConf,
                 facetConfig);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
+        this.searchFieldConfig = literatureSearchFieldConfig;
         this.queryProcessor = literatureQueryProcessor;
     }
 

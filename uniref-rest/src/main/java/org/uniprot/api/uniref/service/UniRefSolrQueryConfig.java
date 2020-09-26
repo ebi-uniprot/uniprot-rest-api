@@ -28,21 +28,29 @@ public class UniRefSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor uniRefQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig uniRefSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
+    }
+
+    @Bean
+    public QueryProcessor uniRefQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig uniRefSearchFieldConfig) {
         Map<String, String> uniRefWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIREF.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), uniRefWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(uniRefSearchFieldConfig),
+                uniRefWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig uniRefSearchFieldConfig) {
         return asList(
-                searchFieldConfig.getSearchFieldItemByName(UniRefLightSearchService.UNIREF_ID),
-                searchFieldConfig.getSearchFieldItemByName(UniRefLightSearchService.UNIREF_UPI));
+                uniRefSearchFieldConfig.getSearchFieldItemByName(
+                        UniRefLightSearchService.UNIREF_ID),
+                uniRefSearchFieldConfig.getSearchFieldItemByName(
+                        UniRefLightSearchService.UNIREF_UPI));
     }
 }

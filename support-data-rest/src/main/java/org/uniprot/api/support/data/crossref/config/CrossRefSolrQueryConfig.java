@@ -28,20 +28,28 @@ public class CrossRefSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor crossRefQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig crossRefSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
+    }
+
+    @Bean
+    public QueryProcessor crossRefQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig crossRefSearchFieldConfig) {
         Map<String, String> crossRefWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.CROSSREF.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), crossRefWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(crossRefSearchFieldConfig),
+                crossRefWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig crossRefSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(CrossRefService.CROSS_REF_ID_FIELD));
+                crossRefSearchFieldConfig.getSearchFieldItemByName(
+                        CrossRefService.CROSS_REF_ID_FIELD));
     }
 }

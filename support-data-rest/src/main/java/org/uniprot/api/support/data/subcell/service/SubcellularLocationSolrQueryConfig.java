@@ -27,7 +27,13 @@ public class SubcellularLocationSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor subcellQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig subcellSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
+    }
+
+    @Bean
+    public QueryProcessor subcellQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig subcellSearchFieldConfig) {
         Map<String, String> subcellWhiteListFields =
                 whiteListFieldConfig
                         .getField()
@@ -35,12 +41,12 @@ public class SubcellularLocationSolrQueryConfig {
                                 UniProtDataType.SUBCELLLOCATION.toString().toLowerCase(),
                                 new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), subcellWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(subcellSearchFieldConfig),
+                subcellWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig searchFieldConfig) {
         return Collections.singletonList(
                 searchFieldConfig.getSearchFieldItemByName(
                         SubcellularLocationService.SUBCELL_ID_FIELD));

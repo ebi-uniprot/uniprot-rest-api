@@ -27,7 +27,14 @@ public class LiteratureSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor literatureQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig literatureSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
+    }
+
+    @Bean
+    public QueryProcessor literatureQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig literatureSearchFieldConfig) {
         Map<String, String> literatureWhiteListFields =
                 whiteListFieldConfig
                         .getField()
@@ -35,13 +42,14 @@ public class LiteratureSolrQueryConfig {
                                 UniProtDataType.LITERATURE.toString().toLowerCase(),
                                 new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), literatureWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(literatureSearchFieldConfig),
+                literatureWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig literatureSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(LiteratureService.LITERATURE_ID_FIELD));
+                literatureSearchFieldConfig.getSearchFieldItemByName(
+                        LiteratureService.LITERATURE_ID_FIELD));
     }
 }

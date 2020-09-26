@@ -27,20 +27,28 @@ public class ProteomeSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor proteomeQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig proteomeSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
+    }
+
+    @Bean
+    public QueryProcessor proteomeQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig proteomeSearchFieldConfig) {
         Map<String, String> proteomeWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.PROTEOME.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), proteomeWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(proteomeSearchFieldConfig),
+                proteomeWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig proteomeSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(ProteomeQueryService.PROTEOME_ID_FIELD));
+                proteomeSearchFieldConfig.getSearchFieldItemByName(
+                        ProteomeQueryService.PROTEOME_ID_FIELD));
     }
 }

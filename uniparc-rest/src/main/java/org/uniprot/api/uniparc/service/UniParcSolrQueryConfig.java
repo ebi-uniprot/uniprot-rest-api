@@ -27,20 +27,27 @@ public class UniParcSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor uniParcQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig uniParcSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+    }
+
+    @Bean
+    public QueryProcessor uniParcQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig uniParcSearchFieldConfig) {
         Map<String, String> uniParcWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIPARC.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), uniParcWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(uniParcSearchFieldConfig),
+                uniParcWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig uniParcSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(UniParcQueryService.UNIPARC_ID_FIELD));
+                uniParcSearchFieldConfig.getSearchFieldItemByName(
+                        UniParcQueryService.UNIPARC_ID_FIELD));
     }
 }

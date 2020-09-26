@@ -8,9 +8,7 @@ import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.core.proteome.ProteomeEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
@@ -30,14 +28,15 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
             ProteomeFacetConfig facetConfig,
             ProteomeSortClause solrSortClause,
             SolrQueryConfig proteomeSolrQueryConf,
-            QueryProcessor proteomeQueryProcessor) {
+            QueryProcessor proteomeQueryProcessor,
+            SearchFieldConfig proteomeSearchFieldConfig) {
         super(
                 repository,
                 new ProteomeEntryConverter(),
                 solrSortClause,
                 proteomeSolrQueryConf,
                 facetConfig);
-        fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
+        fieldConfig = proteomeSearchFieldConfig;
         this.queryProcessor = proteomeQueryProcessor;
     }
 

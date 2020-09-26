@@ -6,9 +6,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.core.cv.disease.DiseaseEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
@@ -24,7 +22,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             DiseaseDocumentToDiseaseConverter toDiseaseConverter,
             DiseaseSolrSortClause diseaseSolrSortClause,
             SolrQueryConfig diseaseSolrQueryConf,
-            QueryProcessor diseaseQueryProcessor) {
+            QueryProcessor diseaseQueryProcessor,
+            SearchFieldConfig diseaseSearchFieldConfig) {
 
         super(
                 diseaseRepository,
@@ -32,8 +31,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 diseaseSolrSortClause,
                 diseaseSolrQueryConf,
                 null);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.DISEASE);
+        this.searchFieldConfig = diseaseSearchFieldConfig;
         this.queryProcessor = diseaseQueryProcessor;
     }
 

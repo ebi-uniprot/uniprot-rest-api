@@ -7,9 +7,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.support.data.keyword.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 
@@ -25,9 +23,10 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordEntryConverter keywordEntryConverter,
             KeywordSortClause keywordSortClause,
             SolrQueryConfig keywordSolrQueryConf,
-            QueryProcessor keywordQueryProcessor) {
+            QueryProcessor keywordQueryProcessor,
+            SearchFieldConfig keywordSearchFieldConfig) {
         super(repository, keywordEntryConverter, keywordSortClause, keywordSolrQueryConf, null);
-        this.fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
+        this.fieldConfig = keywordSearchFieldConfig;
         this.queryProcessor = keywordQueryProcessor;
     }
 

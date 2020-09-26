@@ -7,9 +7,7 @@ import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.support.data.subcell.SubcellularLocationRepository;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 
@@ -30,15 +28,15 @@ public class SubcellularLocationService
             SubcellularLocationEntryConverter subcellularLocationEntryConverter,
             SubcellularLocationSortClause subcellularLocationSortClause,
             SolrQueryConfig subcellSolrQueryConf,
-            QueryProcessor subcellQueryProcessor) {
+            QueryProcessor subcellQueryProcessor,
+            SearchFieldConfig subcellSearchFieldConfig) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
                 subcellularLocationSortClause,
                 subcellSolrQueryConf,
                 null);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.SUBCELLLOCATION);
+        this.searchFieldConfig = subcellSearchFieldConfig;
         this.queryProcessor = subcellQueryProcessor;
     }
 

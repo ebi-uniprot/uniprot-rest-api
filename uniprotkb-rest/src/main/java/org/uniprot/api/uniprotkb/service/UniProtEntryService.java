@@ -39,7 +39,6 @@ import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
@@ -70,7 +69,8 @@ public class UniProtEntryService
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
-            QueryProcessor uniProtKBQueryProcessor) {
+            QueryProcessor uniProtKBQueryProcessor,
+            SearchFieldConfig uniProtKBSearchFieldConfig) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -82,8 +82,7 @@ public class UniProtEntryService
         this.solrQueryConfig = uniProtKBSolrQueryConf;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.storeStreamer = uniProtEntryStoreStreamer;
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+        this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         this.queryProcessor = uniProtKBQueryProcessor;

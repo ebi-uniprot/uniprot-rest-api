@@ -27,20 +27,26 @@ public class KeywordSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor keywordQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public SearchFieldConfig keywordSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
+    }
+
+    @Bean
+    public QueryProcessor keywordQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig keywordSearchFieldConfig) {
         Map<String, String> keywordWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.KEYWORD.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(), keywordWhiteListFields);
+                getDefaultSearchOptimisedFieldItems(keywordSearchFieldConfig),
+                keywordWhiteListFields);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.KEYWORD);
+    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
+            SearchFieldConfig keywordSearchFieldConfig) {
         return Collections.singletonList(
-                searchFieldConfig.getSearchFieldItemByName(KeywordService.KEYWORD_ID_FIELD));
+                keywordSearchFieldConfig.getSearchFieldItemByName(KeywordService.KEYWORD_ID_FIELD));
     }
 }

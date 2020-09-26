@@ -10,9 +10,7 @@ import org.uniprot.api.support.data.crossref.config.CrossRefSolrQueryConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
 import org.uniprot.api.support.data.crossref.request.CrossRefEntryConverter;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
@@ -29,15 +27,15 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             CrossRefSolrSortClause crossRefSolrSortClause,
             CrossRefFacetConfig crossRefFacetConfig,
             SolrQueryConfig crossRefSolrQueryConf,
-            QueryProcessor crossRefQueryProcessor) {
+            QueryProcessor crossRefQueryProcessor,
+            SearchFieldConfig crossRefSearchFieldConfig) {
         super(
                 crossRefRepository,
                 toCrossRefEntryConverter,
                 crossRefSolrSortClause,
                 crossRefSolrQueryConf,
                 crossRefFacetConfig);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.CROSSREF);
+        this.searchFieldConfig = crossRefSearchFieldConfig;
         this.queryProcessor = crossRefQueryProcessor;
     }
 

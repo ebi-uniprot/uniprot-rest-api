@@ -9,9 +9,7 @@ import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
 
@@ -32,15 +30,15 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
             GeneCentricFacetConfig facetConfig,
             GeneCentricSortClause solrSortClause,
             SolrQueryConfig geneCentricSolrQueryConf,
-            QueryProcessor geneCentricQueryProcessor) {
+            QueryProcessor geneCentricQueryProcessor,
+            SearchFieldConfig geneCentricSearchFieldConfig) {
         super(
                 repository,
                 new GeneCentricEntryConverter(),
                 solrSortClause,
                 geneCentricSolrQueryConf,
                 facetConfig);
-        searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
+        searchFieldConfig = geneCentricSearchFieldConfig;
         this.queryProcessor = geneCentricQueryProcessor;
     }
 
