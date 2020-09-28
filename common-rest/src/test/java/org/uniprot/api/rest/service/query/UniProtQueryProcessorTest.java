@@ -7,6 +7,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -32,9 +35,30 @@ class UniProtQueryProcessorTest {
 
     @BeforeEach
     void setUp() {
+        Map<String, String> whitelistFields = new HashMap<>();
+        whitelistFields.put("go", "^[0-9]+$");
         processor =
                 new UniProtQueryProcessor(
-                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")));
+                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")),
+                        whitelistFields);
+    }
+
+    @Test
+    void optimiseWhitelistFieldQuery() {
+        String processedQuery = processor.processQuery("GO:1234567");
+        assertThat(processedQuery, is("GO\\:1234567"));
+    }
+
+    @Test
+    void optimiseWhitelistFieldQueryAndDefaultSearchValue() {
+        String processedQuery = processor.processQuery("GO:1234567 OR P12345");
+        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+    }
+
+    @Test
+    void optimiseWhitelistFieldNeedToBeTermQuery() {
+        String processedQuery = processor.processQuery("GO AND 1234567");
+        assertThat(processedQuery, is("GO AND 1234567"));
     }
 
     @Test
