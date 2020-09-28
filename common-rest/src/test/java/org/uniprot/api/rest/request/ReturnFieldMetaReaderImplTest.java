@@ -41,7 +41,7 @@ class ReturnFieldMetaReaderImplTest {
                 returnFieldMetaReaderImpl.read("uniparc-return-fields.json");
         assertNotNull(result);
 
-        assertEquals(25, result.size());
+        assertEquals(24, result.size());
         assertTrue(validateFieldMap(result, "name", "sequence"));
         assertTrue(validateFieldMap(result, "label", "Sequence"));
     }
