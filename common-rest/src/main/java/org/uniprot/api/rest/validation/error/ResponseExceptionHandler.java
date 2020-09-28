@@ -115,8 +115,8 @@ public class ResponseExceptionHandler {
         String url = Encode.forHtml(request.getRequestURL().toString());
         String queryString = Encode.forHtml(request.getQueryString());
         String urlAndParams = queryString == null ? url : url + '?' + queryString;
-        // NOSONAR
-        logger.error("handleInternalServerError -- {}", urlAndParams, ex);
+        //NOSONAR
+        logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
         addDebugError(request, ex, messages);

@@ -25,6 +25,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.support.data.taxonomy.request.GetByTaxonIdsRequest;
 import org.uniprot.api.support.data.taxonomy.request.TaxonomyRequest;
 import org.uniprot.api.support.data.taxonomy.service.TaxonomyService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -102,6 +103,45 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             HttpServletRequest request) {
         TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.parseLong(taxonId));
         return super.getEntityResponse(taxonomyEntry, fields, request);
+    }
+
+    @Operation(
+            summary = "Get taxonomy by comma separated taxon ids.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            TaxonomyEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
+            value = "/taxonIds/{taxonIds}",
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getByIds(
+            @Valid @ModelAttribute GetByTaxonIdsRequest getByTaxonIdsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<TaxonomyEntry> result = this.taxonomyService.search(getByTaxonIdsRequest);
+        return super.getSearchResponse(
+                result,
+                getByTaxonIdsRequest.getFields(),
+                getByTaxonIdsRequest.isDownload(),
+                request,
+                response);
     }
 
     @Operation(
