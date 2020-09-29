@@ -685,6 +685,28 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
+    void searchSizeBiggerThanDefaultPageSize() throws Exception {
+        // given
+        saveEntries(getDefaultPageSize() + 10);
+
+        // when page
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*")
+                                .param("size", "" + (getDefaultPageSize() + 1)));
+
+        // then page
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string("X-TotalRecords", "" + (getDefaultPageSize() + 10)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(jsonPath("$.results.size()", is(getDefaultPageSize() + 1)));
+    }
+
+    @Test
     void searchCanPaginateOverTwoPagesResults() throws Exception {
         // given
         saveEntries(6);

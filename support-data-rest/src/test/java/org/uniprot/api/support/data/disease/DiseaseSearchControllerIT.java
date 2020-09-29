@@ -55,7 +55,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired private DiseaseRepository repository;
 
-    @Value("${solr.query.batchSize:#{null}}")
+    @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     @Override

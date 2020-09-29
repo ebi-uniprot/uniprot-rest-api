@@ -8,18 +8,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 
+@TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 class BasicSearchServiceTest {
     private static BasicSearchService mockService;
     private SearchRequest request;
 
+    private static final int defaultPageSize = 10;
+
     @BeforeAll
-    static void setUpBeforeAll() {
+    void setUpBeforeAll() {
         mockService = Mockito.mock(BasicSearchService.class, Mockito.CALLS_REAL_METHODS);
         Mockito.when(mockService.getQueryProcessor())
                 .thenReturn(new UniProtQueryProcessor(emptyList(), emptyMap()));
@@ -27,6 +31,8 @@ class BasicSearchServiceTest {
                 mockService,
                 "solrBatchSize",
                 BasicSearchService.DEFAULT_SOLR_BATCH_SIZE); // default batch size
+        ReflectionTestUtils.setField(
+                mockService, "defaultPageSize", defaultPageSize); // default batch size
     }
 
     @BeforeEach
@@ -114,17 +120,17 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequestDefaults() {
         // when
-        Mockito.when(request.getSize()).thenReturn(SearchRequest.DEFAULT_RESULTS_SIZE);
+        Mockito.when(request.getSize()).thenReturn(defaultPageSize);
         Mockito.when(request.getQuery()).thenReturn("queryValue");
         SolrRequest solrRequest = mockService.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getRows()),
                 "Solr batch size mismatch");
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getTotalRows()),
                 "Solr total result count mismatch");
         assertEquals(
@@ -134,17 +140,14 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsLessThanDefaultResultSize() {
         // when
-        Mockito.when(request.getSize()).thenReturn(SearchRequest.DEFAULT_RESULTS_SIZE - 5);
+        Mockito.when(request.getSize()).thenReturn(defaultPageSize - 5);
         Mockito.when(request.getQuery()).thenReturn("queryValue");
         SolrRequest solrRequest = mockService.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
+        assertEquals(defaultPageSize - 5, solrRequest.getRows(), "Solr batch size mismatch");
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE - 5,
-                solrRequest.getRows(),
-                "Solr batch size mismatch");
-        assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE - 5,
+                defaultPageSize - 5,
                 solrRequest.getTotalRows(),
                 "Solr total result count mismatch");
         assertEquals(
@@ -154,17 +157,17 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsEqualToDefaultResultSize() {
         // when
-        Mockito.when(request.getSize()).thenReturn(SearchRequest.DEFAULT_RESULTS_SIZE);
+        Mockito.when(request.getSize()).thenReturn(defaultPageSize);
         Mockito.when(request.getQuery()).thenReturn("queryValue");
         SolrRequest solrRequest = mockService.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getRows()),
                 "Solr batch size mismatch");
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getTotalRows()),
                 "Solr total result count mismatch");
         assertEquals(
@@ -175,19 +178,17 @@ class BasicSearchServiceTest {
     void testSearchSolrRequest_SizeIsGreaterThanDefaultResultSize_ButLessThanBatchSize() {
         // when
         Mockito.when(request.getSize())
-                .thenReturn(
-                        BasicSearchService.DEFAULT_SOLR_BATCH_SIZE
-                                - SearchRequest.DEFAULT_RESULTS_SIZE);
+                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - defaultPageSize);
         Mockito.when(request.getQuery()).thenReturn("queryValue");
         SolrRequest solrRequest = mockService.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
         assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - SearchRequest.DEFAULT_RESULTS_SIZE,
+                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - defaultPageSize,
                 solrRequest.getRows(),
                 "Solr batch size mismatch");
         assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - SearchRequest.DEFAULT_RESULTS_SIZE,
+                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - defaultPageSize,
                 solrRequest.getTotalRows(),
                 "Solr total result count mismatch");
         assertEquals(
@@ -239,21 +240,16 @@ class BasicSearchServiceTest {
     @Test
     void testSolrSolrRequest_SizeIsGreaterThanBatchSize() {
         // when
-        Mockito.when(request.getSize())
-                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2)
-                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2)
-                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE);
+        int size = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2;
+        Mockito.when(request.getSize()).thenReturn(size);
         Mockito.when(request.getQuery()).thenReturn("queryValue");
 
         SolrRequest solrRequest = mockService.createSearchSolrRequest(request);
         assertNotNull(solrRequest);
         // then
+        assertEquals(size, Integer.valueOf(solrRequest.getRows()), "Solr batch size mismatch");
         assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE,
-                Integer.valueOf(solrRequest.getRows()),
-                "Solr batch size mismatch");
-        assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE,
+                size,
                 Integer.valueOf(solrRequest.getTotalRows()),
                 "Solr total result count mismatch");
         assertEquals(

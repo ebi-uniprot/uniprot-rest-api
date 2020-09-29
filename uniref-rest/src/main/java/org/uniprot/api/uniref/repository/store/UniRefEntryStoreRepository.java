@@ -11,12 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.store.BatchStoreIterable;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniref.request.UniRefIdRequest;
 import org.uniprot.api.uniref.service.UniRefEntryResult;
 import org.uniprot.core.uniref.*;
@@ -39,6 +39,9 @@ public class UniRefEntryStoreRepository {
     private final RetryPolicy<Object> uniRefLightRetryPolicy;
     private final UniRefMemberStoreClient unirefMemberStore;
     private final UniRefLightStoreClient uniRefLightStore;
+
+    @Value("${search.default.page.size:#{null}}")
+    protected Integer defaultPageSize;
 
     public UniRefEntryStoreRepository(
             UniRefMemberStoreClient unirefMemberStore,
@@ -159,7 +162,7 @@ public class UniRefEntryStoreRepository {
 
     private CursorPage getPage(UniRefIdRequest uniRefIdRequest, int memberCount) {
         if (uniRefIdRequest.getSize() == null) { // set the default result size
-            uniRefIdRequest.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
+            uniRefIdRequest.setSize(defaultPageSize);
         }
         return CursorPage.of(uniRefIdRequest.getCursor(), uniRefIdRequest.getSize(), memberCount);
     }
