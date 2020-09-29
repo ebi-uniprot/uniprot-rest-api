@@ -24,12 +24,13 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BasicSearchServiceTest {
+class BasicSearchServiceTest {
     private BasicSearchService<FakeDocument, FakeEntity> service;
     @Mock private SolrQueryRepository<FakeDocument> repository;
     @Mock private Function<FakeDocument, FakeEntity> entryConverter;
@@ -52,7 +53,7 @@ public class BasicSearchServiceTest {
 
                     @Override
                     protected QueryProcessor getQueryProcessor() {
-                        return new UniProtQueryProcessor(emptyList());
+                        return new UniProtQueryProcessor(emptyList(), emptyMap());
                     }
                 };
         ReflectionTestUtils.setField(
