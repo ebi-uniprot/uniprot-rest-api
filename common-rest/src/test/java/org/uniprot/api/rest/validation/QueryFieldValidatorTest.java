@@ -11,6 +11,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.model.SearchFieldType;
 
@@ -128,6 +129,16 @@ class QueryFieldValidatorTest {
                                 + "(gene:\"CDC7\") AND "
                                 + "((cc_bpcp_kinetics:1234 AND ccev_bpcp_kinetics:\"the value\")))",
                         null);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidWhiteListFieldReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("HGNC:12345 AND PR:12345", null);
         assertTrue(result);
     }
 
@@ -268,6 +279,23 @@ class QueryFieldValidatorTest {
         @Override
         public void addQueryTypeErrorMessage(Query inputQuery, ConstraintValidatorContext context) {
             errorFields.get(ErrorType.INVALID_TYPE).add(inputQuery.getClass().getName());
+        }
+
+        @Override
+        WhitelistFieldConfig getWhitelistFieldConfig() {
+            WhitelistFieldConfig config;
+            try {
+                config = super.getWhitelistFieldConfig();
+            } catch (Exception e) {
+                config = new WhitelistFieldConfig();
+            }
+            Map<String, String> whiteListFields = new HashMap<>();
+            whiteListFields.put("hgnc", "^[0-9]+$");
+            whiteListFields.put("pr", "^[0-9]+$");
+            Map<String, Map<String, String>> whiteListCollection = new HashMap<>();
+            whiteListCollection.put("uniprotkb", whiteListFields);
+            config.setField(whiteListCollection);
+            return config;
         }
     }
 }

@@ -6,8 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Constraint;
@@ -21,6 +20,10 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -57,16 +60,33 @@ public @interface ValidSolrQueryFields {
         private String messagePrefix;
         private SearchFieldConfig searchFieldConfig;
 
+        @Autowired private ApplicationContext applicationContext;
+
+        private Map<String, String> whiteListFields;
+
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
+            SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             try {
                 UniProtDataType uniProtDataType = constraintAnnotation.uniProtDataType();
                 this.searchFieldConfig =
                         SearchFieldConfigFactory.getSearchFieldConfig(uniProtDataType);
                 this.messagePrefix = constraintAnnotation.messagePrefix();
+
+                WhitelistFieldConfig whiteListFieldConfig = getWhitelistFieldConfig();
+                whiteListFields =
+                        whiteListFieldConfig
+                                .getField()
+                                .getOrDefault(
+                                        uniProtDataType.name().toLowerCase(), new HashMap<>());
             } catch (Exception e) {
                 LOGGER.error("Error initializing QueryFieldValidator", e);
+                whiteListFields = new HashMap<>();
             }
+        }
+
+        WhitelistFieldConfig getWhitelistFieldConfig() {
+            return applicationContext.getBean(WhitelistFieldConfig.class);
         }
 
         @Override
@@ -178,7 +198,9 @@ public @interface ValidSolrQueryFields {
             boolean validField = true;
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
             boolean fieldExists = this.searchFieldConfig.searchFieldItemExists(fieldName);
-            if (!fieldExists && !fieldName.equals(DEFAULT_FIELD_NAME)) {
+            if (!fieldExists
+                    && !fieldName.equals(DEFAULT_FIELD_NAME)
+                    && !isWhiteListField(fieldName, value)) {
                 addFieldNameErrorMessage(fieldName, contextImpl);
                 validField = false;
             } else if (fieldExists) {
@@ -193,6 +215,11 @@ public @interface ValidSolrQueryFields {
                 }
             }
             return validField;
+        }
+
+        private boolean isWhiteListField(String fieldName, String value) {
+            return whiteListFields.containsKey(fieldName.toLowerCase())
+                    && value.matches(whiteListFields.get(fieldName.toLowerCase()));
         }
 
         private SearchFieldItem getFieldByName(String fieldName) {

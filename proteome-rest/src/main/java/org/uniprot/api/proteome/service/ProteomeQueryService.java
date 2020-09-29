@@ -1,8 +1,5 @@
 package org.uniprot.api.proteome.service;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -10,11 +7,8 @@ import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.core.proteome.ProteomeEntry;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
@@ -25,7 +19,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 @Service
 @Import(ProteomeSolrQueryConfig.class)
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
-    private static final String PROTEOME_ID_FIELD = "upid";
+    public static final String PROTEOME_ID_FIELD = "upid";
     private final SearchFieldConfig fieldConfig;
     private final QueryProcessor queryProcessor;
 
@@ -33,15 +27,17 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
             ProteomeQueryRepository repository,
             ProteomeFacetConfig facetConfig,
             ProteomeSortClause solrSortClause,
-            SolrQueryConfig proteomeSolrQueryConf) {
+            SolrQueryConfig proteomeSolrQueryConf,
+            QueryProcessor proteomeQueryProcessor,
+            SearchFieldConfig proteomeSearchFieldConfig) {
         super(
                 repository,
                 new ProteomeEntryConverter(),
                 solrSortClause,
                 proteomeSolrQueryConf,
                 facetConfig);
-        fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PROTEOME);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        fieldConfig = proteomeSearchFieldConfig;
+        this.queryProcessor = proteomeQueryProcessor;
     }
 
     @Override
@@ -52,9 +48,5 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }
