@@ -2,6 +2,7 @@ package org.uniprot.api.rest.output.converter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -102,7 +103,10 @@ class AbstractUUWHttpMessageConverterTest {
         ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
         MessageConverterContext<Character> context =
                 createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, null, httpOutputMessage(mockOS));
+
+        assertThrows(
+                StopStreamException.class,
+                () -> converter.writeInternal(context, null, httpOutputMessage(mockOS)));
 
         verify(mockOS).close();
         assertThat(converter.hasCleanedUp(), is(true));
@@ -125,7 +129,10 @@ class AbstractUUWHttpMessageConverterTest {
         ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
         MessageConverterContext<Character> context =
                 createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, null, httpOutputMessage(mockOS));
+
+        assertThrows(
+                StopStreamException.class,
+                () -> converter.writeInternal(context, null, httpOutputMessage(mockOS)));
 
         verify(mockOS).close();
         assertThat(converter.hasCleanedUp(), is(true));
@@ -147,7 +154,10 @@ class AbstractUUWHttpMessageConverterTest {
         ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
         MessageConverterContext<Character> context =
                 createFakeMessageConverterContext(FileType.FILE);
-        converter.writeInternal(context, null, httpOutputMessage(mockOS));
+
+        assertThrows(
+                StopStreamException.class,
+                () -> converter.writeInternal(context, null, httpOutputMessage(mockOS)));
 
         verify(mockOS).close();
         assertThat(converter.hasCleanedUp(), is(true));
