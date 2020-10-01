@@ -1,17 +1,9 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -23,6 +15,14 @@ import org.uniprot.core.uniprotkb.impl.UniProtKBIdBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>}
@@ -38,13 +38,11 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  */
 @Service
 class UniProtEntryQueryResultsConverter {
-
     private final UniProtKBStoreClient entryStore;
     private final RetryPolicy<Object> retryPolicy =
             new RetryPolicy<>()
                     .handle(IOException.class)
                     .withDelay(Duration.ofMillis(100))
-                    //      .withDelay(500,TimeUnit.MILLISECONDS)
                     .withMaxRetries(5);
     private final TaxonomyService taxonomyService;
 
@@ -68,12 +66,22 @@ class UniProtEntryQueryResultsConverter {
     Optional<UniProtKBEntry> convertDoc(UniProtDocument doc, List<ReturnField> filters) {
         if (doc.active) {
             Optional<UniProtKBEntry> opEntry = getEntryFromStore(doc);
-            if (hasLineage(filters) && opEntry.isPresent()) {
-                return addLineage(opEntry.get());
-            } else return opEntry;
+            return opEntry.map(entry -> addLineageIfRequested(filters, entry))
+                    .orElseThrow(
+                            () ->
+                                    new ServiceException(
+                                            "Could not get entry from store: " + doc.accession));
         } else {
             return getInactiveUniProtEntry(doc);
         }
+    }
+
+    private Optional<UniProtKBEntry> addLineageIfRequested(
+            List<ReturnField> filters, UniProtKBEntry e) {
+        if (hasLineage(filters)) {
+            return addLineage(e);
+        }
+        return Optional.of(e);
     }
 
     private boolean hasLineage(List<ReturnField> filters) {
