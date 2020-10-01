@@ -124,10 +124,9 @@ public class PublicationService {
                 .map(this::getPubmedId)
                 .forEach(
                         pubmedId ->
-                            queryBuilder.add(
-                                    new TermQuery(new Term("id", pubmedId.toString())),
-                                    BooleanClause.Occur.SHOULD)
-                        );
+                                queryBuilder.add(
+                                        new TermQuery(new Term("id", pubmedId.toString())),
+                                        BooleanClause.Occur.SHOULD));
 
         SolrRequest solrRequest = getSolrRequest(queryBuilder.build().toString());
         Stream<LiteratureDocument> literatures = repository.getAll(solrRequest);
@@ -221,11 +220,14 @@ public class PublicationService {
                             .map(
                                     category ->
                                             Arrays.stream(PublicationCategory.values())
-                                                .filter(a -> a.name().equalsIgnoreCase(category))
-                                                .map(PublicationCategory::getLabel)
-                                                .findFirst()
-                                                .orElse("")
-                                    )
+                                                    .filter(
+                                                            a ->
+                                                                    a.name()
+                                                                            .equalsIgnoreCase(
+                                                                                    category))
+                                                    .map(PublicationCategory::getLabel)
+                                                    .findFirst()
+                                                    .orElse(""))
                             .filter(Utils::notNullNotEmpty)
                             .collect(Collectors.toList());
             mappedReference.getSourceCategories().clear();

@@ -35,6 +35,7 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -619,7 +620,7 @@ public abstract class AbstractSearchControllerIT {
     // -----------------------------------------------
 
     @Test
-    void searchWithInvalidPageSizeReturnBadRequest() throws Exception {
+    void searchWithInvalidPageSizeZeroReturnBadRequest() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -633,6 +634,26 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*", contains("'size' must be greater than 0")));
+    }
+
+    @Test
+    void searchWithInvalidPageSizeBiggerThanMaxReturnBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*:*")
+                                .param("size", "" + (SearchRequest.MAX_RESULTS_SIZE + 1)));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains("'size' must be less than or equals to 500")));
     }
 
     @Test

@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.uniprot.store.config.UniProtDataType;
 
 /**
  * Created 01/10/2019
@@ -82,30 +81,6 @@ class AbstractSolrSortClauseTest {
                         SolrQuery.SortClause.asc(field(name)),
                         SolrQuery.SortClause.desc(field(age)),
                         SolrQuery.SortClause.asc(FakeSolrSortClause.ID)));
-    }
-
-    private static class FakeSolrSortClause extends AbstractSolrSortClause {
-        private static final String ID = "id_field";
-
-        FakeSolrSortClause() {
-            addDefaultFieldOrderPair("default", SolrQuery.ORDER.asc);
-            addDefaultFieldOrderPair(FakeSolrSortClause.ID, SolrQuery.ORDER.asc);
-        }
-
-        @Override
-        protected String getSolrDocumentIdFieldName() {
-            return ID;
-        }
-
-        @Override
-        public String getSolrSortFieldName(String name) {
-            return field(name);
-        }
-
-        @Override
-        protected UniProtDataType getUniProtDataType() {
-            return null;
-        }
     }
 
     static String field(String name) {
