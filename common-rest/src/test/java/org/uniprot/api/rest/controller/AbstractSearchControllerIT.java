@@ -653,7 +653,7 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.messages.*",
-                                contains("'size' must be less than or equals to 500")));
+                                contains("'size' must be less than or equal to 500")));
     }
 
     @Test
