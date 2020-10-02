@@ -34,7 +34,6 @@ import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.xml.jaxb.proteome.CanonicalGene;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -56,6 +55,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class GeneCentricController extends BasicSearchController<CanonicalProtein> {
 
     private final GeneCentricService service;
+    private final SearchFieldConfig geneCentricSearchFieldConfig;
 
     @Autowired
     public GeneCentricController(
@@ -63,9 +63,11 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             GeneCentricService service,
             @Qualifier("GENECENTRIC")
                     MessageConverterContextFactory<CanonicalProtein> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            SearchFieldConfig geneCentricSearchFieldConfig) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, GENECENTRIC);
         this.service = service;
+        this.geneCentricSearchFieldConfig = geneCentricSearchFieldConfig;
     }
 
     @Tag(name = "genecentric", description = "gene centric service")
@@ -153,10 +155,10 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
             HttpServletRequest request,
             HttpServletResponse response) {
         GeneCentricRequest searchRequest = new GeneCentricRequest();
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
         String query =
-                searchFieldConfig.getSearchFieldItemByName("upid").getFieldName() + ":" + upid;
+                geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName()
+                        + ":"
+                        + upid;
         searchRequest.setQuery(query);
         searchRequest.setFields(fields);
         QueryResult<CanonicalProtein> results = service.search(searchRequest);

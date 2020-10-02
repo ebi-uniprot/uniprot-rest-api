@@ -124,7 +124,9 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             after(context, outputStream);
             logStats(counter.get(), start);
         } catch (StopStreamException | IOException e) {
-            LOGGER.error("Error encountered when streaming data: closing stream.", e);
+            String errorMsg = "Error encountered when streaming data.";
+            outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
+            throw new StopStreamException(errorMsg, e);
         } finally {
             outputStream.close();
             entities.close();
@@ -148,26 +150,30 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             Instant start,
             AtomicInteger counter) {
         AtomicBoolean firstIteration = new AtomicBoolean(true);
-        entityCollection.forEach(
-                entity -> {
-                    try {
-                        int currentCount = counter.getAndIncrement();
-                        flushWhenNecessary(outputStream, currentCount);
-                        logWhenNecessary(start, currentCount);
+        try {
+            entityCollection.forEach(
+                    entity -> {
+                        try {
+                            int currentCount = counter.getAndIncrement();
+                            flushWhenNecessary(outputStream, currentCount);
+                            logWhenNecessary(start, currentCount);
 
-                        if (Objects.nonNull(ENTITY_SEPARATOR.get())) {
-                            if (firstIteration.get()) {
-                                firstIteration.set(false);
-                            } else {
-                                writeEntitySeparator(outputStream, ENTITY_SEPARATOR.get());
+                            if (Objects.nonNull(ENTITY_SEPARATOR.get())) {
+                                if (firstIteration.get()) {
+                                    firstIteration.set(false);
+                                } else {
+                                    writeEntitySeparator(outputStream, ENTITY_SEPARATOR.get());
+                                }
                             }
-                        }
 
-                        writeEntity(entity, outputStream);
-                    } catch (Exception e) {
-                        throw new StopStreamException("Could not write entry: " + entity, e);
-                    }
-                });
+                            writeEntity(entity, outputStream);
+                        } catch (Exception e) {
+                            throw new StopStreamException("Could not write entry: " + entity, e);
+                        }
+                    });
+        } catch (Exception e) {
+            throw new StopStreamException("Stream must be closed", e);
+        }
     }
 
     protected void writeEntitySeparator(OutputStream outputStream, String separator)

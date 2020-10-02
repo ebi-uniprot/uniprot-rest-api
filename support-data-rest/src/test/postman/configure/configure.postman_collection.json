@@ -346,7 +346,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/search-terms",
+							"raw": "{{base_url}}/{{path_context}}/configure/uniprotkb/search_terms",
 							"host": [
 								"{{base_url}}"
 							],
@@ -354,7 +354,7 @@
 								"{{path_context}}",
 								"configure",
 								"uniprotkb",
-								"search-terms"
+								"search_terms"
 							]
 						}
 					},

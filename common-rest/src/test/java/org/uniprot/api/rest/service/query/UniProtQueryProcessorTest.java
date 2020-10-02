@@ -1,5 +1,15 @@
 package org.uniprot.api.rest.service.query;
 
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -9,13 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 /**
  * This class tests the full flow of functionality offered by {@link UniProtQueryProcessor},
@@ -32,9 +35,30 @@ class UniProtQueryProcessorTest {
 
     @BeforeEach
     void setUp() {
+        Map<String, String> whitelistFields = new HashMap<>();
+        whitelistFields.put("go", "^[0-9]+$");
         processor =
                 new UniProtQueryProcessor(
-                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")));
+                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")),
+                        whitelistFields);
+    }
+
+    @Test
+    void optimiseWhitelistFieldQuery() {
+        String processedQuery = processor.processQuery("GO:1234567");
+        assertThat(processedQuery, is("GO\\:1234567"));
+    }
+
+    @Test
+    void optimiseWhitelistFieldQueryAndDefaultSearchValue() {
+        String processedQuery = processor.processQuery("GO:1234567 OR P12345");
+        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+    }
+
+    @Test
+    void optimiseWhitelistFieldNeedToBeTermQuery() {
+        String processedQuery = processor.processQuery("GO AND 1234567");
+        assertThat(processedQuery, is("GO AND 1234567"));
     }
 
     @Test
@@ -95,7 +119,7 @@ class UniProtQueryProcessorTest {
     @Test
     void complexQueryWithOptimisation() {
         String ACC = "P12345";
-        String pre = "a OR ( b AND ( +c:something AND -d:something ) AND ( ";
+        String pre = "a OR ( b AND ( +c:something -d:something ) AND ( ";
         String post = " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String query = pre + ACC + post;
         String processedQuery = processor.processQuery(query);
@@ -105,7 +129,7 @@ class UniProtQueryProcessorTest {
     @Test
     void complexQueryWithNoOptimisation() {
         String query =
-                "a OR ( b AND ( +c:something AND -d:something ) AND ( "
+                "a OR ( b AND ( +c:something -d:something ) AND ( "
                         + "XX"
                         + " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String processedQuery = processor.processQuery(query);
