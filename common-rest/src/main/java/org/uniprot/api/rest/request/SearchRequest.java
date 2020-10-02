@@ -12,7 +12,7 @@ import org.uniprot.core.util.Utils;
  */
 public interface SearchRequest extends BasicRequest {
 
-    Integer DEFAULT_RESULTS_SIZE = 25;
+    int MAX_RESULTS_SIZE = 500;
 
     String getFacets();
 

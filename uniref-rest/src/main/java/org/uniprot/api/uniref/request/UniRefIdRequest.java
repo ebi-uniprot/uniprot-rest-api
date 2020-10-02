@@ -1,5 +1,8 @@
 package org.uniprot.api.uniref.request;
 
+import static org.uniprot.api.rest.request.SearchRequest.*;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
@@ -47,6 +50,7 @@ public class UniRefIdRequest {
 
     @Parameter(description = "Size of the result. Defaults to 25")
     @Positive(message = "{search.positive}")
+    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     public boolean isComplete() {

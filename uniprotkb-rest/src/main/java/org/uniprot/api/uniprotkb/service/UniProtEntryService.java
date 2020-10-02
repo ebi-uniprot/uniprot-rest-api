@@ -93,7 +93,7 @@ public class UniProtEntryService
     @Override
     public QueryResult<UniProtKBEntry> search(SearchRequest request) {
 
-        SolrRequest solrRequest = createSearchSolrRequest(request, true);
+        SolrRequest solrRequest = createSearchSolrRequest(request);
 
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
@@ -192,11 +192,11 @@ public class UniProtEntryService
     }
 
     @Override
-    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
+    public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
         // fill the common params from the basic service class
-        SolrRequest solrRequest = super.createSolrRequest(uniProtRequest, includeFacets);
+        SolrRequest solrRequest = super.createSearchSolrRequest(uniProtRequest);
 
         // uniprotkb related stuff
         solrRequest.setQueryConfig(solrQueryConfig);

@@ -1,5 +1,12 @@
 package org.uniprot.api.rest.service;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import lombok.Data;
+
 import lombok.Builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +20,11 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+
+import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.api.rest.search.FakeSolrSortClause;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -23,8 +33,6 @@ import org.uniprot.store.search.document.Document;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -32,12 +40,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BasicSearchServiceTest {
     private BasicSearchService<FakeDocument, FakeEntity> service;
+    private final AbstractSolrSortClause solrSortClause = new FakeSolrSortClause();
+    private final FacetConfig facetConfig = new FakeFacetConfig();
     @Mock private SolrQueryRepository<FakeDocument> repository;
     @Mock private Function<FakeDocument, FakeEntity> entryConverter;
-    @Mock private AbstractSolrSortClause solrSortClause;
     @Mock private SolrQueryConfig queryBoosts;
-    @Mock private FacetConfig facetConfig;
-    @Mock private SearchRequest request;
+
+    private static final int defaultPageSize = 10;
 
     @BeforeEach
     void setUpBeforeAll() {
@@ -60,6 +69,9 @@ class BasicSearchServiceTest {
                 service,
                 "solrBatchSize",
                 BasicSearchService.DEFAULT_SOLR_BATCH_SIZE); // default batch size
+
+        ReflectionTestUtils.setField(
+                service, "defaultPageSize", defaultPageSize);
     }
 
     @Test
@@ -114,8 +126,8 @@ class BasicSearchServiceTest {
     @Test
     void testDownloadSolrRequestDefaults() {
         // when
-        when(request.getSize()).thenReturn(-1);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setQuery("queryValue");
         SolrRequest solrRequest = service.createDownloadSolrRequest(request);
         // then
         assertNotNull(solrRequest);
@@ -130,8 +142,9 @@ class BasicSearchServiceTest {
     @Test
     void testDownloadSolrRequest_SizeIsLessThanBatchSize() {
         // when
-        when(request.getSize()).thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 2);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 2);
+        request.setQuery("queryValue");
 
         SolrRequest solrRequest = service.createDownloadSolrRequest(request);
         assertNotNull(solrRequest);
@@ -151,9 +164,9 @@ class BasicSearchServiceTest {
     @Test
     void testDownloadSolrRequest_SizeIsEqualToBatchSize() {
         // when
-
-        when(request.getSize()).thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE);
+        request.setQuery("queryValue");
 
         SolrRequest solrRequest = service.createDownloadSolrRequest(request);
         assertNotNull(solrRequest);
@@ -173,8 +186,9 @@ class BasicSearchServiceTest {
     @Test
     void testDownloadSolrRequest_SizeIsGreaterThanBatchSize() {
         // when
-        when(request.getSize()).thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2);
+        request.setQuery("queryValue");
 
         SolrRequest solrRequest = service.createDownloadSolrRequest(request);
         assertNotNull(solrRequest);
@@ -192,17 +206,17 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequestDefaults() {
         // when
-        when(request.getSize()).thenReturn(SearchRequest.DEFAULT_RESULTS_SIZE);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setQuery("queryValue");
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getRows()),
                 "Solr batch size mismatch");
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getTotalRows()),
                 "Solr total result count mismatch");
         assertEquals(
@@ -212,17 +226,15 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsLessThanDefaultResultSize() {
         // when
-        when(request.getSize()).thenReturn(SearchRequest.DEFAULT_RESULTS_SIZE - 5);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(defaultPageSize - 5);
+        request.setQuery("queryValue");
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
+        assertEquals(defaultPageSize - 5, solrRequest.getRows(), "Solr batch size mismatch");
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE - 5,
-                solrRequest.getRows(),
-                "Solr batch size mismatch");
-        assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE - 5,
+                defaultPageSize - 5,
                 solrRequest.getTotalRows(),
                 "Solr total result count mismatch");
         assertEquals(
@@ -232,17 +244,18 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsEqualToDefaultResultSize() {
         // when
-        when(request.getSize()).thenReturn(SearchRequest.DEFAULT_RESULTS_SIZE);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(defaultPageSize);
+        request.setQuery("queryValue");
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getRows()),
                 "Solr batch size mismatch");
         assertEquals(
-                SearchRequest.DEFAULT_RESULTS_SIZE,
+                defaultPageSize,
                 Integer.valueOf(solrRequest.getTotalRows()),
                 "Solr total result count mismatch");
         assertEquals(
@@ -252,22 +265,15 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsGreaterThanDefaultResultSize_ButLessThanBatchSize() {
         // when
-        when(request.getSize())
-                .thenReturn(
-                        BasicSearchService.DEFAULT_SOLR_BATCH_SIZE
-                                - SearchRequest.DEFAULT_RESULTS_SIZE);
-        when(request.getQuery()).thenReturn("queryValue");
+        int size = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - defaultPageSize;
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(size);
+        request.setQuery("queryValue");
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         // then
         assertNotNull(solrRequest);
-        assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - SearchRequest.DEFAULT_RESULTS_SIZE,
-                solrRequest.getRows(),
-                "Solr batch size mismatch");
-        assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - SearchRequest.DEFAULT_RESULTS_SIZE,
-                solrRequest.getTotalRows(),
-                "Solr total result count mismatch");
+        assertEquals(size, solrRequest.getRows(), "Solr batch size mismatch");
+        assertEquals(size, solrRequest.getTotalRows(), "Solr total result count mismatch");
         assertEquals(
                 solrRequest.getRows(), solrRequest.getTotalRows(), "rows and totalRows mismatch");
     }
@@ -275,20 +281,16 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsLessThanBatchSize() {
         // when
-        when(request.getSize()).thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 2);
-        when(request.getQuery()).thenReturn("queryValue");
+        int size = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 2;
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(size);
+        request.setQuery("queryValue");
 
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         assertNotNull(solrRequest);
         // then
-        assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 2,
-                solrRequest.getRows(),
-                "Solr batch size mismatch");
-        assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE - 2,
-                solrRequest.getTotalRows(),
-                "Solr total result count mismatch");
+        assertEquals(size, solrRequest.getRows(), "Solr batch size mismatch");
+        assertEquals(size, solrRequest.getTotalRows(), "Solr total result count mismatch");
         assertEquals(
                 solrRequest.getRows(), solrRequest.getTotalRows(), "rows and totalRows mismatch");
     }
@@ -296,9 +298,9 @@ class BasicSearchServiceTest {
     @Test
     void testSearchSolrRequest_SizeIsEqualToBatchSize() {
         // when
-
-        when(request.getSize()).thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE);
-        when(request.getQuery()).thenReturn("queryValue");
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE);
+        request.setQuery("queryValue");
 
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         assertNotNull(solrRequest);
@@ -318,29 +320,62 @@ class BasicSearchServiceTest {
     @Test
     void testSolrSolrRequest_SizeIsGreaterThanBatchSize() {
         // when
-        when(request.getSize())
-                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2)
-                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2)
-                .thenReturn(BasicSearchService.DEFAULT_SOLR_BATCH_SIZE);
-        when(request.getQuery()).thenReturn("queryValue");
+        int size = BasicSearchService.DEFAULT_SOLR_BATCH_SIZE * 2;
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setSize(size);
+        request.setQuery("queryValue");
 
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         assertNotNull(solrRequest);
         // then
+        assertEquals(size, Integer.valueOf(solrRequest.getRows()), "Solr batch size mismatch");
         assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE,
-                Integer.valueOf(solrRequest.getRows()),
-                "Solr batch size mismatch");
-        assertEquals(
-                BasicSearchService.DEFAULT_SOLR_BATCH_SIZE,
+                size,
                 Integer.valueOf(solrRequest.getTotalRows()),
                 "Solr total result count mismatch");
         assertEquals(
                 solrRequest.getRows(), solrRequest.getTotalRows(), "rows and totalRows mismatch");
     }
 
+    @Test
+    void testSearchSolrRequest_WithFacets() {
+        // when
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setQuery("queryValue");
+        request.setFacets("facet1,facet2");
+
+        SolrRequest solrRequest = service.createSearchSolrRequest(request);
+        assertNotNull(solrRequest);
+
+        // then
+        assertNotNull(solrRequest.getFacets());
+        assertEquals(2, solrRequest.getFacets().size());
+        assertEquals("facet1", solrRequest.getFacets().get(0));
+        assertEquals("facet2", solrRequest.getFacets().get(1));
+
+        assertNotNull(solrRequest.getFacetConfig());
+    }
+
+    @Test
+    void testSearchSolrRequest_WithSort() {
+        // when
+        FakeSearchRequest request = new FakeSearchRequest();
+        request.setQuery("queryValue");
+        request.setSort("field1 asc");
+
+        SolrRequest solrRequest = service.createSearchSolrRequest(request);
+        assertNotNull(solrRequest);
+
+        // then
+        assertNotNull(solrRequest.getSorts());
+        assertEquals(2, solrRequest.getSorts().size());
+    }
+
     @Builder
     private static class FakeDocument implements Document {
+
+        private static final long serialVersionUID = -2078841376204509749L;
+
         String id;
 
         @Override
@@ -352,5 +387,16 @@ class BasicSearchServiceTest {
     @Builder
     private static class FakeEntity {
         String id;
+    }
+
+    @Data
+    private static class FakeSearchRequest implements SearchRequest {
+
+        private Integer size;
+        private String cursor;
+        private String facets;
+        private String query;
+        private String fields;
+        private String sort;
     }
 }

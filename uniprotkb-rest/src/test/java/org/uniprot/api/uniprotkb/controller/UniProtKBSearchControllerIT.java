@@ -104,7 +104,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private TaxonomyRepository taxRepository;
 
-    @Value("${solr.query.batchSize:#{null}}")
+    @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     private UniProtKBStoreClient storeClient;

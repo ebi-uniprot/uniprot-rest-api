@@ -54,7 +54,7 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Autowired private KeywordRepository repository;
 
-    @Value("${solr.query.batchSize:#{null}}")
+    @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     @Override

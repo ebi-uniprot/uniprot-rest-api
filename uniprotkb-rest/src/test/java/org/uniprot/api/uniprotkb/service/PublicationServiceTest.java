@@ -34,6 +34,8 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
  */
 class PublicationServiceTest {
 
+    private static final int DEFAULT_PAGE_SIZE = 25;
+
     @Test
     void getPublicationsByUniprotAccessionCanReturnUniprotEntryPublications() {
         // when
@@ -51,6 +53,7 @@ class PublicationServiceTest {
         PublicationService service =
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         QueryResult<PublicationEntry> result =
                 service.getPublicationsByUniprotAccession("P12345", request);
@@ -97,6 +100,7 @@ class PublicationServiceTest {
         PublicationService service =
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         QueryResult<PublicationEntry> result =
                 service.getPublicationsByUniprotAccession("P12345", request);
@@ -139,6 +143,7 @@ class PublicationServiceTest {
         PublicationService service =
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         request.setFacets("category,source,study_type");
         request.setQuery("category:Interaction");
@@ -168,6 +173,7 @@ class PublicationServiceTest {
         PublicationService service =
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         request.setFacets("category,source,study_type");
         request.setSize(3);
@@ -205,6 +211,7 @@ class PublicationServiceTest {
         PublicationService service =
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         request.setFacets("category,source,study_type");
         request.setSize(3);
@@ -242,6 +249,7 @@ class PublicationServiceTest {
         PublicationService service =
                 new PublicationService(
                         storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         request.setFacets("category,source,study_type");
         request.setSize(3);
