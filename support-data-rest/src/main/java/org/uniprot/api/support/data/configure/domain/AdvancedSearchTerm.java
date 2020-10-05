@@ -1,10 +1,7 @@
 package org.uniprot.api.support.data.configure.domain;
 
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +16,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.config.searchfield.model.SearchFieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
+import org.uniprot.store.search.domain.impl.GoEvidences;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -43,6 +41,7 @@ public class AdvancedSearchTerm implements Serializable {
     private String autoCompleteQueryTerm;
     @JsonIgnore private String autoCompleteQueryFieldValidRegex;
     private String regex;
+    private String valuePrefix;
     private List<Value> values;
     private List<AdvancedSearchTerm> items;
     private List<EvidenceGroup> evidenceGroups;
@@ -108,7 +107,11 @@ public class AdvancedSearchTerm implements Serializable {
         if (fi.getFieldType() != null) {
             b.fieldType(fi.getFieldType().name().toLowerCase());
             if (fi.getFieldType() == SearchFieldType.EVIDENCE) {
-                b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
+                if (fi.getId().equalsIgnoreCase("go_evidence")) {
+                    b.evidenceGroups(GoEvidences.INSTANCE.getEvidences());
+                } else {
+                    b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
+                }
             }
         }
 

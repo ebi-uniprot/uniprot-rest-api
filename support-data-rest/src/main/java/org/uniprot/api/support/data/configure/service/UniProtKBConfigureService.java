@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
@@ -38,7 +39,20 @@ public class UniProtKBConfigureService {
     private static final EvidenceDatabaseTypes EVIDENCE_DBS = EvidenceDatabaseTypes.INSTANCE;
 
     public List<AdvancedSearchTerm> getUniProtSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPROTKB);
+        List<AdvancedSearchTerm> result =
+                AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPROTKB);
+        // ADD UniProtkb databases
+        AdvancedSearchTerm xRef =
+                result.stream()
+                        .filter(item -> item.getId().equals("cross_references"))
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new ServiceException(
+                                                "Unable to find cross_references for advanced search"));
+        xRef.setItemType("group");
+        xRef.setItems(getCrossReferencesSearchItem());
+        return result;
     }
 
     public List<EvidenceGroup> getAnnotationEvidences() {
@@ -58,7 +72,7 @@ public class UniProtKBConfigureService {
                         .collect(Collectors.toList());
 
         // add the Any DB Group
-        databases.add(ANY_DB_GROUP);
+        databases.add(0, ANY_DB_GROUP);
 
         return databases;
     }
@@ -72,6 +86,14 @@ public class UniProtKBConfigureService {
 
     public List<UniProtReturnField> getResultFields2() {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPROTKB);
+    }
+
+    public List<UniProtDatabaseDetail> getAllDatabases() {
+        return DBX_TYPES.getAllDbTypes();
+    }
+
+    public List<EvidenceDatabaseDetail> getEvidenceDatabases() {
+        return EVIDENCE_DBS.getAllEvidenceDatabases();
     }
 
     private Tuple convertToTuple(UniProtDatabaseDetail dbType) {
@@ -89,11 +111,36 @@ public class UniProtKBConfigureService {
         return new DatabaseGroupImpl(dbCategory.getDisplayName(), databaseTypes);
     }
 
-    public List<UniProtDatabaseDetail> getAllDatabases() {
-        return DBX_TYPES.getAllDbTypes();
+    private List<AdvancedSearchTerm> getCrossReferencesSearchItem() {
+        return getDatabases().stream()
+                .map(this::databaseGroupToAdvancedSearchTerm)
+                .collect(Collectors.toList());
     }
 
-    public List<EvidenceDatabaseDetail> getEvidenceDatabases() {
-        return EVIDENCE_DBS.getAllEvidenceDatabases();
+    private AdvancedSearchTerm databaseGroupToAdvancedSearchTerm(DatabaseGroup databaseGroup) {
+        List<AdvancedSearchTerm> categoryDbs =
+                databaseGroup.getItems().stream()
+                        .map(this::databaseItemToAdvancedSearchTerm)
+                        .collect(Collectors.toList());
+
+        String cleanName = databaseGroup.getGroupName().replace(" ", "_").toLowerCase();
+        AdvancedSearchTerm.AdvancedSearchTermBuilder builder = AdvancedSearchTerm.builder();
+        builder.label(databaseGroup.getGroupName());
+        builder.id("xref_group_" + cleanName);
+        builder.itemType("group");
+        builder.items(categoryDbs);
+        return builder.build();
+    }
+
+    private AdvancedSearchTerm databaseItemToAdvancedSearchTerm(Tuple item) {
+        AdvancedSearchTerm.AdvancedSearchTermBuilder builder = AdvancedSearchTerm.builder();
+        builder.id("xref_" + item.getValue());
+        builder.label(item.getName());
+        builder.valuePrefix(item.getValue() + "-");
+        builder.itemType("single");
+        builder.term("xref");
+        builder.dataType("string");
+        builder.fieldType("general");
+        return builder.build();
     }
 }
