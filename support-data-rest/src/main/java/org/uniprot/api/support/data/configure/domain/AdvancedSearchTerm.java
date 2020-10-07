@@ -44,6 +44,7 @@ public class AdvancedSearchTerm implements Serializable {
     private String valuePrefix;
     private List<Value> values;
     private List<AdvancedSearchTerm> items;
+    private List<AdvancedSearchTerm> siblings;
     private List<EvidenceGroup> evidenceGroups;
 
     @Data
@@ -70,7 +71,11 @@ public class AdvancedSearchTerm implements Serializable {
             List<SearchFieldItem> childFieldItems = getChildFieldItems(config, currentItem.getId());
             List<AdvancedSearchTerm> children = convert(childFieldItems, comparatorByChildNumber);
             queue.addAll(children);
-            currentItem.setItems(children);
+            if (currentItem.getItemType().equals("sibling_group")) {
+                currentItem.setSiblings(children);
+            } else {
+                currentItem.setItems(children);
+            }
         }
         return rootSearchTermConfigs;
     }
