@@ -159,6 +159,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         document.proteomeStored = getBinary(entry);
         document.isRedundant = i % 2 != 0;
         document.isReferenceProteome = i % 2 != 0;
+        document.isExcluded = i % 2 != 0;
         document.proteomeType = 1;
         document.score = 3;
         document.organismTaxon = document.organismName;
@@ -294,6 +295,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                                         .build())
                         .genomeAssembly(genomeAssembly)
                         .proteomeCompletenessReport(completenessReport)
+                        .exclusionReasonsAdd(ExclusionReason.MIXED_CULTURE)
                         .annotationScore(15);
 
         return builder.build();
