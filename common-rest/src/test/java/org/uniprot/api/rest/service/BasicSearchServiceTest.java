@@ -2,12 +2,18 @@ package org.uniprot.api.rest.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-import lombok.Data;
+import java.util.Optional;
+import java.util.function.Function;
 
 import lombok.Builder;
+import lombok.Data;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +26,6 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -29,13 +34,6 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
-
-import java.util.Optional;
-import java.util.function.Function;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BasicSearchServiceTest {
@@ -70,8 +68,7 @@ class BasicSearchServiceTest {
                 "solrBatchSize",
                 BasicSearchService.DEFAULT_SOLR_BATCH_SIZE); // default batch size
 
-        ReflectionTestUtils.setField(
-                service, "defaultPageSize", defaultPageSize);
+        ReflectionTestUtils.setField(service, "defaultPageSize", defaultPageSize);
     }
 
     @Test
