@@ -2,12 +2,9 @@ package org.uniprot.api.support.data.configure.domain;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.AssertionFailedError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,11 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.uniprot.cv.evidence.GOEvidences;
 import org.uniprot.store.config.UniProtDataType;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
@@ -78,12 +73,6 @@ class AdvancedSearchTermIT {
     @BeforeAll
     static void setUp() {
         SEARCH_TERMS = AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPROTKB);
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(SEARCH_TERMS));
-        } catch (JsonProcessingException e) {
-            System.out.println("ERROR:"+e.getMessage());
-        }
     }
 
     @ParameterizedTest(name = "[{0}] == \"{1}\" ?")
