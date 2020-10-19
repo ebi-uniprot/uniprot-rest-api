@@ -1,17 +1,16 @@
 package org.uniprot.api.rest.service.query.processor;
 
-import org.apache.lucene.queryparser.flexible.core.nodes.*;
-import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
-import org.uniprot.api.common.repository.search.QueryOperator;
-import org.uniprot.api.common.repository.search.SolrRequest;
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+import org.apache.lucene.queryparser.flexible.core.nodes.*;
+import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
+import org.uniprot.api.common.repository.search.QueryOperator;
+import org.uniprot.api.common.repository.search.SolrRequest;
 
 /**
  * Created 23/08/2020
@@ -19,6 +18,16 @@ import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBL
  * @author Edd
  */
 class UniProtDefaultFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
+    private final Set<String> stopWords;
+
+    UniProtDefaultFieldQueryNodeProcessor(Set<String> stopWords) {
+        HashSet<String> realStopWords = new HashSet<>();
+        realStopWords.add("and");
+        realStopWords.add("or");
+        realStopWords.addAll(stopWords);
+        this.stopWords = realStopWords;
+    }
+
     @Override
     protected QueryNode preProcessNode(QueryNode node) {
         return node;
@@ -33,23 +42,13 @@ class UniProtDefaultFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
             if (SolrRequest.DEFAULT_OPERATOR == QueryOperator.AND) {
                 // explicitly interpret the default operator as AND
                 return conjuctionWithoutStopTerms(node);
+                //                return new AndQueryNode(node.getChildren());
             } else {
                 // explicitly interpret the default operator as OR
                 return new OrQueryNode((node.getChildren()));
             }
         }
         return node;
-    }
-
-    static Set<String> stopWords = new HashSet<>();
-
-    static {
-        Stream.of(
-                        "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in",
-                        "into", "is", "it", "no", "not", "of", "on", "or", "such", "that", "the",
-                        "their", "then", "there", "these", "they", "this", "to", "was", "will",
-                        "with", "which")
-                .forEach(stopWords::add);
     }
 
     private AndQueryNode conjuctionWithoutStopTerms(QueryNode node1) {
@@ -60,8 +59,9 @@ class UniProtDefaultFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
                 // handle all subtypes of FieldQueryNode
                 if (!(node instanceof QuotedFieldQueryNode) && !(node instanceof FuzzyQueryNode)) {
                     FieldQueryNode fieldQueryNode = (FieldQueryNode) node;
-                    if (fieldQueryNode.getField().equals(IMPOSSIBLE_FIELD)
-                            && !stopWords.contains(fieldQueryNode.getText().toString().toLowerCase())) {
+                    if ( // fieldQueryNode.getField().equals(IMPOSSIBLE_FIELD)
+                    //  &&
+                    isNotAStopWord(fieldQueryNode)) {
                         childrenWithoutStopTerms.add(node);
                     }
                 } else {
@@ -73,6 +73,15 @@ class UniProtDefaultFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
         }
 
         return new AndQueryNode(childrenWithoutStopTerms);
+    }
+
+    private boolean isNotAStopWord(FieldQueryNode fieldQueryNode) {
+        if (stopWords.isEmpty()) {
+            return true;
+        } else {
+            return !(fieldQueryNode.getField().equals(IMPOSSIBLE_FIELD)
+                    && stopWords.contains(fieldQueryNode.getText().toString().toLowerCase()));
+        }
     }
 
     @Override

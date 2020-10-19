@@ -11,6 +11,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.store.config.UniProtDataType;
@@ -41,9 +42,12 @@ public class CrossRefSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.CROSSREF.toString().toLowerCase(), new HashMap<>());
-        return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(crossRefSearchFieldConfig),
-                crossRefWhiteListFields);
+        return UniProtQueryProcessor.newInstance(
+                UniProtQueryProcessorConfig.builder()
+                        .optimisableFields(
+                                getDefaultSearchOptimisedFieldItems(crossRefSearchFieldConfig))
+                        .whiteListFields(crossRefWhiteListFields)
+                        .build());
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

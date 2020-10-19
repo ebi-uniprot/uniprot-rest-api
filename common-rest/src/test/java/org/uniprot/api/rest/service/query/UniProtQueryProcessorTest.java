@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
@@ -38,9 +39,13 @@ class UniProtQueryProcessorTest {
         Map<String, String> whitelistFields = new HashMap<>();
         whitelistFields.put("go", "^[0-9]+$");
         processor =
-                new UniProtQueryProcessor(
-                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")),
-                        whitelistFields);
+                UniProtQueryProcessor.newInstance(
+                        UniProtQueryProcessorConfig.builder()
+                                .optimisableFields(
+                                        singletonList(
+                                                searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")))
+                                .whiteListFields(whitelistFields)
+                                .build());
     }
 
     @Test
@@ -62,16 +67,30 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void test1() {
-        String processedQuery = processor.processQuery("a b");
-        assertThat(processedQuery, is("b"));
+    void ignoreTheAndStopWordThenInterpretDefaultQuery() {
+        String processedQuery = processor.processQuery("a and b");
+        assertThat(processedQuery, is("a AND b"));
     }
 
     @Test
-    void test2() {
+    void ignoreTheOrStopWordThenInterpretDefaultQuery() {
+        String processedQuery = processor.processQuery("a or b");
+        assertThat(processedQuery, is("a AND b"));
+    }
+
+    @Test
+    void handleORQuery() {
+        String processedQuery = processor.processQuery("a OR b");
+        assertThat(processedQuery, is("a OR b"));
+    }
+
+    @Test
+    void longerExample() {
         String processedQuery =
                 processor.processQuery("The allele defined by Arg-6 and Glu-89 is associated ");
-        assertThat(processedQuery, is("allele AND defined AND Arg-6 AND Glu-89 AND associated"));
+        assertThat(
+                processedQuery,
+                is("The AND allele AND defined AND by AND Arg-6 AND Glu-89 AND is AND associated"));
     }
 
     @Test
@@ -81,7 +100,7 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void useAndAsDefault2() {
+    void useAndAsDefaultWithOneClauseAsAFieldQuery() {
         String processedQuery = processor.processQuery("a:thing b");
         assertThat(processedQuery, is("a:thing AND b"));
     }
@@ -119,7 +138,7 @@ class UniProtQueryProcessorTest {
     @Test
     void complexQueryWithOptimisation() {
         String ACC = "P12345";
-        String pre = "a OR ( b AND ( +c:something -d:something ) AND ( ";
+        String pre = "a OR ( b AND ( +c:something AND -d:something ) AND ( ";
         String post = " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String query = pre + ACC + post;
         String processedQuery = processor.processQuery(query);
@@ -129,7 +148,7 @@ class UniProtQueryProcessorTest {
     @Test
     void complexQueryWithNoOptimisation() {
         String query =
-                "a OR ( b AND ( +c:something -d:something ) AND ( "
+                "a OR ( b AND ( +c:something AND -d:something ) AND ( "
                         + "XX"
                         + " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String processedQuery = processor.processQuery(query);

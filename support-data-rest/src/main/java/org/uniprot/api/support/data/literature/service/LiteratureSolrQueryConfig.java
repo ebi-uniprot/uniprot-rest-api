@@ -11,6 +11,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -41,9 +42,12 @@ public class LiteratureSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.LITERATURE.toString().toLowerCase(),
                                 new HashMap<>());
-        return new UniProtQueryProcessor(
-                getDefaultSearchOptimisedFieldItems(literatureSearchFieldConfig),
-                literatureWhiteListFields);
+        return UniProtQueryProcessor.newInstance(
+                UniProtQueryProcessorConfig.builder()
+                        .optimisableFields(
+                                getDefaultSearchOptimisedFieldItems(literatureSearchFieldConfig))
+                        .whiteListFields(literatureWhiteListFields)
+                        .build());
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

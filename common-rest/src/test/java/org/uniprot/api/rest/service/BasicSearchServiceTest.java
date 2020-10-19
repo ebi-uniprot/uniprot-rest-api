@@ -1,6 +1,14 @@
 package org.uniprot.api.rest.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+import java.util.function.Function;
+
 import lombok.Builder;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,17 +25,9 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
-
-import java.util.Optional;
-import java.util.function.Function;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BasicSearchServiceTest {
@@ -53,7 +53,8 @@ class BasicSearchServiceTest {
 
                     @Override
                     protected QueryProcessor getQueryProcessor() {
-                        return new UniProtQueryProcessor(emptyList(), emptyMap());
+                        return UniProtQueryProcessor.newInstance(
+                                UniProtQueryProcessorConfig.builder().build());
                     }
                 };
         ReflectionTestUtils.setField(

@@ -1,8 +1,6 @@
 package org.uniprot.api.rest.service.query;
 
-import java.util.List;
-import java.util.Map;
-
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
@@ -11,7 +9,7 @@ import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 
 /**
  * This class does the following:
@@ -30,14 +28,14 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author Edd
  */
 @Slf4j
+@Builder
 public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final UniProtQueryNodeProcessorPipeline queryProcessorPipeline;
 
-    public UniProtQueryProcessor(
-            List<SearchFieldItem> optimisableFields, Map<String, String> whiteListFields) {
-        this(new UniProtQueryNodeProcessorPipeline(optimisableFields, whiteListFields));
+    public static UniProtQueryProcessor newInstance(UniProtQueryProcessorConfig config) {
+        return new UniProtQueryProcessor(new UniProtQueryNodeProcessorPipeline(config));
     }
 
     public UniProtQueryProcessor(UniProtQueryNodeProcessorPipeline pipeline) {
