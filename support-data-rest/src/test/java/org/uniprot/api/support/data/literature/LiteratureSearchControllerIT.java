@@ -70,7 +70,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Autowired private LiteratureRepository repository;
 
-    @Value("${solr.query.batchSize:#{null}}")
+    @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     @Override

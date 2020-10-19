@@ -10,6 +10,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryOperator;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -48,6 +49,9 @@ public class PublicationService {
     private final LiteratureStoreEntryConverter entryStoreConverter;
     private final SearchFieldConfig searchFieldConfig;
 
+    @Value("${search.default.page.size:#{null}}")
+    protected Integer defaultPageSize;
+
     public PublicationService(
             UniProtKBStoreClient entryStore,
             LiteratureRepository repository,
@@ -76,12 +80,18 @@ public class PublicationService {
         }
 
         // PAGINATE THE RESULT
-        CursorPage page =
-                CursorPage.of(request.getCursor(), request.getSize(), publications.size());
+        CursorPage page = getPage(request, publications);
         publications =
                 publications.subList(page.getOffset().intValue(), CursorPage.getNextOffset(page));
 
         return QueryResult.of(publications.stream(), page, facets);
+    }
+
+    private CursorPage getPage(PublicationRequest request, List<PublicationEntry> publications) {
+        if (request.getSize() == null) {
+            request.setSize(defaultPageSize);
+        }
+        return CursorPage.of(request.getCursor(), request.getSize(), publications.size());
     }
 
     private List<PublicationEntry> getUniprotEntryPublicationEntries(String accession) {
@@ -113,11 +123,10 @@ public class PublicationService {
                 .filter(this::hasPubmedId)
                 .map(this::getPubmedId)
                 .forEach(
-                        pubmedId -> {
-                            queryBuilder.add(
-                                    new TermQuery(new Term("id", pubmedId.toString())),
-                                    BooleanClause.Occur.SHOULD);
-                        });
+                        pubmedId ->
+                                queryBuilder.add(
+                                        new TermQuery(new Term("id", pubmedId.toString())),
+                                        BooleanClause.Occur.SHOULD));
 
         SolrRequest solrRequest = getSolrRequest(queryBuilder.build().toString());
         Stream<LiteratureDocument> literatures = repository.getAll(solrRequest);
@@ -209,13 +218,16 @@ public class PublicationService {
             categories =
                     mappedReference.getSourceCategories().stream()
                             .map(
-                                    category -> {
-                                        return Arrays.stream(PublicationCategory.values())
-                                                .filter(a -> a.name().equalsIgnoreCase(category))
-                                                .map(PublicationCategory::getLabel)
-                                                .findFirst()
-                                                .orElse("");
-                                    })
+                                    category ->
+                                            Arrays.stream(PublicationCategory.values())
+                                                    .filter(
+                                                            a ->
+                                                                    a.name()
+                                                                            .equalsIgnoreCase(
+                                                                                    category))
+                                                    .map(PublicationCategory::getLabel)
+                                                    .findFirst()
+                                                    .orElse(""))
                             .filter(Utils::notNullNotEmpty)
                             .collect(Collectors.toList());
             mappedReference.getSourceCategories().clear();

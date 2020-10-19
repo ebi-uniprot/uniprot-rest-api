@@ -1,5 +1,6 @@
 package org.uniprot.api.support.data.literature.request;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -51,6 +52,7 @@ public class LiteratureRequest implements SearchRequest {
 
     @Parameter(description = "Size of the result. Defaults to 25")
     @Positive(message = "{search.positive}")
+    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @Parameter(description = "Comma separated list of facets to search")

@@ -1,11 +1,20 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import static org.uniprot.api.rest.request.SearchRequest.*;
+
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 
 import lombok.Data;
 
+import org.springframework.http.MediaType;
+import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
+import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.uniprotkb.service.PublicationFacetConfig;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author lgonzales
@@ -14,14 +23,21 @@ import org.uniprot.api.uniprotkb.service.PublicationFacetConfig;
 @Data
 public class PublicationRequest {
 
+    @Parameter(description = "Size of the result. Defaults to 25")
     @Positive(message = "{search.positive}")
-    private Integer size = 25;
+    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
+    private Integer size;
 
+    @Parameter(hidden = true)
     private String cursor;
 
-    // TODO: add query validation...
+    @Parameter(description = "Facet filter query for Publications")
+    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
+    @ValidSolrQueryFacetFields(facetConfig = PublicationFacetConfig.class)
     private String query;
 
+    @Parameter(description = "Name of the facet search")
+    @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     @ValidFacets(facetConfig = PublicationFacetConfig.class)
     private String facets;
 }
