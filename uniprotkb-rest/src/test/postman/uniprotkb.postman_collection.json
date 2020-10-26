@@ -508,12 +508,12 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "da234ca9-9e29-4b61-ba9b-e7fe746857d1",
+								"id": "8a65c635-cadc-4ae0-af51-ddfd5dd329bd",
 								"exec": [
 									"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
 									"// to log various types of message on Postman Console",
-									"//e.g. console.warn(\"This is a sample warning message to print on Postman console\");",
-									"//e.g.console.error(\"This is a sample error message to print on Postman console\");",
+									"// e.g., console.warn(\"This is a sample warning message to print on Postman console\");",
+									"// e.g., console.error(\"This is a sample error message to print on Postman console\");",
 									"",
 									"// verify common headers",
 									"let xRelease = pm.globals.get('x_release');",
@@ -526,53 +526,7 @@
 									"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
 									"verifyXCacheInfoHeader();",
 									"",
-									"// verify data",
-									"let jsonData = pm.response.json();",
-									"",
-									"pm.test(\"entryType\", function () {",
-									"    pm.expect(jsonData.entryType).to.eql(\"UniProtKB reviewed (Swiss-Prot)\");",
-									"});",
-									"",
-									"pm.test(\"primaryAccession\", function () {",
-									"    pm.expect(jsonData.primaryAccession).to.eql(\"P12345\");",
-									"});",
-									"",
-									"utils.verifySecondaryAccessions(jsonData.secondaryAccessions, [\"G1SKL2\"]);",
-									"",
-									"",
-									"pm.test(\"uniProtkbId\", function () {",
-									"    pm.expect(jsonData.uniProtkbId).to.eql(\"AATM_RABIT\");",
-									"});",
-									"",
-									"// verify entryAudit",
-									"var expectedFirstPublicDate = '1989-10-01';",
-									"",
-									"utils.verifyEntryAudit(jsonData.entryAudit, expectedFirstPublicDate);",
-									"",
-									"console.log(jsonData.annotationScore);",
-									"pm.test(\"annotationScore\", function () {",
-									"    pm.expect(jsonData.annotationScore).is.a('number');",
-									"});",
-									"",
-									"utils.verifyOrganism(jsonData.organism, \"Oryctolagus cuniculus\", \"Rabbit\", 9986, ",
-									"[\"Eukaryota\", \"Metazoa\", \"Chordata\", \"Craniata\", \"Vertebrata\", \"Euteleostomi\", \"Mammalia\",",
-									"\"Eutheria\", \"Euarchontoglires\", \"Glires\", \"Lagomorpha\", \"Leporidae\", \"Oryctolagus\"]);",
-									"",
-									"pm.test(\"proteinExistence\", function () {",
-									"    pm.expect(jsonData.proteinExistence).to.eql(\"1: Evidence at protein level\");",
-									"});",
-									"",
-									"pm.test(\"proteinDescription\", function () {",
-									"    utils.verifyNotNull(\"proteinDescription\", jsonData.proteinDescription);",
-									"});",
-									"",
-									"var expectedFullName = {\"value\": \"Aspartate aminotransferase, mitochondrial\"};",
-									"var expectedShortNames = [{\"value\": \"mAspAT\"}];",
-									"var expectedEcNumbers = [{\"value\": \"2.6.1.1\"},{\"value\": \"2.6.1.7\"}];",
-									"utils.verifyProteinName(\"recommendedName\", jsonData.proteinDescription.recommendedName,  ",
-									"    expectedFullName, expectedShortNames, expectedEcNumbers);",
-									"",
-									""
+									"utils.verifyEntryContents(pm.response.json(), pm.collectionVariables.get(\"accession_swissprot\"))"
 								],
 								"type": "text/javascript"
 							}
@@ -589,7 +543,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession}}",
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_swissprot}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -597,7 +551,7 @@
 								"{{path_context}}",
 								"{{uniprotkb_path}}",
 								"accession",
-								"{{accession}}"
+								"{{accession_swissprot}}"
 							]
 						}
 					},
@@ -605,11 +559,48 @@
 				},
 				{
 					"name": "Get by accession (TrEMBL)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "41929ed8-2e05-49a1-8984-6079c5e35d72",
+								"exec": [
+									"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
+									"// to log various types of message on Postman Console",
+									"// e.g., console.warn(\"This is a sample warning message to print on Postman console\");",
+									"// e.g., console.error(\"This is a sample error message to print on Postman console\");",
+									"",
+									"// verify common headers",
+									"let xRelease = pm.globals.get('x_release');",
+									"let controlAllow = pm.globals.get('control_origin');",
+									"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+									"verifyHeaders(undefined, undefined, undefined, undefined, ",
+									"            undefined, undefined, xRelease, controlAllow);",
+									"",
+									"// X-Cache-Info - Sample code to verify a single header",
+									"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
+									"verifyXCacheInfoHeader();",
+									"",
+									"utils.verifyEntryContents(pm.response.json(), pm.collectionVariables.get(\"accession_trembl\"))"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"{{uniprotkb_path}}",
+								"accession",
+								"{{accession_trembl}}"
+							]
 						}
 					},
 					"response": []
@@ -902,7 +893,7 @@
 					"    // protein's recommended name",
 					"    pm.test(\"protein description exists with recommended/submission name\", function() {",
 					"        let valid = false;",
-					"        if (jsonData.proteinDescription.recommendedName != null || jsonData.proteinDescription. submissionNames != null) {",
+					"        if (jsonData.proteinDescription.hasOwnProperty('recommendedName') || jsonData.proteinDescription.hasOwnProperty('submissionNames')) {",
 					"            valid = true;    ",
 					"        }",
 					"        pm.expect(valid).is.true",
@@ -951,29 +942,29 @@
 	],
 	"variable": [
 		{
-			"id": "786c5fa4-bb9a-450b-9f82-ff9ed5941ec0",
+			"id": "af69a290-9fd1-4164-8067-4f198428fce4",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "57393e5c-9a36-4ade-a6d8-b24af92a355e",
+			"id": "12da1362-d7fd-4e34-9bec-4af5be2aded4",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "9853fd02-65a5-4b5a-bbcb-d24547e616a4",
-			"key": "accession_swissprot",
-			"value": "P21802"
-		},
-		{
-			"id": "845c2d26-ec07-4835-9933-b53c899c9bdb",
+			"id": "4185f39a-535a-4e39-9457-307663a949ba",
 			"key": "search_by_gene",
 			"value": "gene:p53"
 		},
 		{
-			"id": "bcb30bc3-1821-41cb-96f0-4513b56c9513",
+			"id": "276f09e9-22a4-4849-a70e-fbb0a8d11a76",
+			"key": "accession_swissprot",
+			"value": ""
+		},
+		{
+			"id": "106c75d8-05bb-438f-b7a9-489a9e1127df",
 			"key": "accession_trembl",
-			"value": "A0A514LIK3"
+			"value": ""
 		}
 	],
 	"protocolProfileBehavior": {}
