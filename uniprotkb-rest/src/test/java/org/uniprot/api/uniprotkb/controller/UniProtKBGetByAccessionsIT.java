@@ -239,7 +239,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "accessions",
                                         "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
                                 .param("facets", facetList)
-                                .param("size", "0"));
+                                .param("size", "1"));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
@@ -247,7 +247,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.facets.size()", is(4)))
                 .andExpect(
                         jsonPath(

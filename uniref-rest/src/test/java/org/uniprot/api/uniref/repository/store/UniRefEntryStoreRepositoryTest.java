@@ -63,6 +63,7 @@ class UniRefEntryStoreRepositoryTest {
         repository =
                 new UniRefEntryStoreRepository(
                         memberStoreClient, memberStoreConfig, lightStoreClient, lightStoreConfig);
+        repository.defaultPageSize = 25;
     }
 
     @Test

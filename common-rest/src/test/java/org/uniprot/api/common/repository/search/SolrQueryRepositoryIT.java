@@ -26,7 +26,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -38,6 +37,8 @@ class SolrQueryRepositoryIT {
     private static GeneralSolrQueryRepository queryRepo;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();;
+
+    private final int defaultPageSize = 10;
 
     @BeforeAll
     static void setUp() {
@@ -319,12 +320,12 @@ class SolrQueryRepositoryIT {
         return SolrRequest.builder()
                 .query("*:*")
                 .sort(SolrQuery.SortClause.desc("accession_id"))
-                .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
+                .rows(defaultPageSize)
                 .build();
     }
 
     private SolrRequest queryWithFacets(String query, List<String> facets) {
-        return queryWithFacets(query, facets, SearchRequest.DEFAULT_RESULTS_SIZE);
+        return queryWithFacets(query, facets, defaultPageSize);
     }
 
     private SolrRequest queryWithFacets(String query, List<String> facets, int size) {
@@ -340,7 +341,7 @@ class SolrQueryRepositoryIT {
     }
 
     private SolrRequest queryWithoutFacets(String query) {
-        return queryWithoutFacets(query, SearchRequest.DEFAULT_RESULTS_SIZE);
+        return queryWithoutFacets(query, defaultPageSize);
     }
 
     private SolrRequest queryWithoutFacets(String query, int size) {
@@ -358,7 +359,7 @@ class SolrQueryRepositoryIT {
                 .termField("keyword")
                 .termField("protein_name")
                 .sort(SolrQuery.SortClause.asc("accession_id"))
-                .rows(SearchRequest.DEFAULT_RESULTS_SIZE)
+                .rows(defaultPageSize)
                 .build();
     }
 

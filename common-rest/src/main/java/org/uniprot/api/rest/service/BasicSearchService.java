@@ -40,6 +40,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     @Value("${solr.query.batchSize:#{null}}")
     private Integer solrBatchSize;
 
+    @Value("${search.default.page.size:#{null}}")
+    private Integer defaultPageSize;
+
     public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
         this(repository, entryConverter, null, null, null);
     }
@@ -110,7 +113,19 @@ public abstract class BasicSearchService<D extends Document, R> {
     include facets true for search api
     */
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
-        return createSearchSolrRequest(request, true);
+        if (request.getSize() == null) { // set the default result size
+            request.setSize(defaultPageSize);
+        }
+        SolrRequest.SolrRequestBuilder builder =
+                createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts);
+
+        if (request.hasFacets()) {
+            builder.facets(request.getFacetList());
+            builder.facetConfig(facetConfig);
+        }
+        builder.rows(request.getSize());
+        builder.totalRows(request.getSize());
+        return builder.build();
     }
 
     protected abstract SearchFieldItem getIdField();
@@ -124,32 +139,13 @@ public abstract class BasicSearchService<D extends Document, R> {
        For the search rows, size and totalRows should be same. We should restrict size value less than solrBatchSize.
     */
 
-    protected SolrRequest createSearchSolrRequest(SearchRequest request, boolean includeFacets) {
-        if (request.getSize() == null) { // set the default result size
-            request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
-        } else if (request.getSize()
-                > getDefaultBatchSize()) { // set to batch size if requested for more
-            request.setSize(getDefaultBatchSize());
-        }
-
-        return createSolrRequest(request, includeFacets);
-    }
-
     public SolrRequest createDownloadSolrRequest(SearchRequest request) {
         if (request.getSize() == null) { // set -1 to download all if not passed
             request.setSize(NumberUtils.INTEGER_MINUS_ONE);
         }
-        return createSolrRequest(request, false);
-    }
 
-    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder builder =
                 createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts);
-
-        if (includeFacets && request.hasFacets()) {
-            builder.facets(request.getFacetList());
-            builder.facetConfig(facetConfig);
-        }
 
         // If the requested size is less than batch size, set the batch size as requested size
         Integer requestedSize = request.getSize();
