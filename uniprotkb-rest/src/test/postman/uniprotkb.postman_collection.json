@@ -7,10 +7,10 @@
 	},
 	"item": [
 		{
-			"name": "Entry retrieval",
+			"name": "/accession",
 			"item": [
 				{
-					"name": "UC-1: accession",
+					"name": "standard requests",
 					"item": [
 						{
 							"name": "Get by accession (Swiss-Prot)",
@@ -20,21 +20,11 @@
 									"script": {
 										"id": "8a65c635-cadc-4ae0-af51-ddfd5dd329bd",
 										"exec": [
-											"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
-											"// to log various types of message on Postman Console",
-											"// e.g., console.warn(\"This is a sample warning message to print on Postman console\");",
-											"// e.g., console.error(\"This is a sample error message to print on Postman console\");",
-											"",
-											"// verify common headers",
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, undefined, undefined, ",
+											"verifyHeaders(undefined, 200, undefined, undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);",
-											"",
-											"// X-Cache-Info - Sample code to verify a single header",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
 											"",
 											"utils.verifyEntryContents(pm.response.json(), pm.collectionVariables.get(\"accession_swissprot\"))"
 										],
@@ -73,23 +63,13 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "41929ed8-2e05-49a1-8984-6079c5e35d72",
+										"id": "dcac8d8c-259a-4a7d-8416-d0d4dddd77a0",
 										"exec": [
-											"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
-											"// to log various types of message on Postman Console",
-											"// e.g., console.warn(\"This is a sample warning message to print on Postman console\");",
-											"// e.g., console.error(\"This is a sample error message to print on Postman console\");",
-											"",
-											"// verify common headers",
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, undefined, undefined, ",
+											"verifyHeaders(undefined, 200, undefined, undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);",
-											"",
-											"// X-Cache-Info - Sample code to verify a single header",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
 											"",
 											"utils.verifyEntryContents(pm.response.json(), pm.collectionVariables.get(\"accession_trembl\"))"
 										],
@@ -114,50 +94,32 @@
 								}
 							},
 							"response": []
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "UC-2: accessions",
-					"item": [
+						},
 						{
-							"name": "Get by accession list",
+							"name": "Wrong accession format",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "a5ab63b3-9fc6-474a-aae8-cd6b56a0a04f",
+										"id": "808e6869-05e7-4f55-aebd-42bce93f4f04",
 										"exec": [
-											"// use console.log(msg), console.info(msg), console.warn(msg), console.error(msg) ",
-											"// to log various types of message on Postman Console",
-											"// e.g., console.warn(\"This is a sample warning message to print on Postman console\");",
-											"// e.g., console.error(\"This is a sample error message to print on Postman console\");",
-											"",
-											"// verify common headers",
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, undefined, undefined, ",
-											"            undefined, undefined, xRelease, controlAllow);",
 											"",
-											"// X-Cache-Info - Sample code to verify a single header",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
+											"verifyHeaders(\"none\", 400, \"application/json\", undefined, ",
+											"            undefined, \"none\", xRelease, controlAllow);",
 											"",
-											"let jsonData = pm.response.json();",
-											"",
-											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
-											"let accessions = accessionList.split(\",\");",
-											"",
-											"pm.test(\"Check results contains one object only\", function () {",
-											"    pm.expect(jsonData.results.length).to.eql(accessions.length);",
+											"let response = pm.response.json();",
+											"pm.test(\"Error url exists\", function() {",
+											"    let re = new RegExp(\".*WRONG_FORMAT.*\");",
+											"    pm.expect(response.url).to.be.a('string');",
+											"    pm.expect(response.url).to.match(re);",
 											"});",
 											"",
-											"for(let i = 0; i < accessions.length ; i++) {",
-											"    utils.verifyEntryContents(jsonData.results[i], accessions[i]);    ",
-											"}"
+											"pm.test(\"There is an error message\", function() {",
+											"    pm.expect(response.messages[0]).to.be.a('string');",
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -167,20 +129,15 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/WRONG_FORMAT",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"{{path_context}}",
 										"{{uniprotkb_path}}",
-										"accessions"
-									],
-									"query": [
-										{
-											"key": "accessions",
-											"value": "{{accession_list}}"
-										}
+										"accession",
+										"WRONG_FORMAT"
 									]
 								}
 							},
@@ -191,10 +148,10 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "UC-3: entry formats",
+					"name": "entry formats",
 					"item": [
 						{
-							"name": "xml",
+							"name": "json",
 							"event": [
 								{
 									"listen": "test",
@@ -204,11 +161,52 @@
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, \"application/xml\", undefined, ",
+											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);",
 											"",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
+											"utils.verifyEntryContents(pm.response.json(), pm.collectionVariables.get(\"accession_trembl\"))"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{accession_trembl}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "xml",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "271f8d79-23cd-4dd2-bd3f-85c291507bca",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"application/xml\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
 											"",
 											"let response = xml2Json(pm.response.text());",
 											"pm.test(\"Accession exists\", function() {",
@@ -254,11 +252,8 @@
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, \"text/fasta\", undefined, ",
+											"verifyHeaders(undefined, 200, \"text/fasta\", undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);",
-											"",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
 											"",
 											"let response = pm.response.text();",
 											"let parts = response.split('|');",
@@ -305,11 +300,8 @@
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, \"text/flatfile\", undefined, ",
+											"verifyHeaders(undefined, 200, \"text/flatfile\", undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);",
-											"",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
 											"",
 											"let response = pm.response.text();",
 											"let parts = response.split('\\n');",
@@ -328,6 +320,245 @@
 										"key": "Accept",
 										"type": "text",
 										"value": "text/flatfile"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{accession_trembl}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "tsv",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ec130d89-ec13-4447-930a-b11adfaf08ca",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/tsv\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let response = pm.response.text();",
+											"let lines = response.split('\\n');",
+											"let lineParts = lines[1].split('\\t');",
+											"pm.test(\"Accession exists\", function() {",
+											"    pm.expect(lineParts[0]).to.eql(pm.collectionVariables.get(\"accession_trembl\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/tsv"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{accession_trembl}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "84b60f06-fe92-46ca-854a-564caa58b4ed",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/list\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let response = pm.response.text();",
+											"pm.test(\"Accession exists\", function() {",
+											"    pm.expect(response).to.eql(pm.collectionVariables.get(\"accession_trembl\")+\"\\n\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/list"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{accession_trembl}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "gff",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ed45d26e-014a-44f1-b612-ce3dc000df1b",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/gff\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let response = pm.response.text();",
+											"let parts = response.split('\\n')[1].split(' ');",
+											"pm.test(\"Accession exists\", function() {",
+											"    pm.expect(parts[1]).to.eql(pm.collectionVariables.get(\"accession_trembl\"));",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/gff"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{accession_trembl}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "xls",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "adee6afb-89ca-42b0-a5e5-7a0232be48f7",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"application/vnd.ms-excel\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/vnd.ms-excel"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accession",
+										"{{accession_trembl}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "33a0b7d4-d9aa-4231-92b4-617acfb761d7",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(\"none\", 400, \"application/json\", undefined, ",
+											"            undefined, \"none\", xRelease, controlAllow);",
+											"",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"Error url exists\", function() {",
+											"    pm.expect(response.url).to.be.a('string');",
+											"});",
+											"",
+											"pm.test(\"Wrong content type is in error message\", function() {",
+											"    let re = new RegExp(\".*\"+pm.request.headers.get(\"Accept\")+\".*\");",
+											"    pm.expect(response.messages[0]).to.match(re);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "unknown/content-type"
 									}
 								],
 								"url": {
@@ -376,29 +607,684 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "search",
+			"name": "/accessions",
 			"item": [
 				{
-					"name": "UC-1: search by accession",
+					"name": "standard requests",
 					"item": [
 						{
-							"name": "Search by accession field",
+							"name": "Get by accession list",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "3837b392-2db7-4311-bd23-f625433b8416",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, undefined, undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let jsonData = pm.response.json();",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(jsonData.results.length).to.eql(accessions.length);",
+											"});",
+											"",
+											"for(let i = 0; i < accessions.length ; i++) {",
+											"    utils.verifyEntryContents(jsonData.results[i], accessions[i]);    ",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "entry formats",
+					"item": [
+						{
+							"name": "json",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "0f2fd2a9-2026-426a-a468-15b5eb17b0bf",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let response = pm.response.json();",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let entryAccession = response.results[i].primaryAccession;",
+											"",
+											"        pm.expect(entryAccession).to.eql(accessions[i]);",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(response.results.length).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "xml",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "5d9888fd-d0bd-4ce3-b2f4-5c860616cde9",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"application/xml\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let response = xml2Json(pm.response.text());",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let xmlAccessions = 0;",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let entryAccession = response.uniprot.entry[i].accession;",
+											"        if(Array.isArray(response.uniprot.entry[i].accession)) {",
+											"            entryAccession = response.uniprot.entry[i].accession[0];",
+											"        }",
+											"",
+											"        pm.expect(entryAccession).to.eql(accessions[i]);",
+											"        if(entryAccession == accessions[i]) {",
+											"            xmlAccessions++;",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(xmlAccessions).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/xml",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "fasta",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "9b1fc95d-4c32-45d8-9627-225ac8147f1f",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/fasta\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let response = pm.response.text();",
+											"let lines = response.split('>');",
+											"",
+											"let actualAccessions = 0;",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let parts = lines[i+1].split('|');",
+											"        let entryAccession = parts[1];",
+											"",
+											"        pm.expect(entryAccession).to.eql(accessions[i]);",
+											"        if(entryAccession == accessions[i]) {",
+											"            actualAccessions++;",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(actualAccessions).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/fasta"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "text",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4721f46a-6b9f-45df-9d5b-482ed235e36a",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/flatfile\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let response = pm.response.text();",
+											"let lines = response.split('AC   ');",
+											"",
+											"let actualAccessions = 0;",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let entryAccession = lines[i+1];",
+											"",
+											"        let re = new RegExp(accessions[i]+\"; .*\");",
+											"        pm.expect(entryAccession).to.match(re);",
+											"        if(entryAccession.match(re)) {",
+											"            actualAccessions++;",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(actualAccessions).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/flatfile"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "tsv",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "bbd0e0bd-9c7a-471f-b6f3-80c6e98435d8",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/tsv\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let response = pm.response.text();",
+											"let lines = response.split('\\n');",
+											"",
+											"let actualAccessions = 0;",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let entryAccession = lines[i+1].split('\\t')[0];",
+											"",
+											"        pm.expect(entryAccession).to.eql(accessions[i]);",
+											"        if(entryAccession == accessions[i]) {",
+											"            actualAccessions++;",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(actualAccessions).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/tsv"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "1ef4060c-014b-4c92-a757-4ac976bc96f9",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/list\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let response = pm.response.text();",
+											"let lines = response.split('\\n');",
+											"",
+											"let actualAccessions = 0;",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let entryAccession = lines[i];",
+											"",
+											"        pm.expect(entryAccession).to.eql(accessions[i]);",
+											"        if(entryAccession == accessions[i]) {",
+											"            actualAccessions++;",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(actualAccessions).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/list"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "gff",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2381b66d-a1e7-4608-82db-10ee9d790c73",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"text/gff\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"let accessionList = pm.collectionVariables.get(\"accession_list\");",
+											"let accessions = accessionList.split(\",\");",
+											"",
+											"let response = pm.response.text();",
+											"let lines = response.split('sequence-region ');",
+											"",
+											"let actualAccessions = 0;",
+											"for(let i = 0; i < accessions.length; i++) {",
+											"    pm.test(\"Accession exists in response: \"+accessions[i], function() {",
+											"        let entryAccession = lines[i+1].match(/[A-Z0-9]+/)[0];",
+											"",
+											"        pm.expect(entryAccession).to.eql(accessions[i]);",
+											"        if(entryAccession == accessions[i]) {",
+											"            actualAccessions++;",
+											"        }",
+											"    });",
+											"}",
+											"",
+											"pm.test(\"Check results contains correct number\", function () {",
+											"    pm.expect(actualAccessions).to.eql(accessions.length);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "text/gff"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "xls",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "da3f28e7-a14a-477d-ac10-948124d1c875",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"application/vnd.ms-excel\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/vnd.ms-excel"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "wrong format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "4014a17e-e66b-4946-85c3-45bc32d44864",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(\"none\", 400, \"application/json\", undefined, ",
+											"            undefined, \"none\", xRelease, controlAllow);",
+											"",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"Error url exists\", function() {",
+											"    pm.expect(response.url).to.be.a('string');",
+											"});",
+											"",
+											"pm.test(\"Wrong content type is in error message\", function() {",
+											"    let re = new RegExp(\".*\"+pm.request.headers.get(\"Accept\")+\".*\");",
+											"    pm.expect(response.messages[0]).to.match(re);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "unknown/content-type"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accessions?accessions={{accession_list}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"accessions"
+									],
+									"query": [
+										{
+											"key": "accessions",
+											"value": "{{accession_list}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "/search",
+			"item": [
+				{
+					"name": "search by field",
+					"item": [
+						{
+							"name": "accession:P21802",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"id": "af3b08a6-fc9d-4b40-93ed-97a4dc39932c",
 										"exec": [
-											"// verify common headers",
 											"let xRelease = pm.globals.get('x_release');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, undefined, undefined, undefined, ",
+											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);",
-											"",
-											"// X-Cache-Info - Sample code to verify a single header",
-											"let verifyXCacheInfoHeader = eval(pm.globals.get(\"verifyXCacheInfoHeader\"));",
-											"verifyXCacheInfoHeader();",
 											"",
 											"// verify data",
 											"let jsonData = pm.response.json();",
@@ -444,37 +1330,7 @@
 								}
 							},
 							"response": []
-						}
-					],
-					"description": "1. Search using gene and organism\n2. Get the first entry\n3. Download the first entry as text file",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "4cfffdd2-5537-425c-a2be-d6680117c4ce",
-								"type": "text/javascript",
-								"exec": [
-									"pm.environment.set(\"scenario-1-search-term\", \"cdc7 human\");"
-								]
-							}
 						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "63d8413c-8cba-4afb-b95a-48d9d21188ee",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "UC-2: search by term",
-					"item": [
 						{
 							"name": "reviewed:true",
 							"event": [
@@ -483,7 +1339,9 @@
 									"script": {
 										"id": "9f5e1bfc-8e32-41f6-847c-e82a7e2254c7",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -532,9 +1390,11 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "75fa2314-9f7b-44f5-b912-db8cf69e4c3b",
+										"id": "625052c4-770d-42b0-86b7-e1a70b5f021d",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -547,7 +1407,6 @@
 											"        ",
 											"    for(let keywordIndex = 0; keywordIndex < entry.keywords.length; keywordIndex++) {",
 											"        if(entry.keywords[keywordIndex].name == \"Kinase\") {",
-											"            console.log(\"thing\");",
 											"            hasKinase = true;",
 											"        }",
 											"    }",
@@ -563,7 +1422,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
-										"id": "947c883c-32f6-42be-be59-94c8bc38fdd4",
+										"id": "3b68aacf-b0d5-4dca-a7ab-9dda126b0625",
 										"exec": [
 											""
 										],
@@ -602,7 +1461,9 @@
 									"script": {
 										"id": "92512652-50d5-4511-80e3-ea00eb898ed2",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -661,7 +1522,9 @@
 									"script": {
 										"id": "16c51c39-6f07-431a-a3b3-73b6734fd5e9",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -713,7 +1576,9 @@
 									"script": {
 										"id": "2b84a3ed-b272-472e-a6c5-3a195a69a3c4",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -764,7 +1629,9 @@
 									"script": {
 										"id": "d8a1b22e-7e11-48b7-ac01-66303b9169ad",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -815,7 +1682,9 @@
 									"script": {
 										"id": "022b996a-a8c6-4930-b4a9-af7e0a8a5692",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -874,7 +1743,7 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "UC-3: complex search",
+					"name": "complex search",
 					"item": [
 						{
 							"name": "search with complex request",
@@ -884,7 +1753,9 @@
 									"script": {
 										"id": "a9731d81-af01-4b56-9d11-938e2b07a597",
 										"exec": [
-											"// verify data",
+											"let responseOkay = eval(pm.globals.get('responseOkay'));",
+											"responseOkay();",
+											"",
 											"let jsonData = pm.response.json();",
 											"",
 											"pm.test(\"Check results contains more than 1\", function () {",
@@ -990,210 +1861,6 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Search Proteins",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "d9292393-16b1-4723-8be6-06893141f75e",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Content-Type\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\");",
-									"    pm.response.to.be.header(\"Content-Type\", \"application/json\");",
-									"});",
-									"// verify data",
-									"let jsonData = pm.response.json();",
-									"utils.verifyResults(jsonData.results, ['A9Q1J6', 'P0CI25']);",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"{{path_context}}",
-								"{{uniprotkb_path}}",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "{{search_value}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search by gene",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "0638df30-378a-4f80-a9f8-93b6252747a4",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_by_gene}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"{{path_context}}",
-								"{{uniprotkb_path}}",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "{{search_by_gene}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search by gene xml",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "e57ac829-7bc4-443a-8d27-829cf6cc7fbf",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"{{path_context}}",
-								"{{uniprotkb_path}}",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "{{search_value}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search by gene tsv",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "ef03a978-8c14-46ba-bafe-39a90f438a1e",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"{{path_context}}",
-								"{{uniprotkb_path}}",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "{{search_value}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search by gene list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "1cca6ecf-b8d7-44be-812d-616e52ae9d1c",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query={{search_value}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"{{path_context}}",
-								"{{uniprotkb_path}}",
-								"search"
-							],
-							"query": [
-								{
-									"key": "query",
-									"value": "{{search_value}}"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"description": "Test suite for /search API.",
@@ -1222,19 +1889,21 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "stream",
+			"name": "/stream",
 			"item": [
 				{
-					"name": "Stream Proteins",
+					"name": "gene:cdc7",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "a0b13c64-bea5-412b-ac1a-b1bfe698d3fd",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
+									"let xRelease = pm.globals.get('x_release');",
+									"let controlAllow = pm.globals.get('control_origin');",
+									"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+									"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
+									"            undefined, undefined, xRelease, controlAllow);"
 								],
 								"type": "text/javascript"
 							}
@@ -1244,7 +1913,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/stream?query={{search_value}}",
+							"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/stream?query=gene:cdc7",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1256,7 +1925,7 @@
 							"query": [
 								{
 									"key": "query",
-									"value": "{{search_value}}"
+									"value": "gene:cdc7"
 								}
 							]
 						}
@@ -1326,14 +1995,14 @@
 					"})},",
 					"",
 					"verifyProteinName: function(fieldName, proteinName, fullName, shortNames, ecNumbers){",
-					"pm.test(fieldName, function () {",
-					"      utils.verifyNotNull(fieldName, proteinName);",
-					"      pm.expect(proteinName, 'is not an object').to.be.an(\"object\");",
-					"      utils.verifyNotNull(\"fieldName\", proteinName.fullName);",
-					"      pm.expect(proteinName.fullName, \"fullName\").to.eql(fullName);",
-					"      utils.verifyArrayValues(\"shortNames\", proteinName.shortNames, shortNames);",
-					"      utils.verifyArrayValues(\"ecNumbers\", proteinName.ecNumbers, ecNumbers);",
-					"})",
+					"    pm.test(fieldName, function () {",
+					"        utils.verifyNotNull(fieldName, proteinName);",
+					"        pm.expect(proteinName, 'is not an object').to.be.an(\"object\");",
+					"        utils.verifyNotNull(\"fieldName\", proteinName.fullName);",
+					"        pm.expect(proteinName.fullName, \"fullName\").to.eql(fullName);",
+					"        utils.verifyArrayValues(\"shortNames\", proteinName.shortNames, shortNames);",
+					"        utils.verifyArrayValues(\"ecNumbers\", proteinName.ecNumbers, ecNumbers);",
+					"    })",
 					"},",
 					"",
 					"// verify results array common things",
@@ -1362,6 +2031,7 @@
 					"  }",
 					"",
 					"  return false;",
+					"//   return obj !== 'null' && obj !== 'undefined';",
 					"},",
 					"",
 					"verifyObject: function(name, value){",
@@ -1502,27 +2172,27 @@
 	],
 	"variable": [
 		{
-			"id": "91cb58eb-22f9-424e-b173-c6aa580a9835",
+			"id": "dc2e1a6a-5015-420e-a42e-28756cebff15",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "a5fab58b-adad-4c8b-ada2-1fbeef5387d5",
+			"id": "3872eeb4-d9eb-421f-a095-aba0da1b6ce8",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "a05d80fc-8358-4743-b89f-a3a0b857ca4a",
+			"id": "7b6d32a0-c274-4815-9fb3-9c058edb37d3",
 			"key": "search_by_gene",
 			"value": "gene:p53"
 		},
 		{
-			"id": "7438e5ca-6f89-453d-b724-a5349cecc6de",
+			"id": "30cd5f50-3d84-450c-af49-a8589186d5f4",
 			"key": "accession_swissprot",
 			"value": ""
 		},
 		{
-			"id": "0fae4f2e-2c5c-427a-a3f1-12ddcff3201a",
+			"id": "0b57a565-409f-4b5a-99b5-a8dce522621a",
 			"key": "accession_trembl",
 			"value": ""
 		}
