@@ -1,47 +1,59 @@
 package org.uniprot.api.proteome.output.converter;
 
-import javax.xml.bind.Marshaller;
+import java.io.IOException;
+import java.io.OutputStream;
 
-import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
-import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.core.xml.jaxb.proteome.CanonicalGene;
-import org.uniprot.core.xml.proteome.CanonicalProteinConverter;
+import org.springframework.http.MediaType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
+import org.uniprot.core.genecentric.GeneCentricEntry;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author jluo
  * @date: 21 Jun 2019
  */
 public class GeneCentricXmlMessageConverter
-        extends AbstractXmlMessageConverter<CanonicalProtein, CanonicalGene> {
-    private final CanonicalProteinConverter converter;
-    private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
-    private static final String HEADER =
-            "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
+        extends AbstractEntityHttpMessageConverter<GeneCentricEntry> {
 
-    private static final String FOOTER = "\n</proteomes>";
+    private final XmlMapper mapper;
 
     public GeneCentricXmlMessageConverter() {
-        super(CanonicalProtein.class, XML_CONTEXT);
-        converter = new CanonicalProteinConverter();
+        super(MediaType.APPLICATION_XML, GeneCentricEntry.class);
+        JacksonXmlModule xmlModule = new JacksonXmlModule();
+        xmlModule.setDefaultUseWrapper(false);
+
+        mapper = new XmlMapper(xmlModule);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     }
 
     @Override
-    protected String getHeader() {
-        return HEADER;
+    protected void writeEntity(GeneCentricEntry entity, OutputStream outputStream)
+            throws IOException {
+        byte[] output = mapper.writer().withRootName("GeneCentric").writeValueAsBytes(entity);
+        outputStream.write(output);
     }
 
     @Override
-    protected CanonicalGene toXml(CanonicalProtein entity) {
-        return converter.toXml(entity);
+    protected void before(
+            MessageConverterContext<GeneCentricEntry> context, OutputStream outputStream)
+            throws IOException {
+        outputStream.write("<GeneCentrics>".getBytes());
     }
 
     @Override
-    protected Marshaller getMarshaller() {
-        return createMarshaller();
-    }
-
-    @Override
-    protected String getFooter() {
-        return FOOTER;
+    protected void after(
+            MessageConverterContext<GeneCentricEntry> context, OutputStream outputStream)
+            throws IOException {
+        outputStream.write("</GeneCentrics>".getBytes());
     }
 }

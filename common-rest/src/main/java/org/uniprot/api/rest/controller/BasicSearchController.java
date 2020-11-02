@@ -26,6 +26,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
+import org.uniprot.api.rest.request.StreamRequest;
 
 /**
  * @param <T>
@@ -118,6 +119,23 @@ public abstract class BasicSearchController<T> {
             Stream<T> result, String fields, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
+        context.setFileType(getBestFileTypeFromRequest(request));
+        if (contentType.equals(LIST_MEDIA_TYPE)) {
+            context.setEntityIds(result.map(this::getEntityId));
+        } else {
+            context.setEntities(result);
+        }
+        return getDeferredResultResponseEntity(request, context);
+    }
+
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
+            Stream<T> result,
+            StreamRequest streamRequest,
+            MediaType contentType,
+            HttpServletRequest request) {
+        MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         context.setFileType(getBestFileTypeFromRequest(request));
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(result.map(this::getEntityId));

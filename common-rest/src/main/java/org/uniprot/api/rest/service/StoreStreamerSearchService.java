@@ -40,6 +40,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     public abstract R findByUniqueId(final String uniqueId, final String filters);
 
+    @Override
     public Stream<R> stream(StreamRequest request) {
         SolrRequest query = createDownloadSolrRequest(request);
         return this.storeStreamer.idsToStoreStream(query);

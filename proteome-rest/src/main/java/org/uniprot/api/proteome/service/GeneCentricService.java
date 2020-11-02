@@ -8,7 +8,7 @@ import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.core.proteome.CanonicalProtein;
+import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.proteome.GeneCentricDocument;
@@ -19,7 +19,7 @@ import org.uniprot.store.search.document.proteome.GeneCentricDocument;
  */
 @Service
 @Import(GeneCentricSolrQueryConfig.class)
-public class GeneCentricService extends BasicSearchService<GeneCentricDocument, CanonicalProtein> {
+public class GeneCentricService extends BasicSearchService<GeneCentricDocument, GeneCentricEntry> {
     public static final String GENECENTRIC_ID_FIELD = "accession_id";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
