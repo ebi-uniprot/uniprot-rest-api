@@ -159,6 +159,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.entryType", is("UniRef50")))
                 .andExpect(jsonPath("$.commonTaxonId", is(9606)))
                 .andExpect(jsonPath("$.commonTaxon", is("Homo sapiens")))
+                .andExpect(jsonPath("$.seedId", is("P12301")))
                 .andExpect(jsonPath("$.goTerms.size()", is(3)))
                 .andExpect(jsonPath("$.representativeMember.memberIdType", is("UniProtKB ID")))
                 .andExpect(jsonPath("$.representativeMember.memberId", is("P12301_HUMAN")))

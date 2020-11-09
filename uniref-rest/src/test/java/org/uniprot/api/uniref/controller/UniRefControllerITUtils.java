@@ -59,6 +59,7 @@ class UniRefControllerITUtils {
                 .entryType(type)
                 .commonTaxonId(9606L)
                 .commonTaxon("Homo sapiens")
+                .seedId(getName(ACC_2_PREF, i))
                 .representativeMember(createReprestativeMember(i))
                 .membersAdd(createMember(i))
                 .goTermsAdd(
