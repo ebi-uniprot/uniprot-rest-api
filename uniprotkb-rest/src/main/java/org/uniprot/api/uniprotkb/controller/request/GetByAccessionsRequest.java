@@ -45,7 +45,7 @@ public class GetByAccessionsRequest implements SearchRequest {
 
     @Parameter(
             description =
-                    "Add content disposition attachment to response header, this way it can be downloaded as a file in the browser.")
+                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
             regexp = "^true|false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

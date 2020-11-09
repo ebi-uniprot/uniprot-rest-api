@@ -200,7 +200,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
             @Valid @ModelAttribute GeneCentricStreamRequest streamRequest,
             HttpServletRequest request) {
         Stream<GeneCentricEntry> result = service.stream(streamRequest);
-        return super.download(result, streamRequest, getAcceptHeader(request), request);
+        return super.stream(result, streamRequest, getAcceptHeader(request), request);
     }
 
     @Tag(name = "genecentric")

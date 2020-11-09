@@ -115,7 +115,7 @@ public abstract class BasicSearchController<T> {
         return ResponseEntity.ok().headers(headers).body(context);
     }
 
-    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(
             Stream<T> result, String fields, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
@@ -128,7 +128,7 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(request, context);
     }
 
-    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> download(
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(
             Stream<T> result,
             StreamRequest streamRequest,
             MediaType contentType,

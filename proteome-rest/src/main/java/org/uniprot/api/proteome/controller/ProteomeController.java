@@ -210,7 +210,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     MediaType contentType,
             HttpServletRequest request) {
         Stream<ProteomeEntry> result = queryService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request);
+        return super.stream(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override

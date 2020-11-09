@@ -188,7 +188,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                     HttpServletRequest request) {
         Stream<SubcellularLocationEntry> result =
                 subcellularLocationService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request);
+        return super.stream(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override
