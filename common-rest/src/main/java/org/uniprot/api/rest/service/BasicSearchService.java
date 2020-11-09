@@ -16,6 +16,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -98,6 +99,25 @@ public abstract class BasicSearchService<D extends Document, R> {
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
+    public Stream<R> stream(StreamRequest request) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts)
+                        .rows(getDefaultBatchSize())
+                        .totalRows(Integer.MAX_VALUE)
+                        .build();
+
+        return repository
+                .getAll(solrRequest)
+                .map(entryConverter)
+                .filter(Objects::nonNull)
+                .limit(solrRequest.getTotalRows());
+    }
+
+    /**
+     * Please replace download method with stream method
+     * @deprecated (we need to replaced by stream, remove when finished)
+     */
+    @Deprecated
     public Stream<R> download(SearchRequest request) {
         SolrRequest solrRequest = createDownloadSolrRequest(request);
 

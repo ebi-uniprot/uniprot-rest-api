@@ -161,7 +161,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> download(
             @Valid @ModelAttribute KeywordRequest searchRequest, HttpServletRequest request) {
         Stream<KeywordEntry> result = keywordService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), getAcceptHeader(request), request);
+        return super.stream(result, searchRequest.getFields(), getAcceptHeader(request), request);
     }
 
     @Override
