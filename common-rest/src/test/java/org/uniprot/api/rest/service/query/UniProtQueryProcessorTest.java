@@ -67,18 +67,6 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void ignoreTheAndStopWordThenInterpretDefaultQuery() {
-        String processedQuery = processor.processQuery("a and b");
-        assertThat(processedQuery, is("a AND b"));
-    }
-
-    @Test
-    void ignoreTheOrStopWordThenInterpretDefaultQuery() {
-        String processedQuery = processor.processQuery("a or b");
-        assertThat(processedQuery, is("a AND b"));
-    }
-
-    @Test
     void handleORQuery() {
         String processedQuery = processor.processQuery("a OR b");
         assertThat(processedQuery, is("a OR b"));
@@ -90,7 +78,8 @@ class UniProtQueryProcessorTest {
                 processor.processQuery("The allele defined by Arg-6 and Glu-89 is associated ");
         assertThat(
                 processedQuery,
-                is("The AND allele AND defined AND by AND Arg-6 AND Glu-89 AND is AND associated"));
+                is(
+                        "The AND allele AND defined AND by AND Arg-6 AND and AND Glu-89 AND is AND associated"));
     }
 
     @Test

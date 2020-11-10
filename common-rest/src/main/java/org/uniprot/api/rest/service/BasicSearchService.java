@@ -115,6 +115,7 @@ public abstract class BasicSearchService<D extends Document, R> {
 
     /**
      * Please replace download method with stream method
+     *
      * @deprecated (we need to replaced by stream, remove when finished)
      */
     @Deprecated

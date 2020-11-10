@@ -160,6 +160,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         return repository;
     }
 
+    // TODO: 10/11/2020
+    /*
+     * stopwords and phrase queries are known to have problems. Please see:
+     * https://mail-archives.apache.org/mod_mbox/lucene-solr-user/202011.mbox/%3CCAA%3DaKsc1oS0FBcijT9tvvShf08QEppEZuAMRY2ZSLtFB%3D5r3Uw%40mail.gmail.com%3E
+     *
+     * A possible solution would be to pre-process all index/query data going to Solr, and remove its stopwords.
+     *
+     * If the solution is implemented, then we can eliminate stopwords in the index and save space. We'll then need
+     * an integration test below, which tests the full slice:
+     * - source text -> document -> index (i.e., indexing data), and
+     * - REST app -> Solr query -> index retrieval -> response (i.e., querying data)
+     *
+     * e.g., index "Molecular cloning and evolution of the genes" and then search for
+     *             "Molecular cloning and evolution of the genes".
+     * (the two adjacent stopwords was causing problems when configuring Solr directly to handle this using the
+     * stopword filter factory and removeduplicatesfilterfactory)
+     *
+     */
+
     @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given

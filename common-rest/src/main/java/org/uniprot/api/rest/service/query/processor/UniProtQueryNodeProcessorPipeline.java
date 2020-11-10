@@ -28,6 +28,6 @@ public class UniProtQueryNodeProcessorPipeline extends QueryNodeProcessorPipelin
         add(new UniProtOpenRangeQueryNodeProcessor());
         add(new UniProtPointRangeQueryNodeProcessor());
         add(new UniProtTermRangeQueryNodeProcessor());
-        add(new UniProtDefaultFieldQueryNodeProcessor(conf.getStopwords()));
+        add(new UniProtDefaultFieldQueryNodeProcessor());
     }
 }
