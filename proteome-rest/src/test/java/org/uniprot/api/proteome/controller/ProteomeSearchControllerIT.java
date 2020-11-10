@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -75,6 +76,9 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Autowired private ProteomeFacetConfig facetConfig;
 
+    @Value("${search.default.page.size}")
+    protected String defaultPageSize;
+
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.PROTEOME;
@@ -97,7 +101,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return Integer.parseInt(defaultPageSize);
     }
 
     @Override
@@ -159,6 +163,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         document.proteomeStored = getBinary(entry);
         document.isRedundant = i % 2 != 0;
         document.isReferenceProteome = i % 2 != 0;
+        document.isExcluded = i % 2 != 0;
         document.proteomeType = 1;
         document.score = 3;
         document.organismTaxon = document.organismName;
@@ -294,6 +299,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                                         .build())
                         .genomeAssembly(genomeAssembly)
                         .proteomeCompletenessReport(completenessReport)
+                        .exclusionReasonsAdd(ExclusionReason.MIXED_CULTURE)
                         .annotationScore(15);
 
         return builder.build();

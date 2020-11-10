@@ -14,7 +14,7 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.core.flatfile.parser.UniProtParser;
 import org.uniprot.core.flatfile.parser.impl.DefaultUniProtParser;
 import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
-import org.uniprot.core.parser.fasta.uniprot.UniprotKBFastaParser;
+import org.uniprot.core.parser.fasta.uniprot.UniProtKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /** @author Edd */
@@ -34,8 +34,7 @@ public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConve
         if (entity.isCurrentRelease()) {
             String ffContent = entity.getContent();
             UniProtKBEntry uniProtKBEntry = UNIPROT_FF_PARSER.parse(ffContent);
-            UniprotKBFastaParser fastaParser = UniprotKBFastaParser.create(uniProtKBEntry);
-            fastaContent = fastaParser.toString();
+            fastaContent = UniProtKBFastaParser.toFasta(uniProtKBEntry);
         } else {
             StringBuilder sequenceStringBuilder = new StringBuilder();
             BufferedReader br = new BufferedReader(new StringReader(entity.getContent()));

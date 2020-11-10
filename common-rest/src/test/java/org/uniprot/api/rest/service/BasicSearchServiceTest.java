@@ -1,6 +1,10 @@
 package org.uniprot.api.rest.service;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +32,6 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.search.FakeSolrSortClause;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
 
@@ -57,8 +60,7 @@ class BasicSearchServiceTest {
 
                     @Override
                     protected QueryProcessor getQueryProcessor() {
-                        return UniProtQueryProcessor.newInstance(
-                                UniProtQueryProcessorConfig.builder().build());
+                        return new UniProtQueryProcessor(emptyList(), emptyMap());
                     }
                 };
         ReflectionTestUtils.setField(
@@ -368,6 +370,7 @@ class BasicSearchServiceTest {
 
     @Builder
     private static class FakeDocument implements Document {
+
         private static final long serialVersionUID = -2078841376204509749L;
 
         String id;
@@ -385,6 +388,7 @@ class BasicSearchServiceTest {
 
     @Data
     private static class FakeSearchRequest implements SearchRequest {
+
         private Integer size;
         private String cursor;
         private String facets;

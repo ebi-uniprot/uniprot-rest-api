@@ -176,7 +176,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     MediaType contentType,
             HttpServletRequest request) {
         Stream<LiteratureEntry> result = literatureService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request);
+        return super.stream(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override

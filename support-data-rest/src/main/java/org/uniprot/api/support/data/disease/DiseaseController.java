@@ -171,7 +171,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
 
         Stream<DiseaseEntry> result = this.diseaseService.download(searchRequest);
 
-        return super.download(result, searchRequest.getFields(), contentType, request);
+        return super.stream(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override

@@ -210,7 +210,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                     MediaType contentType,
             HttpServletRequest request) {
         Stream<TaxonomyEntry> result = taxonomyService.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), contentType, request);
+        return super.stream(result, searchRequest.getFields(), contentType, request);
     }
 
     @Override
