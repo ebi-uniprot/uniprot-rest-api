@@ -34,10 +34,11 @@ import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentricDocumentBuilder;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument.GeneCentricDocumentBuilder;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocumentConverter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo
@@ -89,13 +90,9 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     private byte[] getBinary(GeneCentricEntry entry) {
-        try {
-            return GeneCentricJsonConfig.getInstance()
-                    .getFullObjectMapper()
-                    .writeValueAsBytes(entry);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
-        }
+        ObjectMapper mapper = GeneCentricJsonConfig.getInstance().getFullObjectMapper();
+        GeneCentricDocumentConverter converter = new GeneCentricDocumentConverter(mapper);
+        return converter.getStoredGeneCentricEntry(entry);
     }
 
     private GeneCentricEntry create() {

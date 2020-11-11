@@ -35,7 +35,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
 
 /**
  * @author jluo

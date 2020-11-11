@@ -33,7 +33,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
 
 /**
  * @author lgonzales
@@ -249,7 +249,7 @@ class GeneCentricStreamControllerIT extends AbstractSolrStreamControllerIT {
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
         Assertions.assertNotNull(response);
-        
+
         // then
         mockMvc.perform(asyncDispatch(response))
                 .andDo(log())
