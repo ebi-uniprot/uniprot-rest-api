@@ -1,9 +1,5 @@
 package org.uniprot.api.proteome.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.uniprot.core.fasta.ProteinFasta;
 import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.core.genecentric.Protein;
 import org.uniprot.core.genecentric.impl.GeneCentricEntryBuilder;
@@ -12,9 +8,10 @@ import org.uniprot.core.json.parser.genecentric.GeneCentricJsonConfig;
 import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocumentConverter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author lgonzales
@@ -39,23 +36,9 @@ class GeneCentricControllerITUtils {
     }
 
     static GeneCentricDocument convert(GeneCentricEntry entry) {
-        GeneCentricDocument.GeneCentricDocumentBuilder builder = GeneCentricDocument.builder();
-        List<String> accessions = new ArrayList<>();
-        accessions.add(entry.getCanonicalProtein().getId());
-        entry.getRelatedProteins().stream().map(ProteinFasta::getId).forEach(accessions::add);
-        List<String> genes = new ArrayList<>();
-        genes.add(entry.getCanonicalProtein().getGeneName());
-        entry.getRelatedProteins().stream().map(Protein::getGeneName).forEach(genes::add);
-
-        builder.accession(entry.getCanonicalProtein().getId())
-                .accessions(accessions)
-                .geneNames(genes)
-                .reviewed(
-                        entry.getCanonicalProtein().getEntryType() == UniProtKBEntryType.SWISSPROT)
-                .upid(entry.getProteomeId())
-                .organismTaxId(TAX_ID);
-        builder.geneCentricStored(getBinary(entry));
-        return builder.build();
+        ObjectMapper mapper = GeneCentricJsonConfig.getInstance().getFullObjectMapper();
+        GeneCentricDocumentConverter converter = new GeneCentricDocumentConverter(mapper);
+        return converter.convert(entry);
     }
 
     static GeneCentricEntryBuilder createGeneCentricEntry(int i) {
@@ -122,15 +105,5 @@ class GeneCentricControllerITUtils {
         } else if (i < 100) {
             return prefix + "0" + i;
         } else return prefix + i;
-    }
-
-    private static byte[] getBinary(GeneCentricEntry entry) {
-        try {
-            return GeneCentricJsonConfig.getInstance()
-                    .getFullObjectMapper()
-                    .writeValueAsBytes(entry);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
-        }
     }
 }

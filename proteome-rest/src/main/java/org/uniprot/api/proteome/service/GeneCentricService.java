@@ -11,7 +11,7 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
 
 /**
  * @author jluo
