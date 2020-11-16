@@ -1,16 +1,5 @@
 package org.uniprot.api.unirule.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,28 +29,40 @@ import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 /**
  * @author sahmad
  * @created 11/11/2020
  */
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
-            UniRuleRestApplication.class,
-            ErrorHandlerConfig.class
+                DataStoreTestConfig.class,
+                UniRuleRestApplication.class,
+                ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRuleController.class)
 @ExtendWith(
         value = {
-            SpringExtension.class,
-            UniRuleGetIdControllerIT.UniRuleGetIdParameterResolver.class,
-            UniRuleGetIdControllerIT.UniRuleGetIdContentTypeParamResolver.class
+                SpringExtension.class,
+                UniRuleGetIdControllerIT.UniRuleGetIdParameterResolver.class,
+                UniRuleGetIdControllerIT.UniRuleGetIdContentTypeParamResolver.class
         })
 public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UNIRULE_ID = "UR000100241";
 
-    @Autowired private UniRuleQueryRepository repository;
+    @Autowired
+    private UniRuleQueryRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -103,7 +104,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(UNIRULE_ID)
-                    .resultMatcher(jsonPath("$.canonicalProtein.id", is(UNIRULE_ID)))
+                    .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
                     .build();
         }
 
@@ -116,14 +117,14 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                                            "The UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}'")))
                     .build();
         }
 
         @Override
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
-                    .id("P21910")
+                    .id("UR123456789")
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
@@ -168,9 +169,9 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(jsonPath("$.information", notNullValue()))
                                     .resultMatcher(jsonPath("$.ruleStatus", is("TEST")))
                                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
-                                    .resultMatcher(jsonPath("$.otherRules", Matchers.iterableWithSize(1)))
-                                    .resultMatcher(jsonPath("$.samFeatureSets", Matchers.iterableWithSize(1)))
-                                    .resultMatcher(jsonPath("$.positionFeatureSets", Matchers.iterableWithSize(1)))
+                                    .resultMatcher(jsonPath("$.otherRules", Matchers.hasSize(greaterThan(0))))
+                                    .resultMatcher(jsonPath("$.samFeatureSets", Matchers.hasSize(greaterThan(0))))
+                                    .resultMatcher(jsonPath("$.positionFeatureSets", Matchers.hasSize(greaterThan(0))))
                                     .resultMatcher(jsonPath("$.proteinsAnnotatedCount", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
@@ -182,31 +183,30 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(UNIRULE_ID)))
                                     .build())
-                    //                    .contentTypeParam(
-                    //                            ContentTypeParam.builder()
-                    //
-                    // .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                    //                                    .resultMatcher(
-                    //                                            content()
-                    //                                                    .string(
-                    //                                                            containsString(
-                    //                                                                    "Keyword
-                    // ID\tName\tDescription\tCategory")))
-                    //                                    .resultMatcher(
-                    //                                            content()
-                    //                                                    .string(
-                    //                                                            containsString(
-                    //
-                    // "KW-0005\tmy keyword\tDefinition value\tLigand")))
-                    //                                    .build())
-                    //                    .contentTypeParam(
-                    //                            ContentTypeParam.builder()
-                    //
-                    // .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                    //                                    .resultMatcher(
-                    //
-                    // content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                    //                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "KeywordID\tName\tDescription\tCategory")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+
+                                                                    "KW-0005\tmy keyword\tDefinition value\tLigand")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -222,25 +222,24 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
+                                                            "The UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            emptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
