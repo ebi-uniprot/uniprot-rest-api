@@ -77,6 +77,9 @@ public class SolrQueryConfigFileReader {
             case QUERY_FIELDS:
                 builder.queryFields(line);
                 break;
+            case STOP_WORDS:
+                builder.stopWords(line);
+                break;
         }
     }
 
@@ -85,7 +88,8 @@ public class SolrQueryConfigFileReader {
         DEFAULT_SEARCH_FUNCTIONS("# DEFAULT-SEARCH-BOOST-FUNCTIONS"),
         QUERY_FIELDS("# QUERY-FIELDS"),
         ADVANCED_SEARCH("# ADVANCED-SEARCH-BOOSTS"),
-        ADVANCED_SEARCH_FUNCTIONS("# ADVANCED-SEARCH-BOOST-FUNCTIONS");
+        ADVANCED_SEARCH_FUNCTIONS("# ADVANCED-SEARCH-BOOST-FUNCTIONS"),
+        STOP_WORDS("# STOP-WORDS");
 
         private final String prefix;
 

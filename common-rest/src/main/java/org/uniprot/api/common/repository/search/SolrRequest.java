@@ -3,9 +3,7 @@ package org.uniprot.api.common.repository.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import lombok.*;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
@@ -18,9 +16,12 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 @Data
 @Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
 public class SolrRequest {
-    private static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
+    public static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
     private String query;
+
+    @Setter(AccessLevel.NONE)
     private QueryOperator defaultQueryOperator;
+
     private FacetConfig facetConfig;
     private String termQuery;
     private SolrQueryConfig queryConfig;
