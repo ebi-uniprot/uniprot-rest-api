@@ -13,9 +13,15 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
  */
 @Repository
 public class UniRuleQueryRepository extends SolrQueryRepository<UniRuleDocument> {
-    public UniRuleQueryRepository(SolrClient solrClient,
-                                     UniRuleFacetConfig facetConfig,
-                                     SolrRequestConverter requestConverter) {
-        super(solrClient, SolrCollection.unirule, UniRuleDocument.class, facetConfig, requestConverter);
+    public UniRuleQueryRepository(
+            SolrClient solrClient,
+            UniRuleFacetConfig facetConfig,
+            SolrRequestConverter requestConverter) {
+        super(
+                solrClient,
+                SolrCollection.unirule,
+                UniRuleDocument.class,
+                facetConfig,
+                requestConverter);
     }
 }

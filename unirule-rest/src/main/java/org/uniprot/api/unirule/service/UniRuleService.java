@@ -24,13 +24,14 @@ public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleE
     private final QueryProcessor queryProcessor;
 
     @Autowired
-    public UniRuleService(UniRuleQueryRepository repository,
-                          UniRuleFacetConfig facetConfig,
-                          UniRuleEntryConverter uniRuleEntryConverter,
-                          UniRuleSortClause solrSortClause,
-                          SolrQueryConfig solrQueryConfig,
-                          QueryProcessor queryProcessor,
-                          SearchFieldConfig searchFieldConfig) {
+    public UniRuleService(
+            UniRuleQueryRepository repository,
+            UniRuleFacetConfig facetConfig,
+            UniRuleEntryConverter uniRuleEntryConverter,
+            UniRuleSortClause solrSortClause,
+            SolrQueryConfig solrQueryConfig,
+            QueryProcessor queryProcessor,
+            SearchFieldConfig searchFieldConfig) {
         super(repository, uniRuleEntryConverter, solrSortClause, solrQueryConfig, facetConfig);
         this.searchFieldConfig = searchFieldConfig;
         this.queryProcessor = queryProcessor;

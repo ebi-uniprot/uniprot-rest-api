@@ -249,7 +249,7 @@ class GeneCentricStreamControllerIT extends AbstractSolrStreamControllerIT {
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
         Assertions.assertNotNull(response);
-        
+
         // then
         mockMvc.perform(asyncDispatch(response))
                 .andDo(log())

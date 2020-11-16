@@ -1,5 +1,16 @@
 package org.uniprot.api.unirule.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +26,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.unirule.service.UniRuleService;
 import org.uniprot.core.unirule.UniRuleEntry;
 
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
-
 /**
  * @author sahmad
  * @created 11/11/2020
@@ -35,12 +36,14 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 public class UniRuleController extends BasicSearchController<UniRuleEntry> {
 
     private final UniRuleService uniRuleService;
+    public static final String UNIRULE_ID_REGEX = "UR(\\d{9})";
 
     @Autowired
-    public UniRuleController(ApplicationEventPublisher eventPublisher,
-                                MessageConverterContextFactory<UniRuleEntry> converterContextFactory,
-                                ThreadPoolTaskExecutor downloadTaskExecutor,
-                                UniRuleService uniRuleService) {
+    public UniRuleController(
+            ApplicationEventPublisher eventPublisher,
+            MessageConverterContextFactory<UniRuleEntry> converterContextFactory,
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            UniRuleService uniRuleService) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIRULE);
         this.uniRuleService = uniRuleService;
     }
@@ -48,14 +51,19 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     @GetMapping(
             value = "/{uniruleid}",
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE
+                 TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByUniRuleId(
-            @PathVariable("uniruleid") String uniRuleId,//TODO add pattern validator
-            String fields,// todo add field name validator add swagger
+            @PathVariable("uniruleid")
+                    @Pattern(
+                            regexp = UNIRULE_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.unirule.invalid.id}")
+                    String uniRuleId,
+            String fields, // todo add field name validator add swagger
             HttpServletRequest request) {
         UniRuleEntry entryResult = this.uniRuleService.findByUniqueId(uniRuleId);
         return super.getEntityResponse(entryResult, fields, request);

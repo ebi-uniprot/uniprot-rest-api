@@ -1,5 +1,17 @@
 package org.uniprot.api.unirule.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,32 +40,23 @@ import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 /**
  * @author sahmad
  * @created 11/11/2020
  */
 @ContextConfiguration(
         classes = {
-                DataStoreTestConfig.class,
-                UniRuleRestApplication.class,
-                ErrorHandlerConfig.class
+            DataStoreTestConfig.class,
+            UniRuleRestApplication.class,
+            ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRuleController.class)
 @ExtendWith(
         value = {
-                SpringExtension.class,
-                UniRuleGetIdControllerIT.UniRuleGetIdParameterResolver.class,
-                UniRuleGetIdControllerIT.UniRuleGetIdContentTypeParamResolver.class
+            SpringExtension.class,
+            UniRuleGetIdControllerIT.UniRuleGetIdParameterResolver.class,
+            UniRuleGetIdControllerIT.UniRuleGetIdContentTypeParamResolver.class
         })
 public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UNIRULE_ID = "UR000100241";
@@ -67,7 +70,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected SolrCollection getSolrCollection() {
-        return SolrCollection.genecentric;
+        return SolrCollection.unirule;
     }
 
     @Override
@@ -161,40 +164,49 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.canonicalProtein.id", is(UNIRULE_ID)))
-                                    .resultMatcher(jsonPath("$.proteomeId", is("UP000000554")))
-                                    .resultMatcher(jsonPath("$.relatedProteins.size()", is(2)))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content().string(containsString("<id>P21312</id>")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "<proteomeId>UP000000554</proteomeId>")))
+                                    .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
+                                    .resultMatcher(jsonPath("$.information", notNullValue()))
+                                    .resultMatcher(jsonPath("$.ruleStatus", is("TEST")))
+                                    .resultMatcher(jsonPath("$.mainRule", notNullValue()))
+                                    .resultMatcher(jsonPath("$.otherRules", Matchers.iterableWithSize(1)))
+                                    .resultMatcher(jsonPath("$.samFeatureSets", Matchers.iterableWithSize(1)))
+                                    .resultMatcher(jsonPath("$.positionFeatureSets", Matchers.iterableWithSize(1)))
+                                    .resultMatcher(jsonPath("$.proteinsAnnotatedCount", notNullValue()))
+                                    .resultMatcher(jsonPath("$.createdBy", notNullValue()))
+                                    .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
+                                    .resultMatcher(jsonPath("$.createdDate", notNullValue()))
+                                    .resultMatcher(jsonPath("$.modifiedDate", notNullValue()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(UNIRULE_ID)))
                                     .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    ">sp|P21312|uniprotkb_id protein name OS=Human OX=9606 GN=some gene PE=1 SV=2")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    ">tr|P31912|uniprotkb_id protein name OS=Human OX=9606 GN=some gene3 PE=5 SV=2")))
-                                    .build())
+                    //                    .contentTypeParam(
+                    //                            ContentTypeParam.builder()
+                    //
+                    // .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                    //                                    .resultMatcher(
+                    //                                            content()
+                    //                                                    .string(
+                    //                                                            containsString(
+                    //                                                                    "Keyword
+                    // ID\tName\tDescription\tCategory")))
+                    //                                    .resultMatcher(
+                    //                                            content()
+                    //                                                    .string(
+                    //                                                            containsString(
+                    //
+                    // "KW-0005\tmy keyword\tDefinition value\tLigand")))
+                    //                                    .build())
+                    //                    .contentTypeParam(
+                    //                            ContentTypeParam.builder()
+                    //
+                    // .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                    //                                    .resultMatcher(
+                    //
+                    // content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                    //                                    .build())
                     .build();
         }
 
