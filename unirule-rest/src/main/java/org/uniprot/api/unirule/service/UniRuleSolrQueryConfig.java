@@ -1,5 +1,10 @@
 package org.uniprot.api.unirule.service;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -12,10 +17,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 /**
  * @author sahmad
  * @created 11/11/2020
@@ -50,7 +51,6 @@ public class UniRuleSolrQueryConfig {
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
             SearchFieldConfig uniRuleSearchFieldConfig) {
         return Collections.singletonList(
-                uniRuleSearchFieldConfig.getSearchFieldItemByName(
-                        UniRuleService.UNIRULE_ID_FIELD));
+                uniRuleSearchFieldConfig.getSearchFieldItemByName(UniRuleService.UNIRULE_ID_FIELD));
     }
 }
