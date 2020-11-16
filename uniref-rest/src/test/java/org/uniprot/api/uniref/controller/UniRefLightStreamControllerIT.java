@@ -124,7 +124,9 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                                         "UniRef100_P03903",
                                         "UniRef50_P03904",
                                         "UniRef90_P03904",
-                                        "UniRef100_P03904")));
+                                        "UniRef100_P03904")))
+                .andExpect(jsonPath("$.results[0].representativeId", is("P12301")))
+                .andExpect(jsonPath("$.results[0].representativeId", is("P12301")));
     }
 
     @Test
