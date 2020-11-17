@@ -1,10 +1,5 @@
 package org.uniprot.api.unirule.response;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -17,11 +12,21 @@ import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.TsvMessageConverter;
+import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.unirule.UniRuleJsonConfig;
+import org.uniprot.core.parser.tsv.uniref.UniRefEntryValueMapper;
+import org.uniprot.core.parser.tsv.unirule.UniRuleEntryValueMapper;
+import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
  * @author sahmad
@@ -56,6 +61,14 @@ public class UniRuleMessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
+                converters.add(
+                        new XlsMessageConverter<>(
+                                UniRuleEntry.class, returnConfig, new UniRuleEntryValueMapper()));
+                converters.add(
+                        new TsvMessageConverter<>(
+                                UniRuleEntry.class,
+                                returnConfig,
+                                new UniRuleEntryValueMapper()));
 
                 JsonMessageConverter<UniRuleEntry> unirefJsonMessageConverter =
                         new JsonMessageConverter<>(

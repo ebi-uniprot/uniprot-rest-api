@@ -134,10 +134,19 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(UNIRULE_ID)
-                    .fields("accession")
-                    .resultMatcher(jsonPath("$.canonicalProtein.id", is(UNIRULE_ID)))
-                    .resultMatcher(jsonPath("$.canonicalProtein.proteinName").doesNotExist())
-                    .resultMatcher(jsonPath("$.canonicalProtein.geneName").doesNotExist())
+                    .fields("information")
+                    .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
+                    .resultMatcher(jsonPath("$.information", notNullValue()))
+                    .resultMatcher(jsonPath("$.ruleStatus").doesNotExist())
+                    .resultMatcher(jsonPath("$.mainRule").doesNotExist())
+                    .resultMatcher(jsonPath("$.otherRules").doesNotExist())
+                    .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
+                    .resultMatcher(jsonPath("$.positionFeatureSets").doesNotExist())
+                    .resultMatcher(jsonPath("$.proteinsAnnotatedCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.createdBy").doesNotExist())
+                    .resultMatcher(jsonPath("$.modifiedBy").doesNotExist())
+                    .resultMatcher(jsonPath("$.createdDate").doesNotExist())
+                    .resultMatcher(jsonPath("$.modifiedDate").doesNotExist())
                     .build();
         }
 
@@ -167,7 +176,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
                                     .resultMatcher(jsonPath("$.information", notNullValue()))
-                                    .resultMatcher(jsonPath("$.ruleStatus", is("TEST")))
+                                    .resultMatcher(jsonPath("$.ruleStatus", notNullValue()))
                                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
                                     .resultMatcher(jsonPath("$.otherRules", Matchers.hasSize(greaterThan(0))))
                                     .resultMatcher(jsonPath("$.samFeatureSets", Matchers.hasSize(greaterThan(0))))
@@ -191,13 +200,13 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "KeywordID\tName\tDescription\tCategory")))
+                                                                    "UniRule ID\tTemplate Entries")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
 
-                                                                    "KW-0005\tmy keyword\tDefinition value\tLigand")))
+                                                                    "UR000100241\taccession-")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

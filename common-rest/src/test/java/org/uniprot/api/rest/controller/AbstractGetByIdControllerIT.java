@@ -178,7 +178,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(log())
+                    response.andDo(print())
                             .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                             .andExpect(
                                     header().string(
