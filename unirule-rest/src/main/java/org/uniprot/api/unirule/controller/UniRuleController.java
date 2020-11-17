@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.unirule.service.UniRuleService;
 import org.uniprot.core.unirule.UniRuleEntry;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author sahmad
@@ -63,7 +65,8 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.unirule.invalid.id}")
                     String uniRuleId,
-            String fields, // todo add field name validator add swagger
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
+            String fields,
             HttpServletRequest request) {
         UniRuleEntry entryResult = this.uniRuleService.findByUniqueId(uniRuleId);
         return super.getEntityResponse(entryResult, fields, request);
