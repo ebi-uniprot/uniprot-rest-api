@@ -53,7 +53,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     @GetMapping(
             value = "/{uniruleid}",
             produces = {
-                 TSV_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
@@ -65,8 +65,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.unirule.invalid.id}")
                     String uniRuleId,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
-            String fields,
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE) String fields,
             HttpServletRequest request) {
         UniRuleEntry entryResult = this.uniRuleService.findByUniqueId(uniRuleId);
         return super.getEntityResponse(entryResult, fields, request);
