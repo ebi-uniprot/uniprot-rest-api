@@ -1,5 +1,16 @@
 package org.uniprot.api.unirule.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,40 +40,28 @@ import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 /**
  * @author sahmad
  * @created 11/11/2020
  */
 @ContextConfiguration(
         classes = {
-                DataStoreTestConfig.class,
-                UniRuleRestApplication.class,
-                ErrorHandlerConfig.class
+            DataStoreTestConfig.class,
+            UniRuleRestApplication.class,
+            ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRuleController.class)
 @ExtendWith(
         value = {
-                SpringExtension.class,
-                UniRuleGetIdControllerIT.UniRuleGetIdParameterResolver.class,
-                UniRuleGetIdControllerIT.UniRuleGetIdContentTypeParamResolver.class
+            SpringExtension.class,
+            UniRuleGetIdControllerIT.UniRuleGetIdParameterResolver.class,
+            UniRuleGetIdControllerIT.UniRuleGetIdContentTypeParamResolver.class
         })
 public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UNIRULE_ID = "UR000100241";
 
-    @Autowired
-    private UniRuleQueryRepository repository;
+    @Autowired private UniRuleQueryRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -178,10 +177,20 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(jsonPath("$.information", notNullValue()))
                                     .resultMatcher(jsonPath("$.ruleStatus", notNullValue()))
                                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
-                                    .resultMatcher(jsonPath("$.otherRules", Matchers.hasSize(greaterThan(0))))
-                                    .resultMatcher(jsonPath("$.samFeatureSets", Matchers.hasSize(greaterThan(0))))
-                                    .resultMatcher(jsonPath("$.positionFeatureSets", Matchers.hasSize(greaterThan(0))))
-                                    .resultMatcher(jsonPath("$.proteinsAnnotatedCount", notNullValue()))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.otherRules",
+                                                    Matchers.hasSize(greaterThan(0))))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.samFeatureSets",
+                                                    Matchers.hasSize(greaterThan(0))))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.positionFeatureSets",
+                                                    Matchers.hasSize(greaterThan(0))))
+                                    .resultMatcher(
+                                            jsonPath("$.proteinsAnnotatedCount", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdDate", notNullValue()))
@@ -194,7 +203,6 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
@@ -205,15 +213,12 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-
                                                                     "UR000100241\taccession-")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(
-
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .build();
@@ -236,10 +241,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            emptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
