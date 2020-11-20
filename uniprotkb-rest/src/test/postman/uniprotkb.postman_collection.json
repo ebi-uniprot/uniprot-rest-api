@@ -2259,12 +2259,12 @@
 		{
 			"id": "2d2537bc-5dc2-45c4-a0c4-8f2c83ae7f72",
 			"key": "accession_swissprot",
-			"value": ""
+			"value": "P21802"
 		},
 		{
 			"id": "1a8ed092-f854-4dfc-b2f8-728baaf3fba1",
 			"key": "accession_trembl",
-			"value": ""
+			"value": "A0A514LIK3"
 		}
 	],
 	"protocolProfileBehavior": {}
