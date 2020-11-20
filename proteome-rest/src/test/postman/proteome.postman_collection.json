@@ -32,7 +32,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{genecentric_path}}/download?query={{genecentric_search_value}}",
+									"raw": "{{base_url}}/{{path_context}}/{{genecentric_path}}/stream?query={{genecentric_search_value}}",
 									"host": [
 										"{{base_url}}"
 									],
