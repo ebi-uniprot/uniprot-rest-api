@@ -219,14 +219,14 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                 new ComponentBuilder()
                         .name("someName1")
                         .description("some description")
-                        .type(org.uniprot.core.proteome.ComponentType.UNPLACED)
+                        .proteinCount(10)
                         .build();
 
         Component component2 =
                 new ComponentBuilder()
                         .name("someName2")
                         .description("some description 2")
-                        .type(org.uniprot.core.proteome.ComponentType.SEGMENTED_GENOME)
+                        .proteinCount(11)
                         .build();
 
         components.add(component1);
@@ -281,22 +281,12 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                                         .title("citation title")
                                         .journalName("journalName value")
                                         .build())
-                        .proteomeCrossReferencesSet(xrefs)
                         .redundantProteomesAdd(
                                 new RedundantProteomeBuilder().proteomeId("UP0000000002").build())
                         .panproteome(new ProteomeIdBuilder("UP000000003").build())
                         .componentsSet(components)
                         .taxonLineagesAdd(new TaxonomyLineageBuilder().taxonId(10L).build())
                         .superkingdom(Superkingdom.EUKARYOTA)
-                        .sourceDb("sourceDb value")
-                        .canonicalProteinsAdd(
-                                new CanonicalProteinBuilder()
-                                        .canonicalProtein(
-                                                new ProteinBuilder()
-                                                        .accession("P00001")
-                                                        .geneNameType(GeneNameType.GENE_NAME)
-                                                        .build())
-                                        .build())
                         .genomeAssembly(genomeAssembly)
                         .proteomeCompletenessReport(completenessReport)
                         .exclusionReasonsAdd(ExclusionReason.MIXED_CULTURE)
@@ -336,7 +326,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("organism_name:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -353,7 +343,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                             Collections.singletonList(
                                     "upid:INVALID OR organism_id:INVALID "
                                             + "OR organism_name:INVALID OR taxonomy_id:invalid OR superkingdom:invalid"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -447,12 +437,12 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UP000005231\tHomo sapiens\t9606\t0")))
+                                                                    "UP000005231\tHomo sapiens\t9606\t21")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UP000005520\tHomo sapiens\t9606\t0")))
+                                                                    "UP000005520\tHomo sapiens\t9606\t21")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
