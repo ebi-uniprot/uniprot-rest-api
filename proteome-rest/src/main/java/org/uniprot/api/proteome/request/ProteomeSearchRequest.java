@@ -4,8 +4,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 
 import lombok.Data;
-
 import lombok.EqualsAndHashCode;
+
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;

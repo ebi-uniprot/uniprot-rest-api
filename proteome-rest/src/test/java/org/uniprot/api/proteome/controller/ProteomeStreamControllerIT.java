@@ -1,5 +1,16 @@
 package org.uniprot.api.proteome.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
+
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,34 +35,22 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
-
 /**
  * @author lgonzales
  * @since 23/11/2020
  */
 @ContextConfiguration(
         classes = {
-                DataStoreTestConfig.class,
-                ProteomeRestApplication.class,
-                ErrorHandlerConfig.class
+            DataStoreTestConfig.class,
+            ProteomeRestApplication.class,
+            ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ProteomeController.class)
 @ExtendWith(value = {SpringExtension.class})
-class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
+class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
 
-    @Autowired
-    private ProteomeQueryRepository repository;
+    @Autowired private ProteomeQueryRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -144,10 +143,18 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                         jsonPath(
                                 "$.results.*.id",
                                 contains(
-                                        "UP000005012", "UP000005011", "UP000005010",
-                                        "UP000005009", "UP000005008", "UP000005007",
-                                        "UP000005006", "UP000005005", "UP000005004",
-                                        "UP000005003", "UP000005002", "UP000005001")));
+                                        "UP000005012",
+                                        "UP000005011",
+                                        "UP000005010",
+                                        "UP000005009",
+                                        "UP000005008",
+                                        "UP000005007",
+                                        "UP000005006",
+                                        "UP000005005",
+                                        "UP000005004",
+                                        "UP000005003",
+                                        "UP000005002",
+                                        "UP000005001")));
     }
 
     @Test
@@ -191,9 +198,13 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(containsString("Proteome Id\tOrganism\tOrganism Id\tProtein count")))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Proteome Id\tOrganism\tOrganism Id\tProtein count")))
                 .andExpect(content().string(containsString("UP000005010\tHomo sapiens\t9606\t21")));
     }
 
@@ -210,8 +221,8 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(emptyString()));
     }
 
@@ -276,8 +287,8 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(containsString("UP000005010")))
                 .andExpect(content().string(containsString("UP000005011")));
     }
@@ -295,8 +306,8 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(emptyString()));
     }
 
@@ -317,9 +328,9 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
-        .andExpect(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE));
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
+                .andExpect(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE));
     }
 
     @Test
@@ -335,8 +346,8 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(emptyString()));
     }
 
@@ -344,5 +355,4 @@ class ProteomeStreamControllerIT  extends AbstractSolrStreamControllerIT {
         ProteomeDocument doc = ProteomeControllerITUtils.getProteomeDocument(i);
         storeManager.saveDocs(DataStoreManager.StoreType.PROTEOME, doc);
     }
-
 }

@@ -1,6 +1,10 @@
 package org.uniprot.api.proteome.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.impl.JournalArticleBuilder;
@@ -11,12 +15,13 @@ import org.uniprot.core.proteome.impl.*;
 import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
+import org.uniprot.core.xml.jaxb.proteome.Proteome;
+import org.uniprot.core.xml.proteome.ProteomeConverter;
+import org.uniprot.store.indexer.proteome.ProteomeDocumentConverter;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
-import java.nio.ByteBuffer;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -28,26 +33,14 @@ class ProteomeControllerITUtils {
     @NotNull
     static ProteomeDocument getProteomeDocument(int i) {
         ProteomeEntry entry = createEntry(i);
-        ProteomeDocument document = new ProteomeDocument();
-        document.upid = entry.getId().getValue();
-        document.organismName.add("Homo sapiens");
-        document.organismName.add("human");
-        document.organismTaxId = 9606;
-        document.content.add(document.upid);
-        document.content.addAll(document.organismName);
-        document.content.add(entry.getDescription());
+        ProteomeConverter converter = new ProteomeConverter();
+        Proteome proteome = converter.toXml(entry);
+        ProteomeDocumentConverter documentConverter =
+                new ProteomeDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+        ProteomeDocument document = documentConverter.convert(proteome);
         document.proteomeStored = getBinary(entry);
         document.isRedundant = i % 2 != 0;
         document.isReferenceProteome = i % 2 != 0;
-        document.isExcluded = i % 2 != 0;
-        document.proteomeType = 1;
-        document.score = 3;
-        document.organismTaxon = document.organismName;
-        document.taxLineageIds.add(9606);
-        document.organismSort = "human";
-        document.superkingdom = "eukaryota";
-        document.genomeAccession.add("someAcc");
-        document.genomeAssembly.add("someAcc");
         return document;
     }
 
@@ -64,17 +57,34 @@ class ProteomeControllerITUtils {
         //	String reId = "UP000005641";
         //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
         List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
-        CrossReference<ProteomeDatabase> xref1 =
+        CrossReference<ProteomeDatabase> xref =
                 new CrossReferenceBuilder<ProteomeDatabase>()
                         .database(ProteomeDatabase.GENOME_ASSEMBLY)
                         .id(getName("ACA", i))
                         .build();
-        xrefs.add(xref1);
+        xrefs.add(xref);
+        xref =
+                new CrossReferenceBuilder<ProteomeDatabase>()
+                        .database(ProteomeDatabase.GENOME_ACCESSION)
+                        .id(getName("GA", i))
+                        .build();
+        xrefs.add(xref);
+        xref =
+                new CrossReferenceBuilder<ProteomeDatabase>()
+                        .database(ProteomeDatabase.BIOSAMPLE)
+                        .id(getName("BS", i))
+                        .build();
+        xrefs.add(xref);
+
+        GenomeAnnotation genomeAnnotation =
+                new GenomeAnnotationBuilder().source("GA Value").url("GA URL value").build();
         List<Component> components = new ArrayList<>();
         Component component1 =
                 new ComponentBuilder()
                         .name("someName1")
                         .description("some description")
+                        .genomeAnnotation(genomeAnnotation)
+                        .proteomeCrossReferencesSet(xrefs)
                         .proteinCount(10)
                         .build();
 
@@ -82,6 +92,8 @@ class ProteomeControllerITUtils {
                 new ComponentBuilder()
                         .name("someName2")
                         .description("some description 2")
+                        .genomeAnnotation(genomeAnnotation)
+                        .proteomeCrossReferencesSet(xrefs)
                         .proteinCount(11)
                         .build();
 
@@ -144,6 +156,7 @@ class ProteomeControllerITUtils {
                         .taxonLineagesAdd(new TaxonomyLineageBuilder().taxonId(10L).build())
                         .superkingdom(Superkingdom.EUKARYOTA)
                         .genomeAssembly(genomeAssembly)
+                        .genomeAnnotation(genomeAnnotation)
                         .proteomeCompletenessReport(completenessReport)
                         .exclusionReasonsAdd(ExclusionReason.MIXED_CULTURE)
                         .annotationScore(15);

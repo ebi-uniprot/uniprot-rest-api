@@ -1,11 +1,13 @@
 package org.uniprot.api.proteome.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.Pattern;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import org.uniprot.api.rest.request.StreamRequest;
 
-import javax.validation.constraints.Pattern;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author lgonzales

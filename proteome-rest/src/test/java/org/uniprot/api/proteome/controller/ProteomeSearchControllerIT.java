@@ -4,14 +4,11 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.nio.ByteBuffer;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,24 +30,12 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.core.CrossReference;
-import org.uniprot.core.citation.impl.JournalArticleBuilder;
-import org.uniprot.core.impl.CrossReferenceBuilder;
-import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.*;
 import org.uniprot.core.proteome.impl.*;
-import org.uniprot.core.proteome.impl.ComponentBuilder;
-import org.uniprot.core.proteome.impl.ProteomeEntryBuilder;
-import org.uniprot.core.proteome.impl.ProteomeIdBuilder;
-import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
-import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
-import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author jluo
@@ -125,10 +110,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                 value = "human";
                 break;
             case "annotation_score":
-                value = "3";
+                value = "15";
                 break;
             case "proteome_type":
-                value = "1";
+                value = "5";
                 break;
         }
         return value;
@@ -219,7 +204,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchSortWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("sort", Collections.singletonList("annotation_score desc"))
+                    .queryParam("sort", Collections.singletonList("organism_name desc"))
                     .resultMatcher(
                             jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
                     .build();
