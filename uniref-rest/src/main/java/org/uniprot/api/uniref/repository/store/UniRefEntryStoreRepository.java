@@ -98,6 +98,7 @@ public class UniRefEntryStoreRepository {
             builder.commonTaxonId(entryLight.getCommonTaxonId());
             builder.commonTaxon(entryLight.getCommonTaxon());
             builder.goTermsSet(entryLight.getGoTerms());
+            builder.seedId(getSeedId(entryLight));
         }
         // build members
         BatchStoreIterable<RepresentativeMember> batchIterable =
@@ -121,7 +122,7 @@ public class UniRefEntryStoreRepository {
             RepresentativeMember storedMember,
             UniRefEntryBuilder builder,
             UniRefEntryLight entryLight) {
-        if (storedMember.getMemberId().equalsIgnoreCase(entryLight.getRepresentativeId())) {
+        if (storedMember.getMemberId().equalsIgnoreCase(getRepresentativeMemberId(entryLight))) {
             RepresentativeMemberBuilder repBuilder = RepresentativeMemberBuilder.from(storedMember);
             cleanMemberFields(repBuilder, entryLight, storedMember.getMemberId());
             builder.representativeMember(repBuilder.build());
@@ -149,7 +150,7 @@ public class UniRefEntryStoreRepository {
             default:
                 break;
         }
-        if (memberId.equalsIgnoreCase(entryLight.getSeedId())) {
+        if (memberId.equalsIgnoreCase(getSeedMemberId(entryLight))) {
             builder.isSeed(true);
         }
     }
@@ -171,5 +172,18 @@ public class UniRefEntryStoreRepository {
         int offset = page.getOffset().intValue();
         int nextOffset = CursorPage.getNextOffset(page);
         return members.subList(offset, nextOffset);
+    }
+
+    private String getSeedId(UniRefEntryLight entryLight) {
+        String[] splittedSeed = entryLight.getSeedId().split(",");
+        return splittedSeed[splittedSeed.length - 1];
+    }
+
+    private String getSeedMemberId(UniRefEntryLight entryLight) {
+        return entryLight.getSeedId().split(",")[0];
+    }
+
+    private String getRepresentativeMemberId(UniRefEntryLight entryLight) {
+        return entryLight.getRepresentativeId().split(",")[0];
     }
 }

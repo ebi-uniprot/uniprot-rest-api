@@ -1861,6 +1861,76 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "matched fields",
+					"item": [
+						{
+							"name": "matched fields object exists",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "2321a074-42b1-4bb6-87a3-7f19dc65a073",
+										"exec": [
+											"let xRelease = pm.globals.get('x_release');",
+											"let controlAllow = pm.globals.get('control_origin');",
+											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
+											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
+											"            undefined, undefined, xRelease, controlAllow);",
+											"",
+											"// verify data",
+											"let jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Check that there is more than one matched field\", function () {",
+											"    pm.expect(jsonData.matchedFields.length).to.be.greaterThan(0);",
+											"});",
+											"",
+											"pm.test(\"Check results contains more than one result\", function () {",
+											"    pm.expect(jsonData.results.length).to.be.greaterThan(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query=cdc7&showMatchedFields=true",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{path_context}}",
+										"{{uniprotkb_path}}",
+										"search"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "cdc7"
+										},
+										{
+											"key": "showMatchedFields",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "Test suite for /search API.",
@@ -2172,29 +2242,29 @@
 	],
 	"variable": [
 		{
-			"id": "dc2e1a6a-5015-420e-a42e-28756cebff15",
+			"id": "d3f7c25b-1b5b-48a3-b0a2-04f29b104da3",
 			"key": "search_value",
 			"value": "rnf18"
 		},
 		{
-			"id": "3872eeb4-d9eb-421f-a095-aba0da1b6ce8",
+			"id": "0892cdb5-816f-49fc-becd-7407f5d3b6b0",
 			"key": "accession_list",
 			"value": "P0CI25,A6NDI0,A9Q1J6,P12345"
 		},
 		{
-			"id": "7b6d32a0-c274-4815-9fb3-9c058edb37d3",
+			"id": "922d1ddc-d53c-4c94-a631-522bcd9d733e",
 			"key": "search_by_gene",
 			"value": "gene:p53"
 		},
 		{
-			"id": "30cd5f50-3d84-450c-af49-a8589186d5f4",
+			"id": "2d2537bc-5dc2-45c4-a0c4-8f2c83ae7f72",
 			"key": "accession_swissprot",
-			"value": ""
+			"value": "P21802"
 		},
 		{
-			"id": "0b57a565-409f-4b5a-99b5-a8dce522621a",
+			"id": "1a8ed092-f854-4dfc-b2f8-728baaf3fba1",
 			"key": "accession_trembl",
-			"value": ""
+			"value": "A0A514LIK3"
 		}
 	],
 	"protocolProfileBehavior": {}
