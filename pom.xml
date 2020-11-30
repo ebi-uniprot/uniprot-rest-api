@@ -412,6 +412,12 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
+							<systemProperties>
+								<property>
+									<name>cv.dr.ord.location</name>
+									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+								</property>
+							</systemProperties>
 							<!-- Exclude integration tests from unit test run -->
 							<excludes>
 								<skipITs>${skipUTs}</skipITs>
@@ -425,6 +431,12 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
+							<systemProperties>
+								<property>
+									<name>cv.dr.ord.location</name>
+									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+								</property>
+							</systemProperties>
 							<skipITs>${skipITs}</skipITs>
 							<argLine>${jacoco.agent.it.arg}</argLine>
 						</configuration>
