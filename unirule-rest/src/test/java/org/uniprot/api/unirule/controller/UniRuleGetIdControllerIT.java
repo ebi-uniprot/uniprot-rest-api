@@ -104,6 +104,17 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(UNIRULE_ID)
                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
+                    .resultMatcher(jsonPath("$.information", notNullValue()))
+                    .resultMatcher(jsonPath("$.ruleStatus", notNullValue()))
+                    .resultMatcher(jsonPath("$.mainRule", notNullValue()))
+                    .resultMatcher(jsonPath("$.otherRules", notNullValue()))
+                    .resultMatcher(jsonPath("$.samFeatureSets", notNullValue()))
+                    .resultMatcher(jsonPath("$.positionFeatureSets", notNullValue()))
+                    .resultMatcher(jsonPath("$.proteinsAnnotatedCount", notNullValue()))
+                    .resultMatcher(jsonPath("$.createdBy", notNullValue()))
+                    .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
+                    .resultMatcher(jsonPath("$.createdDate", notNullValue()))
+                    .resultMatcher(jsonPath("$.modifiedDate", notNullValue()))
                     .build();
         }
 

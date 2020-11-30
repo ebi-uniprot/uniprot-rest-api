@@ -38,14 +38,14 @@ public class UniRuleSolrQueryConfig {
     @Bean
     public QueryProcessor uniRuleQueryProcessor(
             WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig uniRuleSearchFieldConfig) {
-        Map<String, String> uniParcWhiteListFields =
+        Map<String, String> uniRuleWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIRULE.toString().toLowerCase(), new HashMap<>());
         return new UniProtQueryProcessor(
                 getDefaultSearchOptimisedFieldItems(uniRuleSearchFieldConfig),
-                uniParcWhiteListFields);
+                uniRuleWhiteListFields);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
