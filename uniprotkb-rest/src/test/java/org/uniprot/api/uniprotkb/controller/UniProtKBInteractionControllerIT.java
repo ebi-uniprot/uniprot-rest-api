@@ -1,6 +1,17 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.HashMap;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -40,16 +51,6 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.HashMap;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 /**
  * Created 06/05/2020
  *
@@ -71,8 +72,7 @@ class UniProtKBInteractionControllerIT {
     private static final String NON_EXISTENT_ENTRY = "P99993";
     @RegisterExtension static final DataStoreManager STORE_MANAGER = new DataStoreManager();
     private final UniProtKBEntry entryWithNoInteractions =
-            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
-    ;
+            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);;
     @Autowired private UniprotQueryRepository repository;
     @Autowired private UniProtKBStoreClient storeClient;
     @Autowired private MockMvc mockMvc;
