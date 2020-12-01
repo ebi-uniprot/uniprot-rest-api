@@ -1,17 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -36,13 +24,25 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+
+import static org.hamcrest.Matchers.contains;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -78,7 +78,7 @@ class SearchByMnemonicIT {
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(
                         TaxonomyRepoMocker.getTaxonomyRepo(),
-                        GoRelationsRepoMocker.getGoRelationRepo(),
+                        Mockito.mock(GORepo.class),
                         PathwayRepoMocker.getPathwayRepo(),
                         Mockito.mock(ChebiRepo.class),
                         Mockito.mock(ECRepo.class),
