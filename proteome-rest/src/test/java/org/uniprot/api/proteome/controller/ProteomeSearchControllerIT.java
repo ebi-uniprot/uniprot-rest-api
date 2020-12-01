@@ -113,7 +113,10 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
                 value = "15";
                 break;
             case "proteome_type":
-                value = "5";
+                value = "4";
+                break;
+            case "busco":
+                value = "[0 TO *]";
                 break;
         }
         return value;
@@ -225,21 +228,16 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("reference"))
+                    .queryParam("facets", Collections.singletonList("superkingdom,proteome_type"))
                     .resultMatcher(
                             jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
-                    .resultMatcher(jsonPath("$.facets", iterableWithSize(1)))
-                    .resultMatcher(jsonPath("$.facets[0].values", iterableWithSize(2)))
-                    .resultMatcher(jsonPath("$.facets[0].label", is("Status")))
-                    .resultMatcher(jsonPath("$.facets[0].name", is("reference")))
+                    .resultMatcher(jsonPath("$.facets", iterableWithSize(2)))
+                    .resultMatcher(jsonPath("$.facets[0].values", iterableWithSize(1)))
+                    .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))
+                    .resultMatcher(jsonPath("$.facets[0].name", is("superkingdom")))
                     .resultMatcher(jsonPath("$.facets[0].allowMultipleSelection", is(false)))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.facets[0].values.*.label",
-                                    contains("Other Proteomes", "Reference proteomes")))
-                    .resultMatcher(
-                            jsonPath("$.facets[0].values.*.value", contains("false", "true")))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.count", contains(1, 1)))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.value", contains("Eukaryota")))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.count", contains(2)))
                     .build();
         }
     }

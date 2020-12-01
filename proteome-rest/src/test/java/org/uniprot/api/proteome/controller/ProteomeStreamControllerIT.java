@@ -99,7 +99,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(jsonPath("$.results[0].id", is("UP000005010")))
                 .andExpect(jsonPath("$.results[0].taxonomy.taxonId", is(9606)))
                 .andExpect(jsonPath("$.results[0].superkingdom", is("eukaryota")))
-                .andExpect(jsonPath("$.results[0].proteomeType", is("Complete proteome")));
+                .andExpect(jsonPath("$.results[0].proteomeType", is("Other proteome")));
     }
 
     @Test
