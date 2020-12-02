@@ -28,7 +28,7 @@ public class UniRuleControllerITUtils {
         builder.uniRuleId(uniRuleIdBuilder.build());
     }
 
-    private static void updateMainRule(UniRuleEntryBuilder builder){
+    private static void updateMainRule(UniRuleEntryBuilder builder) {
         Rule rule = builder.build().getMainRule();
         ConditionBuilder conditionBuilder = new ConditionBuilder("taxon");
         conditionBuilder.conditionValuesAdd(

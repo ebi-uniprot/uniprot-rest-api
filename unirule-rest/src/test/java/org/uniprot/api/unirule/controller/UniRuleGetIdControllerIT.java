@@ -144,7 +144,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(UNIRULE_ID)
-                    .fields("information")
+                    .fields("template_entries")
                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
                     .resultMatcher(jsonPath("$.information", notNullValue()))
                     .resultMatcher(jsonPath("$.ruleStatus").doesNotExist())

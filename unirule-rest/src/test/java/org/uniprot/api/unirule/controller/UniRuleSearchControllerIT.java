@@ -1,5 +1,22 @@
 package org.uniprot.api.unirule.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +45,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * @author sahmaad
@@ -136,7 +136,6 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         UniRuleEntry entry = UniRuleEntryBuilderTest.createObject(2);
         UniRuleEntry uniRuleEntry = UniRuleControllerITUtils.updateValidValues(entry, suffix);
         UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
-
         UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIRULE, document);
     }
@@ -147,10 +146,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("unirule_id:UR000000200"))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.uniRuleId",
-                                    contains("UR000000200")))
+                    .resultMatcher(jsonPath("$.results.*.uniRuleId", contains("UR000000200")))
                     .resultMatcher(jsonPath("$.results.*.information").exists())
                     .resultMatcher(jsonPath("$.results.*.ruleStatus", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.mainRule", notNullValue()))
@@ -200,10 +196,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam(
-                            "query",
-                            Collections.singletonList(
-                                    "unirule_id:INVALID"))
+                    .queryParam("query", Collections.singletonList("unirule_id:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
@@ -229,18 +222,17 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("uniRuleId,template_entries,annotation_covered"))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.results[*].uniRuleId",
-                                    is(notNullValue())))
+                    .queryParam(
+                            "fields",
+                            Collections.singletonList(
+                                    "uniRuleId,template_entries,annotation_covered"))
+                    .resultMatcher(jsonPath("$.results[*].uniRuleId", is(notNullValue())))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].information.uniProtAccessions",
                                     is(notNullValue())))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results[*].mainRule.annotations", is(notNullValue())))
+                            jsonPath("$.results[*].mainRule.annotations", is(notNullValue())))
                     .build();
         }
 
@@ -258,9 +250,16 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                     .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))
                     .resultMatcher(jsonPath("$.facets[0].name", is("taxonomy")))
                     .resultMatcher(jsonPath("$.facets[0].allowMultipleSelection", is(true)))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.label", containsInAnyOrder("Archaea", "Bacteria", "Eukaryota")))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.value", containsInAnyOrder("archaea", "bacteria", "eukaryota")))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.count", containsInAnyOrder(2,2,2)))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[0].values.*.label",
+                                    containsInAnyOrder("Archaea", "Bacteria", "Eukaryota")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[0].values.*.value",
+                                    containsInAnyOrder("archaea", "bacteria", "eukaryota")))
+                    .resultMatcher(
+                            jsonPath("$.facets[0].values.*.count", containsInAnyOrder(2, 2, 2)))
                     .build();
         }
     }
@@ -278,7 +277,8 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.uniRuleId",
-                                                    containsInAnyOrder("UR000000200", "UR000000300")))
+                                                    containsInAnyOrder(
+                                                            "UR000000200", "UR000000300")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
