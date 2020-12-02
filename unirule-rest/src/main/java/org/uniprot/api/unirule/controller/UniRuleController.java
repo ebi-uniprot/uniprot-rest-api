@@ -7,6 +7,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,12 +25,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.unirule.request.UniRuleSearchRequest;
+import org.uniprot.api.unirule.request.UniRuleStreamRequest;
 import org.uniprot.api.unirule.service.UniRuleService;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -98,6 +101,21 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
         setPreviewInfo(searchRequest, preview);
         QueryResult<UniRuleEntry> results = uniRuleService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/stream",
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniRuleEntry>>> stream(
+            @Valid @ModelAttribute UniRuleStreamRequest streamRequest, HttpServletRequest request) {
+
+        Stream<UniRuleEntry> result = uniRuleService.stream(streamRequest);
+        return super.stream(result, streamRequest, getAcceptHeader(request), request);
     }
 
     @Override
