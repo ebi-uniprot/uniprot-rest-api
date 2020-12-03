@@ -37,12 +37,22 @@ import org.uniprot.api.unirule.service.UniRuleService;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author sahmad
  * @created 11/11/2020
  */
+@Tag(
+        name = "unirule",
+        description =
+                "The unified rule(UniRule) resource for automatic annotation in the UniProt Knowledgebase ")
 @RestController
 @Validated
 @RequestMapping("/unirule")
@@ -70,6 +80,19 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Get a UniRule by id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniRuleEntry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByUniRuleId(
             @PathVariable("uniruleid")
                     @Pattern(
@@ -77,7 +100,10 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.unirule.invalid.id}")
                     String uniRuleId,
-            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE) String fields,
+            @Parameter(description = "Comma separated list of fields to be returned in response")
+                    @RequestParam(value = "fields", required = false)
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
+                    String fields,
             HttpServletRequest request) {
         UniRuleEntry entryResult = this.uniRuleService.findByUniqueId(uniRuleId);
         return super.getEntityResponse(entryResult, fields, request);
@@ -90,6 +116,24 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Search for a UniRule entry (or entries) by a SOLR query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRuleEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> search(
             @Valid @ModelAttribute UniRuleSearchRequest searchRequest,
@@ -110,6 +154,24 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Stream a UniRule entry (or entries) by a SOLR query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRuleEntry.class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRuleEntry>>> stream(
             @Valid @ModelAttribute UniRuleStreamRequest streamRequest, HttpServletRequest request) {
