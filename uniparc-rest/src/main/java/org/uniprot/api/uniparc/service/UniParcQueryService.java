@@ -18,7 +18,13 @@ import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.request.*;
+import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
@@ -44,6 +50,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
     private final QueryProcessor queryProcessor;
+    private final SolrQueryConfig solrQueryConfig;
+    private final StoreStreamer<UniParcEntry> storeStreamer;
 
     @Autowired
     public UniParcQueryService(
@@ -67,6 +75,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
+        this.solrQueryConfig = uniParcSolrQueryConf;
+        this.storeStreamer = storeStreamer;
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
@@ -111,6 +121,12 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         // filter the entries
         Stream<UniParcEntry> filtered = filterUniParcStream(converted, searchRequest);
         return QueryResult.of(filtered, results.getPage(), results.getFacets());
+    }
+
+    public Stream<String> streamRDF(UniParcStreamRequest streamRequest) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override
