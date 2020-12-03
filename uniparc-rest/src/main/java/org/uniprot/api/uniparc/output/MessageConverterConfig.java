@@ -89,6 +89,7 @@ public class MessageConverterConfig {
                                 returnFieldConfig);
                 converters.add(0, uniparcJsonConverter);
                 converters.add(1, new UniParcXmlMessageConverter(""));
+                converters.add(new RDFMessageConverter());
             }
         };
     }
@@ -104,7 +105,8 @@ public class MessageConverterConfig {
                         uniparcContext(APPLICATION_JSON),
                         uniparcContext(FASTA_MEDIA_TYPE),
                         uniparcContext(TSV_MEDIA_TYPE),
-                        uniparcContext(XLS_MEDIA_TYPE))
+                        uniparcContext(XLS_MEDIA_TYPE),
+                        uniparcContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
@@ -159,7 +161,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream a UniParc sequence entry (or entries) by a SOLR query.",
@@ -202,6 +205,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(queryService.streamIds(streamRequest));
+        } else if (contentType.equals(RDF_MEDIA_TYPE)) {
+            context.setEntityIds(queryService.streamRDF(streamRequest));
         } else {
             context.setEntities(queryService.stream(streamRequest));
         }
