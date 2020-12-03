@@ -35,6 +35,7 @@ public class StoreStreamer<T> {
     private final int rdfBatchSize; // number of accession in rdf rest request
     private final RetryPolicy<Object> storeFetchRetryPolicy;
     private final RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
+    private final String rdfProlog; // rdf prefix
 
     @SuppressWarnings("squid:S2095")
     public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
@@ -77,7 +78,7 @@ public class StoreStreamer<T> {
 
         // prepend rdf prolog then rdf data and then append closing rdf tag
         return Stream.concat(
-                Stream.of(RDFService.RDF_PROLOG),
+                Stream.of(rdfProlog),
                 Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
     }
 

@@ -76,6 +76,7 @@ public class UniRefMessageConverterConfig {
                 converters.add(new ListMessageConverter());
                 converters.add(new UniRefLightFastaMessageConverter());
                 converters.add(new UniRefFastaMessageConverter());
+                converters.add(new RDFMessageConverter());
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniRefEntryLight.class,
@@ -123,7 +124,8 @@ public class UniRefMessageConverterConfig {
                         uniRefLightContext(APPLICATION_JSON),
                         uniRefLightContext(FASTA_MEDIA_TYPE),
                         uniRefLightContext(TSV_MEDIA_TYPE),
-                        uniRefLightContext(XLS_MEDIA_TYPE))
+                        uniRefLightContext(XLS_MEDIA_TYPE),
+                        uniRefLightContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

@@ -81,6 +81,7 @@ public class ResultsConfig {
                 .storeFetchRetryPolicy(storeRetryPolicy)
                 .rdfFetchRetryPolicy(rdfRetryPolicy)
                 .rdfStoreClient(new RDFService<>(restTemplate, String.class))
+                .rdfProlog(RDFService.UNIPROT_RDF_PROLOG)
                 .build();
     }
 
