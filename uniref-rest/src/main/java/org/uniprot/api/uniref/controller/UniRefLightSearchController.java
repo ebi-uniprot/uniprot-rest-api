@@ -122,7 +122,8 @@ public class UniRefLightSearchController extends BasicSearchController<UniRefEnt
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                FASTA_MEDIA_TYPE_VALUE
+                FASTA_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.",
@@ -168,6 +169,8 @@ public class UniRefLightSearchController extends BasicSearchController<UniRefEnt
         context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(queryService.streamIds(streamRequest));
+        } else if (contentType.equals(RDF_MEDIA_TYPE)) {
+            context.setEntityIds(queryService.streamRDF(streamRequest));
         } else {
             context.setEntities(queryService.stream(streamRequest));
         }

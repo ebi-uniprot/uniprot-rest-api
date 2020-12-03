@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
@@ -65,5 +66,11 @@ public class DataStoreTestConfig {
                 return solrQuery;
             }
         };
+    }
+
+    @Bean(name = "rdfRestTemplate")
+    @Profile("offline")
+    public RestTemplate restTemplate() {
+        return mock(RestTemplate.class);
     }
 }

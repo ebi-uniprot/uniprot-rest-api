@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -33,7 +34,8 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 @Import(UniRefSolrQueryConfig.class)
 public class UniRefLightSearchService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
-
+    private final SolrQueryConfig solrQueryConfig;
+    private final StoreStreamer<UniRefEntryLight> storeStreamer;
     private static final int ID_LIMIT = 10;
     public static final String UNIREF_ID = "id";
     public static final String UNIREF_UPI = "upi";
@@ -59,6 +61,8 @@ public class UniRefLightSearchService
                 uniRefSolrQueryConf);
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.queryProcessor = uniRefQueryProcessor;
+        this.solrQueryConfig = uniRefSolrQueryConf;
+        this.storeStreamer = storeStreamer;
     }
 
     @Override
@@ -105,6 +109,12 @@ public class UniRefLightSearchService
     public UniRefEntryLight getEntity(String idField, String value) {
         throw new UnsupportedOperationException(
                 "UniRefLightSearchService does not support getEntity, try to use UniRefEntryService");
+    }
+
+    public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override

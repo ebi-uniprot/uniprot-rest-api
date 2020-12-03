@@ -22,12 +22,19 @@ public class RDFService<T> implements StoreService<T> {
     private static final String RDF_STR = "rdf";
     private static final String ID_COLON_STR = "id:";
     private static final String OR_DELIMITER_STR = " or ";
-    public static final String RDF_PROLOG =
+    public static final String UNIPROT_RDF_PROLOG =
             "<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<rdf:RDF xml:base=\"http://purl.uniprot.org/uniprot/\" xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\" xmlns:bibo=\"http://purl.org/ontology/bibo/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:void=\"http://rdfs.org/ns/void#\" xmlns:sd=\"http://www.w3.org/ns/sparql-service-description#\" xmlns:faldo=\"http://biohackathon.org/resource/faldo#\">\n"
                     + "    <owl:Ontology rdf:about=\"http://purl.uniprot.org/uniprot/\">\n"
                     + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
                     + "    </owl:Ontology>";
+    public static final String UNIREF_RDF_PROLOG =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:uniparc=\"http://purl.uniprot.org/uniparc/\" xmlns:uniprot=\"http://purl.uniprot.org/uniprot/\" xmlns:uniref=\"http://purl.uniprot.org/uniref/\">\n"
+                    + "<owl:Ontology rdf:about=\"\">\n"
+                    + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "</owl:Ontology>";
+
     public static final String RDF_CLOSE_TAG = "</rdf:RDF>";
     private static final String OWL_CLOSE_TAG = "</owl:Ontology>";
     private Class<T> clazz;
