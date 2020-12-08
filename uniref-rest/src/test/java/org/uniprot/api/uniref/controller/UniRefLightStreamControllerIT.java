@@ -303,7 +303,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
