@@ -2,10 +2,12 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -13,11 +15,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +31,11 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -46,7 +54,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -84,6 +96,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     private static final String streamRequestPath = "/uniparc/stream";
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
+
     @Autowired UniProtStoreClient<UniParcEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
@@ -102,6 +115,35 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
         when(solrClient.query(anyString(), any())).thenReturn(response);
+    }
+
+    @Test
+    void streamRDFCanReturnSuccess() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE)
+                        .param("query", "*");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(content()
+                        .string(
+                                startsWith(
+                                        RDFService.UNIPARC_RDF_PROLOG)))
+                .andExpect(content()
+                        .string(
+                                containsString(
+                                        "    <sample>text</sample>\n" +
+                                                "    <anotherSample>text2</anotherSample>\n" +
+                                                "    <someMore>text3</someMore>\n\n" +
+                                                "</rdf:RDF>")));
+
     }
 
     @Test
