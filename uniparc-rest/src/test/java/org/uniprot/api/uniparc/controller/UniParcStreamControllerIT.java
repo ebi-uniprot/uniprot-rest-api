@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -21,9 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.File;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -31,11 +27,9 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -54,8 +48,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RDFService;
@@ -132,18 +124,15 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content()
-                        .string(
-                                startsWith(
-                                        RDFService.UNIPARC_RDF_PROLOG)))
-                .andExpect(content()
-                        .string(
-                                containsString(
-                                        "    <sample>text</sample>\n" +
-                                                "    <anotherSample>text2</anotherSample>\n" +
-                                                "    <someMore>text3</someMore>\n\n" +
-                                                "</rdf:RDF>")));
-
+                .andExpect(content().string(startsWith(RDFService.UNIPARC_RDF_PROLOG)))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "    <sample>text</sample>\n"
+                                                        + "    <anotherSample>text2</anotherSample>\n"
+                                                        + "    <someMore>text3</someMore>\n\n"
+                                                        + "</rdf:RDF>")));
     }
 
     @Test
