@@ -287,8 +287,8 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                                 "$.results.*.id",
                                 containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
                 .andExpect(jsonPath("$.results.*.sequenceLength", contains(66, 66)))
-                .andExpect(jsonPath("$.results.*.organismIds", hasItem(hasItem(9600))))
-                .andExpect(jsonPath("$.results.*.organisms").doesNotExist())
+                .andExpect(jsonPath("$.results.*.organisms[0].taxonId", hasItem(is(9600))))
+                .andExpect(jsonPath("$.results.*.organisms.*.scientificName").doesNotExist())
                 .andExpect(jsonPath("$.results.*.name").doesNotExist());
         ;
     }
