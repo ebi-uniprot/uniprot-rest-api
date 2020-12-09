@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyIterable;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -141,6 +142,26 @@ class StoreStreamerIT {
                         transformString("e")));
     }
 
+    @Test
+    void whenStoreExceptionDuringIdStreaming_thenEnsureIOExceptionThrown() throws IOException {
+        List<String> ids = asList("a", "b", "c", "d", "e");
+        TupleStream tupleStream = tupleStream(ids);
+        Mockito.doThrow(new IOException()).when(tupleStream).open();
+        StoreStreamer<String> storeStreamer = createSearchStoreStream(1, tupleStream);
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> storeStreamer.idsToStoreStream(solrRequest).collect(Collectors.toList()));
+    }
+
+    @Test
+    void whenIOExceptionDuringIdsStream() throws IOException {
+        TupleStream tupleStream = tupleStream(asList("a", "b", "c", "d", "e"));
+        Mockito.doThrow(new IOException()).when(tupleStream).open();
+        StoreStreamer<String> storeStreamer = createSearchStoreStream(1, tupleStream);
+        assertThrows(IllegalStateException.class, () -> storeStreamer.idsStream(solrRequest));
+    }
+
     private StoreStreamer<String> createSearchStoreStream(
             int streamerBatchSize, TupleStream tupleStream) {
         TupleStreamTemplate mockTupleStreamTemplate = Mockito.mock(TupleStreamTemplate.class);
@@ -162,7 +183,7 @@ class StoreStreamerIT {
         TupleStream mockTupleStream = mock(TupleStream.class);
 
         try {
-            OngoingStubbing<Tuple> ongoingStubbing = when(mockTupleStream.read());
+            OngoingStubbing<Tuple> ongoingStubbing = lenient().when(mockTupleStream.read());
             for (String value : values) {
                 log.debug("hello " + value);
                 ongoingStubbing = ongoingStubbing.thenReturn(tuple(value));
