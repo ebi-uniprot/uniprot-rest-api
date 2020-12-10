@@ -1,13 +1,18 @@
 package org.uniprot.api.unirule.controller;
 
-import java.util.stream.IntStream;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -19,6 +24,19 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
+
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -70,5 +88,94 @@ class UniRuleStreamControllerIT extends AbstractSolrStreamControllerIT {
         UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
         UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);
         storeManager.saveDocs(DataStoreManager.StoreType.UNIRULE, document);
+    }
+
+    @Test
+    void uniRuleQueryWorks() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "unirule_id:UR000000002");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.uniRuleId", contains("UR000000002")));
+    }
+
+    @Test
+    void uniRuleQueryEmptyResults() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "condition_value:something");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Test
+    void uniRuleSortWorks() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "*")
+                        .param("sort", "unirule_id desc");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(12)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.uniRuleId",
+                                contains(
+                                        "UR000000012", "UR000000011", "UR000000010", "UR000000009", "UR000000008", "UR000000007",
+                                        "UR000000006", "UR000000005", "UR000000004", "UR000000003", "UR000000002",
+                                        "UR000000001")));
+    }
+
+    @Test
+    void uniRuleFieldsWorks() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "*")
+                        .param("fields", "uniRuleId,taxonomic_scope");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.information").doesNotExist())
+                .andExpect(jsonPath("$.results.*.uniRuleId").exists())
+                .andExpect(jsonPath("$.results.*.mainRule").exists())
+                .andExpect(jsonPath("$.results.size()", is(12)));
     }
 }
