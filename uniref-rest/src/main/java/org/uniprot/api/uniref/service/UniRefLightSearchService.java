@@ -20,6 +20,7 @@ import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
+import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -147,15 +148,8 @@ public class UniRefLightSearchService
         members = removeMemberTypeFromMemberId(members);
         builder.membersSet(members);
 
-        if (entry.getOrganismIds().size() > ID_LIMIT) {
-            LinkedHashSet<Long> organismIds =
-                    entry.getOrganismIds().stream()
-                            .limit(ID_LIMIT)
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
-            builder.organismIdsSet(organismIds);
-        }
         if (entry.getOrganisms().size() > ID_LIMIT) {
-            LinkedHashSet<String> organisms =
+            LinkedHashSet<Organism> organisms =
                     entry.getOrganisms().stream()
                             .limit(ID_LIMIT)
                             .collect(Collectors.toCollection(LinkedHashSet::new));

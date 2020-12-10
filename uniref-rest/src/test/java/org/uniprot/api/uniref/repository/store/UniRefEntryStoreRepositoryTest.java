@@ -20,6 +20,8 @@ import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
 import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.Organism;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
@@ -294,6 +296,8 @@ class UniRefEntryStoreRepositoryTest {
     }
 
     private void createLightEntries(UniRefLightStoreClient lightStoreClient) {
+        Organism commonOrganism =
+                new OrganismBuilder().taxonId(10L).scientificName("common taxon value").build();
         UniRefEntryLightBuilder builderOk =
                 new UniRefEntryLightBuilder()
                         .id(UNIREF_ID_OK)
@@ -305,8 +309,7 @@ class UniRefEntryStoreRepositoryTest {
                                         .aspect(GoAspect.COMPONENT)
                                         .id("1")
                                         .build())
-                        .commonTaxonId(10L)
-                        .commonTaxon("common taxon value")
+                        .commonTaxon(commonOrganism)
                         .memberIdTypesAdd(UniRefMemberIdType.UNIPROTKB)
                         .representativeId(REPRESENTATIVE_ID)
                         .membersAdd(REPRESENTATIVE_ID)

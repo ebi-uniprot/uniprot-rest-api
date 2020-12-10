@@ -95,8 +95,10 @@ public class UniRefEntryStoreRepository {
             builder.entryType(entryLight.getEntryType());
             builder.updated(entryLight.getUpdated());
             builder.memberCount(entryLight.getMemberCount());
-            builder.commonTaxonId(entryLight.getCommonTaxonId());
-            builder.commonTaxon(entryLight.getCommonTaxon());
+            if (entryLight.getCommonTaxon() != null) {
+                builder.commonTaxonId(entryLight.getCommonTaxon().getTaxonId());
+                builder.commonTaxon(entryLight.getCommonTaxon().getScientificName());
+            }
             builder.goTermsSet(entryLight.getGoTerms());
             builder.seedId(getSeedId(entryLight));
         }
