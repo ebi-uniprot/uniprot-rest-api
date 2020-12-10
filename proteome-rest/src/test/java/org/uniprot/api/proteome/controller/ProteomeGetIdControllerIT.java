@@ -129,14 +129,14 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                 new ComponentBuilder()
                         .name("someName1")
                         .description("some description")
-                        .type(org.uniprot.core.proteome.ComponentType.UNPLACED)
+                        .proteinCount(10)
                         .build();
 
         Component component2 =
                 new ComponentBuilder()
                         .name("someName2")
                         .description("some description 2")
-                        .type(org.uniprot.core.proteome.ComponentType.SEGMENTED_GENOME)
+                        .proteinCount(11)
                         .build();
 
         components.add(component1);
@@ -150,7 +150,6 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .modified(modified)
                         .proteomeType(ProteomeType.NORMAL)
                         //	.redundantTo(redId)
-                        .proteomeCrossReferencesSet(xrefs)
                         .componentsSet(components)
                         .superkingdom(Superkingdom.EUKARYOTA)
                         .citationsSet(citations)
@@ -254,7 +253,7 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UP000005640\tHomo sapiens\t9606\t0")))
+                                                                    "UP000005640\tHomo sapiens\t9606\t21")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

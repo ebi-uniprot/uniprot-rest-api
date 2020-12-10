@@ -31,6 +31,6 @@ class ProteomeConfigureServiceTest {
         ProteomeConfigureService service = new ProteomeConfigureService();
         List<AdvancedSearchTerm> result = service.getSearchItems();
         assertNotNull(result);
-        assertEquals(6, result.size());
+        assertEquals(8, result.size());
     }
 }

@@ -35,6 +35,6 @@ class ProteomeFacetConfigTest {
     void testGetFacetNames() {
 
         Collection<String> map = config.getFacetNames();
-        assertThat(map, hasItems("superkingdom", "reference"));
+        assertThat(map, hasItems("superkingdom", "proteome_type"));
     }
 }

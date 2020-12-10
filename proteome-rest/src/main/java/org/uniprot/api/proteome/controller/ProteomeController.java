@@ -25,7 +25,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.proteome.request.ProteomeRequest;
+import org.uniprot.api.proteome.request.ProteomeSearchRequest;
+import org.uniprot.api.proteome.request.ProteomeStreamRequest;
 import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -110,7 +111,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> search(
-            @Valid @ModelAttribute ProteomeRequest searchRequest,
+            @Valid @ModelAttribute ProteomeSearchRequest searchRequest,
             @Parameter(hidden = true)
                     @RequestParam(value = "preview", required = false, defaultValue = "false")
                     boolean preview,
@@ -170,7 +171,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
 
     @Tag(name = "proteome")
     @GetMapping(
-            value = "/download",
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -179,7 +180,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download proteomes entry (or entries) via search.",
+            summary = "Stream proteomes entry (or entries) via search.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -204,13 +205,13 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> download(
-            @Valid @ModelAttribute ProteomeRequest searchRequest,
+    public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> stream(
+            @Valid @ModelAttribute ProteomeStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Stream<ProteomeEntry> result = queryService.download(searchRequest);
-        return super.stream(result, searchRequest.getFields(), contentType, request);
+        Stream<ProteomeEntry> result = queryService.stream(streamRequest);
+        return super.stream(result, streamRequest, contentType, request);
     }
 
     @Override
