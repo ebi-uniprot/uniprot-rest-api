@@ -1,5 +1,18 @@
 package org.uniprot.api.unirule.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,19 +37,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
-
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -151,8 +151,17 @@ class UniRuleStreamControllerIT extends AbstractSolrStreamControllerIT {
                         jsonPath(
                                 "$.results.*.uniRuleId",
                                 contains(
-                                        "UR000000012", "UR000000011", "UR000000010", "UR000000009", "UR000000008", "UR000000007",
-                                        "UR000000006", "UR000000005", "UR000000004", "UR000000003", "UR000000002",
+                                        "UR000000012",
+                                        "UR000000011",
+                                        "UR000000010",
+                                        "UR000000009",
+                                        "UR000000008",
+                                        "UR000000007",
+                                        "UR000000006",
+                                        "UR000000005",
+                                        "UR000000004",
+                                        "UR000000003",
+                                        "UR000000002",
                                         "UR000000001")));
     }
 
