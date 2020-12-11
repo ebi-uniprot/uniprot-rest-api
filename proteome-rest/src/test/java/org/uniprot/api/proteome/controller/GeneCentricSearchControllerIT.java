@@ -144,7 +144,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchWithFacetContro
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("gene:*"))
+                    .queryParam("query", Collections.singletonList("*"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].canonicalProtein.id",
