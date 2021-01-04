@@ -65,6 +65,14 @@ public class PublicationService {
 
     public QueryResult<PublicationEntry> getPublicationsByUniprotAccession(
             final String accession, PublicationRequest request) {
+        // TODO: 04/01/2021
+        // docs <- search solr q=accession:$accession&sort=type desc,reference_number asc,pubmed_id
+        // desc&facet.field=categories&facet.field=types
+        // for each doc i $docs
+        //   construct publication entry object from $doc
+        //   hmmm, how do we get publication title -- call literature service -- but could change this in future
+        //   and store it in the publicationdocument binary
+
         // LOAD THE DATA
         List<PublicationEntry> publications = new ArrayList<>();
         publications.addAll(getUniprotEntryPublicationEntries(accession));
