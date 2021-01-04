@@ -10,17 +10,8 @@ import org.uniprot.core.Location;
 import org.uniprot.core.Property;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniparc.InterProGroup;
-import org.uniprot.core.uniparc.SequenceFeature;
-import org.uniprot.core.uniparc.SignatureDbType;
-import org.uniprot.core.uniparc.UniParcCrossReference;
-import org.uniprot.core.uniparc.UniParcDatabase;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.uniparc.impl.InterProGroupBuilder;
-import org.uniprot.core.uniparc.impl.SequenceFeatureBuilder;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
+import org.uniprot.core.uniparc.*;
+import org.uniprot.core.uniparc.impl.*;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 
@@ -84,9 +75,7 @@ public class UniParcControllerITUtils {
                 new Property(UniParcCrossReference.PROPERTY_GENE_NAME, getName("geneName", i)));
         properties.add(
                 new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, getName("UP1234567", i)));
-        properties.add(
-                new Property(
-                        UniParcCrossReference.PROPERTY_UNIPROT_KB_ACCESSION, getName("P321", i)));
+        properties.add(new Property(UniParcCrossReference.PROPERTY_CHAIN, "chain"));
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
                         .versionI(3)

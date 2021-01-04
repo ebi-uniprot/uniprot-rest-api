@@ -41,7 +41,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     void testFilterByTaxonomyIds() {
         verifyUniParcEntry(uniParcEntry);
         assertEquals(2, this.uniParcEntry.getTaxonomies().size());
-        List<String> taxonFilter = Arrays.asList("9606");
+        List<String> taxonFilter = Collections.singletonList("9606");
         // filter by db
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except xrefs
