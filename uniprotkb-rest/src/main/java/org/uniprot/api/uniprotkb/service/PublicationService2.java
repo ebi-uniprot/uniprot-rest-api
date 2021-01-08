@@ -64,11 +64,12 @@ public class PublicationService2
             PublicationRepository publicationRepository,
             LiteratureRepository literatureRepository,
             PublicationConverter publicationConverter,
+            UniProtKBPublicationsSolrSortClause solrSortClause,
             LiteratureStoreEntryConverter literatureEntryStoreConverter,
             @Qualifier("publicationQueryConfig") SolrQueryConfig publicationSolrQueryConf,
             PublicationFacetConfig facetConfig,
             QueryProcessor publicationQueryProcessor) {
-        super(publicationRepository, null, null, publicationSolrQueryConf, facetConfig);
+        super(publicationRepository, null, solrSortClause, publicationSolrQueryConf, facetConfig);
         this.publicationRepository = publicationRepository;
         this.literatureRepository = literatureRepository;
         this.publicationConverter = publicationConverter;
@@ -124,7 +125,7 @@ public class PublicationService2
         PublicationSearchRequest searchRequest =
                 PublicationSearchRequest.builder()
                         .query(accessionFieldName + ":" + accession)
-                        .sort(sortCriteria)
+//                        .sort(sortCriteria)
                         .size(request.getSize())
                         .cursor(request.getCursor())
                         .facets(request.getFacets())
@@ -175,7 +176,11 @@ public class PublicationService2
                         SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
                                 .getSearchFieldItemByName("pubmed_id")
                                 .getFieldName(),
-                        "desc");
+                        "desc")
+                + ','
+                + getSortCriterion(
+"id",
+                "desc");
     }
 
     private String getSortCriterion(String field, String order) {
