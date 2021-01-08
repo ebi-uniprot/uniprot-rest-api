@@ -64,7 +64,7 @@ public class PublicationService2
             SolrQueryConfig queryBoosts,
             PublicationFacetConfig facetConfig,
             QueryProcessor publicationQueryProcessor) {
-        super(publicationRepository, null, null, queryBoosts, facetConfig);
+        super(publicationRepository, null, null, SolrQueryConfig.builder().build(), facetConfig);
         this.publicationRepository = publicationRepository;
         this.literatureRepository = literatureRepository;
         this.publicationConverter = publicationConverter;
