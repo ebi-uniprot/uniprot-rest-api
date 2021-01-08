@@ -71,7 +71,7 @@ public class PublicationService2
         this.publicationQueryProcessor = publicationQueryProcessor;
         this.literatureEntryStoreConverter = literatureEntryStoreConverter;
         this.idFieldName =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE)
                         .getSearchFieldItemByName("id")
                         .getFieldName();
         this.accessionFieldName =
