@@ -63,6 +63,8 @@ public class PublicationService {
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE);
     }
 
+    // TODO: 06/01/2021 take a look at
+
     public QueryResult<PublicationEntry> getPublicationsByUniprotAccession(
             final String accession, PublicationRequest request) {
         // TODO: 04/01/2021
