@@ -1,27 +1,25 @@
 package org.uniprot.api.uniprotkb.service;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryOperator;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry2;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
+import org.uniprot.api.uniprotkb.repository.search.impl.PublicationSolrQueryConfig;
 import org.uniprot.core.citation.Citation;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -38,6 +36,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Created 06/01/2021
  *
@@ -45,8 +47,10 @@ import java.util.stream.Stream;
  */
 @Service
 @Slf4j
+@Import(PublicationSolrQueryConfig.class)
 public class PublicationService2
         extends BasicSearchService<PublicationDocument, PublicationEntry2> {
+    public static final String PUBLICATION_ID_FIELD = "accession";// is it correct?
     private final PublicationRepository publicationRepository;
     private final LiteratureRepository literatureRepository;
     private final PublicationConverter publicationConverter;
@@ -61,10 +65,10 @@ public class PublicationService2
             LiteratureRepository literatureRepository,
             PublicationConverter publicationConverter,
             LiteratureStoreEntryConverter literatureEntryStoreConverter,
-            SolrQueryConfig queryBoosts,
+            @Qualifier("publicationQueryConfig") SolrQueryConfig publicationSolrQueryConf,
             PublicationFacetConfig facetConfig,
             QueryProcessor publicationQueryProcessor) {
-        super(publicationRepository, null, null, SolrQueryConfig.builder().build(), facetConfig);
+        super(publicationRepository, null, null, publicationSolrQueryConf, facetConfig);
         this.publicationRepository = publicationRepository;
         this.literatureRepository = literatureRepository;
         this.publicationConverter = publicationConverter;
