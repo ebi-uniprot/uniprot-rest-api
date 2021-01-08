@@ -8,6 +8,7 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
@@ -17,6 +18,9 @@ import org.uniprot.api.uniprotkb.service.PublicationFacetConfig;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
+ * /search?query=????
+ * /accession/P12345/publications?query=????
+ *
  * @author lgonzales
  * @since 2019-07-09
  */
