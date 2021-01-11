@@ -1,5 +1,10 @@
 package org.uniprot.api.uniprotkb.repository.search.impl;
 
+import static java.util.Collections.emptyList;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -11,12 +16,6 @@ import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 @Configuration
 public class PublicationSolrQueryConfig {

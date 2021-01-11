@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,18 +10,19 @@ import org.uniprot.core.citation.Author;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.SubmissionDatabase;
-import org.uniprot.core.citation.impl.*;
+import org.uniprot.core.citation.impl.AuthorBuilder;
+import org.uniprot.core.citation.impl.JournalArticleBuilder;
+import org.uniprot.core.citation.impl.LiteratureBuilder;
+import org.uniprot.core.citation.impl.PublicationDateBuilder;
+import org.uniprot.core.citation.impl.SubmissionBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStatistics;
-import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.core.literature.impl.LiteratureMappedReferenceBuilder;
 import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
-import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
-import org.uniprot.core.uniprotkb.UniProtKBAccession;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.UniProtKBReference;
@@ -83,13 +83,6 @@ public class UniprotKBObjectsForTests {
         return references;
     }
 
-    public static List<LiteratureMappedReference> getLiteratureMappedReferences(
-            String... accessions) {
-        return Arrays.stream(accessions)
-                .map(UniprotKBObjectsForTests::getLiteratureMappedReference)
-                .collect(Collectors.toList());
-    }
-
     public static LiteratureMappedReference getLiteratureMappedReference(String accession) {
         return new LiteratureMappedReferenceBuilder()
                 .uniprotAccession(accession)
@@ -100,9 +93,8 @@ public class UniprotKBObjectsForTests {
                 .build();
     }
 
-    public static LiteratureDocument getLiteratureDocument(long pubMedId, String... accessions) {
-        LiteratureStoreEntry storeEntry = getLiteratureStoreEntry(pubMedId, accessions);
-        LiteratureEntry entry = storeEntry.getLiteratureEntry();
+    public static LiteratureDocument getLiteratureDocument(long pubMedId) {
+        LiteratureEntry entry = getLiteratureEntry(pubMedId);
         Literature literature = (Literature) entry.getCitation();
         return LiteratureDocument.builder()
                 .id(String.valueOf(pubMedId))
@@ -114,22 +106,7 @@ public class UniprotKBObjectsForTests {
                                 .collect(Collectors.toSet()))
                 .journal(literature.getJournal().getName())
                 .published(literature.getPublicationDate().getValue())
-                .content(Collections.singleton(String.valueOf(pubMedId)))
-                .mappedProteins(
-                        storeEntry.getLiteratureMappedReferences().stream()
-                                .map(LiteratureMappedReference::getUniprotAccession)
-                                .map(UniProtKBAccession::getValue)
-                                .collect(Collectors.toSet()))
-                .literatureObj(UniprotKBObjectsForTests.getLiteratureBinary(storeEntry))
-                .build();
-    }
-
-    public static LiteratureStoreEntry getLiteratureStoreEntry(
-            long pubMedId, String... accessions) {
-        return new LiteratureStoreEntryBuilder()
-                .literatureEntry(getLiteratureEntry(pubMedId))
-                .literatureMappedReferencesSet(
-                        UniprotKBObjectsForTests.getLiteratureMappedReferences(accessions))
+                .literatureObj(UniprotKBObjectsForTests.getLiteratureBinary(entry))
                 .build();
     }
 
@@ -153,7 +130,8 @@ public class UniprotKBObjectsForTests {
                 new LiteratureStatisticsBuilder()
                         .reviewedProteinCount(10)
                         .unreviewedProteinCount(20)
-                        .mappedProteinCount(30)
+                        .computationallyMappedProteinCount(30)
+                        .communityMappedProteinCount(40)
                         .build();
 
         return new LiteratureEntryBuilder().citation(literature).statistics(statistics).build();
@@ -164,7 +142,7 @@ public class UniprotKBObjectsForTests {
         return new CrossReferenceBuilder<CitationDatabase>().database(pubmed2).id(s).build();
     }
 
-    public static ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {
+    public static ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
         try {
             return ByteBuffer.wrap(
                     LiteratureJsonConfig.getInstance()

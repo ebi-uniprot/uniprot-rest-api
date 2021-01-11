@@ -58,53 +58,72 @@ class PublicationServiceTest {
     @Test
     void ensureHappyPathThroughServiceCallExists() {
         // when
-        when(literatureRepository.getAll(argThat(queryContains("id"))))
-                .thenAnswer(invocation -> Stream.of(getLiteratureDocument(2L)));
+        UniProtKBEntry entry =
+                UniprotKBObjectsForTests.getUniprotEntryForPublication("P12345", "200");
+        UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
+        when(storeClient.getEntry("P12345")).thenReturn(Optional.of(entry));
 
-        UniProtKBMappedReference ref =
-                new UniProtKBMappedReferenceBuilder()
-                        .sourceCategoriesAdd("Interaction")
-                        .source(
-                                new MappedSourceBuilder()
-                                        .name(UniProtKBEntryType.SWISSPROT.getName())
-                                        .build())
-                        .build();
-        QueryResult<PublicationDocument> pubDocs =
-                QueryResult.of(
-                        Stream.of(
-                                PublicationDocument.builder()
-                                        .publicationMappedReferences(
-                                                asBinary(
-                                                        new MappedPublicationsBuilder()
-                                                                .reviewedMappedReference(ref)
-                                                                .build()))
-                                        .pubMedId("2")
-                                        .build()),
-                        CursorPage.of(null, 1),
-                        emptyList());
-
-        when(publicationRepository.searchPage(any(), eq(null))).thenReturn(pubDocs);
-
-        solrSortClause.init();
-
-        PublicationSolrQueryConfig solrQueryConfig = new PublicationSolrQueryConfig();
+        LiteratureRepository repository = mock(LiteratureRepository.class);
+        LiteratureDocument docForUninprotEntry200 =
+                UniprotKBObjectsForTests.getLiteratureDocument(200L);
+        when(repository.getAll(argThat(queryContains("id"))))
+                .thenAnswer(invocation -> Stream.of(docForUninprotEntry200));
 
         PublicationService service =
                 new PublicationService(
-                        publicationRepository,
-                        literatureRepository,
-                        new PublicationConverter(),
-                        solrSortClause,
-                        new LiteratureStoreEntryConverter(),
-                        solrQueryConfig.publicationSolrQueryConf(),
-                        publicationFacetConfig,
-                        solrQueryConfig.publicationQueryProcessor());
+                        storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
-        request.setSize(25);
         QueryResult<PublicationEntry> result =
-                service.getPublicationsByUniProtAccession("P12345", request);
+                service.getPublicationsByUniprotAccession("P12345", request);
 
         assertNotNull(result);
+        assertNotNull(result.getFacets());
+        assertTrue(result.getFacets().isEmpty());
+
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
+        assertNotNull(entries);
+        assertEquals(2, entries.size());
+
+        PublicationEntry journal = entries.get(0);
+        assertNotNull(journal);
+        assertNotNull(journal.getReference());
+        assertNotNull(journal.getReference().getCitation());
+        assertTrue(journal.getReference().getCitation() instanceof Literature);
+        assertNull(journal.getLiteratureMappedReference());
+        assertEquals("UniProtKB reviewed (Swiss-Prot)", journal.getPublicationSource());
+        assertTrue(journal.getCategories().containsAll(Arrays.asList("Pathol", "Interaction")));
+
+        PublicationEntry submission = entries.get(1);
+        assertNotNull(submission);
+        assertNull(submission.getLiteratureMappedReference());
+        assertNotNull(submission.getReference());
+        assertNotNull(submission.getReference().getCitation());
+        assertTrue(submission.getReference().getCitation() instanceof Submission);
+        assertEquals("UniProtKB reviewed (Swiss-Prot)", submission.getPublicationSource());
+        assertEquals(1, submission.getCategories().size());
+        assertTrue(submission.getCategories().contains("Interaction"));
+    }
+
+    @Test
+    void getPublicationsByUniprotAccessionCanReturnMappedPublications() {
+        UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
+        when(storeClient.getEntry("P12345")).thenReturn(Optional.empty());
+
+        LiteratureRepository repository = mock(LiteratureRepository.class);
+        LiteratureDocument docForMappedAccession =
+                UniprotKBObjectsForTests.getLiteratureDocument(10L);
+        when(repository.getAll(argThat(queryContains("mapped_protein"))))
+                .thenAnswer(invocation -> Stream.of(docForMappedAccession));
+
+        PublicationService service =
+                new PublicationService(
+                        storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
+        PublicationRequest request = new PublicationRequest();
+        QueryResult<PublicationEntry> result =
+                service.getPublicationsByUniprotAccession("P12345", request);
+
         assertNotNull(result.getFacets());
         assertTrue(result.getFacets().isEmpty());
 
@@ -114,13 +133,91 @@ class PublicationServiceTest {
 
         PublicationEntry journal = entries.get(0);
         assertNotNull(journal);
-        assertNotNull(journal.getCitation());
-        assertTrue(journal.getCitation() instanceof Literature);
-        assertNotNull(journal.getReferences());
-        assertEquals(
-                UniProtKBEntryType.SWISSPROT.getName(),
-                journal.getReferences().get(0).getSource().getName());
-        assertThat(journal.getReferences().get(0).getSourceCategories(), contains("Interaction"));
+        assertNotNull(journal.getReference());
+        assertNotNull(journal.getReference().getCitation());
+        assertTrue(journal.getReference().getCitation() instanceof Literature);
+        assertNotNull(journal.getLiteratureMappedReference());
+        assertEquals("Computationally mapped", journal.getPublicationSource());
+        assertTrue(journal.getCategories().contains("Function"));
+    }
+
+    @Test
+    void getPublicationsByUniprotAccessionWithAllFacets() {
+        UniProtKBEntry entry =
+                UniprotKBObjectsForTests.getUniprotEntryForPublication("P12345", "200");
+        UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
+        when(storeClient.getEntry("P12345")).thenReturn(Optional.of(entry));
+
+        LiteratureRepository repository = mock(LiteratureRepository.class);
+        LiteratureDocument docForUninprotEntry200 =
+                UniprotKBObjectsForTests.getLiteratureDocument(200L);
+        when(repository.getAll(argThat(queryContains("id"))))
+                .thenAnswer(invocation -> Stream.of(docForUninprotEntry200));
+
+        LiteratureDocument docForMappedAccession =
+                UniprotKBObjectsForTests.getLiteratureDocument(10L);
+        when(repository.getAll(argThat(queryContains("mapped_protein"))))
+                .thenAnswer(invocation -> Stream.of(docForMappedAccession));
+
+        PublicationService service =
+                new PublicationService(
+                        storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
+        PublicationRequest request = new PublicationRequest();
+        request.setFacets("category,source,study_type");
+        request.setQuery("category:Interaction");
+        QueryResult<PublicationEntry> result =
+                service.getPublicationsByUniprotAccession("P12345", request);
+
+        assertNotNull(result);
+        assertNotNull(result.getContent());
+        assertEquals(2, result.getContent().count());
+        assertNotNull(result.getFacets());
+
+        List<Facet> facets = new ArrayList<>(result.getFacets());
+        assertEquals(3, facets.size());
+
+        assertEquals("source", facets.get(0).getName());
+        assertEquals("category", facets.get(1).getName());
+        assertEquals("study_type", facets.get(2).getName());
+    }
+
+    @Test
+    void getPublicationsByUniprotAccessionPaginationFirstPage() {
+        UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
+        when(storeClient.getEntry("P12345")).thenReturn(Optional.empty());
+
+        LiteratureRepository repository = getMockedPaginationRepository();
+
+        PublicationService service =
+                new PublicationService(
+                        storeClient, repository, new LiteratureStoreEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
+        PublicationRequest request = new PublicationRequest();
+        request.setFacets("category,source,study_type");
+        request.setSize(3);
+        QueryResult<PublicationEntry> result =
+                service.getPublicationsByUniprotAccession("P12345", request);
+        assertNotNull(result);
+        assertNotNull(result.getFacets());
+        assertTrue(result.getFacets().isEmpty());
+
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
+        assertNotNull(entries);
+        assertEquals(1, entries.size());
+
+    private LiteratureRepository getMockedPaginationRepository() {
+        LiteratureRepository repository = mock(LiteratureRepository.class);
+        LiteratureDocument d1 = UniprotKBObjectsForTests.getLiteratureDocument(10L);
+        LiteratureDocument d2 = UniprotKBObjectsForTests.getLiteratureDocument(20L);
+        LiteratureDocument d3 = UniprotKBObjectsForTests.getLiteratureDocument(30L);
+        LiteratureDocument d4 = UniprotKBObjectsForTests.getLiteratureDocument(40L);
+        LiteratureDocument d5 = UniprotKBObjectsForTests.getLiteratureDocument(50L);
+        LiteratureDocument d6 = UniprotKBObjectsForTests.getLiteratureDocument(60L);
+        LiteratureDocument d7 = UniprotKBObjectsForTests.getLiteratureDocument(70L);
+        when(repository.getAll(argThat(queryContains("mapped_protein"))))
+                .thenAnswer(invocation -> Stream.of(d1, d2, d3, d4, d5, d6, d7));
+        return repository;
     }
 
     private ArgumentMatcher<SolrRequest> queryContains(String queryContains) {

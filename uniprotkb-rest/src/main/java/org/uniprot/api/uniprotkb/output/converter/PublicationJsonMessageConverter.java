@@ -1,7 +1,7 @@
 package org.uniprot.api.uniprotkb.output.converter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.util.Arrays;
+
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.citation.impl.AuthorImpl;
@@ -17,7 +17,8 @@ import org.uniprot.core.uniprotkb.evidence.impl.EvidenceImpl;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionImpl;
 import org.uniprot.store.search.field.ReturnField;
 
-import java.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * @author lgonzales

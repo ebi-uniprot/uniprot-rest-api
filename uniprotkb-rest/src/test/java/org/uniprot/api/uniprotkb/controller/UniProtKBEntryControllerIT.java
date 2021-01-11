@@ -359,8 +359,7 @@ class UniProtKBEntryControllerIT {
 
     private void saveEntry(long pubMedId, String... accessions) {
         System.out.println("Document for PUBMED_ID: " + pubMedId);
-        LiteratureDocument document =
-                UniprotKBObjectsForTests.getLiteratureDocument(pubMedId, accessions);
+        LiteratureDocument document = UniprotKBObjectsForTests.getLiteratureDocument(pubMedId);
 
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
     }
