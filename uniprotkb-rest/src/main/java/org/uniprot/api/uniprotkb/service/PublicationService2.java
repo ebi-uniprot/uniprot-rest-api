@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.service;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -24,21 +27,16 @@ import org.uniprot.core.citation.Citation;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.LiteratureStoreEntry;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.document.publication.PublicationDocument;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 06/01/2021
@@ -50,14 +48,12 @@ import lombok.extern.slf4j.Slf4j;
 @Import(PublicationSolrQueryConfig.class)
 public class PublicationService2
         extends BasicSearchService<PublicationDocument, PublicationEntry2> {
-    public static final String PUBLICATION_ID_FIELD = "accession";// is it correct?
     private final PublicationRepository publicationRepository;
     private final LiteratureRepository literatureRepository;
     private final PublicationConverter publicationConverter;
     private final QueryProcessor publicationQueryProcessor;
     private final LiteratureStoreEntryConverter literatureEntryStoreConverter;
     private final String idFieldName;
-    private final String sortCriteria;
     private final String accessionFieldName;
 
     public PublicationService2(
@@ -67,7 +63,7 @@ public class PublicationService2
             UniProtKBPublicationsSolrSortClause solrSortClause,
             LiteratureStoreEntryConverter literatureEntryStoreConverter,
             @Qualifier("publicationQueryConfig") SolrQueryConfig publicationSolrQueryConf,
-            PublicationFacetConfig facetConfig,
+            PublicationFacetConfig2 facetConfig,
             QueryProcessor publicationQueryProcessor) {
         super(publicationRepository, null, solrSortClause, publicationSolrQueryConf, facetConfig);
         this.publicationRepository = publicationRepository;
@@ -83,34 +79,18 @@ public class PublicationService2
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
                         .getSearchFieldItemByName("accession")
                         .getFieldName();
-        this.sortCriteria = getPublicationsSort();
     }
 
     @Override
     public QueryResult<PublicationEntry2> search(SearchRequest request) {
-        SolrRequest solrRequest = createSearchSolrRequest(request);
+        SolrRequest pubDocsForAccessionSolrRequest = createSearchSolrRequest(request);
 
         QueryResult<PublicationDocument> results =
-                publicationRepository.searchPage(solrRequest, request.getCursor());
-
-        BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+                publicationRepository.searchPage(
+                        pubDocsForAccessionSolrRequest, request.getCursor());
         List<PublicationDocument> content = results.getContent().collect(Collectors.toList());
-        content.stream()
-                .map(PublicationDocument::getPubMedId)
-                .filter(Objects::nonNull)
-                .forEach(
-                        pubmedId ->
-                                queryBuilder.add(
-                                        new TermQuery(new Term(idFieldName, pubmedId)),
-                                        BooleanClause.Occur.SHOULD));
-        SolrRequest solrRequest1 = getSolrRequest(queryBuilder.build().toString());
-        Stream<LiteratureDocument> all = literatureRepository.getAll(solrRequest1);
-        Map<Long, Citation> citationMap =
-                all.map(literatureEntryStoreConverter)
-                        .map(LiteratureStoreEntry::getLiteratureEntry)
-                        .collect(
-                                Collectors.toMap(
-                                        this::getPubmedIdFromEntry, LiteratureEntry::getCitation));
+
+        Map<Long, Citation> citationMap = getPubMedCitationMap(content);
 
         Stream<PublicationEntry2> converted =
                 content.stream()
@@ -125,7 +105,6 @@ public class PublicationService2
         PublicationSearchRequest searchRequest =
                 PublicationSearchRequest.builder()
                         .query(accessionFieldName + ":" + accession)
-//                        .sort(sortCriteria)
                         .size(request.getSize())
                         .cursor(request.getCursor())
                         .facets(request.getFacets())
@@ -144,6 +123,24 @@ public class PublicationService2
         return publicationQueryProcessor;
     }
 
+    private Map<Long, Citation> getPubMedCitationMap(List<PublicationDocument> content) {
+        BooleanQuery.Builder pubmedIdsSolrRequest = new BooleanQuery.Builder();
+        content.stream()
+                .map(PublicationDocument::getPubMedId)
+                .filter(Objects::nonNull)
+                .forEach(
+                        pubmedId ->
+                                pubmedIdsSolrRequest.add(
+                                        new TermQuery(new Term(idFieldName, pubmedId)),
+                                        BooleanClause.Occur.SHOULD));
+        SolrRequest solrRequest1 = getSolrRequest(pubmedIdsSolrRequest.build().toString());
+        Stream<LiteratureDocument> all = literatureRepository.getAll(solrRequest1);
+        return all.map(literatureEntryStoreConverter)
+                .map(LiteratureStoreEntry::getLiteratureEntry)
+                .collect(
+                        Collectors.toMap(this::getPubmedIdFromEntry, LiteratureEntry::getCitation));
+    }
+
     private Long getPubmedIdFromEntry(LiteratureEntry entry) {
         Literature literature = (Literature) entry.getCitation();
         return literature.getPubmedId();
@@ -158,35 +155,6 @@ public class PublicationService2
                 .build();
     }
 
-    // main_type desc,reference_number asc,pubmed_id desc
-    private String getPublicationsSort() {
-        return getSortCriterion(
-                        SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
-                                .getSearchFieldItemByName("main_type")
-                                .getFieldName(),
-                        "desc")
-                + ','
-                + getSortCriterion(
-                        SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
-                                .getSearchFieldItemByName("reference_number")
-                                .getFieldName(),
-                        "asc")
-                + ','
-                + getSortCriterion(
-                        SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
-                                .getSearchFieldItemByName("pubmed_id")
-                                .getFieldName(),
-                        "desc")
-                + ','
-                + getSortCriterion(
-"id",
-                "desc");
-    }
-
-    private String getSortCriterion(String field, String order) {
-        return field + " " + order;
-    }
-
     @Builder
     @Data
     private static class PublicationSearchRequest implements SearchRequest {
@@ -196,5 +164,14 @@ public class PublicationService2
         private String fields;
         private Integer size;
         private String facets;
+
+        @Override
+        public List<String> getFacetList() {
+            if (Utils.notNullNotEmpty(facets)) {
+                return Arrays.asList(facets.split(("\\s*,\\s*")));
+            } else {
+                return Collections.emptyList();
+            }
+        }
     }
 }

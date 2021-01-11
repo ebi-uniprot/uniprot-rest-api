@@ -8,22 +8,20 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
-import org.uniprot.api.uniprotkb.service.PublicationService2;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static java.util.Collections.emptyList;
 
 @Configuration
 public class PublicationSolrQueryConfig {
     private static final String RESOURCE_LOCATION = "/publication-query.config";
 
-    @Bean(name="publicationQueryConfig")
+    @Bean(name = "publicationQueryConfig")
     public SolrQueryConfig publicationSolrQueryConf() {
         return new SolrQueryConfigFileReader(RESOURCE_LOCATION).getConfig();
     }
@@ -35,23 +33,17 @@ public class PublicationSolrQueryConfig {
 
     @Bean
     public QueryProcessor publicationQueryProcessor(
-            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig publicationSearchFieldConfig) {
+            WhitelistFieldConfig whiteListFieldConfig) {
         Map<String, String> publicationWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
-                                UniProtDataType.PUBLICATION.toString().toLowerCase(), new HashMap<>());
+                                UniProtDataType.PUBLICATION.toString().toLowerCase(),
+                                new HashMap<>());
         return UniProtQueryProcessor.newInstance(
                 UniProtQueryProcessorConfig.builder()
-                        .optimisableFields(
-                                getDefaultSearchOptimisedFieldItems(publicationSearchFieldConfig))
+                        .optimisableFields(emptyList())
                         .whiteListFields(publicationWhiteListFields)
                         .build());
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
-            SearchFieldConfig keywordSearchFieldConfig) {
-        return Collections.singletonList(
-                keywordSearchFieldConfig.getSearchFieldItemByName(PublicationService2.PUBLICATION_ID_FIELD));
     }
 }

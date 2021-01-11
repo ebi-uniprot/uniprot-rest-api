@@ -30,9 +30,7 @@ public class UniProtKBPublicationsSolrSortClause extends AbstractSolrSortClause 
                         .getSearchFieldItemByName("pubmed_id")
                         .getFieldName(),
                 SolrQuery.ORDER.desc);
-        addDefaultFieldOrderPair(
-"id",
-                SolrQuery.ORDER.desc);
+        addDefaultFieldOrderPair("id", SolrQuery.ORDER.desc);
     }
 
     @Override
