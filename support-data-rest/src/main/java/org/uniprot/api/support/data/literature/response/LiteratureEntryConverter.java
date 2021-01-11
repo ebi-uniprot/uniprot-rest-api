@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,11 +29,9 @@ public class LiteratureEntryConverter implements Function<LiteratureDocument, Li
     public LiteratureEntry apply(LiteratureDocument literatureDocument) {
         LiteratureEntry result = null;
         try {
-            LiteratureStoreEntry storeEntry =
+            result =
                     objectMapper.readValue(
-                            literatureDocument.getLiteratureObj().array(),
-                            LiteratureStoreEntry.class);
-            result = storeEntry.getLiteratureEntry();
+                            literatureDocument.getLiteratureObj().array(), LiteratureEntry.class);
         } catch (Exception e) {
             log.info("Error converting solr binary to LiteratureEntry: ", e);
         }
