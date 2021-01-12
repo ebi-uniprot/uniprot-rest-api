@@ -4,7 +4,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.uniprotkb.service.PublicationFacetConfig2;
+import org.uniprot.api.uniprotkb.service.PublicationFacetConfig;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.publication.PublicationDocument;
 
@@ -13,7 +13,7 @@ public class PublicationRepository extends SolrQueryRepository<PublicationDocume
 
     protected PublicationRepository(
             SolrClient solrClient,
-            PublicationFacetConfig2 facetConfig2,
+            PublicationFacetConfig facetConfig2,
             SolrRequestConverter requestConverter) {
         super(
                 solrClient,

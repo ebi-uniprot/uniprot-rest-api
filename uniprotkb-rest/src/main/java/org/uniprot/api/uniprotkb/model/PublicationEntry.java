@@ -1,65 +1,34 @@
 package org.uniprot.api.uniprotkb.model;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
-
+import lombok.Getter;
+import org.uniprot.core.citation.Citation;
 import org.uniprot.core.literature.LiteratureMappedReference;
 import org.uniprot.core.literature.LiteratureStatistics;
+import org.uniprot.core.publication.ComputationallyMappedReference;
+import org.uniprot.core.publication.MappedReference;
 import org.uniprot.core.uniprotkb.UniProtKBReference;
 import org.uniprot.core.util.Utils;
 
+import java.util.List;
+
 /**
- * @author lgonzales
- * @since 2019-12-09
+ * @author Edd
  */
 @Data
 @Builder
 public class PublicationEntry {
+    private Citation citation;
+    private List<MappedReference> references;
+    private Statistics statistics;
 
-    private UniProtKBReference reference;
-
-    private LiteratureStatistics statistics;
-
-    private LiteratureMappedReference literatureMappedReference;
-
-    private List<String> categories;
-
-    private String publicationSource;
-
-    public boolean isLargeScale() {
-        boolean result = false;
-        if (hasStatistics()) {
-            LiteratureStatistics stat = getStatistics();
-            long referencedProteins =
-                    stat.getMappedProteinCount()
-                            + stat.getReviewedProteinCount()
-                            + stat.getUnreviewedProteinCount();
-            if (referencedProteins > 50) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    public boolean hasStatistics() {
-        return getStatistics() != null;
-    }
-
-    public boolean hasLiteratureMappedReference() {
-        return getLiteratureMappedReference() != null;
-    }
-
-    public boolean hasReference() {
-        return getReference() != null;
-    }
-
-    public boolean hasCategories() {
-        return Utils.notNullNotEmpty(getCategories());
-    }
-
-    public boolean hasPublicationSource() {
-        return Utils.notNullNotEmpty(publicationSource);
+    @Data
+    @Builder
+    public static class Statistics {
+        private final long reviewedMappedProteinCount;
+        private final long unreviewedMappedProteinCount;
+        private final long computationalMappedProteinCount;
+        private final long communityMappedProteinCount;
     }
 }

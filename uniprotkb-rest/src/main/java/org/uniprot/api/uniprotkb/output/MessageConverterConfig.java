@@ -14,7 +14,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
-import org.uniprot.api.uniprotkb.model.PublicationEntry2;
 import org.uniprot.api.uniprotkb.output.converter.*;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
@@ -86,7 +85,7 @@ public class MessageConverterConfig {
                 int index = 0;
                 converters.add(index++, uniProtKBJsonMessageConverter);
                 converters.add(index++, new PublicationJsonMessageConverter());
-                converters.add(index++, new PublicationJsonMessageConverter2());
+                converters.add(index++, new PublicationJsonMessageConverter());
                 converters.add(index++, interactionJsonMessageConverter);
                 converters.add(index++, new UniProtKBFlatFileMessageConverter());
                 converters.add(index++, new UniProtKBFastaMessageConverter());
@@ -143,22 +142,6 @@ public class MessageConverterConfig {
 
         MessageConverterContext<PublicationEntry> jsonContext =
                 MessageConverterContext.<PublicationEntry>builder()
-                        .resource(MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION)
-                        .contentType(APPLICATION_JSON)
-                        .build();
-        contextFactory.addMessageConverterContext(jsonContext);
-
-        return contextFactory;
-    }
-
-    @Bean("publicationMessageConverterContextFactory2")
-    public MessageConverterContextFactory<PublicationEntry2>
-            publicationMessageConverterContextFactory2() {
-        MessageConverterContextFactory<PublicationEntry2> contextFactory =
-                new MessageConverterContextFactory<>();
-
-        MessageConverterContext<PublicationEntry2> jsonContext =
-                MessageConverterContext.<PublicationEntry2>builder()
                         .resource(MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION)
                         .contentType(APPLICATION_JSON)
                         .build();

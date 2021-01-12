@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +18,15 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.service.PublicationService;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION;
+
 /**
  * @author lgonzales
  * @since 2019-12-09
@@ -35,11 +34,11 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb/accession")
-public class UniProtKBEntryController extends BasicSearchController<PublicationEntry> {
+public class UniProtKBPublicationController extends BasicSearchController<PublicationEntry> {
     private final PublicationService publicationService;
 
     @Autowired
-    protected UniProtKBEntryController(
+    protected UniProtKBPublicationController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<PublicationEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
@@ -62,7 +61,7 @@ public class UniProtKBEntryController extends BasicSearchController<PublicationE
             value = "/{accession}/publications",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
-            getMappedLiteratureByUniprotAccession(
+            getMappedPublicationsByUniProtAccession(
                     @PathVariable("accession")
                             @Pattern(
                                     regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
@@ -73,7 +72,7 @@ public class UniProtKBEntryController extends BasicSearchController<PublicationE
                     HttpServletRequest request,
                     HttpServletResponse response) {
         QueryResult<PublicationEntry> literatureEntry =
-                this.publicationService.getPublicationsByUniprotAccession(
+                this.publicationService.getPublicationsByUniProtAccession(
                         accession, publicationRequest);
 
         return super.getSearchResponse(literatureEntry, "", request, response);
