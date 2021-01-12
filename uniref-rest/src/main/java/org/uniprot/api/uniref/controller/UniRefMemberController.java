@@ -1,7 +1,6 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
@@ -17,39 +16,40 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniref.request.UniRefIdRequest;
-import org.uniprot.api.uniref.service.UniRefEntryService;
-import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.core.xml.jaxb.uniref.Entry;
+import org.uniprot.api.uniref.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.service.UniRefMemberService;
+import org.uniprot.core.uniref.UniRefMember;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * @author jluo
- * @date: 22 Aug 2019
+ * @author lgonzales
+ * @since 05/01/2021
  */
 @RestController
 @Validated
 @RequestMapping("/uniref")
-public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
+public class UniRefMemberController extends BasicSearchController<UniRefMember> {
 
-    private final UniRefEntryService entryService;
+    private final UniRefMemberService service;
 
     @Autowired
-    public UniRefEntryController(
+    public UniRefMemberController(
             ApplicationEventPublisher eventPublisher,
-            UniRefEntryService entryService,
-            MessageConverterContextFactory<UniRefEntry> converterContextFactory,
+            UniRefMemberService queryService,
+            MessageConverterContextFactory<UniRefMember> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
-        this.entryService = entryService;
+        this.service = queryService;
     }
 
     @Tag(
@@ -57,47 +57,42 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             description =
                     "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
     @GetMapping(
-            value = "/{id}",
+            value = "/{id}/members",
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve an UniRef cluster by id.",
+            summary = "Retrieve UniRef members by cluster id.",
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = UniRefEntry.class)),
-                            @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
-                                    schema = @Schema(implementation = Entry.class)),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRefMember.class))),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
-            @Valid @ModelAttribute UniRefIdRequest idRequest,
+    public ResponseEntity<MessageConverterContext<UniRefMember>> search(
+            @Valid @ModelAttribute UniRefMemberRequest memberRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        UniRefEntry entryResult = entryService.getEntity(idRequest.getId());
-        return super.getEntityResponse(entryResult, idRequest.getFields(), request);
+        QueryResult<UniRefMember> results = service.retrieveMembers(memberRequest);
+        return super.getSearchResponse(results, "", request, response);
     }
 
     @Override
-    protected String getEntityId(UniRefEntry entity) {
-        return entity.getId().getValue();
+    protected String getEntityId(UniRefMember entity) {
+        return entity.getMemberId();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefEntry entity) {
+    protected Optional<String> getEntityRedirectId(UniRefMember entity) {
         return Optional.empty();
     }
 }

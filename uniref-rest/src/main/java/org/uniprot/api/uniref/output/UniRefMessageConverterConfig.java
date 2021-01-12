@@ -26,10 +26,12 @@ import org.uniprot.api.uniref.output.converter.UniRefLightFastaMessageConverter;
 import org.uniprot.api.uniref.output.converter.UniRefXmlMessageConverter;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
+import org.uniprot.core.json.parser.uniref.UniRefMemberJsonConfig;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryLightValueMapper;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryValueMapper;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.core.uniref.UniRefMember;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -107,7 +109,15 @@ public class UniRefMessageConverterConfig {
                                 UniRefEntry.class,
                                 returnConfig);
                 converters.add(1, unirefJsonMessageConverter);
-                converters.add(2, new UniRefXmlMessageConverter("", ""));
+
+                JsonMessageConverter<UniRefMember> unirefMemberJsonMessageConverter =
+                        new JsonMessageConverter<>(
+                                UniRefMemberJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniRefMember.class,
+                                returnConfig);
+                converters.add(2, unirefMemberJsonMessageConverter);
+
+                converters.add(3, new UniRefXmlMessageConverter("", ""));
             }
         };
     }
@@ -126,6 +136,18 @@ public class UniRefMessageConverterConfig {
                         uniRefLightContext(TSV_MEDIA_TYPE),
                         uniRefLightContext(XLS_MEDIA_TYPE),
                         uniRefLightContext(RDF_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    @Bean
+    public MessageConverterContextFactory<UniRefMember>
+            uniRefMemberMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniRefMember> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(uniRefMemberContext(LIST_MEDIA_TYPE), uniRefMemberContext(APPLICATION_JSON))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -157,6 +179,13 @@ public class UniRefMessageConverterConfig {
 
     private MessageConverterContext<UniRefEntryLight> uniRefLightContext(MediaType contentType) {
         return MessageConverterContext.<UniRefEntryLight>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIREF)
+                .contentType(contentType)
+                .build();
+    }
+
+    private MessageConverterContext<UniRefMember> uniRefMemberContext(MediaType contentType) {
+        return MessageConverterContext.<UniRefMember>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIREF)
                 .contentType(contentType)
                 .build();

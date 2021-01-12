@@ -52,9 +52,8 @@ public class UniRefSolrQueryConfig {
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
             SearchFieldConfig uniRefSearchFieldConfig) {
         return asList(
+                uniRefSearchFieldConfig.getSearchFieldItemByName(UniRefEntryLightService.UNIREF_ID),
                 uniRefSearchFieldConfig.getSearchFieldItemByName(
-                        UniRefLightSearchService.UNIREF_ID),
-                uniRefSearchFieldConfig.getSearchFieldItemByName(
-                        UniRefLightSearchService.UNIREF_UPI));
+                        UniRefEntryLightService.UNIREF_UPI));
     }
 }

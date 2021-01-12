@@ -128,7 +128,7 @@ class UniRefControllerITUtils {
         String pName = "some protein name";
         String upi = getName(UPI_PREF, i);
 
-        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB;
+        UniRefMemberIdType type = UniRefMemberIdType.UNIPROTKB_TREMBL;
 
         return new RepresentativeMemberBuilder()
                 .memberIdType(type)

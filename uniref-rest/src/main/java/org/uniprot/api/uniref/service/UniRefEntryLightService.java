@@ -33,7 +33,7 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  */
 @Service
 @Import(UniRefSolrQueryConfig.class)
-public class UniRefLightSearchService
+public class UniRefEntryLightService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
     private final SolrQueryConfig solrQueryConfig;
     private final StoreStreamer<UniRefEntryLight> storeStreamer;
@@ -44,7 +44,7 @@ public class UniRefLightSearchService
     private final QueryProcessor queryProcessor;
 
     @Autowired
-    public UniRefLightSearchService(
+    public UniRefEntryLightService(
             UniRefQueryRepository repository,
             UniRefFacetConfig facetConfig,
             UniRefSortClause uniRefSortClause,
@@ -68,7 +68,18 @@ public class UniRefLightSearchService
 
     @Override
     public UniRefEntryLight findByUniqueId(String uniqueId, String fields) {
-        return findByUniqueId(uniqueId);
+        UniRefEntryLight entryLight = findByUniqueId(uniqueId);
+
+        // clean unirefLight entry
+        UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entryLight);
+
+        String[] splittedSeed = entryLight.getSeedId().split(",");
+        builder.seedId(splittedSeed[splittedSeed.length - 1]);
+
+        List<String> members = removeMemberTypeFromMemberId(entryLight.getMembers());
+        builder.membersSet(members);
+
+        return builder.build();
     }
 
     @Override
@@ -98,18 +109,6 @@ public class UniRefLightSearchService
             result = result.map(this::cleanMemberId);
         }
         return result;
-    }
-
-    @Override
-    public UniRefEntryLight findByUniqueId(String uniqueId) {
-        throw new UnsupportedOperationException(
-                "UniRefLightSearchService does not support findByUniqueId, try to use UniRefEntryService");
-    }
-
-    @Override
-    public UniRefEntryLight getEntity(String idField, String value) {
-        throw new UnsupportedOperationException(
-                "UniRefLightSearchService does not support getEntity, try to use UniRefEntryService");
     }
 
     public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
