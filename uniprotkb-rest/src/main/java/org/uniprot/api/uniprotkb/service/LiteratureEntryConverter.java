@@ -17,12 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Slf4j
 @Component
-public class LiteratureStoreEntryConverter
-        implements Function<LiteratureDocument, LiteratureEntry> {
+public class LiteratureEntryConverter implements Function<LiteratureDocument, LiteratureEntry> {
 
     private final ObjectMapper objectMapper;
 
-    public LiteratureStoreEntryConverter() {
+    public LiteratureEntryConverter() {
         objectMapper = LiteratureJsonConfig.getInstance().getFullObjectMapper();
     }
 
@@ -32,7 +31,7 @@ public class LiteratureStoreEntryConverter
             return objectMapper.readValue(
                     literatureDocument.getLiteratureObj().array(), LiteratureEntry.class);
         } catch (Exception e) {
-            log.info("Error converting solr binary to LiteratureStoreEntry: ", e);
+            log.info("Error converting solr binary to LiteratureEntry: ", e);
         }
         return null;
     }

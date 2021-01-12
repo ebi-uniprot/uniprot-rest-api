@@ -70,8 +70,7 @@ class PublicationServiceTest {
                 .thenAnswer(invocation -> Stream.of(docForUninprotEntry200));
 
         PublicationService service =
-                new PublicationService(
-                        storeClient, repository, new LiteratureStoreEntryConverter());
+                new PublicationService(storeClient, repository, new LiteratureEntryConverter());
         service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         QueryResult<PublicationEntry> result =
@@ -117,8 +116,7 @@ class PublicationServiceTest {
                 .thenAnswer(invocation -> Stream.of(docForMappedAccession));
 
         PublicationService service =
-                new PublicationService(
-                        storeClient, repository, new LiteratureStoreEntryConverter());
+                new PublicationService(storeClient, repository, new LiteratureEntryConverter());
         service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         QueryResult<PublicationEntry> result =
@@ -160,8 +158,7 @@ class PublicationServiceTest {
                 .thenAnswer(invocation -> Stream.of(docForMappedAccession));
 
         PublicationService service =
-                new PublicationService(
-                        storeClient, repository, new LiteratureStoreEntryConverter());
+                new PublicationService(storeClient, repository, new LiteratureEntryConverter());
         service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         request.setFacets("category,source,study_type");
@@ -190,8 +187,81 @@ class PublicationServiceTest {
         LiteratureRepository repository = getMockedPaginationRepository();
 
         PublicationService service =
-                new PublicationService(
-                        storeClient, repository, new LiteratureStoreEntryConverter());
+                new PublicationService(storeClient, repository, new LiteratureEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
+        PublicationRequest request = new PublicationRequest();
+        request.setFacets("category,source,study_type");
+        request.setSize(3);
+        QueryResult<PublicationEntry> result =
+                service.getPublicationsByUniprotAccession("P12345", request);
+        assertNotNull(result);
+
+        CursorPage cursorPage = (CursorPage) result.getPage();
+        assertTrue(cursorPage.hasNextPage());
+        assertEquals("jxzylcj10", cursorPage.getEncryptedNextCursor());
+        assertEquals(new Long(7), cursorPage.getTotalElements());
+        assertEquals(new Integer(3), cursorPage.getPageSize());
+        assertEquals(new Long(0), cursorPage.getOffset());
+
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
+        assertNotNull(entries);
+        assertEquals(3, entries.size());
+        Literature literature = (Literature) entries.get(0).getReference().getCitation();
+        assertEquals(new Long(10), literature.getPubmedId());
+
+        literature = (Literature) entries.get(1).getReference().getCitation();
+        assertEquals(new Long(20), literature.getPubmedId());
+
+        literature = (Literature) entries.get(2).getReference().getCitation();
+        assertEquals(new Long(30), literature.getPubmedId());
+    }
+
+    @Test
+    void getPublicationsByUniprotAccessionPaginationMiddlePage() {
+        UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
+        when(storeClient.getEntry("P12345")).thenReturn(Optional.empty());
+
+        LiteratureRepository repository = getMockedPaginationRepository();
+
+        PublicationService service =
+                new PublicationService(storeClient, repository, new LiteratureEntryConverter());
+        service.defaultPageSize = DEFAULT_PAGE_SIZE;
+        PublicationRequest request = new PublicationRequest();
+        request.setFacets("category,source,study_type");
+        request.setSize(3);
+        request.setCursor("jxzylcj10");
+
+        QueryResult<PublicationEntry> result =
+                service.getPublicationsByUniprotAccession("P12345", request);
+        CursorPage cursorPage = (CursorPage) result.getPage();
+        assertTrue(cursorPage.hasNextPage());
+        assertEquals("l43abuo2c", cursorPage.getEncryptedNextCursor());
+        assertEquals(new Long(7), cursorPage.getTotalElements());
+        assertEquals(new Integer(3), cursorPage.getPageSize());
+        assertEquals(new Long(3), cursorPage.getOffset());
+
+        List<PublicationEntry> entries = result.getContent().collect(Collectors.toList());
+        assertNotNull(entries);
+        assertEquals(3, entries.size());
+        Literature literature = (Literature) entries.get(0).getReference().getCitation();
+        assertEquals(new Long(40), literature.getPubmedId());
+
+        literature = (Literature) entries.get(1).getReference().getCitation();
+        assertEquals(new Long(50), literature.getPubmedId());
+
+        literature = (Literature) entries.get(2).getReference().getCitation();
+        assertEquals(new Long(60), literature.getPubmedId());
+    }
+
+    @Test
+    void getPublicationsByUniprotAccessionPaginationLastPage() {
+        UniProtKBStoreClient storeClient = mock(UniProtKBStoreClient.class);
+        when(storeClient.getEntry("P12345")).thenReturn(Optional.empty());
+
+        LiteratureRepository repository = getMockedPaginationRepository();
+
+        PublicationService service =
+                new PublicationService(storeClient, repository, new LiteratureEntryConverter());
         service.defaultPageSize = DEFAULT_PAGE_SIZE;
         PublicationRequest request = new PublicationRequest();
         request.setFacets("category,source,study_type");
