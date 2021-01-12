@@ -45,7 +45,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Slf4j
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniProtKBEntryController.class)
+@WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

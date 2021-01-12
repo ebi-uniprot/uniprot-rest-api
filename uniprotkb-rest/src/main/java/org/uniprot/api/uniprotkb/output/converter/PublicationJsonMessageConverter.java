@@ -1,7 +1,7 @@
 package org.uniprot.api.uniprotkb.output.converter;
 
-import java.util.Arrays;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.citation.impl.AuthorImpl;
@@ -17,8 +17,7 @@ import org.uniprot.core.uniprotkb.evidence.impl.EvidenceImpl;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionImpl;
 import org.uniprot.store.search.field.ReturnField;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.util.Arrays;
 
 /**
  * @author lgonzales
@@ -85,6 +84,7 @@ public class PublicationJsonMessageConverter extends JsonMessageConverter<Public
                     UniProtKBAccessionImpl.class, new UniProtKBAccessionSerializer());
             simpleMod.addSerializer(PublicationDateImpl.class, new PublicationDateSerializer());
             simpleMod.addSerializer(EvidenceImpl.class, new EvidenceSerializer());
+            // TODO: 08/01/2021 serialise properly the mappedreferences
 
             prettyObjMapper.registerModule(simpleMod);
             return prettyObjMapper;

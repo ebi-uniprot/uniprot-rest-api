@@ -7,19 +7,14 @@ import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.uniprotkb.service.PublicationFacetConfig2;
-import org.uniprot.core.util.Utils;
+import org.uniprot.api.uniprotkb.service.PublicationFacetConfig;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 /**
- * /search?query=???? /accession/P12345/publications?query=????
  *
  * @author lgonzales
  * @since 2019-07-09

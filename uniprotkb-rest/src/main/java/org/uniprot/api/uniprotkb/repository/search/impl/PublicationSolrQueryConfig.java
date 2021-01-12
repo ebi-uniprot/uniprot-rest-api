@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 @Configuration
 public class PublicationSolrQueryConfig {
@@ -32,18 +33,11 @@ public class PublicationSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor publicationQueryProcessor(
-            WhitelistFieldConfig whiteListFieldConfig) {
-        Map<String, String> publicationWhiteListFields =
-                whiteListFieldConfig
-                        .getField()
-                        .getOrDefault(
-                                UniProtDataType.PUBLICATION.toString().toLowerCase(),
-                                new HashMap<>());
+    public QueryProcessor publicationQueryProcessor() {
         return UniProtQueryProcessor.newInstance(
                 UniProtQueryProcessorConfig.builder()
                         .optimisableFields(emptyList())
-                        .whiteListFields(publicationWhiteListFields)
+                        .whiteListFields(emptyMap())
                         .build());
     }
 }
