@@ -1,6 +1,15 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -185,14 +194,15 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .queryParam(
                             "query",
                             Collections.singletonList(
-                                    "id:INVALID OR is_uniprotkb_mapped:INVALID OR is_computational_mapped:INVALID"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    "id:INVALID OR is_uniprotkb_mapped:INVALID OR is_computational_mapped:INVALID OR is_community_mapped:INVALID"))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()) )))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
                                     containsInAnyOrder(
                                             "The PubMed id value should be a number",
                                             "The literature is_uniprotkb_mapped filter value should be a boolean",
+                                            "The literature is_community_mapped filter value should be a boolean",
                                             "The literature is_computational_mapped filter value should be a boolean")))
                     .build();
         }
@@ -236,7 +246,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .queryParam(
                             "facets",
                             Collections.singletonList(
-                                    "is_uniprotkb_mapped,is_computational_mapped"))
+                                    "is_uniprotkb_mapped,is_computational_mapped,is_community_mapped"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.citation.citationCrossReferences[0].id",
@@ -249,7 +259,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .resultMatcher(
                             jsonPath(
                                     "$.facets.*.name",
-                                    contains("is_uniprotkb_mapped", "is_computational_mapped")))
+                                    contains("is_uniprotkb_mapped", "is_computational_mapped", "is_community_mapped")))
                     .build();
         }
     }
