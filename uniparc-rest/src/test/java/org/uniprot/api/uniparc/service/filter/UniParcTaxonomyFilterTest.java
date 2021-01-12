@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.service.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +41,7 @@ class UniParcTaxonomyFilterTest {
     void testFilterByTaxonomyIds() {
         verifyUniParcEntry(uniParcEntry);
         Assertions.assertEquals(2, this.uniParcEntry.getTaxonomies().size());
-        List<String> taxonFilter = Arrays.asList("9606");
+        List<String> taxonFilter = Collections.singletonList("9606");
         // filter by db
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except xrefs
@@ -79,7 +80,7 @@ class UniParcTaxonomyFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<Taxonomy> taxonomies = uniParcEntry.getTaxonomies();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> taxonFilter = Arrays.asList("0");
+        List<String> taxonFilter = Collections.singletonList("0");
         // filter by taxon
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same but no taxon
@@ -96,7 +97,7 @@ class UniParcTaxonomyFilterTest {
         UniParcEntryBuilder entryBuilder = UniParcEntryBuilder.from(uniParcEntry);
         entryBuilder.taxonomiesSet(null);
         UniParcEntry entryWithoutXref = entryBuilder.build();
-        List<String> filter = Arrays.asList("9606");
+        List<String> filter = Collections.singletonList("9606");
         // filter by taxon
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(entryWithoutXref, filter);
         Assertions.assertEquals(entryWithoutXref, filteredEntry);

@@ -54,6 +54,7 @@ public class MessageConverterContextFactory<T> {
         DISEASE,
         CROSSREF,
         SUBCELLULAR_LOCATION,
-        UNIPROTKB_INTERACTION
+        UNIPROTKB_INTERACTION,
+        UNIRULE
     }
 }
