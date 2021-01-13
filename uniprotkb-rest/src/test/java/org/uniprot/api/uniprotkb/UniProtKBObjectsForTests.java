@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * @author lgonzales
  * @since 2019-12-18
  */
-public class UniprotKBObjectsForTests {
+public class UniProtKBObjectsForTests {
 
     public static UniProtKBEntry getUniprotEntryForPublication(
             String accession, String... pubmedIds) {
@@ -106,7 +106,7 @@ public class UniprotKBObjectsForTests {
                                 .collect(Collectors.toSet()))
                 .journal(literature.getJournal().getName())
                 .published(literature.getPublicationDate().getValue())
-                .literatureObj(UniprotKBObjectsForTests.getLiteratureBinary(entry))
+                .literatureObj(UniProtKBObjectsForTests.getLiteratureBinary(entry))
                 .build();
     }
 

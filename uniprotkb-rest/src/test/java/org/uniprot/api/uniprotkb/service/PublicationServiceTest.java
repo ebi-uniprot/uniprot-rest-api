@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static java.util.Collections.emptyList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.UniProtKBObjectsForTests.getLiteratureDocument;
+import static org.uniprot.store.indexer.publication.common.PublicationUtils.asBinary;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
@@ -22,19 +35,6 @@ import org.uniprot.core.publication.impl.MappedSourceBuilder;
 import org.uniprot.core.publication.impl.UniProtKBMappedReferenceBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.store.search.document.publication.PublicationDocument;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.UniprotKBObjectsForTests.getLiteratureDocument;
-import static org.uniprot.store.indexer.publication.common.PublicationUtils.asBinary;
 
 /**
  * @author lgonzales

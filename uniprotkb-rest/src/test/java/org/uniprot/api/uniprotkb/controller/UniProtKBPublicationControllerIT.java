@@ -30,11 +30,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.UniprotKBObjectsForTests;
+import org.uniprot.api.uniprotkb.UniProtKBObjectsForTests;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
+import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.PublicationDocumentMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
@@ -49,11 +51,12 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniProtKBEntryControllerIT {
+class UniProtKBPublicationControllerIT {
 
     private static final String MAPPED_PROTEIN_PATH = "/uniprotkb/accession/";
 
-    @Autowired private LiteratureRepository repository;
+    @Autowired private LiteratureRepository literatureRepository;
+    @Autowired private PublicationRepository publicationRepository;
 
     @Autowired private UniProtKBStoreClient storeClient;
 
@@ -66,10 +69,16 @@ class UniProtKBEntryControllerIT {
         storeManager.addSolrClient(
                 DataStoreManager.StoreType.LITERATURE, SolrCollection.literature);
         storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
+
+        storeManager.addSolrClient(DataStoreManager.StoreType.PUBLICATION, SolrCollection.publication);
         ReflectionTestUtils.setField(
-                repository,
+                literatureRepository,
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.LITERATURE));
+        ReflectionTestUtils.setField(
+                publicationRepository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.PUBLICATION));
     }
 
     @BeforeEach
@@ -155,7 +164,7 @@ class UniProtKBEntryControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12312/publications")
-                                .param("facets", "source,category,study_type")
+                                .param("facets", "types,categories,is_large_scale")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -166,7 +175,7 @@ class UniProtKBEntryControllerIT {
                 .andExpect(
                         jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
                 .andExpect(
-                        jsonPath("$.facets.*.name", contains("source", "category", "study_type")))
+                        jsonPath("$.facets.*.name", contains("types", "category", "is_large_scale")))
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.label",
@@ -213,8 +222,8 @@ class UniProtKBEntryControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12312/publications")
-                                .param("facets", "source,category,study_type")
-                                .param("query", "category:Interaction")
+                                .param("facets", "types,categories,is_large_scale")
+                                .param("query", "categories:Interaction")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -225,7 +234,7 @@ class UniProtKBEntryControllerIT {
                 .andExpect(
                         jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
                 .andExpect(
-                        jsonPath("$.facets.*.name", contains("source", "category", "study_type")))
+                        jsonPath("$.facets.*.name", contains("source", "categories", "study_type")))
                 .andExpect(
                         jsonPath(
                                 "$.facets[0].values.*.label",
@@ -270,7 +279,7 @@ class UniProtKBEntryControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'invalid'. Expected value can be [source, category, study_type].")));
+                                        "Invalid facet name 'invalid'. Expected value can be [types, categories, is_large_scale].")));
     }
 
     @Test
@@ -321,7 +330,7 @@ class UniProtKBEntryControllerIT {
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12345/publications")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("facets", "study_type")
+                                .param("facets", "is_large_scale")
                                 .param("size", "5"));
 
         // then first page
@@ -359,13 +368,15 @@ class UniProtKBEntryControllerIT {
 
     private void saveEntry(long pubMedId, String... accessions) {
         System.out.println("Document for PUBMED_ID: " + pubMedId);
-        LiteratureDocument document = UniprotKBObjectsForTests.getLiteratureDocument(pubMedId);
+        LiteratureDocument document = UniProtKBObjectsForTests.getLiteratureDocument(pubMedId);
 
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+        storeManager.saveDocs(
+                DataStoreManager.StoreType.PUBLICATION, PublicationDocumentMocker.create(1, 1));
     }
 
     private void saveUniprotEntryInStore(String accession, String... pubmedIds) {
         storeClient.saveEntry(
-                UniprotKBObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
+                UniProtKBObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
     }
 }
