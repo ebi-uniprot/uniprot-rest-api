@@ -11,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
-import org.uniprot.core.citation.Citation;
 import org.uniprot.core.json.parser.publication.MappedPublicationsJsonConfig;
+import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.publication.MappedPublications;
 import org.uniprot.core.publication.MappedReference;
 import org.uniprot.core.publication.UniProtKBMappedReference;
@@ -29,17 +29,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Slf4j
 public class PublicationConverter
-        implements BiFunction<PublicationDocument, Map<Long, Citation>, PublicationEntry> {
+        implements BiFunction<PublicationDocument, Map<Long, LiteratureEntry>, PublicationEntry> {
     private static final ObjectMapper OBJECT_MAPPER =
             MappedPublicationsJsonConfig.getInstance().getFullObjectMapper();
 
     @Override
     public PublicationEntry apply(
-            PublicationDocument pubDocument, Map<Long, Citation> citationMap) {
+            PublicationDocument pubDocument, Map<Long, LiteratureEntry> pubmedLiteratureEntryMap) {
         PublicationEntry.PublicationEntryBuilder pubEntryBuilder = PublicationEntry.builder();
         // pubmed present => get Citation from map; otherwise, use the citation in the binary
         if (Utils.notNullNotEmpty(pubDocument.getPubMedId())) {
-            pubEntryBuilder.citation(citationMap.get(Long.parseLong(pubDocument.getPubMedId())));
+            LiteratureEntry literatureEntry =
+                    pubmedLiteratureEntryMap.get(Long.parseLong(pubDocument.getPubMedId()));
+
+            pubEntryBuilder.citation(literatureEntry.getCitation());
+            pubEntryBuilder.statistics(literatureEntry.getStatistics());
         } else {
             extractObject(pubDocument)
                     .ifPresent(
@@ -55,19 +59,6 @@ public class PublicationConverter
                                 }
                             });
         }
-
-        PublicationEntry.Statistics stats =
-                PublicationEntry.Statistics.builder()
-                        .communityMappedProteinCount(
-                                extractCount(pubDocument::getCommunityMappedProteinCount))
-                        .computationalMappedProteinCount(
-                                extractCount(pubDocument::getComputationalMappedProteinCount))
-                        .reviewedMappedProteinCount(
-                                extractCount(pubDocument::getReviewedMappedProteinCount))
-                        .unreviewedMappedProteinCount(
-                                extractCount(pubDocument::getUnreviewedMappedProteinCount))
-                        .build();
-        pubEntryBuilder.statistics(stats);
 
         extractObject(pubDocument)
                 .ifPresent(

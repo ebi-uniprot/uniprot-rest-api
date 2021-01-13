@@ -1,8 +1,13 @@
 package org.uniprot.api.uniprotkb.service;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -23,7 +28,6 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationSolrQueryConfig;
-import org.uniprot.core.citation.Citation;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.util.Utils;
@@ -32,10 +36,6 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.document.publication.PublicationDocument;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created 06/01/2021
@@ -88,11 +88,11 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
                         pubDocsForAccessionSolrRequest, request.getCursor());
         List<PublicationDocument> content = results.getContent().collect(Collectors.toList());
 
-        Map<Long, Citation> citationMap = getPubMedCitationMap(content);
+        Map<Long, LiteratureEntry> pubmedLiteratureEntryMap = getPubMedLiteratureEntryMap(content);
 
         Stream<PublicationEntry> converted =
                 content.stream()
-                        .map(e -> publicationConverter.apply(e, citationMap))
+                        .map(e -> publicationConverter.apply(e, pubmedLiteratureEntryMap))
                         .filter(Objects::nonNull);
 
         return QueryResult.of(converted, results.getPage(), results.getFacets());
@@ -121,7 +121,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return publicationQueryProcessor;
     }
 
-    private Map<Long, Citation> getPubMedCitationMap(List<PublicationDocument> content) {
+    private Map<Long, LiteratureEntry> getPubMedLiteratureEntryMap(List<PublicationDocument> content) {
         BooleanQuery.Builder pubmedIdsQuery = new BooleanQuery.Builder();
         content.stream()
                 .map(PublicationDocument::getPubMedId)
@@ -135,7 +135,9 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         Stream<LiteratureDocument> all = literatureRepository.getAll(pubmedIdsSolrRequest);
         return all.map(literatureEntryConverter)
                 .collect(
-                        Collectors.toMap(this::getPubmedIdFromEntry, LiteratureEntry::getCitation));
+                        Collectors.toMap(
+                                this::getPubmedIdFromEntry,
+                                literatureEntry -> literatureEntry));
     }
 
     private Long getPubmedIdFromEntry(LiteratureEntry entry) {

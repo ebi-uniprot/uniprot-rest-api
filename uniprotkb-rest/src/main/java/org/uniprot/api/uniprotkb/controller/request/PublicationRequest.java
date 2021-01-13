@@ -1,7 +1,12 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
+
 import lombok.Data;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -9,13 +14,9 @@ import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.uniprotkb.service.PublicationFacetConfig;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Positive;
-
-import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
- *
  * @author lgonzales
  * @since 2019-07-09
  */
