@@ -75,7 +75,7 @@ public class UniProtKBObjectsForTests {
                         .referencePositionsAdd("Position INTERACTION ")
                         .citation(
                                 new SubmissionBuilder()
-                                        .title("Submission tittle")
+                                        .title("Submission title")
                                         .authorsAdd("Submission Author")
                                         .submittedToDatabase(SubmissionDatabase.PDB)
                                         .build())

@@ -23,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
@@ -87,7 +88,8 @@ class PublicationServiceTest {
 
         solrSortClause.init();
 
-        PublicationSolrQueryConfig solrQueryConfig = new PublicationSolrQueryConfig();
+        PublicationSolrQueryConfig publicationSolrQueryConfig = new PublicationSolrQueryConfig();
+        LiteratureSolrQueryConfig literatureSolrQueryConfig = new LiteratureSolrQueryConfig();
 
         PublicationService service =
                 new PublicationService(
@@ -96,9 +98,10 @@ class PublicationServiceTest {
                         new PublicationConverter(),
                         solrSortClause,
                         new LiteratureEntryConverter(),
-                        solrQueryConfig.publicationSolrQueryConf(),
+                        publicationSolrQueryConfig.publicationSolrQueryConf(),
                         publicationFacetConfig,
-                        solrQueryConfig.publicationQueryProcessor());
+                        publicationSolrQueryConfig.publicationQueryProcessor(),
+                        literatureSolrQueryConfig.literatureSolrQueryConf());
         PublicationRequest request = new PublicationRequest();
         request.setSize(25);
         QueryResult<PublicationEntry> result =
