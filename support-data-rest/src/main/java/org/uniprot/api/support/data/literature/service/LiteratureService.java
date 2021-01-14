@@ -7,6 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.api.support.data.literature.request.LiteratureSolrQueryConfig;
