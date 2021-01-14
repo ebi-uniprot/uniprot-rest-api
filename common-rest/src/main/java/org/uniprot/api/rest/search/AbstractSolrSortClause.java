@@ -31,6 +31,10 @@ public abstract class AbstractSolrSortClause {
 
     protected abstract UniProtDataType getUniProtDataType();
 
+    protected void resetDefaultFieldOrderPairs() {
+        this.defaultFieldSortOrderPairs.clear();
+    }
+
     protected void addDefaultFieldOrderPair(String sortFieldName, SolrQuery.ORDER direction) {
         this.defaultFieldSortOrderPairs.add(SolrQuery.SortClause.create(sortFieldName, direction));
     }
