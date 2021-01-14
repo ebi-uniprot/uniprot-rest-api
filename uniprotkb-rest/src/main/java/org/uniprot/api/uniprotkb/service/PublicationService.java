@@ -130,7 +130,8 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return publicationQueryProcessor;
     }
 
-    private Map<Long, LiteratureEntry> getPubMedLiteratureEntryMap(List<PublicationDocument> content) {
+    private Map<Long, LiteratureEntry> getPubMedLiteratureEntryMap(
+            List<PublicationDocument> content) {
         BooleanQuery.Builder pubmedIdsQuery = new BooleanQuery.Builder();
         content.stream()
                 .map(PublicationDocument::getPubMedId)
@@ -145,8 +146,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return all.map(literatureEntryConverter)
                 .collect(
                         Collectors.toMap(
-                                this::getPubmedIdFromEntry,
-                                literatureEntry -> literatureEntry));
+                                this::getPubmedIdFromEntry, literatureEntry -> literatureEntry));
     }
 
     private Long getPubmedIdFromEntry(LiteratureEntry entry) {

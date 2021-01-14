@@ -1,11 +1,13 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static org.uniprot.core.util.Utils.addOrIgnoreNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,14 +105,6 @@ public class PublicationConverter
             List<T> referencesToAdd, List<MappedReference> mappedReferences) {
         if (!referencesToAdd.isEmpty()) {
             mappedReferences.addAll(referencesToAdd);
-        }
-    }
-
-    static Long extractCount(LongSupplier countSupplier) {
-        try {
-            return countSupplier.getAsLong();
-        } catch (NullPointerException e) {
-            return 0L;
         }
     }
 }
