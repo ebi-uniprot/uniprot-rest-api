@@ -67,7 +67,7 @@ class PublicationConverterTest {
                         .map(MappedSource::getName)
                         .collect(Collectors.toSet());
 
-        assertThat(sources, containsInAnyOrder("source 1", "source 2", "source 3"));
+        assertThat(sources, contains("source P00001"));
     }
 
     @Test
