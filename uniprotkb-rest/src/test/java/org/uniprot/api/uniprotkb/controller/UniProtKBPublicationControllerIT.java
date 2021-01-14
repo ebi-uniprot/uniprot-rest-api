@@ -1,17 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.stream.IntStream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.UniProtKBObjectsForTests;
+import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
@@ -39,6 +28,20 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.PublicationDocumentMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author lgonzales
@@ -54,6 +57,19 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 class UniProtKBPublicationControllerIT {
 
     private static final String MAPPED_PROTEIN_PATH = "/uniprotkb/accession/";
+    private static final String ACCESSION = "P12312";
+    private static final List<String> VALID_CATEGORIES =
+            asList(
+                    "Expression",
+                    "Family & Domains",
+                    "Function",
+                    "Interaction",
+                    "Names",
+                    "Pathology & Biotech",
+                    "PTM / Processing",
+                    "Sequences",
+                    "Subcellular Location",
+                    "Structure");
 
     @Autowired private LiteratureRepository literatureRepository;
     @Autowired private PublicationRepository publicationRepository;
@@ -70,7 +86,8 @@ class UniProtKBPublicationControllerIT {
                 DataStoreManager.StoreType.LITERATURE, SolrCollection.literature);
         storeManager.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
 
-        storeManager.addSolrClient(DataStoreManager.StoreType.PUBLICATION, SolrCollection.publication);
+        storeManager.addSolrClient(
+                DataStoreManager.StoreType.PUBLICATION, SolrCollection.publication);
         ReflectionTestUtils.setField(
                 literatureRepository,
                 "solrClient",
@@ -84,6 +101,7 @@ class UniProtKBPublicationControllerIT {
     @BeforeEach
     void cleanData() {
         storeManager.cleanSolr(DataStoreManager.StoreType.LITERATURE);
+        storeManager.cleanSolr(DataStoreManager.StoreType.PUBLICATION);
         storeManager.cleanStore(DataStoreManager.StoreType.UNIPROT);
     }
 
@@ -92,61 +110,53 @@ class UniProtKBPublicationControllerIT {
         // given
         saveEntry(10, "P12309", "P12310");
         saveEntry(11, "P12310", "P12311");
-        saveEntry(12, "P12311", "P12312");
-        saveEntry(13, "P12312", "P12313");
+        saveEntry(12, "P12311", ACCESSION);
+        saveEntry(13, ACCESSION, "P12313");
         saveEntry(14, "P12313", "P12314");
 
-        saveUniprotEntryInStore("P12312", "11");
+        saveUniProtEntryInStore(ACCESSION, "11");
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P12312/publications")
+                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(4)))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        jsonPath("$.results[0].citation.citationCrossReferences[0].id", is("12")))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].reference.citation.citationCrossReferences[0].id",
-                                is("11")))
+                                "$.results[0].citation.citationType",
+                                is("UniProt indexed literatures")))
+                .andExpect(jsonPath("$.results[0].citation.title", is("title 12")))
                 .andExpect(
-                        jsonPath("$.results[1].reference.citation.citationType", is("submission")))
-                .andExpect(
-                        jsonPath(
-                                "$.results[2].reference.citation.citationCrossReferences[0].id",
-                                is("12")))
+                        jsonPath("$.results[*].citation.title", contains("title 12", "title 13")))
                 .andExpect(
                         jsonPath(
-                                "$.results[3].reference.citation.citationCrossReferences[0].id",
-                                is("13")))
+                                "$.results[*].references[*].sourceCategories[*]",
+                                everyItem(in(VALID_CATEGORIES))))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.reference.citation.title",
-                                contains("title 11", "Submission tittle", "title 12", "title 13")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.categories",
+                                "$.results[*].references[*].source.source",
                                 contains(
-                                        contains("Pathol", "Interaction"),
-                                        contains("Interaction"),
-                                        contains("Function"),
-                                        contains("Function"))))
+                                        "source P12312",
+                                        "source P12312",
+                                        "source P12312",
+                                        "source P12312",
+                                        "source P12312",
+                                        "source P12312")))
+                .andExpect(jsonPath("$.results[0].statistics.reviewedProteinCount", is(10)))
+                .andExpect(jsonPath("$.results[0].statistics.unreviewedProteinCount", is(20)))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.publicationSource",
-                                contains(
-                                        "UniProtKB reviewed (Swiss-Prot)",
-                                        "UniProtKB reviewed (Swiss-Prot)",
-                                        "Computationally mapped",
-                                        "Computationally mapped")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.literatureMappedReference.uniprotAccession",
-                                contains("P12312", "P12312")));
+                                "$.results[0].statistics.computationallyMappedProteinCount",
+                                is(30)))
+                .andExpect(jsonPath("$.results[0].statistics.communityMappedProteinCount", is(40)));
     }
 
     @Test
@@ -154,110 +164,82 @@ class UniProtKBPublicationControllerIT {
         // given
         saveEntry(10, "P12309", "P12310");
         saveEntry(11, "P12310", "P12311");
-        saveEntry(12, "P12311", "P12312");
-        saveEntry(13, "P12312", "P12313");
+        saveEntry(12, "P12311", ACCESSION);
+        saveEntry(13, ACCESSION, "P12313");
         saveEntry(14, "P12313", "P12314");
 
-        saveUniprotEntryInStore("P12312", "10", "11");
+        saveUniProtEntryInStore(ACCESSION, "10", "11");
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P12312/publications")
+                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
                                 .param("facets", "types,categories,is_large_scale")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(
                         jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
                 .andExpect(
-                        jsonPath("$.facets.*.name", contains("types", "category", "is_large_scale")))
+                        jsonPath(
+                                "$.facets.*.name",
+                                contains("types", "categories", "is_large_scale")))
+                .andExpect(jsonPath("$.facets[0].values[0].label", is("Computationally mapped")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(2)))
+                .andExpect(jsonPath("$.facets[1].values.*.value", everyItem(in(VALID_CATEGORIES))))
                 .andExpect(
                         jsonPath(
-                                "$.facets[0].values.*.label",
-                                contains(
-                                        "UniProtKB reviewed (Swiss-Prot)",
-                                        "Computationally mapped")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("uniprotkb_reviewed_swissprot", "computationally_mapped")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 2)))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[1].values.*.label",
-                                contains("Interaction", "Function", "Pathol")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[1].values.*.value",
-                                contains("interaction", "function", "pathol")))
-                .andExpect(jsonPath("$.facets[1].values.*.count", contains(3, 2, 2)))
+                                "$.facets[1].values.*.count",
+                                hasSize(lessThanOrEqualTo(VALID_CATEGORIES.size()))))
                 .andExpect(
                         jsonPath(
                                 "$.facets[2].values.*.label",
-                                contains("Large scale", "Small scale")))
+                                everyItem(in(asList("Small scale", "Large scale")))))
                 .andExpect(
                         jsonPath(
                                 "$.facets[2].values.*.value",
-                                contains("large_scale", "small_scale")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(4, 1)));
+                                everyItem(in(asList("true", "false")))));
     }
 
     @Test
     void getPublicationsWithFacetFiltersSuccess() throws Exception {
         // given
         saveEntry(10, "P12309", "P12310", "P12311");
-        saveEntry(11, "P12310", "P12311", "P12312");
-        saveEntry(12, "P12311", "P12312", "P12313");
-        saveEntry(13, "P12312", "P12313", "P12314");
+        saveEntry(11, "P12310", "P12311", ACCESSION);
+        saveEntry(12, "P12311", ACCESSION, "P12313");
+        saveEntry(13, ACCESSION, "P12313", "P12314");
         saveEntry(14, "P12313", "P12314", "P12315");
 
-        saveUniprotEntryInStore("P12312", "10", "11");
+        saveUniProtEntryInStore(ACCESSION, "10", "11");
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P12312/publications")
+                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
                                 .param("facets", "types,categories,is_large_scale")
                                 .param("query", "categories:Interaction")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(
                         jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
                 .andExpect(
-                        jsonPath("$.facets.*.name", contains("source", "categories", "study_type")))
-                .andExpect(
                         jsonPath(
-                                "$.facets[0].values.*.label",
-                                contains("UniProtKB reviewed (Swiss-Prot)")))
+                                "$.facets.*.name",
+                                contains("types", "categories", "is_large_scale")))
                 .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("uniprotkb_reviewed_swissprot")))
+                        jsonPath("$.facets[0].values.*.label", contains("Computationally mapped")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("1")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3)))
-                .andExpect(
-                        jsonPath("$.facets[1].values.*.label", contains("Interaction", "Pathol")))
-                .andExpect(
-                        jsonPath("$.facets[1].values.*.value", contains("interaction", "pathol")))
-                .andExpect(jsonPath("$.facets[1].values.*.count", contains(3, 2)))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[2].values.*.label",
-                                contains("Large scale", "Small scale")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[2].values.*.value",
-                                contains("large_scale", "small_scale")))
-                .andExpect(jsonPath("$.facets[2].values.*.count", contains(2, 1)));
+                .andExpect(jsonPath("$.facets[1].values.*.value", hasItem("Interaction")));
     }
 
     @Test
@@ -342,8 +324,7 @@ class UniProtKBPublicationControllerIT {
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=5")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
                 .andExpect(jsonPath("$.results.size()", is(5)))
-                .andExpect(jsonPath("$.facets.size()", is(1)))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(7)));
+                .andExpect(jsonPath("$.facets.size()", is(1)));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
@@ -366,16 +347,23 @@ class UniProtKBPublicationControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(2)));
     }
 
+    private static final AtomicInteger REFERENCE_NUMBER_COUNT = new AtomicInteger();
+
     private void saveEntry(long pubMedId, String... accessions) {
         System.out.println("Document for PUBMED_ID: " + pubMedId);
         LiteratureDocument document = UniProtKBObjectsForTests.getLiteratureDocument(pubMedId);
 
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
-        storeManager.saveDocs(
-                DataStoreManager.StoreType.PUBLICATION, PublicationDocumentMocker.create(1, 1));
+
+        for (String accession : accessions) {
+            storeManager.saveDocs(
+                    DataStoreManager.StoreType.PUBLICATION,
+                    PublicationDocumentMocker.createWithAccAndPubMed(
+                            accession, pubMedId, REFERENCE_NUMBER_COUNT.getAndIncrement()));
+        }
     }
 
-    private void saveUniprotEntryInStore(String accession, String... pubmedIds) {
+    private void saveUniProtEntryInStore(String accession, String... pubmedIds) {
         storeClient.saveEntry(
                 UniProtKBObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
     }
