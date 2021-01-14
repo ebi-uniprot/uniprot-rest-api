@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.support.data.configure.domain.SolrJsonQuery;
+import org.uniprot.api.support.data.configure.response.SolrJsonQuery;
 import org.uniprot.api.support.data.configure.service.UtilService;
 
 import io.swagger.v3.oas.annotations.Operation;

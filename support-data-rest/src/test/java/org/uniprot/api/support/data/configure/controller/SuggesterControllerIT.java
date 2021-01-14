@@ -34,7 +34,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.support.data.DataStoreTestConfig;
-import org.uniprot.api.support.data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.suggester.service.SuggesterService;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -48,7 +48,7 @@ import org.uniprot.store.search.field.SuggestField;
  * @author Edd
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
+@SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SuggesterControllerIT {

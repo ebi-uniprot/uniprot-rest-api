@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.support.data.suggester.model.Suggestion;
+import org.uniprot.api.support.data.suggester.response.Suggestion;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
