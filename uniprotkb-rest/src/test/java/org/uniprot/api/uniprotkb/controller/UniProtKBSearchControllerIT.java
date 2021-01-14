@@ -788,6 +788,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.unirefCluster50 = "UniRef50_P0001";
             doc.unirefCluster90 = "UniRef90_P0001";
             doc.unirefCluster100 = "UniRef100_P0001";
+            doc.computationalPubmedIds.add("890123456");
+            doc.communityPubmedIds.add("1234567");
             UniProtDatabaseTypes.INSTANCE
                     .getAllDbTypes()
                     .forEach(
