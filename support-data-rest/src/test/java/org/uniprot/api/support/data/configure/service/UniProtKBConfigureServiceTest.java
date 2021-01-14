@@ -8,7 +8,7 @@ import junit.framework.AssertionFailedError;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 
 class UniProtKBConfigureServiceTest {
     private static UniProtKBConfigureService service;

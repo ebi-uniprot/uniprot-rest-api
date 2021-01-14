@@ -27,9 +27,9 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.support.data.DataStoreTestConfig;
-import org.uniprot.api.support.data.SupportDataApplication;
-import org.uniprot.api.support.data.crossref.config.CrossRefFacetConfig;
+import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
+import org.uniprot.api.support.data.crossref.request.CrossRefFacetConfig;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
@@ -37,7 +37,7 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
-@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(CrossRefController.class)
 @ExtendWith(

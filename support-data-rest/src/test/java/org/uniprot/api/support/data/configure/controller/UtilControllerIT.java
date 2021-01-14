@@ -19,11 +19,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.support.data.DataStoreTestConfig;
-import org.uniprot.api.support.data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataRestApplication;
 
 /** @author lgonzales */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @WebMvcTest(UtilControllerIT.class)
 class UtilControllerIT {
 

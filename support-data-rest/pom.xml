@@ -186,7 +186,7 @@
 								<packageLocation>org.uniprot.api.support.data.disease</packageLocation>
 								<packageLocation>org.uniprot.api.support.data.keyword</packageLocation>
 								<packageLocation>org.uniprot.api.support.data.literature</packageLocation>
-								<packageLocation>org.uniprot.api.support.data.subcell</packageLocation>
+								<packageLocation>org.uniprot.api.support.data.subcellular</packageLocation>
 								<packageLocation>org.uniprot.api.support.data.taxonomy</packageLocation>
 								<packageLocation>org.uniprot.api.support.data.suggester</packageLocation>
 								<packageLocation>org.uniprot.api.support.data.configure.controller</packageLocation>

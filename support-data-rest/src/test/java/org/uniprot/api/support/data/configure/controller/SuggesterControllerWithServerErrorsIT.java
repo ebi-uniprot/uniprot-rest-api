@@ -35,7 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.support.data.DataStoreTestConfig;
-import org.uniprot.api.support.data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataRestApplication;
 
 /**
  * Created 19/05/19
@@ -47,7 +47,7 @@ import org.uniprot.api.support.data.SupportDataApplication;
         classes = {
             SuggesterControllerWithServerErrorsIT.OtherConfig.class,
             DataStoreTestConfig.class,
-            SupportDataApplication.class
+            SupportDataRestApplication.class
         })
 @WebAppConfiguration
 @ActiveProfiles({"server-errors"})
