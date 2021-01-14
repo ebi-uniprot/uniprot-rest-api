@@ -9,6 +9,11 @@ import java.util.Map;
 package org.uniprot.api.rest.service.query.config;
 >>>>>>> move LiteratureSolrQueryConfig; add "resettable" sort clause, so that score need not be used by default:common-rest/src/main/java/org/uniprot/api/rest/service/query/config/LiteratureSolrQueryConfig.java
 
+import static java.util.Collections.emptyMap;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -25,11 +30,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.Collections;
-import java.util.List;
-
-import static java.util.Collections.emptyMap;
 
 @Configuration
 public class LiteratureSolrQueryConfig {

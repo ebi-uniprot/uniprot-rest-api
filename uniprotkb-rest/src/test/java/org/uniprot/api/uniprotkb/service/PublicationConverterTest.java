@@ -1,5 +1,17 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static java.util.Collections.emptyMap;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.uniprotkb.service.PublicationConverter.extractObject;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
@@ -14,18 +26,6 @@ import org.uniprot.core.publication.MappedReference;
 import org.uniprot.core.publication.MappedSource;
 import org.uniprot.store.indexer.uniprot.mockers.PublicationDocumentMocker;
 import org.uniprot.store.search.document.publication.PublicationDocument;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.uniprotkb.service.PublicationConverter.extractObject;
 
 class PublicationConverterTest {
     private PublicationConverter converter;
@@ -109,23 +109,5 @@ class PublicationConverterTest {
         Optional<MappedPublications> mappedPublications = extractObject(document);
 
         assertThat(mappedPublications, is(Optional.empty()));
-    }
-
-    @Test
-    void canExtractDocumentWithCount() {
-        long count = 1L;
-        PublicationDocument document =
-                PublicationDocument.builder().reviewedMappedProteinCount(count).build();
-        Long extractedCount =
-                PublicationConverter.extractCount(document::getReviewedMappedProteinCount);
-        assertThat(extractedCount, is(count));
-    }
-
-    @Test
-    void canExtractDocumentWithoutCount() {
-        PublicationDocument document = PublicationDocument.builder().build();
-        Long extractedCount =
-                PublicationConverter.extractCount(document::getReviewedMappedProteinCount);
-        assertThat(extractedCount, is(0L));
     }
 }
