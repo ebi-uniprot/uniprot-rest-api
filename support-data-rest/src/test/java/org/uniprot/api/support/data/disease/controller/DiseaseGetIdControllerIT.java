@@ -129,14 +129,10 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         kwIds.stream()),
                                 diseaseEntry.getAlternativeNames().stream())
                         .collect(Collectors.toList());
-        // content is name + accession
-        List<String> content = new ArrayList<>(name);
-        content.add(diseaseEntry.getId());
         DiseaseDocument document =
                 DiseaseDocument.builder()
                         .id(ACCESSION)
                         .name(name)
-                        .content(content)
                         .diseaseObj(getDiseaseBinary(diseaseEntry))
                         .build();
 

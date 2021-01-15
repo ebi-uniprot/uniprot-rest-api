@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.configure.controller;
+package org.uniprot.api.support.data.suggester.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

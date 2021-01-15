@@ -135,9 +135,10 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
                 KeywordDocument.builder()
                         .id(keywordId)
                         .name("my keyword " + keywordId)
+                        .definition("my definition " + keywordId)
                         .ancestor(Collections.singletonList("ancestor"))
                         .parent(Collections.singletonList("parent"))
-                        .content(Collections.singletonList("content"))
+                        .synonyms(Collections.singletonList("content"))
                         .keywordObj(getKeywordBinary(keywordEntry))
                         .build();
 

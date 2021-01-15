@@ -469,14 +469,10 @@ class DiseaseControllerSearchTestIT {
             name.addAll(kwIds);
             name.add(StringUtils.join(disease.getAlternativeNames()));
 
-            // content is name + accession
-            List<String> content = new ArrayList<>(name);
-            content.add(disease.getId());
-
             // create disease document
             DiseaseDocument.DiseaseDocumentBuilder builder = DiseaseDocument.builder();
             builder.id(disease.getId());
-            builder.name(name).content(content);
+            builder.name(name);
             byte[] diseaseByte = getDiseaseObjectBinary(disease);
             builder.diseaseObj(ByteBuffer.wrap(diseaseByte));
 

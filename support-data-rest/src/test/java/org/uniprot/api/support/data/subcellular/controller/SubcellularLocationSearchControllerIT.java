@@ -147,7 +147,8 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                         .id(accession)
                         .name("Name value " + accession)
                         .category(SubcellLocationCategory.LOCATION.getName())
-                        .content(Collections.singletonList("Content value " + accession))
+                        .definition("definition sample text")
+                        .synonyms(Collections.singletonList("synonym value " + accession))
                         .subcellularlocationObj(
                                 getSubcellularLocationBinary(subcellularLocationEntry))
                         .build();
