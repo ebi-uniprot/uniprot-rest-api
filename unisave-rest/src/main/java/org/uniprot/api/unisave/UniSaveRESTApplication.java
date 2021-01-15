@@ -20,7 +20,12 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 @ComponentScan(
         basePackages = {"org.uniprot.api.unisave", "org.uniprot.api.rest"},
         excludeFilters = {
-            @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RepositoryConfig.class)
+            @ComponentScan.Filter(
+                    type = FilterType.ASSIGNABLE_TYPE,
+                    value = RepositoryConfig.class),
+            @ComponentScan.Filter(
+                    type = FilterType.REGEX,
+                    pattern = "org\\.uniprot\\.api\\.rest\\.service\\.query\\..*")
         })
 public class UniSaveRESTApplication {
     public static void main(String[] args) {
