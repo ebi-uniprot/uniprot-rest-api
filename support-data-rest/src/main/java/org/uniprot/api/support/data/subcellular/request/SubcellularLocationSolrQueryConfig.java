@@ -21,7 +21,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 @Configuration
 public class SubcellularLocationSolrQueryConfig {
-    private static final String RESOURCE_LOCATION = "/subcell-query.config";
+    private static final String RESOURCE_LOCATION = "/subcellular-query.config";
 
     @Bean
     public SolrQueryConfig subcellSolrQueryConf() {

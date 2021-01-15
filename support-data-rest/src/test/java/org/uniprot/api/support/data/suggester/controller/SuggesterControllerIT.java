@@ -1,57 +1,57 @@
-package org.uniprot.api.support.data.configure.controller;
+ package org.uniprot.api.support.data.suggester.controller;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
-import static org.uniprot.store.search.field.SuggestField.Importance.medium;
+ import static java.util.Arrays.asList;
+ import static java.util.Collections.emptyList;
+ import static java.util.Collections.singletonList;
+ import static org.hamcrest.Matchers.*;
+ import static org.springframework.http.HttpHeaders.ACCEPT;
+ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+ import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
+ import static org.uniprot.store.search.field.SuggestField.Importance.medium;
 
-import java.io.IOException;
-import java.util.List;
+ import java.io.IOException;
+ import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.uniprot.api.support.data.DataStoreTestConfig;
-import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.suggester.service.SuggesterService;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.suggest.SuggestDictionary;
-import org.uniprot.store.search.document.suggest.SuggestDocument;
-import org.uniprot.store.search.field.SuggestField;
+ import org.apache.solr.client.solrj.SolrServerException;
+ import org.junit.jupiter.api.BeforeAll;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.TestInstance;
+ import org.junit.jupiter.api.extension.ExtendWith;
+ import org.junit.jupiter.api.extension.RegisterExtension;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.boot.test.context.SpringBootTest;
+ import org.springframework.http.HttpHeaders;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.test.context.junit.jupiter.SpringExtension;
+ import org.springframework.test.context.web.WebAppConfiguration;
+ import org.springframework.test.util.ReflectionTestUtils;
+ import org.springframework.test.web.servlet.MockMvc;
+ import org.springframework.test.web.servlet.ResultActions;
+ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+ import org.springframework.web.context.WebApplicationContext;
+ import org.uniprot.api.support.data.DataStoreTestConfig;
+ import org.uniprot.api.support.data.SupportDataRestApplication;
+ import org.uniprot.api.support.data.suggester.service.SuggesterService;
+ import org.uniprot.store.indexer.DataStoreManager;
+ import org.uniprot.store.search.SolrCollection;
+ import org.uniprot.store.search.document.suggest.SuggestDictionary;
+ import org.uniprot.store.search.document.suggest.SuggestDocument;
+ import org.uniprot.store.search.field.SuggestField;
 
 /**
  * Created 19/05/19
  *
  * @author Edd
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
-@WebAppConfiguration
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SuggesterControllerIT {
+ @ExtendWith(SpringExtension.class)
+ @SpringBootTest(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
+ @WebAppConfiguration
+ @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+ class SuggesterControllerIT {
     private static final String SEARCH_RESOURCE = "/suggester";
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
@@ -219,4 +219,4 @@ class SuggesterControllerIT {
                         .build();
         storeManager.saveDocs(DataStoreManager.StoreType.SUGGEST, doc);
     }
-}
+ }
