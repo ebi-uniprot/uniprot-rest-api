@@ -113,35 +113,7 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
     }
 
     private void saveEntry(String keywordId, boolean facet) {
-        KeywordId keyword =
-                new KeywordIdBuilder().name("my keyword " + keywordId).id(keywordId).build();
-        KeywordId category = new KeywordIdBuilder().name("Ligand").id("KW-9993").build();
-
-        KeywordEntry keywordEntry =
-                new KeywordEntryBuilder()
-                        .definition("Definition value")
-                        .keyword(keyword)
-                        .category(category)
-                        .synonymsAdd("synonyms")
-                        .parentsAdd(new KeywordEntryBuilder().keyword(keyword).build())
-                        .childrenAdd(new KeywordEntryBuilder().keyword(keyword).build())
-                        .geneOntologiesAdd(
-                                new GoTermBuilder().id("idValue").name("nameValue").build())
-                        .sitesAdd("siteValue")
-                        .statistics(new StatisticsBuilder().build())
-                        .build();
-
-        KeywordDocument document =
-                KeywordDocument.builder()
-                        .id(keywordId)
-                        .name("my keyword " + keywordId)
-                        .definition("my definition " + keywordId)
-                        .ancestor(Collections.singletonList("ancestor"))
-                        .parent(Collections.singletonList("parent"))
-                        .synonyms(Collections.singletonList("content"))
-                        .keywordObj(getKeywordBinary(keywordEntry))
-                        .build();
-
+        KeywordDocument document = KeywordITUtils.createSolrDocument(keywordId, facet);
         getStoreManager().saveDocs(DataStoreManager.StoreType.KEYWORD, document);
     }
 
