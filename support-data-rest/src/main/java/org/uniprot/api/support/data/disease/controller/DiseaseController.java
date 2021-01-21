@@ -1,7 +1,10 @@
 package org.uniprot.api.support.data.disease.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -17,7 +20,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -25,6 +34,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.support.data.disease.request.DiseaseSearchRequest;
+import org.uniprot.api.support.data.disease.request.DiseaseStreamRequest;
 import org.uniprot.api.support.data.disease.service.DiseaseService;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -157,7 +167,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                         })
             })
     @GetMapping(
-            value = "/download",
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -166,14 +176,14 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> download(
-            @Valid @ModelAttribute DiseaseSearchRequest searchRequest,
+            @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
 
-        Stream<DiseaseEntry> result = this.diseaseService.download(searchRequest);
+        Stream<DiseaseEntry> result = this.diseaseService.stream(streamRequest);
 
-        return super.stream(result, searchRequest.getFields(), contentType, request);
+        return super.stream(result, streamRequest, contentType, request);
     }
 
     @Override
