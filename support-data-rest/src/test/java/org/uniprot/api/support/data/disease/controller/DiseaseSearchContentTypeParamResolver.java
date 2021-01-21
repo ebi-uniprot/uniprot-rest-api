@@ -1,19 +1,23 @@
 package org.uniprot.api.support.data.disease.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.support.data.disease.controller.download.IT.BaseDiseaseDownloadIT.SEARCH_ACCESSION1;
-import static org.uniprot.api.support.data.disease.controller.download.IT.BaseDiseaseDownloadIT.SEARCH_ACCESSION2;
-
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-public class DiseaseSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.support.data.disease.controller.DiseaseSearchControllerIT.SEARCH_ACCESSION1;
+import static org.uniprot.api.support.data.disease.controller.DiseaseSearchControllerIT.SEARCH_ACCESSION2;
 
+public class DiseaseSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
     @Override
     protected SearchContentTypeParam searchSuccessContentTypesParam() {
         String fmtStr = "format-version: 1.2";
