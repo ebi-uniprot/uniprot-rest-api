@@ -1,5 +1,20 @@
 package org.uniprot.api.support.data.keyword.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +38,6 @@ import org.uniprot.api.support.data.keyword.service.KeywordService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -38,13 +45,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
 
 @Tag(
         name = "Keyword",

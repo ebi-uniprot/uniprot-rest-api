@@ -1,5 +1,15 @@
 package org.uniprot.api.support.data.disease.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -23,16 +33,6 @@ import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})

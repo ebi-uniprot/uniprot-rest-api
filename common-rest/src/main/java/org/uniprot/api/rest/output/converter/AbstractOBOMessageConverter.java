@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Objects;
 
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
@@ -26,6 +27,10 @@ public abstract class AbstractOBOMessageConverter<T> extends AbstractEntityHttpM
 
     protected abstract String getHeaderNamespace();
 
+    protected Frame getTypeDefStanza() {
+        return null;
+    }
+
     public Frame getHeaderFrame() {
         Frame headerFrame = new Frame(Frame.FrameType.HEADER);
         headerFrame.addClause(
@@ -44,10 +49,9 @@ public abstract class AbstractOBOMessageConverter<T> extends AbstractEntityHttpM
     @Override
     protected void before(MessageConverterContext<T> context, OutputStream outputStream)
             throws IOException {
-        Frame headerFrame = getHeaderFrame();
-        StringWriter out = new StringWriter();
-        this.oboFormatWriter.writeHeader(headerFrame, new PrintWriter(out), null);
-        outputStream.write(out.getBuffer().toString().getBytes());
+
+        writeHeader(outputStream);
+        writeTypeDef(outputStream);
     }
 
     @Override
@@ -56,5 +60,21 @@ public abstract class AbstractOBOMessageConverter<T> extends AbstractEntityHttpM
         StringWriter out = new StringWriter();
         this.oboFormatWriter.write(termFrame, new PrintWriter(out), null);
         outputStream.write(out.getBuffer().toString().getBytes());
+    }
+
+    private void writeHeader(OutputStream outputStream) throws IOException {
+        Frame headerFrame = getHeaderFrame();
+        StringWriter out = new StringWriter();
+        this.oboFormatWriter.writeHeader(headerFrame, new PrintWriter(out), null);
+        outputStream.write(out.getBuffer().toString().getBytes());
+    }
+
+    private void writeTypeDef(OutputStream outputStream) throws IOException {
+        Frame typeDefStanza = getTypeDefStanza();
+        if (Objects.nonNull(typeDefStanza)) {
+            StringWriter out = new StringWriter();
+            this.oboFormatWriter.write(typeDefStanza, new PrintWriter(out), null);
+            outputStream.write(out.getBuffer().toString().getBytes());
+        }
     }
 }

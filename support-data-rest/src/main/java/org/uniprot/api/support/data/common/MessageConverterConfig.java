@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.support.data.disease.response.DiseaseOBOMessageConverter;
+import org.uniprot.api.support.data.keyword.response.KeywordOBOMessageConverter;
 import org.uniprot.api.support.data.subcellular.response.SubcellularLocationOBOMessageConverter;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.keyword.KeywordEntry;
@@ -98,6 +99,7 @@ public class MessageConverterConfig {
                 converters.add(
                         new TsvMessageConverter<>(
                                 KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
+                converters.add(new KeywordOBOMessageConverter());
 
                 ReturnFieldConfig subcellReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(

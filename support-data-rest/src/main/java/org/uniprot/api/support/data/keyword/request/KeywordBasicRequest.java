@@ -1,5 +1,9 @@
 package org.uniprot.api.support.data.keyword.request;
 
+import javax.validation.constraints.NotNull;
+
+import lombok.Data;
+
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
@@ -9,11 +13,8 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.validation.constraints.NotNull;
-
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad
@@ -39,5 +40,4 @@ public class KeywordBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
     private String fields;
-
 }

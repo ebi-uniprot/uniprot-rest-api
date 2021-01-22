@@ -1,5 +1,26 @@
 package org.uniprot.api.support.data.keyword.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.LongStream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,41 +37,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
-import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.disease.DiseaseSolrDocumentHelper;
-import org.uniprot.api.support.data.disease.controller.DiseaseController;
-import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
 import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.disease.DiseaseDocument;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -89,8 +83,7 @@ class KeywordStreamControllerIT extends AbstractSolrStreamControllerIT {
     @Override
     protected int saveEntries() {
         int numberOfEntries = 12;
-        LongStream.rangeClosed(1, numberOfEntries)
-                .forEach(this::saveEntry);
+        LongStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
         return numberOfEntries;
     }
 
@@ -136,10 +129,7 @@ class KeywordStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(12)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].definition",
-                                containsString("Definition value")));
+                .andExpect(jsonPath("$.results[0].definition", containsString("Definition value")));
     }
 
     @Test
@@ -240,15 +230,15 @@ class KeywordStreamControllerIT extends AbstractSolrStreamControllerIT {
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
                 .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "Keyword ID\tName\tDescription\tCategory")))
+                        content().string(containsString("Keyword ID\tName\tDescription\tCategory")))
                 .andExpect(
                         content()
                                 .string(
                                         containsString(
-                                                searchAccession + "\tmy keyword " + searchAccession + "\tDefinition value\tLigand")));
+                                                searchAccession
+                                                        + "\tmy keyword "
+                                                        + searchAccession
+                                                        + "\tDefinition value\tLigand")));
     }
 
     @Test
@@ -322,18 +312,29 @@ class KeywordStreamControllerIT extends AbstractSolrStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
+                .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.OBO_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(containsString("format-version: 1.2")))
-                .andExpect(content().string(containsString("default-namespace: uniprot:diseases")))
+                .andExpect(content().string(containsString("date: ")))
+                .andExpect(content().string(containsString("default-namespace: uniprot:keywords")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "[Typedef]\n"
+                                                        + "id: category\n"
+                                                        + "name: category\n"
+                                                        + "is_cyclic: false\n\n")))
                 .andExpect(content().string(containsString("id: " + searchAccession)))
                 .andExpect(content().string(containsString("name:")))
                 .andExpect(content().string(containsString("synonym:")))
-                .andExpect(content().string(containsString("xref:")));
+                .andExpect(content().string(containsString("xref:")))
+                .andExpect(content().string(containsString("is_a:")))
+                .andExpect(content().string(containsString("relationship:")));
     }
 
     @Test
@@ -411,5 +412,4 @@ class KeywordStreamControllerIT extends AbstractSolrStreamControllerIT {
         KeywordDocument document = KeywordITUtils.createSolrDocument(accession, suffix % 2 == 0);
         storeManager.saveDocs(DataStoreManager.StoreType.KEYWORD, document);
     }
-
 }

@@ -1,7 +1,15 @@
 package org.uniprot.api.support.data.disease.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -39,16 +47,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
