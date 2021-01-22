@@ -4,11 +4,9 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,24 +30,11 @@ import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
-import org.uniprot.core.CrossReference;
-import org.uniprot.core.citation.Author;
-import org.uniprot.core.citation.CitationDatabase;
-import org.uniprot.core.citation.Literature;
 import org.uniprot.core.citation.impl.*;
-import org.uniprot.core.impl.CrossReferenceBuilder;
-import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
-import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureStoreEntry;
-import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
-import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
-import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -132,71 +117,9 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     private void saveEntry(long pubMedId, boolean facet) {
 
-        CrossReference<CitationDatabase> pubmed =
-                new CrossReferenceBuilder<CitationDatabase>()
-                        .database(CitationDatabase.PUBMED)
-                        .id(String.valueOf(pubMedId))
-                        .build();
-
-        CrossReference<CitationDatabase> doi =
-                new CrossReferenceBuilder<CitationDatabase>()
-                        .database(CitationDatabase.DOI)
-                        .id("doi " + pubMedId)
-                        .build();
-
-        Literature literature =
-                new LiteratureBuilder()
-                        .citationCrossReferencesAdd(pubmed)
-                        .citationCrossReferencesAdd(doi)
-                        .authoringGroupsAdd("group value")
-                        .title("title " + pubMedId)
-                        .authorsAdd(new AuthorBuilder("author " + pubMedId).build())
-                        .journalName("journal " + pubMedId)
-                        .firstPage("firstPage value")
-                        .lastPage("lastPage value")
-                        .volume("volume value")
-                        .literatureAbstract("literatureAbstract value")
-                        .publicationDate(new PublicationDateBuilder("2019").build())
-                        .build();
-
-        LiteratureEntry entry =
-                new LiteratureEntryBuilder()
-                        .citation(literature)
-                        .statistics(new LiteratureStatisticsBuilder().build())
-                        .build();
-
-        LiteratureStoreEntry storeEntry =
-                new LiteratureStoreEntryBuilder().literatureEntry(entry).build();
-
-        LiteratureDocument document =
-                LiteratureDocument.builder()
-                        .id(String.valueOf(pubMedId))
-                        .doi(literature.getDoiId())
-                        .title(literature.getTitle())
-                        .author(
-                                literature.getAuthors().stream()
-                                        .map(Author::getValue)
-                                        .collect(Collectors.toSet()))
-                        .journal(literature.getJournal().getName())
-                        .published(literature.getPublicationDate().getValue())
-                        .citedin(facet)
-                        .mappedin(facet)
-                        .content(Collections.singleton(String.valueOf(pubMedId)))
-                        .literatureObj(getLiteratureBinary(storeEntry))
-                        .build();
+        LiteratureDocument document = LiteratureITUtils.createSolrDoc(pubMedId, facet);
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
-    }
-
-    private ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {
-        try {
-            return ByteBuffer.wrap(
-                    LiteratureJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
-        }
     }
 
     static class LiteratureSearchParameterResolver extends AbstractSearchParameterResolver {
