@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.keyword.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.util.Collections;
 
 import org.uniprot.core.cv.go.impl.GoTermBuilder;
 import org.uniprot.core.cv.keyword.KeywordEntry;
@@ -11,15 +12,14 @@ import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 
-import java.nio.ByteBuffer;
-import java.util.Collections;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author sahmad
  * @created 21/01/2021
  */
 public class KeywordITUtils {
-    public static KeywordDocument createSolrDocument(String keywordId, boolean facet){
+    public static KeywordDocument createSolrDocument(String keywordId, boolean facet) {
         KeywordId keyword =
                 new KeywordIdBuilder().name("my keyword " + keywordId).id(keywordId).build();
         KeywordId category = new KeywordIdBuilder().name("Ligand").id("KW-9993").build();

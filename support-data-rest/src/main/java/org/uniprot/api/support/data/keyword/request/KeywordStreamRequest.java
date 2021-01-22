@@ -1,12 +1,13 @@
 package org.uniprot.api.support.data.keyword.request;
 
-import org.uniprot.api.rest.request.StreamRequest;
-
 import javax.validation.constraints.Pattern;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.uniprot.api.rest.request.StreamRequest;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad

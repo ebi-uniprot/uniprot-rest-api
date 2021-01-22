@@ -1,11 +1,5 @@
 package org.uniprot.api.support.data.disease.controller;
 
-import org.springframework.http.MediaType;
-import org.uniprot.api.rest.controller.param.ContentTypeParam;
-import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
-import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
-import org.uniprot.api.rest.output.UniProtMediaType;
-
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -16,6 +10,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.support.data.disease.controller.DiseaseSearchControllerIT.SEARCH_ACCESSION1;
 import static org.uniprot.api.support.data.disease.controller.DiseaseSearchControllerIT.SEARCH_ACCESSION2;
+
+import org.springframework.http.MediaType;
+import org.uniprot.api.rest.controller.param.ContentTypeParam;
+import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
+import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
+import org.uniprot.api.rest.output.UniProtMediaType;
 
 public class DiseaseSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
     @Override
