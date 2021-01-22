@@ -1,7 +1,9 @@
 package org.uniprot.api.support.data.literature.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
 
 import java.util.Optional;
@@ -18,14 +20,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.support.data.literature.request.LiteratureRequest;
+import org.uniprot.api.support.data.literature.request.LiteratureSearchRequest;
+import org.uniprot.api.support.data.literature.request.LiteratureStreamRequest;
 import org.uniprot.api.support.data.literature.service.LiteratureService;
 import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -136,7 +145,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> search(
-            @Valid @ModelAttribute LiteratureRequest searchRequest,
+            @Valid @ModelAttribute LiteratureSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<LiteratureEntry> results = literatureService.search(searchRequest);
@@ -163,7 +172,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                         })
             })
     @GetMapping(
-            value = "/download",
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -171,12 +180,12 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> download(
-            @Valid @ModelAttribute LiteratureRequest searchRequest,
+            @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Stream<LiteratureEntry> result = literatureService.download(searchRequest);
-        return super.stream(result, searchRequest.getFields(), contentType, request);
+        Stream<LiteratureEntry> result = literatureService.stream(streamRequest);
+        return super.stream(result, streamRequest, contentType, request);
     }
 
     @Override
