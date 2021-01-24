@@ -1,10 +1,17 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,17 +38,10 @@ import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.api.support.data.taxonomy.request.TaxonomyFacetConfig;
-import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
-import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.taxonomy.TaxonomyRank;
-import org.uniprot.core.taxonomy.impl.*;
-import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -121,59 +121,8 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     private void saveEntry(long taxId, boolean facet) {
-
-        TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
-        TaxonomyEntry taxonomyEntry =
-                entryBuilder
-                        .taxonId(taxId)
-                        .scientificName("scientific" + taxId)
-                        .mnemonic("mnemonic" + taxId)
-                        .commonName("common" + taxId)
-                        .synonymsAdd("synonym" + taxId)
-                        .otherNamesAdd("other names" + taxId)
-                        .rank(TaxonomyRank.FAMILY)
-                        .parentId(taxId - 1)
-                        .statistics(new TaxonomyStatisticsBuilder().build())
-                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
-                        .strainsAdd(new TaxonomyStrainBuilder().name("str name").build())
-                        .hostsAdd(new TaxonomyBuilder().taxonId(taxId + 2).build())
-                        .linksAdd("link value")
-                        .active(true)
-                        .inactiveReason(new TaxonomyInactiveReasonBuilder().build())
-                        .build();
-
-        TaxonomyDocument document =
-                TaxonomyDocument.builder()
-                        .id(String.valueOf(taxId))
-                        .taxId(taxId)
-                        .synonym("synonym" + taxId)
-                        .scientific("scientific" + taxId)
-                        .common("common" + taxId)
-                        .mnemonic("mnemonic" + taxId)
-                        .rank("rank")
-                        .strain(Collections.singletonList("strain"))
-                        .host(Collections.singletonList(10L))
-                        .proteome(facet)
-                        .reference(facet)
-                        .reviewed(facet)
-                        .annotated(facet)
-                        .linked(facet)
-                        .active(facet)
-                        .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
-                        .build();
-
+        TaxonomyDocument document = TaxonomyITUtils.createSolrDoc(taxId, facet);
         getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
-    }
-
-    private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
-        try {
-            return ByteBuffer.wrap(
-                    TaxonomyJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
-        }
     }
 
     static class TaxonomySearchParameterResolver extends AbstractSearchParameterResolver {

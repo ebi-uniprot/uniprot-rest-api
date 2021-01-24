@@ -1,7 +1,9 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.TAXONOMY;
 
 import java.util.Optional;
@@ -18,7 +20,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -26,7 +34,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.support.data.taxonomy.request.GetByTaxonIdsRequest;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomyRequest;
+import org.uniprot.api.support.data.taxonomy.request.TaxonomySearchRequest;
+import org.uniprot.api.support.data.taxonomy.request.TaxonomyStreamRequest;
 import org.uniprot.api.support.data.taxonomy.service.TaxonomyService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
@@ -171,7 +180,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> search(
-            @Valid @ModelAttribute TaxonomyRequest searchRequest,
+            @Valid @ModelAttribute TaxonomySearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<TaxonomyEntry> results = taxonomyService.search(searchRequest);
@@ -197,20 +206,20 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                         })
             })
     @GetMapping(
-            value = "/download",
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> download(
-            @Valid @ModelAttribute TaxonomyRequest searchRequest,
+    public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
+            @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Stream<TaxonomyEntry> result = taxonomyService.download(searchRequest);
-        return super.stream(result, searchRequest.getFields(), contentType, request);
+        Stream<TaxonomyEntry> result = taxonomyService.stream(streamRequest);
+        return super.stream(result, streamRequest, contentType, request);
     }
 
     @Override

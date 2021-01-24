@@ -18,6 +18,7 @@ import org.uniprot.core.cv.keyword.KeywordEntry;
 public class KeywordOBOMessageConverter extends AbstractOBOMessageConverter<KeywordEntry> {
 
     private static final String KEYWORD_NAMESPACE = "uniprot:keywords";
+    private static final String CATEGORY_STR = "category";
 
     public KeywordOBOMessageConverter() {
         super(KeywordEntry.class);
@@ -61,9 +62,9 @@ public class KeywordOBOMessageConverter extends AbstractOBOMessageConverter<Keyw
     @Override
     protected Frame getTypeDefStanza() {
         Frame headerFrame = new Frame(Frame.FrameType.TYPEDEF);
-        headerFrame.setId("category");
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, "category"));
-        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, "category"));
+        headerFrame.setId(CATEGORY_STR);
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, CATEGORY_STR));
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, CATEGORY_STR));
         headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_IS_CYCLIC, "false"));
         return headerFrame;
     }
@@ -97,7 +98,7 @@ public class KeywordOBOMessageConverter extends AbstractOBOMessageConverter<Keyw
     }
 
     private Clause getRelationship(KeywordEntry keywordEntry) {
-        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, "category");
+        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, CATEGORY_STR);
         clause.addValue(keywordEntry.getCategory().getId());
         return clause;
     }

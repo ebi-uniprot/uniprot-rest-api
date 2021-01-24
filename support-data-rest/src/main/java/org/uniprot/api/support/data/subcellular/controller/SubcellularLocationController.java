@@ -1,7 +1,10 @@
 package org.uniprot.api.support.data.subcellular.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.SUBCELLULAR_LOCATION;
 
 import java.util.Optional;
@@ -18,14 +21,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.support.data.subcellular.request.SubcellularLocationRequest;
+import org.uniprot.api.support.data.subcellular.request.SubcellularLocationSearchRequest;
+import org.uniprot.api.support.data.subcellular.request.SubcellularLocationStreamRequest;
 import org.uniprot.api.support.data.subcellular.service.SubcellularLocationService;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -143,7 +153,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 OBO_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> search(
-            @Valid @ModelAttribute SubcellularLocationRequest searchRequest,
+            @Valid @ModelAttribute SubcellularLocationSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<SubcellularLocationEntry> results =
@@ -172,7 +182,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                         })
             })
     @GetMapping(
-            value = "/download",
+            value = "/stream",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -182,13 +192,12 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>>
             download(
-                    @Valid @ModelAttribute SubcellularLocationRequest searchRequest,
+                    @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
                     @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                             MediaType contentType,
                     HttpServletRequest request) {
-        Stream<SubcellularLocationEntry> result =
-                subcellularLocationService.download(searchRequest);
-        return super.stream(result, searchRequest.getFields(), contentType, request);
+        Stream<SubcellularLocationEntry> result = subcellularLocationService.stream(streamRequest);
+        return super.stream(result, streamRequest, contentType, request);
     }
 
     @Override
