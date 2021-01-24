@@ -18,6 +18,7 @@ import org.uniprot.core.util.Utils;
 public class SubcellularLocationOBOMessageConverter
         extends AbstractOBOMessageConverter<SubcellularLocationEntry> {
     private static final String SUBCELLULAR_LOCATION_NAMESPACE = "uniprot:locations";
+    private static final String PART_OF_STR = "part_of";
 
     public SubcellularLocationOBOMessageConverter() {
         super(SubcellularLocationEntry.class);
@@ -67,17 +68,29 @@ public class SubcellularLocationOBOMessageConverter
         return frame;
     }
 
+    @Override
+    public String getHeaderNamespace() {
+        return SUBCELLULAR_LOCATION_NAMESPACE;
+    }
+
+    @Override
+    protected Frame getTypeDefStanza() {
+        Frame headerFrame = new Frame(Frame.FrameType.TYPEDEF);
+        headerFrame.setId(PART_OF_STR);
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_ID, PART_OF_STR));
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_NAME, PART_OF_STR));
+        headerFrame.addClause(
+                new Clause(OBOFormatConstants.OboFormatTag.TAG_IS_TRANSITIVE, "true"));
+        headerFrame.addClause(new Clause(OBOFormatConstants.OboFormatTag.TAG_IS_CYCLIC, "false"));
+        return headerFrame;
+    }
+
     private Clause getGeneOntologyXRefClause(GoTerm go) {
         Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_XREF);
         Xref xref = new Xref(go.getId());
         xref.setAnnotation(go.getName());
         clause.setValue(xref);
         return clause;
-    }
-
-    @Override
-    public String getHeaderNamespace() {
-        return SUBCELLULAR_LOCATION_NAMESPACE;
     }
 
     private Clause getSynonymClause(String synonym) {
@@ -124,7 +137,7 @@ public class SubcellularLocationOBOMessageConverter
     }
 
     private Clause getRelationshipClause(SubcellularLocationEntry partOf) {
-        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, "part_of");
+        Clause clause = new Clause(OBOFormatConstants.OboFormatTag.TAG_RELATIONSHIP, PART_OF_STR);
         clause.addValue(partOf.getId());
         return clause;
     }

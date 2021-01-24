@@ -112,4 +112,27 @@ class SubcellularLocationOBOMessageConverterTest {
         assertNotNull(oboFormatStr);
         assertEquals(expectedOutput, oboFormatStr);
     }
+
+    @Test
+    void testTypeStanza() throws IOException {
+        // when
+        SubcellularLocationOBOMessageConverter converter =
+                new SubcellularLocationOBOMessageConverter();
+        Frame typeStanza = converter.getTypeDefStanza();
+        assertNotNull(typeStanza);
+        // convert to string
+        OBOFormatWriter oboFormatWriter = new OBOFormatWriter();
+        StringWriter out = new StringWriter();
+        oboFormatWriter.write(typeStanza, new PrintWriter(out), null);
+        String typeStanzaStr = out.getBuffer().toString();
+        // verify
+        assertNotNull(typeStanzaStr);
+        assertEquals(
+                "[Typedef]\n"
+                        + "id: part_of\n"
+                        + "name: part_of\n"
+                        + "is_cyclic: false\n"
+                        + "is_transitive: true\n\n",
+                typeStanzaStr);
+    }
 }

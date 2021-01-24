@@ -1,14 +1,15 @@
 package org.uniprot.api.support.data.subcellular.request;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationRequest.java
 import javax.validation.constraints.PositiveOrZero;
+=======
+>>>>>>> use stream in keyword and location:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationBasicRequest.java
 
 import lombok.Data;
 
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
@@ -19,9 +20,12 @@ import org.uniprot.store.config.UniProtDataType;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
+/**
+ * @author sahmad
+ * @created 22/01/2021
+ */
 @Data
-public class SubcellularLocationRequest implements SearchRequest {
-
+public class SubcellularLocationBasicRequest {
     @ModelFieldMeta(
             reader = QueryFieldMetaReaderImpl.class,
             path = "subcelllocation-search-fields.json")
@@ -42,15 +46,13 @@ public class SubcellularLocationRequest implements SearchRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String sort;
 
-    @Parameter(hidden = true)
-    private String cursor;
-
     @ModelFieldMeta(
             reader = ReturnFieldMetaReaderImpl.class,
             path = "subcelllocation-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String fields;
+<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationRequest.java
 
     @Parameter(description = "Size of the result. Defaults to 25")
     @PositiveOrZero(message = "{search.positive.or.zero}")
@@ -62,4 +64,6 @@ public class SubcellularLocationRequest implements SearchRequest {
     public String getFacets() {
         return "";
     }
+=======
+>>>>>>> use stream in keyword and location:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationBasicRequest.java
 }

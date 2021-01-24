@@ -1,24 +1,27 @@
 package org.uniprot.api.support.data.taxonomy.request;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
+/**
+ * @author sahmad
+ * @created 23/01/2021
+ */
 @Data
-public class TaxonomyRequest implements SearchRequest {
-
+public class TaxonomyBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "taxonomy-search-fields.json")
     @Parameter(description = "Criteria to search taxonomies. It can take any valid solr query.")
     @NotNull(message = "{search.required}")
@@ -33,20 +36,8 @@ public class TaxonomyRequest implements SearchRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String sort;
 
-    @Parameter(hidden = true)
-    private String cursor;
-
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
-
-    @Parameter(description = "Comma separated list of facets to search")
-    @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
-    private String facets;
-
-    @Parameter(description = "Size of the result. Defaults to 25")
-    @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    private Integer size;
 }
