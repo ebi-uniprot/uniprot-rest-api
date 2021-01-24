@@ -113,22 +113,6 @@ public abstract class BasicSearchService<D extends Document, R> {
                 .limit(solrRequest.getTotalRows());
     }
 
-    /**
-     * Please replace download method with stream method
-     *
-     * @deprecated (we need to replaced by stream, remove when finished)
-     */
-    @Deprecated
-    public Stream<R> download(SearchRequest request) {
-        SolrRequest solrRequest = createDownloadSolrRequest(request);
-
-        return repository
-                .getAll(solrRequest)
-                .map(entryConverter)
-                .filter(Objects::nonNull)
-                .limit(solrRequest.getTotalRows());
-    }
-
     /*
     to create request for search api.
     include facets true for search api
