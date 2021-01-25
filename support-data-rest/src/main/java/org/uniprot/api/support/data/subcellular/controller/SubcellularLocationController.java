@@ -191,7 +191,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 OBO_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>>
-            download(
+            stream(
                     @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
                     @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                             MediaType contentType,

@@ -179,7 +179,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,

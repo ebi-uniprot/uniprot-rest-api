@@ -175,7 +175,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> stream(
             @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
