@@ -90,7 +90,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "download",
+			"name": "stream",
 			"item": [
 				{
 					"name": "Download",
@@ -112,14 +112,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/subcellularlocation/download?query={{subcellularlocation_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/subcellularlocation/stream?query={{subcellularlocation_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
 								"subcellularlocation",
-								"download"
+								"stream"
 							],
 							"query": [
 								{

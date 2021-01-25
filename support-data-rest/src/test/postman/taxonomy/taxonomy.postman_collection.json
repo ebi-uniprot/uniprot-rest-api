@@ -90,7 +90,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "download",
+			"name": "stream",
 			"item": [
 				{
 					"name": "Download taxonomy",
@@ -112,14 +112,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/taxonomy/download?query={{taxonomy_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/taxonomy/stream?query={{taxonomy_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
 								"taxonomy",
-								"download"
+								"stream"
 							],
 							"query": [
 								{
