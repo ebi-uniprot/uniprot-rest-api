@@ -190,12 +190,11 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>>
-            stream(
-                    @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
-                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                            MediaType contentType,
-                    HttpServletRequest request) {
+    public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>> stream(
+            @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    MediaType contentType,
+            HttpServletRequest request) {
         Stream<SubcellularLocationEntry> result = subcellularLocationService.stream(streamRequest);
         return super.stream(result, streamRequest, contentType, request);
     }
