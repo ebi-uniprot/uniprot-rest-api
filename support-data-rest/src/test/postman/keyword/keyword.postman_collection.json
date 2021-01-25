@@ -90,7 +90,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "download",
+			"name": "stream",
 			"item": [
 				{
 					"name": "Download keyword",
@@ -112,14 +112,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/keyword/download?query={{keyword_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/keyword/stream?query={{keyword_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
 								"keyword",
-								"download"
+								"stream"
 							],
 							"query": [
 								{
