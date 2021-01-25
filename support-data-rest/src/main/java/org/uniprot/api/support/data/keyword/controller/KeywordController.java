@@ -166,9 +166,10 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> download(
+    public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> stream(
             @Valid @ModelAttribute KeywordStreamRequest searchRequest, HttpServletRequest request) {
         Stream<KeywordEntry> result = keywordService.stream(searchRequest);
         return super.stream(result, searchRequest, getAcceptHeader(request), request);
