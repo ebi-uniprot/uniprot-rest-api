@@ -170,12 +170,17 @@ class StoreStreamerIT {
         StreamerConfigProperties streamConfig = new StreamerConfigProperties();
         streamConfig.setIdFieldName(ID);
         streamConfig.setStoreBatchSize(STORE_BATCH_SIZE);
-
+        DocumentIdStream idStream =
+                TupleStreamDocumentIdStream.builder()
+                        .tupleStreamTemplate(mockTupleStreamTemplate)
+                        .streamConfig(streamConfig)
+                        .build();
         return StoreStreamer.<String>builder()
                 .streamConfig(streamConfig)
                 .tupleStreamTemplate(mockTupleStreamTemplate)
                 .storeClient(fakeStore)
                 .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
+                .documentIdStream(idStream)
                 .build();
     }
 
