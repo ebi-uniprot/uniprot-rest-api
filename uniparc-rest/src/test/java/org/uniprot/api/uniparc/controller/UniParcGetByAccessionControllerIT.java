@@ -76,14 +76,17 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
             idParam.resultMatcher(
                     jsonPath("$.uniParcCrossReferences[*].lastUpdated", notNullValue()));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()));
+            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()));
             idParam.resultMatcher(
-                    jsonPath("$.uniParcCrossReferences[*].properties", notNullValue()));
+                    jsonPath("$.uniParcCrossReferences[*].proteinName", notNullValue()));
+            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].geneName", notNullValue()));
             idParam.resultMatcher(
-                    jsonPath("$.uniParcCrossReferences[0].properties", iterableWithSize(4)));
+                    jsonPath("$.uniParcCrossReferences[*].proteomeId", notNullValue()));
             idParam.resultMatcher(
-                    jsonPath("$.uniParcCrossReferences[*].properties[*].key", notNullValue()));
+                    jsonPath("$.uniParcCrossReferences[*].component", notNullValue()));
             idParam.resultMatcher(
-                    jsonPath("$.uniParcCrossReferences[*].properties[*].value", notNullValue()));
+                    jsonPath("$.uniParcCrossReferences[*].proteomeId", notNullValue()));
+            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].chain", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequence", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequence.value", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequence.length", notNullValue()));
@@ -104,9 +107,6 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     jsonPath("$.sequenceFeatures[*].interproGroup.id", notNullValue()));
             idParam.resultMatcher(
                     jsonPath("$.sequenceFeatures[*].interproGroup.name", notNullValue()));
-            idParam.resultMatcher(jsonPath("$.taxonomies", iterableWithSize(2)));
-            idParam.resultMatcher(jsonPath("$.taxonomies[*].scientificName", notNullValue()));
-            idParam.resultMatcher(jsonPath("$.taxonomies[*].taxonId", notNullValue()));
             return idParam.build();
         }
 
@@ -139,8 +139,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     .id(ACCESSION)
                     .fields("upi,organism")
                     .resultMatcher(jsonPath("$.uniParcId", Matchers.is(UNIPARC_ID)))
-                    .resultMatcher(jsonPath("$.taxonomies").exists())
-                    .resultMatcher(jsonPath("$.uniParcCrossReferences").doesNotExist())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.taxonomy").exists())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .build();
@@ -204,7 +203,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                                             content()
                                                     .string(
                                                             Matchers.containsString(
-                                                                    "UPI0000083D01\tHomo sapiens; Torpedo californica\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
+                                                                    "UPI0000083D01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

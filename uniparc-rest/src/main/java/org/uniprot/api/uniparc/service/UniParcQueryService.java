@@ -25,9 +25,9 @@ import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
-import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
@@ -162,7 +162,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         List<String> toxonomyIds = csvToList(request.getTaxonIds());
         // converters
         UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
-        UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
+        UniParcCrossReferenceTaxonomyFilter taxonFilter = new UniParcCrossReferenceTaxonomyFilter();
         UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
 
         // filter the results

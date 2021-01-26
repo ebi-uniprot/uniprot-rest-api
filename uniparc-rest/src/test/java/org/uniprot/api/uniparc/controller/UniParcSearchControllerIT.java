@@ -1,14 +1,9 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +34,9 @@ import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.repository.store.UniParcStoreClient;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
+import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
@@ -148,6 +145,19 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(11);
         saveEntry(20);
+        if (SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
+            UniParcEntry entry = createEntry(30, UPI_PREF);
+            UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_BACTERIA));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EMBL));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EMBL));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.REFSEQ));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_FUNGI));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_METAZOA));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_PLANTS));
+            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_PROTISTS));
+            saveEntry(builder.build());
+        }
     }
 
     @Override
@@ -156,7 +166,11 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
     }
 
     private void saveEntry(int i) {
-        UniParcEntry entry = UniParcControllerITUtils.createEntry(i, UPI_PREF);
+        UniParcEntry entry = createEntry(i, UPI_PREF);
+        saveEntry(entry);
+    }
+
+    private void saveEntry(UniParcEntry entry) {
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
 
@@ -253,12 +267,16 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
                     .resultMatcher(
-                            jsonPath(
-                                            "$.results[*].uniParcCrossReferences[*].properties[?(@.key=='gene_name')]")
+                            jsonPath("$.results[*].uniParcCrossReferences[*].geneName")
                                     .hasJsonPath())
+                    .resultMatcher(
+                            jsonPath("$.results[*].uniParcCrossReferences[*].taxonomy")
+                                    .doesNotExist())
+                    .resultMatcher(
+                            jsonPath("$.results[*].uniParcCrossReferences[*].proteinName")
+                                    .doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
-                    .resultMatcher(jsonPath("$.results[*].taxonomies").doesNotExist())
                     .build();
         }
 
@@ -270,15 +288,16 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].uniParcId",
-                                    contains("UPI0000083A11", "UPI0000083A20")))
+                                    contains("UPI0000083A11", "UPI0000083A20", "UPI0000083A30")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.value", contains("uniprot")))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.count", contains(2)))
+                    .resultMatcher(jsonPath("$.facets[0].values.size()", is(8)))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.value", hasItem("uniprot")))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.count", hasItem(3)))
                     .resultMatcher(
                             jsonPath(
                                     "$.facets[1].values.*.value",
                                     contains("Homo sapiens", "Torpedo californica")))
-                    .resultMatcher(jsonPath("$.facets[1].values.*.count", contains(2, 2)))
+                    .resultMatcher(jsonPath("$.facets[1].values.*.count", contains(3, 3)))
                     .build();
         }
     }
@@ -326,12 +345,12 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083A11	Homo sapiens; Torpedo californica	P10011; P12311	2017-02-12	2017-04-23	21")))
+                                                                    "UPI0000083A11	Name 7787; Name 9606	P10011; P12311	2017-02-12	2017-04-23	21")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083A20	Homo sapiens; Torpedo californica	P10020; P12320	2017-02-12	2017-04-23	30")))
+                                                                    "UPI0000083A20	Name 7787; Name 9606	P10020; P12320	2017-02-12	2017-04-23	30")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
