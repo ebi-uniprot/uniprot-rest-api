@@ -14,6 +14,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.common.repository.store.TupleStreamRDFStreamer;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
@@ -51,7 +52,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final UniParcQueryResultConverter entryConverter;
     private final QueryProcessor queryProcessor;
     private final SolrQueryConfig solrQueryConfig;
-    private final StoreStreamer<UniParcEntry> storeStreamer;
+    private final TupleStreamRDFStreamer uniParcRDFStreamer;
 
     @Autowired
     public UniParcQueryService(
@@ -62,7 +63,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             StoreStreamer<UniParcEntry> storeStreamer,
             SolrQueryConfig uniParcSolrQueryConf,
             QueryProcessor uniParcQueryProcessor,
-            SearchFieldConfig uniParcSearchFieldConfig) {
+            SearchFieldConfig uniParcSearchFieldConfig,
+            TupleStreamRDFStreamer uniParcRDFStreamer) {
 
         super(
                 repository,
@@ -76,7 +78,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
         this.solrQueryConfig = uniParcSolrQueryConf;
-        this.storeStreamer = storeStreamer;
+        this.uniParcRDFStreamer = uniParcRDFStreamer;
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
@@ -126,7 +128,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     public Stream<String> streamRDF(UniParcStreamRequest streamRequest) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+        return this.uniParcRDFStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override
