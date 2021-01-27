@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.rdf;
 
 import java.util.stream.Stream;
 
@@ -6,6 +6,7 @@ import lombok.Builder;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.rest.service.RDFService;
 
 /**

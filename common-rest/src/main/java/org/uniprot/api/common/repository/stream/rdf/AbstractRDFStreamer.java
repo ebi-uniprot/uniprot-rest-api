@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.rdf;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +11,7 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
 import org.uniprot.api.rest.service.RDFService;
 
 /**
@@ -64,7 +65,7 @@ public abstract class AbstractRDFStreamer {
         }
 
         @Override
-        List<String> convertBatch(List<String> batch) {
+        protected List<String> convertBatch(List<String> batch) {
             return Failsafe.with(retryPolicy)
                     .onFailure(
                             throwable ->

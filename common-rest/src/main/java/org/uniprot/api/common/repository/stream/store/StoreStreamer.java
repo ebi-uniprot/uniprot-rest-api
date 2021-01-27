@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.store;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -12,6 +12,9 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.stream.common.TupleStreamIterable;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
 /**
