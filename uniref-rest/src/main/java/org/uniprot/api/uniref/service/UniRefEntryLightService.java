@@ -73,9 +73,9 @@ public class UniRefEntryLightService
         // clean unirefLight entry
         UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entryLight);
 
-        //seedId can be size 1 (for UniParc Members. Example: UPI0005EFF57F)
+        // seedId can be size 1 (for UniParc Members. Example: UPI0005EFF57F)
         // or size2 (for UniProtMembers, Example: "FGFR2_HUMAN,P21802").
-        //In this case bellow we need the UniParcId or Accession to display
+        // In this case bellow we need the UniParcId or Accession to display
         // in the search result (always the last index)
         String[] splittedSeed = entryLight.getSeedId().split(",");
         builder.seedId(splittedSeed[splittedSeed.length - 1]);
