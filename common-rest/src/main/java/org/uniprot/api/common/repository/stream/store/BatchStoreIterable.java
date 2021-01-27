@@ -1,10 +1,11 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.store;
 
 import java.util.List;
 
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
 public class BatchStoreIterable<T> extends BatchIterable<T> {
@@ -22,7 +23,7 @@ public class BatchStoreIterable<T> extends BatchIterable<T> {
     }
 
     @Override
-    List<T> convertBatch(List<String> batch) {
+    protected List<T> convertBatch(List<String> batch) {
         return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(batch));
     }
 }

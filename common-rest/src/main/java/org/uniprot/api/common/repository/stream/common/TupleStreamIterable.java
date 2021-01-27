@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.common;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -20,7 +20,7 @@ import org.apache.solr.client.solrj.io.stream.TupleStream;
  *
  * @author Edd
  */
-class TupleStreamIterable implements Iterable<String> {
+public class TupleStreamIterable implements Iterable<String> {
     private static final int MAX_RETRIES = 5;
     private static final int DELAY = 500;
     private final TupleStream tupleStream;
@@ -30,7 +30,7 @@ class TupleStreamIterable implements Iterable<String> {
     private Tuple next = current;
     private boolean atEnd = false;
 
-    TupleStreamIterable(TupleStream tupleStream, String id) {
+    public TupleStreamIterable(TupleStream tupleStream, String id) {
         this.tupleStream = tupleStream;
         this.id = id;
         retryPolicy =

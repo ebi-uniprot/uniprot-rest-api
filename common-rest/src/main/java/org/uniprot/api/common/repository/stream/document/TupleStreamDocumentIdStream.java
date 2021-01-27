@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.document;
 
 import java.io.IOException;
 import java.util.stream.Stream;
@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.stream.common.TupleStreamIterable;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 
 /**
  * @author sahmad

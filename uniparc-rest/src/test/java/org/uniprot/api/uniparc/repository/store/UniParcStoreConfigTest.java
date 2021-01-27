@@ -3,7 +3,7 @@ package org.uniprot.api.uniparc.repository.store;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.common.repository.store.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 
 /**
  * @author sahmad
