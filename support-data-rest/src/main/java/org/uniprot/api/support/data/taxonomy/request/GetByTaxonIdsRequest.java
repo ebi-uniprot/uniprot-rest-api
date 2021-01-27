@@ -61,7 +61,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
             message = "{search.taxonomy.invalid.download}")
     private String download;
 
-    @Positive(message = "{search.positive}")
+    @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     @Parameter(description = "Size of the result. Defaults to number of ids passed.")
     private Integer size;

@@ -98,6 +98,7 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
                         .perform(
                                 get(getSearchRequestPath())
                                         .param("query", "*:*")
+                                        .param("size", "0")
                                         .param("facets", facetField)
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -105,7 +106,7 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
                 .andExpect(jsonPath("$.facets.*.name", contains(facetField)));
     }
