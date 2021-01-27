@@ -5,13 +5,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyIterable;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.uniprot.api.common.repository.stream.store.TupleStreamUtils.tupleStream;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +19,6 @@ import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +27,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.OngoingStubbing;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
@@ -189,36 +184,6 @@ class StoreStreamerIT {
                 .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
                 .documentIdStream(idStream)
                 .build();
-    }
-
-    private TupleStream tupleStream(Collection<String> values) {
-        TupleStream mockTupleStream = mock(TupleStream.class);
-
-        try {
-            OngoingStubbing<Tuple> ongoingStubbing = lenient().when(mockTupleStream.read());
-            for (String value : values) {
-                log.debug("hello " + value);
-                ongoingStubbing = ongoingStubbing.thenReturn(tuple(value));
-            }
-
-            ongoingStubbing.thenReturn(endTuple());
-        } catch (IOException e) {
-            log.error("Error when tupleStream", e);
-        }
-
-        return mockTupleStream;
-    }
-
-    private Tuple tuple(String accession) {
-        Map<String, String> valueMap = new HashMap<>();
-        valueMap.put(ID, accession);
-        return new Tuple(valueMap);
-    }
-
-    private Tuple endTuple() {
-        Map<String, String> eofMap = new HashMap<>();
-        eofMap.put("EOF", "");
-        return new Tuple(eofMap);
     }
 
     private FakeDocument doc(int id) {
