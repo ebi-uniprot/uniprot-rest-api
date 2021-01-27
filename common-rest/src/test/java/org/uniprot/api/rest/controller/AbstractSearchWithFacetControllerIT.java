@@ -108,7 +108,9 @@ public abstract class AbstractSearchWithFacetControllerIT extends AbstractSearch
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
-                .andExpect(jsonPath("$.facets.*.name", contains(facetField)));
+                .andExpect(jsonPath("$.facets.*.name", contains(facetField)))
+                .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
     }
 
     protected abstract List<String> getAllFacetFields();
