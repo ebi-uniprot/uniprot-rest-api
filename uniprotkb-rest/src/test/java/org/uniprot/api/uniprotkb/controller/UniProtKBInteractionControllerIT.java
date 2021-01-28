@@ -5,8 +5,11 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import java.util.HashMap;
 
@@ -121,7 +124,7 @@ class UniProtKBInteractionControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print()).andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+        response.andDo(log()).andExpect(status().is(HttpStatus.NO_CONTENT.value()));
     }
 
     @Test
@@ -133,7 +136,7 @@ class UniProtKBInteractionControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -184,7 +187,7 @@ class UniProtKBInteractionControllerIT {
                                 .header(ACCEPT, APPLICATION_XML_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
                 .andExpect(xpath("//InteractionEntry").exists())
@@ -235,7 +238,7 @@ class UniProtKBInteractionControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        response.andDo(log()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
@@ -249,7 +252,7 @@ class UniProtKBInteractionControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print()).andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        response.andDo(log()).andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 
     private void saveScenarios() {

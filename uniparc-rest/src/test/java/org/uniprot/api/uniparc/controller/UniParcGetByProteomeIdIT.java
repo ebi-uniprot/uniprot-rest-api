@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -64,7 +64,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -153,7 +153,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("size", String.valueOf(size)));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -186,7 +186,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
 
         // then verify second page
         responsePage2
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -220,7 +220,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
 
         // then verify third page
         responsePage3
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -247,7 +247,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))

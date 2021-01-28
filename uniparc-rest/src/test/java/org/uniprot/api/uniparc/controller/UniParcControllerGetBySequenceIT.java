@@ -2,7 +2,7 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
@@ -117,7 +117,7 @@ class UniParcControllerGetBySequenceIT {
                         MockMvcRequestBuilders.get(getBySequencePath).param("sequence", "AAAAAA"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -133,7 +133,7 @@ class UniParcControllerGetBySequenceIT {
                         MockMvcRequestBuilders.get(getBySequencePath).param("dbTypes", "invalid"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -165,7 +165,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -188,7 +188,7 @@ class UniParcControllerGetBySequenceIT {
                         MockMvcRequestBuilders.get(getBySequencePath).param("sequence", SEQUENCE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -241,7 +241,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("fields", "sequence,organism"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -262,7 +262,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -290,7 +290,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -314,7 +314,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("taxonIds", taxonIds));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -340,7 +340,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -369,7 +369,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
