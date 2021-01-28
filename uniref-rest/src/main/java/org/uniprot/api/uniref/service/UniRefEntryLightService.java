@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.stream.rdf.TupleStreamRDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -37,13 +37,12 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 public class UniRefEntryLightService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
     private final SolrQueryConfig solrQueryConfig;
-    private final StoreStreamer<UniRefEntryLight> storeStreamer;
     private static final int ID_LIMIT = 10;
     public static final String UNIREF_ID = "id";
     public static final String UNIREF_UPI = "upi";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
-    private final TupleStreamRDFStreamer uniRefRDFStreamer;
+    private final RDFStreamer uniRefRDFStreamer;
 
     @Autowired
     public UniRefEntryLightService(
@@ -55,7 +54,7 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             QueryProcessor uniRefQueryProcessor,
             SearchFieldConfig uniRefSearchFieldConfig,
-            TupleStreamRDFStreamer uniRefRDFStreamer) {
+            RDFStreamer uniRefRDFStreamer) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -66,7 +65,6 @@ public class UniRefEntryLightService
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.queryProcessor = uniRefQueryProcessor;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.storeStreamer = storeStreamer;
         this.uniRefRDFStreamer = uniRefRDFStreamer;
     }
 

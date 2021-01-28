@@ -15,14 +15,13 @@ import org.uniprot.store.search.document.Document;
  */
 @Builder
 public class DefaultDocumentIdStream<D extends Document> implements DocumentIdStream {
-    private SolrQueryRepository<D> repository;
-    private Function<D, String> documentToId;
+    private final SolrQueryRepository<D> repository;
+    private final Function<D, String> documentToId;
 
     @Override
     public Stream<String> fetchIds(SolrRequest solrRequest) {
-        Stream<String> idsStream =
-                repository.getAll(solrRequest).map(documentToId).limit(solrRequest.getTotalRows());
-
-        return idsStream;
+        return repository.getAll(solrRequest)
+                .map(documentToId)
+                .limit(solrRequest.getTotalRows());
     }
 }

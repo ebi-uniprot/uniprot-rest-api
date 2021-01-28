@@ -9,8 +9,8 @@ import org.uniprot.api.common.repository.stream.common.BatchIterable;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
 public class BatchStoreIterable<T> extends BatchIterable<T> {
-    private UniProtStoreClient<T> storeClient;
-    private RetryPolicy<Object> retryPolicy;
+    private final UniProtStoreClient<T> storeClient;
+    private final RetryPolicy<Object> retryPolicy;
 
     public BatchStoreIterable(
             Iterable<String> sourceIterable,

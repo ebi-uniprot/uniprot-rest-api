@@ -21,7 +21,7 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
-import org.uniprot.api.common.repository.stream.rdf.TupleStreamRDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -62,7 +62,7 @@ public class UniProtEntryService
     private final FacetTupleStreamTemplate facetTupleStreamTemplate;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final QueryProcessor queryProcessor;
-    private final TupleStreamRDFStreamer uniProtRDFStreamer;
+    private final RDFStreamer uniProtRDFStreamer;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -76,7 +76,7 @@ public class UniProtEntryService
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             QueryProcessor uniProtKBQueryProcessor,
             SearchFieldConfig uniProtKBSearchFieldConfig,
-            TupleStreamRDFStreamer uniProtRDFStreamer) {
+            RDFStreamer uniProtRDFStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,

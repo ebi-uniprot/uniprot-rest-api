@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.common.BatchIterable;
+import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
 import org.uniprot.api.rest.service.RDFService;
 
 /**
@@ -19,20 +20,23 @@ import org.uniprot.api.rest.service.RDFService;
  * @created 26/01/2021
  */
 @Slf4j
-@AllArgsConstructor
-public abstract class AbstractRDFStreamer {
+@Builder
+public class RDFStreamer {
     private final RDFService<String> rdfService;
     private final RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
     private final String rdfProlog; // rdf prefix
-    private final int rdfBatchSize; // number of accession in rdf rest request
+    private final int rdfBatchSize;
+    private final DocumentIdStream idStream; // number of accession in rdf rest request
 
-    protected abstract Stream<String> fetchIds(SolrRequest solrRequest);
+    protected Stream<String> fetchIds(SolrRequest solrRequest) {
+        return idStream.fetchIds(solrRequest);
+    }
 
     public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
         Stream<String> idsStream = fetchIds(solrRequest);
 
-        AbstractRDFStreamer.BatchRDFStoreIterable batchRDFStoreIterable =
-                new AbstractRDFStreamer.BatchRDFStoreIterable(
+        RDFStreamer.BatchRDFStoreIterable batchRDFStoreIterable =
+                new RDFStreamer.BatchRDFStoreIterable(
                         idsStream::iterator, rdfService, rdfFetchRetryPolicy, rdfBatchSize);
 
         Stream<String> rdfStringStream =
