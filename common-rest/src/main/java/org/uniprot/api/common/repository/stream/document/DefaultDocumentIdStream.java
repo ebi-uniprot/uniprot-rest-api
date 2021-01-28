@@ -20,8 +20,6 @@ public class DefaultDocumentIdStream<D extends Document> implements DocumentIdSt
 
     @Override
     public Stream<String> fetchIds(SolrRequest solrRequest) {
-        return repository.getAll(solrRequest)
-                .map(documentToId)
-                .limit(solrRequest.getTotalRows());
+        return repository.getAll(solrRequest).map(documentToId).limit(solrRequest.getTotalRows());
     }
 }

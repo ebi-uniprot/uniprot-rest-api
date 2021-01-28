@@ -25,8 +25,8 @@ public class RDFStreamer {
     private final RDFService<String> rdfService;
     private final RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
     private final String rdfProlog; // rdf prefix
-    private final int rdfBatchSize;
-    private final DocumentIdStream idStream; // number of accession in rdf rest request
+    private final int rdfBatchSize; // number of accession in rdf rest request
+    private final DocumentIdStream idStream;
 
     protected Stream<String> fetchIds(SolrRequest solrRequest) {
         return idStream.fetchIds(solrRequest);
