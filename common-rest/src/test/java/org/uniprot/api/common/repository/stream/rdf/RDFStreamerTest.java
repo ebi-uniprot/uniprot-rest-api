@@ -25,6 +25,7 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
 import org.uniprot.api.common.repository.stream.document.TestDocument;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
@@ -66,7 +67,7 @@ class RDFStreamerTest {
         TestDocument doc5 = new TestDocument("5", "name5");
         when(repository.getAll(solrRequest)).thenReturn(Stream.of(doc1, doc2, doc3, doc4, doc5));
 
-        DefaultDocumentIdStream<TestDocument> idStream =
+        DocumentIdStream idStream =
                 DefaultDocumentIdStream.<TestDocument>builder()
                         .documentToId(TestDocument::getDocumentId)
                         .repository(repository)
@@ -107,7 +108,7 @@ class RDFStreamerTest {
     void testEmptyResponse() {
         when(repository.getAll(any())).thenReturn(Stream.empty());
 
-        DefaultDocumentIdStream<TestDocument> idStream =
+        DocumentIdStream idStream =
                 DefaultDocumentIdStream.<TestDocument>builder()
                         .documentToId(TestDocument::getDocumentId)
                         .repository(repository)
@@ -145,9 +146,8 @@ class RDFStreamerTest {
         builder.rdfProlog(RDF_PRELOG).rdfBatchSize(2).rdfService(rdfService);
         // then
         RDFStreamer rdfStreamer = builder.build();
-        Assertions.assertThrows(
-                RestClientException.class,
-                () -> rdfStreamer.idsToRDFStoreStream(solrRequest).collect(Collectors.toList()));
+        Stream<String> idsStream = rdfStreamer.idsToRDFStoreStream(solrRequest);
+        Assertions.assertThrows(RestClientException.class, () -> idsStream.count());
     }
 
     @Test
@@ -162,7 +162,7 @@ class RDFStreamerTest {
         streamConfig.setIdFieldName("id");
         streamConfig.setStoreBatchSize(10);
 
-        TupleStreamDocumentIdStream idStream =
+        DocumentIdStream idStream =
                 TupleStreamDocumentIdStream.builder()
                         .tupleStreamTemplate(mockTupleStreamTemplate)
                         .streamConfig(streamConfig)
