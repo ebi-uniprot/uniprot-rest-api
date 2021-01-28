@@ -67,7 +67,7 @@ import org.uniprot.store.search.SolrCollection;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefLightSearchController.class)
+@WebMvcTest(UniRefEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
@@ -136,7 +136,10 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
-                .andExpect(jsonPath("$.results[*].representativeId", contains("P12301")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].representativeMember.accessions",
+                                contains(contains("P12301"))))
                 .andExpect(jsonPath("$.results[*].seedId", contains("P12301")))
                 .andExpect(jsonPath("$.results[*].members.size()", contains(10)))
                 .andExpect(
@@ -460,12 +463,12 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    ">UniRef50_P03911 MoeK5 11 n=2 Tax=Homo sapiens TaxID=9606 RepID=P12311_HUMAN")))
+                                                                    ">UniRef50_P03911 some protein name n=2 Tax=Homo sapiens TaxID=9606 RepID=P12311_HUMAN")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    ">UniRef50_P03911 MoeK5 11 n=2 Tax=Homo sapiens TaxID=9606 RepID=P12311_HUMAN")))
+                                                                    ">UniRef50_P03920 some protein name n=2 Tax=Homo sapiens TaxID=9606 RepID=P12320_HUMAN")))
                                     .build())
                     .build();
         }
