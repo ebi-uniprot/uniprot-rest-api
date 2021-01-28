@@ -19,8 +19,8 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
-import org.uniprot.api.common.repository.stream.rdf.TupleStreamRDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
@@ -97,7 +97,7 @@ public class UniParcStreamConfig {
     }
 
     @Bean
-    public TupleStreamRDFStreamer uniParcRDFStreamer(
+    public RDFStreamer uniParcRDFStreamer(
             @Qualifier("rdfRestTemplate") RestTemplate restTemplate,
             TupleStreamDocumentIdStream documentIdStream) {
 
@@ -114,7 +114,7 @@ public class UniParcStreamConfig {
                                                 "Call to RDF server failed. Failure #{}. Retrying...",
                                                 e.getAttemptCount()));
 
-        return TupleStreamRDFStreamer.builder()
+        return RDFStreamer.builder()
                 .rdfBatchSize(rdfConfigProperties().getBatchSize())
                 .rdfFetchRetryPolicy(rdfRetryPolicy)
                 .rdfService(new RDFService<>(restTemplate, String.class))

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.stream.rdf.TupleStreamRDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
@@ -52,7 +52,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final UniParcQueryResultConverter entryConverter;
     private final QueryProcessor queryProcessor;
     private final SolrQueryConfig solrQueryConfig;
-    private final TupleStreamRDFStreamer uniParcRDFStreamer;
+    private final RDFStreamer uniParcRDFStreamer;
 
     @Autowired
     public UniParcQueryService(
@@ -64,7 +64,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             QueryProcessor uniParcQueryProcessor,
             SearchFieldConfig uniParcSearchFieldConfig,
-            TupleStreamRDFStreamer uniParcRDFStreamer) {
+            RDFStreamer uniParcRDFStreamer) {
 
         super(
                 repository,
