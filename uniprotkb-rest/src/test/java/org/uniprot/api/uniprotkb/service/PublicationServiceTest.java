@@ -77,7 +77,7 @@ class PublicationServiceTest {
                                         .publicationMappedReferences(
                                                 asBinary(
                                                         new MappedPublicationsBuilder()
-                                                                .reviewedMappedReference(ref)
+                                                                .uniProtKBMappedReference(ref)
                                                                 .build()))
                                         .pubMedId("2")
                                         .build()),

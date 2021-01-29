@@ -1,16 +1,7 @@
 package org.uniprot.api.uniprotkb.service;
 
-import static org.uniprot.core.util.Utils.addOrIgnoreNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.json.parser.publication.MappedPublicationsJsonConfig;
@@ -21,7 +12,14 @@ import org.uniprot.core.publication.UniProtKBMappedReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.publication.PublicationDocument;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
+import static org.uniprot.core.util.Utils.addOrIgnoreNull;
 
 /**
  * Created 07/01/2021
@@ -50,15 +48,9 @@ public class PublicationConverter
             extractObject(pubDocument)
                     .ifPresent(
                             mappedPublications -> {
-                                boolean citationWasAdded =
-                                        addCitationIfPresent(
-                                                mappedPublications::getReviewedMappedReference,
-                                                pubEntryBuilder);
-                                if (!citationWasAdded) {
-                                    addCitationIfPresent(
-                                            mappedPublications::getUnreviewedMappedReference,
-                                            pubEntryBuilder);
-                                }
+                                addCitationIfPresent(
+                                        mappedPublications::getUniProtKBMappedReference,
+                                        pubEntryBuilder);
                             });
         }
 
@@ -67,8 +59,7 @@ public class PublicationConverter
                         mappedPubs -> {
                             List<MappedReference> mappedRefs = new ArrayList<>();
 
-                            addOrIgnoreNull(mappedPubs.getReviewedMappedReference(), mappedRefs);
-                            addOrIgnoreNull(mappedPubs.getUnreviewedMappedReference(), mappedRefs);
+                            addOrIgnoreNull(mappedPubs.getUniProtKBMappedReference(), mappedRefs);
 
                             addIfPresent(mappedPubs.getComputationalMappedReferences(), mappedRefs);
                             addIfPresent(mappedPubs.getCommunityMappedReferences(), mappedRefs);
