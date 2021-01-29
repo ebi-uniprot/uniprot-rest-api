@@ -93,7 +93,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].name", Matchers.containsString(searchString)));
@@ -119,7 +119,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].acronym", Matchers.equalTo(searchString)));
@@ -144,7 +144,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -173,7 +173,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -202,7 +202,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -229,7 +229,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].id", Matchers.equalTo(searchString)));
@@ -274,7 +274,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].name", Matchers.containsString(searchString)));
@@ -299,7 +299,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[0].acronym", Matchers.equalTo(searchString)));
@@ -324,7 +324,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -350,7 +350,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -378,7 +378,7 @@ class DiseaseControllerSearchTestIT {
         Assertions.assertEquals(1, results.length());
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -422,7 +422,7 @@ class DiseaseControllerSearchTestIT {
                                 .param("query", "acronym:" + searchString));
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         jsonPath(
@@ -443,7 +443,7 @@ class DiseaseControllerSearchTestIT {
                                 .param("query", "id:" + accession));
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.id", Matchers.contains(accession)));

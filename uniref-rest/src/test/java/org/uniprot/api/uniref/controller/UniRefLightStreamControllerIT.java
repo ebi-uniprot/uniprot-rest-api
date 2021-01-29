@@ -166,8 +166,10 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                                         "UniRef50_P03904",
                                         "UniRef90_P03904",
                                         "UniRef100_P03904")))
-                .andExpect(jsonPath("$.results[0].representativeId", is("P12301")))
-                .andExpect(jsonPath("$.results[0].representativeId", is("P12301")));
+                .andExpect(
+                        jsonPath("$.results[0].representativeMember.accessions[0]", is("P12301")))
+                .andExpect(
+                        jsonPath("$.results[0].representativeMember.memberId", is("P12301_HUMAN")));
     }
 
     @Test
@@ -286,7 +288,10 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.id",
                                 containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
-                .andExpect(jsonPath("$.results.*.sequenceLength", contains(66, 66)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.representativeMember.sequence.length",
+                                contains(66, 66)))
                 .andExpect(jsonPath("$.results.*.organisms[0].taxonId", hasItem(is(9600))))
                 .andExpect(jsonPath("$.results.*.organisms.*.scientificName").doesNotExist())
                 .andExpect(jsonPath("$.results.*.name").doesNotExist());

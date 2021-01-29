@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.common;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -7,7 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -27,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Edd
  */
 @ExtendWith(MockitoExtension.class)
-class TupleStreamIterableTest {
+class TupleStreamIterableIT {
     private static final String ID = "id";
 
     @Mock private TupleStream tupleStream;

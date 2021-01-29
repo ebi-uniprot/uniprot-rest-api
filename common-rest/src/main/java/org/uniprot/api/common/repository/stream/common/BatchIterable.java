@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,5 +38,5 @@ public abstract class BatchIterable<T> implements Iterable<Collection<T>> {
         };
     }
 
-    abstract List<T> convertBatch(List<String> batch);
+    protected abstract List<T> convertBatch(List<String> batch);
 }

@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.repository.search.facet.*;
-import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefMemberIdType;
 import org.uniprot.core.util.Utils;
 
@@ -74,31 +73,37 @@ public class UniRefEntryFacetConfig extends FacetConfig {
                         memberValue -> filterUniProtMemberTypeValue(filterValue, memberValue));
             }
         }
-        return result.stream().map(memberId -> memberId.split(",")[0]).collect(Collectors.toList());
+        return result;
     }
 
-    static List<Facet> getFacets(UniRefEntryLight uniRefEntryLight) {
+    static List<Facet> getFacets(List<String> members, String facetNames) {
         List<Facet> results = new ArrayList<>();
-        Facet memberType =
-                Facet.builder()
-                        .label(UniRefEntryFacet.MEMBER_ID_TYPE.getLabel())
-                        .name(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName())
-                        .allowMultipleSelection(false)
-                        .values(getMemberTypeValues(uniRefEntryLight.getMembers()))
-                        .build();
-        if (Utils.notNullNotEmpty(memberType.getValues())) {
-            results.add(memberType);
+        if (Utils.notNullNotEmpty(facetNames)
+                && facetNames.contains(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName())) {
+            Facet memberType =
+                    Facet.builder()
+                            .label(UniRefEntryFacet.MEMBER_ID_TYPE.getLabel())
+                            .name(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName())
+                            .allowMultipleSelection(false)
+                            .values(getMemberTypeValues(members))
+                            .build();
+            if (Utils.notNullNotEmpty(memberType.getValues())) {
+                results.add(memberType);
+            }
         }
 
-        Facet uniProtMemberType =
-                Facet.builder()
-                        .label(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getLabel())
-                        .name(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName())
-                        .allowMultipleSelection(false)
-                        .values(getUniProtMemberTypeValues(uniRefEntryLight.getMembers()))
-                        .build();
-        if (Utils.notNullNotEmpty(uniProtMemberType.getValues())) {
-            results.add(uniProtMemberType);
+        if (Utils.notNullNotEmpty(facetNames)
+                && facetNames.contains(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName())) {
+            Facet uniProtMemberType =
+                    Facet.builder()
+                            .label(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getLabel())
+                            .name(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName())
+                            .allowMultipleSelection(false)
+                            .values(getUniProtMemberTypeValues(members))
+                            .build();
+            if (Utils.notNullNotEmpty(uniProtMemberType.getValues())) {
+                results.add(uniProtMemberType);
+            }
         }
 
         return results;
@@ -117,9 +122,9 @@ public class UniRefEntryFacetConfig extends FacetConfig {
         UniRefMemberIdType memberType = UniRefMemberIdType.fromMemberTypeId(memberTypeId);
 
         boolean shouldRemove = true;
-        if (UNIPROTKB_FILTER_VALUE.equals(filterValue)) {
+        if (UNIPROTKB_FILTER_VALUE.equalsIgnoreCase(filterValue)) {
             shouldRemove = !isMemberTypeTremblOrSwissProt(memberType);
-        } else if (UNIPARC_FILTER_VALUE.equals(filterValue)) {
+        } else if (UNIPARC_FILTER_VALUE.equalsIgnoreCase(filterValue)) {
             shouldRemove = !memberType.equals(UniRefMemberIdType.UNIPARC);
         }
         return shouldRemove;

@@ -6,7 +6,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
@@ -609,7 +608,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
@@ -631,7 +630,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
@@ -654,7 +653,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
@@ -785,6 +784,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMisc.add("Search All");
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
+            doc.uniparc = "UPI000000000";
+            doc.unirefCluster50 = "UniRef50_P0001";
+            doc.unirefCluster90 = "UniRef90_P0001";
+            doc.unirefCluster100 = "UniRef100_P0001";
             UniProtDatabaseTypes.INSTANCE
                     .getAllDbTypes()
                     .forEach(

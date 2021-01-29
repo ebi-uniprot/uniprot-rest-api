@@ -124,7 +124,7 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     private void logSolrQuery(SolrRequest request) {
         if (request != null) {
-            LOGGER.debug("SolrRequest: {}", request);
+            LOGGER.info("SolrRequest: {}", request);
         }
     }
 }

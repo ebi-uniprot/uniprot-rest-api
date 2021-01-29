@@ -1,6 +1,9 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -18,7 +21,8 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
-import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -58,6 +62,7 @@ public class UniProtEntryService
     private final FacetTupleStreamTemplate facetTupleStreamTemplate;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final QueryProcessor queryProcessor;
+    private final RDFStreamer uniProtRDFStreamer;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -70,7 +75,8 @@ public class UniProtEntryService
             TaxonomyService taxService,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             QueryProcessor uniProtKBQueryProcessor,
-            SearchFieldConfig uniProtKBSearchFieldConfig) {
+            SearchFieldConfig uniProtKBSearchFieldConfig,
+            RDFStreamer uniProtRDFStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -88,6 +94,7 @@ public class UniProtEntryService
         this.queryProcessor = uniProtKBQueryProcessor;
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
+        this.uniProtRDFStreamer = uniProtRDFStreamer;
     }
 
     @Override
@@ -173,7 +180,7 @@ public class UniProtEntryService
     public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+        return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override

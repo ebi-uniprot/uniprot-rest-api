@@ -1,4 +1,4 @@
-package org.uniprot.api.common.repository.store;
+package org.uniprot.api.common.repository.stream.common;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +23,7 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.solrstream.AbstractTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.core.util.Utils;
 
 /**

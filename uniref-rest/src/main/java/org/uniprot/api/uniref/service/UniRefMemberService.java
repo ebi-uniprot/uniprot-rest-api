@@ -1,33 +1,37 @@
 package org.uniprot.api.uniref.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.uniref.repository.store.UniRefEntryStoreRepository;
-import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.api.uniref.request.UniRefMemberRequest;
+import org.uniprot.core.uniref.UniRefMember;
 
 /**
  * @author lgonzales
- * @since 09/07/2020
+ * @since 05/01/2021
  */
 @Service
-public class UniRefEntryService {
+@Import(UniRefSolrQueryConfig.class)
+public class UniRefMemberService {
 
     private final UniRefEntryStoreRepository entryStoreRepository;
 
     @Autowired
-    public UniRefEntryService(UniRefEntryStoreRepository entryStoreRepository) {
+    public UniRefMemberService(UniRefEntryStoreRepository entryStoreRepository) {
         this.entryStoreRepository = entryStoreRepository;
     }
 
-    public UniRefEntry getEntity(String clusterId) {
+    public QueryResult<UniRefMember> retrieveMembers(UniRefMemberRequest memberRequest) {
         try {
-            return entryStoreRepository.getEntryById(clusterId);
+            return entryStoreRepository.getEntryMembers(memberRequest);
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            String message = "Could not get entity for id: [" + clusterId + "]";
+            String message = "Could not get members for id: [" + memberRequest.getId() + "]";
             throw new ServiceException(message, e);
         }
     }
