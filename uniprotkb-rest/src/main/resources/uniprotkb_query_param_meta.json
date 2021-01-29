@@ -1258,5 +1258,21 @@
   {
     "name": "proteins_with",
     "type": "String"
+  },
+  {
+    "name": "uniparc",
+    "type": "String"
+  },
+  {
+    "name": "uniref_cluster_50",
+    "type": "String"
+  },
+  {
+    "name": "uniref_cluster_90",
+    "type": "String"
+  },
+  {
+    "name": "uniref_cluster_100",
+    "type": "String"
   }
 ]
