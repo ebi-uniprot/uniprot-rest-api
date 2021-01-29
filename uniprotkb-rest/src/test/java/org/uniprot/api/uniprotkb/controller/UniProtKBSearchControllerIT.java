@@ -730,7 +730,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext)
-                || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)) {
+                || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)
+                || SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
             doc.active = true;
@@ -1028,7 +1029,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.primaryAccession",
-                                    contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
+                                    contains(ACCESSION_SP_CANONICAL, ACCESSION_SP, "P00001")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets.*.name", contains("reviewed", "fragment")))
