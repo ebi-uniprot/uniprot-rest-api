@@ -63,12 +63,16 @@ import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.go.GORepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
-import org.uniprot.store.indexer.uniprot.mockers.*;
+import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
+import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
@@ -103,7 +107,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private TaxonomyRepository taxRepository;
 
-    @Value("${solr.query.batchSize:#{null}}")
+    @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     private UniProtKBStoreClient storeClient;
@@ -117,7 +121,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 DataStoreManager.StoreType.UNIPROT,
                 new UniProtEntryConverter(
                         TaxonomyRepoMocker.getTaxonomyRepo(),
-                        GoRelationsRepoMocker.getGoRelationRepo(),
+                        Mockito.mock(GORepo.class),
                         PathwayRepoMocker.getPathwayRepo(),
                         Mockito.mock(ChebiRepo.class),
                         Mockito.mock(ECRepo.class),
@@ -158,6 +162,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     protected SolrQueryRepository getRepository() {
         return repository;
     }
+
+    // TODO: 10/11/2020
+    /*
+     * stopwords and phrase queries are known to have problems. Please see:
+     * https://mail-archives.apache.org/mod_mbox/lucene-solr-user/202011.mbox/%3CCAA%3DaKsc1oS0FBcijT9tvvShf08QEppEZuAMRY2ZSLtFB%3D5r3Uw%40mail.gmail.com%3E
+     *
+     * A possible solution would be to pre-process all index/query data going to Solr, and remove its stopwords.
+     *
+     * If the solution is implemented, then we can eliminate stopwords in the index and save space. We'll then need
+     * an integration test below, which tests the full slice:
+     * - source text -> document -> index (i.e., indexing data), and
+     * - REST app -> Solr query -> index retrieval -> response (i.e., querying data)
+     *
+     * e.g., index "Molecular cloning and evolution of the genes" and then search for
+     *             "Molecular cloning and evolution of the genes".
+     * (the two adjacent stopwords was causing problems when configuring Solr directly to handle this using the
+     * stopword filter factory and removeduplicatesfilterfactory)
+     *
+     */
 
     @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
@@ -569,6 +592,73 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                                 "Invalid content type received, 'application/xml'. Expected one of [application/json]")));
     }
 
+    @Test
+    void searchWhiteListPRODatabaseFieldDefaultSearch() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "PR:P21802")
+                                        .param("fields", "accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+    }
+
+    @Test
+    void searchWhiteListHGNCDatabaseFieldDefaultSearch() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "HGNC:3689 AND accession:P21802")
+                                        .param("fields", "accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+    }
+
+    @Test
+    void searchGoTermDefaultSearch() throws Exception {
+        // we have a solr field named GO, so, it is not necessary add to white list
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "GO:0016020")
+                                        .param("fields", "accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -640,7 +730,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext)
-                || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)) {
+                || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)
+                || SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
             doc.active = true;
@@ -693,6 +784,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMisc.add("Search All");
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
+            doc.uniparc = "UPI000000000";
+            doc.unirefCluster50 = "UniRef50_P0001";
+            doc.unirefCluster90 = "UniRef90_P0001";
+            doc.unirefCluster100 = "UniRef100_P0001";
             UniProtDatabaseTypes.INSTANCE
                     .getAllDbTypes()
                     .forEach(
@@ -934,7 +1029,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.primaryAccession",
-                                    contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
+                                    contains(ACCESSION_SP_CANONICAL, ACCESSION_SP, "P00001")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets.*.name", contains("reviewed", "fragment")))

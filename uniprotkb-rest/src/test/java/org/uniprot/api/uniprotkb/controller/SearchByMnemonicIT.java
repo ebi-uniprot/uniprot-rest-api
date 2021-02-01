@@ -36,9 +36,9 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
@@ -78,7 +78,7 @@ class SearchByMnemonicIT {
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(
                         TaxonomyRepoMocker.getTaxonomyRepo(),
-                        GoRelationsRepoMocker.getGoRelationRepo(),
+                        Mockito.mock(GORepo.class),
                         PathwayRepoMocker.getPathwayRepo(),
                         Mockito.mock(ChebiRepo.class),
                         Mockito.mock(ECRepo.class),

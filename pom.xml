@@ -71,6 +71,7 @@
 		<module>uniref-rest</module>
 		<module>unisave-rest</module>
 		<module>benchmark-rest</module>
+		<module>unirule-rest</module>
 		<module>jacoco-aggregate-report</module>
 	</modules>
 
@@ -308,18 +309,6 @@
 
 	<repositories>
 		<repository>
-			<id>spring-releases</id>
-			<url>https://repo.spring.io/libs-release</url>
-		</repository>
-		<repository>
-			<id>spring-libs-milestone</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/libs-milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>uniprot-artifactory-release</id>
 			<name>UniProt Artifactory for Releases</name>
 			<releases>
@@ -364,14 +353,7 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>spring-releases</id>
-			<url>https://repo.spring.io/libs-release</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-libs-milestone</id>
-			<url>https://repo.spring.io/libs-milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<url>https://repo.spring.io/plugins-release</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>uniprot-artifactory-snapshots</id>
@@ -412,6 +394,12 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
+							<systemProperties>
+								<property>
+									<name>cv.dr.ord.location</name>
+									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+								</property>
+							</systemProperties>
 							<!-- Exclude integration tests from unit test run -->
 							<excludes>
 								<skipITs>${skipUTs}</skipITs>
@@ -425,6 +413,12 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
+							<systemProperties>
+								<property>
+									<name>cv.dr.ord.location</name>
+									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+								</property>
+							</systemProperties>
 							<skipITs>${skipITs}</skipITs>
 							<argLine>${jacoco.agent.it.arg}</argLine>
 						</configuration>

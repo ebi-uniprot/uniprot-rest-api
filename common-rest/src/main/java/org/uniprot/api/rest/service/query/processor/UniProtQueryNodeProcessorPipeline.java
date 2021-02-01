@@ -1,12 +1,9 @@
 package org.uniprot.api.rest.service.query.processor;
 
-import java.util.List;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorPipeline;
 import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * This class contains query node processors, that act to manipulate the query. If we need to do any
@@ -22,12 +19,15 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author Edd
  */
 public class UniProtQueryNodeProcessorPipeline extends QueryNodeProcessorPipeline {
-    public UniProtQueryNodeProcessorPipeline(List<SearchFieldItem> optimisableFields) {
+    public UniProtQueryNodeProcessorPipeline(UniProtQueryProcessorConfig conf) {
         super(new StandardQueryConfigHandler());
 
-        add(new UniProtFieldQueryNodeProcessor(optimisableFields));
+        add(
+                new UniProtFieldQueryNodeProcessor(
+                        conf.getOptimisableFields(), conf.getWhiteListFields()));
         add(new UniProtOpenRangeQueryNodeProcessor());
         add(new UniProtPointRangeQueryNodeProcessor());
         add(new UniProtTermRangeQueryNodeProcessor());
+        add(new UniProtDefaultFieldQueryNodeProcessor());
     }
 }

@@ -2,11 +2,10 @@ package org.uniprot.api.proteome.service;
 
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
-import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
+import org.uniprot.core.genecentric.GeneCentricEntry;
+import org.uniprot.core.json.parser.genecentric.GeneCentricJsonConfig;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocumentConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,26 +13,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jluo
  * @date: 17 May 2019
  */
-public class GeneCentricEntryConverter implements Function<GeneCentricDocument, CanonicalProtein> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProteomeEntryConverter.class);
+public class GeneCentricEntryConverter implements Function<GeneCentricDocument, GeneCentricEntry> {
 
-    private final ObjectMapper objectMapper;
+    private final GeneCentricDocumentConverter converter;
 
     public GeneCentricEntryConverter() {
-        objectMapper = ProteomeJsonConfig.getInstance().getFullObjectMapper();
+        ObjectMapper objectMapper = GeneCentricJsonConfig.getInstance().getFullObjectMapper();
+        converter = new GeneCentricDocumentConverter(objectMapper);
     }
 
     @Override
-    public CanonicalProtein apply(GeneCentricDocument t) {
-        try {
-            CanonicalProtein entry =
-                    objectMapper.readValue(
-                            t.getGeneCentricStored().array(),
-                            org.uniprot.core.proteome.CanonicalProtein.class);
-            return entry;
-        } catch (Exception e) {
-            LOGGER.info("Error converting solr avro_binary default UniProtKBEntry", e);
-        }
-        return null;
+    public GeneCentricEntry apply(GeneCentricDocument document) {
+        return converter.getCanonicalEntryFromDocument(document);
     }
 }

@@ -25,7 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.store.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -37,6 +37,17 @@ import org.uniprot.store.search.SolrCollection;
 public abstract class AbstractStreamControllerIT {
 
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
+
+    protected static final String SAMPLE_RDF =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF>\n"
+                    + "    <owl:Ontology rdf:about=\"\">\n"
+                    + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "    </owl:Ontology>\n"
+                    + "    <sample>text</sample>\n"
+                    + "    <anotherSample>text2</anotherSample>\n"
+                    + "    <someMore>text3</someMore>\n"
+                    + "</rdf:RDF>";
 
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
 

@@ -40,15 +40,13 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     @Test
     void testFilterByTaxonomyIds() {
         verifyUniParcEntry(uniParcEntry);
-        assertEquals(2, this.uniParcEntry.getTaxonomies().size());
-        List<String> taxonFilter = Arrays.asList("9606");
+        List<String> taxonFilter = Collections.singletonList("9606");
         // filter by db
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except xrefs
         assertEquals(1, filteredEntry.getUniParcCrossReferences().size());
         assertEquals(
-                "9606",
-                filteredEntry.getUniParcCrossReferences().get(0).getProperties().get(1).getValue());
+                9606L, filteredEntry.getUniParcCrossReferences().get(0).getTaxonomy().getTaxonId());
         verifyUniParcEntry(filteredEntry);
         verifyOriginalAndFilteredEntry(this.uniParcEntry, filteredEntry);
     }
@@ -65,15 +63,13 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     @Test
     void testFilterByMatchingNonMatchingTaxons() {
         verifyUniParcEntry(uniParcEntry);
-        assertEquals(2, this.uniParcEntry.getTaxonomies().size());
         List<String> taxonFilter = Arrays.asList("10090", "9606");
         // filter by taxon
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
         // everything should be same except UniParcCrossReferences
         assertEquals(1, filteredEntry.getUniParcCrossReferences().size());
         assertEquals(
-                "9606",
-                filteredEntry.getUniParcCrossReferences().get(0).getProperties().get(1).getValue());
+                9606L, filteredEntry.getUniParcCrossReferences().get(0).getTaxonomy().getTaxonId());
         verifyUniParcEntry(filteredEntry);
         assertNotEquals(
                 uniParcEntry.getUniParcCrossReferences(),
@@ -122,6 +118,5 @@ class UniParcCrossReferenceTaxonomyFilterTest {
         assertEquals(uniParcEntry.getUniParcId(), filteredEntry.getUniParcId());
         assertEquals(uniParcEntry.getSequence(), filteredEntry.getSequence());
         assertEquals(uniParcEntry.getSequenceFeatures(), filteredEntry.getSequenceFeatures());
-        assertEquals(uniParcEntry.getTaxonomies(), filteredEntry.getTaxonomies());
     }
 }

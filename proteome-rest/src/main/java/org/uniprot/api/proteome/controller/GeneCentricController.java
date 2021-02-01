@@ -2,8 +2,7 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
 
 import java.util.Optional;
@@ -23,18 +22,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.proteome.request.GeneCentricRequest;
+import org.uniprot.api.proteome.request.GeneCentricSearchRequest;
+import org.uniprot.api.proteome.request.GeneCentricStreamRequest;
+import org.uniprot.api.proteome.request.GeneCentricUPIdRequest;
 import org.uniprot.api.proteome.service.GeneCentricService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.core.xml.jaxb.proteome.CanonicalGene;
+import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -53,19 +52,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping("/genecentric")
-public class GeneCentricController extends BasicSearchController<CanonicalProtein> {
+public class GeneCentricController extends BasicSearchController<GeneCentricEntry> {
 
     private final GeneCentricService service;
+    private final String upIdFieldName;
 
     @Autowired
     public GeneCentricController(
             ApplicationEventPublisher eventPublisher,
             GeneCentricService service,
             @Qualifier("GENECENTRIC")
-                    MessageConverterContextFactory<CanonicalProtein> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
+                    MessageConverterContextFactory<GeneCentricEntry> converterContextFactory,
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            SearchFieldConfig geneCentricSearchFieldConfig) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, GENECENTRIC);
         this.service = service;
+        this.upIdFieldName =
+                geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName();
     }
 
     @Tag(name = "genecentric", description = "gene centric service")
@@ -81,7 +84,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            CanonicalProtein
+                                                                            GeneCentricEntry
                                                                                     .class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
@@ -90,26 +93,37 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            CanonicalGene.class,
+                                                                            GeneCentricEntry.class,
                                                                     name = "entries"))),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
             value = "/search",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<CanonicalProtein>> searchCursor(
-            @Valid @ModelAttribute GeneCentricRequest searchRequest,
+            produces = {
+                APPLICATION_JSON_VALUE,
+                APPLICATION_XML_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
+    public ResponseEntity<MessageConverterContext<GeneCentricEntry>> searchCursor(
+            @Valid @ModelAttribute GeneCentricSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<CanonicalProtein> results = service.search(searchRequest);
+        QueryResult<GeneCentricEntry> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @Tag(name = "genecentric")
     @GetMapping(
             value = "/upid/{upid}",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
+            produces = {
+                APPLICATION_JSON_VALUE,
+                APPLICATION_XML_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
     @Operation(
             summary = "Fetch all proteins of Proteome id.",
             responses = {
@@ -122,7 +136,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            CanonicalProtein
+                                                                            GeneCentricEntry
                                                                                     .class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
@@ -131,35 +145,18 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            CanonicalGene.class,
+                                                                            GeneCentricEntry.class,
                                                                     name = "entries"))),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByUpId(
-            @Parameter(description = "Unique identifier for the Proteome entry")
-                    @PathVariable("upid")
-                    @Pattern(
-                            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
-                            flags = {Pattern.Flag.CASE_INSENSITIVE},
-                            message = "{search.invalid.upid.value}")
-                    String upid,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "genecentric-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
-                    @RequestParam(value = "fields", required = false)
-                    String fields,
+    public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByUpId(
+            @Valid @ModelAttribute GeneCentricUPIdRequest upIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        GeneCentricRequest searchRequest = new GeneCentricRequest();
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
-        String query =
-                searchFieldConfig.getSearchFieldItemByName("upid").getFieldName() + ":" + upid;
-        searchRequest.setQuery(query);
-        searchRequest.setFields(fields);
-        QueryResult<CanonicalProtein> results = service.search(searchRequest);
+        GeneCentricSearchRequest searchRequest = convertUPIdRequestToSearchRequest(upIdRequest);
+        QueryResult<GeneCentricEntry> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
@@ -176,7 +173,7 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            CanonicalProtein
+                                                                            GeneCentricEntry
                                                                                     .class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
@@ -185,18 +182,25 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            CanonicalGene.class,
+                                                                            GeneCentricEntry.class,
                                                                     name = "entries"))),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
-            value = "/download",
-            produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
-    public DeferredResult<ResponseEntity<MessageConverterContext<CanonicalProtein>>> download(
-            @Valid @ModelAttribute GeneCentricRequest searchRequest, HttpServletRequest request) {
-        Stream<CanonicalProtein> result = service.download(searchRequest);
-        return super.download(result, searchRequest.getFields(), getAcceptHeader(request), request);
+            value = "/stream",
+            produces = {
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
+            })
+    public DeferredResult<ResponseEntity<MessageConverterContext<GeneCentricEntry>>> stream(
+            @Valid @ModelAttribute GeneCentricStreamRequest streamRequest,
+            HttpServletRequest request) {
+        Stream<GeneCentricEntry> result = service.stream(streamRequest);
+        return super.stream(result, streamRequest, getAcceptHeader(request), request);
     }
 
     @Tag(name = "genecentric")
@@ -207,17 +211,23 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = CanonicalProtein.class)),
+                                    schema = @Schema(implementation = GeneCentricEntry.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
-                                    schema = @Schema(implementation = CanonicalGene.class)),
+                                    schema = @Schema(implementation = GeneCentricEntry.class)),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
             value = "/{accession}",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, LIST_MEDIA_TYPE_VALUE})
-    public ResponseEntity<MessageConverterContext<CanonicalProtein>> getByAccession(
+            produces = {
+                APPLICATION_JSON_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
+    public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByAccession(
             @Parameter(description = "UnirotKB accession")
                     @PathVariable("accession")
                     @Pattern(
@@ -232,17 +242,27 @@ public class GeneCentricController extends BasicSearchController<CanonicalProtei
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        CanonicalProtein entry = service.findByUniqueId(accession.toUpperCase());
+        GeneCentricEntry entry = service.findByUniqueId(accession.toUpperCase());
         return super.getEntityResponse(entry, fields, request);
     }
 
     @Override
-    protected String getEntityId(CanonicalProtein entity) {
-        return entity.getCanonicalProtein().getAccession().getValue();
+    protected String getEntityId(GeneCentricEntry entity) {
+        return entity.getCanonicalProtein().getId();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(CanonicalProtein entity) {
+    protected Optional<String> getEntityRedirectId(GeneCentricEntry entity) {
         return Optional.empty();
+    }
+
+    private GeneCentricSearchRequest convertUPIdRequestToSearchRequest(
+            @ModelAttribute @Valid GeneCentricUPIdRequest upIdRequest) {
+        GeneCentricSearchRequest searchRequest = new GeneCentricSearchRequest();
+        searchRequest.setQuery(upIdFieldName + ":" + upIdRequest.getUpid());
+        searchRequest.setFields(upIdRequest.getFields());
+        searchRequest.setCursor(upIdRequest.getCursor());
+        searchRequest.setSize(upIdRequest.getSize());
+        return searchRequest;
     }
 }

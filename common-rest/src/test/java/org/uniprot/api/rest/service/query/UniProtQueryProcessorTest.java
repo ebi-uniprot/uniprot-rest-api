@@ -7,6 +7,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -15,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
@@ -32,9 +36,86 @@ class UniProtQueryProcessorTest {
 
     @BeforeEach
     void setUp() {
+        Map<String, String> whitelistFields = new HashMap<>();
+        whitelistFields.put("go", "^[0-9]+$");
         processor =
-                new UniProtQueryProcessor(
-                        singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")));
+                UniProtQueryProcessor.newInstance(
+                        UniProtQueryProcessorConfig.builder()
+                                .optimisableFields(
+                                        singletonList(
+                                                searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")))
+                                .whiteListFields(whitelistFields)
+                                .build());
+    }
+
+    @Test
+    void optimiseWhitelistFieldQuery() {
+        String processedQuery = processor.processQuery("GO:1234567");
+        assertThat(processedQuery, is("GO\\:1234567"));
+    }
+
+    @Test
+    void optimiseWhitelistFieldQueryAndDefaultSearchValue() {
+        String processedQuery = processor.processQuery("GO:1234567 OR P12345");
+        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+    }
+
+    @Test
+    void optimiseWhitelistFieldNeedToBeTermQuery() {
+        String processedQuery = processor.processQuery("GO AND 1234567");
+        assertThat(processedQuery, is("GO AND 1234567"));
+    }
+
+    @Test
+    void handleORQuery() {
+        String processedQuery = processor.processQuery("a OR b");
+        assertThat(processedQuery, is("a OR b"));
+    }
+
+    @Test
+    void longerExample() {
+        String processedQuery =
+                processor.processQuery("The allele defined by Arg-6 and Glu-89 is associated ");
+        assertThat(
+                processedQuery,
+                is(
+                        "The AND allele AND defined AND by AND Arg-6 AND and AND Glu-89 AND is AND associated"));
+    }
+
+    @Test
+    void useAndAsDefault() {
+        String processedQuery = processor.processQuery("a b");
+        assertThat(processedQuery, is("a AND b"));
+    }
+
+    @Test
+    void useAndAsDefaultWithOneClauseAsAFieldQuery() {
+        String processedQuery = processor.processQuery("a:thing b");
+        assertThat(processedQuery, is("a:thing AND b"));
+    }
+
+    @Test
+    void showPrecendenceWhileUsingAndAsDefault() {
+        String processedQuery = processor.processQuery("a b OR c");
+        assertThat(processedQuery, is("a AND ( b OR c )"));
+    }
+
+    @Test
+    void showPrecendenceAgainWhileUsingAndAsDefault() {
+        String processedQuery = processor.processQuery("a OR b c");
+        assertThat(processedQuery, is("( a OR b ) AND c"));
+    }
+
+    @Test
+    void showPrecendenceAgainWhileUsingAndAsDefault1() {
+        String processedQuery = processor.processQuery("a:thing OR b c:thing");
+        assertThat(processedQuery, is("( a:thing OR b ) AND c:thing"));
+    }
+
+    @Test
+    void useAndAsDefaultInNestedQuery() {
+        String processedQuery = processor.processQuery("a b (c (d OR e)) f");
+        assertThat(processedQuery, is("a AND b AND ( c AND ( d OR e ) ) AND f"));
     }
 
     @Test
@@ -46,7 +127,7 @@ class UniProtQueryProcessorTest {
     @Test
     void complexQueryWithOptimisation() {
         String ACC = "P12345";
-        String pre = "a OR ( b AND ( +c:something -d:something ) AND ( ";
+        String pre = "a OR ( b AND ( +c:something AND -d:something ) AND ( ";
         String post = " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String query = pre + ACC + post;
         String processedQuery = processor.processQuery(query);
@@ -56,7 +137,7 @@ class UniProtQueryProcessorTest {
     @Test
     void complexQueryWithNoOptimisation() {
         String query =
-                "a OR ( b AND ( +c:something -d:something ) AND ( "
+                "a OR ( b AND ( +c:something AND -d:something ) AND ( "
                         + "XX"
                         + " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String processedQuery = processor.processQuery(query);

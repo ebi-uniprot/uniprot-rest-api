@@ -1,32 +1,26 @@
 package org.uniprot.api.proteome.service;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
 
 /**
  * @author jluo
  * @date: 30 Apr 2019
  */
 @Service
-@Import(GeneCentricQueryBoostsConfig.class)
-public class GeneCentricService extends BasicSearchService<GeneCentricDocument, CanonicalProtein> {
-    private static final String GENECENTRIC_ID_FIELD = "accession_id";
+@Import(GeneCentricSolrQueryConfig.class)
+public class GeneCentricService extends BasicSearchService<GeneCentricDocument, GeneCentricEntry> {
+    public static final String GENECENTRIC_ID_FIELD = "accession_id";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
 
@@ -35,16 +29,17 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
             GeneCentricQueryRepository repository,
             GeneCentricFacetConfig facetConfig,
             GeneCentricSortClause solrSortClause,
-            QueryBoosts geneCentricQueryBoosts) {
+            SolrQueryConfig geneCentricSolrQueryConf,
+            QueryProcessor geneCentricQueryProcessor,
+            SearchFieldConfig geneCentricSearchFieldConfig) {
         super(
                 repository,
                 new GeneCentricEntryConverter(),
                 solrSortClause,
-                geneCentricQueryBoosts,
+                geneCentricSolrQueryConf,
                 facetConfig);
-        searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.GENECENTRIC);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        searchFieldConfig = geneCentricSearchFieldConfig;
+        this.queryProcessor = geneCentricQueryProcessor;
     }
 
     @Override
@@ -55,9 +50,5 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }

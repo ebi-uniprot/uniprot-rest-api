@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "27aeddeb-033c-452d-8058-b7864a329a21",
+		"_postman_id": "c2ae5398-9726-4068-9a11-f51355fea11e",
 		"name": "uniref",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c73a482a-89b3-4e60-ba95-af00ce5c3ee0",
+								"id": "8318b686-e457-4003-a869-224b58b48577",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -53,7 +53,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fe3df2f2-93b9-424a-bfe3-e46c954efc42",
+								"id": "93ce8fc6-2333-4669-8bf0-c4b08c64d1db",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -67,7 +67,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniref/search?query?{{uniref_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniref/search?query={{uniref_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -78,8 +78,8 @@
 							],
 							"query": [
 								{
-									"key": "query?{{uniref_search_string}}",
-									"value": null
+									"key": "query",
+									"value": "{{uniref_search_string}}"
 								}
 							]
 						}
@@ -98,7 +98,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b1e83469-2beb-43c5-b30c-aeff53f04285",
+								"id": "351af818-d591-42e8-9bf3-676c83bc0464",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -112,7 +112,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/uniref/stream?query?{{uniref_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/uniref/stream?query={{uniref_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
@@ -123,8 +123,8 @@
 							],
 							"query": [
 								{
-									"key": "query?{{uniref_search_string}}",
-									"value": null
+									"key": "query",
+									"value": "{{uniref_search_string}}"
 								}
 							]
 						}
@@ -139,7 +139,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "19505b90-0a1b-4ec2-9299-71702f130bc0",
+				"id": "1864b0e2-95cf-4936-9d23-16384708bd64",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -149,7 +149,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "6dd69fc1-901e-4577-81b0-8cef57030e75",
+				"id": "309ae54c-ef21-41b5-a7c0-b515f9b91332",
 				"type": "text/javascript",
 				"exec": [
 					""

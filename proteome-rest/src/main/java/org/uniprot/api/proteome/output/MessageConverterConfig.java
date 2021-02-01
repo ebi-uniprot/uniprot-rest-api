@@ -22,9 +22,10 @@ import org.uniprot.api.proteome.output.converter.*;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
+import org.uniprot.core.genecentric.GeneCentricEntry;
+import org.uniprot.core.json.parser.genecentric.GeneCentricJsonConfig;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.parser.tsv.proteome.ProteomeEntryValueMapper;
-import org.uniprot.core.proteome.CanonicalProtein;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -67,6 +68,7 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter());
+                converters.add(new GeneCentricFastaMessageConverter());
 
                 ReturnFieldConfig returnFieldConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PROTEOME);
@@ -89,10 +91,10 @@ public class MessageConverterConfig {
                 converters.add(0, proteomeJsonConverter);
                 converters.add(1, new ProteomeXmlMessageConverter());
 
-                JsonMessageConverter<CanonicalProtein> geneCentricJsonConverter =
+                JsonMessageConverter<GeneCentricEntry> geneCentricJsonConverter =
                         new JsonMessageConverter<>(
-                                ProteomeJsonConfig.getInstance().getSimpleObjectMapper(),
-                                CanonicalProtein.class,
+                                GeneCentricJsonConfig.getInstance().getSimpleObjectMapper(),
+                                GeneCentricEntry.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
                                         UniProtDataType.GENECENTRIC));
                 converters.add(0, geneCentricJsonConverter);
@@ -125,21 +127,22 @@ public class MessageConverterConfig {
     }
 
     @Bean(name = "GENECENTRIC")
-    public MessageConverterContextFactory<CanonicalProtein>
+    public MessageConverterContextFactory<GeneCentricEntry>
             geneCentricMssageConverterContextFactory() {
-        MessageConverterContextFactory<CanonicalProtein> contextFactory =
+        MessageConverterContextFactory<GeneCentricEntry> contextFactory =
                 new MessageConverterContextFactory<>();
         asList(
                         geneCentricContent(LIST_MEDIA_TYPE),
                         geneCentricContent(APPLICATION_XML),
-                        geneCentricContent(APPLICATION_JSON))
+                        geneCentricContent(APPLICATION_JSON),
+                        geneCentricContent(FASTA_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
-    private MessageConverterContext<CanonicalProtein> geneCentricContent(MediaType contentType) {
-        return MessageConverterContext.<CanonicalProtein>builder()
+    private MessageConverterContext<GeneCentricEntry> geneCentricContent(MediaType contentType) {
+        return MessageConverterContext.<GeneCentricEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.GENECENTRIC)
                 .contentType(contentType)
                 .build();

@@ -1,0 +1,75 @@
+1	\N	1	0	no rank	1	0	root	\N	root	\N	\N	9ZZZZ	1	2506016
+2	1	0	0	superkingdom	11	0	Bacteria	eubacteria	Bacteria	\N	\N	9BACT	17987	771760
+2157	131567	0	0	superkingdom	11	0	Archaea	\N	Archaea	\N	\N	9ARCH	1482387	1509548
+2759	131567	0	0	superkingdom	1	1	Eukaryota	eucaryotes	Eukaryota	\N	\N	9EUKA	1509549	4547344
+10239	1	0	0	superkingdom	1	0	Viruses	\N	Viruses	\N	\N	9VIRU	2	421295
+289376	2	1	0	no rank	11	0	Thermodesulfovibrio yellowstonii DSM 11347	\N	Thermodesulfovibrio yellowstonii (strain ATCC 51303 / DSM 11347 / YP87)	\N	\N	THEYD	906512	906513
+12185	10239	1	0	no rank	1	0	Potato virus X (strain X3)	\N	Potato virus X (strain X3)	PVX	\N	PVXX3	298447	298448
+11049	10239	1	0	no rank	1	0	Lelystad virus	\N	Porcine reproductive and respiratory syndrome virus (strain Lelystad)	PRRSV	\N	PRRSL	307795	307798
+60714	10239	1	0	species	1	0	Galinsoga mosaic virus	\N	Galinsoga mosaic virus	GaMV	\N	GAMV	303401	303402
+1076255	10239	1	0	species	1	0	Yokapox virus	\N	Yokapox virus	\N	\N	\N	418965	418966
+1559365	10239	1	1	no rank	1	0	Turnip curly top virus isolate Turnip/South Africa/B11/2006	\N	Turnip curly top virus (isolate Turnip/South Africa/B11/2006)	TCTV	\N	TCTVB	415263	415264
+6	335928	0	0	genus	11	0	Azorhizobium	\N	Azorhizobium	\N	\N	\N	532256	532439
+7	6	1	0	species	11	0	Azorhizobium caulinodans	\N	Azorhizobium caulinodans	\N	\N	AZOCA	532287	532290
+9	32199	1	0	species	11	0	Buchnera aphidicola	\N	Buchnera aphidicola	\N	\N	\N	749867	750404
+10	135621	0	0	genus	11	0	Cellvibrio	\N	Cellvibrio	\N	\N	\N	601720	601815
+11	1707	1	0	species	11	0	[Cellvibrio] gilvus	\N	[Cellvibrio] gilvus	\N	\N	\N	132015	132018
+13	203488	0	0	genus	11	0	Dictyoglomus	\N	Dictyoglomus	\N	\N	\N	21568	21597
+14	13	1	0	species	11	0	Dictyoglomus thermophilum	\N	Dictyoglomus thermophilum	\N	\N	DICTH	21577	21580
+16	32011	0	0	genus	11	0	Methylophilus	\N	Methylophilus	\N	\N	\N	570760	570857
+17	16	1	0	species	11	0	Methylophilus methylotrophus	\N	Methylophilus methylotrophus	\N	Bacterium W3A1	METME	570803	570808
+18	213423	0	0	genus	11	0	Pelobacter	\N	Pelobacter	\N	\N	\N	576997	577040
+19	18	1	0	species	11	0	Pelobacter carbinolicus	\N	Pelobacter carbinolicus	\N	\N	PELCA	577028	577031
+20	76892	0	0	genus	11	0	Phenylobacterium	\N	Phenylobacterium	\N	\N	\N	488090	488201
+21	20	1	0	species	11	0	Phenylobacterium immobile	\N	Phenylobacterium immobile	\N	\N	PHEIM	488111	488112
+22	267890	0	0	genus	11	0	Shewanella	\N	Shewanella	\N	\N	\N	677562	680375
+23	22	1	0	species	11	0	Shewanella colwelliana	\N	Shewanella colwelliana	\N	Alteromonas colwelliana	SHECO	678123	678126
+24	22	1	0	species	11	0	Shewanella putrefaciens	\N	Shewanella putrefaciens	\N	Pseudomonas putrefaciens	SHEPU	678067	678078
+25	22	1	0	species	11	0	Shewanella hanedai	\N	Shewanella hanedai	\N	Alteromonas hanedai	SHEHA	678089	678090
+27	49928	1	0	species	11	0	halophilic eubacterium NRCC 41227	\N	Halophilic eubacterium NRCC 41227	\N	\N	HALEU	368040	368041
+28	49928	1	0	species	11	0	halophilic eubacterium	\N	halophilic eubacterium	\N	\N	\N	383264	383265
+29	28221	0	0	order	11	0	Myxococcales	fruiting gliding bacteria	Myxococcales	fruiting gliding bacteria	\N	\N	575287	576550
+31	80811	0	0	family	11	0	Myxococcaceae	\N	Myxococcaceae	\N	\N	\N	575289	576020
+32	31	0	0	genus	11	0	Myxococcus	\N	Myxococcus	\N	\N	\N	575290	575899
+33	32	1	0	species	11	0	Myxococcus fulvus	\N	Myxococcus fulvus	\N	\N	MYXFU	575375	575380
+34	32	1	0	species	11	0	Myxococcus xanthus	\N	Myxococcus xanthus	\N	\N	MYXXA	575391	575400
+35	83461	1	0	species	11	0	Corallococcus macrosporus	\N	Corallococcus macrosporus	\N	\N	\N	575921	575924
+38	42	1	0	species	11	0	Angiococcus disciformis	\N	Angiococcus disciformis	\N	\N	\N	576065	576066
+39	80811	0	0	family	11	0	Cystobacteraceae	\N	Cystobacteraceae	\N	\N	\N	576021	576166
+40	39	0	0	genus	11	0	Stigmatella	\N	Stigmatella	\N	\N	\N	576022	576043
+41	40	1	0	species	11	0	Stigmatella aurantiaca	\N	Stigmatella aurantiaca	\N	\N	STIAU	576025	576030
+42	39	0	0	genus	11	0	Cystobacter	\N	Cystobacter	\N	\N	\N	576044	576113
+43	42	1	0	species	11	0	Cystobacter fuscus	\N	Cystobacter fuscus	\N	\N	\N	576049	576052
+44	39	0	0	genus	11	0	Melittangium	\N	Melittangium	\N	\N	\N	576114	576129
+45	44	1	0	species	11	0	Melittangium lichenicola	\N	Melittangium lichenicola	\N	\N	\N	576121	576122
+47	39	0	0	genus	11	0	Archangium	\N	Archangium	\N	\N	\N	576130	576145
+48	47	1	0	species	11	0	Archangium gephyra	\N	Archangium gephyra	\N	\N	\N	576131	576132
+49	80812	0	0	family	11	0	Polyangiaceae	\N	Polyangiaceae	\N	\N	\N	576207	576314
+50	49	0	0	genus	11	0	Chondromyces	\N	Chondromyces	\N	\N	\N	576258	576277
+51	50	1	0	species	11	0	Chondromyces apiculatus	\N	Chondromyces apiculatus	\N	\N	\N	576259	576262
+52	50	1	0	species	11	0	Chondromyces crocatus	\N	Chondromyces crocatus	\N	\N	CHOCO	576269	576270
+53	224463	0	0	genus	11	0	Nannocystis	\N	Nannocystis	\N	\N	\N	576476	576507
+54	53	1	0	species	11	0	Nannocystis exedens	\N	Nannocystis exedens	\N	\N	\N	576491	576494
+55	49	0	0	genus	11	0	Polyangium	\N	Polyangium	\N	\N	\N	576208	576243
+56	39643	1	0	species	11	0	Sorangium cellulosum	\N	Sorangium cellulosum	\N	Polyangium cellulosum	SORCE	576283	576288
+57	55	1	0	species	11	0	Polyangium sp.	\N	Polyangium sp.	\N	\N	\N	576209	576210
+59	481	0	0	genus	11	0	Vitreoscilla	\N	Vitreoscilla	\N	\N	\N	572420	572447
+2759	1	0	0	superkingdom	1	1	Eukaryota	eucaryotes	Eukaryota	\N	\N	9EUKA	1	2
+7711	33208	0	0	phylum	1	5	Chordata	chordates	Chordata	\N	\N	9CHOR	1	2
+33208	2759	0	0	kingdom	1	1	Metazoa	metazoans	Metazoa	\N	\N	9METZ	1	2
+7787	7711	1	0	species	1	2	Tetronarce californica	Pacific electric ray	Tetronarce californica	Pacific electric ray	Torpedo californica	TETCF	1	2
+11308	1	0	0	family	1	0	Orthomyxoviridae	\N	Orthomyxoviridae	\N	\N	9ORTO	1	2
+11320	197911	1	0	species	1	0	Influenza A virus	\N	Influenza A virus	\N	\N	9INFA	1	2
+11552	197913	1	0	species	1	0	Influenza C virus	\N	Influenza C virus	\N	\N	\N	1	2
+197911	11308	0	0	genus	1	0	Alphainfluenzavirus	\N	Alphainfluenzavirus	\N	\N	\N	1	2
+197913	11308	0	0	genus	1	0	Gammainfluenzavirus	\N	Gammainfluenzavirus	\N	\N	\N	1	2
+93838	11320	1	0	no rank	11	0	Influenza A virus (A/goose/Guangdong/1/1996(H5N1))	\N	Influenza A virus (strain A/Goose/Guangdong/1/1996 H5N1 genotype Gs/Gd)	\N	\N	I96A0	1	2
+100673	11552	1	0	no rank	11	0	Influenza C virus (C/Johannesburg/1/66)	\N	Influenza C virus (strain C/Johannesburg/1/1966)	\N	\N	INCJH	1	2
+269446	1	1	0	no rank	1	0	Rous sarcoma virus (strain Schmidt-Ruppin A)	\N	Avian leukosis virus RSA	RSV-SRA	Rous sarcoma virus (strain Schmidt-Ruppin A)	RSVSA	1	2
+4111	1	1	0	species	1	1	Solanum melongena	eggplant	Solanum melongena	Eggplant	Aubergine	SOLME	1	2
+11034	1	1	0	species	1	0	Sindbis virus	\N	Sindbis virus	SINV	\N	SINDV	1	2
+9536	1	1	0	species	1	2	Cercopithecus hamlyni	owl-faced monkey	Cercopithecus hamlyni	Owl-faced monkey	Hamlyn's monkey	CERHA	1	2
+9481	1	0	0	genus	1	2	Callithrix	\N	Callithrix	\N	\N	\N	1	2
+    9615	1	1	0	subspecies	1	2	Canis lupus familiaris	dog	Canis lupus familiaris	Dog	Canis familiaris	CANLF	1	2
+9519	1	1	0	species	1	2	Lagothrix lagotricha	brown woolly monkey	Lagothrix lagotricha	Brown woolly monkey	Humboldt's woolly monkey	LAGLA	1	2
+9606	2759	1	0	species	1	2	Homo sapiens	human	Homo sapiens	Human	\N	HUMAN	1	2

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -44,8 +45,8 @@ import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniprot.mockers.GoRelationsRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
@@ -74,7 +75,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
-                    GoRelationsRepoMocker.getGoRelationRepo(),
+                    Mockito.mock(GORepo.class),
                     PathwayRepoMocker.getPathwayRepo(),
                     mock(ChebiRepo.class),
                     mock(ECRepo.class),
@@ -239,7 +240,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                                         "accessions",
                                         "P00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009")
                                 .param("facets", facetList)
-                                .param("size", "0"));
+                                .param("size", "1"));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
@@ -247,7 +248,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.facets.size()", is(4)))
                 .andExpect(
                         jsonPath(

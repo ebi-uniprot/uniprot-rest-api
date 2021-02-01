@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBL
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
@@ -21,8 +22,11 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  */
 class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
     private final List<SearchFieldItem> optimisableFields;
+    private final Map<String, String> whiteListFields;
 
-    UniProtFieldQueryNodeProcessor(List<SearchFieldItem> optimisableFields) {
+    UniProtFieldQueryNodeProcessor(
+            List<SearchFieldItem> optimisableFields, Map<String, String> whiteListFields) {
+        this.whiteListFields = whiteListFields;
         this.optimisableFields = optimisableFields;
     }
 
@@ -47,7 +51,8 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
                     ((FuzzyQueryNode) node).setField(null);
                 }
             } else {
-                return new UniProtFieldQueryNode((FieldQueryNode) node, optimisableFields);
+                return new UniProtFieldQueryNode(
+                        (FieldQueryNode) node, optimisableFields, whiteListFields);
             }
         }
         return node;
@@ -60,10 +65,15 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
 
     private static class UniProtFieldQueryNode extends FieldQueryNode {
         private final List<SearchFieldItem> optimisableFields;
+        private final Map<String, String> whiteListFields;
 
-        public UniProtFieldQueryNode(FieldQueryNode node, List<SearchFieldItem> optimisableFields) {
+        public UniProtFieldQueryNode(
+                FieldQueryNode node,
+                List<SearchFieldItem> optimisableFields,
+                Map<String, String> whiteListFields) {
             super(node.getField(), node.getText(), node.getBegin(), node.getEnd());
             this.optimisableFields = optimisableFields;
+            this.whiteListFields = whiteListFields;
         }
 
         @Override
@@ -81,6 +91,8 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
                                 .findFirst();
 
                 return optionalSearchField.map(f -> f.getFieldName() + ":" + text).orElse(text);
+            } else if (whiteListFields.containsKey(field.toLowerCase())) {
+                return field.toUpperCase() + "\\:" + text;
             } else {
                 return super.toQueryString(escaper);
             }

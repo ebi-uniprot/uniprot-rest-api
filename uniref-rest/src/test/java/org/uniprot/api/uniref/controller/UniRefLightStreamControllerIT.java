@@ -1,6 +1,11 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -10,7 +15,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +47,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -76,6 +88,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniRefEntryLight> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
+    @Autowired private RestTemplate restTemplate;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -91,6 +104,34 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
         when(solrClient.query(anyString(), any())).thenReturn(response);
+        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
+
+    @Test
+    void streamRDFCanReturnSuccess() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE)
+                        .param("query", "*");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(content().string(startsWith(RDFService.UNIREF_RDF_PROLOG)))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "    <sample>text</sample>\n"
+                                                        + "    <anotherSample>text2</anotherSample>\n"
+                                                        + "    <someMore>text3</someMore>\n\n"
+                                                        + "</rdf:RDF>")));
     }
 
     @Test
@@ -99,7 +140,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*");
+                        .param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -124,7 +165,11 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                                         "UniRef100_P03903",
                                         "UniRef50_P03904",
                                         "UniRef90_P03904",
-                                        "UniRef100_P03904")));
+                                        "UniRef100_P03904")))
+                .andExpect(
+                        jsonPath("$.results[0].representativeMember.accessions[0]", is("P12301")))
+                .andExpect(
+                        jsonPath("$.results[0].representativeMember.memberId", is("P12301_HUMAN")));
     }
 
     @Test
@@ -160,7 +205,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("download", "true");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -210,7 +255,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*")
+                        .param("query", "*")
                         .param("sort", sortField + " asc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -243,9 +288,12 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.id",
                                 containsInAnyOrder("UniRef100_P03901", "UniRef100_P03902")))
-                .andExpect(jsonPath("$.results.*.sequenceLength", contains(66, 66)))
-                .andExpect(jsonPath("$.results.*.organismIds", hasItem(hasItem(9600))))
-                .andExpect(jsonPath("$.results.*.organisms").doesNotExist())
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.representativeMember.sequence.length",
+                                contains(66, 66)))
+                .andExpect(jsonPath("$.results.*.organisms[0].taxonId", hasItem(is(9600))))
+                .andExpect(jsonPath("$.results.*.organisms.*.scientificName").doesNotExist())
                 .andExpect(jsonPath("$.results.*.name").doesNotExist());
         ;
     }
@@ -255,7 +303,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "content:*");
+                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 

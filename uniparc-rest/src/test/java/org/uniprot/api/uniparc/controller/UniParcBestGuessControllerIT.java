@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.createEntry;
@@ -94,12 +94,10 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     void bestGuessCanReturnSuccessSwissProt() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(BEST_GUESS_PATH)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*");
+                get(BEST_GUESS_PATH).header(ACCEPT, MediaType.APPLICATION_JSON).param("query", "*");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.uniParcId", is("UPI0000183A10")))
                 .andExpect(jsonPath("$.uniParcCrossReferences.size()", is(1)))
@@ -118,7 +116,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         .param("query", "upi:UPI0000183A11 OR upi:UPI0000183A12");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.uniParcId", is("UPI0000183A12")))
                 .andExpect(jsonPath("$.uniParcCrossReferences.size()", is(1)))
@@ -137,7 +135,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                                 "upi:UPI0000183A11 OR upi:UPI0000183A12 OR upi:UPI0000183A13");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.uniParcId", is("UPI0000183A13")))
                 .andExpect(jsonPath("$.uniParcCrossReferences.size()", is(1)))
@@ -157,7 +155,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         .param("query", "taxonomy_id:9609");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.uniParcId", is("UPI0000183A13")))
                 .andExpect(jsonPath("$.uniParcCrossReferences.size()", is(1)))
@@ -178,7 +176,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         .param("fields", "upi,sequence");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.uniParcId", is("UPI0000183A10")))
                 .andExpect(jsonPath("$.sequence").exists())
@@ -195,7 +193,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         .param("fields", "invalid");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))
                 .andExpect(jsonPath("$.messages.size()", is(2)))
@@ -216,7 +214,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         .param("query", "taxonomy_id:9607");
 
         mockMvc.perform(requestBuilder)
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))
                 .andExpect(jsonPath("$.messages.size()", is(1)))

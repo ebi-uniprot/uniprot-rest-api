@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,18 +24,21 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
-import org.uniprot.core.proteome.CanonicalProtein;
-import org.uniprot.core.proteome.Protein;
-import org.uniprot.core.proteome.impl.CanonicalProteinBuilder;
-import org.uniprot.core.proteome.impl.ProteinBuilder;
+import org.uniprot.core.genecentric.GeneCentricEntry;
+import org.uniprot.core.genecentric.Protein;
+import org.uniprot.core.genecentric.impl.GeneCentricEntryBuilder;
+import org.uniprot.core.genecentric.impl.ProteinBuilder;
+import org.uniprot.core.json.parser.genecentric.GeneCentricJsonConfig;
+import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument;
-import org.uniprot.store.search.document.proteome.GeneCentricDocument.GeneCentricDocumentBuilder;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocument.GeneCentricDocumentBuilder;
+import org.uniprot.store.search.document.genecentric.GeneCentricDocumentConverter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author jluo
@@ -78,7 +80,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
-        CanonicalProtein entry = create();
+        GeneCentricEntry entry = create();
         GeneCentricDocumentBuilder builder = GeneCentricDocument.builder();
         builder.accession(ACCESSION)
                 .accessions(Arrays.asList(ACCESSION, "P21912", "P31912"))
@@ -87,46 +89,66 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         getStoreManager().saveDocs(getStoreType(), builder.build());
     }
 
-    private ByteBuffer getBinary(CanonicalProtein entry) {
-        try {
-            return ByteBuffer.wrap(
-                    ProteomeJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
-        }
+    private byte[] getBinary(GeneCentricEntry entry) {
+        ObjectMapper mapper = GeneCentricJsonConfig.getInstance().getFullObjectMapper();
+        GeneCentricDocumentConverter converter = new GeneCentricDocumentConverter(mapper);
+        return converter.getStoredGeneCentricEntry(entry);
     }
 
-    private CanonicalProtein create() {
+    private GeneCentricEntry create() {
         Protein protein =
                 new ProteinBuilder()
-                        .accession(ACCESSION)
+                        .id(ACCESSION)
+                        .uniProtkbId("uniprotkb_id")
                         .entryType(UniProtKBEntryType.SWISSPROT)
+                        .proteinName("protein name")
                         .geneName("some gene")
-                        .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
-                        .sequenceLength(324)
+                        .organism(
+                                new OrganismBuilder()
+                                        .taxonId(9606L)
+                                        .scientificName("Human")
+                                        .build())
+                        .sequence("AAAAA")
+                        .sequenceVersion(2)
+                        .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
                         .build();
 
         Protein protein2 =
                 new ProteinBuilder()
-                        .accession("P21912")
+                        .id("P21912")
+                        .uniProtkbId("uniprotkb_id")
                         .entryType(UniProtKBEntryType.SWISSPROT)
+                        .proteinName("protein name")
                         .geneName("some gene1")
-                        .geneNameType(org.uniprot.core.proteome.GeneNameType.ENSEMBL)
-                        .sequenceLength(334)
+                        .organism(
+                                new OrganismBuilder()
+                                        .taxonId(9606L)
+                                        .scientificName("Human")
+                                        .build())
+                        .sequence("BBBBB")
+                        .sequenceVersion(2)
+                        .proteinExistence(ProteinExistence.PREDICTED)
                         .build();
         Protein protein3 =
                 new ProteinBuilder()
-                        .accession("P31912")
+                        .id("P31912")
+                        .uniProtkbId("uniprotkb_id")
                         .entryType(UniProtKBEntryType.TREMBL)
+                        .proteinName("protein name")
                         .geneName("some gene3")
-                        .geneNameType(org.uniprot.core.proteome.GeneNameType.OLN)
-                        .sequenceLength(434)
+                        .organism(
+                                new OrganismBuilder()
+                                        .taxonId(9606L)
+                                        .scientificName("Human")
+                                        .build())
+                        .sequence("CCCCC")
+                        .sequenceVersion(2)
+                        .proteinExistence(ProteinExistence.UNCERTAIN)
                         .build();
-        CanonicalProteinBuilder builder = new CanonicalProteinBuilder();
+        GeneCentricEntryBuilder builder = new GeneCentricEntryBuilder();
 
         return builder.canonicalProtein(protein)
+                .proteomeId("UP000000554")
                 .relatedProteinsAdd(protein2)
                 .relatedProteinsAdd(protein3)
                 .build();
@@ -143,7 +165,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .resultMatcher(jsonPath("$.canonicalProtein.accession", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.canonicalProtein.id", is(ACCESSION)))
                     .build();
         }
 
@@ -151,7 +173,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -164,7 +186,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("P21910")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -174,7 +196,9 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(ACCESSION)
                     .fields("accession")
-                    .resultMatcher(jsonPath("$.canonicalProtein.accession", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.canonicalProtein.id", is(ACCESSION)))
+                    .resultMatcher(jsonPath("$.canonicalProtein.proteinName").doesNotExist())
+                    .resultMatcher(jsonPath("$.canonicalProtein.geneName").doesNotExist())
                     .build();
         }
 
@@ -183,7 +207,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(ACCESSION)
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -202,24 +226,39 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(
-                                            jsonPath("$.canonicalProtein.accession", is(ACCESSION)))
+                                    .resultMatcher(jsonPath("$.canonicalProtein.id", is(ACCESSION)))
+                                    .resultMatcher(jsonPath("$.proteomeId", is("UP000000554")))
+                                    .resultMatcher(jsonPath("$.relatedProteins.size()", is(2)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
+                                            content().string(containsString("<id>P21312</id>")))
+                                    .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "accession=\""
-                                                                            + ACCESSION
-                                                                            + "\"")))
+                                                                    "<proteomeId>UP000000554</proteomeId>")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(ACCESSION)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    ">sp|P21312|uniprotkb_id protein name OS=Human OX=9606 GN=some gene PE=1 SV=2")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    ">tr|P31912|uniprotkb_id protein name OS=Human OX=9606 GN=some gene3 PE=5 SV=2")))
                                     .build())
                     .build();
         }
@@ -231,7 +270,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -250,7 +289,12 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
         }

@@ -67,7 +67,7 @@ import org.uniprot.store.search.SolrCollection;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRefLightSearchController.class)
+@WebMvcTest(UniRefEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
@@ -104,7 +104,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getSearchRequestPath() + "?query=content:*&complete=invalid")
+                                get(getSearchRequestPath() + "?query=*&complete=invalid")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -128,7 +128,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getSearchRequestPath() + "?query=content:*")
+                                get(getSearchRequestPath() + "?query=*")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -136,6 +136,11 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].representativeMember.accessions",
+                                contains(contains("P12301"))))
+                .andExpect(jsonPath("$.results[*].seedId", contains("P12301")))
                 .andExpect(jsonPath("$.results[*].members.size()", contains(10)))
                 .andExpect(
                         jsonPath(
@@ -146,9 +151,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(jsonPath("$.results[*].organisms.size()", contains(10)))
                 .andExpect(
                         jsonPath(
-                                "$.results[*].organisms[*]",
+                                "$.results[*].organisms[*].scientificName",
                                 contains(
-                                        "Homo sapiens (Representative)",
+                                        "Homo sapiens",
                                         "Homo sapiens 1",
                                         "Homo sapiens 2",
                                         "Homo sapiens 3",
@@ -158,10 +163,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                                         "Homo sapiens 7",
                                         "Homo sapiens 8",
                                         "Homo sapiens 9")))
-                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(10)))
                 .andExpect(
                         jsonPath(
-                                "$.results[*].organismIds[*]",
+                                "$.results[*].organisms[*].taxonId",
                                 contains(
                                         9600, 9607, 9608, 9609, 9610, 9611, 9612, 9613, 9614,
                                         9615)))
@@ -179,7 +183,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getSearchRequestPath() + "?query=content:*&complete=true")
+                                get(getSearchRequestPath() + "?query=*&complete=true")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -189,7 +193,6 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")))
                 .andExpect(jsonPath("$.results[*].members.size()", contains(12)))
                 .andExpect(jsonPath("$.results[*].organisms.size()", contains(12)))
-                .andExpect(jsonPath("$.results[*].organismIds.size()", contains(12)))
                 .andExpect(jsonPath("$.results[*].memberCount", contains(12)))
                 .andExpect(jsonPath("$.results[*].organismCount", contains(12)));
     }
@@ -335,7 +338,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("taxonomy_name:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -352,7 +355,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                             Collections.singletonList(
                                     "id:INVALID OR taxonomy_id:INVALID "
                                             + "OR length:INVALID OR count:INVALID  OR upi:INVALID"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -458,7 +461,14 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
+                                                    .string(
+                                                            containsString(
+                                                                    ">UniRef50_P03911 some protein name n=2 Tax=Homo sapiens TaxID=9606 RepID=P12311_HUMAN")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    ">UniRef50_P03920 some protein name n=2 Tax=Homo sapiens TaxID=9606 RepID=P12320_HUMAN")))
                                     .build())
                     .build();
         }
@@ -470,7 +480,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -480,17 +490,17 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

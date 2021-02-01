@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -111,12 +112,16 @@ public class ResponseExceptionHandler {
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
             Throwable ex, HttpServletRequest request) {
-        logger.error("handleThrowableBadRequest: ", ex);
+        String url = Encode.forHtml(request.getRequestURL().toString());
+        String queryString = Encode.forHtml(request.getQueryString());
+        String urlAndParams = queryString == null ? url : url + '?' + queryString;
+        // NOSONAR
+        logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
         addDebugError(request, ex, messages);
 
-        ErrorInfo error = new ErrorInfo(request.getRequestURL().toString(), messages);
+        ErrorInfo error = new ErrorInfo(url, messages);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(getContentTypeFromRequest(request))

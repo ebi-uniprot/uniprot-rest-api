@@ -23,7 +23,9 @@ class UniRefEntryFacetConfigTest {
     @Test
     void getFacetsEmptyMembers() {
         UniRefEntryLight entryLight = new UniRefEntryLightBuilder().build();
-        List<Facet> result = UniRefEntryFacetConfig.getFacets(entryLight);
+        List<Facet> result =
+                UniRefEntryFacetConfig.getFacets(
+                        entryLight.getMembers(), "member_id_type,uniprot_member_id_type");
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
@@ -31,7 +33,9 @@ class UniRefEntryFacetConfigTest {
     @Test
     void getFacetsSuccess() {
         UniRefEntryLight entryLight = getUniRefEntryLight();
-        List<Facet> result = UniRefEntryFacetConfig.getFacets(entryLight);
+        List<Facet> result =
+                UniRefEntryFacetConfig.getFacets(
+                        entryLight.getMembers(), "member_id_type,uniprot_member_id_type");
         assertNotNull(result);
         assertEquals(2, result.size());
         Facet memberType = result.get(0);
@@ -75,8 +79,8 @@ class UniRefEntryFacetConfigTest {
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("300", result.get(0));
-        assertEquals("301", result.get(1));
+        assertEquals("300,3", result.get(0));
+        assertEquals("301,3", result.get(1));
     }
 
     @Test
@@ -89,10 +93,10 @@ class UniRefEntryFacetConfigTest {
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);
         assertEquals(4, result.size());
-        assertEquals("000", result.get(0));
-        assertEquals("001", result.get(1));
-        assertEquals("100", result.get(2));
-        assertEquals("101", result.get(3));
+        assertEquals("000,0", result.get(0));
+        assertEquals("001,0", result.get(1));
+        assertEquals("100,1", result.get(2));
+        assertEquals("101,1", result.get(3));
     }
 
     @Test
@@ -106,8 +110,8 @@ class UniRefEntryFacetConfigTest {
         assertNotNull(result);
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("000", result.get(0));
-        assertEquals("001", result.get(1));
+        assertEquals("000,0", result.get(0));
+        assertEquals("001,0", result.get(1));
     }
 
     @Test
@@ -120,8 +124,8 @@ class UniRefEntryFacetConfigTest {
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("100", result.get(0));
-        assertEquals("101", result.get(1));
+        assertEquals("100,1", result.get(0));
+        assertEquals("101,1", result.get(1));
     }
 
     @Test
@@ -137,8 +141,8 @@ class UniRefEntryFacetConfigTest {
                 UniRefEntryFacetConfig.applyFacetFilters(entryLight.getMembers(), query);
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("000", result.get(0));
-        assertEquals("001", result.get(1));
+        assertEquals("000,0", result.get(0));
+        assertEquals("001,0", result.get(1));
     }
 
     @Test

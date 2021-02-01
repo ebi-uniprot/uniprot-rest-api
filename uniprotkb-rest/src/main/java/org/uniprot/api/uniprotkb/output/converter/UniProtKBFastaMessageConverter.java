@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
-import org.uniprot.core.parser.fasta.uniprot.UniprotKBFastaParser;
+import org.uniprot.core.parser.fasta.uniprot.UniProtKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 public class UniProtKBFastaMessageConverter
@@ -17,6 +17,6 @@ public class UniProtKBFastaMessageConverter
     @Override
     protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream)
             throws IOException {
-        outputStream.write((UniprotKBFastaParser.create(entity).toString() + "\n").getBytes());
+        outputStream.write((UniProtKBFastaParser.toFasta(entity) + "\n").getBytes());
     }
 }

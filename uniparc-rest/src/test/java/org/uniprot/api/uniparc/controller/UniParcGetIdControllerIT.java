@@ -93,8 +93,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .id(UNIPARC_ID)
                     .fields("upi,organism")
                     .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                    .resultMatcher(jsonPath("$.taxonomies").exists())
-                    .resultMatcher(jsonPath("$.uniParcCrossReferences").doesNotExist())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.taxonomy").exists())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .build();
@@ -153,7 +152,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UPI0000083D01\tHomo sapiens; Torpedo californica\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
+                                                                    "UPI0000083D01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

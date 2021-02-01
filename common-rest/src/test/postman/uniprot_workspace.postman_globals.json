@@ -1,9 +1,9 @@
 {
-	"id": "8d8902c2-d671-4c64-8931-ffd8a400f037",
+	"id": "e4d5e710-4495-47ed-8e71-ef27f942473a",
 	"values": [
 		{
 			"key": "x_release",
-			"value": "15-July-2020",
+			"value": "20-November-2020",
 			"enabled": true
 		},
 		{
@@ -58,12 +58,17 @@
 		},
 		{
 			"key": "verifyHeaders",
-			"value": "(function verifyHeaders(varyValue = 'Accept, Accept-Encoding', status=200, \ncontentType='application/json', headers='Link, X-TotalRecords, X-Release', \nencode='chunked', info='caching', xRelease, controlAllow){\npm.test(\"Vary Header\", function () {\npm.response.to.have.header(\"Vary\");\npm.response.to.be.header(\"Vary\", varyValue);\n});\npm.test(\"Status code Header\", function () {\npm.response.to.have.status(status);\n});\npm.test(\"Content-Type Header\", function () {\npm.response.to.have.header(\"Content-Type\");\npm.response.to.be.header(\"Content-Type\", contentType);\n});\npm.test(\"X-Release Header\", function () {\npm.response.to.have.header(\"X-Release\");\npm.response.to.be.header(\"X-Release\", xRelease);\n});\npm.test(\"Access-Control-Allow-Origin Header\", function () {\npm.response.to.have.header(\"Access-Control-Allow-Origin\");\npm.response.to.be.header(\"Access-Control-Allow-Origin\", controlAllow);\n});\npm.test(\"Access-Control-Expose-Headers Header\", function () {\npm.response.to.have.header(\"Access-Control-Expose-Headers\");\npm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n});\npm.test(\"Date Header\", function () {\npm.response.to.have.header(\"Date\");\n});\npm.test(\"Transfer-Encoding Header\", function () {\npm.response.to.have.header(\"Transfer-Encoding\");\npm.response.to.be.header(\"Transfer-Encoding\", encode);\n});\npm.test(\"X-Cache-Info Header\", function () {\npm.response.to.have.header(\"X-Cache-Info\");\npm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);\n});\n})\n",
+			"value": "(function verifyHeaders(\n    varyValue = 'Accept, Accept-Encoding', \n    status=200, \n    contentType='application/json', \n    headers='Link, X-TotalRecords, X-Release', \n    encode='chunked', \n    info='caching', \n    xRelease, \n    controlAllow) {\n    if(varyValue != \"none\") {\n        pm.test(\"Vary Header\", function () {\n                pm.response.to.be.header(\"Vary\", varyValue);\n        });\n    }\n\n    if(status != \"none\") {\n        pm.test(\"Status code Header\", function () {\n        pm.response.to.have.status(status);\n        });\n    }\n\n    if(contentType != \"none\") {\n        pm.test(\"Content-Type Header\", function () {\n            pm.response.to.be.header(\"Content-Type\", contentType);\n        }); \n    }\n\n    if(xRelease != \"none\") {\n        pm.test(\"X-Release Header\", function () {\n            pm.response.to.be.header(\"X-Release\", xRelease);\n        });\n    }\n\n    if(controlAllow != \"none\") {\n        pm.test(\"Access-Control-Allow-Origin Header\", function () {\n            pm.response.to.be.header(\"Access-Control-Allow-Origin\", controlAllow);\n        });\n    }\n\n    if(headers != \"none\") {\n        pm.test(\"Access-Control-Expose-Headers Header\", function () {\n            pm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n        });\n    }\n\n    pm.test(\"Date Header\", function () {\n        pm.response.to.have.header(\"Date\");\n    });\n    \n    if(encode != \"none\") {\n        pm.test(\"Transfer-Encoding Header\", function () {\n            pm.response.to.be.header(\"Transfer-Encoding\", encode);\n        });\n    }\n\n    if(info != \"none\") {\n        pm.test(\"X-Cache-Info Header\", function () {\n                pm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);        \n        });\n    }\n})",
+			"enabled": true
+		},
+		{
+			"key": "responseOkay",
+			"value": "(function responseOkay() {\n    pm.test(\"Status code is 200\", function () {\n        pm.response.to.have.status(200);\n    });\n})",
 			"enabled": true
 		}
 	],
 	"name": "My Workspace Globals",
 	"_postman_variable_scope": "globals",
-	"_postman_exported_at": "2020-08-06T12:39:43.915Z",
-	"_postman_exported_using": "Postman/7.29.1"
+	"_postman_exported_at": "2020-10-30T09:20:19.779Z",
+	"_postman_exported_using": "Postman/7.34.0"
 }

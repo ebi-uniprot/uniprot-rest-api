@@ -3,11 +3,11 @@ package org.uniprot.api.rest.service;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.uniprot.api.common.repository.search.QueryBoosts;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.search.document.Document;
@@ -21,9 +21,9 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             FacetConfig facetConfig,
             AbstractSolrSortClause solrSortClause,
             StoreStreamer<R> storeStreamer,
-            QueryBoosts queryBoosts) {
+            SolrQueryConfig solrQueryConfig) {
 
-        this(repository, null, solrSortClause, facetConfig, storeStreamer, queryBoosts);
+        this(repository, null, solrSortClause, facetConfig, storeStreamer, solrQueryConfig);
     }
 
     public StoreStreamerSearchService(
@@ -32,14 +32,15 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             AbstractSolrSortClause solrSortClause,
             FacetConfig facetConfig,
             StoreStreamer<R> storeStreamer,
-            QueryBoosts queryBoosts) {
+            SolrQueryConfig solrQueryConfig) {
 
-        super(repository, entryConverter, solrSortClause, queryBoosts, facetConfig);
+        super(repository, entryConverter, solrSortClause, solrQueryConfig, facetConfig);
         this.storeStreamer = storeStreamer;
     }
 
     public abstract R findByUniqueId(final String uniqueId, final String filters);
 
+    @Override
     public Stream<R> stream(StreamRequest request) {
         SolrRequest query = createDownloadSolrRequest(request);
         return this.storeStreamer.idsToStoreStream(query);

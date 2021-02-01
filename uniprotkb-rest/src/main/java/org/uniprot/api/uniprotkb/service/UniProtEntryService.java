@@ -1,6 +1,9 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -9,8 +12,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
@@ -18,17 +21,17 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
-import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniProtQueryBoostsConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniProtSolrQueryConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -40,18 +43,17 @@ import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @Service
-@Import(UniProtQueryBoostsConfig.class)
+@Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
-    private static final String ACCESSION = "accession_id";
+    public static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
-    private final QueryBoosts uniProtKBqueryBoosts;
+    private final SolrQueryConfig solrQueryConfig;
     private final UniProtTermsConfig uniProtTermsConfig;
     private final UniprotQueryRepository repository;
     private final StoreStreamer<UniProtKBEntry> storeStreamer;
@@ -60,41 +62,45 @@ public class UniProtEntryService
     private final FacetTupleStreamTemplate facetTupleStreamTemplate;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final QueryProcessor queryProcessor;
+    private final RDFStreamer uniProtRDFStreamer;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
             UniprotKBFacetConfig uniprotKBFacetConfig,
             UniProtTermsConfig uniProtTermsConfig,
             UniProtSolrSortClause uniProtSolrSortClause,
-            QueryBoosts uniProtKBQueryBoosts,
+            SolrQueryConfig uniProtKBSolrQueryConf,
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService,
-            FacetTupleStreamTemplate facetTupleStreamTemplate) {
+            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            QueryProcessor uniProtKBQueryProcessor,
+            SearchFieldConfig uniProtKBSearchFieldConfig,
+            RDFStreamer uniProtRDFStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
                 uniProtSolrSortClause,
                 uniProtEntryStoreStreamer,
-                uniProtKBQueryBoosts);
+                uniProtKBSolrQueryConf);
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
-        this.uniProtKBqueryBoosts = uniProtKBQueryBoosts;
+        this.solrQueryConfig = uniProtKBSolrQueryConf;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.storeStreamer = uniProtEntryStoreStreamer;
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+        this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+        this.queryProcessor = uniProtKBQueryProcessor;
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
+        this.uniProtRDFStreamer = uniProtRDFStreamer;
     }
 
     @Override
     public QueryResult<UniProtKBEntry> search(SearchRequest request) {
 
-        SolrRequest solrRequest = createSearchSolrRequest(request, true);
+        SolrRequest solrRequest = createSearchSolrRequest(request);
 
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
@@ -173,9 +179,8 @@ public class UniProtEntryService
 
     public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
         SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, uniProtKBqueryBoosts)
-                        .build();
-        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override
@@ -194,14 +199,14 @@ public class UniProtEntryService
     }
 
     @Override
-    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
+    public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
         // fill the common params from the basic service class
-        SolrRequest solrRequest = super.createSolrRequest(uniProtRequest, includeFacets);
+        SolrRequest solrRequest = super.createSearchSolrRequest(uniProtRequest);
 
         // uniprotkb related stuff
-        solrRequest.setQueryBoosts(uniProtKBqueryBoosts);
+        solrRequest.setQueryConfig(solrQueryConfig);
 
         if (needsToFilterIsoform(uniProtRequest.getQuery(), uniProtRequest.isIncludeIsoform())) {
             addIsoformFilter(solrRequest);
@@ -286,9 +291,5 @@ public class UniProtEntryService
                         && Utils.notNullNotEmpty(accessionsRequest.getFacetList())
                         && !accessionsRequest.isDownload())
                 || Utils.notNullNotEmpty(accessionsRequest.getFacetFilter());
-    }
-
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
     }
 }

@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.*;
 
 import lombok.Data;
 
@@ -47,7 +45,7 @@ public class GetByAccessionsRequest implements SearchRequest {
 
     @Parameter(
             description =
-                    "Add content disposition attachment to response header, this way it can be downloaded as a file in the browser.")
+                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
             regexp = "^true|false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -58,7 +56,8 @@ public class GetByAccessionsRequest implements SearchRequest {
     private String cursor;
 
     @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
-    @PositiveOrZero(message = "{search.positive}")
+    @PositiveOrZero(message = "{search.positive.or.zero}")
+    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @Override

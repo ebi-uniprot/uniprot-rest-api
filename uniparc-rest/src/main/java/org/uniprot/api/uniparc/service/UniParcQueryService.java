@@ -2,7 +2,6 @@ package org.uniprot.api.uniparc.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -11,25 +10,29 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniparc.repository.UniParcFacetConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
-import org.uniprot.api.uniparc.request.*;
+import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
-import org.uniprot.api.uniparc.service.filter.UniParcTaxonomyFilter;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
@@ -38,9 +41,9 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  * @date: 21 Jun 2019
  */
 @Service
-@Import(UniParcQueryBoostsConfig.class)
+@Import(UniParcSolrQueryConfig.class)
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
-    private static final String UNIPARC_ID_FIELD = "upi";
+    public static final String UNIPARC_ID_FIELD = "upi";
     private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String MD5_STR = "md5";
     private static final String COMMA_STR = ",";
@@ -48,6 +51,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
     private final QueryProcessor queryProcessor;
+    private final SolrQueryConfig solrQueryConfig;
+    private final RDFStreamer uniParcRDFStreamer;
 
     @Autowired
     public UniParcQueryService(
@@ -56,7 +61,10 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcSortClause solrSortClause,
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
-            QueryBoosts uniParcQueryBoosts) {
+            SolrQueryConfig uniParcSolrQueryConf,
+            QueryProcessor uniParcQueryProcessor,
+            SearchFieldConfig uniParcSearchFieldConfig,
+            RDFStreamer uniParcRDFStreamer) {
 
         super(
                 repository,
@@ -64,12 +72,13 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 solrSortClause,
                 facetConfig,
                 storeStreamer,
-                uniParcQueryBoosts);
-        this.searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        this.queryProcessor = new UniProtQueryProcessor(getDefaultSearchOptimisedFieldItems());
+                uniParcSolrQueryConf);
+        this.searchFieldConfig = uniParcSearchFieldConfig;
+        this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
+        this.solrQueryConfig = uniParcSolrQueryConf;
+        this.uniParcRDFStreamer = uniParcRDFStreamer;
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
@@ -116,6 +125,12 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return QueryResult.of(filtered, results.getPage(), results.getFacets());
     }
 
+    public Stream<String> streamRDF(UniParcStreamRequest streamRequest) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return this.uniParcRDFStreamer.idsToRDFStoreStream(solrRequest);
+    }
+
     @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
@@ -142,10 +157,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return analyser.analyseBestGuess(streamResult, request);
     }
 
-    private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems() {
-        return Collections.singletonList(getIdField());
-    }
-
     private Stream<UniParcEntry> filterUniParcStream(
             Stream<UniParcEntry> uniParcEntryStream, UniParcGetByIdRequest request) {
         // convert comma separated values to list
@@ -153,7 +164,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         List<String> toxonomyIds = csvToList(request.getTaxonIds());
         // converters
         UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
-        UniParcTaxonomyFilter taxonFilter = new UniParcTaxonomyFilter();
+        UniParcCrossReferenceTaxonomyFilter taxonFilter = new UniParcCrossReferenceTaxonomyFilter();
         UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
 
         // filter the results

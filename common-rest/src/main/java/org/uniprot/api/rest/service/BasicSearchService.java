@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.QueryBoosts;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -32,13 +33,16 @@ public abstract class BasicSearchService<D extends Document, R> {
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
     protected final AbstractSolrSortClause solrSortClause;
-    protected final QueryBoosts queryBoosts;
+    protected final SolrQueryConfig queryBoosts;
     private final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE
     @Value("${solr.query.batchSize:#{null}}")
     private Integer solrBatchSize;
+
+    @Value("${search.default.page.size:#{null}}")
+    private Integer defaultPageSize;
 
     public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
         this(repository, entryConverter, null, null, null);
@@ -48,7 +52,7 @@ public abstract class BasicSearchService<D extends Document, R> {
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,
             AbstractSolrSortClause solrSortClause,
-            QueryBoosts queryBoosts,
+            SolrQueryConfig queryBoosts,
             FacetConfig facetConfig) {
         this.repository = repository;
         this.entryConverter = entryConverter;
@@ -95,6 +99,26 @@ public abstract class BasicSearchService<D extends Document, R> {
         return QueryResult.of(converted, results.getPage(), results.getFacets());
     }
 
+    public Stream<R> stream(StreamRequest request) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts)
+                        .rows(getDefaultBatchSize())
+                        .totalRows(Integer.MAX_VALUE)
+                        .build();
+
+        return repository
+                .getAll(solrRequest)
+                .map(entryConverter)
+                .filter(Objects::nonNull)
+                .limit(solrRequest.getTotalRows());
+    }
+
+    /**
+     * Please replace download method with stream method
+     *
+     * @deprecated (we need to replaced by stream, remove when finished)
+     */
+    @Deprecated
     public Stream<R> download(SearchRequest request) {
         SolrRequest solrRequest = createDownloadSolrRequest(request);
 
@@ -110,7 +134,19 @@ public abstract class BasicSearchService<D extends Document, R> {
     include facets true for search api
     */
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
-        return createSearchSolrRequest(request, true);
+        if (request.getSize() == null) { // set the default result size
+            request.setSize(defaultPageSize);
+        }
+        SolrRequest.SolrRequestBuilder builder =
+                createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts);
+
+        if (request.hasFacets()) {
+            builder.facets(request.getFacetList());
+            builder.facetConfig(facetConfig);
+        }
+        builder.rows(request.getSize());
+        builder.totalRows(request.getSize());
+        return builder.build();
     }
 
     protected abstract SearchFieldItem getIdField();
@@ -124,32 +160,13 @@ public abstract class BasicSearchService<D extends Document, R> {
        For the search rows, size and totalRows should be same. We should restrict size value less than solrBatchSize.
     */
 
-    protected SolrRequest createSearchSolrRequest(SearchRequest request, boolean includeFacets) {
-        if (request.getSize() == null) { // set the default result size
-            request.setSize(SearchRequest.DEFAULT_RESULTS_SIZE);
-        } else if (request.getSize()
-                > getDefaultBatchSize()) { // set to batch size if requested for more
-            request.setSize(getDefaultBatchSize());
-        }
-
-        return createSolrRequest(request, includeFacets);
-    }
-
     public SolrRequest createDownloadSolrRequest(SearchRequest request) {
         if (request.getSize() == null) { // set -1 to download all if not passed
             request.setSize(NumberUtils.INTEGER_MINUS_ONE);
         }
-        return createSolrRequest(request, false);
-    }
 
-    protected SolrRequest createSolrRequest(SearchRequest request, boolean includeFacets) {
         SolrRequest.SolrRequestBuilder builder =
                 createSolrRequestBuilder(request, this.solrSortClause, this.queryBoosts);
-
-        if (includeFacets && request.hasFacets()) {
-            builder.facets(request.getFacetList());
-            builder.facetConfig(facetConfig);
-        }
 
         // If the requested size is less than batch size, set the batch size as requested size
         Integer requestedSize = request.getSize();
@@ -170,7 +187,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            BasicRequest request, AbstractSolrSortClause solrSortClause, QueryBoosts queryBoosts) {
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
 
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
 
@@ -182,7 +201,7 @@ public abstract class BasicSearchService<D extends Document, R> {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
-        requestBuilder.queryBoosts(queryBoosts);
+        requestBuilder.queryConfig(queryBoosts);
 
         return requestBuilder;
     }

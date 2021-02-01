@@ -59,7 +59,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
 
     @Autowired private SubcellularLocationRepository repository;
 
-    @Value("${solr.query.batchSize:#{null}}")
+    @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     @Override
