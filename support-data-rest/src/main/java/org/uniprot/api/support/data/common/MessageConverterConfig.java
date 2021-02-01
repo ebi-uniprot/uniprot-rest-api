@@ -173,6 +173,7 @@ public class MessageConverterConfig {
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
                                         UniProtDataType.CROSSREF));
                 converters.add(0, xrefJsonConverter);
+                converters.add(new RDFMessageConverter());
             }
         };
     }

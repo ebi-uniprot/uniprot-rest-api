@@ -31,6 +31,16 @@ import org.uniprot.store.search.SolrCollection;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractSolrStreamControllerIT {
+    protected static final String SAMPLE_RDF =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF>\n"
+                    + "    <owl:Ontology rdf:about=\"\">\n"
+                    + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "    </owl:Ontology>\n"
+                    + "    <sample>text</sample>\n"
+                    + "    <anotherSample>text2</anotherSample>\n"
+                    + "    <someMore>text3</someMore>\n"
+                    + "</rdf:RDF>";
 
     @RegisterExtension protected static DataStoreManager storeManager = new DataStoreManager();
 

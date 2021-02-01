@@ -30,8 +30,6 @@ import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
 import org.uniprot.api.support.data.crossref.request.CrossRefFacetConfig;
-import org.uniprot.core.cv.xdb.CrossRefEntry;
-import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -118,44 +116,14 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     private void saveEntry(long suffix) {
-        String accPrefix = "DI-";
+        String accPrefix = "DB-";
         long num = ThreadLocalRandom.current().nextLong(1000, 9999);
         String accession = accPrefix + num;
         saveEntry(accession, suffix);
     }
 
     private void saveEntry(String accession, long suffix) {
-        CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
-        CrossRefEntry crossRefEntry =
-                entryBuilder
-                        .id(accession)
-                        .abbrev("TIGRFAMs" + suffix)
-                        .name("TIGRFAMs; a protein family database" + suffix)
-                        .pubMedId("17151080" + suffix)
-                        .doiId("10.1093/nar/gkl1043" + suffix)
-                        .linkType("Explicit" + suffix)
-                        .server("http://tigrfams.jcvi.org/cgi-bin/index.cgi" + suffix)
-                        .dbUrl("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s" + suffix)
-                        .category("Family and domain databases" + suffix)
-                        .reviewedProteinCount(10L + suffix)
-                        .unreviewedProteinCount(5L + suffix)
-                        .build();
-
-        CrossRefDocument document =
-                CrossRefDocument.builder()
-                        .id(crossRefEntry.getId())
-                        .abbrev(crossRefEntry.getAbbrev())
-                        .name(crossRefEntry.getName())
-                        .pubMedId(crossRefEntry.getPubMedId())
-                        .doiId(crossRefEntry.getDoiId())
-                        .linkType(crossRefEntry.getLinkType())
-                        .server(crossRefEntry.getServer())
-                        .dbUrl(crossRefEntry.getDbUrl())
-                        .category(crossRefEntry.getCategory())
-                        .reviewedProteinCount(crossRefEntry.getReviewedProteinCount())
-                        .unreviewedProteinCount(crossRefEntry.getUnreviewedProteinCount())
-                        .build();
-
+        CrossRefDocument document = CrossRefITUtils.createSolrDocument(accession, suffix);
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.CROSSREF, document);
     }
 

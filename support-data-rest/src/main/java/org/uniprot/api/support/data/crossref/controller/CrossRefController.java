@@ -1,6 +1,8 @@
 package org.uniprot.api.support.data.crossref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
 import java.util.Optional;
@@ -12,15 +14,25 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.support.data.crossref.request.CrossRefSearchRequest;
+import org.uniprot.api.support.data.crossref.request.CrossRefStreamRequest;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -46,13 +58,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "The databases are categorized for easy user perusal and understanding of how the "
                         + "different databases relate to both UniProtKB and to each other")
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
+    private final MessageConverterContextFactory<CrossRefEntry> converterContextFactory;
     @Autowired private CrossRefService crossRefService;
     private static final String ACCESSION_REGEX = "DB-(\\d{4})";
 
     public CrossRefController(
             ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<CrossRefEntry> crossrefMessageConverterContextFactory) {
-        super(eventPublisher, crossrefMessageConverterContextFactory, null, CROSSREF);
+            MessageConverterContextFactory<CrossRefEntry> crossrefMessageConverterContextFactory,
+            ThreadPoolTaskExecutor downloadTaskExecutor) {
+        super(
+                eventPublisher,
+                crossrefMessageConverterContextFactory,
+                downloadTaskExecutor,
+                CROSSREF);
+        this.converterContextFactory = crossrefMessageConverterContextFactory;
     }
 
     @Operation(
@@ -111,6 +130,46 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
         QueryResult<CrossRefEntry> results = this.crossRefService.search(searchRequest);
 
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
+    }
+
+    @Operation(
+            summary = "Download cross-references by given SOLR search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CrossRefEntry.class))),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
+            value = "/stream",
+            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE})
+    public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
+            @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    MediaType contentType,
+            HttpServletRequest request) {
+
+        MessageConverterContext<CrossRefEntry> context =
+                converterContextFactory.get(CROSSREF, contentType);
+        context.setFileType(getBestFileTypeFromRequest(request));
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
+
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            context.setEntityIds(crossRefService.streamRDF(streamRequest));
+        } else {
+            context.setEntities(crossRefService.stream(streamRequest));
+        }
+
+        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override
