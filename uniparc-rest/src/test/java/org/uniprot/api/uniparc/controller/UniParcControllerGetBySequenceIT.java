@@ -208,9 +208,7 @@ class UniParcControllerGetBySequenceIT {
                                 "uniParcCrossReferences[*].taxonomy.scientificName",
                                 notNullValue()))
                 .andExpect(
-                        jsonPath(
-                                "uniParcCrossReferences[*].taxonomy.commonName",
-                                notNullValue()))
+                        jsonPath("uniParcCrossReferences[*].taxonomy.commonName", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].taxonomy.taxonId", notNullValue()))
                 .andExpect(jsonPath("sequence", notNullValue()))
                 .andExpect(jsonPath("sequence.value", is(SEQUENCE)))

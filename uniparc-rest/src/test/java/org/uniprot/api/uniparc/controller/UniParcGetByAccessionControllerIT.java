@@ -77,8 +77,10 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     jsonPath("$.uniParcCrossReferences[*].lastUpdated", notNullValue()));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()));
-            idParam.resultMatcher(jsonPath("uniParcCrossReferences[*].taxonomy.scientificName", notNullValue()));
-            idParam.resultMatcher(jsonPath("uniParcCrossReferences[*].taxonomy.commonName", notNullValue()));
+            idParam.resultMatcher(
+                    jsonPath("uniParcCrossReferences[*].taxonomy.scientificName", notNullValue()));
+            idParam.resultMatcher(
+                    jsonPath("uniParcCrossReferences[*].taxonomy.commonName", notNullValue()));
             idParam.resultMatcher(
                     jsonPath("$.uniParcCrossReferences[*].proteinName", notNullValue()));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].geneName", notNullValue()));
