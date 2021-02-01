@@ -1,7 +1,7 @@
 package org.uniprot.api.support.data.keyword.request;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class KeywordSearchRequest extends KeywordBasicRequest implements SearchR
     private String cursor;
 
     @Parameter(description = "Size of the result. Defaults to 25")
-    @Positive(message = "{search.positive}")
+    @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 

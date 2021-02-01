@@ -1,12 +1,12 @@
 package org.uniprot.api.support.data.literature.request;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +21,7 @@ public class LiteratureSearchRequest extends LiteratureBasicRequest implements S
     private String cursor;
 
     @Parameter(description = "Size of the result. Defaults to 25")
-    @Positive(message = "{search.positive}")
+    @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
