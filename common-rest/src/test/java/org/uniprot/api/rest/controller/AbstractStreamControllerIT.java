@@ -25,7 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.store.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
 
 /**

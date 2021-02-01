@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
@@ -33,18 +34,18 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
  */
 @Service
 @Import(UniRefSolrQueryConfig.class)
-public class UniRefLightSearchService
+public class UniRefEntryLightService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
     private final SolrQueryConfig solrQueryConfig;
-    private final StoreStreamer<UniRefEntryLight> storeStreamer;
     private static final int ID_LIMIT = 10;
     public static final String UNIREF_ID = "id";
     public static final String UNIREF_UPI = "upi";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
+    private final RDFStreamer uniRefRDFStreamer;
 
     @Autowired
-    public UniRefLightSearchService(
+    public UniRefEntryLightService(
             UniRefQueryRepository repository,
             UniRefFacetConfig facetConfig,
             UniRefSortClause uniRefSortClause,
@@ -52,7 +53,8 @@ public class UniRefLightSearchService
             StoreStreamer<UniRefEntryLight> storeStreamer,
             SolrQueryConfig uniRefSolrQueryConf,
             QueryProcessor uniRefQueryProcessor,
-            SearchFieldConfig uniRefSearchFieldConfig) {
+            SearchFieldConfig uniRefSearchFieldConfig,
+            RDFStreamer uniRefRDFStreamer) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -63,12 +65,27 @@ public class UniRefLightSearchService
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.queryProcessor = uniRefQueryProcessor;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.storeStreamer = storeStreamer;
+        this.uniRefRDFStreamer = uniRefRDFStreamer;
     }
 
     @Override
     public UniRefEntryLight findByUniqueId(String uniqueId, String fields) {
-        return findByUniqueId(uniqueId);
+        UniRefEntryLight entryLight = findByUniqueId(uniqueId);
+
+        // clean unirefLight entry
+        UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entryLight);
+
+        // seedId can be size 1 (for UniParc Members. Example: UPI0005EFF57F)
+        // or size2 (for UniProtMembers, Example: "FGFR2_HUMAN,P21802").
+        // In this case bellow we need the UniParcId or Accession to display
+        // in the search result (always the last index)
+        String[] splittedSeed = entryLight.getSeedId().split(",");
+        builder.seedId(splittedSeed[splittedSeed.length - 1]);
+
+        List<String> members = removeMemberTypeFromMemberId(entryLight.getMembers());
+        builder.membersSet(members);
+
+        return builder.build();
     }
 
     @Override
@@ -100,22 +117,10 @@ public class UniRefLightSearchService
         return result;
     }
 
-    @Override
-    public UniRefEntryLight findByUniqueId(String uniqueId) {
-        throw new UnsupportedOperationException(
-                "UniRefLightSearchService does not support findByUniqueId, try to use UniRefEntryService");
-    }
-
-    @Override
-    public UniRefEntryLight getEntity(String idField, String value) {
-        throw new UnsupportedOperationException(
-                "UniRefLightSearchService does not support getEntity, try to use UniRefEntryService");
-    }
-
     public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return this.storeStreamer.idsToRDFStoreStream(solrRequest);
+        return this.uniRefRDFStreamer.idsToRDFStoreStream(solrRequest);
     }
 
     @Override

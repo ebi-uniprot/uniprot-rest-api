@@ -218,13 +218,16 @@ class GeneCentricUpIdSearchControllerIT {
                         get(UPID_PATH + UPID)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
                                 .param("query", "*:*")
-                                .param("size", "0"));
+                                .param("size", "-1"));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", contains("'size' must be greater than 0")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains("'size' must be greater than or equal to 0")));
     }
 
     @Test
