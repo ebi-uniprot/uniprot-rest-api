@@ -1,10 +1,6 @@
 package org.uniprot.api.support.data.subcellular.request;
 
 import javax.validation.constraints.NotNull;
-<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationRequest.java
-import javax.validation.constraints.PositiveOrZero;
-=======
->>>>>>> use stream in keyword and location:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationBasicRequest.java
 
 import lombok.Data;
 
@@ -52,18 +48,4 @@ public class SubcellularLocationBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String fields;
-<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationRequest.java
-
-    @Parameter(description = "Size of the result. Defaults to 25")
-    @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    private Integer size;
-
-    @Parameter(hidden = true)
-    @Override
-    public String getFacets() {
-        return "";
-    }
-=======
->>>>>>> use stream in keyword and location:support-data-rest/src/main/java/org/uniprot/api/support/data/subcellular/request/SubcellularLocationBasicRequest.java
 }

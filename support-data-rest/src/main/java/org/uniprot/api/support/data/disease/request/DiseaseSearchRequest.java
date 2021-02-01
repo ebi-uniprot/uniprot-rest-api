@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.disease.request;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
