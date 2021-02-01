@@ -2168,8 +2168,8 @@
             "valuePrefix": "euhcvdb"
           },
           {
-            "id": "id_xref_eupathdb",
-            "label": "EuPathDB",
+            "id": "id_xref_veupathdb",
+            "label": "VEuPathDB",
             "itemType": "database",
             "term": "xref",
             "dataType": "string",

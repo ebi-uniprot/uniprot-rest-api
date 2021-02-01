@@ -406,7 +406,7 @@ DR   KEGG; hsa:6510; -.
 DR   UCSC; uc002pfr.4; human. [Q15758-1]
 DR   CTD; 6510; -.
 DR   DisGeNET; 6510; -.
-DR   EuPathDB; HostDB:ENSG00000105281.12; -.
+DR   VEuPathDB; HostDB:ENSG00000105281.12; -.
 DR   GeneCards; SLC1A5; -.
 DR   HGNC; HGNC:10943; SLC1A5.
 DR   HPA; HPA035239; -.

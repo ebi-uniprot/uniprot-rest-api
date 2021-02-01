@@ -1358,7 +1358,7 @@ DR   KEGG; hsa:2263; -.
 DR   UCSC; uc010qtl.3; human. [P21802-1]
 DR   CTD; 2263; -.
 DR   DisGeNET; 2263; -.
-DR   EuPathDB; HostDB:ENSG00000066468.20; -.
+DR   VEuPathDB; HostDB:ENSG00000066468.20; -.
 DR   GeneCards; FGFR2; -.
 DR   GeneReviews; FGFR2; -.
 DR   HGNC; HGNC:3689; FGFR2.
