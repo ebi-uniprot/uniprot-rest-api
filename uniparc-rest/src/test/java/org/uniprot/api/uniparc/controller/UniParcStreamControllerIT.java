@@ -295,12 +295,11 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                 containsInAnyOrder("UPI0000283A06", "UPI0000283A05")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcCrossReferences.*.properties[?(@.key=='gene_name')].value",
-                                containsInAnyOrder(
-                                        "geneName05", "geneName06", "geneName05", "geneName06")))
+                                "$.results.*.uniParcCrossReferences.*.geneName",
+                                containsInAnyOrder("geneName05", "geneName06")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.taxonomies.*.taxonId",
+                                "$.results.*.uniParcCrossReferences.*.taxonomy.taxonId",
                                 containsInAnyOrder(9606, 7787, 9606, 7787)))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());

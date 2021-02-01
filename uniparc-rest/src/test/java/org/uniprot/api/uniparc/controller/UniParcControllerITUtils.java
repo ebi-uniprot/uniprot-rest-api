@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.uniprot.core.Location;
-import org.uniprot.core.Property;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.impl.*;
-import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
-import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.Organism;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 
 /**
  * @author lgonzales
@@ -33,22 +32,16 @@ public class UniParcControllerITUtils {
                         signatureType -> {
                             seqFeatures.add(getSeqFeature(i, signatureType));
                         });
-        List<Taxonomy> taxonomies = getTaxonomies();
         return new UniParcEntryBuilder()
                 .uniParcId(new UniParcIdBuilder(getName(upiRef, i)).build())
                 .uniParcCrossReferencesSet(xrefs)
                 .sequence(sequence)
                 .sequenceFeaturesSet(seqFeatures)
-                .taxonomiesSet(taxonomies)
                 .build();
     }
 
-    static List<Taxonomy> getTaxonomies() {
-        Taxonomy taxonomy =
-                new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
-        Taxonomy taxonomy2 =
-                new TaxonomyBuilder().taxonId(7787).scientificName("Torpedo californica").build();
-        return Arrays.asList(taxonomy, taxonomy2);
+    static Organism getTaxonomy(long taxId) {
+        return new OrganismBuilder().taxonId(taxId).scientificName("Name " + taxId).build();
     }
 
     static SequenceFeature getSeqFeature(int i, SignatureDbType signatureDbType) {
@@ -66,16 +59,17 @@ public class UniParcControllerITUtils {
                 .build();
     }
 
+    static UniParcCrossReference getXref(UniParcDatabase database) {
+        return new UniParcCrossReferenceBuilder()
+                .versionI(3)
+                .database(database)
+                .id("id-" + database.name())
+                .version(7)
+                .active(true)
+                .build();
+    }
+
     static List<UniParcCrossReference> getXrefs(int i) {
-        List<Property> properties = new ArrayList<>();
-        properties.add(
-                new Property(
-                        UniParcCrossReference.PROPERTY_PROTEIN_NAME, getName("proteinName", i)));
-        properties.add(
-                new Property(UniParcCrossReference.PROPERTY_GENE_NAME, getName("geneName", i)));
-        properties.add(
-                new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, getName("UP1234567", i)));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_CHAIN, "chain"));
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
                         .versionI(3)
@@ -85,17 +79,13 @@ public class UniParcControllerITUtils {
                         .active(true)
                         .created(LocalDate.of(2017, 5, 17))
                         .lastUpdated(LocalDate.of(2017, 2, 27))
-                        .propertiesSet(properties)
+                        .proteinName(getName("proteinName", i))
+                        .geneName(getName("geneName", i))
+                        .proteomeId(getName("UP1234567", i))
+                        .taxonomy(getTaxonomy(7787L))
+                        .component(getName("component", i))
+                        .chain("chain")
                         .build();
-
-        List<Property> properties2 = new ArrayList<>();
-        properties2.add(
-                new Property(
-                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                        getName("anotherProteinName", i)));
-        properties2.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "9606"));
-        properties2.add(new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, "7787"));
-        properties2.add(new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, "UP000005640"));
 
         UniParcCrossReference xref2 =
                 new UniParcCrossReferenceBuilder()
@@ -106,7 +96,10 @@ public class UniParcControllerITUtils {
                         .active(true)
                         .created(LocalDate.of(2017, 2, 12))
                         .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesSet(properties2)
+                        .proteinName(getName("anotherProteinName", i))
+                        .taxonomy(getTaxonomy(9606L))
+                        .proteomeId("UP000005640")
+                        .component("com")
                         .build();
 
         return Arrays.asList(xref, xref2);
@@ -124,24 +117,21 @@ public class UniParcControllerITUtils {
 
     static UniParcCrossReference getXref(
             UniParcDatabase database, String id, Integer taxId, boolean active) {
-        UniParcCrossReferenceBuilder xrefBuilder = new UniParcCrossReferenceBuilder();
-        xrefBuilder
+        return new UniParcCrossReferenceBuilder()
                 .database(database)
                 .id(id)
                 .versionI(1)
                 .version(7)
                 .active(active)
                 .created(LocalDate.of(2017, 2, 12))
-                .lastUpdated(LocalDate.of(2017, 4, 23));
-        List<Property> properties = new ArrayList<>();
-        properties.add(
-                new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, taxId.toString()));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "protein Name"));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_GENE_NAME, "Gel"));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, "UPI"));
-        xrefBuilder.propertiesSet(properties);
-
-        return xrefBuilder.build();
+                .lastUpdated(LocalDate.of(2017, 4, 23))
+                .taxonomy(getTaxonomy(taxId))
+                .proteinName("protein Name")
+                .geneName("Gel")
+                .proteomeId("UPI")
+                .component("com")
+                .chain("chain")
+                .build();
     }
 
     static String getName(String prefix, int i) {
@@ -160,10 +150,7 @@ public class UniParcControllerITUtils {
                         .active(true)
                         .created(LocalDate.of(2017, 2, 12))
                         .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "proteinName" + i))
+                        .proteinName("proteinName" + i)
                         .build();
 
         UniParcCrossReference xref2 =
@@ -175,10 +162,7 @@ public class UniParcControllerITUtils {
                         .active(false)
                         .created(LocalDate.of(2017, 2, 12))
                         .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "proteinName" + i))
+                        .proteinName("proteinName" + i)
                         .build();
 
         // common db xref
@@ -191,10 +175,7 @@ public class UniParcControllerITUtils {
                         .active(true)
                         .created(LocalDate.of(2017, 2, 12))
                         .lastUpdated(LocalDate.of(2017, 4, 23))
-                        .propertiesAdd(
-                                new Property(
-                                        UniParcCrossReference.PROPERTY_PROTEIN_NAME,
-                                        "common-vector-proteinName" + i))
+                        .proteinName("common-vector-proteinName" + i)
                         .build();
         UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
         builder.uniParcCrossReferencesAdd(xref1);

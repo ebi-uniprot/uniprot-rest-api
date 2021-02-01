@@ -1,8 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
@@ -201,15 +200,16 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("uniParcCrossReferences[*].created", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].lastUpdated", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("uniParcCrossReferences[*].properties", notNullValue()))
-                .andExpect(jsonPath("uniParcCrossReferences[0].properties", iterableWithSize(4)))
-                .andExpect(jsonPath("uniParcCrossReferences[*].properties[*].key", notNullValue()))
-                .andExpect(
-                        jsonPath("uniParcCrossReferences[*].properties[*].value", notNullValue()))
+                .andExpect(jsonPath("uniParcCrossReferences[*].proteomeId", notNullValue()))
+                .andExpect(jsonPath("uniParcCrossReferences[*].proteomeId", hasItem("UP123456701")))
+                .andExpect(jsonPath("uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(
                         jsonPath(
-                                "uniParcCrossReferences[*].properties[*].value",
-                                hasItem("UP123456701")))
+                                "uniParcCrossReferences[*].taxonomy.scientificName",
+                                notNullValue()))
+                .andExpect(
+                        jsonPath("uniParcCrossReferences[*].taxonomy.commonName", notNullValue()))
+                .andExpect(jsonPath("uniParcCrossReferences[*].taxonomy.taxonId", notNullValue()))
                 .andExpect(jsonPath("sequence", notNullValue()))
                 .andExpect(jsonPath("sequence.value", is(SEQUENCE)))
                 .andExpect(jsonPath("sequence.length", notNullValue()))
@@ -225,10 +225,7 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("sequenceFeatures[*].locations[*].end", notNullValue()))
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup", notNullValue()))
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup.id", notNullValue()))
-                .andExpect(jsonPath("sequenceFeatures[*].interproGroup.name", notNullValue()))
-                .andExpect(jsonPath("taxonomies", iterableWithSize(2)))
-                .andExpect(jsonPath("taxonomies[*].scientificName", notNullValue()))
-                .andExpect(jsonPath("taxonomies[*].taxonId", notNullValue()));
+                .andExpect(jsonPath("sequenceFeatures[*].interproGroup.name", notNullValue()));
     }
 
     @Test
@@ -247,8 +244,10 @@ class UniParcControllerGetBySequenceIT {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)))
-                .andExpect(jsonPath("$.uniParcCrossReferences").doesNotExist());
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].proteomeId").doesNotExist())
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].proteinName").doesNotExist())
+                .andExpect(jsonPath("$.sequenceFeatures").doesNotExist());
     }
 
     @Test
@@ -270,13 +269,13 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].database",
                                 containsInAnyOrder("UniProtKB/TrEMBL", "EMBL")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 
     @Test
@@ -306,7 +305,7 @@ class UniParcControllerGetBySequenceIT {
     @Test
     void testGetBySequenceWithTaxonomyIdsFilterSuccess() throws Exception {
         // when
-        String taxonIds = "9606,radomTaxonId";
+        String taxonIds = "9606,55555";
         ResultActions response =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getBySequencePath)
@@ -319,14 +318,16 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(1)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(1)))
-                .andExpect(jsonPath("$.taxonomies[0].taxonId", Matchers.is(9606)));
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.uniParcCrossReferences[0].taxonomy.taxonId", Matchers.is(9606)));
     }
 
     @Test
@@ -349,13 +350,13 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].active",
                                 contains(true, true, true, true)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 
     @Test
@@ -378,8 +379,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].active", contains(false)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 }

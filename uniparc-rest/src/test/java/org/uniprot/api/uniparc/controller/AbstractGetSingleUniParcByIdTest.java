@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.HashMap;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -116,14 +115,13 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
                 .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].database",
                                 containsInAnyOrder("UniProtKB/TrEMBL", "EMBL")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 
     @Test
@@ -153,7 +151,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     @Test
     void testGetByAccessionWithTaxonomyIdsFilterSuccess() throws Exception {
         // when
-        String taxonIds = "9606,radomTaxonId";
+        String taxonIds = "9606,5555";
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -166,14 +164,13 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(1)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy.taxonId", hasItem(9606)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(1)))
-                .andExpect(jsonPath("$.taxonomies[0].taxonId", Matchers.is(9606)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 
     @Test
@@ -196,13 +193,13 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].active",
                                 contains(true, true, true, true)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 
     @Test
@@ -224,9 +221,9 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(1)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].active", contains(false)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
-                .andExpect(jsonPath("$.taxonomies", iterableWithSize(2)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }
 }

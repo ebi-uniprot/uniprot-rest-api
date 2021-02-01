@@ -11,12 +11,13 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.service.exception.BestGuessAnalyserException;
-import org.uniprot.core.Property;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.Organism;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -212,12 +213,12 @@ class BestGuessAnalyserTest {
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
         BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessRequest request = new UniParcBestGuessRequest();
+        Stream<UniParcEntry> entryStream = entries.stream();
         BestGuessAnalyserException result =
                 assertThrows(
                         BestGuessAnalyserException.class,
-                        () ->
-                                bestGuessAnalyser.analyseBestGuess(
-                                        entries.stream(), new UniParcBestGuessRequest()));
+                        () -> bestGuessAnalyser.analyseBestGuess(entryStream, request));
         assertEquals(
                 "More than one Best Guess found {UP1:swissProtUP1;UP2:swissProtUP2}. Review your query and/or contact us.",
                 result.getMessage());
@@ -263,25 +264,21 @@ class BestGuessAnalyserTest {
 
     private static UniParcCrossReference createCrossReference(
             UniParcDatabase database, String id, Integer taxId, boolean active) {
-        UniParcCrossReferenceBuilder xrefBuilder = new UniParcCrossReferenceBuilder();
-        xrefBuilder
+        Organism taxonomy = new OrganismBuilder().taxonId(taxId).build();
+        return new UniParcCrossReferenceBuilder()
                 .database(database)
                 .id(id)
                 .versionI(1)
                 .version(1)
                 .active(active)
                 .created(LocalDate.of(2015, 4, 1))
-                .lastUpdated(LocalDate.of(2019, 5, 8));
-        List<Property> properties = new ArrayList<>();
-        properties.add(
-                new Property(UniParcCrossReference.PROPERTY_NCBI_TAXONOMY_ID, taxId.toString()));
-        properties.add(
-                new Property(UniParcCrossReference.PROPERTY_PROTEIN_NAME, "Gelsolin, isoform J"));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_GENE_NAME, "Gel"));
-        properties.add(new Property(UniParcCrossReference.PROPERTY_PROTEOME_ID, "UPI"));
-        xrefBuilder.propertiesSet(properties);
-
-        return xrefBuilder.build();
+                .lastUpdated(LocalDate.of(2019, 5, 8))
+                .taxonomy(taxonomy)
+                .proteinName("Gelsolin, isoform J")
+                .geneName("Gel")
+                .proteomeId("UPI")
+                .component("CompValue")
+                .build();
     }
 
     public static UniParcEntry createUniParcEntry(
