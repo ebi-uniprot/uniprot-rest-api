@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
@@ -20,7 +21,7 @@ public class CrossRefMessageConverterConfig {
         MessageConverterContextFactory<CrossRefEntry> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        Arrays.asList(context(APPLICATION_JSON))
+        Arrays.asList(context(APPLICATION_JSON), context(UniProtMediaType.RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

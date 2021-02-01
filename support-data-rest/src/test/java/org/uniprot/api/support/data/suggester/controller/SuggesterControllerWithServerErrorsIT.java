@@ -31,6 +31,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -57,6 +58,8 @@ class SuggesterControllerWithServerErrorsIT {
     @Autowired private SolrClient solrClient;
 
     @Autowired private WebApplicationContext webApplicationContext;
+
+    @Autowired private RestTemplate restTemplate;
 
     private MockMvc mockMvc;
 
@@ -110,6 +113,11 @@ class SuggesterControllerWithServerErrorsIT {
                     return solrQuery;
                 }
             };
+        }
+
+        @Bean(name = "rdfRestTemplate")
+        public RestTemplate restTemplate() {
+            return mock(RestTemplate.class);
         }
     }
 }
