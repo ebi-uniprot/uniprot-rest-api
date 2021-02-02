@@ -72,7 +72,7 @@ public class LiteratureStreamConfig {
 
     @Bean(name = "literatureRDFRestTemplate")
     @Profile("live")
-    RestTemplate literatureRDFRestTemplate(
+    public RestTemplate literatureRDFRestTemplate(
             RDFStreamerConfigProperties literatureRDFConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
