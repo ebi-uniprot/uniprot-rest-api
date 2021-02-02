@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
+import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
@@ -59,8 +62,12 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(SubcellularLocationController.class)
 @ExtendWith(value = {SpringExtension.class})
-class SubcellularLocationStreamControllerIT extends AbstractSolrStreamControllerIT {
+class SubcellularLocationStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Autowired private SubcellularLocationRepository repository;
+
+    @Autowired
+    @Qualifier("locationRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private String searchAccession;
     private List<String> allAccessions = new ArrayList<>();
@@ -427,5 +434,20 @@ class SubcellularLocationStreamControllerIT extends AbstractSolrStreamController
     private void saveEntry(String accession, long suffix) {
         SubcellularLocationDocument document = SubcellularLocationITUtils.createSolrDoc(accession);
         storeManager.saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
+    }
+
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return searchAccession;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.SUBCELLULAR_LOCATION_PROLOG;
     }
 }

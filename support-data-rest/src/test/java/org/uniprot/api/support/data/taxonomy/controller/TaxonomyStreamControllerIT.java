@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
+import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
@@ -59,8 +62,12 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(TaxonomyController.class)
 @ExtendWith(value = {SpringExtension.class})
-class TaxonomyStreamControllerIT extends AbstractSolrStreamControllerIT {
+class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Autowired private TaxonomyRepository repository;
+
+    @Autowired
+    @Qualifier("taxonomyRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private int searchAccession;
     private List<Integer> allAccessions = new ArrayList<>();
@@ -361,5 +368,20 @@ class TaxonomyStreamControllerIT extends AbstractSolrStreamControllerIT {
     private void saveEntry(long taxonId, long suffix) {
         TaxonomyDocument document = TaxonomyITUtils.createSolrDoc(taxonId, suffix % 2 == 0);
         storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
+    }
+
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return String.valueOf(searchAccession);
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.TAXONOMY_PROLOG;
     }
 }

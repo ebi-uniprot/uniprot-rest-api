@@ -2,6 +2,8 @@ package org.uniprot.api.support.data.taxonomy.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.TAXONOMY;
@@ -202,7 +204,8 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                                                                             TaxonomyEntry.class))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
@@ -211,15 +214,21 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Stream<TaxonomyEntry> result = taxonomyService.stream(streamRequest);
-        return super.stream(result, streamRequest, contentType, request);
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result = taxonomyService.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
+        } else {
+            Stream<TaxonomyEntry> result = taxonomyService.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
+        }
     }
 
     @Override

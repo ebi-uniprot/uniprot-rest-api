@@ -2,10 +2,16 @@ package org.uniprot.api.uniref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,11 +24,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
@@ -56,7 +67,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
 
     private static final int PREVIEW_SIZE = 10;
     private final UniRefEntryLightService service;
-    private final MessageConverterContextFactory<UniRefEntryLight> converterContextFactory;
 
     @Autowired
     public UniRefEntryLightController(
@@ -66,7 +76,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
         this.service = queryService;
-        this.converterContextFactory = converterContextFactory;
     }
 
     @Tag(
@@ -222,20 +231,13 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        MessageConverterContext<UniRefEntryLight> context =
-                converterContextFactory.get(UNIREF, contentType);
-        context.setFileType(FileType.bestFileTypeMatch(encoding));
-        context.setFields(streamRequest.getFields());
-        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
-        if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(service.streamIds(streamRequest));
-        } else if (contentType.equals(RDF_MEDIA_TYPE)) {
-            context.setEntityIds(service.streamRDF(streamRequest));
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result = service.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            context.setEntities(service.stream(streamRequest));
+            Stream<UniRefEntryLight> result = service.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
         }
-
-        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override

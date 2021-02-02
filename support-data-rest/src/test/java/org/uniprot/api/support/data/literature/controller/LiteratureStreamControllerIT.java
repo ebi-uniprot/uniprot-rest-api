@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
+import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
@@ -59,8 +62,12 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(LiteratureController.class)
 @ExtendWith(value = {SpringExtension.class})
-class LiteratureStreamControllerIT extends AbstractSolrStreamControllerIT {
+class LiteratureStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Autowired private LiteratureRepository repository;
+
+    @Autowired
+    @Qualifier("literatureRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private String searchAccession;
     private List<String> allAccessions = new ArrayList<>();
@@ -361,5 +368,20 @@ class LiteratureStreamControllerIT extends AbstractSolrStreamControllerIT {
     private void saveEntry(long pubmed, long suffix) {
         LiteratureDocument document = LiteratureITUtils.createSolrDoc(pubmed, suffix % 2 == 0);
         storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+    }
+
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return searchAccession;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.LITERATURE_PROLOG;
     }
 }

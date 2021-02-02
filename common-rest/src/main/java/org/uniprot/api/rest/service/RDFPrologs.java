@@ -18,4 +18,33 @@ public class RDFPrologs {
                     + "<owl:Ontology rdf:about=\"\">\n"
                     + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
                     + "</owl:Ontology>";
+    public static final String KEYWORD_PROLOG =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:obo=\"http://purl.obolibrary.org/obo/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\">\n"
+                    + "<owl:Ontology rdf:about=\"\">\n"
+                    + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "</owl:Ontology>";
+
+    public static final String LITERATURE_PROLOG =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:pubmed=\"http://purl.uniprot.org/pubmed/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\">\n"
+                    + "<owl:Ontology rdf:about=\"\">\n"
+                    + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "</owl:Ontology>";
+
+    public static final String SUBCELLULAR_LOCATION_PROLOG =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\">\n"
+                    + "<owl:Ontology rdf:about=\"\">\n"
+                    + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "</owl:Ontology>";
+
+    public static final String TAXONOMY_PROLOG =
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    + "<rdf:RDF xml:base=\"http://purl.uniprot.org/taxonomy/\" xmlns=\"http://purl.uniprot.org/core/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\">\n"
+                    + "<owl:Ontology rdf:about=\"http://purl.uniprot.org/taxonomy/\">\n"
+                    + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                    + "</owl:Ontology>";
+
+    private RDFPrologs() {}
 }

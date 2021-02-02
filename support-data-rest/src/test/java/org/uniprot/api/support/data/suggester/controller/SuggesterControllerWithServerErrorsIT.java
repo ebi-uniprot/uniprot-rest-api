@@ -68,6 +68,22 @@ class SuggesterControllerWithServerErrorsIT {
     @Qualifier("diseaseRDFRestTemplate")
     private RestTemplate diseaseRestTemplate;
 
+    @Autowired
+    @Qualifier("keywordRDFRestTemplate")
+    private RestTemplate keywordRDFRestTemplate;
+
+    @Autowired
+    @Qualifier("taxonomyRDFRestTemplate")
+    private RestTemplate taxonomyRDFRestTemplate;
+
+    @Autowired
+    @Qualifier("locationRDFRestTemplate")
+    private RestTemplate locationRDFRestTemplate;
+
+    @Autowired
+    @Qualifier("literatureRDFRestTemplate")
+    private RestTemplate literatureRDFRestTemplate;
+
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -129,6 +145,26 @@ class SuggesterControllerWithServerErrorsIT {
 
         @Bean(name = "diseaseRDFRestTemplate")
         public RestTemplate diseaseRestTemplate() {
+            return mock(RestTemplate.class);
+        }
+
+        @Bean(name = "keywordRDFRestTemplate")
+        public RestTemplate keywordRDFRestTemplate() {
+            return mock(RestTemplate.class);
+        }
+
+        @Bean(name = "taxonomyRDFRestTemplate")
+        public RestTemplate taxonomyRDFRestTemplate() {
+            return mock(RestTemplate.class);
+        }
+
+        @Bean(name = "locationRDFRestTemplate")
+        public RestTemplate locationRDFRestTemplate() {
+            return mock(RestTemplate.class);
+        }
+
+        @Bean(name = "literatureRDFRestTemplate")
+        public RestTemplate literaturesRDFRestTemplate() {
             return mock(RestTemplate.class);
         }
     }

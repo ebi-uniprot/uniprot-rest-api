@@ -3,6 +3,8 @@ package org.uniprot.api.support.data.keyword.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
@@ -17,6 +19,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -148,7 +151,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                OBO_MEDIA_TYPE_VALUE
+                OBO_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download Keywords by given SOLR search query.",
@@ -166,13 +170,20 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> stream(
-            @Valid @ModelAttribute KeywordStreamRequest searchRequest, HttpServletRequest request) {
-        Stream<KeywordEntry> result = keywordService.stream(searchRequest);
-        return super.stream(result, searchRequest, getAcceptHeader(request), request);
+            @Valid @ModelAttribute KeywordStreamRequest streamRequest, HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result = keywordService.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
+        } else {
+            Stream<KeywordEntry> result = keywordService.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
+        }
     }
 
     @Override

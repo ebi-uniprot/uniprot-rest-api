@@ -1,16 +1,15 @@
 package org.uniprot.api.support.data.disease.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.DISEASE;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,7 +60,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     @Autowired private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
-    private final MessageConverterContextFactory<DiseaseEntry> converterContextFactory;
 
     protected DiseaseController(
             ApplicationEventPublisher eventPublisher,
@@ -73,7 +71,6 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 diseaseMessageConverterContextFactory,
                 downloadTaskExecutor,
                 MessageConverterContextFactory.Resource.DISEASE);
-        this.converterContextFactory = diseaseMessageConverterContextFactory;
     }
 
     @Operation(
@@ -188,20 +185,13 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                     MediaType contentType,
             HttpServletRequest request) {
 
-        MessageConverterContext<DiseaseEntry> context =
-                converterContextFactory.get(DISEASE, contentType);
-        context.setFileType(getBestFileTypeFromRequest(request));
-        context.setFields(streamRequest.getFields());
-        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
-        if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(diseaseService.stream(streamRequest).map(this::getEntityId));
-        } else if (contentType.equals(RDF_MEDIA_TYPE)) {
-            context.setEntityIds(diseaseService.streamRDF(streamRequest));
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result = diseaseService.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            context.setEntities(diseaseService.stream(streamRequest));
+            Stream<DiseaseEntry> result = diseaseService.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
         }
-
-        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override

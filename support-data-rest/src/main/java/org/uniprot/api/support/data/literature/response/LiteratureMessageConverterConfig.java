@@ -28,7 +28,8 @@ public class LiteratureMessageConverterConfig {
                         context(APPLICATION_JSON),
                         context(UniProtMediaType.LIST_MEDIA_TYPE),
                         context(UniProtMediaType.TSV_MEDIA_TYPE),
-                        context(UniProtMediaType.XLS_MEDIA_TYPE))
+                        context(UniProtMediaType.XLS_MEDIA_TYPE),
+                        context(UniProtMediaType.RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

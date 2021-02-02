@@ -1,8 +1,10 @@
 package org.uniprot.api.support.data.subcellular.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
@@ -25,6 +27,7 @@ public class SubcellularLocationService
     public static final String SUBCELL_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
+    private final RDFStreamer rdfStreamer;
 
     public SubcellularLocationService(
             SubcellularLocationRepository repository,
@@ -32,7 +35,8 @@ public class SubcellularLocationService
             SubcellularLocationSortClause subcellularLocationSortClause,
             SolrQueryConfig subcellSolrQueryConf,
             QueryProcessor subcellQueryProcessor,
-            SearchFieldConfig subcellSearchFieldConfig) {
+            SearchFieldConfig subcellSearchFieldConfig,
+            @Qualifier("locationRDFStreamer") RDFStreamer rdfStreamer) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
@@ -41,6 +45,7 @@ public class SubcellularLocationService
                 null);
         this.searchFieldConfig = subcellSearchFieldConfig;
         this.queryProcessor = subcellQueryProcessor;
+        this.rdfStreamer = rdfStreamer;
     }
 
     @Override
@@ -51,5 +56,10 @@ public class SubcellularLocationService
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
+    }
+
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return this.rdfStreamer;
     }
 }
