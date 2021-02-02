@@ -10,7 +10,7 @@ variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   JACOCO_AGGREGATE_REPORT: "jacoco-aggregate-report/target/site/jacoco-aggregate/jacoco.xml"
 
-image: maven:3.3.9-jdk-8
+image: maven:3.6.3-jdk-11
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
