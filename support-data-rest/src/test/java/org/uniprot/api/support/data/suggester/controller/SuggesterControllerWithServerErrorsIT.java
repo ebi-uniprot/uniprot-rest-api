@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -59,7 +60,13 @@ class SuggesterControllerWithServerErrorsIT {
 
     @Autowired private WebApplicationContext webApplicationContext;
 
-    @Autowired private RestTemplate restTemplate;
+    @Autowired
+    @Qualifier("xrefRDFRestTemplate")
+    private RestTemplate xrefRestTemplate;
+
+    @Autowired
+    @Qualifier("diseaseRDFRestTemplate")
+    private RestTemplate diseaseRestTemplate;
 
     private MockMvc mockMvc;
 
@@ -115,8 +122,13 @@ class SuggesterControllerWithServerErrorsIT {
             };
         }
 
-        @Bean(name = "rdfRestTemplate")
-        public RestTemplate restTemplate() {
+        @Bean(name = "xrefRDFRestTemplate")
+        public RestTemplate xrefRestTemplate() {
+            return mock(RestTemplate.class);
+        }
+
+        @Bean(name = "diseaseRDFRestTemplate")
+        public RestTemplate diseaseRestTemplate() {
             return mock(RestTemplate.class);
         }
     }

@@ -1,8 +1,10 @@
 package org.uniprot.api.support.data.disease.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
@@ -20,6 +22,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     public static final String DISEASE_ID_FIELD = "id";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
+    private final RDFStreamer rdfStreamer;
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -27,7 +30,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             DiseaseSolrSortClause diseaseSolrSortClause,
             SolrQueryConfig diseaseSolrQueryConf,
             QueryProcessor diseaseQueryProcessor,
-            SearchFieldConfig diseaseSearchFieldConfig) {
+            SearchFieldConfig diseaseSearchFieldConfig,
+            @Qualifier("diseaseRDFStreamer") RDFStreamer rdfStreamer) {
 
         super(
                 diseaseRepository,
@@ -37,6 +41,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 null);
         this.searchFieldConfig = diseaseSearchFieldConfig;
         this.queryProcessor = diseaseQueryProcessor;
+        this.rdfStreamer = rdfStreamer;
     }
 
     @Override
@@ -47,5 +52,10 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
+    }
+
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return this.rdfStreamer;
     }
 }

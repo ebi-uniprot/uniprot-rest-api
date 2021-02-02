@@ -14,6 +14,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -196,5 +197,18 @@ public abstract class BasicSearchService<D extends Document, R> {
 
     protected Integer getDefaultBatchSize() {
         return this.solrBatchSize == null ? DEFAULT_SOLR_BATCH_SIZE : this.solrBatchSize;
+    }
+
+    public Stream<String> streamRDF(StreamRequest streamRequest) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, queryBoosts)
+                        .rows(getDefaultBatchSize())
+                        .totalRows(Integer.MAX_VALUE)
+                        .build();
+        return getRDFStreamer().idsToRDFStoreStream(solrRequest);
+    }
+
+    protected RDFStreamer getRDFStreamer() {
+        throw new UnsupportedOperationException("Override this method");
     }
 }
