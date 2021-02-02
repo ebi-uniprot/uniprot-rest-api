@@ -27,7 +27,8 @@ public class TaxonomyMessageConverterConfig {
                         context(UniProtMediaType.LIST_MEDIA_TYPE),
                         context(APPLICATION_JSON),
                         context(UniProtMediaType.TSV_MEDIA_TYPE),
-                        context(UniProtMediaType.XLS_MEDIA_TYPE))
+                        context(UniProtMediaType.XLS_MEDIA_TYPE),
+                        context(UniProtMediaType.RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

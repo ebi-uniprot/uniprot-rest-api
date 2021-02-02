@@ -1,5 +1,16 @@
 package org.uniprot.api.support.data;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -12,17 +23,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author sahmad
  * @created 02/02/2021
@@ -30,7 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class AbstractRDFStreamControllerIT extends AbstractSolrStreamControllerIT {
 
     protected abstract RestTemplate getRestTemple();
+
     protected abstract String getSearchAccession();
+
     protected abstract String getRDFProlog();
 
     @Test
@@ -52,8 +54,8 @@ public abstract class AbstractRDFStreamControllerIT extends AbstractSolrStreamCo
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(
@@ -80,8 +82,7 @@ public abstract class AbstractRDFStreamControllerIT extends AbstractSolrStreamCo
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.RDF_MEDIA_TYPE_VALUE));
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE));
     }
-
 }

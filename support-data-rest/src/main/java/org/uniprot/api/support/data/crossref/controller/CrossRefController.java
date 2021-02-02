@@ -6,6 +6,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,7 +59,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "The databases are categorized for easy user perusal and understanding of how the "
                         + "different databases relate to both UniProtKB and to each other")
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
-    private final MessageConverterContextFactory<CrossRefEntry> converterContextFactory;
     @Autowired private CrossRefService crossRefService;
     private static final String ACCESSION_REGEX = "DB-(\\d{4})";
 
@@ -71,7 +71,6 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                 crossrefMessageConverterContextFactory,
                 downloadTaskExecutor,
                 CROSSREF);
-        this.converterContextFactory = crossrefMessageConverterContextFactory;
     }
 
     @Operation(
@@ -157,19 +156,13 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                     MediaType contentType,
             HttpServletRequest request) {
 
-        MessageConverterContext<CrossRefEntry> context =
-                converterContextFactory.get(CROSSREF, contentType);
-        context.setFileType(getBestFileTypeFromRequest(request));
-        context.setFields(streamRequest.getFields());
-        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
-
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            context.setEntityIds(crossRefService.streamRDF(streamRequest));
+            Stream<String> result = crossRefService.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            context.setEntities(crossRefService.stream(streamRequest));
+            Stream<CrossRefEntry> result = crossRefService.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
         }
-
-        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override

@@ -55,4 +55,28 @@ public class DataStoreTestConfig {
     public RestTemplate diseaseRDFRestTemplate() {
         return mock(RestTemplate.class);
     }
+
+    @Bean(name = "keywordRDFRestTemplate")
+    @Profile("offline")
+    public RestTemplate keywordRDFRestTemplate() {
+        return mock(RestTemplate.class);
+    }
+
+    @Bean(name = "taxonomyRDFRestTemplate")
+    @Profile("offline")
+    public RestTemplate taxonomyRDFRestTemplate() {
+        return mock(RestTemplate.class);
+    }
+
+    @Bean(name = "locationRDFRestTemplate")
+    @Profile("offline")
+    public RestTemplate locationRDFRestTemplate() {
+        return mock(RestTemplate.class);
+    }
+
+    @Bean(name = "literatureRDFRestTemplate")
+    @Profile("offline")
+    public RestTemplate literaturesRDFRestTemplate() {
+        return mock(RestTemplate.class);
+    }
 }

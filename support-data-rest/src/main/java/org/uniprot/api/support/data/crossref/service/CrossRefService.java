@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.crossref.service;
 
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;

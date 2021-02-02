@@ -186,6 +186,18 @@ public abstract class BasicSearchController<T> {
         return FileType.bestFileTypeMatch(encoding);
     }
 
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRDF(
+            Stream<String> rdfStream,
+            StreamRequest streamRequest,
+            MediaType contentType,
+            HttpServletRequest request) {
+        MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
+        context.setFileType(getBestFileTypeFromRequest(request));
+        context.setEntityIds(rdfStream);
+        return getDeferredResultResponseEntity(request, context);
+    }
+
     private String getLocationURLForId(String redirectId) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         if (path != null) {

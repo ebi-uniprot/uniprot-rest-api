@@ -129,7 +129,6 @@ public class MessageConverterConfig {
                                 diseaseReturnFields,
                                 new DiseaseEntryValueMapper()));
                 converters.add(new DiseaseOBOMessageConverter());
-                converters.add(new RDFMessageConverter());
 
                 // add Json message converter first in the list because it is the most used
                 JsonMessageConverter<LiteratureEntry> litJsonConverter =
