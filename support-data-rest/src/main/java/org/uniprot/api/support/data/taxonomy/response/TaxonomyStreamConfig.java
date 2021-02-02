@@ -72,7 +72,8 @@ public class TaxonomyStreamConfig {
 
     @Bean(name = "taxonomyRDFRestTemplate")
     @Profile("live")
-    public RestTemplate taxonomyRDFRestTemplate(RDFStreamerConfigProperties taxonomyRDFConfigProperties) {
+    public RestTemplate taxonomyRDFRestTemplate(
+            RDFStreamerConfigProperties taxonomyRDFConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);

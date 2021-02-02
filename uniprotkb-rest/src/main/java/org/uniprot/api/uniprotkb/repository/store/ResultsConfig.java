@@ -1,5 +1,10 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
@@ -21,12 +26,6 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 21/08/18

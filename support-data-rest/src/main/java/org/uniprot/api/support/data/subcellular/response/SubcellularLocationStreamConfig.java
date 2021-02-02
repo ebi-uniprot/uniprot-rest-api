@@ -72,7 +72,8 @@ public class SubcellularLocationStreamConfig {
 
     @Bean(name = "locationRDFRestTemplate")
     @Profile("live")
-    public RestTemplate locationRDFRestTemplate(RDFStreamerConfigProperties locationRDFConfigProperties) {
+    public RestTemplate locationRDFRestTemplate(
+            RDFStreamerConfigProperties locationRDFConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
