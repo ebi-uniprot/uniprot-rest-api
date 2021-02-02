@@ -1,13 +1,16 @@
 package org.uniprot.api.support.data.disease.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.DISEASE;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,6 +61,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     @Autowired private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
+    private final MessageConverterContextFactory<DiseaseEntry> converterContextFactory;
 
     protected DiseaseController(
             ApplicationEventPublisher eventPublisher,
@@ -69,6 +73,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 diseaseMessageConverterContextFactory,
                 downloadTaskExecutor,
                 MessageConverterContextFactory.Resource.DISEASE);
+        this.converterContextFactory = diseaseMessageConverterContextFactory;
     }
 
     @Operation(
@@ -163,7 +168,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
@@ -173,7 +179,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                OBO_MEDIA_TYPE_VALUE
+                OBO_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> stream(
             @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
@@ -181,9 +188,20 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                     MediaType contentType,
             HttpServletRequest request) {
 
-        Stream<DiseaseEntry> result = this.diseaseService.stream(streamRequest);
+        MessageConverterContext<DiseaseEntry> context =
+                converterContextFactory.get(DISEASE, contentType);
+        context.setFileType(getBestFileTypeFromRequest(request));
+        context.setFields(streamRequest.getFields());
+        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
+        if (contentType.equals(LIST_MEDIA_TYPE)) {
+            context.setEntityIds(diseaseService.stream(streamRequest).map(this::getEntityId));
+        } else if (contentType.equals(RDF_MEDIA_TYPE)) {
+            context.setEntityIds(diseaseService.streamRDF(streamRequest));
+        } else {
+            context.setEntities(diseaseService.stream(streamRequest));
+        }
 
-        return super.stream(result, streamRequest, contentType, request);
+        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @Override

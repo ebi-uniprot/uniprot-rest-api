@@ -1,32 +1,10 @@
 package org.uniprot.api.support.data.crossref.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,20 +13,36 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -58,9 +52,12 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(CrossRefController.class)
 @ExtendWith(value = {SpringExtension.class})
-class CrossRefStreamControllerIT extends AbstractSolrStreamControllerIT {
+class CrossRefStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Autowired private CrossRefRepository repository;
-    @Autowired private RestTemplate restTemplate;
+
+    @Autowired
+    @Qualifier("xrefRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private String searchAccession;
     private List<String> allAccessions = new ArrayList<>();
@@ -211,55 +208,19 @@ class CrossRefStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(jsonPath("$.results.*.pubMedId").doesNotExist());
     }
 
-    @Test
-    void idSuccessRDFContentType() throws Exception {
-        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(getStreamPath())
-                        .queryParam("query", "id:" + searchAccession)
-                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-        Assertions.assertNotNull(response);
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(
-                                        HttpHeaders.CONTENT_TYPE,
-                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        equalTo(
-                                                RDFPrologs.XREF_PROLOG
-                                                        + "\n\n"
-                                                        + "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n"
-                                                        + "\n"
-                                                        + "</rdf:RDF>\n")));
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
     }
 
-    @Test
-    void idBadRequestRDFContentType() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(getStreamPath()).header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE_VALUE);
+    @Override
+    protected String getSearchAccession() {
+        return searchAccession;
+    }
 
-        ResultActions response = mockMvc.perform(requestBuilder);
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        header().string(
-                                        HttpHeaders.CONTENT_TYPE,
-                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE));
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.XREF_PROLOG;
     }
 
     private void saveEntry(long suffix) {

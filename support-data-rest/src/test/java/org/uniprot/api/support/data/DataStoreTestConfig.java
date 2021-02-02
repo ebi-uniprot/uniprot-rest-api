@@ -44,9 +44,15 @@ public class DataStoreTestConfig {
         };
     }
 
-    @Bean(name = "rdfRestTemplate")
+    @Bean(name = "xrefRDFRestTemplate")
     @Profile("offline")
-    public RestTemplate restTemplate() {
+    public RestTemplate xrefRDFRestTemplate() {
+        return mock(RestTemplate.class);
+    }
+
+    @Bean(name = "diseaseRDFRestTemplate")
+    @Profile("offline")
+    public RestTemplate diseaseRDFRestTemplate() {
         return mock(RestTemplate.class);
     }
 }

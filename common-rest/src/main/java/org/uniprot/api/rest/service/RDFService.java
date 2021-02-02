@@ -56,8 +56,8 @@ public class RDFService<T> implements StoreService<T> {
     public List<T> getEntries(Iterable<String> accessions) {
         List<String> allAccessions = new ArrayList<>();
         accessions.forEach(acc -> allAccessions.add(acc));
-        LOGGER.debug("RDF call for accessions : {}", allAccessions);
-            T rdfXML = getEntriesByAccessions(allAccessions);
+        LOGGER.info("RDF call for accessions : {}", allAccessions);
+        T rdfXML = getEntriesByAccessions(allAccessions);
         if (Objects.nonNull(rdfXML)) {
             T rdfResponse = convertRDFForStreaming(rdfXML);
             return Arrays.asList(rdfResponse);

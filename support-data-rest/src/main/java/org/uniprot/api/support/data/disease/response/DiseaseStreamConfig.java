@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.crossref.response;
+package org.uniprot.api.support.data.disease.response;
 
 import java.util.Collections;
 
@@ -25,61 +25,61 @@ import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.api.support.data.common.RDFStreamConfig;
 import org.uniprot.api.support.data.common.SolrDocumentRDFIdConverter;
-import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
-import org.uniprot.store.search.document.dbxref.CrossRefDocument;
+import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
+import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 /**
  * @author sahmad
- * @created 01/02/2021
+ * @created 02/02/2021
  */
 @Configuration
 @Import(RepositoryConfig.class)
 @Slf4j
-public class CrossRefStreamConfig {
+public class DiseaseStreamConfig {
 
-    @Bean(name = "xrefRDFStreamer")
-    public RDFStreamer xrefRDFStreamer(
-            @Qualifier("xrefRDFRestTemplate") RestTemplate restTemplate,
-            DefaultDocumentIdStream<CrossRefDocument> xrefDocumentIdStream,
-            RDFStreamerConfigProperties xrefRDFConfigProperties) {
+    @Bean
+    public RDFStreamer diseaseRDFStreamer(
+            @Qualifier("diseaseRDFRestTemplate") RestTemplate restTemplate,
+            DefaultDocumentIdStream<DiseaseDocument> diseaseDocumentIdStream,
+            RDFStreamerConfigProperties diseaseRDFConfigProperties) {
 
         RetryPolicy<Object> rdfRetryPolicy =
-                RDFStreamConfig.rdfRetryPolicy(xrefRDFConfigProperties);
+                RDFStreamConfig.rdfRetryPolicy(diseaseRDFConfigProperties);
 
         return RDFStreamer.builder()
-                .rdfBatchSize(xrefRDFConfigProperties.getBatchSize())
+                .rdfBatchSize(diseaseRDFConfigProperties.getBatchSize())
                 .rdfFetchRetryPolicy(rdfRetryPolicy)
                 .rdfService(new RDFService<>(restTemplate, String.class))
-                .rdfProlog(RDFPrologs.XREF_PROLOG)
-                .idStream(xrefDocumentIdStream)
+                .rdfProlog(RDFPrologs.DISEASE_PROLOG)
+                .idStream(diseaseDocumentIdStream)
                 .build();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "xref.streamer.rdf")
-    public RDFStreamerConfigProperties xrefRDFConfigProperties() {
+    @ConfigurationProperties(prefix = "disease.streamer.rdf")
+    public RDFStreamerConfigProperties diseaseRDFConfigProperties() {
         return new RDFStreamerConfigProperties();
     }
 
     @Bean
-    public DefaultDocumentIdStream<CrossRefDocument> xrefDocumentIdStream(
-            CrossRefRepository repository) {
-        return DefaultDocumentIdStream.<CrossRefDocument>builder()
+    public DefaultDocumentIdStream<DiseaseDocument> diseaseDocumentIdStream(
+            DiseaseRepository repository) {
+        return DefaultDocumentIdStream.<DiseaseDocument>builder()
                 .repository(repository)
-                .documentToId(document -> new SolrDocumentRDFIdConverter().apply(document))
+                .documentToId(doc -> new SolrDocumentRDFIdConverter().apply(doc))
                 .build();
     }
 
-    @Bean(name = "xrefRDFRestTemplate")
+    @Bean(name = "diseaseRDFRestTemplate")
     @Profile("live")
-    RestTemplate restTemplate(RDFStreamerConfigProperties xrefRDFConfigProperties) {
+    RestTemplate diseaseRestTemplate(RDFStreamerConfigProperties diseaseRDFConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(xrefRDFConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(diseaseRDFConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 }
