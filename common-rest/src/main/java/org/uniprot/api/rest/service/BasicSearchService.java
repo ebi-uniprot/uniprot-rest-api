@@ -195,7 +195,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         return requestedSize > NumberUtils.INTEGER_ZERO && requestedSize <= getDefaultBatchSize();
     }
 
-    protected Integer getDefaultBatchSize() {
+    private Integer getDefaultBatchSize() {
         return this.solrBatchSize == null ? DEFAULT_SOLR_BATCH_SIZE : this.solrBatchSize;
     }
 

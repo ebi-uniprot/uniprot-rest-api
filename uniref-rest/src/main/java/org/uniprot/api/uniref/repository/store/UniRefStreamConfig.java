@@ -1,10 +1,5 @@
 package org.uniprot.api.uniref.repository.store;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
-import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
@@ -25,9 +20,16 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
+import lombok.extern.slf4j.Slf4j;
 
 /** @author jluo date: 21 Aug 2019 */
 @Configuration
@@ -93,7 +95,7 @@ public class UniRefStreamConfig {
                 .rdfBatchSize(rdfConfigProperties().getBatchSize())
                 .rdfFetchRetryPolicy(rdfRetryPolicy)
                 .rdfService(new RDFService<>(restTemplate, String.class))
-                .rdfProlog(RDFService.UNIREF_RDF_PROLOG)
+                .rdfProlog(RDFPrologs.UNIREF_RDF_PROLOG)
                 .idStream(documentIdStream)
                 .build();
     }

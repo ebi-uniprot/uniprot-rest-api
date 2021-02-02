@@ -25,6 +25,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.SolrCollection;
@@ -118,7 +119,7 @@ public class UniParcStreamConfig {
                 .rdfBatchSize(rdfConfigProperties().getBatchSize())
                 .rdfFetchRetryPolicy(rdfRetryPolicy)
                 .rdfService(new RDFService<>(restTemplate, String.class))
-                .rdfProlog(RDFService.UNIPARC_RDF_PROLOG)
+                .rdfProlog(RDFPrologs.UNIPARC_RDF_PROLOG)
                 .idStream(documentIdStream)
                 .build();
     }

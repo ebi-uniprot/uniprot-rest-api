@@ -1,31 +1,5 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -51,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFService;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -67,6 +41,32 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author lgonzales
@@ -123,7 +123,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFService.UNIREF_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIREF_RDF_PROLOG)))
                 .andExpect(
                         content()
                                 .string(
