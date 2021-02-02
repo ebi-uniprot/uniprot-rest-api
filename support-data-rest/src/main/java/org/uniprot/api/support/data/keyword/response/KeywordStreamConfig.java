@@ -72,7 +72,8 @@ public class KeywordStreamConfig {
 
     @Bean(name = "keywordRDFRestTemplate")
     @Profile("live")
-    public RestTemplate keywordRDFRestTemplate(RDFStreamerConfigProperties keywordRDFConfigProperties) {
+    public RestTemplate keywordRDFRestTemplate(
+            RDFStreamerConfigProperties keywordRDFConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);

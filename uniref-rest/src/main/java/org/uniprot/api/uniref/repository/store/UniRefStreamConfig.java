@@ -1,5 +1,10 @@
 package org.uniprot.api.uniref.repository.store;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
@@ -24,12 +29,6 @@ import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
-import lombok.extern.slf4j.Slf4j;
 
 /** @author jluo date: 21 Aug 2019 */
 @Configuration
