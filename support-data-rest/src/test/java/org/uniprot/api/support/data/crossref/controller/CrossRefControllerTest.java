@@ -44,7 +44,7 @@ class CrossRefControllerTest {
                                 .param("accessionId", accession)
                                 .header(HttpHeaders.ACCEPT, APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(jsonPath("$.id", equalTo(crossRef.getId())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
                 .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))
