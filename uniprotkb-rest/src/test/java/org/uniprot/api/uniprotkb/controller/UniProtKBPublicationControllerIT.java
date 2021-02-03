@@ -7,7 +7,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
@@ -124,7 +123,7 @@ class UniProtKBPublicationControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
@@ -179,7 +178,7 @@ class UniProtKBPublicationControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
@@ -226,7 +225,7 @@ class UniProtKBPublicationControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(3)))
@@ -250,19 +249,20 @@ class UniProtKBPublicationControllerIT {
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12345/publications")
                                 .param("facets", "invalid")
-                                // TODO: add validation for filter query....
+                                .param("query", "invalidQuery:invalidValue")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url", not(isEmptyOrNullString())))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
                 .andExpect(
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'invalid'. Expected value can be [types, categories, is_large_scale].")));
+                                        "Invalid facet name 'invalid'. Expected value can be [types, categories, is_large_scale].",
+                                        "Invalid facet name 'invalidQuery'. Expected value can be [types, categories, is_large_scale].")));
     }
 
     @Test
@@ -277,7 +277,7 @@ class UniProtKBPublicationControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url", not(isEmptyOrNullString())))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
                 .andExpect(
                         jsonPath(
                                 "$.messages.*",
