@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class TaxonomyBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "taxonomy-search-fields.json")
-    @Parameter(description = "Criteria to search taxonomies. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search taxonomies. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(

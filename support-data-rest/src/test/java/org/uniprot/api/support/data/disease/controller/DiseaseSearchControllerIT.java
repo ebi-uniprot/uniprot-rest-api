@@ -77,7 +77,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected String getSearchRequestPath() {
-        return "/disease/search";
+        return "/diseases/search";
     }
 
     @Override

@@ -77,7 +77,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected String getSearchRequestPath() {
-        return "/xref/search";
+        return "/database/search";
     }
 
     @Override

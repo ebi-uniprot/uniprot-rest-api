@@ -81,7 +81,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected String getSearchRequestPath() {
-        return "/proteome/search";
+        return "/proteomes/search";
     }
 
     @Override

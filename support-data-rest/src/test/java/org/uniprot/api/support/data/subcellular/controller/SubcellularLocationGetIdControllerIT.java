@@ -87,7 +87,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
 
     @Override
     protected String getIdRequestPath() {
-        return "/subcellularlocation/";
+        return "/locations/";
     }
 
     private ByteBuffer getSubcellularLocationBinary(SubcellularLocationEntry entry) {

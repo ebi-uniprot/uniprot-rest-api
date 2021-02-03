@@ -96,7 +96,7 @@ class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
 
     @Override
     protected String getStreamPath() {
-        return "/disease/stream";
+        return "/diseases/stream";
     }
 
     @Test

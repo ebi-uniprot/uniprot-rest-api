@@ -70,7 +70,7 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
     @Override
     protected String getSearchRequestPath() {
-        return "/keyword/search";
+        return "/keywords/search";
     }
 
     @Override

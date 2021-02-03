@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class DiseaseBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "disease-search-fields.json")
-    @Parameter(description = "Criteria to search diseases. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search diseases. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
