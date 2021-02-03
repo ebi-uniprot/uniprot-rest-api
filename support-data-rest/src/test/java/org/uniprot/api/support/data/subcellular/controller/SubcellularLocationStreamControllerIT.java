@@ -96,7 +96,7 @@ class SubcellularLocationStreamControllerIT extends AbstractRDFStreamControllerI
 
     @Override
     protected String getStreamPath() {
-        return "/subcellularlocation/stream";
+        return "/locations/stream";
     }
 
     @Test

@@ -25,7 +25,7 @@ public class LiteratureBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "literature-search-fields.json")
     @Parameter(
             description =
-                    "Criteria to search literature publications. It can take any valid solr query.")
+                    "Criteria to search literature publications. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(

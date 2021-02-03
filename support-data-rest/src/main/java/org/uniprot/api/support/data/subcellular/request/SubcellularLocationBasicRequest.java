@@ -27,7 +27,7 @@ public class SubcellularLocationBasicRequest {
             path = "subcelllocation-search-fields.json")
     @Parameter(
             description =
-                    "Criteria to search Subcellular locations. It can take any valid solr query.")
+                    "Criteria to search Subcellular locations. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(

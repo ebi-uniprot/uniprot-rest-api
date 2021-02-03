@@ -80,7 +80,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/disease/";
+        return "/diseases/";
     }
 
     @Override

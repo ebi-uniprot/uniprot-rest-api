@@ -156,7 +156,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
-            summary = "Search taxonomies by given SOLR search query.",
+            summary = "Search taxonomies by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -190,7 +190,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
-            summary = "Download taxonomies by given SOLR search query.",
+            summary = "Download taxonomies by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {

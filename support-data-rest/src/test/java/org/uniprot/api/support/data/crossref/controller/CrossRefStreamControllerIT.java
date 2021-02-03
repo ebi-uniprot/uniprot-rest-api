@@ -86,7 +86,7 @@ class CrossRefStreamControllerIT extends AbstractRDFStreamControllerIT {
 
     @Override
     protected String getStreamPath() {
-        return "/xref/stream";
+        return "/database/stream";
     }
 
     @Test

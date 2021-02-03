@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class KeywordBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "keyword-search-fields.json")
-    @Parameter(description = "Criteria to search keywords. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search keywords. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(

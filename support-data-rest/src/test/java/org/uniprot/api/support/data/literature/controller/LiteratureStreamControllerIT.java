@@ -96,7 +96,7 @@ class LiteratureStreamControllerIT extends AbstractRDFStreamControllerIT {
 
     @Override
     protected String getStreamPath() {
-        return "/literature/stream";
+        return "/citations/stream";
     }
 
     @Test

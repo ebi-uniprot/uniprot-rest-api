@@ -46,7 +46,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(
             description =
-                    "Criteria to filter by facet value. It can any supported valid solr query.")
+                    "Criteria to filter by facet value. It can any supported valid Lucene query.")
     @ValidSolrQuerySyntax(message = "{search.taxonomy.ids.invalid.facet.filter}")
     @ValidSolrQueryFacetFields(facetConfig = TaxonomyFacetConfig.class)
     private String facetFilter;

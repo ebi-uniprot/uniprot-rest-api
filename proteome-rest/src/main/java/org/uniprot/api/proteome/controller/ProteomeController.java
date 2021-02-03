@@ -53,7 +53,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @Validated
-@RequestMapping("/proteome")
+@RequestMapping("/proteomes")
 public class ProteomeController extends BasicSearchController<ProteomeEntry> {
 
     private final ProteomeQueryService queryService;

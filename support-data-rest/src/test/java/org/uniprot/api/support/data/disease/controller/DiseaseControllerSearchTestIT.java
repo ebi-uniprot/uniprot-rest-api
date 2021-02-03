@@ -90,7 +90,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", searchString));
 
@@ -116,7 +116,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .param("query", searchString)
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
@@ -141,7 +141,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", searchString));
 
@@ -170,7 +170,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", searchString));
 
@@ -199,7 +199,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", searchString));
 
@@ -226,7 +226,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", searchString));
 
@@ -251,7 +251,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", searchString));
 
@@ -271,7 +271,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "name:" + searchString));
 
@@ -296,7 +296,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "name:" + searchString));
 
@@ -321,7 +321,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "name:" + searchString));
 
@@ -347,7 +347,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "name:" + searchString));
 
@@ -375,7 +375,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "name:" + searchString));
 
@@ -404,7 +404,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "name:" + searchString));
 
@@ -424,7 +424,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "acronym:" + searchString));
 
@@ -445,7 +445,7 @@ class DiseaseControllerSearchTestIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/search/")
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", "id:" + accession));
 
@@ -496,5 +496,9 @@ class DiseaseControllerSearchTestIT {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse disease to binary json: ", e);
         }
+    }
+
+    private String getSearchRequestPath() {
+        return "/diseases/search/";
     }
 }

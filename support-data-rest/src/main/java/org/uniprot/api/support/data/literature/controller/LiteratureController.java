@@ -59,7 +59,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         description =
                 "Search publications that are cited in, or were computationally mapped to, UniProtKB")
 @RestController
-@RequestMapping("/literature")
+@RequestMapping("/citations")
 @Validated
 public class LiteratureController extends BasicSearchController<LiteratureEntry> {
 
@@ -120,7 +120,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Operation(
-            summary = "Search literature by given SOLR search query.",
+            summary = "Search literature by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -155,7 +155,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Operation(
-            summary = "Download literature by given SOLR search query.",
+            summary = "Download literature by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {

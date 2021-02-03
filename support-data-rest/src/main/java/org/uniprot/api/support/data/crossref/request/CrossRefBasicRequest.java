@@ -24,7 +24,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class CrossRefBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "crossref-search-fields.json")
     @Parameter(
-            description = "Criteria to search cross-references. It can take any valid solr query.")
+            description =
+                    "Criteria to search cross-references. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(

@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/disease")
+@RequestMapping("/diseases")
 @Validated
 @Tag(
         name = "Disease",
@@ -114,7 +114,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     }
 
     @Operation(
-            summary = "Search disease by given SOLR search query.",
+            summary = "Search disease by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -150,7 +150,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     }
 
     @Operation(
-            summary = "Download disease by given SOLR search query.",
+            summary = "Download disease by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {

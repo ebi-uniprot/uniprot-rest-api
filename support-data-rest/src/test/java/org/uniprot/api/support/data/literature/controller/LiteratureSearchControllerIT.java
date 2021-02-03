@@ -75,7 +75,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected String getSearchRequestPath() {
-        return "/literature/search";
+        return "/citations/search";
     }
 
     @Override

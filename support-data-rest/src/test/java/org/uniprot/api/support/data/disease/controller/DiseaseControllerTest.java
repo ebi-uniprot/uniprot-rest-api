@@ -49,7 +49,7 @@ class DiseaseControllerTest {
 
         ResultActions response =
                 this.mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/" + accession)
+                        MockMvcRequestBuilders.get("/diseases/" + accession)
                                 .param("accessionId", accession));
 
         response.andDo(log())
@@ -88,7 +88,7 @@ class DiseaseControllerTest {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/" + accession)
+                        MockMvcRequestBuilders.get("/diseases/" + accession)
                                 .param("accessionId", accession));
 
         // then
@@ -113,7 +113,7 @@ class DiseaseControllerTest {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/disease/" + accession)
+                        MockMvcRequestBuilders.get("/diseases/" + accession)
                                 .param("accessionId", accession));
 
         // then

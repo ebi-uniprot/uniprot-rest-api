@@ -70,7 +70,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
 
     @Override
     protected String getSearchRequestPath() {
-        return "/subcellularlocation/search";
+        return "/locations/search";
     }
 
     @Override

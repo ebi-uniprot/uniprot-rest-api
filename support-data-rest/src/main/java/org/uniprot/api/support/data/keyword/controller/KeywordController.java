@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         description =
                 "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.")
 @RestController
-@RequestMapping("/keyword")
+@RequestMapping("/keywords")
 @Validated
 public class KeywordController extends BasicSearchController<KeywordEntry> {
     private final KeywordService keywordService;
@@ -119,7 +119,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search Keywords by given SOLR search query.",
+            summary = "Search Keywords by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -155,7 +155,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download Keywords by given SOLR search query.",
+            summary = "Download Keywords by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {

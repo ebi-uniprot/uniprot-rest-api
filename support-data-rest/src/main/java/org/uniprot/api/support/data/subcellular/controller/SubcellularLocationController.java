@@ -59,7 +59,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         description =
                 "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.")
 @RestController
-@RequestMapping("/subcellularlocation")
+@RequestMapping("/locations")
 @Validated
 public class SubcellularLocationController extends BasicSearchController<SubcellularLocationEntry> {
 
@@ -126,7 +126,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
-            summary = "Search subcellular locations by given SOLR search query.",
+            summary = "Search subcellular locations by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -164,7 +164,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
-            summary = "Download subcellular locations by given SOLR search query.",
+            summary = "Download subcellular locations by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {

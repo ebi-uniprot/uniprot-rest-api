@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/xref")
+@RequestMapping("/database")
 @Validated
 @Tag(
         name = "CrossReference",
@@ -105,7 +105,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
-            summary = "Search cross-references by given SOLR search query.",
+            summary = "Search cross-references by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -132,7 +132,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
-            summary = "Download cross-references by given SOLR search query.",
+            summary = "Download cross-references by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {

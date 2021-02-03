@@ -96,7 +96,7 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
 
     @Override
     protected String getStreamPath() {
-        return "/keyword/stream";
+        return "/keywords/stream";
     }
 
     @Test
