@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -53,6 +54,7 @@ import org.uniprot.store.search.SolrCollection;
             UniRefGetIdControllerIT.UniRefGetIdParameterResolver.class,
             UniRefGetIdControllerIT.UniRefGetIdContentTypeParamResolver.class
         })
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ID = "UniRef50_P03901";
     private static final String NAME = "Cluster: MoeK5 01";

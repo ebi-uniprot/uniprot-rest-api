@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,7 @@ import org.uniprot.store.search.SolrCollection;
             UniRefLightSearchControllerIT.UniRefSearchContentTypeParamResolver.class,
             UniRefLightSearchControllerIT.UniRefSearchParameterResolver.class
         })
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private UniRefQueryRepository repository;
