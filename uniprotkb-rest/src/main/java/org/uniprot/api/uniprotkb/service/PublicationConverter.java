@@ -1,7 +1,16 @@
 package org.uniprot.api.uniprotkb.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.uniprot.core.util.Utils.addOrIgnoreNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.json.parser.publication.MappedPublicationsJsonConfig;
@@ -12,14 +21,7 @@ import org.uniprot.core.publication.UniProtKBMappedReference;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.publication.PublicationDocument;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
-
-import static org.uniprot.core.util.Utils.addOrIgnoreNull;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 07/01/2021
@@ -47,11 +49,11 @@ public class PublicationConverter
         } else {
             extractObject(pubDocument)
                     .ifPresent(
-                            mappedPublications -> {
+                            mappedPublications ->
                                 addCitationIfPresent(
                                         mappedPublications::getUniProtKBMappedReference,
-                                        pubEntryBuilder);
-                            });
+                                        pubEntryBuilder)
+                            );
         }
 
         extractObject(pubDocument)
