@@ -29,12 +29,12 @@ public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleE
             UniRuleFacetConfig facetConfig,
             UniRuleEntryConverter uniRuleEntryConverter,
             UniRuleSortClause solrSortClause,
-            SolrQueryConfig solrQueryConfig,
-            QueryProcessor queryProcessor,
-            SearchFieldConfig searchFieldConfig) {
-        super(repository, uniRuleEntryConverter, solrSortClause, solrQueryConfig, facetConfig);
-        this.searchFieldConfig = searchFieldConfig;
-        this.queryProcessor = queryProcessor;
+            SolrQueryConfig uniRuleSolrQueryConf,
+            QueryProcessor uniRuleQueryProcessor,
+            SearchFieldConfig uniRuleSearchFieldConfig) {
+        super(repository, uniRuleEntryConverter, solrSortClause, uniRuleSolrQueryConf, facetConfig);
+        this.searchFieldConfig = uniRuleSearchFieldConfig;
+        this.queryProcessor = uniRuleQueryProcessor;
     }
 
     @Override
