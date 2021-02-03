@@ -28,13 +28,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/subcellularlocation/{{subcellularlocation_id}}",
+							"raw": "{{base_url}}/{{path_context}}/locations/{{subcellularlocation_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"subcellularlocation",
+								"locations",
 								"{{subcellularlocation_id}}"
 							]
 						}
@@ -67,13 +67,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/subcellularlocation/search?query={{subcellularlocation_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/locations/search?query={{subcellularlocation_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"subcellularlocation",
+								"locations",
 								"search"
 							],
 							"query": [
@@ -112,13 +112,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/subcellularlocation/stream?query={{subcellularlocation_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/locations/stream?query={{subcellularlocation_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"subcellularlocation",
+								"locations",
 								"stream"
 							],
 							"query": [
