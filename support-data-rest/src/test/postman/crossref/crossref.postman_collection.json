@@ -28,13 +28,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/xref/{{xref_id}}",
+							"raw": "{{base_url}}/{{path_context}}/database/{{xref_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"xref",
+								"database",
 								"{{xref_id}}"
 							]
 						}
@@ -48,7 +48,7 @@
 			"name": "search",
 			"item": [
 				{
-					"name": "Search xref",
+					"name": "Search database",
 					"event": [
 						{
 							"listen": "test",
@@ -67,13 +67,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/xref/search?query={{xref_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/database/search?query={{xref_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"xref",
+								"database",
 								"search"
 							],
 							"query": [
