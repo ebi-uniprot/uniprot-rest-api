@@ -39,6 +39,7 @@ public class PublicationConverter
     public PublicationEntry apply(
             PublicationDocument pubDocument, Map<Long, LiteratureEntry> pubmedLiteratureEntryMap) {
         PublicationEntry.PublicationEntryBuilder pubEntryBuilder = PublicationEntry.builder();
+        Optional<MappedPublications> mappedPub = extractObject(pubDocument);
         // pubmed present => get Citation from map; otherwise, use the citation in the binary
         if (Utils.notNullNotEmpty(pubDocument.getPubMedId())) {
             LiteratureEntry literatureEntry =
@@ -47,16 +48,14 @@ public class PublicationConverter
             pubEntryBuilder.citation(literatureEntry.getCitation());
             pubEntryBuilder.statistics(literatureEntry.getStatistics());
         } else {
-            extractObject(pubDocument)
-                    .ifPresent(
-                            mappedPublications ->
-                                addCitationIfPresent(
-                                        mappedPublications::getUniProtKBMappedReference,
-                                        pubEntryBuilder)
-                            );
+            mappedPub.ifPresent(
+                    mappedPublications ->
+                            addCitationIfPresent(
+                                    mappedPublications::getUniProtKBMappedReference,
+                                    pubEntryBuilder));
         }
 
-        extractObject(pubDocument)
+        mappedPub
                 .ifPresent(
                         mappedPubs -> {
                             List<MappedReference> mappedRefs = new ArrayList<>();
@@ -72,15 +71,13 @@ public class PublicationConverter
         return pubEntryBuilder.build();
     }
 
-    private boolean addCitationIfPresent(
+    private void addCitationIfPresent(
             Supplier<UniProtKBMappedReference> referenceSupplier,
             PublicationEntry.PublicationEntryBuilder pubEntryBuilder) {
         UniProtKBMappedReference reference = referenceSupplier.get();
         if (reference != null && reference.getCitation() != null) {
             pubEntryBuilder.citation(reference.getCitation());
-            return true;
         }
-        return false;
     }
 
     static Optional<MappedPublications> extractObject(PublicationDocument document) {

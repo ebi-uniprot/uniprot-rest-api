@@ -51,6 +51,8 @@ import org.uniprot.store.search.document.publication.PublicationDocument;
 class PublicationServiceTest {
     @MockBean private PublicationRepository publicationRepository;
     @MockBean private LiteratureRepository literatureRepository;
+    @MockBean private PublicationConverter publicationConverter;
+    @MockBean private LiteratureEntryConverter literatureEntryConverter;
     @MockBean private UniProtKBPublicationsSolrSortClause solrSortClause;
     @MockBean private PublicationFacetConfig publicationFacetConfig;
 
