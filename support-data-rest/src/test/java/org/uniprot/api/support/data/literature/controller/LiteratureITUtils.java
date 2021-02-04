@@ -2,7 +2,6 @@ package org.uniprot.api.support.data.literature.controller;
 
 import java.nio.ByteBuffer;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.uniprot.core.CrossReference;
@@ -15,10 +14,8 @@ import org.uniprot.core.citation.impl.PublicationDateBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
-import org.uniprot.core.literature.LiteratureStoreEntry;
 import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
-import org.uniprot.core.literature.impl.LiteratureStoreEntryBuilder;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,34 +59,29 @@ public class LiteratureITUtils {
                         .statistics(new LiteratureStatisticsBuilder().build())
                         .build();
 
-        LiteratureStoreEntry storeEntry =
-                new LiteratureStoreEntryBuilder().literatureEntry(entry).build();
-
-        Set<String> content = new HashSet<>();
-        content.add(literature.getTitle());
-        content.add(String.valueOf(pubMedId));
-
         LiteratureDocument document =
                 LiteratureDocument.builder()
                         .id(String.valueOf(pubMedId))
                         .doi(literature.getDoiId())
                         .title(literature.getTitle())
+                        .authorGroups(new HashSet<>(literature.getAuthoringGroups()))
+                        .litAbstract(literature.getLiteratureAbstract())
                         .author(
                                 literature.getAuthors().stream()
                                         .map(Author::getValue)
                                         .collect(Collectors.toSet()))
                         .journal(literature.getJournal().getName())
                         .published(literature.getPublicationDate().getValue())
-                        .citedin(facet)
-                        .mappedin(facet)
-                        .content(content)
-                        .literatureObj(getLiteratureBinary(storeEntry))
+                        .isUniprotkbMapped(facet)
+                        .isComputationalMapped(facet)
+                        .isCommunityMapped(facet)
+                        .literatureObj(getLiteratureBinary(entry))
                         .build();
 
         return document;
     }
 
-    private static ByteBuffer getLiteratureBinary(LiteratureStoreEntry entry) {
+    private static ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
         try {
             return ByteBuffer.wrap(
                     LiteratureJsonConfig.getInstance()

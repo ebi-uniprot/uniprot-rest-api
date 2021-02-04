@@ -10,7 +10,6 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
-import org.uniprot.api.support.data.literature.request.LiteratureSolrQueryConfig;
 import org.uniprot.api.support.data.literature.request.LiteratureSortClause;
 import org.uniprot.api.support.data.literature.response.LiteratureEntryConverter;
 import org.uniprot.core.literature.LiteratureEntry;

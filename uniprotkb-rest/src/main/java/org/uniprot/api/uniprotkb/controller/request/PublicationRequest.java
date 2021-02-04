@@ -3,7 +3,7 @@ package org.uniprot.api.uniprotkb.controller.request;
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
