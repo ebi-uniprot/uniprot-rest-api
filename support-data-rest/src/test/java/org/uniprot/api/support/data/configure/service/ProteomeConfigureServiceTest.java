@@ -23,7 +23,7 @@ class ProteomeConfigureServiceTest {
         assertEquals(2, resultGroups.size());
 
         assertEquals(6, resultGroups.get(0).getFields().size());
-        assertEquals(4, resultGroups.get(1).getFields().size());
+        assertEquals(5, resultGroups.get(1).getFields().size());
     }
 
     @Test
