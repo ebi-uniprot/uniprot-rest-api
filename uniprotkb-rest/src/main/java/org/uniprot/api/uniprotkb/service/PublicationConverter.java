@@ -55,18 +55,17 @@ public class PublicationConverter
                                     pubEntryBuilder));
         }
 
-        mappedPub
-                .ifPresent(
-                        mappedPubs -> {
-                            List<MappedReference> mappedRefs = new ArrayList<>();
+        mappedPub.ifPresent(
+                mappedPubs -> {
+                    List<MappedReference> mappedRefs = new ArrayList<>();
 
-                            addOrIgnoreNull(mappedPubs.getUniProtKBMappedReference(), mappedRefs);
+                    addOrIgnoreNull(mappedPubs.getUniProtKBMappedReference(), mappedRefs);
 
-                            addIfPresent(mappedPubs.getComputationalMappedReferences(), mappedRefs);
-                            addIfPresent(mappedPubs.getCommunityMappedReferences(), mappedRefs);
+                    addIfPresent(mappedPubs.getComputationalMappedReferences(), mappedRefs);
+                    addIfPresent(mappedPubs.getCommunityMappedReferences(), mappedRefs);
 
-                            pubEntryBuilder.references(mappedRefs);
-                        });
+                    pubEntryBuilder.references(mappedRefs);
+                });
 
         return pubEntryBuilder.build();
     }

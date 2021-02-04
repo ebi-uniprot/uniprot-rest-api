@@ -1,13 +1,4 @@
-<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/support/data/literature/request/LiteratureSolrQueryConfig.java
-package org.uniprot.api.support.data.literature.request;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-=======
 package org.uniprot.api.rest.service.query.config;
->>>>>>> move LiteratureSolrQueryConfig; add "resettable" sort clause, so that score need not be used by default:common-rest/src/main/java/org/uniprot/api/rest/service/query/config/LiteratureSolrQueryConfig.java
 
 import static java.util.Collections.emptyMap;
 
@@ -21,11 +12,6 @@ import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-<<<<<<< HEAD:support-data-rest/src/main/java/org/uniprot/api/support/data/literature/request/LiteratureSolrQueryConfig.java
-import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
-import org.uniprot.api.support.data.literature.service.LiteratureService;
-=======
->>>>>>> move LiteratureSolrQueryConfig; add "resettable" sort clause, so that score need not be used by default:common-rest/src/main/java/org/uniprot/api/rest/service/query/config/LiteratureSolrQueryConfig.java
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
