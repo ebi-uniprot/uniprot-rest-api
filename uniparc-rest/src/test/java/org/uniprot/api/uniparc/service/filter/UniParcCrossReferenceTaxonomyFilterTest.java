@@ -46,7 +46,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
         // everything should be same except xrefs
         assertEquals(1, filteredEntry.getUniParcCrossReferences().size());
         assertEquals(
-                9606L, filteredEntry.getUniParcCrossReferences().get(0).getTaxonomy().getTaxonId());
+                9606L, filteredEntry.getUniParcCrossReferences().get(0).getOrganism().getTaxonId());
         verifyUniParcEntry(filteredEntry);
         verifyOriginalAndFilteredEntry(this.uniParcEntry, filteredEntry);
     }
@@ -69,7 +69,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
         // everything should be same except UniParcCrossReferences
         assertEquals(1, filteredEntry.getUniParcCrossReferences().size());
         assertEquals(
-                9606L, filteredEntry.getUniParcCrossReferences().get(0).getTaxonomy().getTaxonId());
+                9606L, filteredEntry.getUniParcCrossReferences().get(0).getOrganism().getTaxonId());
         verifyUniParcEntry(filteredEntry);
         assertNotEquals(
                 uniParcEntry.getUniParcCrossReferences(),

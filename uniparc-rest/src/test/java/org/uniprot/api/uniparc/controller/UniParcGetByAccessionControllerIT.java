@@ -143,7 +143,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     .id(ACCESSION)
                     .fields("upi,organism")
                     .resultMatcher(jsonPath("$.uniParcId", Matchers.is(UNIPARC_ID)))
-                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.taxonomy").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.organism").exists())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .build();

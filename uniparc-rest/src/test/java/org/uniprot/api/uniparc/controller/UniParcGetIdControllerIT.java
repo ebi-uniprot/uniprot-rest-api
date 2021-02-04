@@ -93,7 +93,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .id(UNIPARC_ID)
                     .fields("upi,organism")
                     .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.taxonomy").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.organism").exists())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .build();
